@@ -27,12 +27,12 @@
 #include <functional>
 #include <platform/CHIPDeviceError.h>
 
-#ifndef SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS
+#ifdef SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS
+#include <sl_token_manager_defines.h>
+#else
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
-#else
-#include <sl_token_manager_defines.h>
-#endif
+#endif // SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS
 
 #ifndef KVS_MAX_ENTRIES
 #define KVS_MAX_ENTRIES 255 // Available key slot count for Kvs Key mapping.
@@ -61,24 +61,7 @@ namespace Internal {
  * the template class (e.g. the ReadConfigValue() method).
  */
 
-#ifndef SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS
-// Silabs NVM3 objects use a 20-bit number,
-// NVM3 Key 19:16 Stack region
-// NVM3 Key 15:0 Available NVM3 keys 0x0000 -> 0xFFFF.
-// Matter stack reserved region ranges from 0x087200 to 0x087FFF
-// e.g. key = 0x087201
-// '08' = Matter nvm3 region
-// '72' = the sub region group base offset (Factory, Config, Counter or KVS)
-// '01' = the id offset inside the group.
-inline constexpr uint32_t kUserNvm3KeyDomainLoLimit = 0x000000U; // User Domain NVM3 Key Range lower limit
-inline constexpr uint32_t kUserNvm3KeyDomainHiLimit = 0x00FFFFU; // User Domain NVM3 Key Range Maximum limit
-inline constexpr uint32_t kMatterNvm3KeyDomain      = 0x087000U; // Matter specific NVM3 range
-constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
-{
-    return kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
-}
-#else
-
+#ifdef SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS
 inline constexpr uint32_t kUserNvm3KeyDomainLoLimit = SL_TOKEN_NVM3_REGION_USER;
 inline constexpr uint32_t kUserNvm3KeyDomainHiLimit = SL_TOKEN_NVM3_REGION_ZIGBEE - 1;
 
@@ -95,7 +78,23 @@ constexpr inline uint32_t SilabsSecureTokenKey(uint8_t keyBaseOffset, uint8_t id
 {
     return SL_TOKEN_TYPE_STATIC_SECURE | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
 }
-#endif
+#else
+// Silabs NVM3 objects use a 20-bit number,
+// NVM3 Key 19:16 Stack region
+// NVM3 Key 15:0 Available NVM3 keys 0x0000 -> 0xFFFF.
+// Matter stack reserved region ranges from 0x087200 to 0x087FFF
+// e.g. key = 0x087201
+// '08' = Matter nvm3 region
+// '72' = the sub region group base offset (Factory, Config, Counter or KVS)
+// '01' = the id offset inside the group.
+inline constexpr uint32_t kUserNvm3KeyDomainLoLimit = 0x000000U; // User Domain NVM3 Key Range lower limit
+inline constexpr uint32_t kUserNvm3KeyDomainHiLimit = 0x00FFFFU; // User Domain NVM3 Key Range Maximum limit
+inline constexpr uint32_t kMatterNvm3KeyDomain      = 0x087000U; // Matter specific NVM3 range
+constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
+{
+    return kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
+}
+#endif // SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS
 
 inline constexpr uint32_t kMatterNvm3KeyLoLimit = 0x087200U; // Do not modify without Silabs GSDK team approval
 inline constexpr uint32_t kMatterNvm3KeyHiLimit = 0x087FFFU; // Do not modify without Silabs GSDK team approval
