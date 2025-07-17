@@ -367,7 +367,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace ActivePresetChange
 
 } // namespace Events
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

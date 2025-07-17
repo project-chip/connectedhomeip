@@ -45,7 +45,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace CurrentConditionsChanged
 
 } // namespace Events
-
 } // namespace ElectricalGridConditions
 } // namespace Clusters
 } // namespace app

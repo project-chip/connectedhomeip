@@ -57,7 +57,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCondition::
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace HepaFilterMonitoring
 } // namespace Clusters
 } // namespace app

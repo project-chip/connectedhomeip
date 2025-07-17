@@ -34,7 +34,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFl
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace MicrowaveOvenMode
 } // namespace Clusters
 } // namespace app

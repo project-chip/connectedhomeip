@@ -175,7 +175,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace BatChargeFaultChange
 
 } // namespace Events
-
 } // namespace PowerSource
 } // namespace Clusters
 } // namespace app

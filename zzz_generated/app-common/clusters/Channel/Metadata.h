@@ -64,7 +64,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CancelRecordProg
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace Channel
 } // namespace Clusters
 } // namespace app

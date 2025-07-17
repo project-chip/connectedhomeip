@@ -61,7 +61,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace MessageComplete
 
 } // namespace Events
-
 } // namespace Messages
 } // namespace Clusters
 } // namespace app

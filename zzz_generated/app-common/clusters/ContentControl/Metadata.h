@@ -109,7 +109,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace RemainingScreenTimeExpired
 
 } // namespace Events
-
 } // namespace ContentControl
 } // namespace Clusters
 } // namespace app

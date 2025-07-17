@@ -136,7 +136,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace StateChanged
 
 } // namespace Events
-
 } // namespace MediaPlayback
 } // namespace Clusters
 } // namespace app

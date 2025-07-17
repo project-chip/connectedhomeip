@@ -81,7 +81,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LampBurnHoursTripPoint
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace BallastConfiguration
 } // namespace Clusters
 } // namespace app

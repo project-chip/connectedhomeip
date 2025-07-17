@@ -118,7 +118,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace AllClear
 
 } // namespace Events
-
 } // namespace SmokeCoAlarm
 } // namespace Clusters
 } // namespace app

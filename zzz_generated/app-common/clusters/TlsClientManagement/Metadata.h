@@ -52,7 +52,6 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace TlsClientManagement
 } // namespace Clusters
 } // namespace app

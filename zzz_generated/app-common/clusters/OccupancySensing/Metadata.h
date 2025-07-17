@@ -96,7 +96,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace OccupancyChanged
 
 } // namespace Events
-
 } // namespace OccupancySensing
 } // namespace Clusters
 } // namespace app

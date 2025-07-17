@@ -74,7 +74,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace OperationCompletion
 
 } // namespace Events
-
 } // namespace RvcOperationalState
 } // namespace Clusters
 } // namespace app

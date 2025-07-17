@@ -58,7 +58,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetTemperature::
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace TemperatureControl
 } // namespace Clusters
 } // namespace app

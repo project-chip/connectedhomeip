@@ -87,7 +87,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace ValveFault
 
 } // namespace Events
-
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters
 } // namespace app

@@ -86,7 +86,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(StayActiveReques
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace IcdManagement
 } // namespace Clusters
 } // namespace app

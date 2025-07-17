@@ -85,7 +85,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace ZoneStopped
 
 } // namespace Events
-
 } // namespace ZoneManagement
 } // namespace Clusters
 } // namespace app

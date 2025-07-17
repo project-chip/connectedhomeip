@@ -49,7 +49,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(End::Id, BitFlag
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace WebRTCTransportRequestor
 } // namespace Clusters
 } // namespace app

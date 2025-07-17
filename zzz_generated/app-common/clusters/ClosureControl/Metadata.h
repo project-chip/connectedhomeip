@@ -81,7 +81,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace SecureStateChanged
 
 } // namespace Events
-
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app

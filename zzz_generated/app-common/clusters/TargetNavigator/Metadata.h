@@ -45,7 +45,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace TargetUpdated
 
 } // namespace Events
-
 } // namespace TargetNavigator
 } // namespace Clusters
 } // namespace app

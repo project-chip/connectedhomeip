@@ -35,7 +35,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedDrynessLevel::
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace LaundryDryerControls
 } // namespace Clusters
 } // namespace app

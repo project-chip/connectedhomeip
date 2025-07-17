@@ -79,7 +79,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Step::Id, BitFla
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace FanControl
 } // namespace Clusters
 } // namespace app

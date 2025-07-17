@@ -45,7 +45,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerThreshold::Id, Bi
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace MeterIdentification
 } // namespace Clusters
 } // namespace app

@@ -120,7 +120,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace MissingTrustedTimeSource
 
 } // namespace Events
-
 } // namespace TimeSynchronization
 } // namespace Clusters
 } // namespace app

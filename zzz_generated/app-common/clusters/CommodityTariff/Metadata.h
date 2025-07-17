@@ -125,7 +125,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetDayEntry::Id,
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace CommodityTariff
 } // namespace Clusters
 } // namespace app

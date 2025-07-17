@@ -41,7 +41,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Tolerance::Id, BitFlag
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace FlowMeasurement
 } // namespace Clusters
 } // namespace app

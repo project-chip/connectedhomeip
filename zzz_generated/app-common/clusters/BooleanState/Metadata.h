@@ -34,7 +34,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace StateChange
 
 } // namespace Events
-
 } // namespace BooleanState
 } // namespace Clusters
 } // namespace app

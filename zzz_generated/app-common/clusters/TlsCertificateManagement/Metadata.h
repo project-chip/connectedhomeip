@@ -99,7 +99,6 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace TlsCertificateManagement
 } // namespace Clusters
 } // namespace app

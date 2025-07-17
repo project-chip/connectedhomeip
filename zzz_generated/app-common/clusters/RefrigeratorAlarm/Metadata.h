@@ -42,7 +42,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace Notify
 
 } // namespace Events
-
 } // namespace RefrigeratorAlarm
 } // namespace Clusters
 } // namespace app

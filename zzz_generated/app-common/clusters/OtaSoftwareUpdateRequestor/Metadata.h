@@ -60,7 +60,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace DownloadError
 
 } // namespace Events
-
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace Clusters
 } // namespace app

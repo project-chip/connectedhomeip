@@ -309,7 +309,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace NetworkFaultChange
 
 } // namespace Events
-
 } // namespace ThreadNetworkDiagnostics
 } // namespace Clusters
 } // namespace app

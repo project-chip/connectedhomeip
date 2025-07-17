@@ -141,7 +141,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace ReachableChanged
 
 } // namespace Events
-
 } // namespace BasicInformation
 } // namespace Clusters
 } // namespace app

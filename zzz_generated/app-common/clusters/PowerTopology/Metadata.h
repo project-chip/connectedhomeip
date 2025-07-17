@@ -37,7 +37,6 @@ inline constexpr DataModel::AttributeEntry
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

@@ -59,7 +59,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace PeriodicEnergyMeasured
 
 } // namespace Events
-
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
 } // namespace app

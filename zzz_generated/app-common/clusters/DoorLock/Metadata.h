@@ -339,7 +339,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace LockUserChange
 
 } // namespace Events
-
 } // namespace DoorLock
 } // namespace Clusters
 } // namespace app

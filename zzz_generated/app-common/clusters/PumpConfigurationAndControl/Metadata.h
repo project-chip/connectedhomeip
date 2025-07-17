@@ -170,7 +170,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace TurbineOperation
 
 } // namespace Events
-
 } // namespace PumpConfigurationAndControl
 } // namespace Clusters
 } // namespace app

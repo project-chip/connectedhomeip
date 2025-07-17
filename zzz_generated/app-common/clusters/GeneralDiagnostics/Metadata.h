@@ -98,7 +98,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace BootReason
 
 } // namespace Events
-
 } // namespace GeneralDiagnostics
 } // namespace Clusters
 } // namespace app

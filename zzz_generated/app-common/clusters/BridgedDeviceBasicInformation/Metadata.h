@@ -120,7 +120,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace ActiveChanged
 
 } // namespace Events
-
 } // namespace BridgedDeviceBasicInformation
 } // namespace Clusters
 } // namespace app

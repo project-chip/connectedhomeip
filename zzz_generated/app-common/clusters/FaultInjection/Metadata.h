@@ -33,7 +33,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(FailRandomlyAtFa
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace FaultInjection
 } // namespace Clusters
 } // namespace app

@@ -76,7 +76,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace SensorFault
 
 } // namespace Events
-
 } // namespace BooleanStateConfiguration
 } // namespace Clusters
 } // namespace app

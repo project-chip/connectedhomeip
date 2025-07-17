@@ -60,7 +60,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace MultiPressComplete
 
 } // namespace Events
-
 } // namespace Switch
 } // namespace Clusters
 } // namespace app

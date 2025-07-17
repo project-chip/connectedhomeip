@@ -54,7 +54,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(EndpointUniqueID::Id, 
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace Descriptor
 } // namespace Clusters
 } // namespace app

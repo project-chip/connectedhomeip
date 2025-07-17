@@ -93,7 +93,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(DPTZRelativeMove
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters
 } // namespace app

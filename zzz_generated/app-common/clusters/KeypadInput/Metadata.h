@@ -29,7 +29,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SendKey::Id, Bit
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace KeypadInput
 } // namespace Clusters
 } // namespace app

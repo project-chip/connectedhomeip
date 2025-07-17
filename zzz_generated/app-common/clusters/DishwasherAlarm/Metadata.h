@@ -56,7 +56,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace Notify
 
 } // namespace Events
-
 } // namespace DishwasherAlarm
 } // namespace Clusters
 } // namespace app

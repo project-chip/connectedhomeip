@@ -67,7 +67,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace BoostEnded
 
 } // namespace Events
-
 } // namespace WaterHeaterManagement
 } // namespace Clusters
 } // namespace app

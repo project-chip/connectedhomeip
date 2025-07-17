@@ -44,7 +44,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace PingCountEvent
 
 } // namespace Events
-
 } // namespace SampleMei
 } // namespace Clusters
 } // namespace app

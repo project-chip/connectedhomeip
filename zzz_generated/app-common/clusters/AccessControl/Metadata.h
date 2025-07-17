@@ -80,7 +80,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdmin
 } // namespace FabricRestrictionReviewUpdate
 
 } // namespace Events
-
 } // namespace AccessControl
 } // namespace Clusters
 } // namespace app

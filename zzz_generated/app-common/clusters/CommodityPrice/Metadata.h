@@ -57,7 +57,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace PriceChange
 
 } // namespace Events
-
 } // namespace CommodityPrice
 } // namespace Clusters
 } // namespace app

@@ -40,7 +40,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace LaundryWasherMode
 } // namespace Clusters
 } // namespace app

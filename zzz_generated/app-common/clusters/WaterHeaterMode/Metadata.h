@@ -40,7 +40,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace WaterHeaterMode
 } // namespace Clusters
 } // namespace app

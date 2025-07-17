@@ -70,7 +70,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelValue::Id, BitFla
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace NitrogenDioxideConcentrationMeasurement
 } // namespace Clusters
 } // namespace app

@@ -70,7 +70,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace OperationCompletion
 
 } // namespace Events
-
 } // namespace OvenCavityOperationalState
 } // namespace Clusters
 } // namespace app

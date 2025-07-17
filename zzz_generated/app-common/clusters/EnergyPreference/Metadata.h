@@ -51,7 +51,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentLowPowerModeSen
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace EnergyPreference
 } // namespace Clusters
 } // namespace app

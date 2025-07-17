@@ -45,7 +45,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kManag
 } // namespace CommissioningRequestResult
 
 } // namespace Events
-
 } // namespace CommissionerControl
 } // namespace Clusters
 } // namespace app

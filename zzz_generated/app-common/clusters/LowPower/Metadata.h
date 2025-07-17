@@ -29,7 +29,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Sleep::Id, BitFl
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace LowPower
 } // namespace Clusters
 } // namespace app

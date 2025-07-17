@@ -94,7 +94,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace ConnectionStatus
 
 } // namespace Events
-
 } // namespace WiFiNetworkDiagnostics
 } // namespace Clusters
 } // namespace app

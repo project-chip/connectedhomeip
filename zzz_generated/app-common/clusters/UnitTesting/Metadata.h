@@ -533,7 +533,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace TestDifferentVendorMeiEvent
 
 } // namespace Events
-
 } // namespace UnitTesting
 } // namespace Clusters
 } // namespace app

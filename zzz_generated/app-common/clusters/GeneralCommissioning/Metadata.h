@@ -100,7 +100,6 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace GeneralCommissioning
 } // namespace Clusters
 } // namespace app

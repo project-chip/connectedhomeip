@@ -55,7 +55,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ReduceTime::Id, 
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace Timer
 } // namespace Clusters
 } // namespace app

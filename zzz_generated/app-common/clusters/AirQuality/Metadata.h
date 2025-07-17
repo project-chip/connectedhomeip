@@ -29,7 +29,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AirQuality::Id, BitFla
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace AirQuality
 } // namespace Clusters
 } // namespace app

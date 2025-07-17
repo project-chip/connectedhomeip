@@ -106,7 +106,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace Resumed
 
 } // namespace Events
-
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app

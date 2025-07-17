@@ -37,7 +37,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(NotifyUpdateAppl
 } // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace OtaSoftwareUpdateProvider
 } // namespace Clusters
 } // namespace app

@@ -177,7 +177,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace RFID
 
 } // namespace Events
-
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app

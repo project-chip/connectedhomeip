@@ -80,7 +80,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace PushTransportEnd
 
 } // namespace Events
-
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

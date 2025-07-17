@@ -112,7 +112,6 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 } // namespace MeasurementPeriodRanges
 
 } // namespace Events
-
 } // namespace ElectricalPowerMeasurement
 } // namespace Clusters
 } // namespace app

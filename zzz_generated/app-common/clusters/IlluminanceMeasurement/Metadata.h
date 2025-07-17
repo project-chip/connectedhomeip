@@ -45,7 +45,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LightSensorType::Id, B
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace IlluminanceMeasurement
 } // namespace Clusters
 } // namespace app

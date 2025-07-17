@@ -23,7 +23,6 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace ProxyValid
 } // namespace Clusters
 } // namespace app

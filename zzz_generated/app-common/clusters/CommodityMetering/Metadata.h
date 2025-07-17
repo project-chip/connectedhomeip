@@ -45,7 +45,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantiti
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
-
 } // namespace CommodityMetering
 } // namespace Clusters
 } // namespace app
