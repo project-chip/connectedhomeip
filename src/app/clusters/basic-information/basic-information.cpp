@@ -17,7 +17,6 @@
  */
 
 #include "basic-information.h"
-#include "lib/core/CHIPError.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
