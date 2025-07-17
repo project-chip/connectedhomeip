@@ -61,7 +61,7 @@ using Protocols::InteractionModel::Status;
 ///   If the returned value is std::nullopt, that means the ACL check passed and the
 ///   read should proceed.
 std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
-                                                   const ConcreteReadAttributePath & path)
+                                                   const ConcreteReadAttributePath & path, Privilege requiredPrivilege)
 {
 
     RequestPath requestPath{ .cluster     = path.mClusterId,
@@ -69,50 +69,9 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
                              .requestType = RequestType::kAttributeReadRequest,
                              .entityId    = path.mAttributeId };
 
-    DataModel::AttributeFinder finder(dataModel);
-
-    std::optional<DataModel::AttributeEntry> info = finder.Find(path);
-
-    // If the attribute exists, we know whether it is readable (readPrivilege has value)
-    // and what the required access privilege is. However for attributes missing from the metatada
-    // (e.g. global attributes) or completely missing attributes we do not actually know of a required
-    // privilege and default to kView (this is correct for global attributes and a reasonable check
-    // for others)
-    Privilege requiredPrivilege = Privilege::kView;
-    if (info.has_value())
-    {
-        // if attribute exists and is readable, set the correct read privilege; otherwise, set default value
-        requiredPrivilege = info->GetReadPrivilege().value_or(requiredPrivilege);
-    }
-
     CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, requiredPrivilege);
     if (err == CHIP_NO_ERROR)
     {
-        if (IsSupportedGlobalAttributeNotInMetadata(path.mAttributeId))
-        {
-            // Global attributes passing a kView check is ok
-            return std::nullopt;
-        }
-
-        // We want to return "success" (i.e. nulopt) IF AND ONLY IF the attribute exists and is readable (has read privilege).
-        // Since the Access control check above may have passed with kView, we do another check here:
-        //    - Attribute exists (info has value)
-        //    - Attribute is readable (readProvilege has value) and not "write only"
-        // If the attribute exists and is not readable, we will return UnsupportedRead (spec 8.4.3.2: "Else if the path indicates
-        // attribute data that is not readable, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_READ Status Code.")
-        //
-        // TODO:: https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024 requires interleaved ordering that
-        //        is NOT implemented here. Spec requires:
-        //           - check cluster access check (done here as kView at least)
-        //           - unsupported endpoint/cluster/attribute check (NOT done here) when the attribute is missing.
-        //             this SHOULD be done here when info does not have a value. This was not done as a first pass to
-        //             minimize amount of delta in the initial PR.
-        //           - "write-only" attributes should return UNSUPPORTED_READ (this is done here)
-        if (info.has_value() && !info->GetReadPrivilege().has_value())
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
-        }
-
         return std::nullopt;
     }
     VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
@@ -129,11 +88,9 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
 
 /// Checks that the given attribute path corresponds to a readable attribute. If not, it
 /// will return the corresponding failure status.
-std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataModel, const ConcreteReadAttributePath & path)
+std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataModel, const ConcreteReadAttributePath & path,
+                                                  std::optional<DataModel::AttributeEntry> entry)
 {
-    DataModel::AttributeFinder finder(dataModel);
-
-    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
     if (!entry.has_value())
     {
         return DataModel::ValidateClusterPath(dataModel, path, Status::UnsupportedAttribute);
@@ -186,7 +143,15 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     //
     //       See https://github.com/project-chip/connectedhomeip/issues/37410
 
-    if (auto access_status = ValidateReadAttributeACL(dataModel, subjectDescriptor, path); access_status.has_value())
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
+
+    DataModel::AttributeFinder finder(dataModel);
+    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+
+    if (auto access_status = ValidateReadAttributeACL(dataModel, subjectDescriptor, path, Privilege::kView);
+        access_status.has_value())
     {
         status = *access_status;
     }
@@ -196,9 +161,16 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         // the are routed through metadata.
         status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
     }
-    else if (auto readable_status = ValidateAttributeIsReadable(dataModel, path); readable_status.has_value())
+    else if (auto readable_status = ValidateAttributeIsReadable(dataModel, path, entry); readable_status.has_value())
     {
         status = *readable_status;
+    }
+    // Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
+    else if (auto required_privilege_access_status =
+                 ValidateReadAttributeACL(dataModel, subjectDescriptor, path, entry->GetReadPrivilege().value());
+             required_privilege_access_status.has_value())
+    {
+        status = *required_privilege_access_status;
     }
     else
     {
@@ -302,13 +274,6 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         outStatus = StatusIB(Status::Success);
 
         requestPath.entityId = path.mEventId;
-
-        err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
-        if (IsTranslatableAclError(path, err, outStatus))
-        {
-            return CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(err);
     }
 
     Status status = DataModel::ValidateClusterPath(provider, path, Status::Success);
@@ -318,6 +283,14 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         outStatus = StatusIB(status);
         return CHIP_NO_ERROR;
     }
+
+    // Per spec, the required-privilege ACL check is performed only after path existence is validated
+    err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
+    if (IsTranslatableAclError(path, err, outStatus))
+    {
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
 
     // Status set above: could be success, but also UnsupportedEvent
     return CHIP_NO_ERROR;
