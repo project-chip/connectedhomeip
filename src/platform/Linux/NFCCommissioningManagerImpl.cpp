@@ -611,9 +611,14 @@ void NFCCommissioningManagerImpl::EnqueueMessage(std::unique_ptr<NFCMessage> mes
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     std::shared_ptr<TagInstance> targetedTagInstance = nullptr;
-
     if (!mThreadRunning)
     {
+        std::lock_guard<std::mutex> lock(mQueueMutex);
+        if (!mThreadRunning)
+        {
+            ReturnErrorOnFailure(StartNFCProcessingThread());
+        }
+    }
         StartNFCProcessingThread();
     }
 
