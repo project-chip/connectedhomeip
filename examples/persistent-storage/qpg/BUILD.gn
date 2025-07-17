@@ -37,7 +37,9 @@ qpg_executable("persistent_storage_app") {
   include_dirs = [ "${qpg_project_dir}/.." ]
   output_name = "chip-${qpg_target_ic}-persistent_storage-example.out"
 
-  deps = []
+  deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+  ]
   defines = []
 
   public_deps = [

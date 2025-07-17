@@ -203,7 +203,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             if canbemadebusy:
                 self.step(18)
                 # Busy response check
-                if not self.is_ci:
+                if not self.is_pics_sdk_ci_only:
                     self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
                     await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.Busy)
             else:

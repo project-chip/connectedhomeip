@@ -127,6 +127,7 @@ BallastConfiguration
 BarrierControl
 BasicCHIPRegression
 BasicInformation
+Batcher
 baudrate
 BCM
 BD
@@ -309,6 +310,7 @@ ContentLauncher
 contrib
 controllee
 conv
+Cooktop
 CopperConcentrationMeasurement
 Corstone
 cortexa
@@ -444,6 +446,7 @@ DL
 DM
 DMG
 DMM
+DMTT
 DNS
 Dnsmasq
 dnsmasqd
@@ -571,6 +574,7 @@ FFF
 FFFFFFFFFFFF0102
 fffe
 fffff
+FFmpeg
 Fi
 filepath
 fini
@@ -1136,6 +1140,7 @@ PowerProfile
 PowerSource
 PowerSourceConfiguration
 pre
+PrebuiltDataModelDirectory
 preprocessor
 Presetup
 PressureMeasurement
@@ -1159,6 +1164,7 @@ PRs
 PSA
 PSCAN
 PSECT
+Pseudocode
 PSK
 PSoC
 PTR

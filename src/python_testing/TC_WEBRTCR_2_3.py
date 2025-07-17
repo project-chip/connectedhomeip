@@ -26,7 +26,7 @@
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
-#       --string-arg th_server_app_path:out/linux-x64-camera/chip-camera-app
+#       --string-arg th_server_app_path:${CAMERA_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -98,8 +98,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         """
         steps = [
             TestStep(1, "Commission the {TH_Server} from DUT"),
-            TestStep(2, "Connect the {TH_Server} from DUT"),
-            TestStep(3, "Send SolicitOffer command to the {TH_Server}"),
+            TestStep(2, "Send SolicitOffer command to the {TH_Server}"),
         ]
         return steps
 
@@ -157,21 +156,8 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
         await asyncio.sleep(1)
         # Prompt user with instructions
         prompt_msg = (
-            "\nPlease connect the server app from DUT:\n"
-            "  webrtc connect 1 1\n"
-        )
-
-        if self.is_pics_sdk_ci_only:
-            await self.send_command("webrtc connect 1 1")
-        else:
-            self.wait_for_user_input(prompt_msg)
-
-        self.step(3)
-        await asyncio.sleep(1)
-        # Prompt user with instructions
-        prompt_msg = (
             "\nSend 'SolicitOffer' command to the server app from DUT:\n"
-            "  webrtc solicit-offer 3\n"
+            "  webrtc establish-session 1 --offer-type 1\n"
             "Input 'Y' if WebRTC session is successfully established\n"
             "Input 'N' if WebRTC session is not established\n"
         )
@@ -181,7 +167,7 @@ class TC_WebRTCRequestor_2_3(MatterBaseTest):
             self.th_server.event.clear()
 
             try:
-                await self.send_command("webrtc solicit-offer 3")
+                await self.send_command("webrtc establish-session 1 --offer-type 1")
                 # Wait up to 90s until the provider logs that the data‑channel opened
                 if not self.th_server.event.wait(90):
                     raise TimeoutError("PeerConnection is not connected within 90s")

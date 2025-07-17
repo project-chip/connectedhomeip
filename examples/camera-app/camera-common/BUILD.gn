@@ -29,6 +29,7 @@ source_set("camera-lib") {
 
   sources = [
     "include/camera-app.h",
+    "include/camera-avstream-controller/camera-avstream-controller.h",
     "include/camera-device-interface.h",
     "include/media-controller/media-controller.h",
     "include/transport/transport.h",
@@ -37,6 +38,7 @@ source_set("camera-lib") {
 
   include_dirs = [
     "include",
+    "include/camera-avstream-controller",
     "include/media-controller",
     "include/transport",
   ]
