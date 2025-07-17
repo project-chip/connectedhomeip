@@ -108,8 +108,10 @@ class TC_PAVST_2_5(MatterBaseTest):
                 maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),
                 minBitRate=20000,
                 maxBitRate=150000,
-                minFragmentLen=2000,
-                maxFragmentLen=8000
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=1,
+                OSDEnabled=1,
             ),
                 endpoint=endpoint)
 
