@@ -48,6 +48,13 @@ void Connectivity::ChipEventHandler(const ChipDeviceEvent * event)
         mWiFiEnabled     = chip::DeviceLayer::ConnectivityMgr().IsWiFiStationEnabled();
         mWiFiProvisioned = chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned();
         mWiFiAttached    = chip::DeviceLayer::ConnectivityMgr().IsWiFiStationConnected();
+        break;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    case DeviceEventType::kThreadConnectivityChange:
+        mThreadEnabled     = chip::DeviceLayer::ConnectivityMgr().IsThreadEnabled();
+        mThreadProvisioned = chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned();
+        break;
 #endif
     default:
         break;
@@ -57,7 +64,8 @@ void Connectivity::ChipEventHandler(const ChipDeviceEvent * event)
 void Connectivity::LoadInitialState()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    mBLEConnected = chip::DeviceLayer::ConnectivityMgr().NumBLEConnections() != 0;
+    mBLEAdvertising = chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertising();
+    mBLEConnected   = chip::DeviceLayer::ConnectivityMgr().NumBLEConnections() != 0;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     mWiFiEnabled     = chip::DeviceLayer::ConnectivityMgr().IsWiFiStationEnabled();
