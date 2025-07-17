@@ -32,7 +32,7 @@
 #endif
 
 #ifdef ENABLE_CHIP_SHELL
-#include "AppCLIBase.h"
+#include "AppCLIZephyr.h"
 #endif
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file contains definitions for the CHIP DeviceManager Interface
- *
- *      This object will co-ordinate multiple activities such as
- *      initialisation, rendezvous, session mgmt and other such
- *      activities within the CHIP stack. This is a singleton object.
- */
 
 #pragma once
 

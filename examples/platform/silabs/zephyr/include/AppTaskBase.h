@@ -33,12 +33,10 @@ public:
     virtual ~AppTaskBase() = default;
 
     /**
-     * \brief Entry point of AppTaskBase. This function should be overridden.
+     * \brief Entry point of AppTaskBase.
      *
      * This function should be called by the main function in order to initialize the matter stack and all other components
      * required.
-     * Should be overriden depending on the OS, for example FreeRTOS start the AppTaskMain task, but Zephyr didn't need to start any
-     * task.
      *
      */
     virtual void Start() = 0;

@@ -22,6 +22,8 @@
 
 namespace chip::Zephyr::App {
 
+// This class implements the AppTaskBase interface for Zephyr platform.
+// In the future a cleanup will be needed to unify Silicon Labs offerings
 class AppTaskZephyr : public AppTaskBase
 {
 public:

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,27 +18,30 @@
 
 #pragma once
 
-#include "AppCLIBase.h"
-
 namespace chip {
 namespace Zephyr {
 namespace App {
 
-class AppCLIZephyr : public AppCLIBase
+class AppCLIZephyr
 {
 public:
     virtual ~AppCLIZephyr() = default;
 
-    virtual CHIP_ERROR Init(void) override;
+    virtual CHIP_ERROR Init(void);
 
-    virtual void ResetCmdHandle(void) override;
+    virtual void ResetCmdHandle(void);
+
+    /**
+     * \brief Registers common CLI commands used by application
+     */
+    void RegisterDefaultCommands();
 
     static AppCLIZephyr & GetDefaultInstance();
 
 private:
     bool isShellInitialized = false;
 };
-AppCLIBase & GetAppCLI();
+AppCLIZephyr & GetAppCLI();
 } // namespace App
 } // namespace Zephyr
 } // namespace chip
