@@ -119,10 +119,6 @@ not_automated:
     - name: TC_WEBRTCPTestBase.py
       reason:
           Shared code for the WebRTC Provider Cluster, not a standalone test.
-    - name: TC_WEBRTCR_2_3.py
-      reason: Camera Controller App does not support stream allocation requests
-    - name: TC_WEBRTCR_2_4.py
-      reason: Camera Controller App does not support stream allocation requests
     - name: TC_PAVST_2_1.py
       reason:
           Depends on PushAV cluster. Will be enabled once local tests are fully
@@ -170,3 +166,4 @@ slow_tests:
     - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }
     - { name: TC_CLCTRL_3_1.py, duration: 45 seconds }
+    - { name: TC_CLCTRL_6_1.py, duration: 45 seconds }
