@@ -550,7 +550,8 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 {
     bool canSendToPeer = false;
 
-    if (!mThreadRunning) {
+    if (!mThreadRunning)
+    {
         StartNFCProcessingThread();
     }
 
@@ -603,7 +604,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
 {
     std::shared_ptr<TagInstance> targetedTagInstance = nullptr;
 
-    if (!mThreadRunning) {
+    if (!mThreadRunning)
+    {
         StartNFCProcessingThread();
     }
 
