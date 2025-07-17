@@ -428,10 +428,10 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
             # STEP 5b: TH sends command MoveTo with Position = MoveToFullyOpen
             self.step("5b")
-            
+
             event_sub_handler.reset()
             sub_handler.reset()
-            
+
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
@@ -467,7 +467,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
             logging.info("Waiting for OverallCurrentState.Position to be FullyClosed and the corresponding MovementCompleted event.")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
-                                                timeout_sec=timeout)
+                                                          timeout_sec=timeout)
             event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
 
             # STEP 5f: TH reads from the DUT the MainState attribute
