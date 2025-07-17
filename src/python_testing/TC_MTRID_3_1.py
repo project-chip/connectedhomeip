@@ -99,7 +99,7 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
         super().__init__(*args)
 
     async def subscribe_attribute(self):
-        """Implements subscription to PowerThreshold attribute with minInterval=5 and maxInterval=30
+        """Implements subscription to PowerThreshold attribute with minInterval=0 and maxInterval=30
         """
 
         self.default_controller: ChipDeviceController
