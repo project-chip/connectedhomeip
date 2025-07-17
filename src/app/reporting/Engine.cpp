@@ -60,7 +60,7 @@ using Protocols::InteractionModel::Status;
 ///
 ///   If the returned value is std::nullopt, that means the ACL check passed and the
 ///   read should proceed.
-std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
+std::optional<CHIP_ERROR> ValidateReadAttributeACL(const SubjectDescriptor & subjectDescriptor,
                                                    const ConcreteReadAttributePath & path, Privilege requiredPrivilege)
 {
 
@@ -89,7 +89,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
 /// Checks that the given attribute path corresponds to a readable attribute. If not, it
 /// will return the corresponding failure status.
 std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataModel, const ConcreteReadAttributePath & path,
-                                                  std::optional<DataModel::AttributeEntry> entry)
+                                                  const std::optional<DataModel::AttributeEntry> & entry)
 {
     if (!entry.has_value())
     {
@@ -150,8 +150,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     DataModel::AttributeFinder finder(dataModel);
     std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
 
-    if (auto access_status = ValidateReadAttributeACL(dataModel, subjectDescriptor, path, Privilege::kView);
-        access_status.has_value())
+    if (auto access_status = ValidateReadAttributeACL(subjectDescriptor, path, Privilege::kView); access_status.has_value())
     {
         status = *access_status;
     }
@@ -167,7 +166,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     }
     // Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
     else if (auto required_privilege_access_status =
-                 ValidateReadAttributeACL(dataModel, subjectDescriptor, path, entry->GetReadPrivilege().value());
+                 ValidateReadAttributeACL(subjectDescriptor, path, entry->GetReadPrivilege().value());
              required_privilege_access_status.has_value())
     {
         status = *required_privilege_access_status;
