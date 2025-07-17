@@ -773,6 +773,12 @@ CHIP_ERROR EnergyEvseDelegate::HwGetVehicleID(DataModel::Nullable<MutableCharSpa
         return CHIP_NO_ERROR;
     }
 
+    if (outValue.IsNull())
+    {
+        // Defensive: outValue must be non-null to copy into it
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     return CopyCharSpanToMutableCharSpan(mVehicleID.Value(), outValue.Value());
 }
 
