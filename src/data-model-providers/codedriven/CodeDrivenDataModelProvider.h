@@ -52,6 +52,7 @@ class CodeDrivenDataModelProvider : public DataModel::Provider
 public:
     CodeDrivenDataModelProvider(PersistentStorageDelegate * delegate = nullptr) : mPersistentStorageDelegate(delegate) {}
 
+    /* DataModel::Provider implementation */
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
     CHIP_ERROR Shutdown() override;
 
