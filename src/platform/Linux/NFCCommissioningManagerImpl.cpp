@@ -617,7 +617,6 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
         {
             ReturnErrorOnFailure(StartNFCProcessingThread());
         }
-    }
         StartNFCProcessingThread();
     }
 
