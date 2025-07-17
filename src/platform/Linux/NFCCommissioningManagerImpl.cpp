@@ -552,13 +552,10 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 
     if (!mThreadRunning)
     {
-        std::lock_guard<std::mutex> lock(mQueueMutex);
-        if (!mThreadRunning)
+        if (StartNFCProcessingThread() != CHIP_NO_ERROR)
         {
-            if (StartNFCProcessingThread() != CHIP_NO_ERROR)
-            {
-                return false;
-            }
+            ChipLogError(DeviceLayer, "Failed to start NFCProcessing Thread");
+            return false;
         }
     }
 
@@ -610,14 +607,10 @@ void NFCCommissioningManagerImpl::EnqueueMessage(std::unique_ptr<NFCMessage> mes
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     std::shared_ptr<TagInstance> targetedTagInstance = nullptr;
+
     if (!mThreadRunning)
     {
-        std::lock_guard<std::mutex> lock(mQueueMutex);
-        if (!mThreadRunning)
-        {
-            ReturnErrorOnFailure(StartNFCProcessingThread());
-        }
-        StartNFCProcessingThread();
+        ReturnErrorOnFailure(StartNFCProcessingThread());
     }
 
     // nfcShortId is used to find the peer device
