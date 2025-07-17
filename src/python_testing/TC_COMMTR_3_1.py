@@ -128,7 +128,7 @@ class TC_COMMTR_3_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
 
         self.step("4")
         # TH establishes a subscription to MeteredQuantity attribute.
-        subscription_handler = ClusterAttributeChangeAccumulator(cluster, cluster.Attributes.MeteredQuantity)
+        subscription_handler = AttributeSubscriptionHandler(cluster, cluster.Attributes.MeteredQuantity)
         await subscription_handler.start(self.default_controller, self.dut_node_id,
                                          endpoint,
                                          min_interval_sec=0,
