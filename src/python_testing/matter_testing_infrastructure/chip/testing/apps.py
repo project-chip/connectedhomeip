@@ -15,6 +15,7 @@
 import os
 import signal
 import tempfile
+from typing import Optional
 
 import chip.clusters as Clusters
 from chip.testing.tasks import Subprocess
@@ -112,8 +113,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
     PREFIX = b"[OTA-PROVIDER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, ota_image_path: str = None,
-                 image_list_path: str = None, extra_args: list[str] = []):
+                 passcode: int, port: int = 5540, ota_image_path: Optional[str] = None,
+                 image_list_path: Optional[str] = None, extra_args: list[str] = []):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -122,12 +123,10 @@ class OTAProviderSubprocess(AppServerSubprocess):
             discriminator: Discriminator for commissioning
             passcode: Passcode for commissioning
             port: UDP port for secure connections
-            ota_image_path: Path to OTA image file (cannot be used with image_list_path)
-            image_list_path: Path to JSON image list file (cannot be used with ota_image_path)
+            ota_image_path: Path to a file containing an OTA image (cannot be used with image_list_path)
+            image_list_path: Path to a file containing a list of OTA images (cannot be used with ota_image_path)
             extra_args: Additional command line arguments
         """
-        # Initialize kvs_fd to None to avoid __del__ issues if constructor fails
-        self.kvs_fd = None
 
         if ota_image_path and image_list_path:
             raise ValueError("Cannot specify both ota_image_path and image_list_path")
@@ -142,14 +141,13 @@ class OTAProviderSubprocess(AppServerSubprocess):
         elif image_list_path:
             ota_args.extend(["--otaImageList", image_list_path])
 
-        # Combine with any additional extra args
         combined_extra_args = ota_args + extra_args
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
                          passcode=passcode, port=port, extra_args=combined_extra_args)
 
-    def create_acl_entry(self, dev_ctrl, provider_node_id: int, requestor_node_id: int = None):
+    def create_acl_entry(self, dev_ctrl, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
 
         Args:
