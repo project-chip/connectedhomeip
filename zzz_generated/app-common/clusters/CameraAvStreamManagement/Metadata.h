@@ -247,6 +247,9 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CaptureSnapshot:
 } // namespace CaptureSnapshot
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace CameraAvStreamManagement
 } // namespace Clusters
 } // namespace app

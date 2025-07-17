@@ -27,6 +27,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StateValue::Id, BitFla
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace StateChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateChange
+
+} // namespace Events
+
 } // namespace BooleanState
 } // namespace Clusters
 } // namespace app

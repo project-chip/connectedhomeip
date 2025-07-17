@@ -33,6 +33,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SoilMoistureMeasuredVa
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace SoilMeasurement
 } // namespace Clusters
 } // namespace app

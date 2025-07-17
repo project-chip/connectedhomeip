@@ -176,6 +176,9 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveACLFromNod
 } // namespace RemoveACLFromNode
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace JointFabricDatastore
 } // namespace Clusters
 } // namespace app

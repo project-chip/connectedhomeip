@@ -98,6 +98,9 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace SetTCAcknowledgements
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace GeneralCommissioning
 } // namespace Clusters
 } // namespace app

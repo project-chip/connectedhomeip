@@ -53,6 +53,9 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RevokeCommissioning
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace AdministratorCommissioning
 } // namespace Clusters
 } // namespace app

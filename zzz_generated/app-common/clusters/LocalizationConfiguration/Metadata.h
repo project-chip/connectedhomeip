@@ -33,6 +33,9 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace LocalizationConfiguration
 } // namespace Clusters
 } // namespace app

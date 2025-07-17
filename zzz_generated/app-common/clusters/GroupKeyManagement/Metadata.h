@@ -64,6 +64,9 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace KeySetReadAllIndices
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace GroupKeyManagement
 } // namespace Clusters
 } // namespace app

@@ -75,6 +75,9 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace CopyScene
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace ScenesManagement
 } // namespace Clusters
 } // namespace app

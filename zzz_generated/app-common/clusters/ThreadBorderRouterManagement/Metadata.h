@@ -67,6 +67,9 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace SetPendingDatasetRequest
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters
 } // namespace app

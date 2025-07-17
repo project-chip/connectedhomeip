@@ -37,6 +37,9 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
+
 } // namespace TimeFormatLocalization
 } // namespace Clusters
 } // namespace app
