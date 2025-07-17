@@ -505,16 +505,7 @@ NFCCommissioningManagerImpl NFCCommissioningManagerImpl::sInstance;
 
 CHIP_ERROR NFCCommissioningManagerImpl::_Init()
 {
-    // Creates an Application Context to the PC/SC Resource Manager.
-    long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
-    CHECK("SCardEstablishContext", result)
-
-    lastTagInstanceUsed = nullptr;
-
-    // Start the NFC processing thread
-    mThreadRunning = true;
-    mNfcThread     = std::thread(&NFCCommissioningManagerImpl::NfcThreadMain, this);
-
+    // NFC processing Thread will be started with the first request to do NFC-based commissioning
     return CHIP_NO_ERROR;
 }
 
@@ -535,6 +526,21 @@ void NFCCommissioningManagerImpl::_Shutdown()
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
 
+CHIP_ERROR NFCCommissioningManagerImpl::StartNFCProcessingThread()
+{
+    // Creates an Application Context to the PC/SC Resource Manager.
+    long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
+    CHECK("SCardEstablishContext", result)
+
+    lastTagInstanceUsed = nullptr;
+
+    // Start the NFC processing thread
+    mThreadRunning = true;
+    mNfcThread     = std::thread(&NFCCommissioningManagerImpl::NfcThreadMain, this);
+
+    return CHIP_NO_ERROR;
+}
+
 void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
 {
     mNFCBase = nfcBase;
@@ -543,6 +549,10 @@ void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
 bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & address)
 {
     bool canSendToPeer = false;
+
+    if (!mThreadRunning) {
+        StartNFCProcessingThread();
+    }
 
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
@@ -592,6 +602,10 @@ void NFCCommissioningManagerImpl::EnqueueMessage(std::unique_ptr<NFCMessage> mes
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     std::shared_ptr<TagInstance> targetedTagInstance = nullptr;
+
+    if (!mThreadRunning) {
+        StartNFCProcessingThread();
+    }
 
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
