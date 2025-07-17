@@ -394,7 +394,6 @@ lcov --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --output-file "$COVERAGE_ROOT/lcov_final.info" \
     "${QUIET_FLAG[@]}"
 
-
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --ignore-errors inconsistent,category,count \
     --rc max_message_count=1000 \
