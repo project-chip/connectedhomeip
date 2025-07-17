@@ -201,8 +201,8 @@ public:
      *    and updates the IDs to those for the matching stream
      *
      * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
-     * @param[in] videoStreamId  Optional identifier for the requested video stream.
-     * @param[in] audioStreamId  Optional identifier for the requested audio stream.
+     * @param[in,out] videoStreamId  Optional identifier for the requested video stream.
+     * @param[in,out] audioStreamId  Optional identifier for the requested audio stream.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
      */
