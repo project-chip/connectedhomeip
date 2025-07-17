@@ -243,7 +243,7 @@ void CYW30739MatterConfig::InitApp(void)
      * part of the cluster. The EventManagementTestEventTriggerHandler is based upon
      * GenericEventManagementTestEventTriggerHandler, and so creating an instance of it here allows
      * this to work and replace the old global instance call to the cluster
-    */
+     */
     const Clusters::GeneralDiagnosticsEnabledAttributes enabledAttributes = Clusters::GeneralDiagnosticsEnabledAttributes();
     static Clusters::GeneralDiagnosticsCluster cluster(enabledAttributes);
     sEventManagementTestEventTriggerHandler.SetGeneralDiagnosticsClusterInstance(&cluster);

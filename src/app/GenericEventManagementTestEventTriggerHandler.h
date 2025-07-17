@@ -27,18 +27,13 @@ namespace app {
 class GenericEventManagementTestEventTriggerHandler : public TestEventTriggerHandler
 {
 public:
-    GenericEventManagementTestEventTriggerHandler(
-        Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance) :
+    GenericEventManagementTestEventTriggerHandler(Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance) :
         mGeneralDiagnosticsCluster(generalDiagnosticsClusterInstance)
     {}
 
-    Clusters::GeneralDiagnosticsCluster * GetGeneralDiagnosticsClusterInstance()
-    {
-        return mGeneralDiagnosticsCluster;
-    }
+    Clusters::GeneralDiagnosticsCluster * GetGeneralDiagnosticsClusterInstance() { return mGeneralDiagnosticsCluster; }
 
-    void SetGeneralDiagnosticsClusterInstance(
-        Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance)
+    void SetGeneralDiagnosticsClusterInstance(Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance)
     {
         mGeneralDiagnosticsCluster = generalDiagnosticsClusterInstance;
     }
@@ -48,8 +43,8 @@ protected:
 
 private:
     void FillUpEventLoggingBufferWithFakeSoftwareFault(size_t bufferSize);
-    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString)                                         = 0;
-    Clusters::GeneralDiagnosticsCluster * mGeneralDiagnosticsCluster = nullptr;
+    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString) = 0;
+    Clusters::GeneralDiagnosticsCluster * mGeneralDiagnosticsCluster       = nullptr;
 };
 
 } // namespace app
