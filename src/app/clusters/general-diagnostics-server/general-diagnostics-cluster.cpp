@@ -264,6 +264,9 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
 {
     using namespace GeneralDiagnostics::Attributes;
 
+    // Ensure we have space for all possible attributes (there will be 5 optional at most, 4 mandatory)
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(9 + DefaultServerCluster::GlobalAttributes().size()));
+
     // Mandatory attributes
     ReturnErrorOnFailure(builder.AppendElements({
         NetworkInterfaces::kMetadataEntry,
@@ -271,9 +274,6 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
         UpTime::kMetadataEntry,
         TestEventTriggersEnabled::kMetadataEntry,
     }));
-
-    // Ensure we have space for all optional attributes (there will be 5 at most)
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(5 + DefaultServerCluster::GlobalAttributes().size()));
 
     if (mEnabledAttributes.enableTotalOperationalHours)
     {
