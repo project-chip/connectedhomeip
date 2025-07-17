@@ -168,8 +168,12 @@ class TC_PAVST_2_7(MatterBaseTest):
 
        # TH2 sends command
        self.step(4)
-        if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.ManuallyTriggerTransport(
+       th2_nodeid = self.nodeid + 1
+       th2 = fabric_admin.NewController(nodeId=th2_nodeid,
+               paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path)
+               )
+        if th2.pics_guard(th2.check_pics("PAVST.S.A0001")):
+            status = await th2.send_single_cmd(cmd=pvcluster.Commands.ManuallyTriggerTransport(
                 {"connectionID": aConnectionID,
                 }), endpoint=endpoint)
             asserts.assert_true(status, pvattr.Status.NOT_FOUND, "DUT must responds with NOT_FOUND status code.")
