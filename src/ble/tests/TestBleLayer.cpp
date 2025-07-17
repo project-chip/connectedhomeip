@@ -457,7 +457,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
 }
 
-// Simulate successfull connection callback from delegate
+// Simulate successful connection callback from delegate
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
 {
     chip::Test::BleLayerTestAccess access(this);
