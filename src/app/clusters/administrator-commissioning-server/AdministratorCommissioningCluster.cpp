@@ -56,13 +56,13 @@ DataModel::ActionReturnStatus AdministratorCommissioningCluster::ReadAttribute(c
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(BitFlags<AdministratorCommissioning::Feature>{ 0 }.Raw());
+        return encoder.Encode(BitFlags<AdministratorCommissioning::Feature>{ 0 });
     case ClusterRevision::Id:
         return encoder.Encode(AdministratorCommissioning::kRevision);
     case WindowStatus::Id:
         return encoder.Encode(mLogic.GetWindowStatus());
     case AdminFabricIndex::Id:
-        return encoder.Encode(mLogic.GetOpenerFabricIndex());
+        return encoder.Encode(mLogic.GetAdminFabricIndex());
     case AdminVendorId::Id:
         return encoder.Encode(mLogic.GetAdminVendorId());
     default:
@@ -144,7 +144,7 @@ AdministratorCommissioningWithBasicCommissioningWindowCluster::ReadAttribute(con
 
     if (request.path.mAttributeId == FeatureMap::Id)
     {
-        return encoder.Encode(mFeatures.Raw());
+        return encoder.Encode(mFeatures);
     }
 
     return AdministratorCommissioningCluster::ReadAttribute(request, encoder);

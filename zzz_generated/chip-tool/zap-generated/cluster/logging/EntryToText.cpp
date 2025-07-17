@@ -844,6 +844,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "RecoveryIdentifier";
         case chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::Id:
             return "NetworkRecoveryReason";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id:
+            return "IsCommissioningWithoutPower";
         case chip::app::Clusters::GeneralCommissioning::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::Id:
@@ -4765,8 +4767,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MeteredQuantity";
         case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantityTimestamp::Id:
             return "MeteredQuantityTimestamp";
-        case chip::app::Clusters::CommodityMetering::Attributes::TariffUnit::Id:
-            return "TariffUnit";
+        case chip::app::Clusters::CommodityMetering::Attributes::MeasurementType::Id:
+            return "MeasurementType";
+        case chip::app::Clusters::CommodityMetering::Attributes::MaximumMeteredQuantities::Id:
+            return "MaximumMeteredQuantities";
         case chip::app::Clusters::CommodityMetering::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CommodityMetering::Attributes::AcceptedCommandList::Id:
@@ -4882,6 +4886,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GlobalEnum";
         case chip::app::Clusters::UnitTesting::Attributes::GlobalStruct::Id:
             return "GlobalStruct";
+        case chip::app::Clusters::UnitTesting::Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id:
+            return "UnsupportedAttributeRequiringAdminPrivilege";
         case chip::app::Clusters::UnitTesting::Attributes::Unsupported::Id:
             return "Unsupported";
         case chip::app::Clusters::UnitTesting::Attributes::ReadFailureCode::Id:
