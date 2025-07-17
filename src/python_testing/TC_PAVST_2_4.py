@@ -38,6 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -241,11 +242,14 @@ class TC_PAVST_2_4(MatterBaseTest):
 
         # TH2 sends command
         self.step(4)
-        th2_nodeid = self.nodeid + 1
-        th2 = fabric_admin.NewController(
-            nodeId=th2_nodeid,
-            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+        # Establishing TH2 controller
+        th2_certificate_authority = (
+            self.certificate_authority_manager.NewCertificateAuthority()
         )
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
+            vendorId=0xFFF1, fabricId=self.fabricId + 1
+        )
+        th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
         if th2.pics_guard(th2.check_pics("PAVST.S.A0001")):
             status = await th2.send_single_cmd(
                 cmd=pvcluster.Commands.ModifyPushTransport(
