@@ -31,7 +31,7 @@ using namespace chip::app::Clusters;
 static bool EnergyGatewayAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
                                           const char * aName, const char * aValue);
 
-static chip::ArgParser::OptionDef sEnergyGatewayAppOptionDefs[] = {{ nullptr }};
+static chip::ArgParser::OptionDef sEnergyGatewayAppOptionDefs[] = { { nullptr } };
 
 static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyGatewayAppOptionHandler, // handler function
                                                       sEnergyGatewayAppOptionDefs,   // array of option definitions

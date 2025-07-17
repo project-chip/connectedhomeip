@@ -17,8 +17,8 @@
  */
 
 #include <CommodityTariffMain.h>
-#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
 #include <CommodityTariffSamples.h>
+#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
 
 #include <fstream>
 
@@ -41,15 +41,12 @@ namespace TariffPresets {
 static constexpr size_t kCount = 2;
 
 // Array of all presets
-static constexpr std::array<const char *, kCount> kAllPresets = {
-        TariffPresets::tariff_sample_1,
-        TariffPresets::tariff_sample_2
-    };
+static constexpr std::array<const char *, kCount> kAllPresets = { TariffPresets::tariff_sample_1, TariffPresets::tariff_sample_2 };
 
 // Safe accessor function
 static constexpr const char * GetPreset(size_t index)
 {
-    if (index == kCount-1)
+    if (index == kCount - 1)
     {
         presetIndex = 0;
     }

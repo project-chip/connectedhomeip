@@ -51,20 +51,21 @@ CommodityTariffDelegate * CommodityTariff::GetCommodityTariffDelegate()
     return dg;
 }
 
-static bool parseFromConstant(const char * aJsonString, Json::Value& aRoot, std::string& aErrorMsg)
+static bool parseFromConstant(const char * aJsonString, Json::Value & aRoot, std::string & aErrorMsg)
 {
     Json::CharReaderBuilder builder;
     JSONCPP_STRING errs;
 
-    if (aJsonString == nullptr) {
+    if (aJsonString == nullptr)
+    {
         aErrorMsg = "Null JSON string provided";
         return false;
     }
 
-
     std::istringstream jsonStream(aJsonString);
     bool success = Json::parseFromStream(builder, jsonStream, &aRoot, &errs);
-    if (!success) {
+    if (!success)
+    {
         aErrorMsg = "Failed to parse JSON: " + errs;
     }
 
@@ -77,7 +78,8 @@ void LoadTariffFromJSONString(const char * aJsonStringPreset, CommodityTariffDel
     std::string errs;
     if (parseFromConstant(aJsonStringPreset, json_root, errs))
     {
-        ChipLogProgress(NotSpecified, "The tariff data loaded successfully. Tariff name: %s", json_root["TariffInfo"]["TariffLabel"].asString().c_str());
+        ChipLogProgress(NotSpecified, "The tariff data loaded successfully. Tariff name: %s",
+                        json_root["TariffInfo"]["TariffLabel"].asString().c_str());
         if (CHIP_NO_ERROR == dg->LoadTariffData(json_root))
         {
             dg->TariffDataUpdate();
@@ -85,7 +87,7 @@ void LoadTariffFromJSONString(const char * aJsonStringPreset, CommodityTariffDel
     }
     else
     {
-        ChipLogError(NotSpecified, "Unable to load tariff data, err: %s", errs.c_str() );
+        ChipLogError(NotSpecified, "Unable to load tariff data, err: %s", errs.c_str());
     }
 }
 

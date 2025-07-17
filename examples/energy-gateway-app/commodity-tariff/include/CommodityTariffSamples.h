@@ -20,7 +20,7 @@
 #include <string>
 
 namespace TariffPresets {
-    static constexpr const char* tariff_sample_1 = R"({
+static constexpr const char * tariff_sample_1 = R"({
         "TariffInfo": {
             "TariffLabel": "Full Tariff One",
             "ProviderName": "Default Provider",
@@ -246,7 +246,7 @@ namespace TariffPresets {
         "DefaultRandomizationOffset": 0,
         "DefaultRandomizationType": 0
     })";
-    static constexpr const char*  tariff_sample_2 = R"({
+static constexpr const char * tariff_sample_2 = R"({
         "TariffInfo": {
             "TariffLabel": "Full Tariff Two",
             "ProviderName": "Example Provider",
@@ -419,4 +419,4 @@ namespace TariffPresets {
         "DefaultRandomizationOffset": 0,
         "DefaultRandomizationType": 0
     })";
-} //TariffPresets
+} // namespace TariffPresets
