@@ -59,7 +59,7 @@ class TC_PAVST_2_5(MatterBaseTest):
                      "Verify the number of PushAV Connections in the list is 1. Store the TransportStatus and ConnectionID in the corresponding TransportConfiguration as aTransportStatus and aConnectionID."),
             TestStep(3, "TH1 sends the DeallocatePushTransport command with ConnectionID != aConnectionID.",
                      "DUT responds with NOT_FOUND status code."),
-            TestStep(4, "TTH2 sends the DeallocatePushTransport command with ConnectionID = aConnectionID.",
+            TestStep(4, "TH2 sends the DeallocatePushTransport command with ConnectionID = aConnectionID.",
                      "DUT responds with NOT_FOUND status code."),
             TestStep(5, "TH1 sends the DeallocatePushTransport command with ConnectionID = aConnectionID.",
                      "DUT responds with SUCCESS status code."),
@@ -166,8 +166,12 @@ class TC_PAVST_2_5(MatterBaseTest):
 
        # TH2 sends command
        self.step(4)
-        if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.SetTransportStatus(
+       th2_nodeid = self.nodeid + 1
+       th2 = fabric_admin.NewController(nodeId=th2_nodeid,
+               paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path)
+               )
+        if th2.pics_guard(th2.check_pics("PAVST.S.A0001")):
+            status = await th2.send_single_cmd(cmd=pvcluster.Commands.SetTransportStatus(
                 {"connectionID": aConnectionID,
                  "transportStatus": aTransportOptions.transportStatus
                 }), endpoint=endpoint)
