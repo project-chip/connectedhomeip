@@ -275,6 +275,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #if CHIP_ENABLE_OPENTHREAD
     ReturnErrorOnFailure(InitOpenThread());
 #endif
+#ifdef SL_WIFI
+    sWifiNetworkDriver.Init();
+#endif
 
     // Stop Matter event handling while setting up resources
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -341,7 +344,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
-    sWifiNetworkDriver.Init();
     return WifiInterface::GetInstance().InitWiFiStack();
 }
 #endif // SL_WIFI
