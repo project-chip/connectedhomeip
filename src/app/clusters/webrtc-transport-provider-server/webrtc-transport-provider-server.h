@@ -197,7 +197,7 @@ public:
      * The implementation SHALL ensure:
      *  - The requested stream usage (streamUsage) is allowed given the current allocation of
      *    camera resources (e.g. CPU, memory, network bandwidth) and the prioritized stream list.
-     *  - If the provide IDs are null, it matches against an allocated stream with the same stream usage
+     *  - If the provided IDs are null, it matches against an allocated stream with the same stream usage
      *    and updates the IDs to those for the matching stream
      *
      * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
