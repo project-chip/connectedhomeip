@@ -552,7 +552,15 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 
     if (!mThreadRunning)
     {
-        StartNFCProcessingThread();
+        std::lock_guard<std::mutex> lock(mQueueMutex);
+        if (!mThreadRunning)
+        {
+            if (StartNFCProcessingThread() != CHIP_NO_ERROR)
+            {
+                return false;
+            }
+        }
+    }
     }
 
     // nfcShortId is used to find the peer device
