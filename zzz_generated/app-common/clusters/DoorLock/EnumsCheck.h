@@ -243,6 +243,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DoorStateEnum
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LEDSettingEnum val)
+{
+    using EnumType = DoorLock::LEDSettingEnum;
+    switch (val)
+    {
+    case EnumType::kNoLEDSignal:
+    case EnumType::kNoLEDSignalAccessAllowed:
+    case EnumType::kLEDSignalAll:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeEnum val)
 {
     using EnumType = DoorLock::LockDataTypeEnum;
@@ -328,6 +341,32 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperationSour
     case EnumType::kRfid:
     case EnumType::kBiometric:
     case EnumType::kAliro:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::SoundVolumeEnum val)
+{
+    using EnumType = DoorLock::SoundVolumeEnum;
+    switch (val)
+    {
+    case EnumType::kSilent:
+    case EnumType::kLow:
+    case EnumType::kHigh:
+    case EnumType::kMedium:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::StatusCodeEnum val)
+{
+    using EnumType = DoorLock::StatusCodeEnum;
+    switch (val)
+    {
+    case EnumType::kDuplicate:
+    case EnumType::kOccupied:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

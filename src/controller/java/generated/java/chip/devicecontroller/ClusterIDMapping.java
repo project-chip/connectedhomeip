@@ -10743,6 +10743,12 @@ public class ClusterIDMapping {
             LockDoor(0L),
             UnlockDoor(1L),
             UnlockWithTimeout(3L),
+            SetPINCode(5L),
+            GetPINCode(6L),
+            ClearPINCode(7L),
+            ClearAllPINCodes(8L),
+            SetUserStatus(9L),
+            GetUserStatus(10L),
             SetWeekDaySchedule(11L),
             GetWeekDaySchedule(12L),
             ClearWeekDaySchedule(13L),
@@ -10752,6 +10758,12 @@ public class ClusterIDMapping {
             SetHolidaySchedule(17L),
             GetHolidaySchedule(18L),
             ClearHolidaySchedule(19L),
+            SetUserType(20L),
+            GetUserType(21L),
+            SetRFIDCode(22L),
+            GetRFIDCode(23L),
+            ClearRFIDCode(24L),
+            ClearAllRFIDCodes(25L),
             SetUser(26L),
             GetUser(27L),
             ClearUser(29L),
@@ -10823,6 +10835,91 @@ public class ClusterIDMapping {
                     }
                     public static UnlockWithTimeoutCommandField value(int id) throws NoSuchFieldError {
                         for (UnlockWithTimeoutCommandField field : UnlockWithTimeoutCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetPINCodeCommandField {UserID(0),UserStatus(1),UserType(2),Pin(3),;
+                    private final int id;
+                    SetPINCodeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetPINCodeCommandField value(int id) throws NoSuchFieldError {
+                        for (SetPINCodeCommandField field : SetPINCodeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GetPINCodeCommandField {UserID(0),;
+                    private final int id;
+                    GetPINCodeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GetPINCodeCommandField value(int id) throws NoSuchFieldError {
+                        for (GetPINCodeCommandField field : GetPINCodeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ClearPINCodeCommandField {PINSlotIndex(0),;
+                    private final int id;
+                    ClearPINCodeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ClearPINCodeCommandField value(int id) throws NoSuchFieldError {
+                        for (ClearPINCodeCommandField field : ClearPINCodeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetUserStatusCommandField {UserID(0),UserStatus(1),;
+                    private final int id;
+                    SetUserStatusCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetUserStatusCommandField value(int id) throws NoSuchFieldError {
+                        for (SetUserStatusCommandField field : SetUserStatusCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GetUserStatusCommandField {UserID(0),;
+                    private final int id;
+                    GetUserStatusCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GetUserStatusCommandField value(int id) throws NoSuchFieldError {
+                        for (GetUserStatusCommandField field : GetUserStatusCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -10976,6 +11073,91 @@ public class ClusterIDMapping {
                     }
                     public static ClearHolidayScheduleCommandField value(int id) throws NoSuchFieldError {
                         for (ClearHolidayScheduleCommandField field : ClearHolidayScheduleCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetUserTypeCommandField {UserID(0),UserType(1),;
+                    private final int id;
+                    SetUserTypeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetUserTypeCommandField value(int id) throws NoSuchFieldError {
+                        for (SetUserTypeCommandField field : SetUserTypeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GetUserTypeCommandField {UserID(0),;
+                    private final int id;
+                    GetUserTypeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GetUserTypeCommandField value(int id) throws NoSuchFieldError {
+                        for (GetUserTypeCommandField field : GetUserTypeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetRFIDCodeCommandField {UserID(0),UserStatus(1),UserType(2),RFIDCode(3),;
+                    private final int id;
+                    SetRFIDCodeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetRFIDCodeCommandField value(int id) throws NoSuchFieldError {
+                        for (SetRFIDCodeCommandField field : SetRFIDCodeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GetRFIDCodeCommandField {UserID(0),;
+                    private final int id;
+                    GetRFIDCodeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GetRFIDCodeCommandField value(int id) throws NoSuchFieldError {
+                        for (GetRFIDCodeCommandField field : GetRFIDCodeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ClearRFIDCodeCommandField {RFIDSlotIndex(0),;
+                    private final int id;
+                    ClearRFIDCodeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ClearRFIDCodeCommandField value(int id) throws NoSuchFieldError {
+                        for (ClearRFIDCodeCommandField field : ClearRFIDCodeCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
