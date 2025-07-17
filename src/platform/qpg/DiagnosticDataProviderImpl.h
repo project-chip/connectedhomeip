@@ -56,7 +56,6 @@ public:
     CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults) override;
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
-
 };
 
 /**
