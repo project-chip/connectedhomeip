@@ -62,4 +62,4 @@ ffmpeg -hide_banner \
     -cert_file "$CERT_ROOT_DIR/certs/device/dev.pem" \
     -key_file "$CERT_ROOT_DIR/certs/device/dev.key" \
     -tls_verify 1 \
-    "$PUBLISHING_ENDPOINT/cmaf/example/video-720p.cmfv"
+    "$PUBLISHING_ENDPOINT/segment1/video/clip1.m4s"
