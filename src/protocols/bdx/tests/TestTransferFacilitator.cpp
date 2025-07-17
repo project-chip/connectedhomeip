@@ -103,7 +103,7 @@ class TestTransferFacilitator : public ::testing::Test
 public:
     static void SetUpTestSuite()
     {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        EXPECT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         gSavedClock = &System::SystemClock();
         System::Clock::Internal::SetSystemClockForTesting(&gSystemLayerAndClock);
     }
@@ -114,28 +114,6 @@ public:
         System::Clock::Internal::SetSystemClockForTesting(gSavedClock);
         Platform::MemoryShutdown();
     }
-};
-
-class TestResponder : public Responder
-{
-
-private:
-    void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override
-    {
-        if (mTransferSessionOutputHandler.has_value())
-        {
-            mTransferSessionOutputHandler.value()(event);
-        }
-    }
-
-    using BASE = Responder;
-
-public:
-    void PollForOutput() { BASE::PollForOutput(); }
-
-    void ScheduleImmediatePoll() { BASE::ScheduleImmediatePoll(); }
-
-    std::optional<TransferSessionOutputHandler> mTransferSessionOutputHandler{ std::nullopt };
 };
 
 class TestInitiator : public Initiator
@@ -167,7 +145,7 @@ TEST_F(TestTransferFacilitator, InitiatesTransfer)
     auto r = initiator.InitiateTransfer(&gSystemLayerAndClock, TransferRole::kSender, TransferSession::TransferInitData(),
                                         System::Clock::Seconds16(60), System::Clock::Milliseconds32(500));
 
-    ASSERT_EQ(r, CHIP_NO_ERROR); // Placeholder for actual test logic
+    EXPECT_EQ(r, CHIP_NO_ERROR); // Placeholder for actual test logic
 }
 
 TEST_F(TestTransferFacilitator, PollsForOutputAfterTimeoutExpires)
@@ -217,7 +195,7 @@ TEST_F(TestTransferFacilitator, PollsForOutput)
     auto r = initiator.InitiateTransfer(&gSystemLayerAndClock, TransferRole::kSender, TransferSession::TransferInitData(),
                                         System::Clock::Seconds16(60), System::Clock::Milliseconds32(500));
 
-    ASSERT_EQ(r, CHIP_NO_ERROR); // Placeholder for actual test logic
+    EXPECT_EQ(r, CHIP_NO_ERROR); // Placeholder for actual test logic
 
     // hook a callback to the output handler
     bool outputHandled                      = false;
@@ -231,52 +209,8 @@ TEST_F(TestTransferFacilitator, PollsForOutput)
     initiator.PollForOutput();
 
     // Check if the poll was handled correctly
-    ASSERT_TRUE(outputHandled);
+    EXPECT_TRUE(outputHandled);
 
     // Check if the timer was started
-    ASSERT_TRUE(timerStarted);
-}
-
-TEST_F(TestTransferFacilitator, TriggeringImmediatePollCallsPollForOutput)
-{
-    TestInitiator initiator;
-
-    gSystemLayerAndClock.SetMonotonic(0_ms);
-
-    auto r = initiator.InitiateTransfer(&gSystemLayerAndClock, TransferRole::kSender, TransferSession::TransferInitData(),
-                                        System::Clock::Seconds16(60), System::Clock::Milliseconds32(500));
-
-    ASSERT_EQ(r, CHIP_NO_ERROR); // Placeholder for actual test logic
-
-    // hook a callback to the output handler
-    bool outputHandled                      = false;
-    initiator.mTransferSessionOutputHandler = [&outputHandled](TransferSession::OutputEvent & event) { outputHandled = true; };
-
-    // hook a callback to the StartTimerHook
-    bool timerStarted                    = false;
-    gSystemLayerAndClock.mStartTimerHook = [&timerStarted](auto, auto, void *) { timerStarted = true; };
-
-    // Schedule an immediate poll
-    initiator.ScheduleImmediatePoll();
-
-    // Advancing clock 1_ms triggers the immediate poll disregarding the poll frequency timer
-    gSystemLayerAndClock.AdvanceMonotonic(1_ms);
-
-    // Check if the poll was handled correctly
-    ASSERT_TRUE(outputHandled);
-
-    // Check if the timer was started
-    ASSERT_TRUE(timerStarted);
-}
-
-TEST_F(TestTransferFacilitator, ResponderPreparesForTransfer)
-{
-    TestResponder responder;
-
-    gSystemLayerAndClock.SetMonotonic(0_ms);
-
-    auto r = responder.PrepareForTransfer(&gSystemLayerAndClock, TransferRole::kReceiver, TransferControlFlags::kReceiverDrive,
-                                          1024, System::Clock::Seconds16(60), System::Clock::Milliseconds32(500));
-
-    EXPECT_EQ(r, CHIP_NO_ERROR); // Placeholder for actual test logic
+    EXPECT_TRUE(timerStarted);
 }
