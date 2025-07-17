@@ -2,6 +2,7 @@
 	chosen {
 		zephyr,ieee802154 = &ieee802154;
 		zephyr,code-partition = &app_partition_0;
+		zephyr,entropy = &trng;
 	};
 
 	leds {
@@ -115,6 +116,10 @@
 			reg = <0x248000 DT_SIZE_K(32)>;
 		};
 	};
+};
+
+&trng {
+	status = "okay";
 };
 
 &ieee802154 {
