@@ -100,7 +100,7 @@ class TC_PAVST_2_4(MatterBaseTest):
             aSupportedFormats = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
             )
-            asserts.assert_greater_equal(len(aSupportedFormats, 1), "SupportedFormats must not be empty!")
+            asserts.assert_greater_equal(len(aSupportedFormats), 1, "SupportedFormats must not be empty!")
 
             await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
                 streamUsage=0,
@@ -191,7 +191,7 @@ class TC_PAVST_2_4(MatterBaseTest):
             )
             asserts.assert_greater_equal(len(transport_configs, 1), "TransportConfigurations must not be empty!")
             result = (transport_configs.TransportOptions.expiryTime == aModifiedTransportOptions & transport_configs.ConnectionID == aConnectionID)
-            asserts.assert_true(result, "ConnectionID or ExpiryTime is should match as per the modified transport options")
+            asserts.assert_true(result, "ConnectionID or ExpiryTime should match as per the modified transport options")
 
 if __name__ == "__main__":
     default_matter_test_main()
