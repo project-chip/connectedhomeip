@@ -20,17 +20,20 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Install tizen
-ENV TIZEN_VERSION=8.0
+ENV TIZEN_VERSION=9.0
 ENV TIZEN_SDK_ROOT=/opt/tizen-sdk
 
 COPY tizen-sdk-installer $TIZEN_SDK_ROOT/files/installer
 RUN set -x \
     && bash $TIZEN_SDK_ROOT/files/installer/install.sh \
+    --verbose \
     --cpu arm,arm64 \
     --tizen-sdk-path $TIZEN_SDK_ROOT \
     --tizen-sdk-data-path /home/ubuntu/tizen-sdk-data \
     --tizen-version $TIZEN_VERSION  \
+    --pkg-cache-path /tmp/tizen-pkg/$TIZEN_VERSION \
     --override-secret-tool \
+    && rm -rf /tmp/tizen-pkg \
     && : # last line
 
 # ------------------------------------------------------------------------------
