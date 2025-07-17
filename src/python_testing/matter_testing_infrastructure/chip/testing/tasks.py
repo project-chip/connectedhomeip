@@ -134,7 +134,7 @@ class Subprocess(threading.Thread):
 
     def send(self, message: str, end: str = "\n",
              expected_output: Optional[Union[str, re.Pattern]] = None,
-             timeout: Optional[float] = None):
+             timeout: float = 300):
         """Send a message to a process and optionally wait for a response."""
 
         if expected_output is not None:

@@ -78,7 +78,7 @@ config CHIP_APP_FACTORY_DATA
 if CHIP_APP_FACTORY_DATA
     choice CHIP_APP_FACTORY_DATA_IMPL_SELECTION
         prompt "Select AppFactoryData Implementation"
-        default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_RT1060
+        default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_RT1060
         default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA || CHIP_ENABLE_EL2GO_FACTORY_DATA
         default CHIP_APP_FACTORY_DATA_IMPL_COMMON
 
@@ -109,7 +109,7 @@ config CHIP_APP_LOW_POWER
 
 config CHIP_APP_BUTTON
     bool "App Button"
-    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     default n
     help
         Enable the application Button implementation.
@@ -117,7 +117,7 @@ config CHIP_APP_BUTTON
 choice CHIP_APP_BUTTON_REGISTRATION_SELECTION
     prompt "App Button Registration Implementation Selection"
     default CHIP_APP_BUTTON_REGISTRATION_EMPTY if !CHIP_APP_BUTTON
-    default CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     default CHIP_APP_BUTTON_REGISTRATION_APP_ONLY if CHIP_NXP_PLATFORM_RW61X
 
     config CHIP_APP_BUTTON_REGISTRATION_EMPTY
@@ -148,7 +148,7 @@ endchoice # CHIP_APP_BUTTON_REGISTRATION_SELECTION
 if  CHIP_APP_BUTTON
     config CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
         bool "App button handle is not predefined within the SDK"
-        default n if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default n if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
         default y
         help
             App button handle is not predefined within the SDK
@@ -213,7 +213,7 @@ if CHIP_APP_OTA_REQUESTOR
 
         config CHIP_APP_OTA_REQUESTOR_INITIATOR_MULTI_IMAGE
             bool "OTA Requestor Initiator Multi-Image"
-            depends on CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+            depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
             help
                 Enable OTA Requestor Initiator for multiple image OTA SW update.
 
@@ -233,7 +233,7 @@ if CHIP_APP_OTA_REQUESTOR
 
     config CHIP_APP_PLATFORM_OTA_UTILS
         bool "Platform OTA Utils"
-        default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
         help
             Use platform OtaUtils.cpp file.
 
@@ -246,14 +246,14 @@ config CHIP_APP_RPC
 
 config ENABLE_FEEDBACK
 	bool "Enable the app feedback component"
-    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     depends on !NXP_USE_LOW_POWER
 	help
 		"Enable the app feedback component"
 
 config CHIP_APP_UI_FEEDBACK
     bool "App UI Feedback"
-    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     help
         Enable application user interface feedback.
 
@@ -289,7 +289,7 @@ endif # CHIP_APP_WIFI_CONNECT_AT_BOOT
 
 config CHIP_APP_PLATFORM_LED_ON_OFF
     bool "App platform Led On Off Implementation"
-    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
     depends on CHIP_APP_UI_FEEDBACK
     help
         Enable platform LedOnOff Implementation.

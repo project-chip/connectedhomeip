@@ -62,7 +62,12 @@ public:
     ///
     ///       Users of DataModel::Provider are expected to get these lists
     ///       from ProviderMetadataTree (in particular IM Reads of these
-    ///       attributes will the automatically filled from metadata).
+    ///       attributes will be automatically filled from metadata).
+    ///
+    /// When this is invoked, caller is expected to have already done some validations:
+    ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
+    ///    - Attribute is readable according to the ProviderMetadataTree/AttributeEntry data
+    ///    - Appropriate ACL checks done according to the attribute's AttributeEntry
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
@@ -76,6 +81,9 @@ public:
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - cluster `data version` has been checked for the incoming request if applicable
     ///    - validation of ACL/timed interaction flags/writability, if those checks are desired.
+    ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
+    ///    - Attribute is writable according to the ProviderMetadataTree/AttributeEntry data
+    ///    - Appropriate ACL checks done according to the attribute's AttributeEntry
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     ///   Indicates the start/end of a series of list operations. This function will be called either before the first

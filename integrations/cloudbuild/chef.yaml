@@ -38,8 +38,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:140"
-      # TODO: use more recent image once NRF builds are fixed
+    - name: "ghcr.io/project-chip/chip-build-vscode:150"
       # ICD device is currently not supported for ESP32 and NRF targets. New rule to compile only ICD
       # linux binary.
       env:

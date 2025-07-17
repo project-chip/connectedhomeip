@@ -106,8 +106,6 @@ typedef struct
     uint8_t public_key[2 * NUM_ECC_BYTES];
 } mbedtls_uecc_keypair;
 
-static EntropyContext gsEntropyContext;
-
 void _log_mbedTLS_error(int error_code)
 {
     if (error_code != 0 && error_code != UECC_SUCCESS)
@@ -434,41 +432,7 @@ exit:
 
     return error;
 }
-#if !(SLI_SI91X_MCU_INTERFACE)
-static EntropyContext * get_entropy_context()
-{
-    if (!gsEntropyContext.mInitialized)
-    {
-        mbedtls_entropy_init(&gsEntropyContext.mEntropy);
-        mbedtls_ctr_drbg_init(&gsEntropyContext.mDRBGCtxt);
 
-        gsEntropyContext.mInitialized = true;
-    }
-
-    return &gsEntropyContext;
-}
-
-static mbedtls_ctr_drbg_context * get_drbg_context()
-{
-    EntropyContext * const context = get_entropy_context();
-
-    mbedtls_ctr_drbg_context * const drbgCtxt = &context->mDRBGCtxt;
-
-    if (!context->mDRBGSeeded)
-    {
-        const int status = mbedtls_ctr_drbg_seed(drbgCtxt, mbedtls_entropy_func, &context->mEntropy, nullptr, 0);
-        if (status != 0)
-        {
-            _log_mbedTLS_error(status);
-            return nullptr;
-        }
-
-        context->mDRBGSeeded = true;
-    }
-
-    return drbgCtxt;
-}
-#endif // !SLI_SI91X_MCU_INTERFACE
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
 #if SLI_SI91X_MCU_INTERFACE

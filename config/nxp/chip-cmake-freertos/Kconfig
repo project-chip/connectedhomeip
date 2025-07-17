@@ -41,12 +41,6 @@ choice CHIP_NXP_PLATFORM_SELECTION
 		help
 			NXP RT1060 platform.
 
-	config CHIP_NXP_PLATFORM_K32W1
-		bool "k32w1 platform"
-		depends on MCUX_HW_DEVICE_K32W1480
-		help
-			NXP k32w1 platform.
-
 	config CHIP_NXP_PLATFORM_MCXW71
 		bool "mcxw71 platform"
 		depends on MCUX_HW_DEVICE_MCXW716C
@@ -66,7 +60,7 @@ config CHIP_NXP_PLATFORM_FOLDER_NAME
 	default "rt/rw61x" if CHIP_NXP_PLATFORM_RW61X
 	default "rt/rt1170" if CHIP_NXP_PLATFORM_RT1170
 	default "rt/rt1060" if CHIP_NXP_PLATFORM_RT1060
-	default "mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71
 	default "mcxw72" if CHIP_NXP_PLATFORM_MCXW72
 	default "not specified"
 	help
@@ -74,13 +68,13 @@ config CHIP_NXP_PLATFORM_FOLDER_NAME
 
 config CHIP_NXP_DEVICE_LAYER
 	string "NXP device layer"
-	default "nxp/mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+	default "nxp/mcxw71" if CHIP_NXP_PLATFORM_MCXW71
 	default "nxp/common"
 
 # Invisible symbol to get the platform family name
 config CHIP_NXP_PLATFORM_FAMILY
 	string
-	default "mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	default "rt" if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
 
 choice CHIP_NVM_COMPONENT
@@ -111,7 +105,7 @@ endchoice
 choice CHIP_CRYPTO
 	prompt "CHIP Crypto selection"
 	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
-	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	
 	config CHIP_CRYPTO_MBEDTLS
 		bool "CHIP MbedTLS crypto"
@@ -231,7 +225,7 @@ config NETWORK_LAYER_BLE
 
 config OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
-	default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	help
 		"Use custom implementation of operational keystore"
 

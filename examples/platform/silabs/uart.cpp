@@ -497,8 +497,6 @@ int16_t uartLogWrite(const char * log, uint16_t length)
  */
 int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 {
-    uint8_t * data;
-
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
     EUSART_INT_ENABLE(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 #endif
@@ -508,6 +506,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
         return UART_CONSOLE_ERR;
     }
 #if SLI_SI91X_MCU_INTERFACE == 0
+    uint8_t * data;
     if (NbBytesToRead > AvailableDataCount(&sReceiveFifo))
     {
         UARTDRV_Count_t count, remaining;

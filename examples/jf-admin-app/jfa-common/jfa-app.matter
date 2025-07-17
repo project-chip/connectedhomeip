@@ -2794,8 +2794,11 @@ provisional cluster JointFabricAdministrator = 1875 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kVIDNotVerified = 2;
-    kInvalidAdministratorFabricIndex = 3;
+    kBusy = 2;
+    kPAKEParameterError = 3;
+    kWindowNotOpen = 4;
+    kVIDNotVerified = 5;
+    kInvalidAdministratorFabricIndex = 6;
   }
 
   enum TransferAnchorResponseStatusEnum : enum8 {
@@ -2825,7 +2828,7 @@ provisional cluster JointFabricAdministrator = 1875 {
 
   request struct OpenJointCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;

@@ -1656,6 +1656,46 @@ provisional cluster MeterIdentification = 2822 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises. */
+provisional cluster CommodityMetering = 2823 {
+  revision 1;
+
+  shared enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
+  }
+
+  struct MeteredQuantityStruct {
+    int32u tariffComponentIDs[] = 0;
+    int64s quantity = 1;
+  }
+
+  readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
+  readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
+  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable int16u maximumMeteredQuantities = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
   device type ma_otarequestor = 18, version 1;
@@ -1931,6 +1971,18 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster CommodityMetering {
+    callback attribute meteredQuantity;
+    callback attribute meteredQuantityTimestamp;
+    callback attribute measurementType;
+    callback attribute maximumMeteredQuantities;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 }

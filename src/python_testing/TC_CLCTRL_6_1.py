@@ -25,7 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --timeout 30
+#       --timeout 60
 #       --endpoint 1
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -425,7 +425,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # STEP 5b: TH sends command MoveTo with Position = MoveToFullyOpen
             self.step("5b")
 
+            event_sub_handler.reset()
             sub_handler.reset()
+
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
@@ -434,12 +436,13 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
 
-            # STEP 5c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened.
+            # STEP 5c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened and the MovementCompleted event.
             self.step("5c")
 
-            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and OverallCurrentState.SecureState to be False")
+            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and the corresponding MovementCompleted event.")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
                                                           timeout_sec=timeout)
+            event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
 
             # STEP 5d: TH sends command MoveTo with Position = MoveToFullyClosed
             self.step("5d")
@@ -453,10 +456,12 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
 
-            # STEP 5e: Verify that the DUT has emitted the MovementCompleted event.
+            # STEP 5e: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed and the MovementCompleted event.
             self.step("5e")
 
-            # Wait for the MovementCompleted event to be emitted
+            logging.info("Waiting for OverallCurrentState.Position to be FullyClosed and the corresponding MovementCompleted event.")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
+                                                          timeout_sec=timeout)
             event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
 
             # STEP 5f: TH reads from the DUT the MainState attribute

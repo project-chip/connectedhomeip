@@ -63,6 +63,7 @@ target_include_directories(app PUBLIC
   ${PIGWEED_ROOT}/pw_assert_zephyr/public
   ${PIGWEED_ROOT}/pw_assert_zephyr/public_overrides
   ${PIGWEED_ROOT}/pw_bytes/public
+  ${PIGWEED_ROOT}/pw_numeric/public
   ${PIGWEED_ROOT}/pw_preprocessor/public
   ${PIGWEED_ROOT}/pw_polyfill/public
   ${PIGWEED_ROOT}/pw_polyfill/standard_library_public

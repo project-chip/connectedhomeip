@@ -93,7 +93,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
     BootReasonType matterBootCause;
-    uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
+    [[maybe_unused]] uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
 
 #if defined(_RMU_RSTCAUSE_MASK)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
