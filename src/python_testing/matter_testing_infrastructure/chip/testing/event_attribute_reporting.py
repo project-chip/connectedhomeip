@@ -32,9 +32,8 @@ import logging
 import queue
 import threading
 import time
-
-from enum import Enum
 from datetime import datetime, timezone
+from enum import Enum
 from typing import Any, Iterable, Optional
 
 from chip.clusters import ClusterObjects as ClusterObjects
