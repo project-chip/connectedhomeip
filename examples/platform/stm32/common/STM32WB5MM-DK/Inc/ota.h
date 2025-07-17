@@ -25,8 +25,8 @@
 extern "C" {
 #endif
 
-#include <platform/stm32/FactoryDataProvider.h>
-#include <platform/stm32/OTAImageProcessorImpl.h>
+#include <platform/stm32/stm32wb/FactoryDataProvider.h>
+#include <platform/stm32/stm32wb/OTAImageProcessorImpl.h>
 #include <stdint.h>
 
 /*! Attribute structure */
