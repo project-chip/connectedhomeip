@@ -214,7 +214,9 @@ const char * WebRTCClient::GetLocalDescription()
 
     auto desc = mPeerConnection->localDescription();
     if (desc.has_value())
+    {
         mLocalDescription = desc.value();
+    }
 
     return mLocalDescription.c_str();
 }

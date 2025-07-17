@@ -17,6 +17,7 @@
 
 import asyncio
 import logging
+from typing import Optional
 
 from .command import WebRTCProviderCommand
 from .types import Events, IceCandiate, IceCandidateList, PeerConnectionState
@@ -125,11 +126,11 @@ class PeerConnection(WebRTCClient):
         for candidate in remote_candidates:
             self.add_ice_candidate(candidate, "video")
 
-    async def get_local_answer(self, timeout: int | None = None) -> str:
+    async def get_local_answer(self, timeout_sec: Optional[int] = None) -> str:
         """Fetches the local SDP answer for the WebRTC peer connection.
 
         Args:
-            timeout (int | None): The maximum time in seconds to wait for a local answer sdp.
+            timeout_sec (Optional[int]): The maximum time in seconds to wait for a local answer sdp.
 
         Returns:
             str: The local SDP answer.
@@ -137,7 +138,7 @@ class PeerConnection(WebRTCClient):
         Raises:
             asyncio.TimeoutError: If timeout period is elapsed waiting.
         """
-        return await self._local_events[Events.ANSWER].get(timeout)
+        return await self._local_events[Events.ANSWER].get(timeout_sec)
 
     def set_remote_answer(self, answer_sdp: str) -> None:
         """Sets the remote SDP answer for the WebRTC peer connection.
@@ -147,11 +148,11 @@ class PeerConnection(WebRTCClient):
         """
         self.set_remote_description(answer_sdp, "answer")
 
-    async def get_local_offer(self, timeout: int | None = None) -> str:
+    async def get_local_offer(self, timeout_sec: Optional[int] = None) -> str:
         """Fetches the local SDP offer for the WebRTC peer connection.
 
         Args:
-            timeout (int | None): The maximum time in seconds to wait for a local offer sdp.
+            timeout_sec (Optional[int]): The maximum time in seconds to wait for a local offer sdp.
 
         Returns:
             str: The local SDP offer.
@@ -160,7 +161,7 @@ class PeerConnection(WebRTCClient):
             asyncio.TimeoutError: If timeout period is elapsed waiting.
         """
 
-        return await self._local_events[Events.OFFER].get(timeout)
+        return await self._local_events[Events.OFFER].get(timeout_sec)
 
     def set_remote_offer(self, offer_sdp: str) -> None:
         """Sets the remote SDP offer for the WebRTC peer connection.
