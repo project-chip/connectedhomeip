@@ -269,7 +269,7 @@ inline CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder)
     return aEncoder.Encode(Revision::kSpecificationVersion);
 }
 
-inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider *deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     ProductFinishEnum finish;
     ReturnErrorOnFailure(deviceInfoProvider->GetProductFinish(&finish));
