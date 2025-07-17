@@ -32,3 +32,4 @@ chip_enable_commodity_price_trigger = true
 chip_enable_commodity_tariff_trigger = true
 chip_enable_electrical_grid_conditions_trigger = true
 chip_enable_meter_identification_trigger = true
+chip_enable_commodity_metering_trigger = true

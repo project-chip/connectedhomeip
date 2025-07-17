@@ -38,6 +38,7 @@ declare_args() {
   chip_enable_meter_identification_trigger = false
   chip_enable_water_heater_management_trigger = false
   chip_enable_device_energy_management_trigger = false
+  chip_enable_commodity_metering_trigger = false
 }
 
 config("app-main-config") {
@@ -94,6 +95,10 @@ source_set("device-energy-management-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h" ]
 }
 
+source_set("commodity-metering-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h" ]
+}
+
 source_set("commodity-tariff-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h" ]
 }
@@ -125,6 +130,7 @@ source_set("app-main") {
   public_deps = [
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
+    ":commodity-metering-test-event-trigger",
     ":commodity-price-test-event-trigger",
     ":commodity-tariff-test-event-trigger",
     ":device-energy-management-test-event-trigger",
@@ -194,6 +200,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${chip_enable_water_heater_management_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER=${chip_enable_wifi_diagnostics_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${chip_enable_device_energy_management_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER=${chip_enable_commodity_metering_trigger}",
   ]
 
   public_configs = [ ":app-main-config" ]
