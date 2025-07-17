@@ -109,6 +109,8 @@ class JFControllerSubprocess(Subprocess):
 class OTAProviderSubprocess(AppServerSubprocess):
     """Wrapper class for starting an OTA Provider application server in a subprocess."""
 
+    DEFAULT_ADMIN_NODE_ID = 112233
+
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
 
@@ -164,7 +166,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
                 "fabricIndex": 1,
                 "privilege": Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                 "authMode": Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                "subjects": [dev_ctrl.nodeId] if hasattr(dev_ctrl, 'nodeId') else [112233],
+                "subjects": [dev_ctrl.nodeId] if hasattr(dev_ctrl, 'nodeId') else [self.DEFAULT_ADMIN_NODE_ID],
                 "targets": None
             },
             {
