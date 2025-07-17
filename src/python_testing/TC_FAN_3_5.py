@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,8 @@ from typing import Any, Callable, Optional
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
                                          has_feature, run_if_endpoint_matches)
 from mobly import asserts
 
@@ -66,10 +67,10 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 # LowestOff tests
                 TestStep(6, """[FC] Step 6 is used to verify the Step command behavior of the LowestOff field. The following step command fields are used in step 6 substeps:
-                         "- Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowestOff=True."),
+                         - Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowestOff=True."""),
                 TestStep(7, "[FC] Initialize the PercentSetting attribute to 100.",
                          "- Verify that the SpeedSetting attribute value is set to SpeedMax. - Verify that the FanMode attribute value is set to High."),
-                TestStep(8, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.")
+                TestStep(8, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes."),
                 TestStep(9, "[FC] TH sends Step commands iteratively.",
                          "- Verify that the PercentSetting attribute value reaches 0. - When the PercentSetting attribute value reaches 0, send an additional Step command to veiryf that the PercentSetting attribute value stays at 0."),
                 TestStep(10, "[FC] Read the resulting attribute reports from each subscription after the Step commands.",
@@ -310,15 +311,15 @@ class TC_FAN_3_5(MatterBaseTest):
 
         if not handle_current_values:
             self.subscriptions = [
-                ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
-                ClusterAttributeChangeAccumulator(cluster, attr.FanMode),
-                ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting)
+                AttributeSubscriptionHandler(cluster, attr.PercentSetting),
+                AttributeSubscriptionHandler(cluster, attr.FanMode),
+                AttributeSubscriptionHandler(cluster, attr.SpeedSetting)
             ]
         else:
             self.subscriptions = [
-                ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
-                ClusterAttributeChangeAccumulator(cluster, attr.PercentCurrent),
-                ClusterAttributeChangeAccumulator(cluster, attr.SpeedCurrent)
+                AttributeSubscriptionHandler(cluster, attr.PercentSetting),
+                AttributeSubscriptionHandler(cluster, attr.PercentCurrent),
+                AttributeSubscriptionHandler(cluster, attr.SpeedCurrent)
             ]
 
         for sub in self.subscriptions:
@@ -431,7 +432,7 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.write_setting(attr.PercentSetting, percent_setting_zero)
 
         # Subscribe to PercentSetting attribute
-        percent_setting_sub = ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting)
+        percent_setting_sub = AttributeSubscriptionHandler(cluster, attr.PercentSetting)
         await percent_setting_sub.start(self.default_controller, self.dut_node_id, self.endpoint)
 
         # Send Step command with direction=Increase
