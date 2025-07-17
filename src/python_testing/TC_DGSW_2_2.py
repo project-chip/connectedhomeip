@@ -80,7 +80,11 @@ class TC_DGSW_2_2(MatterBaseTest):
     def steps_TC_DGSW_2_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read the SoftwareFault event(s) from the DUT"),
+            TestStep(2, "DUT sends an event report to TH. TH reads a list of SoftwareFault struct from DUT.",
+                     "Validate the SoftwareFault event fields." \
+                     "The Id field of the struct is mandatory and shall be set with software thread ID that last software fault occurred." \
+                     "Name field shall be set to vendor specific name strings that last software fault occurred." \
+                     "FaultRecording field shall be set by a vendor specific payload in octstr format."),
         ]
         return steps
 
