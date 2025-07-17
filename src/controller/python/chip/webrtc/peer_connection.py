@@ -125,13 +125,19 @@ class PeerConnection(WebRTCClient):
         for candidate in remote_candidates:
             self.add_ice_candidate(candidate, "video")
 
-    def get_local_answer(self) -> str:
+    async def get_local_answer(self, timeout: int | None = None) -> str:
         """Fetches the local SDP answer for the WebRTC peer connection.
+
+        Args:
+            timeout (int | None): The maximum time in seconds to wait for a local answer sdp.
 
         Returns:
             str: The local SDP answer.
+
+        Raises:
+            asyncio.TimeoutError: If timeout period is elapsed waiting.
         """
-        return self.get_local_description()
+        return await self._local_events[Events.ANSWER].get(timeout)
 
     def set_remote_answer(self, answer_sdp: str) -> None:
         """Sets the remote SDP answer for the WebRTC peer connection.
@@ -141,13 +147,20 @@ class PeerConnection(WebRTCClient):
         """
         self.set_remote_description(answer_sdp, "answer")
 
-    def get_local_offer(self) -> str:
+    async def get_local_offer(self, timeout: int | None = None) -> str:
         """Fetches the local SDP offer for the WebRTC peer connection.
+
+        Args:
+            timeout (int | None): The maximum time in seconds to wait for a local offer sdp.
 
         Returns:
             str: The local SDP offer.
+
+        Raises:
+            asyncio.TimeoutError: If timeout period is elapsed waiting.
         """
-        return self.get_local_description()
+
+        return await self._local_events[Events.OFFER].get(timeout)
 
     def set_remote_offer(self, offer_sdp: str) -> None:
         """Sets the remote SDP offer for the WebRTC peer connection.
