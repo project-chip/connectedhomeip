@@ -213,42 +213,6 @@ class TC_PAVST_2_8(MatterBaseTest):
             asserts.assert_greater_equal(
                 len(transport_configs), 1, "TransportConfigurations must not be empty!"
             )
-#!/bin/bash
-
-# Step 1: Check if Pigweed is installed
-PW_ROOT="/home/raveendra/source-code/opensource/connectedhomeip/third_party/pigweed/repo"
-if [ ! -d "$PW_ROOT" ]; then
-    echo "Pigweed directory not found. Installing Pigweed..."
-    git clone https://github.com/google/pigweed.git "$PW_ROOT"
-fi
-
-# Step 2: Ensure necessary files are present
-PW_ENV_SCRIPT="$PW_ROOT/pw_env_setup/util.sh"
-PIGWEED_JSON="$PW_ROOT/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
-
-if [ ! -f "$PW_ENV_SCRIPT" ]; then
-    echo "Pigweed environment script not found. Reinstalling Pigweed..."
-    rm -rf "$PW_ROOT"
-    git clone https://github.com/google/pigweed.git "$PW_ROOT"
-fi
-
-if [ ! -f "$PIGWEED_JSON" ]; then
-    echo "pigweed.json not found. Generating it..."
-    # Assuming there's a script or command to generate pigweed.json
-    # For example:
-    # python3 "$PW_ROOT/pw_env_setup/py/pw_env_setup/generate_pigweed_json.py"
-fi
-
-# Step 3: Set environment variables
-export PW_ROOT="$PW_ROOT"
-
-# Step 4: Run Pigweed bootstrap and finalize scripts
-source "$PW_ROOT/pw_env_setup/util.sh"
-pw_bootstrap
-pw_finalize
-
-# Step 5: Activate the connectedhomeip environment
-source ./scripts/activate.sh            aConnectionID = transport_configs[0].ConnectionID
 
         # TH1 sends command
         self.step(3)
