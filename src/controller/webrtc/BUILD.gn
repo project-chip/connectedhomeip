@@ -53,11 +53,6 @@ static_library("chip_webrtc") {
     "crypto",
   ]
 
-  # suppress known `libdatachannel` int conversion issues on darwin builds
-  if (host_os == "mac") {
-    cflags = [
-      "-Wno-implicit-int-conversion",
-      "-Wno-conversion",
-    ]
-  }
+  # suppress known `libdatachannel` int conversion issues
+  cflags_cc = [ "-Wno-implicit-int-conversion" ]
 }
