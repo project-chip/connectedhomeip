@@ -117,9 +117,9 @@ private:
      * invalid index.
      *
      */
-    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(System::Clock::Seconds32 currentMatterEpochTimestampInSeconds);
+    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(System::Clock::Seconds32 currentMatterEpochTimestamp);
 
-    CHIP_ERROR StartExpirationTimer(System::Clock::Seconds32 timeoutInSecs);
+    CHIP_ERROR StartExpirationTimer(System::Clock::Seconds32 timeout);
 
     static void TimerExpiredCallback(System::Layer * systemLayer, void * appState);
 

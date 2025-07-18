@@ -339,11 +339,11 @@ CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(size_t indexT
     return CHIP_NO_ERROR;
 }
 
-bool ThermostatDelegate::FindInList(uint8_t uniqueIDToFind)
+bool ThermostatDelegate::HaveSuggestionWithID(uint8_t uniqueIDToFind)
 {
-    for (size_t index = 0; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList); index++)
+    for (auto & suggestion : Span(mThermostatSuggestions, mNextFreeIndexInThermostatSuggestionsList))
     {
-        if (uniqueIDToFind == mThermostatSuggestions[index].GetUniqueID())
+        if (uniqueIDToFind == suggestion.GetUniqueID())
         {
             return true;
         }
@@ -375,7 +375,6 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
             if (uniqueID == UINT8_MAX)
             {
                 return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-                return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
             }
         };
     }
@@ -387,7 +386,7 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
  *
  * @param[in] timeoutInSecs The timeout in seconds.
  */
-CHIP_ERROR ThermostatDelegate::StartExpirationTimer(Seconds32 timeoutInSecs)
+CHIP_ERROR ThermostatDelegate::StartExpirationTimer(Seconds32 timeout)
 {
     ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
                     timeoutInSecs.count());
@@ -460,7 +459,7 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
     return CHIP_NO_ERROR;
 }
 
-size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime(Seconds32 currentMatterEpochTimestampInSeconds)
+size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime(Seconds32 currentMatterEpochTimestamp)
 {
     uint8_t maxThermostatSuggestions = GetMaxThermostatSuggestions();
     VerifyOrReturnValue(GetNumberOfThermostatSuggestions() > 0, maxThermostatSuggestions);

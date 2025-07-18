@@ -88,7 +88,7 @@ Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueID
     CHIP_ERROR err              = CHIP_NO_ERROR;
 
     size_t index = 0;
-    while (true)
+    for (size_t index = 0; true; ++index)
     {
         ThermostatSuggestionStructWithOwnedMembers suggestion;
         err = delegate->GetThermostatSuggestionAtIndex(index, suggestion);
