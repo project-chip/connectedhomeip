@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include <app/AttributeValueEncoder.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <app/AttributeValueEncoder.h>
 
 namespace chip {
 namespace app {

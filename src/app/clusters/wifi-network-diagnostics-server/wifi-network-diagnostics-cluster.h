@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/WiFiNetworkDiagnostics/ClusterId.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
@@ -35,8 +35,8 @@ class WiFiDiagnosticsServerCluster : public DefaultServerCluster
 {
 public:
     WiFiDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                          const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
-                          BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
+                                 const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
+                                 BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
         DefaultServerCluster({ endpointId, WiFiNetworkDiagnostics::Id }),
         mLogic(diagnosticProvider, enabledAttributes, featureFlags)
     {}
