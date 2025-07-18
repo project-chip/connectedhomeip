@@ -106,70 +106,91 @@ tests:
               minValue: 0
               maxValue: 254
 
-    #SDK not enabled this failure response
-    # - label:
-    #       "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
-    #       to PIXIT.LWM.MODE_CHANGE_FAIL"
-    #   PICS: LWM.S.M.CAN_TEST_MODE_FAILURE && LWM.S.C00.Rsp
-    #   command: "ChangeToMode"
-    #   arguments:
-    #       values:
-    #           - name: "NewMode"
-    #             value: NewMode_CHANGE_FAIL
-    #   response:
-    #       values:
-    #           - name: "Status"
-    #             constraints:
-    #                 anyOf:
-    #                     [
-    #                         0x02,
-    #                         0x80,
-    #                         0x81,
-    #                         0x82,
-    #                         0x83,
-    #                         0x84,
-    #                         0x85,
-    #                         0x86,
-    #                         0x87,
-    #                         0x88,
-    #                         0x89,
-    #                         0x8A,
-    #                         0x8B,
-    #                         0x8C,
-    #                         0x8D,
-    #                         0x8E,
-    #                         0xBF,
-    #                     ]
-    #           - name: "StatusText"
-    #             constraints:
-    #                 minLength: 1
-    #                 maxLength: 64
-
     - label:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.LWM.MODE_CHANGE_FAIL"
-      PICS:
-          LWM.S.M.CAN_TEST_MODE_FAILURE && LWM.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
-      verification: |
-          Note : Please skip this step as SDK is not enabled with this failure response
-
-          ./chip-tool laundrywashermode change-to-mode 2 1 1
-
-          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a GenericFailure(0x02)  status response and below is the sample log provided for the raspi platform:
-
-          [1690270057.274893][31185:31187] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0051 Command=0x0000_0001
-          [1690270057.274901][31185:31187] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Command 0x0000_0001
-          [1690270057.274915][31185:31187] CHIP:TOO:   ChangeToModeResponse: {
-          [1690270057.274921][31185:31187] CHIP:TOO:     status: 0
-          [1690270057.274924][31185:31187] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: LWM.S.M.CAN_TEST_MODE_FAILURE && LWM.S.C00.Rsp
+      command: "ChangeToMode"
       arguments:
           values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "NewMode"
+                value: NewMode_CHANGE_FAIL
+      response:
+          values:
+              - name: "Status"
+                constraints:
+                    anyOf: [
+                            0x02, # GenericFailure
+                            0x03, # InvalidInMode
+                            0x80,
+                            0x81,
+                            0x82,
+                            0x83,
+                            0x84,
+                            0x85,
+                            0x86,
+                            0x87,
+                            0x88,
+                            0x89,
+                            0x8A,
+                            0x8B,
+                            0x8C,
+                            0x8D,
+                            0x8E,
+                            0x8F,
+                            0x90,
+                            0x91,
+                            0x92,
+                            0x93,
+                            0x94,
+                            0x95,
+                            0x96,
+                            0x97,
+                            0x98,
+                            0x99,
+                            0x9A,
+                            0x9B,
+                            0x9C,
+                            0x9D,
+                            0x9E,
+                            0x9F,
+                            0xA0,
+                            0xA1,
+                            0xA2,
+                            0xA3,
+                            0xA4,
+                            0xA5,
+                            0xA6,
+                            0xA7,
+                            0xA8,
+                            0xA9,
+                            0xAA,
+                            0xAB,
+                            0xAC,
+                            0xAD,
+                            0xAE,
+                            0xAF,
+                            0xB0,
+                            0xB1,
+                            0xB2,
+                            0xB3,
+                            0xB4,
+                            0xB5,
+                            0xB6,
+                            0xB7,
+                            0xB8,
+                            0xB9,
+                            0xBA,
+                            0xBB,
+                            0xBC,
+                            0xBD,
+                            0xBE,
+                            0xBF,
+                        ]
+              - name: "StatusText"
+                constraints:
+                    minLength: 1
+                    maxLength: 64
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
       PICS: LWM.S.A0001
