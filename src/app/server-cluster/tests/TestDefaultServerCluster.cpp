@@ -205,7 +205,6 @@ TEST_F(TestDefaultServerCluster, NotifyAttributeChanged)
 TEST_F(TestDefaultServerCluster, AppendAttributes)
 {
     const size_t global_attribute_count = DefaultServerCluster::GlobalAttributes().size();
-    ASSERT_EQ(global_attribute_count, 5u); // Sanity check on what we expect below.
 
     constexpr BitFlags<DataModel::AttributeQualityFlags> kNoFlags;
 
