@@ -149,7 +149,9 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
 
                     if (fabricDescriptor.VIDVerificationStatement.HasValue())
                     {
-                        ChipLogError(Controller, "JCM: A VID Verification Statement is not supported, Joint Fabric requires an ICA on the fabric!");
+                        ChipLogError(
+                            Controller,
+                            "JCM: A VID Verification Statement is not supported, Joint Fabric requires an ICA on the fabric!");
                         return CHIP_ERROR_CANCELLED;
                     }
 
@@ -162,15 +164,16 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
                         }
 
                         mInfo.rootPublicKey.CopyFromSpan(fabricDescriptor.rootPublicKey);
-                        mInfo.adminVendorId = fabricDescriptor.vendorID;
-                        mInfo.adminFabricId = fabricDescriptor.fabricID;
+                        mInfo.adminVendorId      = fabricDescriptor.vendorID;
+                        mInfo.adminFabricId      = fabricDescriptor.fabricID;
                         foundMatchingFabricIndex = true;
 
                         ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator Fabric Table");
                         break;
                     }
                 }
-                if (!foundMatchingFabricIndex) {
+                if (!foundMatchingFabricIndex)
+                {
                     return CHIP_ERROR_NOT_FOUND;
                 }
 
