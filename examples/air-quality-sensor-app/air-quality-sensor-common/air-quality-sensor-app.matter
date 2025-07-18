@@ -2822,6 +2822,17 @@ endpoint 0 {
     handle command KeySetReadAllIndices;
     handle command KeySetReadAllIndicesResponse;
   }
+
+  server cluster IcdManagement {
+    callback attribute idleModeDuration;
+    callback attribute activeModeDuration;
+    callback attribute activeModeThreshold;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
 }
 endpoint 1 {
   device type ma_air_quality_sensor = 44, version 1;
@@ -2849,17 +2860,6 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
-  }
-
-  server cluster IcdManagement {
-    callback attribute idleModeDuration;
-    callback attribute activeModeDuration;
-    callback attribute activeModeThreshold;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
   }
 
   server cluster AirQuality {
