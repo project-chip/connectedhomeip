@@ -127,9 +127,8 @@ DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTr
     return (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                   const Commands::TimeSnapshot::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                                                const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -147,7 +146,7 @@ HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & command
  * This builds upon the HandleTimeSnapshot function used by the default general diagnostic cluster class,
  * but also considers real posix time. This is put into a seperate function and called in a seperate class so
  * that it will be used only for the cases where needed, to avoid frequently reporting unsynced time.
-*/
+ */
 std::optional<DataModel::ActionReturnStatus>
 HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const Commands::TimeSnapshot::DecodableType & commandData)
@@ -171,8 +170,7 @@ HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandP
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     if (posix_time_ms.count() != 0)
     {
-        response.posixTimeMs.SetNonNull(
-            static_cast<uint64_t>(posix_time_ms.count()));
+        response.posixTimeMs.SetNonNull(static_cast<uint64_t>(posix_time_ms.count()));
     }
     handler.AddResponse(commandPath, response);
     return std::nullopt;
@@ -468,8 +466,9 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
     return err;
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(
-    const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                         CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -481,14 +480,18 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterFullConfig
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        if (mFunctionConfig.enablePosixTime) {
+        if (mFunctionConfig.enablePosixTime)
+        {
             return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data);
-        } else {
+        }
+        else
+        {
             return HandleTimeSnapshot(*handler, request.path, request_data);
         }
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
-        if (mFunctionConfig.enablePayloadSnaphot) {
+        if (mFunctionConfig.enablePayloadSnaphot)
+        {
             GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
             ReturnErrorOnFailure(request_data.Decode(input_arguments));
             return HandlePayloadTestRequest(*handler, request.path, request_data);

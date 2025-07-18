@@ -76,7 +76,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
-        .enablePosixTime = true,
+        .enablePosixTime      = true,
         .enablePayloadSnaphot = true,
     };
 

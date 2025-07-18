@@ -28,8 +28,7 @@ namespace CYW30739 {
 class EventManagementTestEventTriggerHandler : public app::GenericEventManagementTestEventTriggerHandler
 {
 public:
-    EventManagementTestEventTriggerHandler(
-        app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance = nullptr) :
+    EventManagementTestEventTriggerHandler(app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance = nullptr) :
         app::GenericEventManagementTestEventTriggerHandler(generalDiagnosticsClusterInstance)
     {}
 

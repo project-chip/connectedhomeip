@@ -125,8 +125,10 @@ private:
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
-    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsEnabledAttributes & enabledAttributes, const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(enabledAttributes), mFunctionConfig(functionsConfig)
+    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsEnabledAttributes & enabledAttributes,
+                                              const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
+        GeneralDiagnosticsCluster(enabledAttributes),
+        mFunctionConfig(functionsConfig)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
