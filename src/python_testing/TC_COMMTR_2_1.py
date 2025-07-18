@@ -188,7 +188,7 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
             matter_asserts.assert_list_element_type(
                 val, cluster.Structs.MeteredQuantityStruct, "MeteredQuantity attribute must contain MeteredQuantityStruct elements")
             for item in val:
-                await self.checkMeteredQuantityStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                await self.checkMeteredQuantityStruct(struct=item)
 
         self.step("12")
         # TH sends TestEventTrigger command for Test Event Clear, expected SUCCESS
