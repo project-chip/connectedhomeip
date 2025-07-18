@@ -173,9 +173,8 @@ gboolean BluezConnection::WriteHandlerCallback(GIOChannel * aChannel, GIOConditi
 {
     VerifyOrReturnValue(!(aCond & G_IO_HUP), G_SOURCE_REMOVE,
                         ChipLogError(DeviceLayer, "INFO: socket disconnected in %s", __func__));
-    VerifyOrReturnValue(!(aCond & (G_IO_ERR | G_IO_NVAL)), G_SOURCE_REMOVE,
-                        ChipLogError(DeviceLayer, "INFO: socket error in %s", __func__));
-    VerifyOrReturnValue(aCond == G_IO_IN, G_SOURCE_REMOVE, ChipLogError(DeviceLayer, "FAIL: error in %s", __func__));
+    VerifyOrReturnValue(aCond == G_IO_IN, G_SOURCE_REMOVE,
+                        ChipLogError(DeviceLayer, "FAIL: socket error in %s: cond=0x%x", __func__, aCond));
 
     uint8_t buf[512 /* characteristic max size per BLE specification */];
     ssize_t len;
@@ -212,9 +211,8 @@ gboolean BluezConnection::NotifyHandlerCallback(GIOChannel * aChannel, GIOCondit
 {
     VerifyOrReturnValue(!(aCond & G_IO_HUP), G_SOURCE_REMOVE,
                         ChipLogError(DeviceLayer, "INFO: socket disconnected in %s", __func__));
-    VerifyOrReturnValue(!(aCond & (G_IO_ERR | G_IO_NVAL)), G_SOURCE_REMOVE,
-                        ChipLogError(DeviceLayer, "INFO: socket error in %s", __func__));
-    VerifyOrReturnValue(aCond == G_IO_IN, G_SOURCE_REMOVE, ChipLogError(DeviceLayer, "FAIL: error in %s", __func__));
+    VerifyOrReturnValue(aCond == G_IO_IN, G_SOURCE_REMOVE,
+                        ChipLogError(DeviceLayer, "FAIL: socket error in %s: cond=0x%x", __func__, aCond));
 
     uint8_t value = 0;
     ssize_t len;
