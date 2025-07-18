@@ -80,7 +80,7 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
             TestStep("3", "TH reads MaximumMeteredQuantities attribute", """
                      - DUT replies a null value or a uint16 value;
                      - Store value as MaxMeteredQuantities."""),
-            TestStep("4 ", "TH reads MeteredQuantity attribute", """
+            TestStep("4", "TH reads MeteredQuantity attribute", """
                      - DUT replies Null or a list of MeteredQuantityStruct entries.
                      - Verify that the list length less or equal MaxMeteredQuantities from step 3;
                      - Verify that the TariffComponentIDs field is a list with length less or equal 128;
