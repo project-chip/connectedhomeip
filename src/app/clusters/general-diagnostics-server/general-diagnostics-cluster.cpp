@@ -137,15 +137,15 @@ HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & command
 
     System::Clock::Milliseconds64 system_time_ms =
         std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
-        
+
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     handler.AddResponse(commandPath, response);
     return std::nullopt;
 }
 
 /*
- * This builds upon the HandleTimeSnapshot function used by the default general diagnostic cluster class, 
- * but also considers real posix time. This is put into a seperate function and called in a seperate class so 
+ * This builds upon the HandleTimeSnapshot function used by the default general diagnostic cluster class,
+ * but also considers real posix time. This is put into a seperate function and called in a seperate class so
  * that it will be used only for the cases where needed, to avoid frequently reporting unsynced time.
 */
 std::optional<DataModel::ActionReturnStatus>

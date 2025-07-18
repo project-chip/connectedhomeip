@@ -73,21 +73,21 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
-        .enablePosixTime = 
-#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) 
-        true, 
-#else 
-        false, 
-#endif
-        .enablePayloadSnaphot = 
-#if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD) 
+        .enablePosixTime =
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
         true,
-#else 
-        false, 
+#else
+        false,
+#endif
+        .enablePayloadSnaphot =
+#if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
+        true,
+#else
+        false,
 #endif
     };
     gServer.Create(enabledAttributes, functionsConfig);
-#else 
+#else
     gServer.Create(enabledAttributes);
 #endif
 
