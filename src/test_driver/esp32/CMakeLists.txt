@@ -56,6 +56,7 @@ esp32_unit_test(NAME testMdns LIBRARY MdnsTests)
 esp32_unit_test(NAME testPlatform LIBRARY PlatformTests)
 esp32_unit_test(NAME testRetransmit LIBRARY RetransmitTests)
 esp32_unit_test(NAME testSetupPayload LIBRARY SetupPayloadTests)
+esp32_unit_test(NAME testSupport LIBRARY SupportTests)
 esp32_unit_test(NAME testSystemLayer LIBRARY SystemLayerTests)
 esp32_unit_test(NAME testUserDirectedCommissioning LIBRARY UserDirectedCommissioningTests)
 
