@@ -29,8 +29,8 @@
 #include <clusters/Thermostat/Structs.h>
 #include <cstdint>
 #include <lib/support/Span.h>
-#include <system/SystemClock.h>
 #include <stddef.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {

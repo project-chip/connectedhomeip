@@ -369,13 +369,13 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
     // If overflow occurs, check for next available uniqueID.
     if (uniqueID == 0)
     {
-        while(FindInList(uniqueID))
+        while (FindInList(uniqueID))
         {
             uniqueID++;
             if (uniqueID == UINT8_MAX)
             {
                 return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-               return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+                return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
             }
         };
     }
@@ -392,8 +392,8 @@ CHIP_ERROR ThermostatDelegate::StartExpirationTimer(Seconds32 timeoutInSecs)
     ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
                     timeoutInSecs.count());
     mIsExpirationTimerRunning = true;
-    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(timeoutInSecs),
-                                                 TimerExpiredCallback, static_cast<void *>(this));
+    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(timeoutInSecs), TimerExpiredCallback,
+                                                 static_cast<void *>(this));
 }
 
 void ThermostatDelegate::TimerExpiredCallback(System::Layer * systemLayer, void * appState)
@@ -465,7 +465,7 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
     uint8_t maxThermostatSuggestions = GetMaxThermostatSuggestions();
     VerifyOrReturnValue(GetNumberOfThermostatSuggestions() > 0, maxThermostatSuggestions);
 
-    Seconds32 minEffectiveTimeValue         = Seconds32(UINT32_MAX);
+    Seconds32 minEffectiveTimeValue        = Seconds32(UINT32_MAX);
     size_t minEffectiveTimeSuggestionIndex = maxThermostatSuggestions;
 
     for (size_t index = 0; index < static_cast<size_t>(GetNumberOfThermostatSuggestions()); index++)

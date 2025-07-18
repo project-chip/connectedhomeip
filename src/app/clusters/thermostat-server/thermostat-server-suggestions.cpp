@@ -44,10 +44,11 @@ CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint32_t currentMatterEpochTimestampInSeconds = 0;
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
+    CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    for (size_t i = static_cast<size_t>(delegate->GetNumberOfThermostatSuggestions() - 1); i >= 0 && delegate->GetNumberOfThermostatSuggestions() > 0; i--)
+    for (size_t i = static_cast<size_t>(delegate->GetNumberOfThermostatSuggestions() - 1);
+         i >= 0 && delegate->GetNumberOfThermostatSuggestions() > 0; i--)
     {
         ThermostatSuggestionStructWithOwnedMembers suggestion;
 
@@ -84,7 +85,7 @@ Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueID
     VerifyOrReturnValue(delegate != nullptr, Status::Failure);
 
     size_t uniqueIDMatchedIndex = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
 
     size_t index = 0;
     while (true)
@@ -175,10 +176,11 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     }
 
     uint8_t uniqueID = 0;
-    err = delegate->GetUniqueID(uniqueID);
+    err              = delegate->GetUniqueID(uniqueID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to AppendToThermostatSuggestionsList. No UniqueID was not found. error: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to AppendToThermostatSuggestionsList. No UniqueID was not found. error: %" CHIP_ERROR_FORMAT,
+                     err.Format());
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
