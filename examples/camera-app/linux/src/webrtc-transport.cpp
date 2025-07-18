@@ -82,3 +82,13 @@ void WebrtcTransport::SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack)
     ChipLogProgress(Camera, "Setting audio track for sessionID: %u", mSessionID);
     mAudioTrack = audioTrack;
 }
+
+void WebrtcTransport::SetVideoStreamID(uint16_t videoStreamID)
+{
+    mVideoStreamID = videoStreamID;
+}
+
+void WebrtcTransport::SetAudioStreamID(uint16_t audioStreamID)
+{
+    mAudioStreamID = audioStreamID;
+}
