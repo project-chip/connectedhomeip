@@ -55,10 +55,6 @@ CHIP_ERROR ReadFullDuplex(DeviceLayer::DiagnosticDataProvider & provider, Attrib
     {
         fullDuplex.SetNonNull(value);
     }
-    else
-    {
-        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
-    }
 
     return encoder.Encode(fullDuplex);
 }
@@ -71,10 +67,6 @@ CHIP_ERROR ReadCarrierDetect(DeviceLayer::DiagnosticDataProvider & provider, Att
     if (provider.GetEthCarrierDetect(value) == CHIP_NO_ERROR)
     {
         carrierDetect.SetNonNull(value);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
     }
 
     return encoder.Encode(carrierDetect);
