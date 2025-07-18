@@ -97,7 +97,7 @@ CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, chip::app::Attr
     if (readError == CHIP_NO_ERROR)
     {
         readError = aEncoder.EncodeList([&valueList](const auto & encoder) -> CHIP_ERROR {
-            for (auto value : valueList)
+            for (auto & value : valueList)
             {
                 ReturnErrorOnFailure(encoder.Encode(value));
             }
