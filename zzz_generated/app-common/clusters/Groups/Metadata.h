@@ -60,6 +60,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace AddGroupIfIdentifying
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Groups
 } // namespace Clusters
 } // namespace app
