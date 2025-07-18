@@ -41,10 +41,10 @@ from chip.exceptions import ChipStackError
 from chip.native import PyChipError
 from chip.testing.matter_testing import CustomCommissioningParameters, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
 
 
-class TC_CADMIN_1_9(CADMINSupport):
+class TC_CADMIN_1_9(CADMINBaseTest):
     async def OpenCommissioningWindowForMaxTime(self) -> CustomCommissioningParameters:
         cluster = Clusters.GeneralCommissioning
         attribute = cluster.Attributes.BasicCommissioningInfo

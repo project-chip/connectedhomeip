@@ -39,10 +39,10 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
 
 
-class TC_CADMIN_1_22_24(CADMINSupport):
+class TC_CADMIN_1_22_24(CADMINBaseTest):
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
             params = await self.th1.OpenCommissioningWindow(

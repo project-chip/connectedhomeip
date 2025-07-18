@@ -39,10 +39,10 @@ from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import AttributeValue, TestStep, async_test_body, default_matter_test_main
 
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
 
 
-class TC_CADMIN_1_19(CADMINSupport):
+class TC_CADMIN_1_19(CADMINBaseTest):
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),

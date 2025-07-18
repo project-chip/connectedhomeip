@@ -32,7 +32,7 @@ from mdns_discovery import mdns_discovery
 from mobly import asserts
 
 
-class CADMINSupport(MatterBaseTest):
+class CADMINBaseTest(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl, fabric_filtered: bool = True) -> int:
         """Get fabrics information from the device."""
         OC_cluster = Clusters.OperationalCredentials

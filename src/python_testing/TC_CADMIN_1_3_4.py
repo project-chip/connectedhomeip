@@ -56,13 +56,13 @@ from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
 from chip.tlv import TLVReader
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
 
-class TC_CADMIN(CADMINSupport):
+class TC_CADMIN(CADMINBaseTest):
     async def combined_commission_val_steps(self, commission_type: str):
         """
         Combined test function for commissioning tests.

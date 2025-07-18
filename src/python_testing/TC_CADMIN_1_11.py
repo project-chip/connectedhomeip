@@ -44,10 +44,10 @@ from chip.exceptions import ChipStackError
 from chip.native import PyChipError
 from chip.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
 
 
-class TC_CADMIN_1_11(CADMINSupport):
+class TC_CADMIN_1_11(CADMINBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode is None:
             params = await th.OpenCommissioningWindow(
