@@ -44,6 +44,8 @@ config("datachannel_config") {
   ]
 
   cflags_cc = [ "-Wno-shadow" ]
+
+  # suppress known `libdatachannel` int conversion issues on darwin builds
   if (host_os == "mac") {
     cflags_cc += [ "-Wno-implicit-int-conversion" ]
   }
