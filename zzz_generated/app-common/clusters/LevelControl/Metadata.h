@@ -117,6 +117,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace MoveToClosestFrequency
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace LevelControl
 } // namespace Clusters
 } // namespace app
