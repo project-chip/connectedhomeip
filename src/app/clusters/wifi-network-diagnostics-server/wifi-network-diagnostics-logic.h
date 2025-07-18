@@ -47,7 +47,7 @@ public:
     {
         T value;
         CHIP_ERROR err = (mDiagnosticProvider.*getter)(value);
-    
+
         if (err == CHIP_NO_ERROR)
         {
             data.SetNonNull(value);
@@ -56,7 +56,7 @@ public:
         {
             ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
         }
-    
+
         return aEncoder.Encode(data);
     }
 
