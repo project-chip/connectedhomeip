@@ -118,7 +118,7 @@ chip::app::DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::
     auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
     if (triggerDelegate == nullptr)
     {
-        return chip::Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
 
     CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTriggers(commandData.eventTrigger);
