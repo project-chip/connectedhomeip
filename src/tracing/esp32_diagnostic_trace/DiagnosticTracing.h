@@ -21,6 +21,7 @@
 #include <tracing/backend.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 #include <tracing/metric_event.h>
+#include <unordered_map>
 
 namespace chip {
 namespace Tracing {
@@ -31,7 +32,7 @@ namespace Diagnostics {
 class ESP32Diagnostics : public ::chip::Tracing::Backend
 {
 public:
-    ESP32Diagnostics(CircularDiagnosticBuffer * storageInstance) : mStorageInstance(storageInstance) {}
+    ESP32Diagnostics(CircularDiagnosticBuffer * storageInstance);
 
     // Deleted copy constructor and assignment operator to prevent copying
     ESP32Diagnostics(const ESP32Diagnostics &)             = delete;
@@ -54,10 +55,52 @@ public:
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
     void LogMetricEvent(const MetricEvent &) override;
 
+    /*
+     * @brief Add a filter to the diagnostic backend
+     * @param scope The scope to filter
+     * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid or already exists
+     * @return CHIP_NO_ERROR if the filter is already present or added successfully
+     */
+    CHIP_ERROR AddFilter(const char * scope);
+
+    /*
+     * @brief Remove a filter from the diagnostic backend
+     * @param scope The scope to remove
+     * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid or does not exist
+     * @return CHIP_NO_ERROR if the filter was removed successfully
+     */
+    CHIP_ERROR RemoveFilter(const char * scope);
+
+    /*
+     * @brief Clear all filters from the diagnostic backend
+     */
+    void ClearFilters();
+
 private:
     using ValueType = MetricEvent::Value::Type;
     CircularDiagnosticBuffer * mStorageInstance;
+    std::unordered_map<uint32_t, bool> mEnabledFilters;
+
+    /*
+     * @brief Store the diagnostics in the storage instance
+     * @param label The trace label
+     * @param group The trace group/scope
+     * @return CHIP_ERROR_INVALID_ARGUMENT if the label or group is invalid
+     * @return CHIP_NO_ERROR if the diagnostics were stored successfully
+     */
     CHIP_ERROR StoreDiagnostics(const char * label, const char * group);
+
+    /*
+     * @brief Initialize the default filters
+     */
+    void InitializeDefaultFilters();
+
+    /*
+     * @brief Check if the scope is enabled
+     * @param scope The scope to check
+     * @return true if the scope is enabled or if no filters are set, false otherwise
+     */
+    bool IsEnabled(const char * scope);
 };
 
 } // namespace Diagnostics

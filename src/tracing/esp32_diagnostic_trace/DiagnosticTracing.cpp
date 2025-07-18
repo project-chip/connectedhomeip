@@ -17,9 +17,8 @@
  */
 
 #include <algorithm>
-#include <esp_err.h>
-#include <esp_log.h>
 #include <lib/support/CHIPMemString.h>
+#include <system/SystemClock.h>
 #include <tracing/esp32_diagnostic_trace/Counter.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 
@@ -38,7 +37,7 @@ uint32_t MurmurHash(const void * key)
 
     while (*data)
     {
-        uint32_t value = *data++;
+        uint32_t value = tolower(*data++);
         value *= kMultiplier;
         value ^= value >> kShift;
         value *= kMultiplier;
@@ -59,44 +58,58 @@ uint32_t MurmurHash(const void * key)
 }
 } // anonymous namespace
 
-constexpr size_t kPermitListMaxSize = CONFIG_MAX_PERMIT_LIST_SIZE;
-using HashValue                     = uint32_t;
-
-/*
- * gPermitList will allow the following traces to be stored in the storage instance while other traces are skipped.
- * Only traces with scope in gPermitList are allowed.
- * Used for MATTER_TRACE_SCOPE()
- */
-HashValue gPermitList[kPermitListMaxSize] = { MurmurHash("PASESession"),
-                                              MurmurHash("CASESession"),
-                                              MurmurHash("NetworkCommissioning"),
-                                              MurmurHash("GeneralCommissioning"),
-                                              MurmurHash("OperationalCredentials"),
-                                              MurmurHash("CASEServer"),
-                                              MurmurHash("Fabric") };
-
-/*
- * gSkipList will skip the following traces from being stored in the storage instance while other traces are stored.
- * Used for MATTER_TRACE_INSTANT()
- */
-HashValue gSkipList[kPermitListMaxSize] = {
-    MurmurHash("Resolver"),
-};
-
-bool IsPresent(const char * str, HashValue * list)
+ESP32Diagnostics::ESP32Diagnostics(CircularDiagnosticBuffer * storageInstance) : mStorageInstance(storageInstance)
 {
-    for (int i = 0; i < kPermitListMaxSize; i++)
+    ClearFilters();
+    InitializeDefaultFilters();
+}
+
+void ESP32Diagnostics::InitializeDefaultFilters()
+{
+    mEnabledFilters[MurmurHash("PASESession")]            = true;
+    mEnabledFilters[MurmurHash("CASESession")]            = true;
+    mEnabledFilters[MurmurHash("NetworkCommissioning")]   = true;
+    mEnabledFilters[MurmurHash("GeneralCommissioning")]   = true;
+    mEnabledFilters[MurmurHash("OperationalCredentials")] = true;
+    mEnabledFilters[MurmurHash("CASEServer")]             = true;
+    mEnabledFilters[MurmurHash("Fabric")]                 = true;
+}
+
+CHIP_ERROR ESP32Diagnostics::AddFilter(const char * scope)
+{
+    VerifyOrReturnError(scope != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end())
     {
-        if (list[i] == 0)
-        {
-            break;
-        }
-        if (MurmurHash(str) == list[i])
-        {
-            return true;
-        }
+        ChipLogProgress(DeviceLayer, "Filter for scope '%s' already exists", scope);
+        return CHIP_NO_ERROR;
     }
-    return false;
+    mEnabledFilters[MurmurHash(scope)] = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ESP32Diagnostics::RemoveFilter(const char * scope)
+{
+    VerifyOrReturnError(scope != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(strlen(scope) > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end(), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(DeviceLayer, "Filter does not exist"));
+    mEnabledFilters.erase(MurmurHash(scope));
+    return CHIP_NO_ERROR;
+}
+
+void ESP32Diagnostics::ClearFilters()
+{
+    mEnabledFilters.clear();
+}
+
+bool ESP32Diagnostics::IsEnabled(const char * scope)
+{
+    // If no filters are set, all scopes are enabled
+    if (mEnabledFilters.empty())
+    {
+        return true;
+    }
+    return mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end();
 }
 
 void ESP32Diagnostics::LogMessageReceived(MessageReceivedInfo & info) {}
@@ -111,6 +124,9 @@ void ESP32Diagnostics::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 
 void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 {
+#if CONFIG_ENABLE_ONLY_TRACES
+    return;
+#endif // CONFIG_ENABLE_ONLY_TRACES
     VerifyOrReturn(mStorageInstance != nullptr, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
     DiagnosticEntry entry;
     switch (event.ValueType())
@@ -120,7 +136,7 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
         Platform::CopyString(entry.label, event.key());
         entry.intValue                 = event.ValueInt32();
         entry.type                     = Diagnostics::ValueType::kSignedInteger;
-        entry.timestamps_ms_since_boot = esp_log_timestamp();
+        entry.timestamps_ms_since_boot = static_cast<uint32_t>(chip::System::SystemClock().GetMonotonicMilliseconds64().count());
         ReturnOnFailure(mStorageInstance->Store(entry));
         break;
     case ValueType::kUInt32:
@@ -128,7 +144,7 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
         Platform::CopyString(entry.label, event.key());
         entry.uintValue                = event.ValueUInt32();
         entry.type                     = Diagnostics::ValueType::kUnsignedInteger;
-        entry.timestamps_ms_since_boot = esp_log_timestamp();
+        entry.timestamps_ms_since_boot = static_cast<uint32_t>(chip::System::SystemClock().GetMonotonicMilliseconds64().count());
         ReturnOnFailure(mStorageInstance->Store(entry));
         break;
     case ValueType::kChipErrorCode:
@@ -145,6 +161,9 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 
 void ESP32Diagnostics::TraceCounter(const char * label)
 {
+#if CONFIG_ENABLE_ONLY_TRACES
+    return;
+#endif // CONFIG_ENABLE_ONLY_TRACES
     ESPDiagnosticCounter & counter = ESPDiagnosticCounter::GetInstance();
     counter.IncreaseCount(label);
     ReturnOnFailure(counter.ReportMetrics(label, mStorageInstance));
@@ -152,7 +171,10 @@ void ESP32Diagnostics::TraceCounter(const char * label)
 
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
 {
-    VerifyOrReturn(IsPresent(group, gPermitList));
+#if CONFIG_ENABLE_ONLY_METRICS
+    return;
+#endif // CONFIG_ENABLE_ONLY_METRICS
+    VerifyOrReturn(IsEnabled(group));
     ReturnOnFailure(StoreDiagnostics(label, group));
 }
 
@@ -160,12 +182,17 @@ void ESP32Diagnostics::TraceEnd(const char * label, const char * group) {}
 
 void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
 {
-    VerifyOrReturn(!IsPresent(value, gSkipList));
+#if CONFIG_ENABLE_ONLY_METRICS
+    return;
+#endif // CONFIG_ENABLE_ONLY_METRICS
+    VerifyOrReturn(IsEnabled(value));
     ReturnOnFailure(StoreDiagnostics(label, value));
 }
 
 CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
 {
+    VerifyOrReturnError(label != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(group != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
 
@@ -174,7 +201,7 @@ CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * g
     Platform::CopyString(entry.label, label);
     Platform::CopyString(entry.stringValue, group);
     entry.type                     = Diagnostics::ValueType::kCharString;
-    entry.timestamps_ms_since_boot = esp_log_timestamp();
+    entry.timestamps_ms_since_boot = static_cast<uint32_t>(chip::System::SystemClock().GetMonotonicMilliseconds64().count());
 
     return mStorageInstance->Store(entry);
 }
