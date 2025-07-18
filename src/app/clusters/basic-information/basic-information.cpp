@@ -161,7 +161,7 @@ inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoP
     // Format is YYYYMMDD
     snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear, manufacturingMonth,
              manufacturingDayOfMonth);
-    return aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
+    return aEncoder.Encode(CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
 }
 
 inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
