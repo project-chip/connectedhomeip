@@ -124,7 +124,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
     }
 
     // Failure if a stream has value (actual or Null) and there's no match for either stream type
-    if (!(audioStreamId.HasValue() && matchedAudioStream) || !(videoStreamId.HasValue() && matchedVideoStream))
+    if ((audioStreamId.HasValue() && !matchedAudioStream) || (videoStreamId.HasValue() && !matchedVideoStream))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
