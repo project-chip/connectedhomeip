@@ -222,7 +222,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Calling on device reboot here to maintain the event generation of the old implemenation of the
+    // Calling OnDeviceReboot here to maintain the event generation of the old implemenation of the
     // server init callback. We consider startup to be a boot event here.
     GeneralDiagnostics::BootReasonEnum bootReason;
     if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
