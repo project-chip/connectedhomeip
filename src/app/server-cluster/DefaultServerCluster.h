@@ -99,7 +99,7 @@ public:
 
     struct OptionalAttributeEntry
     {
-        bool enabled;                               // is this optional attribute enabled?
+        bool enabled;                               // Is this optional attribute enabled?
         const DataModel::AttributeEntry & metadata; // Metadata for the attribute
     };
 
