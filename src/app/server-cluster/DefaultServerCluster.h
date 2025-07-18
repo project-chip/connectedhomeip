@@ -129,12 +129,11 @@ protected:
 
     /// Appends the given attributes to the builder.
     ///
-    /// It is VERY common to have a set of mandatory and a set of optional attributes for a
+    /// It is very common to have a set of mandatory and a set of optional attributes for a
     /// cluster. This method allows for a single call to setup all of the given attributes in `builder`:
     ///   - mandatoryAttributes
     ///   - optionalAttributes IF AND ONLY IF they are enabled
-    ///   - all of `GlobalAttributes`
-    ///
+    ///   - all of `GlobalAttributes()`
     CHIP_ERROR AppendAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
                                 Span<const DataModel::AttributeEntry> mandatoryAttributes,
                                 std::initializer_list<const OptionalAttributeEntry> optionalAttributes);
