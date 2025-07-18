@@ -186,6 +186,7 @@ config CHIP_APP_OPERATIONAL_KEYSTORE
 if CHIP_APP_OPERATIONAL_KEYSTORE
     choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
         prompt "Select Operation Keystore Implementation"
+        default CHIP_APP_OPERATIONAL_KEYSTORE_SE05X if CHIP_SE05X
         default CHIP_APP_OPERATIONAL_KEYSTORE_S200
 
         config CHIP_APP_OPERATIONAL_KEYSTORE_S200
@@ -197,6 +198,11 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
             bool "Operation Keystore Empty"
             help
                 Enable application Operational keystore empty implementation.
+
+        config CHIP_APP_OPERATIONAL_KEYSTORE_SE05X
+            bool "Operation Keystore SE05X"
+            help
+                Enable application Operational keystore SE05X implementation.
 
     endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
 endif # CHIP_APP_OPERATIONAL_KEYSTORE
