@@ -391,21 +391,8 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
             Stop();
             return -1;
         }
-        mAudioEncoderContext->sample_rate                 = mAudioInfo.mSampleRate;
-        mAudioEncoderContext->channels                    = mAudioInfo.mChannels;
-        mAudioEncoderContext->channel_layouts.nb_channels = mAudioInfo.mChannels;
-        if (mAudioInfo.mChannels == 1)
-        {
-            mAudioEncoderContext->ch_layout = AV_CHANNEL_LAYOUT_MONO;
-        }
-        else if (mAudioInfo.mChannels == 2)
-        {
-            mAudioEncoderContext->ch_layout = AV_CHANNEL_LAYOUT_STEREO;
-        }
-        else
-        {
-            av_channel_layout_default(&mAudioEncoderContext->ch_layout, mAudioInfo.mChannels);
-        }
+        av_channel_layout_default(&mAudioEncoderContext->ch_layout, mAudioInfo.mChannels);
+        mAudioEncoderContext->sample_rate           = mAudioInfo.mSampleRate;
         mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
         mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
         mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
