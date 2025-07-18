@@ -121,6 +121,24 @@ protected:
         return status;
     }
 
+    struct OptionalAttributeEntry
+    {
+        bool enabled;                               // is this optional attribute enabled?
+        const DataModel::AttributeEntry & metadata; // Metadata for the attribute
+    };
+
+    /// Appends the given attributes to the builder.
+    ///
+    /// It is VERY common to have a set of mandatory and a set of optional attributes for a
+    /// cluster. This method allows for a single call to setup all of the given attributes in `builder`:
+    ///   - mandatoryAttributes
+    ///   - optionalAttributes IF AND ONLY IF they are enabled
+    ///   - all of `GlobalAttributes`
+    ///
+    CHIP_ERROR AppendAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
+                                Span<const DataModel::AttributeEntry> mandatoryAttributes,
+                                Span<const OptionalAttributeEntry> optionalAttributes);
+
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec
 };

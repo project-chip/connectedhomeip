@@ -376,34 +376,26 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
 CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryAttributes));
-
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(9));
-
-    if (!mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose))
-    {
-        ReturnErrorOnFailure(builder.Append(UniqueID::kMetadataEntry));
+#define OPTIONAL_ATTR(name)                                                                                                        \
+    {                                                                                                                              \
+        mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name), name::kMetadataEntry                          \
     }
 
-#define OPTIONAL_ATTR_SET(name)                                                                                                    \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name))                                           \
-        {                                                                                                                          \
-            ReturnErrorOnFailure(builder.Append(name::kMetadataEntry));                                                            \
-        }                                                                                                                          \
-    } while (false)
+    const OptionalAttributeEntry optionalAttributesEnabling[] = {
+        { mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose),
+          UniqueID::kMetadataEntry },
+        OPTIONAL_ATTR(ManufacturingDate),
+        OPTIONAL_ATTR(PartNumber),
+        OPTIONAL_ATTR(ProductURL),
+        OPTIONAL_ATTR(ProductLabel),
+        OPTIONAL_ATTR(SerialNumber),
+        OPTIONAL_ATTR(LocalConfigDisabled),
+        OPTIONAL_ATTR(Reachable),
+        OPTIONAL_ATTR(ProductAppearance)
+    };
 
-    OPTIONAL_ATTR_SET(ManufacturingDate);
-    OPTIONAL_ATTR_SET(PartNumber);
-    OPTIONAL_ATTR_SET(ProductURL);
-    OPTIONAL_ATTR_SET(ProductLabel);
-    OPTIONAL_ATTR_SET(SerialNumber);
-    OPTIONAL_ATTR_SET(LocalConfigDisabled);
-    OPTIONAL_ATTR_SET(Reachable);
-    OPTIONAL_ATTR_SET(ProductAppearance);
-
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    return AppendAttributes(builder, Span<const DataModel::AttributeEntry>(kMandatoryAttributes),
+                            Span<const OptionalAttributeEntry>(optionalAttributesEnabling));
 }
 
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
