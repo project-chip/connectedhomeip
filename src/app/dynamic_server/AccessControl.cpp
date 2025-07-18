@@ -53,7 +53,8 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
 
         // Check for WebRTC Transport Requestor endpoint
         bool isWebRtcEndpoint =
-            (requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
+            ((requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id) ||
+             (requestPath.endpoint == kWebRTCProviderDynamicEndpointId && requestPath.cluster == WebRTCTransportProvider::Id));
 
         // Only allow these specific endpoints
         if (!isOtaEndpoint && !isWebRtcEndpoint)

@@ -15,13 +15,14 @@
 #  limitations under the License.
 #
 
-from ctypes import CDLL, c_char_p, c_int, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
+from ctypes import CDLL, c_char_p, c_int, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
 
 from ..clusters.Command import (_OnCommandSenderDoneCallbackFunct, _OnCommandSenderErrorCallbackFunct,
                                 _OnCommandSenderResponseCallbackFunct)
 from ..native import GetLibraryHandle, HandleFlags, PyChipError
 from .types import (GatheringCompleteCallbackType, IceCandidateCallbackType, LocalDescriptionCallbackType, OnAnswerCallbackFunct,
-                    OnEndCallbackFunct, OnICECandidatesCallbackFunct, OnOfferCallbackFunct, StateChangeCallback, WebRTCClientHandle)
+                    OnEndCallbackFunct, OnICECandidatesCallbackFunct, OnOfferCallbackFunct, SessionIdCreatedCallbackFunct,
+                    StateChangeCallback, WebRTCClientHandle)
 
 
 def _GetWebRTCLibraryHandle() -> CDLL:
@@ -64,7 +65,7 @@ def _GetWebRTCLibraryHandle() -> CDLL:
         lib.pychip_webrtc_client_set_gathering_complete_callback.argtypes = [WebRTCClientHandle, GatheringCompleteCallbackType]
         lib.pychip_webrtc_client_set_state_change_callback.argtypes = [WebRTCClientHandle, StateChangeCallback]
 
-        lib.pychip_webrtc_provider_client_init.argtypes = [WebRTCClientHandle, c_uint32, c_uint8, c_uint16]
+        lib.pychip_webrtc_provider_client_init.argtypes = [WebRTCClientHandle, c_uint64, c_uint8, c_uint16]
         lib.pychip_webrtc_provider_client_init_commandsender_callbacks.argtypes = [
             WebRTCClientHandle,
             _OnCommandSenderResponseCallbackFunct,
@@ -85,7 +86,7 @@ def _GetWebRTCLibraryHandle() -> CDLL:
     return lib
 
 
-def get_webrtc_requestor_handle() -> CDLL:
+def get_webrtc_cluster_handle() -> CDLL:
     lib = GetLibraryHandle()
 
     if not lib.pychip_WebRTCTransportRequestor_InitCallbacks.argtypes:
@@ -96,10 +97,18 @@ def get_webrtc_requestor_handle() -> CDLL:
             OnICECandidatesCallbackFunct,
             OnEndCallbackFunct,
         ]
+        lib.pychip_WebRTCTransportProvider_Init.argtypes = []
+        lib.pychip_WebRTCTransportProvider_InitCallbacks.argtypes = [
+            OnOfferCallbackFunct,
+            OnAnswerCallbackFunct,
+            OnICECandidatesCallbackFunct,
+            OnEndCallbackFunct,
+            SessionIdCreatedCallbackFunct,
+        ]
     return lib
 
 
-class WebRTCRequestorNativeBindings:
+class WebRTCTransportNativeBindings:
     """This class is intended to be used only by WebRTCManager.
 
     Exposes python methods for accessing native APIs. Also holds
@@ -111,13 +120,28 @@ class WebRTCRequestorNativeBindings:
         self.handle_answer_cb = OnAnswerCallbackFunct(self.handle_answer)
         self.handle_ice_candidates_cb = OnICECandidatesCallbackFunct(self.handle_ice_candidates)
         self.handle_end_cb = OnEndCallbackFunct(self.handle_end)
+        self.sessionid_created_cb = SessionIdCreatedCallbackFunct(self.session_id_created)
 
     def init_webrtc_requestor_server(self):
-        handle = get_webrtc_requestor_handle()
+        handle = get_webrtc_cluster_handle()
         handle.pychip_WebRTCTransportRequestor_Init()
 
     def set_webrtc_requestor_delegate_callbacks(self):
-        handle = get_webrtc_requestor_handle()
+        handle = get_webrtc_cluster_handle()
         handle.pychip_WebRTCTransportRequestor_InitCallbacks(
             self.handle_offer_cb, self.handle_answer_cb, self.handle_ice_candidates_cb, self.handle_end_cb
+        )
+
+    def init_webrtc_provider_server(self):
+        handle = get_webrtc_cluster_handle()
+        handle.pychip_WebRTCTransportProvider_Init()
+
+    def set_webrtc_provider_delegate_callbacks(self):
+        handle = get_webrtc_cluster_handle()
+        handle.pychip_WebRTCTransportProvider_InitCallbacks(
+            self.handle_offer_cb,
+            self.handle_answer_cb,
+            self.handle_ice_candidates_cb,
+            self.handle_end_cb,
+            self.sessionid_created_cb,
         )
