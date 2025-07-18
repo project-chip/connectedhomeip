@@ -46,7 +46,7 @@ config("datachannel_config") {
   cflags_cc = [ "-Wno-shadow" ]
 
   # suppress known `libdatachannel` int conversion issues
-  cflags_cc += [ "-Wno-implicit-int-conversion" ]
+  cflags = [ "-Wno-implicit-int-conversion" ]
 
   if (is_clang) {
     # We build static libraries and srtp2 depends on openssl

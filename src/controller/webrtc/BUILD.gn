@@ -54,5 +54,5 @@ static_library("chip_webrtc") {
   ]
 
   # suppress known `libdatachannel` int conversion issues
-  cflags_cc = [ "-Wno-implicit-int-conversion" ]
+  cflags = [ "-Wno-implicit-int-conversion" ]
 }
