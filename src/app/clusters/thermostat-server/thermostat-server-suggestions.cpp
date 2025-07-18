@@ -47,7 +47,7 @@ CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
     CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    for (size_t i = static_cast<size_t>(delegate->GetNumberOfThermostatSuggestions() - 1);
+    for (int i = static_cast<int>(delegate->GetNumberOfThermostatSuggestions() - 1);
          i >= 0 && delegate->GetNumberOfThermostatSuggestions() > 0; i--)
     {
         ThermostatSuggestionStructWithOwnedMembers suggestion;
