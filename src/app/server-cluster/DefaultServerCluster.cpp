@@ -112,7 +112,7 @@ CHIP_ERROR DefaultServerCluster::AppendAttributes(ReadOnlyBufferBuilder<DataMode
 {
     // determine how much data to append. This should only be called if generally we have something to append
     size_t append_size = mandatoryAttributes.size() + GlobalAttributes().size();
-    for (const auto& entry : optionalAttributes)
+    for (const auto & entry : optionalAttributes)
     {
         if (entry.enabled)
         {
