@@ -3352,7 +3352,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-
     case CommissioningStage::kJCMTrustVerification: {
         CHIP_ERROR err = StartJCMTrustVerification();
         if (err != CHIP_NO_ERROR)

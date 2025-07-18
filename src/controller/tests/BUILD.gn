@@ -65,6 +65,8 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
+  sources = [ "AutoCommissionerTestAccess.h" ]
+
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",
