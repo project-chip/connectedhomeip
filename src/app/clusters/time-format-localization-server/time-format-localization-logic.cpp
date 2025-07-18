@@ -48,6 +48,33 @@ private:
 };
 
 }
+
+void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrProvider)
+{
+    VerifyOrReturn(mAttrProvider == nullptr);
+    VerifyOrReturn(attrProvider != nullptr);
+
+    mAttrProvider = attrProvider;
+
+    // TODO: Consider moving the storage handling inside the Logic layer.
+    // Get the current calendar type, if any.
+    TimeFormatLocalization::CalendarTypeEnum calendarType;
+    MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
+    CHIP_ERROR error = mAttrProvider->ReadValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id},
+                                                            calendarBytes);
+    // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
+    // If initial value is not one of the allowed values, pick one valid value and write it.
+    TimeFormatLocalization::CalendarTypeEnum validCalendar = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+    IsSupportedCalendarType(calendarType, &validCalendar);
+    setActiveCalendarType(validCalendar);
+
+    TimeFormatLocalization::HourFormatEnum hourFormat;
+    MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
+    error = mAttrProvider->ReadValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id},
+                                                            hourBytes);
+    setHourFormat(hourFormat);
+}
+
 CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const 
 {
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
@@ -105,26 +132,49 @@ TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveC
 
 DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFormatLocalization::HourFormatEnum rHour)
 {
-    mHourFormat = rHour;
-    return Protocols::InteractionModel::Status::Success;
+    VerifyOrReturnValue(mAttrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
+
+    if(rHour == TimeFormatLocalization::HourFormatEnum::kUnknownEnumValue)
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    
+    CHIP_ERROR result = mAttrProvider->WriteValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id},
+    {reinterpret_cast<const uint8_t *>(&rHour), sizeof(rHour)});
+    if(result == CHIP_NO_ERROR)
+    {
+        mHourFormat = rHour;
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    return Protocols::InteractionModel::Status::WriteIgnored;
 }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar)
 {
+    VerifyOrReturnValue(mAttrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
     // TODO: Confirm error values for this operation.
     if(!mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 
-    if(IsSupportedCalendarType(rCalendar))
+    // Verify that the requested value is in the supported calendars.
+    if(!IsSupportedCalendarType(rCalendar))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    // Now try to write the value using the AttributeProvider.
+    CHIP_ERROR result = mAttrProvider->WriteValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id},
+        {reinterpret_cast<const uint8_t *>(&rCalendar), sizeof(rCalendar)});
+    if(result == CHIP_NO_ERROR)
     {
         mCalendarType = rCalendar;
         return Protocols::InteractionModel::Status::Success;
     }
 
-    return Protocols::InteractionModel::Status::ConstraintError;
-    
+    return Protocols::InteractionModel::Status::WriteIgnored;
 }
 
 TimeFormatLocalization::HourFormatEnum TimeFormatLocalizationLogic::GetHourFormat()

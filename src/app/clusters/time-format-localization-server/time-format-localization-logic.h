@@ -19,6 +19,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <clusters/TimeFormatLocalization/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -35,8 +36,11 @@ public:
     {
         mHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
         mCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+        mAttrProvider = nullptr;
     };
     virtual ~TimeFormatLocalizationLogic() = default;
+
+    void Startup(AttributePersistenceProvider * attrStorage);
 
     BitFlags<TimeFormatLocalization::Feature> GetFeatureMap() const;
 
@@ -47,15 +51,17 @@ public:
     DataModel::ActionReturnStatus setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar);
     CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
-    // Method used to validate if the requested calendar is valid, optionally can return a valid calendar from the
-    // supported calendars list.
-    static bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
 
 private:
+
+    // Method used to validate if the requested calendar is valid, optionally can return a valid calendar from the
+    // supported calendars list.
+    bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
 
     BitFlags<TimeFormatLocalization::Feature> mFeatures;
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
+    AttributePersistenceProvider * mAttrProvider;
 
 };
 
