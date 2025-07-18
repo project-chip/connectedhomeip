@@ -29,7 +29,7 @@ function trim_whitespace() {
     eval "$OLD_SHOPT_EXTGLOB"
 }
 
-# This function parses the input from `ninja -t query` and extracts the input targets.
+# Parses the input from `ninja -t query` and extracts the input targets.
 function parse_input_targets() {
     while IFS= read -r line; do
         if [[ "$line" == "input: "* ]]; then
@@ -49,7 +49,7 @@ function parse_input_targets() {
     done
 }
 
-# This function executes a command with lastpipe enabled, allowing the last command in a pipeline to run in the current shell.
+# Executes a command with lastpipe enabled, allowing the last command in a pipeline to run in the current shell.
 function dowithlastpipe() {
     # Save the current lastpipe and monitor settings
     local original_lastpipe_setting="$(shopt -p lastpipe)"
@@ -78,12 +78,12 @@ function dowithlastpipe() {
     return "$?"
 }
 
-# This function returns the rules that should be cleaned based on the targets provided.
-# Based on this, ninja -t clean -r <rules> will clean the exact targets that need to be reexecuted.
+# Returns the rules that should be cleaned based on the targets provided.
+# Based on this, ninja -t clean -r <rules> will clean the exact targets that need to be reexecuted for recalculating the coverage.
 function get_rules_to_clean() {
     declare -A RULES
 
-    # Read the rules that execute (not build) targets from the toolchain.ninja file
+    # Get all the rules that execute (not build) targets from the toolchain.ninja file
     readarray -t POSSIBLE_RULES_ARR < <(ninja -C out/coverage -f toolchain.ninja -t rules | grep "__rule")
 
     declare -A POSSIBLE_RULES
@@ -338,13 +338,12 @@ fi
 
 # ------------------------------------------------------------------------------
 # Coverage Generation
-#
-# Exclude files we do NOT want included in coverage
-# Exclude unit test files from coverage
 # ----------------------------------------------------------------------------
-LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused" # incosistent and unused twice is needed to suppress the warnings.
+LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused,gcov,gcov" # Some error types mentioned twice is needed to suppress the warnings.
 LCOV_EXCLUDE_INCLUDE_OPTIONS=()
 
+# Exclude files we do NOT want included in coverage
+# Exclude unit test files from coverage
 if [[ "$skip_gn" == false ]]; then
     LCOV_EXCLUDE_INCLUDE_OPTIONS=(
         --exclude "$CHIP_ROOT/zzz_generated/**"
@@ -362,7 +361,7 @@ if [[ "$skip_gn" == false ]]; then
         --exclude "**/tests/**"
     )
 
-    # Restrict coverage to 'core' or 'clusters' if specified
+    # Restrict coverage to 'core' or 'clusters' if needed
     if [[ "$CODE" == "core" ]]; then
         LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
             --exclude "$CHIP_ROOT/src/app/clusters/**"
@@ -376,30 +375,35 @@ fi
 
 mkdir -p "$COVERAGE_ROOT"
 
+# Capture compile time coverage data
 lcov --capture --initial --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --output-file "$COVERAGE_ROOT/lcov_base.info" \
     "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
     "${QUIET_FLAG[@]}"
 
+# Capture runtime coverage data
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --output-file "$COVERAGE_ROOT/lcov_test.info" \
     "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
     "${QUIET_FLAG[@]}"
 
+# Combine them
 lcov --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
     --output-file "$COVERAGE_ROOT/lcov_final.info" \
     "${QUIET_FLAG[@]}"
 
+# Generate HTML report
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
-    --ignore-errors inconsistent,category,count \
+    --ignore-errors inconsistent,inconsistent,category,count \
     --rc max_message_count=1000 \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
     --header-title "Matter SDK Coverage Report" \
+    --prefix "$CHIP_ROOT/src" \
     "${QUIET_FLAG[@]}"
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
