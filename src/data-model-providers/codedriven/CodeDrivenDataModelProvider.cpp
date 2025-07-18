@@ -129,38 +129,33 @@ CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
 DataModel::ActionReturnStatus CodeDrivenDataModelProvider::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                          AttributeValueEncoder & encoder)
 {
-    DataModel::ActionReturnStatus status{ Status::Success };
-    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId, &status);
-    VerifyOrReturnError(serverCluster != nullptr, status);
+    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId);
+    VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
     return serverCluster->ReadAttribute(request, encoder);
 }
 
 DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                           AttributeValueDecoder & decoder)
 {
-    DataModel::ActionReturnStatus status{ Status::Success };
-    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId, &status);
-    VerifyOrReturnError(serverCluster != nullptr, status);
+    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId);
+    VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
     return serverCluster->WriteAttribute(request, decoder);
 }
 
 void CodeDrivenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & path,
                                                                  DataModel::ListWriteOperation opType)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId, nullptr);
-    if (serverCluster != nullptr)
-    {
-        serverCluster->ListAttributeWriteNotification(path, opType);
-    }
+    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    VerifyOrReturn(serverCluster != nullptr);
+    serverCluster->ListAttributeWriteNotification(path, opType);
 }
 
 std::optional<DataModel::ActionReturnStatus> CodeDrivenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                         TLV::TLVReader & input_arguments,
                                                                                         CommandHandler * handler)
 {
-    DataModel::ActionReturnStatus status{ Status::Success };
-    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId, &status);
-    VerifyOrReturnError(serverCluster != nullptr, status);
+    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId);
+    VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
     return serverCluster->InvokeCommand(request, input_arguments, handler);
 }
 
@@ -249,38 +244,29 @@ CHIP_ERROR CodeDrivenDataModelProvider::ServerClusters(EndpointId endpointId,
 
 CHIP_ERROR CodeDrivenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & out)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId, nullptr);
-    if (serverCluster == nullptr)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
+    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return serverCluster->GeneratedCommands(path, out);
 }
 CHIP_ERROR CodeDrivenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & out)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId, nullptr);
-    if (serverCluster == nullptr)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
+    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return serverCluster->AcceptedCommands(path, out);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::Attributes(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & out)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId, nullptr);
-    if (serverCluster == nullptr)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
+    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return serverCluster->Attributes(path, out);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId, nullptr);
+    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return serverCluster->EventInfo(path, eventInfo);
 }
@@ -330,29 +316,11 @@ EndpointInterface * CodeDrivenDataModelProvider::GetEndpointInterface(EndpointId
     return mEndpointInterfaceRegistry.Get(endpointId);
 }
 
-ServerClusterInterface * CodeDrivenDataModelProvider::GetServerCluster(EndpointId endpointId, ClusterId clusterId,
-                                                                       DataModel::ActionReturnStatus * outStatus)
+ServerClusterInterface * CodeDrivenDataModelProvider::GetServerCluster(EndpointId endpointId, ClusterId clusterId)
 {
     EndpointInterface * epProvider = GetEndpointInterface(endpointId);
-    if (epProvider == nullptr)
-    {
-        if (outStatus != nullptr)
-        {
-            *outStatus = Status::UnsupportedEndpoint;
-        }
-        return nullptr;
-    }
-
-    ServerClusterInterface * serverCluster = epProvider->GetServerCluster(clusterId);
-    if (serverCluster == nullptr)
-    {
-        if (outStatus != nullptr)
-        {
-            *outStatus = Status::UnsupportedCluster;
-        }
-        return nullptr;
-    }
-    return serverCluster;
+    VerifyOrReturnValue(epProvider != nullptr, nullptr);
+    return epProvider->GetServerCluster(clusterId);
 }
 
 } // namespace app

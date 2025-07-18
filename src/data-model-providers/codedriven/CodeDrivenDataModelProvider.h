@@ -90,8 +90,7 @@ public:
 
 private:
     EndpointInterface * GetEndpointInterface(EndpointId endpointId);
-    ServerClusterInterface * GetServerCluster(EndpointId endpointId, ClusterId clusterId,
-                                              DataModel::ActionReturnStatus * outStatus);
+    ServerClusterInterface * GetServerCluster(EndpointId endpointId, ClusterId clusterId);
     EndpointInterfaceRegistry mEndpointInterfaceRegistry;
     std::optional<ServerClusterContext> mServerClusterContext;
     PersistentStorageDelegate * mPersistentStorageDelegate;

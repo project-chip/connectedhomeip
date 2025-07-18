@@ -1094,11 +1094,11 @@ TEST_F(TestCodeDrivenDataModelProvider, ReadAttributeOnInvalidPath)
 
     // Valid endpoint but invalid cluster
     EXPECT_EQ(ReadU32Attribute(mProvider, ConcreteDataAttributePath(1, 99, 1), readValue),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
+              CHIP_IM_GLOBAL_STATUS(Failure));
 
     // Invalid endpoint
     EXPECT_EQ(ReadU32Attribute(mProvider, ConcreteDataAttributePath(99, chip::app::Clusters::Descriptor::Id, 1), readValue),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+              CHIP_IM_GLOBAL_STATUS(Failure));
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, WriteAttributeOnInvalidPath)
@@ -1119,11 +1119,11 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttributeOnInvalidPath)
 
     // Valid endpoint but invalid cluster
     EXPECT_EQ(WriteU32Attribute(mProvider, ConcreteDataAttributePath(1, 99, 1), valueToWrite),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
+              CHIP_IM_GLOBAL_STATUS(Failure));
 
     // Invalid endpoint
     EXPECT_EQ(WriteU32Attribute(mProvider, ConcreteDataAttributePath(99, 10, 1), valueToWrite),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+              CHIP_IM_GLOBAL_STATUS(Failure));
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveNonExistentEndpoint)
@@ -1150,7 +1150,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
     DataModel::InvokeRequest requestUnsupportedEndpoint = { .path = ConcreteCommandPath(5, 10, 1) };
     auto result                                         = mProvider.InvokeCommand(requestUnsupportedEndpoint, reader, nullptr);
     EXPECT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Failure));
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
@@ -1172,5 +1172,5 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
     DataModel::InvokeRequest requestUnsupportedCluster = { .path = ConcreteCommandPath(1, 99, 1) };
     auto result                                        = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
     EXPECT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
+    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Failure));
 }
