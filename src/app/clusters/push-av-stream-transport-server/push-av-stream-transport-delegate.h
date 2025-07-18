@@ -50,7 +50,7 @@ public:
      * @return Success if allocation is successful and a PushTransportConnectionID was produced;
      *         otherwise, the command is rejected with Failure
      *
-     * The delegate processes the transport following options:
+     * The delegate processes the following transport options:
      * - URL: Validates the URL
      * - StreamUsage, VideoStreamID, AudioStreamID: For selection of Stream
      *

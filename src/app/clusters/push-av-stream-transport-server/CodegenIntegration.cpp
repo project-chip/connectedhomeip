@@ -39,7 +39,7 @@ LazyRegisteredServerCluster<PushAvStreamTransportServer> gServers[kPushAvStreamT
 
 // Find the 0-based array index corresponding to the given endpoint id.
 // Log an error if not found.
-bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 {
     uint16_t arrayIndex =
         emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
@@ -57,7 +57,7 @@ void emberAfPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
 {
 
     uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
+    if (!FindEndpointWithLog(endpointId, arrayIndex))
     {
         return;
     }
@@ -72,14 +72,15 @@ void emberAfPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to register OTA on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "Failed to register Push AV Stream Transport on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
 }
 
 void emberAfPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
+    if (!FindEndpointWithLog(endpointId, arrayIndex))
     {
         return;
     }
@@ -87,7 +88,8 @@ void emberAfPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to unregister OTA on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        ChipLogError(AppServer, "Failed to unregister Push AV Stream Transport on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
     gServers[arrayIndex].Cluster().Deinit();
     gServers[arrayIndex].Destroy();
@@ -106,7 +108,7 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
 {
     ChipLogProgress(AppServer, "Setting Push AV Stream Transport delegate on endpoint %u", endpointId);
     uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
+    if (!FindEndpointWithLog(endpointId, arrayIndex))
     {
         return;
     }

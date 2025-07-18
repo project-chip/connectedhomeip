@@ -109,18 +109,6 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
     return result;
 }
 
-PushAvStreamTransportServerLogic::UpsertResultEnum
-PushAvStreamTransportServerLogic::UpsertTimerAppState(std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext> timerAppState)
-{
-    auto it = std::find_if(mTimerContexts.begin(), mTimerContexts.end(),
-                           [id = timerAppState->connectionID](const auto & existing) { return existing->connectionID == id; });
-
-    assert(it == mTimerContexts.end());
-
-    mTimerContexts.push_back(timerAppState);
-    return UpsertResultEnum::kInserted;
-}
-
 void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
 {
     size_t originalSize = mCurrentConnections.size();
@@ -267,7 +255,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_
     }
     else
     {
-        UpsertTimerAppState(transportDeallocateContext);
+        mTimerContexts.push_back(transportDeallocateContext);
     }
 
     return err;
@@ -385,11 +373,14 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
             triggerOptions.motionSensitivity.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing Motion Sensitivity ", mEndpointId));
 
-        VerifyOrReturnValue(
-            triggerOptions.motionSensitivity.Value().Value() >= 1 && triggerOptions.motionSensitivity.Value().Value() <= 10,
-            Status::ConstraintError,
-            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Motion Sensitivity Constraint Error",
-                         mEndpointId));
+        if (!triggerOptions.motionSensitivity.Value().IsNull())
+        {
+            VerifyOrReturnValue(
+                triggerOptions.motionSensitivity.Value().Value() >= 1 && triggerOptions.motionSensitivity.Value().Value() <= 10,
+                Status::ConstraintError,
+                ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Motion Sensitivity Constraint Error",
+                             mEndpointId));
+        }
     }
     else
     {
@@ -502,7 +493,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        return Status::UnsupportedCommand;
+        handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
     }
 
     Commands::AllocatePushTransportResponse::Type response;
@@ -513,20 +505,19 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid", mEndpointId);
         handler.AddStatus(commandPath, transportOptionsValidityStatus);
-        return transportOptionsValidityStatus;
+        return std::nullopt;
     });
 
     // Todo: TLSEndpointID Validation
 
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
-    Structs::ContainerOptionsStruct::Type containerOptions = commandData.transportOptions.containerOptions;
-
     bool isFormatSupported = false;
 
     for (auto & supportsFormat : mSupportedFormats)
     {
-        if ((supportsFormat.ingestMethod == ingestMethod) && (supportsFormat.containerFormat == containerOptions.containerType))
+        if ((supportsFormat.ingestMethod == ingestMethod) &&
+            (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
         {
             isFormatSupported = true;
         }
@@ -538,7 +529,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         ChipLogError(Zcl,
                      "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method and Container Format Combination : (Ingest Method: "
                      "%02X and Container Format: %02X)",
-                     mEndpointId, to_underlying(ingestMethod), to_underlying(containerOptions.containerType));
+                     mEndpointId, to_underlying(ingestMethod),
+                     to_underlying(commandData.transportOptions.containerOptions.containerType));
         handler.AddClusterSpecificFailure(commandPath, status);
         return std::nullopt;
     }
@@ -691,7 +683,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        return Status::UnsupportedCommand;
+        handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
     }
 
     uint16_t connectionID                                  = commandData.connectionID;
@@ -725,7 +718,8 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        return Status::UnsupportedCommand;
+        handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
     }
 
     Status status           = Status::Success;
@@ -736,8 +730,9 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
     Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
 
     VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid", mEndpointId);
+        ChipLogError(Zcl, "HandleModifyPushTransport[ep=%d]: TransportOptions of command data is not Valid", mEndpointId);
         handler.AddStatus(commandPath, transportOptionsValidityStatus);
+        return std::nullopt;
     });
 
     FabricIndex fabricIndex = handler.GetAccessingFabricIndex();
@@ -785,7 +780,8 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        return Status::UnsupportedCommand;
+        handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
     }
 
     Status status                              = Status::Success;
@@ -793,8 +789,9 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
     auto & transportStatus                     = commandData.transportStatus;
 
     VerifyOrDo(transportStatus != TransportStatusEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Motion Time Control (MaxDuration) Constraint Error", mEndpointId);
+        ChipLogError(Zcl, "HandleSetTransportStatus[ep=%d]: Invalid Transport Status in command data", mEndpointId);
         handler.AddStatus(commandPath, Status::ConstraintError);
+        return std::nullopt;
     });
 
     std::vector<uint16_t> connectionIDList;
@@ -848,7 +845,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        return Status::UnsupportedCommand;
+        handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
     }
 
     Status status           = Status::Success;
@@ -858,6 +856,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     VerifyOrDo(activationReason != TriggerActivationReasonEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Activation Reason ", mEndpointId);
         handler.AddStatus(commandPath, Status::ConstraintError);
+        return std::nullopt;
     });
 
     Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> timeControl = commandData.timeControl;
@@ -868,12 +867,14 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
             ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Motion Time Control (InitialDuration) Constraint Error",
                          mEndpointId);
             handler.AddStatus(commandPath, Status::ConstraintError);
+            return std::nullopt;
         });
 
         VerifyOrDo(timeControl.Value().maxDuration >= 1, {
             ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Motion Time Control (MaxDuration) Constraint Error",
                          mEndpointId);
             handler.AddStatus(commandPath, Status::ConstraintError);
+            return std::nullopt;
         });
     }
 
@@ -946,7 +947,8 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
 {
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
-        return Status::UnsupportedCommand;
+        handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
     }
 
     Commands::FindTransportResponse::Type response;
@@ -990,6 +992,7 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     if (transportConfigurations.size() == 0)
     {
         handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
     }
 
     response.transportConfigurations = DataModel::List<const Structs::TransportConfigurationStruct::Type>(

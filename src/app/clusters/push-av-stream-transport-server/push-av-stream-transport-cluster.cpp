@@ -103,7 +103,7 @@ DataModel::ActionReturnStatus PushAvStreamTransportServer::ReadAttribute(const D
     switch (request.path.mAttributeId)
     {
     case PushAvStreamTransport::Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mLogic.mFeatures.Raw());
+        return aEncoder.Encode(mLogic.mFeatures);
 
     case PushAvStreamTransport::Attributes::ClusterRevision::Id:
         return aEncoder.Encode(PushAvStreamTransport::kRevision);
@@ -116,7 +116,7 @@ DataModel::ActionReturnStatus PushAvStreamTransportServer::ReadAttribute(const D
             CHIP_ERROR err = ReadAndEncodeCurrentConnections(encoder, aEncoder.AccessingFabricIndex());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Push AV Stream Transport: Error reading CurrentConnections %s", err.AsString());
+                ChipLogError(Zcl, "Push AV Stream Transport: Error reading CurrentConnections %" CHIP_ERROR_FORMAT, err.Format());
             }
             return err;
         });

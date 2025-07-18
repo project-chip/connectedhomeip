@@ -25,7 +25,7 @@ public:
         mDelegate = delegate;
         if (mDelegate == nullptr)
         {
-            ChipLogError(Zcl, "Push AV Stream Transport: Delegate is null");
+            ChipLogError(Zcl, "Push AV Stream Transport [ep=%d]: Trying to set delegate to null", aEndpoint);
             return;
         }
         mDelegate->SetEndpointId(aEndpoint);
@@ -121,8 +121,6 @@ private:
     void RemoveStreamTransportConnection(const uint16_t connectionID);
 
     static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
-
-    UpsertResultEnum UpsertTimerAppState(std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext> timerAppState);
 
     void RemoveTimerAppState(const uint16_t connectionID);
 

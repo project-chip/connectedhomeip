@@ -48,6 +48,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
     pushavStreams.erase(std::remove_if(pushavStreams.begin(), pushavStreams.end(),
                                        [connectionID](const PushAvStream & stream) { return stream.id == connectionID; }),
                         pushavStreams.end());
+    ChipLogProgress(Zcl, "Deallocated Push AV Stream with ID: %d", connectionID);
     return Status::Success;
 }
 

@@ -230,6 +230,7 @@ public:
         pushavStreams.erase(std::remove_if(pushavStreams.begin(), pushavStreams.end(),
                                            [connectionID](const PushAvStream & stream) { return stream.id == connectionID; }),
                             pushavStreams.end());
+        ChipLogProgress(Zcl, "Deallocated Push AV Stream with ID: %d", connectionID);
         return Status::Success;
     }
 
@@ -586,7 +587,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     commandData.transportOptions = transportOptions;
 
     // Without a delegate, command is unsupported.
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), Status::UnsupportedCommand);
+    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     // Set the delegate to the server logic
     server.GetLogic().SetDelegate(1, &mockDelegate);
