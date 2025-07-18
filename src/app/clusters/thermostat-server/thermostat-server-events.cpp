@@ -25,7 +25,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
-void EmitSystemModeChangeEvent(EndpointId endpoint, Optional<SystemModeEnum> previousSystemMode, SystemModeEnum currentSystemMode)
+void GenerateSystemModeChangeEvent(EndpointId endpoint, Optional<SystemModeEnum> previousSystemMode, SystemModeEnum currentSystemMode)
 {
     Events::SystemModeChange::Type event;
     EventNumber eventNumber;
@@ -54,8 +54,8 @@ void EmitLocalTemperatureChangeEvent(EndpointId endpoint, DataModel::Nullable<in
     }
 }
 
-void EmitOccupancyChangeEvent(EndpointId endpoint, Optional<chip::BitMask<OccupancyBitmap>> previousOccupancy,
-                              chip::BitMask<OccupancyBitmap> currentOccupancy)
+void EmitOccupancyChangeEvent(EndpointId endpoint, Optional<BitMask<OccupancyBitmap>> previousOccupancy,
+                              BitMask<OccupancyBitmap> currentOccupancy)
 {
     Events::OccupancyChange::Type event;
     EventNumber eventNumber;
@@ -70,7 +70,7 @@ void EmitOccupancyChangeEvent(EndpointId endpoint, Optional<chip::BitMask<Occupa
     }
 }
 
-void EmitSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, Optional<chip::BitMask<OccupancyBitmap>> occupancy,
+void EmitSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, Optional<BitMask<OccupancyBitmap>> occupancy,
                              Optional<int16_t> previousSetpoint, int16_t currentSetpoint)
 {
     Events::SetpointChange::Type event;
@@ -88,8 +88,8 @@ void EmitSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, Opt
     }
 }
 
-void EmitRunningStateChangeEvent(EndpointId endpoint, Optional<chip::BitMask<RelayStateBitmap>> previousRunningState,
-                                 chip::BitMask<RelayStateBitmap> currentRunningState)
+void EmitRunningStateChangeEvent(EndpointId endpoint, Optional<BitMask<RelayStateBitmap>> previousRunningState,
+                                 BitMask<RelayStateBitmap> currentRunningState)
 {
     Events::RunningStateChange::Type event;
     EventNumber eventNumber;
@@ -120,8 +120,8 @@ void EmitRunningModeChangeEvent(EndpointId endpoint, Optional<ThermostatRunningM
     }
 }
 
-void EmitActiveScheduleChangeEvent(EndpointId endpoint, Optional<DataModel::Nullable<chip::ByteSpan>> previousScheduleHandle,
-                                   DataModel::Nullable<chip::ByteSpan> currentScheduleHandle)
+void EmitActiveScheduleChangeEvent(EndpointId endpoint, Optional<DataModel::Nullable<ByteSpan>> previousScheduleHandle,
+                                   DataModel::Nullable<ByteSpan> currentScheduleHandle)
 {
     Events::ActiveScheduleChange::Type event;
     EventNumber eventNumber;
@@ -136,8 +136,8 @@ void EmitActiveScheduleChangeEvent(EndpointId endpoint, Optional<DataModel::Null
     }
 }
 
-void EmitActivePresetChangeEvent(EndpointId endpoint, Optional<DataModel::Nullable<chip::ByteSpan>> previousPresetHandle,
-                                 DataModel::Nullable<chip::ByteSpan> currentPresetHandle)
+void EmitActivePresetChangeEvent(EndpointId endpoint, Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
+                                 DataModel::Nullable<ByteSpan> currentPresetHandle)
 {
     Events::ActivePresetChange::Type event;
     EventNumber eventNumber;

@@ -756,7 +756,7 @@ void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, Fabr
     }
 }
 
-void EmitSetpointEvent(const ConcreteAttributePath & attributePath, SystemModeEnum systemMode,
+void GenerateSetpointEvent(const ConcreteAttributePath & attributePath, SystemModeEnum systemMode,
                        Optional<BitMask<OccupancyBitmap>> occupancy, SetpointGetter getter)
 {
     int16_t setpoint;
@@ -766,7 +766,7 @@ void EmitSetpointEvent(const ConcreteAttributePath & attributePath, SystemModeEn
         ChipLogError(Zcl, "EmitSetpointChangeEvent failed to queue event: could not get set point");
         return;
     }
-    EmitSetpointChangeEvent(attributePath.mEndpointId, systemMode, occupancy, chip::Optional<int16_t>(), setpoint);
+    EmitSetpointChangeEvent(attributePath.mEndpointId, systemMode, occupancy, NullOptional, setpoint);
 }
 
 void EmitEvents(const ConcreteAttributePath & attributePath)
@@ -781,13 +781,13 @@ void EmitEvents(const ConcreteAttributePath & attributePath)
         }
         else
         {
-            EmitSystemModeChangeEvent(attributePath.mEndpointId, chip::Optional<SystemModeEnum>(), systemMode);
+            EmitSystemModeChangeEvent(attributePath.mEndpointId, NullOptional, systemMode);
         }
         break;
     }
     case OccupiedHeatingSetpoint::Id:
         EmitSetpointEvent(attributePath, SystemModeEnum::kHeat,
-                          chip::Optional<chip::BitMask<OccupancyBitmap>>(OccupancyBitmap::kOccupied), OccupiedHeatingSetpoint::Get);
+                          MakeOptional(OccupancyBitmap::kOccupied), OccupiedHeatingSetpoint::Get);
         break;
     case OccupiedCoolingSetpoint::Id:
         EmitSetpointEvent(attributePath, SystemModeEnum::kCool,
