@@ -509,11 +509,21 @@
 /**
  *  @def CHIP_CONFIG_ERROR_SOURCE
  *
- *  If asserted (1), then CHIP_ERROR constants will include the source location of their expansion.
+ *  If asserted (1), then CHIP_ERROR constants will include the minimum source location (file, line) of their expansion.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_CONFIG_ERROR_SOURCE 0
 #endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
+ *  @def CHIP_CONFIG_ERROR_SOURCE_FULL
+ *
+ *  If asserted (1), then CHIP_ERROR constants will include the std::source_location of their expansion.
+ *  Note: this option significantly increases output binary size
+ */
+#ifndef CHIP_CONFIG_ERROR_SOURCE_FULL
+#define CHIP_CONFIG_ERROR_SOURCE_FULL 0
+#endif // CHIP_CONFIG_ERROR_SOURCE_FULL
 
 /**
  *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR

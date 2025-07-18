@@ -130,6 +130,11 @@ declare_args() {
   chip_enable_mrp_analytics =
       current_os == "linux" || current_os == "android" || current_os == "mac" ||
       current_os == "ios"
+
+  # Store CHIPError source_location and add API to get it.
+  # Increases target binary size.
+  # Requires at least C++20.
+  chip_enable_error_source_full = false
 }
 
 if (chip_target_style == "") {
