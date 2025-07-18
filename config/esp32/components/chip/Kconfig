@@ -890,19 +890,26 @@ menu "CHIP Device Layer"
                 Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
                 This feature helps monitor system health and performance by providing insights through diagnostics logs.
 
-        config ENABLE_ONLY_TRACES
-            bool "Enable only traces"
-            default n
+        choice
+            prompt "Matter Trace Filter"
             depends on ENABLE_ESP_DIAGNOSTICS_TRACE
+            default DIAGNOSTICS_DEFAULT_ALL
             help
-                Enable only traces for the ESP Platform Diagnostics for Matter.
+              Select what content to include in diagnostics.
 
-        config ENABLE_ONLY_METRICS
-            bool "Enable only metrics"
-            default n
-            depends on ENABLE_ESP_DIAGNOSTICS_TRACE
-            help
-                Enable only metrics for the ESP Platform Diagnostics for Matter.
+            config DIAGNOSTICS_DEFAULT_ALL
+                bool "Traces and Metrics"
+
+            config ENABLE_ONLY_TRACES
+                bool "Only Traces"
+                help
+                    Enable only traces for the ESP Platform Diagnostics for Matter.
+
+            config ENABLE_ONLY_METRICS
+                bool "Only Metrics"
+                help
+                    Enable only metrics for the ESP Platform Diagnostics for Matter.
+        endchoice
     endmenu
 
     menu "Testing Options"

@@ -58,8 +58,8 @@ public:
     /*
      * @brief Add a filter to the diagnostic backend
      * @param scope The scope to filter
-     * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid or already exists
-     * @return CHIP_NO_ERROR if the filter is already present or added successfully
+     * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid
+     * @return CHIP_NO_ERROR if the filter already exists or added successfully
      */
     CHIP_ERROR AddFilter(const char * scope);
 

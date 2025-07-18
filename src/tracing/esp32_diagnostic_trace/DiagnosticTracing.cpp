@@ -78,6 +78,7 @@ void ESP32Diagnostics::InitializeDefaultFilters()
 CHIP_ERROR ESP32Diagnostics::AddFilter(const char * scope)
 {
     VerifyOrReturnError(scope != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(strlen(scope) > 0, CHIP_ERROR_INVALID_ARGUMENT);
     if (mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end())
     {
         ChipLogProgress(DeviceLayer, "Filter for scope '%s' already exists", scope);
