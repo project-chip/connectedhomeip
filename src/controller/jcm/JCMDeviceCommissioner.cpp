@@ -100,6 +100,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommiss
                 return CHIP_ERROR_NOT_FOUND;
             }
 
+            // This is not an error; error checking is after iterating through the attributes
             return CHIP_NO_ERROR;
         });
 
@@ -139,6 +140,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
             case Fabrics::Id: {
                 Fabrics::TypeInfo::DecodableType fabrics;
                 ReturnErrorOnFailure(attributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
+                bool foundMatchingFabricIndex = false;
 
                 auto iter = fabrics.begin();
                 while (iter.Next())
@@ -147,11 +149,11 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
 
                     if (fabricDescriptor.VIDVerificationStatement.HasValue())
                     {
-                        ChipLogError(Controller, "JCM: Per-home RCAC are not supported by JF for now!");
+                        ChipLogError(Controller, "JCM: A VID Verification Statement is not supported, Joint Fabric requires an ICA on the fabric!");
                         return CHIP_ERROR_CANCELLED;
                     }
 
-                    if (fabricDescriptor.fabricIndex != kUndefinedFabricIndex)
+                    if (fabricDescriptor.fabricIndex == mInfo.adminFabricIndex)
                     {
                         if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
                         {
@@ -162,12 +164,17 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
                         mInfo.rootPublicKey.CopyFromSpan(fabricDescriptor.rootPublicKey);
                         mInfo.adminVendorId = fabricDescriptor.vendorID;
                         mInfo.adminFabricId = fabricDescriptor.fabricID;
+                        foundMatchingFabricIndex = true;
 
                         ChipLogProgress(Controller, "JCM: Successfully parsed the Administrator Fabric Table");
                         break;
                     }
                 }
+                if (!foundMatchingFabricIndex) {
+                    return CHIP_ERROR_NOT_FOUND;
+                }
 
+                // Successfully parsed the Fabric Descriptor
                 return CHIP_NO_ERROR;
             }
             case NOCs::Id: {
@@ -200,9 +207,11 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
                 return CHIP_NO_ERROR;
             }
             default:
+                // Ignore other attributes; this is not an error condition
                 return CHIP_NO_ERROR;
             }
 
+            // This is not an error; error checking is after iterating through the attributes
             return CHIP_NO_ERROR;
         });
 
@@ -271,36 +280,40 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
                     if (trustedCAPublicKey.Matches(fabricTableRootPublicKey) && trustedCA.size())
                     {
                         mInfo.adminRCAC.CopyFromSpan(trustedCA);
-
+                        // Successfully found the matching RCAC
                         foundMatchingRcac = true;
                         break;
                     }
                 }
                 if (!foundMatchingRcac)
                 {
+                    // Since a matching RCAC was not found, we cannot proceed
                     return CHIP_ERROR_CERT_NOT_FOUND;
                 }
+
+                // Successfully parsed the Trusted Root Certificates
                 return CHIP_NO_ERROR;
             }
             default:
+                // Ignore other attributes; this is not an error condition
                 return CHIP_NO_ERROR;
             }
             return CHIP_NO_ERROR;
         });
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "JCM: Failed to parse Trusted Root Certificates: %s", err.AsString());
-        return err;
-    }
-
     if (mInfo.adminRCAC.AllocatedSize() == 0)
     {
         ChipLogError(Controller, "JCM: Did not find a matching RCAC!");
+        mInfo.adminFabricIndex = kUndefinedFabricIndex;
         return CHIP_ERROR_CERT_NOT_FOUND;
     }
 
-    return CHIP_NO_ERROR;
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "JCM: Failed to parse Trusted Root Certificates: %s", err.AsString());
+    }
+
+    return err;
 }
 
 CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
@@ -368,7 +381,7 @@ JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation(
     ChipLogProgress(Controller, "JCM: Administrator endpoint ID: %d", mInfo.adminEndpointId);
     ChipLogProgress(Controller, "JCM: Administrator fabric index: %d", mInfo.adminFabricIndex);
     ChipLogProgress(Controller, "JCM: Administrator vendor ID: %d", mInfo.adminVendorId);
-    ChipLogProgress(Controller, "JCM: Administrator fabric ID: %llu", (unsigned long long) mInfo.adminFabricId);
+    ChipLogProgress(Controller, "JCM: Administrator fabric ID: %llu", static_cast<unsigned long long>(mInfo.adminFabricId));
 
     return JCMTrustVerificationError::kSuccess;
 }
