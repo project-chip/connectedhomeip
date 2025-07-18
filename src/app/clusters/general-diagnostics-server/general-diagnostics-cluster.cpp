@@ -22,6 +22,8 @@
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
 
+using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::GeneralDiagnostics;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using namespace chip::DeviceLayer;
@@ -34,16 +36,16 @@ constexpr uint16_t kMaxPayloadTestRequestCount = 2048;
 
 bool IsTestEventTriggerEnabled()
 {
-    auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
+    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
     if (triggerDelegate == nullptr)
     {
         return false;
     }
-    uint8_t zeroByteSpanData[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
-    return !triggerDelegate->DoesEnableKeyMatch(chip::ByteSpan(zeroByteSpanData));
+    uint8_t zeroByteSpanData[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
+    return !triggerDelegate->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData));
 }
 
-bool IsByteSpanAllZeros(const chip::ByteSpan & byteSpan)
+bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
 {
     for (unsigned char it : byteSpan)
     {
@@ -55,9 +57,9 @@ bool IsByteSpanAllZeros(const chip::ByteSpan & byteSpan)
     return true;
 }
 
-chip::TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(chip::ByteSpan enableKey)
+TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
 {
-    if (enableKey.size() != chip::TestEventTriggerDelegate::kEnableKeyLength)
+    if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
     {
         return nullptr;
     }
@@ -67,7 +69,7 @@ chip::TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(chip::ByteSpan 
         return nullptr;
     }
 
-    auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
+    auto * triggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
     if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(enableKey))
     {
@@ -78,7 +80,7 @@ chip::TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(chip::ByteSpan 
 }
 
 template <typename T>
-CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, chip::app::AttributeValueEncoder & encoder)
+CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
 {
     if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
@@ -92,12 +94,12 @@ CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, chip::app::AttributeValueE
 }
 
 template <typename T>
-CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR EncodeListOfValues(const T & valueList, CHIP_ERROR readError, AttributeValueEncoder & aEncoder)
 {
     if (readError == CHIP_NO_ERROR)
     {
         readError = aEncoder.EncodeList([&valueList](const auto & encoder) -> CHIP_ERROR {
-            for (auto & value : valueList)
+            for (const auto & value : valueList)
             {
                 ReturnErrorOnFailure(encoder.Encode(value));
             }
@@ -113,7 +115,7 @@ CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, chip::app::Attr
     return readError;
 }
 
-chip::app::DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData)
+DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData)
 {
     auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
     if (triggerDelegate == nullptr)
@@ -125,90 +127,86 @@ chip::app::DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::
     return (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success;
 }
 
-std::optional<chip::app::DataModel::ActionReturnStatus>
-HandleTimeSnapshot(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+std::optional<DataModel::ActionReturnStatus>
+HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                    const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
     Commands::TimeSnapshotResponse::Type response;
 
-    chip::System::Clock::Microseconds64 posix_time_us{ 0 };
-
-    chip::System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
-
+    System::Clock::Milliseconds64 system_time_ms =
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
+        
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
-    if (posix_time_us.count() != 0)
-    {
-        response.posixTimeMs.SetNonNull(
-            static_cast<uint64_t>(std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(posix_time_us).count()));
-    }
     handler.AddResponse(commandPath, response);
     return std::nullopt;
 }
 
-std::optional<chip::app::DataModel::ActionReturnStatus>
-HandleTimeSnapshotWithPosixTime(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+/*
+ * This builds upon the HandleTimeSnapshot function used by the default general diagnostic cluster class, 
+ * but also considers real posix time. This is put into a seperate function and called in a seperate class so 
+ * that it will be used only for the cases where needed, to avoid frequently reporting unsynced time.
+*/
+std::optional<DataModel::ActionReturnStatus>
+HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
     Commands::TimeSnapshotResponse::Type response;
 
-    chip::System::Clock::Microseconds64 posix_time_us{ 0 };
+    System::Clock::Milliseconds64 posix_time_ms{ 0 };
 
-    // Only consider real time if time sync cluster is actually enabled. Avoids
-    // likelihood of frequently reporting unsynced time.
-    CHIP_ERROR posix_time_err = chip::System::SystemClock().GetClock_RealTime(posix_time_us);
+    CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTimeMS(posix_time_ms);
     if (posix_time_err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
-        posix_time_us = chip::System::Clock::Microseconds64{ 0 };
+        posix_time_ms = System::Clock::Milliseconds64{ 0 };
     }
 
-    chip::System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+    System::Clock::Milliseconds64 system_time_ms =
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
 
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
-    if (posix_time_us.count() != 0)
+    if (posix_time_ms.count() != 0)
     {
         response.posixTimeMs.SetNonNull(
-            static_cast<uint64_t>(std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(posix_time_us).count()));
+            static_cast<uint64_t>(posix_time_ms.count()));
     }
     handler.AddResponse(commandPath, response);
     return std::nullopt;
 }
 
-std::optional<chip::app::DataModel::ActionReturnStatus>
-HandlePayloadTestRequest(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+std::optional<DataModel::ActionReturnStatus>
+HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                          const Commands::PayloadTestRequest::DecodableType & commandData)
 {
     if (commandData.count > kMaxPayloadTestRequestCount)
     {
-        return chip::Protocols::InteractionModel::Status::ConstraintError;
+        return Protocols::InteractionModel::Status::ConstraintError;
     }
 
     // Ensure Test Event triggers are enabled and key matches.
     auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
     if (triggerDelegate == nullptr)
     {
-        return chip::Protocols::InteractionModel::Status::ConstraintError;
+        return Protocols::InteractionModel::Status::ConstraintError;
     }
 
     Commands::PayloadTestResponse::Type response;
-    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
     if (!payload.Calloc(commandData.count))
     {
-        return chip::Protocols::InteractionModel::Status::ResourceExhausted;
+        return Protocols::InteractionModel::Status::ResourceExhausted;
     }
 
     memset(payload.Get(), commandData.value, payload.AllocatedSize());
-    response.payload = chip::ByteSpan{ payload.Get(), payload.AllocatedSize() };
+    response.payload = ByteSpan{ payload.Get(), payload.AllocatedSize() };
 
     if (handler.AddResponseData(commandPath, response) != CHIP_NO_ERROR)
     {
-        return chip::Protocols::InteractionModel::Status::ResourceExhausted;
+        return Protocols::InteractionModel::Status::ResourceExhausted;
     }
     return std::nullopt;
 }
@@ -261,7 +259,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
     }
     case GeneralDiagnostics::Attributes::UpTime::Id: {
         System::Clock::Seconds64 system_time_seconds =
-            std::chrono::duration_cast<System::Clock::Seconds64>(chip::Server::GetInstance().TimeSinceInit());
+            std::chrono::duration_cast<System::Clock::Seconds64>(Server::GetInstance().TimeSinceInit());
         return encoder.Encode(static_cast<uint64_t>(system_time_seconds.count()));
     }
     case GeneralDiagnostics::Attributes::TotalOperationalHours::Id: {
@@ -297,7 +295,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
 }
 
 std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                      chip::TLV::TLVReader & input_arguments,
+                                                                                      TLV::TLVReader & input_arguments,
                                                                                       CommandHandler * handler)
 {
     switch (request.path.mCommandId)
@@ -377,7 +375,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath
 CHIP_ERROR GeneralDiagnosticsCluster::GeneratedCommands(const ConcreteClusterPath & path,
                                                         ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    static constexpr chip::CommandId kAcceptedCommands[] = {
+    static constexpr CommandId kAcceptedCommands[] = {
         GeneralDiagnostics::Commands::TimeSnapshotResponse::Id,
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
         GeneralDiagnostics::Commands::PayloadTestResponse::Id,
@@ -470,8 +468,8 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
     return err;
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::InvokeCommand(
-    const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(
+    const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -483,12 +481,19 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapsh
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data);
+        if (mFunctionConfig.enablePosixTime) {
+            return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data);
+        } else {
+            return HandleTimeSnapshot(*handler, request.path, request_data);
+        }
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
-        GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandlePayloadTestRequest(*handler, request.path, request_data);
+        if (mFunctionConfig.enablePayloadSnaphot) {
+            GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
+            ReturnErrorOnFailure(request_data.Decode(input_arguments));
+            return HandlePayloadTestRequest(*handler, request.path, request_data);
+        }
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;

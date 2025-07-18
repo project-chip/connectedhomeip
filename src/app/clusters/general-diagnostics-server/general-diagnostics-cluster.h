@@ -37,6 +37,12 @@ struct GeneralDiagnosticsEnabledAttributes
     bool enableActiveNetworkFaults : 1;
 };
 
+struct GeneralDiagnosticsFunctionsConfig
+{
+    bool enablePosixTime : 1;
+    bool enablePayloadSnaphot : 1;
+};
+
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
@@ -116,16 +122,19 @@ private:
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
-class GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest : public GeneralDiagnosticsCluster
+class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
-    GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest(const GeneralDiagnosticsEnabledAttributes & enabledAttributes) :
-        GeneralDiagnosticsCluster(enabledAttributes)
+    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsEnabledAttributes & enabledAttributes, const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
+        GeneralDiagnosticsCluster(enabledAttributes), mFunctionConfig(functionsConfig)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
+
+private:
+    const GeneralDiagnosticsFunctionsConfig mFunctionConfig;
 };
 
 } // namespace Clusters

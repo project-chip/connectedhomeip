@@ -75,7 +75,12 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     GeneralDiagnosticsCluster cluster(enabledAttributes);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
-    GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest clusterWithTimeAndPayload(enabledAttributes);
+    const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        .enablePosixTime = true,
+        .enablePayloadSnaphot = true,
+    };
+
+    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(enabledAttributes, functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }

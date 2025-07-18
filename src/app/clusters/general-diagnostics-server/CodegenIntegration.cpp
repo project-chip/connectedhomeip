@@ -34,7 +34,7 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
 
 namespace {
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-LazyRegisteredServerCluster<GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
 #else
 LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 #endif
@@ -71,7 +71,25 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
         .enableActiveNetworkFaults   = IsAttributeEnabled(endpointId, Attributes::ActiveNetworkFaults::Id),
     };
 
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
+    const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        .enablePosixTime = 
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) 
+        true, 
+#else 
+        false, 
+#endif
+        .enablePayloadSnaphot = 
+#if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD) 
+        true,
+#else 
+        false, 
+#endif
+    };
+    gServer.Create(enabledAttributes, functionsConfig);
+#else 
     gServer.Create(enabledAttributes);
+#endif
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
     if (err != CHIP_NO_ERROR)
