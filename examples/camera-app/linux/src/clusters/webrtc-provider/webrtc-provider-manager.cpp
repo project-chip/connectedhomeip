@@ -352,6 +352,7 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         mOriginatingEndpointId = 0;
         mPeerId                = ScopedNodeId();
         mLocalSdp.clear();
+        mLocalCandidates.clear();
     }
 
     return CHIP_NO_ERROR;
