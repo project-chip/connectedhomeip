@@ -41,10 +41,6 @@ if (CONFIG_CHIP_APP_COMMON)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/include
     )
-    target_compile_definitions(app
-        PRIVATE
-        APP_QUEUE_TICKS_TO_WAIT=${CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT}
-    )
 
     if (CONFIG_APP_FREERTOS_OS)
         target_sources(app PRIVATE
@@ -129,25 +125,32 @@ if (CONFIG_CHIP_APP_LOW_POWER)
     )
 endif()
 
-if (CONFIG_CHIP_APP_BUTTON)
-    target_include_directories(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/include
+# Button module empty would be chosen in case the app does not support button.
+target_include_directories(app PRIVATE
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/include
+)
+
+if (CONFIG_CHIP_APP_BUTTON_REGISTRATION_DEFAULT)
+    set(button_registration_source ButtonRegistrationDefault.cpp)
+elseif(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE)
+    set(button_registration_source ButtonRegistrationAppAndBle.cpp)
+elseif(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_ONLY)
+    set(button_registration_source ButtonRegistrationAppOnly.cpp)
+else ()
+    set(button_registration_source ButtonRegistrationEmpty.cpp)
+endif()
+
+target_sources(app PRIVATE
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/${button_registration_source}
+)
+
+if (NOT CONFIG_CHIP_APP_BUTTON_REGISTRATION_EMPTY)
+    target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
     )
-    if (CONFIG_CHIP_APP_BUTTON_REGISTRATION_EMPTY)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationEmpty.cpp
-        )
-    elseif (CONFIG_CHIP_APP_BUTTON_REGISTRATION_DEFAULT)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationDefault.cpp
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
-        )
-    elseif(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_BLE)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationAppAndBle.cpp
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
-        )
-    endif()
+endif()
+
+if (CONFIG_CHIP_APP_BUTTON)
     if (CONFIG_CHIP_APP_BUTTON_APP)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonApp.cpp
@@ -226,8 +229,8 @@ if (CONFIG_CHIP_APP_OTA_REQUESTOR)
     endif()
     if (CONFIG_CHIP_APP_PLATFORM_OTA_UTILS)
         target_sources(app PRIVATE
-            # Use the example provided by mcxw71_k32w1 platform until a common solution is proposed.
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71_k32w1/ota/OtaUtils.cpp
+            # Use the example provided by mcxw71 platform until a common solution is proposed.
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/ota/OtaUtils.cpp
         )
     endif()
 endif()
@@ -252,8 +255,8 @@ if (CONFIG_CHIP_APP_UI_FEEDBACK)
             )
         else()
             target_sources(app PRIVATE
-                # Use the example provided by mcxw71_k32w1 platform until a common solution is proposed.
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71_k32w1/util/LedOnOff.cpp
+                # Use the example provided by mcxw71 platform until a common solution is proposed.
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/util/LedOnOff.cpp
             )
         endif()
     endif()

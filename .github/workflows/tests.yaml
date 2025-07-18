@@ -48,7 +48,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:150
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -496,7 +496,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:150
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -649,9 +649,9 @@ jobs:
             - name: Build linux-x64-python-bindings
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-python-bindings
+                  --target linux-x64-python-bindings-webrtc
                   build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-python-bindings"
+                  && rm -rf out/linux-x64-python-bindings-webrtc"
 
             # TODO: JS admin app app needs variants (probably)
             - name: Build linux-x64-jf-control-app
@@ -669,6 +669,17 @@ jobs:
                   build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-jf-admin-app"
 
+            - name: Build linux-x64-closure-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Copy push_av_server and install dependencies
+              run: >-
+                  cp -r ./src/tools/push_av_server objdir-clone/
+                  && pip install --break-system-packages -r objdir-clone/push_av_server/requirements.txt
 
             - name: Generate an argument environment file
               run: |
@@ -693,6 +704,8 @@ jobs:
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
                   echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
+                  echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test/closure-app" >> /tmp/test_env.yaml
+                  echo "PUSH_AV_SERVER: objdir-clone/push_av_server/server.py" >> /tmp/test_env.yaml
 
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
