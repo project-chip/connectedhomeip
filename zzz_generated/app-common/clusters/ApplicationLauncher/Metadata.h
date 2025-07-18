@@ -46,6 +46,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(HideApp::Id, Bit
 } // namespace HideApp
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ApplicationLauncher
 } // namespace Clusters
 } // namespace app

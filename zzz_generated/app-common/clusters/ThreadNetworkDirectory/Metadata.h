@@ -52,6 +52,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace GetOperationalDataset
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ThreadNetworkDirectory
 } // namespace Clusters
 } // namespace app
