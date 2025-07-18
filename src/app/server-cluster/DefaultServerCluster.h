@@ -113,6 +113,7 @@ public:
     static CHIP_ERROR AppendAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
                                        Span<const DataModel::AttributeEntry> mandatoryAttributes,
                                        std::initializer_list<const OptionalAttributeEntry> optionalAttributes);
+
 protected:
     const ConcreteClusterPath mPath;
     ServerClusterContext * mContext = nullptr;

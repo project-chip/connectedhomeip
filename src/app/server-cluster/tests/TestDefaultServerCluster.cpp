@@ -280,4 +280,3 @@ TEST_F(TestDefaultServerCluster, AppendAttributes)
         ASSERT_EQ(result[0].attributeId, Globals::Attributes::ClusterRevision::Id);
     }
 }
-
