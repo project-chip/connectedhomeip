@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-#include "closure-control-server.h"
-
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/closure-control-server/closure-control-server.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -52,9 +52,9 @@ namespace ClosureControl {
 
 CHIP_ERROR Interface::Init()
 {
-    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(this), NotSpecified,
+    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(this), AppServer,
                        "Failed to register attribute access");
-    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this) == CHIP_NO_ERROR, NotSpecified,
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this) == CHIP_NO_ERROR, AppServer,
                        "Failed to register command handler");
 
     return CHIP_NO_ERROR;
@@ -62,7 +62,7 @@ CHIP_ERROR Interface::Init()
 
 CHIP_ERROR Interface::Shutdown()
 {
-    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this) == CHIP_NO_ERROR, NotSpecified,
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this) == CHIP_NO_ERROR, AppServer,
                        "Failed to unregister command handler");
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
@@ -75,35 +75,44 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     {
     case Attributes::CountdownTime::Id: {
         typedef Attributes::CountdownTime::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR {
-            // TODO: Use the correct getter
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        });
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCountdownTime(ret); });
+    }
+
+    case Attributes::MainState::Id: {
+        typedef Attributes::MainState::TypeInfo::Type T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetMainState(ret); });
     }
 
     case Attributes::CurrentErrorList::Id: {
-
-        typedef Attributes::CurrentErrorList::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR {
-            // TODO: Use the correct getter
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        });
+        return aEncoder.EncodeList(
+            [&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR { return logic.ReadCurrentErrorListAttribute(encoder); });
     }
 
-    case Attributes::OverallState::Id: {
-        typedef Attributes::OverallState::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR {
-            // TODO: Use the correct getter
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        });
+    case Attributes::OverallCurrentState::Id: {
+        typedef DataModel::Nullable<GenericOverallCurrentState> T;
+        return EncodeRead<T>(aEncoder,
+                             [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallCurrentState(ret); });
     }
 
-    case Attributes::OverallTarget::Id: {
-        typedef Attributes::OverallTarget::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR {
-            // TODO: Use the correct getter
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        });
+    case Attributes::OverallTargetState::Id: {
+        typedef DataModel::Nullable<GenericOverallTargetState> T;
+        return EncodeRead<T>(aEncoder,
+                             [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallTargetState(ret); });
+    }
+
+    case Attributes::LatchControlModes::Id: {
+        typedef BitFlags<LatchControlModesBitmap> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetLatchControlModes(ret); });
+    }
+
+    case Attributes::FeatureMap::Id: {
+        typedef BitFlags<Feature> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
+    }
+
+    case Attributes::ClusterRevision::Id: {
+        typedef Attributes::ClusterRevision::TypeInfo::Type T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetClusterRevision(ret); });
     }
 
     default:
@@ -113,28 +122,30 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
 
 void Interface::InvokeCommand(HandlerContext & handlerContext)
 {
+    Status status = Status::UnsupportedCommand;
+
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::Stop::Id:
-        HandleCommand<Commands::SetTarget::DecodableType>(
-            handlerContext, [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
-                // TODO: Call cluster logic
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
+        HandleCommand<Commands::Stop::DecodableType>(
+            handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
+                status = logic.HandleStop();
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             });
         return;
 
     case Commands::MoveTo::Id:
-        HandleCommand<Commands::Step::DecodableType>(
-            handlerContext, [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
-                // TODO: Call cluster logic
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
+        HandleCommand<Commands::MoveTo::DecodableType>(
+            handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
+                status = logic.HandleMoveTo(commandData.position, commandData.latch, commandData.speed);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             });
         return;
     case Commands::Calibrate::Id:
-        HandleCommand<Commands::Step::DecodableType>(
-            handlerContext, [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
-                // TODO: Call cluster logic
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
+        HandleCommand<Commands::Calibrate::DecodableType>(
+            handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
+                status = logic.HandleCalibrate();
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             });
         return;
 

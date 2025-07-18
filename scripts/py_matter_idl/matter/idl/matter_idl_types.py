@@ -201,6 +201,8 @@ class ConstantEntry:
     name: str
     code: int
     api_maturity: ApiMaturity = ApiMaturity.STABLE
+    # If set, shows the specification name including spaces and special characters.
+    specification_name: Optional[str] = None
 
 
 @dataclass

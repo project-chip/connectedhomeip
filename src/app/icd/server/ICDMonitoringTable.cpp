@@ -30,7 +30,7 @@ enum class Fields : uint8_t
     kClientType       = 5,
 };
 
-CHIP_ERROR ICDMonitoringEntry::UpdateKey(StorageKeyName & skey)
+CHIP_ERROR ICDMonitoringEntry::UpdateKey(StorageKeyName & skey) const
 {
     VerifyOrReturnError(kUndefinedFabricIndex != this->fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     skey = DefaultStorageKeyAllocator::ICDManagementTableEntry(this->fabricIndex, index);

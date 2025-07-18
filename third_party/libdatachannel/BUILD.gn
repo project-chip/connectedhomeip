@@ -11,11 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
+_compiler_subdir = "gcc"
+if (is_clang) {
+  _compiler_subdir = "clang"
+}
+_output_dir = "build/$current_cpu-$_compiler_subdir"
 
 action("build_libdatachannel") {
   script = "scripts/build_libdatachannel.py"
-  outputs = [ "$target_gen_dir/repo/build/libdatachannel.so" ]
-  args = []
+  outputs = [ "$target_gen_dir/repo/${_output_dir}/libdatachannel.so" ]
+  args = [ "--output-dir=${_output_dir}" ]
+
+  if (is_clang) {
+    args += [ "--clang" ]
+
+    # check for cross compilation
+    if (host_os == "linux" && host_cpu == "x64" && current_cpu == "arm64") {
+      args += [ "--cross-compile-cpu-type=arm64" ]
+    }
+  }
 }
 
 config("datachannel_config") {
@@ -26,11 +43,22 @@ config("datachannel_config") {
     "juice",
   ]
 
+  cflags_cc = [ "-Wno-shadow" ]
+
+  if (is_clang) {
+    # We build static libraries and srtp2 depends on openssl
+    # TODO: can we somehow query this dynamically?
+    libs += [
+      "ssl",
+      "crypto",
+    ]
+  }
+
   lib_dirs = [
-    rebase_path("repo/build"),
-    rebase_path("repo/build/deps/usrsctp/usrsctplib"),
-    rebase_path("repo/build/deps/libsrtp"),
-    rebase_path("repo/build/deps/libjuice"),
+    rebase_path("repo/${_output_dir}"),
+    rebase_path("repo/${_output_dir}/deps/usrsctp/usrsctplib"),
+    rebase_path("repo/${_output_dir}/deps/libsrtp"),
+    rebase_path("repo/${_output_dir}/deps/libjuice"),
   ]
 }
 

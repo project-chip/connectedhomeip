@@ -189,16 +189,14 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : AllocatedSnapshotStreamsAttributeSubscriptionState()
   }
 
-  class RankedVideoStreamPrioritiesListAttribute(val value: List<UByte>?)
+  class StreamUsagePrioritiesAttribute(val value: List<UByte>)
 
-  sealed class RankedVideoStreamPrioritiesListAttributeSubscriptionState {
-    data class Success(val value: List<UByte>?) :
-      RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+  sealed class StreamUsagePrioritiesAttributeSubscriptionState {
+    data class Success(val value: List<UByte>) : StreamUsagePrioritiesAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) :
-      RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+    data class Error(val exception: Exception) : StreamUsagePrioritiesAttributeSubscriptionState()
 
-    object SubscriptionEstablished : RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+    object SubscriptionEstablished : StreamUsagePrioritiesAttributeSubscriptionState()
   }
 
   class ViewportAttribute(val value: CameraAvStreamManagementClusterViewportStruct?)
@@ -230,16 +228,6 @@ class CameraAvStreamManagementCluster(
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -349,8 +337,8 @@ class CameraAvStreamManagementCluster(
     maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     minBitRate: UInt,
     maxBitRate: UInt,
-    minFragmentLen: UShort,
-    maxFragmentLen: UShort,
+    minKeyFrameInterval: UShort,
+    maxKeyFrameInterval: UShort,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
@@ -384,11 +372,11 @@ class CameraAvStreamManagementCluster(
     val TAG_MAX_BIT_RATE_REQ: Int = 7
     tlvWriter.put(ContextSpecificTag(TAG_MAX_BIT_RATE_REQ), maxBitRate)
 
-    val TAG_MIN_FRAGMENT_LEN_REQ: Int = 8
-    tlvWriter.put(ContextSpecificTag(TAG_MIN_FRAGMENT_LEN_REQ), minFragmentLen)
+    val TAG_MIN_KEY_FRAME_INTERVAL_REQ: Int = 8
+    tlvWriter.put(ContextSpecificTag(TAG_MIN_KEY_FRAME_INTERVAL_REQ), minKeyFrameInterval)
 
-    val TAG_MAX_FRAGMENT_LEN_REQ: Int = 9
-    tlvWriter.put(ContextSpecificTag(TAG_MAX_FRAGMENT_LEN_REQ), maxFragmentLen)
+    val TAG_MAX_KEY_FRAME_INTERVAL_REQ: Int = 9
+    tlvWriter.put(ContextSpecificTag(TAG_MAX_KEY_FRAME_INTERVAL_REQ), maxKeyFrameInterval)
 
     val TAG_WATERMARK_ENABLED_REQ: Int = 10
     watermarkEnabled?.let {
@@ -1005,7 +993,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readNightVisionCapableAttribute(): Boolean? {
+  suspend fun readNightVisionUsesInfraredAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -1027,7 +1015,7 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Nightvisioncapable attribute not found in response" }
+    requireNotNull(attributeData) { "Nightvisionusesinfrared attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1041,7 +1029,7 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun subscribeNightVisionCapableAttribute(
+  suspend fun subscribeNightVisionUsesInfraredAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
@@ -1077,7 +1065,7 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Nightvisioncapable attribute not found in Node State update"
+            "Nightvisionusesinfrared attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -2528,8 +2516,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readRankedVideoStreamPrioritiesListAttribute():
-    RankedVideoStreamPrioritiesListAttribute {
+  suspend fun readStreamUsagePrioritiesAttribute(): StreamUsagePrioritiesAttribute {
     val ATTRIBUTE_ID: UInt = 18u
 
     val attributePath =
@@ -2551,32 +2538,26 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Rankedvideostreamprioritieslist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Streamusagepriorities attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<UByte> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<UByte> =
+      buildList<UByte> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUByte(AnonymousTag))
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
-    return RankedVideoStreamPrioritiesListAttribute(decodedValue)
+    return StreamUsagePrioritiesAttribute(decodedValue)
   }
 
-  suspend fun subscribeRankedVideoStreamPrioritiesListAttribute(
+  suspend fun subscribeStreamUsagePrioritiesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<RankedVideoStreamPrioritiesListAttributeSubscriptionState> {
+  ): Flow<StreamUsagePrioritiesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
       listOf(
@@ -2595,7 +2576,7 @@ class CameraAvStreamManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            RankedVideoStreamPrioritiesListAttributeSubscriptionState.Error(
+            StreamUsagePrioritiesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -2609,30 +2590,24 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Rankedvideostreamprioritieslist attribute not found in Node State update"
+            "Streamusagepriorities attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UByte>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<UByte> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUByte(AnonymousTag))
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<UByte> =
+            buildList<UByte> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUByte(AnonymousTag))
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let {
-            emit(RankedVideoStreamPrioritiesListAttributeSubscriptionState.Success(it))
-          }
+          emit(StreamUsagePrioritiesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(RankedVideoStreamPrioritiesListAttributeSubscriptionState.SubscriptionEstablished)
+          emit(StreamUsagePrioritiesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -5581,101 +5556,6 @@ class CameraAvStreamManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

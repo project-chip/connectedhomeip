@@ -14,9 +14,9 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/controller/flags.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/platform/python.gni")
 
 source_set("nodatamodel") {
   sources = [ "EmptyDataModelHandler.cpp" ]
@@ -74,7 +74,7 @@ static_library("controller") {
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
 
-  if (chip_controller && chip_build_controller) {
+  if (chip_support_commissioning_in_controller && chip_build_controller) {
     sources += [
       "AbstractDnssdDiscoveryController.cpp",
       "AutoCommissioner.cpp",
@@ -118,6 +118,9 @@ static_library("controller") {
   ]
 
   cflags = [ "-Wconversion" ]
+  if (chip_support_webrtc_python_bindings) {
+    public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]
+  }
 
   public_configs = [ "${chip_root}/src:includes" ]
 }

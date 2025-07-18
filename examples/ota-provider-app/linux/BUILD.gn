@@ -21,6 +21,8 @@ executable("chip-ota-provider-app") {
   deps = [
     "${chip_root}/examples/ota-provider-app/ota-provider-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/clusters/ota-provider",
+    "${chip_root}/src/app/clusters/ota-provider:user-consent",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
     "${chip_root}/src/protocols/bdx",

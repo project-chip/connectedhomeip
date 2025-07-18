@@ -16,61 +16,49 @@ namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace Accuracy {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Accuracy::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Accuracy::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace Accuracy
 namespace CumulativeEnergyImported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CumulativeEnergyImported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyImported::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
 } // namespace CumulativeEnergyImported
 namespace CumulativeEnergyExported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CumulativeEnergyExported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyExported::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
 } // namespace CumulativeEnergyExported
 namespace PeriodicEnergyImported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PeriodicEnergyImported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PeriodicEnergyImported::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace PeriodicEnergyImported
 namespace PeriodicEnergyExported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PeriodicEnergyExported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PeriodicEnergyExported::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace PeriodicEnergyExported
 namespace CumulativeEnergyReset {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = CumulativeEnergyReset::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyReset::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace CumulativeEnergyReset
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace CumulativeEnergyMeasured {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace CumulativeEnergyMeasured
+namespace PeriodicEnergyMeasured {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PeriodicEnergyMeasured
+
+} // namespace Events
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
 } // namespace app

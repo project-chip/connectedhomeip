@@ -73,12 +73,11 @@ config INIT_STACKS
     default y
 
 config IDLE_STACK_SIZE
-    default 512 if PM || SOC_RISCV_TELINK_TL321X
+    default 512 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 
 config ISR_STACK_SIZE
-    default 576 if PM
-    default 528 if SOC_RISCV_TELINK_TL321X
+    default 592 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
@@ -89,8 +88,9 @@ config HEAP_MEM_POOL_SIZE
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 20716 if SOC_SERIES_RISCV_TELINK_B9X_RETENTION || (SOC_RISCV_TELINK_TL321X && ZEPHYR_VERSION_3_3) || (SOC_RISCV_TELINK_TL721X && SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
-    default 16384 if SOC_RISCV_TELINK_TL721X || (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
-    default 13568 if SOC_RISCV_TELINK_W91
+    default 16954 if (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
+    default 18000 if SOC_RISCV_TELINK_TL721X
+    default 29448 if SOC_RISCV_TELINK_W91
     default 12288
 
 config NET_IPV6_MLD
@@ -103,19 +103,19 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
 
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X
+    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
     default 8
 
 config NET_PKT_TX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X
+    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
     default 8
 
 config NET_BUF_RX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X
+    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
     default 32
 
 config NET_BUF_TX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X
+    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
     default 32
 
 config GPIO
@@ -158,19 +158,16 @@ config BT_BUF_ACL_TX_SIZE
 config BT_BUF_EVT_RX_COUNT
     default 4
 
-config BT_BUF_ACL_RX_COUNT
-    default 4
-
 config BT_GATT_CACHING
     default n
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X || BT_TLX
-    default 2048 if BT_W91
+    default 896 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
-    default 640 if BT_B9X || BT_TLX
-    default 2048 if BT_W91
+    default 664 if BT_B9X || BT_TLX
+    default 896 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
     default n
@@ -179,7 +176,7 @@ if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
     default 648 if ZEPHYR_VERSION_3_3
-    default 680
+    default 696
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
     default 0
@@ -339,10 +336,10 @@ config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
 endif # NET_L2_OPENTHREAD
 
 config NET_TX_STACK_SIZE
-    default 554 if PM || SOC_RISCV_TELINK_TL321X
+    default 600 if PM || SOC_RISCV_TELINK_TL321X
 
 config NET_RX_STACK_SIZE
-    default 554 if PM || SOC_RISCV_TELINK_TL321X
+    default 600 if PM || SOC_RISCV_TELINK_TL321X
 
 # Disable certain parts of Zephyr IPv6 stack
 config NET_IPV6_NBR_CACHE
@@ -429,8 +426,14 @@ config NET_MGMT_EVENT_STACK_SIZE
 if !ZEPHYR_VERSION_3_3
 config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
     int "Size of RX work queue stack"
-    default 2304 if TELINK_W91_IPC_DISPATCHER
+    default 2384 if TELINK_W91_IPC_DISPATCHER
 endif
+
+config TELINK_W91_WIFI_EVENT_THREAD_STACK_SIZE
+	default 1136
+
+config IPC_SERVICE_ICMSG_WORK_QUEUE_STACK_SIZE
+	default 544
 
 endif # CHIP_WIFI
 
@@ -484,6 +487,28 @@ config MBEDTLS_HKDF_C
 config MBEDTLS_X509_CSR_WRITE_C
     bool "X.509 Certificate Signing Requests writing"
     default y
+
+config PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
+    bool "PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY"
+    default y
+
+# Disable PSA usage
+config MBEDTLS_USE_PSA_CRYPTO
+    bool "MBEDTLS_USE_PSA_CRYPTO"
+    default n
+
+config MBEDTLS_PSA_STATIC_KEY_SLOTS
+    bool "MBEDTLS_PSA_STATIC_KEY_SLOTS"
+    default n
+
+config MBEDTLS_PSA_CRYPTO_C
+    bool "MBEDTLS_PSA_CRYPTO_C"
+    default n
+
+config CHIP_CRYPTO_PSA
+    bool "CHIP_CRYPTO_PSA"
+    default n
+
 endif # !ZEPHYR_VERSION_3_3
 
 config GETOPT_LONG

@@ -46,6 +46,10 @@ extern "C" {
 #include "wlan.h"
 }
 #endif
+#if CONFIG_CHIP_ETHERNET
+#include "fsl_enet.h"
+#include "fsl_silicon_id.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -170,6 +174,15 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
+
+#if CONFIG_CHIP_ETHERNET
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
+{
+    ENET_GetMacAddr(ENET, buf.data());
+
+    return CHIP_NO_ERROR;
+}
+#endif
 
 CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {

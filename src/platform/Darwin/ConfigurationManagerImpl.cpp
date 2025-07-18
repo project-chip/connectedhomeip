@@ -26,6 +26,7 @@
 #include <platform/Darwin/ConfigurationManagerImpl.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/Global.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
@@ -138,10 +139,13 @@ exit:
 }
 #endif // TARGET_OS_OSX
 
+namespace {
+AtomicGlobal<ConfigurationManagerImpl> gInstance;
+}
+
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
-    static ConfigurationManagerImpl sInstance;
-    return sInstance;
+    return gInstance.get();
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()

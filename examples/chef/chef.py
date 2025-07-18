@@ -40,11 +40,16 @@ _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
-_EXCLUDE_DEVICE_FROM_LINUX_CI = [  # These do not compile / deprecated.
-    "noip_rootnode_dimmablelight_bCwGYSDpoe",
-    "icd_rootnode_contactsensor_ed3b19ec55",
-    "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680",
+_EXCLUDE_DEVICE_FROM_LINUX_CI = [
+    "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
+    "rootnode_genericswitch_2dfff6e516",  # not actively developed,
+    "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
+    "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
+    "rootnode_onofflight_samplemei",  # not actively developed,
+    "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
+# Pattern to filter (based on device-name) devices that need ICD support.
+_ICD_DEVICE_PATTERN = "^icd_"
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -382,6 +387,10 @@ def main() -> int:
                       help=("For use with --build_all. Build labels to include. "
                             "Accepts a regex pattern. Mutually exclusive with --build_exclude."),
                       dest="build_include")
+    parser.add_option("", "--build_bundle",
+                      help=(
+                          "Build platform bundle after build successed when building single device."),
+                      action="store_true", dest="build_bundle")
     parser.add_option("-k", "--keep_going",
                       help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
@@ -773,6 +782,28 @@ def main() -> int:
             nrf_build_cmds.append(
                 f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
             nrf_build_cmds.append(
+                "-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
+            if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_READ_CLIENT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_LIT_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_CHECK_IN_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_UAT_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_DSLS_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_REPORT_ON_ACTIVE_MODE=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_SIT_SLOW_POLL_LIMIT=5000")
+            else:
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=n")
+            nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
 
             shell.run_cmd(" ".join(nrf_build_cmds))
@@ -904,14 +935,15 @@ def main() -> int:
             else:
                 linux_args.append("chip_inet_config_enable_ipv4=false")
 
-            if options.enable_lit_icd:
+            if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
                 linux_args.append("chip_enable_icd_server = true")
                 linux_args.append("chip_icd_report_on_active_mode = true")
                 linux_args.append("chip_enable_icd_lit = true")
                 linux_args.append("chip_enable_icd_dsls = true")
                 if options.icd_subscription_resumption:
                     options.icd_persist_subscription = True
-                    linux_args.append("chip_subscription_timeout_resumption = true")
+                    linux_args.append(
+                        "chip_subscription_timeout_resumption = true")
                 if options.icd_persist_subscription:
                     linux_args.append("chip_persist_subscriptions = true")
 
@@ -934,6 +966,13 @@ def main() -> int:
     #
     # Compilation DB TODO
     #
+
+    #
+    # Build bundle
+    #
+
+    if options.build_bundle:
+        bundle(options.build_target, options.sample_device_type_name)
 
     #
     # Flash

@@ -19,10 +19,10 @@ import math
 import chip.clusters as Clusters
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                         MatterBaseTest, TestStep, UnknownProblemLocation, async_test_body,
-                                         default_matter_test_main)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
+from chip.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
+                                          UnknownProblemLocation)
 from mobly import asserts
 
 
@@ -84,18 +84,20 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
             self._check_and_record_errors(location, required, pics)
 
     def steps_TC_IDM_10_4(self):
-        return [TestStep(1, "TH performs a wildcard read of all attributes on the endpoint under test"),
+        return [TestStep(1, "TH performs a wildcard read of all attributes on the endpoint under test (done during test setup)"),
                 TestStep(2, "For every standard cluster: If the cluster is present on the endpoint, ensure the server-side PICS code for the cluster is present in the PICS file (e.g. OO.S for On/Off cluster).If the cluster is not present on the endpoint, ensure the cluster server PICS code is not present in the PICS file.", "PICS exactly match for server clusters."),
                 TestStep(3, "For every standard cluster, for every attribute in the cluster:If the cluster is present on the endpoint and the attribute ID is present in the AttributeList global attribute within the cluster, ensure the server-side PICS code for the attribute is present in the PICS file (e.g. OO.S.A000 for On/Off cluster’s OnOff attribute).Otherwise, ensure the attribute PICS code is NOT present in the PICS file.", "PICS exactly match for all attributes in all clusters."),
                 TestStep(4, "For every cluster present in the spec, for every client → server command in the cluster: If the cluster is present on the endpoint and the command id is present in the accepted commands list, ensure the PICS code for the accepted command is present in the PICS file. Otherwise, ensure the accepted command PICS code is not present in the PICS file.", "PICS exactly match for all accepted commands in all clusters."),
                 TestStep(5, "For every cluster present in the spec, for every server → client command in the cluster: If the cluster is present on the endpoint and the command id is present in the generated commands list, ensure the PICS code for the generated command is present in the PICS file. Otherwise, ensure the generated command PICS code is not present in the PICS file.", "PICS exactly match for all generated commands in all clusters."),
                 TestStep(6, "For every cluster present in the spec, for every feature in the cluster: If the cluster is present on the endpoint and the feature is marked in the feature map, ensure the PICS code for the feature is present in the PICS file. Otherwise, ensure the feature PICS code is not present in the PICS file.", "PICS exactly match for all features in all clusters."),
-                TestStep(7, "Ensure that the PICS_SDK_CI_ONLY PICS does not appear in the PICS file", "CI PICS is not present")]
+                TestStep(7, "Ensure that the PICS_SDK_CI_ONLY PICS does not appear in the PICS file", "CI PICS is not present"),
+                TestStep(8, "If any of the checks failed, fail the test")]
 
     def test_TC_IDM_10_4(self):
         # wildcard read is done in setup_class
         self.step(1)
-        self.endpoint_id = self.matter_test_config.endpoint
+        self.endpoint_id = self.get_endpoint(default=None)
+        asserts.assert_not_equal(self.endpoint_id, None, "An explicit endpoint is required for this test, please use --endpoint")
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True
 
@@ -179,6 +181,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                               problem="PICS PICS_SDK_CI_ONLY found in PICS list. This PICS is disallowed for certification.")
             self.success = False
 
+        self.step(8)
         if not self.success:
             self.fail_current_test("At least one PICS error was found for this endpoint")
 

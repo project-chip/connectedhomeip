@@ -55,7 +55,17 @@ public:
     static SilabsButtonCb mButtonCallback;
     uint8_t GetButtonState(uint8_t button) override;
 
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
     void StartScheduler(void) override;
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    // RGB LEDs
+    bool GetRGBLedState(uint8_t led) override;
+
+    CHIP_ERROR SetLedColor(uint8_t led, uint8_t r, uint8_t g, uint8_t b) override;
+    CHIP_ERROR GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, uint16_t & b) override;
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
     CHIP_ERROR FlashInit() override;
     CHIP_ERROR FlashErasePage(uint32_t addr) override;

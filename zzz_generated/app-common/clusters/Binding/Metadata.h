@@ -20,17 +20,16 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace Binding {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Binding::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Binding::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace Binding
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Binding
 } // namespace Clusters
 } // namespace app

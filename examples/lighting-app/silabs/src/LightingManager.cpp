@@ -22,9 +22,14 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <clusters/ColorControl/AttributeIds.h>
+#include <clusters/LevelControl/AttributeIds.h>
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
+using namespace ::chip::app;
+using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::OnOff;
 using namespace ::chip::DeviceLayer;
 
@@ -60,9 +65,47 @@ CHIP_ERROR LightingManager::Init()
     }
 
     bool currentLedState;
+
     // read current on/off value on endpoint one.
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     OnOffServer::Instance().getOnOffValue(1, &currentLedState);
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    app::DataModel::Nullable<uint8_t> brightness;
+    uint16_t currentx, currenty, currentctmireds;
+    uint8_t currenthue, currentsaturation;
+
+    // Read brightness value
+    if (Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness) == Protocols::InteractionModel::Status::Success &&
+        !brightness.IsNull())
+    {
+        mCurrentLevel = brightness.Value();
+    }
+
+    if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success)
+    {
+        mCurrentX = currentx;
+    }
+    if (Clusters::ColorControl::Attributes::CurrentY::Get(1, &currenty) == Protocols::InteractionModel::Status::Success)
+    {
+        mCurrentY = currenty;
+    }
+    if (Clusters::ColorControl::Attributes::CurrentHue::Get(1, &currenthue) == Protocols::InteractionModel::Status::Success)
+    {
+        mCurrentHue = currenthue;
+    }
+    if (Clusters::ColorControl::Attributes::CurrentSaturation::Get(1, &currentsaturation) ==
+        Protocols::InteractionModel::Status::Success)
+    {
+        mCurrentSaturation = currentsaturation;
+    }
+    if (Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(1, &currentctmireds) ==
+        Protocols::InteractionModel::Status::Success)
+    {
+        mCurrentCTMireds = currentctmireds;
+    }
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     mState                 = currentLedState ? kState_OnCompleted : kState_OffCompleted;
@@ -100,7 +143,7 @@ void LightingManager::SetAutoTurnOffDuration(uint32_t aDurationInSecs)
     mAutoTurnOffDuration = aDurationInSecs;
 }
 
-bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
+bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
 {
     bool action_initiated = false;
     State_t new_state;
@@ -111,17 +154,18 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
         action_initiated = true;
 
         new_state = kState_OnInitiated;
+        if (mOffEffectArmed)
+        {
+            CancelTimer();
+            mOffEffectArmed = false;
+        }
     }
     else if (mState == kState_OnCompleted && aAction == OFF_ACTION && mOffEffectArmed == false)
     {
         action_initiated = true;
 
         new_state = kState_OffInitiated;
-    }
-
-    if (action_initiated)
-    {
-        if (mAutoTurnOffTimerArmed && new_state == kState_OffInitiated)
+        if (mAutoTurnOffTimerArmed)
         {
             // If auto turn off timer has been armed and someone initiates turning off,
             // cancel the timer and continue as normal.
@@ -129,22 +173,21 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
 
             CancelTimer();
         }
+    }
+    else if (aAction == LEVEL_ACTION)
+    {
+        action_initiated = true;
+    }
 
-        if (mOffEffectArmed && new_state == kState_OnInitiated)
-        {
-            CancelTimer();
-            mOffEffectArmed = false;
-        }
-
+    if (action_initiated && (aAction == ON_ACTION || aAction == OFF_ACTION))
+    {
         StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
-
-        // Since the timer started successfully, update the state and trigger callback
         mState = new_state;
+    }
 
-        if (mActionInitiated_CB)
-        {
-            mActionInitiated_CB(aAction, aActor);
-        }
+    if (action_initiated && mActionInitiated_CB)
+    {
+        mActionInitiated_CB(aAction, aActor, aValue);
     }
 
     return action_initiated;
@@ -199,6 +242,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor           = AppEvent::kEventType_Timer;
+    uint8_t value           = aEvent->LightEvent.Value;
 
     // Make sure auto turn off timer is still armed.
     if (!light->mAutoTurnOffTimerArmed)
@@ -210,13 +254,14 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION);
+    light->InitiateAction(actor, OFF_ACTION, &value);
 }
 
 void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor           = AppEvent::kEventType_Timer;
+    uint8_t value           = aEvent->LightEvent.Value;
 
     // Make sure auto turn off timer is still armed.
     if (!light->mOffEffectArmed)
@@ -228,7 +273,7 @@ void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("OffEffect completed");
 
-    light->InitiateAction(actor, OFF_ACTION);
+    light->InitiateAction(actor, OFF_ACTION, &value);
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
@@ -307,3 +352,60 @@ void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
     LightMgr().mOffEffectArmed = true;
     LightMgr().StartTimer(offEffectDuration);
 }
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+bool LightingManager::InitiateLightCtrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value)
+{
+    bool action_initiated = false;
+    VerifyOrReturnError(aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT, action_initiated);
+    RGBLEDWidget::ColorData_t colorData;
+    switch (aAction)
+    {
+    case COLOR_ACTION_XY:
+        colorData.xy = { mCurrentX, mCurrentY };
+
+        if (aAttributeId == ColorControl::Attributes::CurrentX::Id)
+        {
+            VerifyOrReturnValue(colorData.xy.y != *reinterpret_cast<uint16_t *>(value), action_initiated);
+            colorData.xy.y   = *reinterpret_cast<uint16_t *>(value);
+            action_initiated = true;
+        }
+        else if (aAttributeId == ColorControl::Attributes::CurrentY::Id)
+        {
+            VerifyOrReturnValue(colorData.xy.y != *reinterpret_cast<uint16_t *>(value), action_initiated);
+            colorData.xy.y   = *reinterpret_cast<uint16_t *>(value);
+            action_initiated = true;
+        }
+        break;
+
+    case COLOR_ACTION_HSV:
+        colorData.hsv = { mCurrentHue, mCurrentSaturation };
+
+        if (aAttributeId == ColorControl::Attributes::CurrentHue::Id)
+        {
+            VerifyOrReturnValue(colorData.hsv.h != *value, action_initiated);
+            colorData.hsv.h  = *value;
+            action_initiated = true;
+        }
+        else if (aAttributeId == ColorControl::Attributes::CurrentSaturation::Id)
+        {
+            VerifyOrReturnValue(colorData.hsv.s != *value, action_initiated);
+            colorData.hsv.s  = *value;
+            action_initiated = true;
+        }
+        break;
+
+    case COLOR_ACTION_CT:
+        colorData.ct.ctMireds = mCurrentCTMireds;
+        VerifyOrReturnValue(colorData.ct.ctMireds != *(uint16_t *) value, action_initiated);
+        colorData.ct.ctMireds = *(uint16_t *) value;
+        action_initiated      = true;
+        break;
+
+    default:
+        break;
+    }
+    AppTask::GetAppTask().PostLightControlActionRequest(aActor, aAction, (RGBLEDWidget::ColorData_t *) &colorData);
+    return action_initiated;
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

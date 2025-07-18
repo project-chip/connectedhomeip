@@ -65,8 +65,7 @@ class TC_CNET_4_3(MatterBaseTest):
                      "TH reads InterfaceEnabled attribute from the DUT. Skip this and remaining steps if the connected network is not on the cluster currently being verified.",
                      "Verify that InterfaceEnabled attribute value is true"),
             TestStep(5, "TH reads LastNetworkingStatus attribute from the DUT",
-                     "LastNetworkingStatus attribute value will be within any one of the following values \
-                      Success, NetworkNotFound, OutOfRange, RegulatoryError, UnknownError, null"),
+                     "LastNetworkingStatus attribute value is Success"),
             TestStep(6, "TH reads the LastNetworkID attribute from the DUT",
                      "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries in the Networks attribute list"),
             TestStep(7, "TH reads the LastConnectErrorValue attribute from the DUT",
@@ -116,7 +115,7 @@ class TC_CNET_4_3(MatterBaseTest):
         self.step(4)
         if not current_cluster_connected:
             logging.info("Current cluster is not connected, skipping all remaining test steps")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped(5)
             return
         interface_enabled = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,

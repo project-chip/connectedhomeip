@@ -38,6 +38,10 @@
 #include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#if CHIP_ATTESTATION_TRUSTY_OS
+#include <platform/Linux/DeviceAttestationCredsTrusty.h>
+#endif
+
 #if ENABLE_TRACING
 #include <TracingCommandLineArgument.h> // nogncheck
 #endif
@@ -88,6 +92,7 @@ enum
     kDeviceOption_PICS,
     kDeviceOption_KVS,
     kDeviceOption_InterfaceId,
+    kDeviceOption_AppPipe,
     kDeviceOption_Spake2pVerifierBase64,
     kDeviceOption_Spake2pSaltBase64,
     kDeviceOption_Spake2pIterations,
@@ -129,6 +134,9 @@ enum
     kDeviceOption_WiFi_PAF,
 #endif
     kDeviceOption_DacProvider,
+#if CHIP_ATTESTATION_TRUSTY_OS
+    kDeviceOption_TrustyDacProvider,
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     kDeviceOption_TermsAndConditions_Version,
     kDeviceOption_TermsAndConditions_Required,
@@ -139,7 +147,13 @@ enum
 #endif
 #if ENABLE_CAMERA_SERVER
     kDeviceOption_Camera_DeferredOffer,
+    kDeviceOption_Camera_VideoDevice,
 #endif
+    kDeviceOption_VendorName,
+    kDeviceOption_ProductName,
+    kDeviceOption_HardwareVersionString,
+    kDeviceOption_SoftwareVersionString,
+    kDeviceOption_SerialNumber,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -161,6 +175,11 @@ OptionDef sDeviceOptionDefs[] = {
     { "version", kArgumentRequired, kDeviceOption_Version },
     { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
     { "product-id", kArgumentRequired, kDeviceOption_ProductID },
+    { "vendor-name", kArgumentRequired, kDeviceOption_VendorName },
+    { "product-name", kArgumentRequired, kDeviceOption_ProductName },
+    { "hardware-version-string", kArgumentRequired, kDeviceOption_HardwareVersionString },
+    { "software-version-string", kArgumentRequired, kDeviceOption_SoftwareVersionString },
+    { "serial-number", kArgumentRequired, kDeviceOption_SerialNumber },
     { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
     { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
@@ -180,6 +199,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
+    { "app-pipe", kArgumentRequired, kDeviceOption_AppPipe },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
@@ -216,6 +236,9 @@ OptionDef sDeviceOptionDefs[] = {
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
     { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
+#if CHIP_ATTESTATION_TRUSTY_OS
+    { "dac_provider_trusty", kNoArgument, kDeviceOption_TrustyDacProvider },
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
     { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
@@ -226,6 +249,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
 #if ENABLE_CAMERA_SERVER
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
+    { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
 #endif
     {}
 };
@@ -265,6 +289,21 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --product-id <id>\n"
     "       The Product ID is specified by vendor.\n"
+    "\n"
+    "  --vendor-name <name>\n"
+    "       The vendor name specified by the vendor.\n"
+    "\n"
+    "  --product-name <name>\n"
+    "       The product name specified by vendor.\n"
+    "\n"
+    "  --hardware-version-string <string>\n"
+    "       The HardwareVersionString used in the basic information cluster.\n"
+    "\n"
+    "  --software-version-string <string>\n"
+    "       The SoftwareVersionString used in the basic information cluster.\n"
+    "\n"
+    "  --serial-number <serial_number>\n"
+    "       The serial number specified by vendor.\n"
     "\n"
     "  --custom-flow <Standard = 0 | UserActionRequired = 1 | Custom = 2>\n"
     "       A 2-bit unsigned enumeration specifying manufacturer-specific custom flow options.\n"
@@ -321,6 +360,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --interface-id <interface>\n"
     "       A interface id to advertise on.\n"
+    "\n"
+    "  --app-pipe <filepath>\n"
+    "       Custom path for the current application to send out of band commands.\n"
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n"
     "  --trace_file <file>\n"
@@ -400,6 +442,10 @@ const char * sDeviceOptionHelp =
 #endif
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+#if CHIP_ATTESTATION_TRUSTY_OS
+    "  --dac_provider_trusty\n"
+    "       Invoke Trusty OS to get device attestation from secure storage.\n"
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     "  --icdActiveModeDurationMs <icdActiveModeDurationMs>\n"
     "       Sets the ICD active mode duration (in milliseconds). (Default: 300) \n"
@@ -413,6 +459,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-deferred-offer\n"
     "       Indicates the delayed processing hint of the WebRTC Provider.\n"
+    "\n"
+    "  --camera-video-device <path>\n"
+    "       Path to a V4L2 video capture device (default: /dev/video0).\n"
 #endif
     "\n";
 
@@ -502,6 +551,26 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_ProductID:
         LinuxDeviceOptions::GetInstance().payload.productID = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
+        break;
+
+    case kDeviceOption_VendorName:
+        LinuxDeviceOptions::GetInstance().vendorName.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_ProductName:
+        LinuxDeviceOptions::GetInstance().productName.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_HardwareVersionString:
+        LinuxDeviceOptions::GetInstance().hardwareVersionString.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_SoftwareVersionString:
+        LinuxDeviceOptions::GetInstance().softwareVersionString.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_SerialNumber:
+        LinuxDeviceOptions::GetInstance().serialNumber.SetValue(std::string{ aValue });
         break;
 
     case kDeviceOption_CustomFlow:
@@ -633,6 +702,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_KVS:
         LinuxDeviceOptions::GetInstance().KVS = aValue;
+        break;
+
+    case kDeviceOption_AppPipe:
+        LinuxDeviceOptions::GetInstance().app_pipe = aValue;
         break;
 
     case kDeviceOption_InterfaceId:
@@ -793,6 +866,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
         break;
     }
+#if CHIP_ATTESTATION_TRUSTY_OS
+    case kDeviceOption_TrustyDacProvider: {
+        LinuxDeviceOptions::GetInstance().dacProvider = &chip::Credentials::Trusty::TrustyDACProvider::GetTrustyDACProvider();
+        break;
+    }
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case kDeviceOption_TermsAndConditions_Version: {
         LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
@@ -836,6 +915,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #if ENABLE_CAMERA_SERVER
     case kDeviceOption_Camera_DeferredOffer: {
         LinuxDeviceOptions::GetInstance().cameraDeferredOffer = true;
+        break;
+    }
+    case kDeviceOption_Camera_VideoDevice: {
+        LinuxDeviceOptions::GetInstance().cameraVideoDevice.SetValue(aValue);
         break;
     }
 #endif

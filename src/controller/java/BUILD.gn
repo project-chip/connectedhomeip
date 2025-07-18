@@ -175,7 +175,10 @@ shared_library("jni") {
 
     defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
 
-    deps += [ "${chip_root}/src/controller:nodatamodel" ]
+    deps += [
+      "${chip_root}/src/app/clusters/ota-provider",
+      "${chip_root}/src/controller:nodatamodel",
+    ]
 
     # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
     # defined and application is supposed to provide it. This adds the sources

@@ -22,14 +22,13 @@ namespace Attributes {} // namespace Attributes
 
 namespace Commands {
 namespace ContentAppMessage {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ContentAppObserver::Commands::ContentAppMessage::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ContentAppMessage::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
 } // namespace ContentAppMessage
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ContentAppObserver
 } // namespace Clusters
 } // namespace app

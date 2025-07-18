@@ -20,7 +20,6 @@
 [![Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-standalone.yaml)
 [![Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-standalone.yaml)
 [![Mbed OS](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Mbed%20OS/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-mbed.yaml)
-[![MW320](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20MW320/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-mw320.yaml)
 [![nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-nrfconnect.yaml)
 [![Open IoT SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Open%20IoT%20SDK/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-openiotsdk.yaml)
 [![QPG](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20QPG/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-qpg.yaml)
@@ -30,9 +29,12 @@
 
 **Tests**
 
+[![Tests](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml)
 [![Unit / Integration Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Integration%20Tests/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/unit_integration_test.yaml)
 [![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/cirque.yaml)
 [![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/qemu.yaml)
+
+-   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
 
 **Tools**
 
@@ -41,6 +43,7 @@
 **Documentation**
 
 [![Documentation Build](https://github.com/project-chip/connectedhomeip/actions/workflows/docbuild.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/docbuild.yaml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
 
 -   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
 

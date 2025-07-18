@@ -19,13 +19,14 @@ pyobjc-core; sys_platform == 'darwin'
 pyobjc-framework-cocoa; sys_platform == 'darwin'
 pyobjc-framework-corebluetooth; sys_platform == 'darwin'
 
+# other tools
+click-option-group
+
 # python unit tests run directly without installing
 # built venv
 #
 # TODO: this should change in the Future
-diskcache
-lark
-websockets
+-r ../tests/requirements.txt
 
 # mobly tests
 portpicker

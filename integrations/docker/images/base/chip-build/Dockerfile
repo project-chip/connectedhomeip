@@ -40,6 +40,8 @@ RUN set -x \
     clang-tidy \
     cmake \
     curl \
+    dbus-daemon \
+    ffmpeg \
     flex \
     g++ \
     generate-ninja \
@@ -54,8 +56,12 @@ RUN set -x \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
     libcairo2-dev \
     libcairo-dev \
+    libcurl4-openssl-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
@@ -64,6 +70,7 @@ RUN set -x \
     libglib2.0-dev \
     libgstreamer1.0-0 \
     libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
     libical-dev \
     libjpeg-dev \
     libmbedtls-dev \
@@ -127,6 +134,7 @@ RUN set -x \
     pygit \
     PyGithub \
     ruff \
+    gcovr==8.3 \
     && : # last line
 
 # Install bloat comparison tools

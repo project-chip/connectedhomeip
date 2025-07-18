@@ -20,6 +20,10 @@ OTHER_CPLUSPLUSFLAGS = $(OTHER_CFLAGS) -fno-c++-static-destructors -DCHIP_CONFIG
 SYSTEM_HEADER_SEARCH_PATHS = $(TEMP_DIR)/out/gen/include $(CHIP_ROOT)/src/darwin/Framework/CHIP $(CHIP_ROOT)/src $(CHIP_ROOT)/src/include $(CHIP_ROOT)/zzz_generated $(CHIP_ROOT)/zzz_generated/app-common $(CHIP_ROOT)/third_party/nlassert/repo/include $(CHIP_ROOT)/third_party/nlio/repo/include
 
 // Linker settings
+OTHER_LDFLAGS = $(inherited) $(LDFLAGS_NO_INITS) // disallow static initializers (unless ASAN or TSAN are enabled)
+LDFLAGS_NO_INITS = $(LDFLAGS_NO_INITS__$(ENABLE_ADDRESS_SANITIZER:default=NO)_$(ENABLE_THREAD_SANITIZER:default=NO))
+LDFLAGS_NO_INITS__NO_NO = -Wl,-no_inits
+
 OTHER_LDFLAGS = $(inherited) $(LDFLAGS_UNEXPORTS) // hide mangled C++ symbols and ASAN symbols
 LDFLAGS_UNEXPORTS = -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*"
 

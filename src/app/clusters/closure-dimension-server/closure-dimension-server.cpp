@@ -44,14 +44,12 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     switch (aPath.mAttributeId)
     {
     case Attributes::CurrentState::Id: {
-        typedef GenericCurrentStateStruct T;
+        typedef DataModel::Nullable<GenericDimensionStateStruct> T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentState(ret); });
     }
-    case Attributes::Target::Id: {
-        // TODO: Each field SHALL be available following its respective feature. If the feature is not set the field SHALL NOT be
-        // present.
-        typedef GenericTargetStruct T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTarget(ret); });
+    case Attributes::TargetState::Id: {
+        typedef DataModel::Nullable<GenericDimensionStateStruct> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTargetState(ret); });
     }
     case Attributes::Resolution::Id: {
         typedef Attributes::Resolution::TypeInfo::Type T;
@@ -90,8 +88,12 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
         typedef Attributes::ModulationType::TypeInfo::Type T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetModulationType(ret); });
     }
+    case Attributes::LatchControlModes::Id: {
+        typedef BitFlags<LatchControlModesBitmap> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetLatchControlModes(ret); });
+    }
     case Attributes::FeatureMap::Id: {
-        typedef Attributes::FeatureMap::TypeInfo::Type T;
+        typedef BitFlags<Feature> T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
     }
     case Attributes::ClusterRevision::Id: {

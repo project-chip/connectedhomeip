@@ -20,33 +20,31 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace MeteredQuantity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeteredQuantity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MeteredQuantity::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MeteredQuantity
 namespace MeteredQuantityTimestamp {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeteredQuantityTimestamp::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeteredQuantityTimestamp::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
 } // namespace MeteredQuantityTimestamp
 namespace MeasurementType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeasurementType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MeasurementType
+namespace MaximumMeteredQuantities {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantities::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace MaximumMeteredQuantities
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace CommodityMetering
 } // namespace Clusters
 } // namespace app

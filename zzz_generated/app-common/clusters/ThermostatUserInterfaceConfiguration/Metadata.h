@@ -20,33 +20,24 @@ inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace TemperatureDisplayMode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = TemperatureDisplayMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureDisplayMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace TemperatureDisplayMode
 namespace KeypadLockout {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = KeypadLockout::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(KeypadLockout::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace KeypadLockout
 namespace ScheduleProgrammingVisibility {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ScheduleProgrammingVisibility::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ScheduleProgrammingVisibility::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          Access::Privilege::kManage);
 } // namespace ScheduleProgrammingVisibility
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ThermostatUserInterfaceConfiguration
 } // namespace Clusters
 } // namespace app
