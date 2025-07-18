@@ -17,6 +17,7 @@ declare_args() {
   stm32_wb_hal = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/STM32WBAxx_HAL_Driver"
   cmsis_device_wb = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/CMSIS/Device/ST/STM32WBAxx"
   stm32_wpan_sdk = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/STM32_WPAN"
+  stm32_wpan_sdk_patch = "${chip_root}/third_party/st/STM32CubeWBAPatch"
   stm32_config_files = "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
   stm32_system = "${chip_root}/examples/platform/stm32/common/STM32WBA651-DK1/Common/WPAN/Modules"
   stm32_system_interfaces = "${chip_root}/examples/platform/stm32/common/STM32WBA651-DK1/Common/WPAN/Interfaces"
@@ -70,10 +71,10 @@ SOURCES = [
 
   
   #WPAN 
-  "${stm32_wpan_sdk}/link_layer/ll_sys/src/ll_sys_cs.c",
-  "${stm32_wpan_sdk}/link_layer/ll_sys/src/ll_sys_dp_slp.c",
-  "${stm32_wpan_sdk}/link_layer/ll_sys/src/ll_sys_intf.c",
-  "${stm32_wpan_sdk}/link_layer/ll_sys/src/ll_sys_startup.c",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/src/ll_sys_cs.c",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/src/ll_sys_dp_slp.c",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/src/ll_sys_intf.c",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/src/ll_sys_startup.c",
   
   "${stm32_wpan_sdk}/thread/openthread/platform/alarm.c",
   "${stm32_wpan_sdk}/thread/openthread/platform/diag.c",
@@ -258,11 +259,11 @@ INCLUDE_DIRS = [
 
   #WPAN
   "${stm32_wpan_sdk}/",
-  "${stm32_wpan_sdk}/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
-  "${stm32_wpan_sdk}/link_layer/ll_cmd_lib/inc/ot_inc",
-  "${stm32_wpan_sdk}/link_layer/ll_cmd_lib/config/concurrent/ble_thread",
-  "${stm32_wpan_sdk}/link_layer/ll_cmd_lib/inc",
-  "${stm32_wpan_sdk}/link_layer/ll_sys/inc",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_cmd_lib/inc/ot_inc",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_cmd_lib/config/concurrent/ble_thread",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_cmd_lib/inc",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/inc",
   "${stm32_wpan_sdk}/ble",
   "${stm32_wpan_sdk}/ble/stack/include",
   "${stm32_wpan_sdk}/ble/stack/include/auto",
@@ -330,7 +331,7 @@ LIBS = [
   # add any .o/.a library here
   "${stm32_wpan_sdk}/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Thread_lib.a",
   "${stm32_wpan_sdk}/ble/stack/lib/stm32wba_ble_stack_basic.a",
-  "${stm32_wpan_sdk}/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib_matter.a",
+  "${stm32_wpan_sdk_patch}/thread/openthread_lib/stm32wba_ot_mtd_lib_matter.a",
 ]
   
 FLAGS = [ 
