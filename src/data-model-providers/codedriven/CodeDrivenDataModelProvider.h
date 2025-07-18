@@ -39,7 +39,7 @@ namespace app {
  * Expected Usage:
  * 1. Instantiate an EndpointInterface implementation.
  * 2. Create an instance of CodeDrivenDataModelProvider.
- * 3. Add the endpoint provider instances to the CodeDrivenDataModelProvider using AddEndpoint().
+ * 3. Add the EndpointInterfaceRegistration objects to the CodeDrivenDataModelProvider using AddEndpoint().
  * 4. Call Startup() on the CodeDrivenDataModelProvider.
  *
  * Lifecycle:
