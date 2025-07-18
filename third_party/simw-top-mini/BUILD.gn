@@ -64,6 +64,7 @@ config("se05x_config") {
     "repo/hostlib/hostLib/libCommon/smCom",
     "repo/hostlib/hostLib/libCommon/smCom/T1oI2C",
     "repo/hostlib/hostLib/accessManager/inc",
+    "repo/demos/se05x_host_gpio",
   ]
 
   if (chip_se05x_auth == "scp03") {
@@ -110,6 +111,7 @@ static_library("se05x") {
     "repo/sss/src/se05x/fsl_sss_se05x_apis.c",
     "repo/sss/src/se05x/fsl_sss_se05x_mw.c",
     "repo/sss/src/se05x/fsl_sss_se05x_policy.c",
+    "repo/demos/se05x_host_gpio/se05x_host_gpio.c",
   ]
 
   if (chip_se05x_auth == "scp03") {
