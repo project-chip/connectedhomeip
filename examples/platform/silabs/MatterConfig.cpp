@@ -276,7 +276,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     ReturnErrorOnFailure(InitOpenThread());
 #endif
 #ifdef SL_WIFI
-    sWifiNetworkDriver.Init();
+    ReturnErrorOnFailure(sWifiNetworkDriver.Init());
 #endif
 
     // Stop Matter event handling while setting up resources
