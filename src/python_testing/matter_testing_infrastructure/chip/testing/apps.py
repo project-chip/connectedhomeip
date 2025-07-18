@@ -130,6 +130,9 @@ class OTAProviderSubprocess(AppServerSubprocess):
             extra_args: Additional command line arguments
         """
 
+        if extra_args is None:
+            extra_args = []
+
         if ota_image_path and image_list_path:
             raise ValueError("Cannot specify both ota_image_path and image_list_path")
 
