@@ -34,6 +34,10 @@ config("se05x_config") {
     ]
   }
 
+  if (chip_se05x_host_gpio == "rpi") {
+    defines += [ "SE05X_HOST_GPIO_RPI = 1" ]
+  }
+
   # defines += ["FLOW_VERBOSE"]
 
   if (chip_device_platform == "nxp"){
