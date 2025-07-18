@@ -375,7 +375,7 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
             if (uniqueID == UINT8_MAX)
             {
                 return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-                break;
+               return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
             }
         };
     }
