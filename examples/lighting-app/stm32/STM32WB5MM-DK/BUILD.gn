@@ -77,12 +77,12 @@ stm32_sdk("sdk") {
 stm32_executable("lighting_app") {
   deps = []
 
-    output_name = "chip-stm32-lighting-example.elf"
+    output_name = "${stm32_board}-lighting.elf"
     include_dirs = [
       "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
       "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/Inc",
-      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/TARGET",
-      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/APP",
+      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/Target",
+      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/App",
       "${chip_root}/src/include/",
     ]
     defines = []
