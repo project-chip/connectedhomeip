@@ -68,6 +68,7 @@ RUN set -x \
     libncursesw5-dev \
     libnspr4-dev \
     libpango1.0-dev \
+    libpcsclite-dev \
     libpixman-1-dev \
     libreadline-dev \
     libssl-dev \
