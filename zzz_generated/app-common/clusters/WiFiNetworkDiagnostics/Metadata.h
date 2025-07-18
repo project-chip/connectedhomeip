@@ -81,6 +81,19 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id,
 } // namespace ResetCounts
 
 } // namespace Commands
+
+namespace Events {
+namespace Disconnection {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Disconnection
+namespace AssociationFailure {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace AssociationFailure
+namespace ConnectionStatus {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ConnectionStatus
+
+} // namespace Events
 } // namespace WiFiNetworkDiagnostics
 } // namespace Clusters
 } // namespace app
