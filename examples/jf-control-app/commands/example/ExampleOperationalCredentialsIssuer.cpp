@@ -334,19 +334,21 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     // If intermediate certificate not found in the storage, generate new intermediate certificate.
     else
     {
+        ChipLogProgress(Controller, "Generating ICAC");
         if (!isForAnchorIcac)
         {
             ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(mIntermediateIssuerId));
+            ReturnErrorOnFailure(IssueX509Cert(mNow, mValidity, rcac_dn, icac_dn, CertType::kIcac, mUseMaximallySizedCerts,
+                                               mIntermediateIssuer.Pubkey(), mIssuer, icac));
         }
         else
         {
             ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(mAnchorIntermediateIssuerId));
             ReturnErrorOnFailure(icac_dn.AddAttribute_OrganizationalUnitName("jf-anchor-icac"_span, false));
+            ReturnErrorOnFailure(IssueX509Cert(mNow, mValidity, rcac_dn, icac_dn, CertType::kIcac, mUseMaximallySizedCerts,
+                                               mAnchorIntermediateIssuer.Pubkey(), mIssuer, icac));
         }
 
-        ChipLogProgress(Controller, "Generating ICAC");
-        ReturnErrorOnFailure(IssueX509Cert(mNow, mValidity, rcac_dn, icac_dn, CertType::kIcac, mUseMaximallySizedCerts,
-                                           mIntermediateIssuer.Pubkey(), mIssuer, icac));
         VerifyOrReturnError(CanCastTo<uint16_t>(icac.size()), CHIP_ERROR_INTERNAL);
 
         // Re-extract DN based on final generated cert
@@ -373,8 +375,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
     ChipLogProgress(Controller, "Generating NOC");
-    return IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mIntermediateIssuer,
-                         noc);
+    return IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey,
+                         (isForAnchorIcac ? mAnchorIntermediateIssuer : mIntermediateIssuer), noc);
 }
 
 CHIP_ERROR
@@ -522,7 +524,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::SignNOC(const ByteSpan & icac, c
 
 CHIP_ERROR ExampleOperationalCredentialsIssuer::ObtainICACSR(MutableByteSpan & icaCsr)
 {
-    return GenerateCertificateSigningRequest(&mIntermediateIssuer, icaCsr);
+    return GenerateCertificateSigningRequest(&mAnchorIntermediateIssuer, icaCsr);
 }
 
 CHIP_ERROR ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(NodeId * aNodeId)
