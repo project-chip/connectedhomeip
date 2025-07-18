@@ -14,4 +14,4 @@ are reviewed.
 ```
 
 -   [Reporting bugs](./BUG_REPORT.md)
--   [Pull request guidelines](./contributing/pull_request_guidelines.md)
+-   [Pull request guidelines](./pull_request_guidelines.md)
