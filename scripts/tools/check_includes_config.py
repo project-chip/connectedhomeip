@@ -187,6 +187,7 @@ ALLOW: Dict[str, Set[str]] = {
 
     # esp32 diagnostic tracing
     'src/tracing/esp32_diagnostic_trace/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostic_trace/DiagnosticTracing.h': {'unordered_map'},
 
     # esp32 tracing
     'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},
