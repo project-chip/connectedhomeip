@@ -478,8 +478,7 @@ JNI_METHOD(void, setServiceResolveListener)
         return;
     }
 
-    mServiceResolveListener =
-        env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
+    mServiceResolveListener = env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
     if (mServiceResolveListener == nullptr)
     {
         ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
