@@ -423,11 +423,19 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     {
         ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::NodeLabel::Id);
     }
+
+    if (itemChangedMask & Device::kChanged_ConfigurationVersion)
+    {
+        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id,
+                                  BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id);
+    }
 }
 
 void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t itemChangedMask)
 {
-    if (itemChangedMask & (DeviceOnOff::kChanged_Reachable | DeviceOnOff::kChanged_Name | DeviceOnOff::kChanged_Location))
+    if (itemChangedMask &
+        (DeviceOnOff::kChanged_Reachable | DeviceOnOff::kChanged_Name | DeviceOnOff::kChanged_Location |
+         DeviceOnOff::kChanged_ConfigurationVersion))
     {
         HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
     }
