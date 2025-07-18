@@ -41,6 +41,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
 } // namespace Logout
 
 } // namespace Commands
+
+namespace Events {
+namespace LoggedOut {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace LoggedOut
+
+} // namespace Events
 } // namespace AccountLogin
 } // namespace Clusters
 } // namespace app
