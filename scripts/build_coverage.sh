@@ -31,6 +31,7 @@ function trim_whitespace() {
 
 # Parses the input from `ninja -t query` and extracts the input targets.
 function parse_input_targets() {
+    local in_input_block=false
     while IFS= read -r line; do
         if [[ "$line" == "input: "* ]]; then
             rule="${line#input: }"
@@ -43,7 +44,7 @@ function parse_input_targets() {
             continue
         elif [[ "$line" == "outputs:" ]]; then
             in_input_block=false
-        elif [[ "$in_input_block" == true && ! -n "${NEW_TARGETS["$line"]}" ]]; then
+        elif [[ "$in_input_block" == true && ! -n "${QUERIED_TARGETS["$line"]}" ]]; then
             NEW_TARGETS["$line"]=1
         fi
     done
@@ -107,7 +108,7 @@ function get_rules_to_clean() {
             for rule in "${!POSSIBLE_RULES[@]}"; do
                 echo "$rule"
             done
-            exit 0
+            return 0
         fi
 
         # This will hold the results of the last query
@@ -118,7 +119,7 @@ function get_rules_to_clean() {
         dowithlastpipe 'ninja -C out/coverage -t query "${!TARGETS[@]}" | grep "^  " | grep -v "|" | trim_whitespace | parse_input_targets'
 
         # Mark the queried targets
-        for target in "${TARGETS[@]}"; do
+        for target in "${!TARGETS[@]}"; do
             QUERIED_TARGETS["$target"]=1
         done
 
