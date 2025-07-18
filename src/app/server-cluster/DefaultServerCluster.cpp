@@ -108,7 +108,7 @@ void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
 
 CHIP_ERROR DefaultServerCluster::AppendAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
                                                   Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                                                  Span<const OptionalAttributeEntry> optionalAttributes)
+                                                  std::initializer_list<const OptionalAttributeEntry> optionalAttributes)
 {
     // determine how much data to append
     size_t append_size = mandatoryAttributes.size();

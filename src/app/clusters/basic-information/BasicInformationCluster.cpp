@@ -381,21 +381,20 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
         mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name), name::kMetadataEntry                          \
     }
 
-    const OptionalAttributeEntry optionalAttributesEnabling[] = {
-        { mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose),
-          UniqueID::kMetadataEntry },
-        OPTIONAL_ATTR(ManufacturingDate),
-        OPTIONAL_ATTR(PartNumber),
-        OPTIONAL_ATTR(ProductURL),
-        OPTIONAL_ATTR(ProductLabel),
-        OPTIONAL_ATTR(SerialNumber),
-        OPTIONAL_ATTR(LocalConfigDisabled),
-        OPTIONAL_ATTR(Reachable),
-        OPTIONAL_ATTR(ProductAppearance)
-    };
-
-    return AppendAttributes(builder, Span<const DataModel::AttributeEntry>(kMandatoryAttributes),
-                            Span<const OptionalAttributeEntry>(optionalAttributesEnabling));
+    return AppendAttributes(
+        builder, Span<const DataModel::AttributeEntry>(kMandatoryAttributes),
+        {
+            { mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose),
+              UniqueID::kMetadataEntry },
+            OPTIONAL_ATTR(ManufacturingDate),
+            OPTIONAL_ATTR(PartNumber),
+            OPTIONAL_ATTR(ProductURL),
+            OPTIONAL_ATTR(ProductLabel),
+            OPTIONAL_ATTR(SerialNumber),
+            OPTIONAL_ATTR(LocalConfigDisabled),
+            OPTIONAL_ATTR(Reachable),
+            OPTIONAL_ATTR(ProductAppearance),
+        });
 }
 
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)

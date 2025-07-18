@@ -137,7 +137,7 @@ protected:
     ///
     CHIP_ERROR AppendAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
                                 Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                                Span<const OptionalAttributeEntry> optionalAttributes);
+                                std::initializer_list<const OptionalAttributeEntry> optionalAttributes);
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec
