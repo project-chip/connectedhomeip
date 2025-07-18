@@ -10461,4 +10461,3 @@ PICS:
 
     - label: "Does the device implement the PowerThreshold attribute?"
       id: MTRID.S.A0004
-
