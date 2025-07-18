@@ -979,7 +979,9 @@ CHIP_ERROR BLEManagerImpl::DeinitBLE()
     VerifyOrReturnError(ble_hs_is_enabled(), CHIP_ERROR_INCORRECT_STATE, ChipLogProgress(DeviceLayer, "BLE already deinited"));
 
     nimble_port_stop();
-    nimble_port_deinit();
+    do {
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    } while (!nimble_port_is_stopped());
 
     return CHIP_NO_ERROR;
 }

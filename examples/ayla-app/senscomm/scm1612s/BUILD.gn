@@ -17,15 +17,17 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/scm1612s.gni")
 
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${scm1612s_sdk_build_root}/scm1612s_executable.gni")
 import("${scm1612s_sdk_build_root}/scm1612s_sdk.gni")
+import("${scm1612s_sdk_build_root}/scm1612s_ayla.gni")
 
 assert(current_os == "freertos")
 
-scm1612s_project_dir = "${chip_root}/examples/lighting-app/senscomm/scm1612s"
+scm1612s_project_dir = "${chip_root}/examples/ayla-app/senscomm/scm1612s"
 examples_plat_dir = "${chip_root}/examples/platform/senscomm/scm1612s"
-elf_name = "chip-scm1612s-lighting-app-example.out"
+elf_name = "chip-scm1612s-ayla-app-example.out"
 
 declare_args() {
   # Dump memory usage at link time.
@@ -41,7 +43,12 @@ declare_args() {
   build_update_image = false
 }
 
-scm1612s_sdk_sources("lighting_app_sdk_sources") {
+#chip_data_model("ayla-demo") {
+#  zap_file = "${scm1612s_project_dir}/data_model/ayla_demo.zap"
+#  is_server = true
+#}
+
+scm1612s_sdk_sources("ayla_app_sdk_sources") {
   sources = [ "${scm1612s_project_dir}/include/CHIPProjectConfig.h" ]
 
   include_dirs = [
@@ -64,16 +71,28 @@ scm1612s_sdk_sources("lighting_app_sdk_sources") {
 #  }
 }
 
-scm1612s_postbuild("lighting_postbuild") {
+scm1612s_ayla_sources("ayla_app_ayla_sources") {
+  include_dirs = [
+    "${chip_root}/src/platform/senscomm/scm1612s",
+    "${scm1612s_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+  public_configs = [
+    "${chip_root}/third_party/senscomm/scm1612s:scm1612s_sdk_config"
+  ]
+  #public_deps = [ ":ayla-demo" ]
+}
+
+scm1612s_postbuild("ayla_postbuild") {
   input_name = "${elf_name}"
   map_name = "System.map"
   deps = [
-    "//:lighting_app.executable",
-    "//:lighting_app.image"
+    "//:ayla_app.executable",
+    "//:ayla_app.image"
   ]
 }
 
-scm1612s_executable("lighting_app") {
+scm1612s_executable("ayla_app") {
   output_name = "${elf_name}"
   include_dirs = []
   defines = [
@@ -81,19 +100,14 @@ scm1612s_executable("lighting_app") {
   ]
 
   sources = [
-    "src/AppTask.cpp",
-    "src/ColorFormat.cpp",
-    "src/DimmableLEDWidget.cpp",
-    "src/LEDWidget.cpp",
-    "src/LightingManager.cpp",
-    "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
 
   deps = [
-    ":lighting_app_sdk_sources",
+    #":ayla-demo",
+    ":ayla_app_sdk_sources",
+    ":ayla_app_ayla_sources",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -107,9 +121,10 @@ scm1612s_executable("lighting_app") {
 
   defines = []
 
-  if (chip_enable_ota_requestor) {
-    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
-  }
+#  if (chip_enable_ota_requestor) {
+#    defines += [ "MT793X_OTA_ENABLED" ]
+#    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+#  }
 
   if (enable_heap_monitoring) {
     sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
@@ -127,7 +142,7 @@ scm1612s_executable("lighting_app") {
 }
 
 #group("scm1612s") {
-#  deps = [ ":lighting_app" ]
+#  deps = [ ":ayla_app" ]
 #}
 
 #group("default") {
@@ -136,8 +151,8 @@ scm1612s_executable("lighting_app") {
 
 group("default") {
   deps = [
-           ":lighting_postbuild_map",
-           ":lighting_postbuild_sign",
-           ":lighting_postbuild_dis",
+           ":ayla_postbuild_map",
+           ":ayla_postbuild_sign",
+           ":ayla_postbuild_dis",
          ]
 }

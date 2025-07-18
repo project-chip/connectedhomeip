@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!--
+Copyright 2022 Ayla Networks, Inc.  All rights reserved.
+
+Ayla Device Agent Matter Cluster Extensions
+
+To add support for the AylaBase cluster:
+    1. Import this file into the ZAP tool as a custom ZCL extension.
+    2. Enable the AylaBase cluster on Endpoint 0.
+    3. Enable each of the attributes listed below as "External" singleton
+       attributes.
+    4. Generate the generated code.
+
+-->
+<configurator>
+  <domain name="Ayla"/>
+  <cluster manufacturerCode="0x1383" singleton="true">
+    <name>AylaBase</name>
+    <domain>Ayla</domain>
+    <code>0xFC00</code>
+    <define>AYLA_BASE_CLUSTER</define>
+    <description>This cluster adds Ayla base support to Matter.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <attribute side="server" code="0x0000" define="AYLA_DSN" type="char_string" length="19" writable="false" default="">
+    	<description>Dsn</description>
+	<access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0001" define="AYLA_OEM_ID" type="char_string" length="20" writable="false" default="">
+    	<description>OemId</description>
+	<access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0002" define="AYLA_OEM_MODEL" type="char_string" length="20" writable="false" default="">
+    	<description>OemModel</description>
+	<access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0003" define="AYLA_TEMPLATE_VERSION" type="char_string" length="20" writable="false" default="">
+    	<description>TemplateVersion</description>
+	<access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0004" define="AYLA_SETUP_TOKEN" type="char_string" length="9" writable="true" default="">
+    	<description>SetupToken</description>
+	<access op="read" privilege="administer"/>
+	<access op="write" privilege="administer"/>
+    </attribute>
+  </cluster>
+  
+  <cluster manufacturerCode="0x1383" singleton="true">
+    <name>AylaLocalControl</name>
+    <domain>Ayla</domain>
+    <code>0xFC01</code>
+    <define>AYLA_LOCAL_CONTROL_CLUSTER</define>
+    <description>This cluster adds Ayla Local Control support to Matter.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <attribute side="server" code="0x0000" define="AYLA_MAILBOX_MASK" type="int16u" writable="false" default="0">
+    	<description>MailboxMask</description>
+	<access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0100" define="AYLA_MAILBOX0_INUSE" type="boolean" writable="true" default="0">
+    	<description>Mailbox0InUse</description>
+	<access op="read" privilege="administer"/>
+	<access op="write" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0101" define="AYLA_INBOX0" type="char_string" length="512" writable="true" default="">
+    	<description>Inbox0</description>
+	<access op="read" privilege="administer"/>
+	<access op="write" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0102" define="AYLA_OUTBOX0" type="char_string" length="512" reportable="true" default="">
+    	<description>Outbox0</description>
+	<access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0110" define="AYLA_MAILBOX1_INUSE" type="boolean" writable="true" default="0">
+    	<description>Mailbox1InUse</description>
+	<access op="read" privilege="administer"/>
+	<access op="write" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0111" define="AYLA_INBOX1" type="char_string" length="512" writable="true" default="">
+    	<description>Inbox1</description>
+	<access op="read" privilege="administer"/>
+	<access op="write" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0112" define="AYLA_OUTBOX1" type="char_string" length="512" reportable="true" default="">
+    	<description>Outbox1</description>
+	<access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0120" define="AYLA_MAILBOX2_INUSE" type="boolean" writable="true" default="0">
+    	<description>Mailbox2InUse</description>
+	<access op="read" privilege="administer"/>
+	<access op="write" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0121" define="AYLA_INBOX2" type="char_string" length="512" writable="true" default="">
+    	<description>Inbox2</description>
+	<access op="read" privilege="administer"/>
+	<access op="write" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0122" define="AYLA_OUTBOX2" type="char_string" length="512" reportable="true" default="">
+    	<description>Outbox2</description>
+	<access op="read" privilege="administer"/>
+    </attribute>
+  </cluster>
+</configurator>

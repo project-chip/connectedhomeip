@@ -58,9 +58,10 @@ static_library("scm1612s") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
+    "AtomicHack.cpp",
   ]
 
-if (chip_enable_ota_requestor) {
+  if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",

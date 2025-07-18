@@ -39,86 +39,70 @@
 #include "wise_wifi_types.h"
 
 #include "FreeRTOS.h"
-#ifdef __no_stub__
-#include "nvdm.h"
-#endif /* __no_stub__ */
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 // Factory config keys
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_SerialNum   = { .Namespace = kConfigNamespace_ChipFactory, .Name = "serial-num" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_UniqueId    = { .Namespace = kConfigNamespace_ChipFactory, .Name = "unique-id" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_MfrDeviceId = { .Namespace = kConfigNamespace_ChipFactory, .Name = "device-id" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_MfrDeviceCert       = { .Namespace = kConfigNamespace_ChipFactory,
-                                                                         .Name      = "device-cert" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_MfrDevicePrivateKey = { .Namespace = kConfigNamespace_ChipFactory,
-                                                                         .Name      = "device-key" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ManufacturingDate   = { .Namespace = kConfigNamespace_ChipFactory,
-                                                                         .Name      = "mfg-date" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_SetupPinCode = { .Namespace = kConfigNamespace_ChipFactory, .Name = "pin-code" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_MfrDeviceICACerts     = { .Namespace = kConfigNamespace_ChipFactory,
-                                                                           .Name      = "device-ca-certs" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_SetupDiscriminator    = { .Namespace = kConfigNamespace_ChipFactory,
-                                                                           .Name      = "discriminator" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Spake2pIterationCount = { .Namespace = kConfigNamespace_ChipFactory,
-                                                                           .Name      = "iteration-count" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Spake2pSalt     = { .Namespace = kConfigNamespace_ChipFactory, .Name = "salt" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Spake2pVerifier = { .Namespace = kConfigNamespace_ChipFactory,
-                                                                     .Name      = "verifier" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_SerialNum             = { .Namespace = kConfigNamespace_ChipFactory, .Name = "serial-num" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_UniqueId              = { .Namespace = kConfigNamespace_ChipFactory, .Name = "unique-id" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_MfrDeviceId           = { .Namespace = kConfigNamespace_ChipFactory, .Name = "device-id" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_MfrDeviceCert         = { .Namespace = kConfigNamespace_ChipFactory, .Name = "device-cert" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_MfrDevicePrivateKey   = { .Namespace = kConfigNamespace_ChipFactory, .Name = "device-key" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_HardwareVersion       = { .Namespace = kConfigNamespace_ChipFactory, .Name = "hardware-ver" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_HardwareVersionString = { .Namespace = kConfigNamespace_ChipFactory, .Name = "hw-ver-str" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ManufacturingDate     = { .Namespace = kConfigNamespace_ChipFactory, .Name = "mfg-date" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_SetupPinCode          = { .Namespace = kConfigNamespace_ChipFactory, .Name = "pin-code" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_MfrDeviceICACerts     = { .Namespace = kConfigNamespace_ChipFactory, .Name = "device-ca-certs" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_SetupDiscriminator    = { .Namespace = kConfigNamespace_ChipFactory, .Name = "discriminator" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Spake2pIterationCount = { .Namespace = kConfigNamespace_ChipFactory, .Name = "iteration-count" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Spake2pSalt           = { .Namespace = kConfigNamespace_ChipFactory, .Name = "salt" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Spake2pVerifier       = { .Namespace = kConfigNamespace_ChipFactory, .Name = "verifier" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_DACCert               = { .Namespace = kConfigNamespace_ChipFactory, .Name = "dac-cert" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_DACPrivateKey         = { .Namespace = kConfigNamespace_ChipFactory, .Name = "dac-key" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_DACPublicKey          = { .Namespace = kConfigNamespace_ChipFactory, .Name = "dac-pub-key" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_PAICert               = { .Namespace = kConfigNamespace_ChipFactory, .Name = "pai-cert" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_CertDeclaration       = { .Namespace = kConfigNamespace_ChipFactory, .Name = "cert-dclrn" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_VendorId              = { .Namespace = kConfigNamespace_ChipFactory, .Name = "vendor-id" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_VendorName            = { .Namespace = kConfigNamespace_ChipFactory, .Name = "vendor-name" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ProductId             = { .Namespace = kConfigNamespace_ChipFactory, .Name = "product-id" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ProductName           = { .Namespace = kConfigNamespace_ChipFactory, .Name = "product-name" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ProductLabel          = { .Namespace = kConfigNamespace_ChipFactory, .Name = "product-label" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ProductURL            = { .Namespace = kConfigNamespace_ChipFactory, .Name = "product-url" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_SupportedCalTypes     = { .Namespace = kConfigNamespace_ChipFactory, .Name = "cal-types" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_SupportedLocaleSize   = { .Namespace = kConfigNamespace_ChipFactory, .Name = "locale-sz" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_RotatingDevIdUniqueId = { .Namespace = kConfigNamespace_ChipFactory, .Name = "rd-id-uid" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_LocationCapability    = { .Namespace = kConfigNamespace_ChipFactory, .Name = "loc-capability" };
+
 // CHIP Config Keys
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_FabricId      = { .Namespace = kConfigNamespace_ChipConfig, .Name = "fabric-id" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ServiceConfig = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                   .Name      = "service-config" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_PairedAccountId = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                     .Name      = "account-id" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ServiceId    = { .Namespace = kConfigNamespace_ChipConfig, .Name = "service-id" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_FabricSecret = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                  .Name      = "fabric-secret" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_LastUsedEpochKeyId = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                        .Name      = "last-ek-id" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_FailSafeArmed      = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                        .Name      = "fail-safe-armed" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_GroupKey = { .Namespace = kConfigNamespace_ChipConfig, .Name = "group-key" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_HardwareVersion    = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                        .Name      = "hardware-ver" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_RegulatoryLocation = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                        .Name      = "reg-location" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_CountryCode = { .Namespace = kConfigNamespace_ChipConfig, .Name = "country-code" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Breadcrumb  = { .Namespace = kConfigNamespace_ChipConfig, .Name = "breadcrumb" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_WiFiSSID    = { .Namespace = kConfigNamespace_ChipConfig, .Name = "wifi-ssid" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_WiFiPSK     = { .Namespace = kConfigNamespace_ChipConfig, .Name = "wifi-psk" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_WiFiSEC     = { .Namespace = kConfigNamespace_ChipConfig, .Name = "wifi-sec" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_GroupKeyBase = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                  .Name      = "group-key-base" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_GroupKeyMax  = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                  .Name      = "group-key-max" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_LockUser     = { .Namespace = kConfigNamespace_ChipConfig, .Name = "lock-user" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Credential   = { .Namespace = kConfigNamespace_ChipConfig, .Name = "credential" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_LockUserName = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                  .Name      = "lock-user-name" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_CredentialData   = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                      .Name      = "credential-data" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_UserCredentials  = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                      .Name      = "user-credential" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_WeekDaySchedules = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                      .Name      = "weekday-sched" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_YearDaySchedules = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                      .Name      = "yearday-sched" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_HolidaySchedules = { .Namespace = kConfigNamespace_ChipConfig,
-                                                                      .Name      = "holiday-sched" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_FabricId           = { .Namespace = kConfigNamespace_ChipConfig, .Name = "fabric-id" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ServiceConfig      = { .Namespace = kConfigNamespace_ChipConfig, .Name = "service-config" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_PairedAccountId    = { .Namespace = kConfigNamespace_ChipConfig, .Name = "account-id" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_ServiceId          = { .Namespace = kConfigNamespace_ChipConfig, .Name = "service-id" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_FabricSecret       = { .Namespace = kConfigNamespace_ChipConfig, .Name = "fabric-secret" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_LastUsedEpochKeyId = { .Namespace = kConfigNamespace_ChipConfig, .Name = "last-ek-id" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_FailSafeArmed      = { .Namespace = kConfigNamespace_ChipConfig, .Name = "fail-safe-armed" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_GroupKey           = { .Namespace = kConfigNamespace_ChipConfig, .Name = "group-key" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_RegulatoryLocation = { .Namespace = kConfigNamespace_ChipConfig, .Name = "reg-location" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_CountryCode        = { .Namespace = kConfigNamespace_ChipConfig, .Name = "country-code" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Breadcrumb         = { .Namespace = kConfigNamespace_ChipConfig, .Name = "breadcrumb" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_WiFiSSID           = { .Namespace = kConfigNamespace_ChipConfig, .Name = "wifi-ssid" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_WiFiPSK            = { .Namespace = kConfigNamespace_ChipConfig, .Name = "wifi-psk" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_WiFiSEC            = { .Namespace = kConfigNamespace_ChipConfig, .Name = "wifi-sec" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_GroupKeyBase       = { .Namespace = kConfigNamespace_ChipConfig, .Name = "group-key-base" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_GroupKeyMax        = { .Namespace = kConfigNamespace_ChipConfig, .Name = "group-key-max" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_LockUser           = { .Namespace = kConfigNamespace_ChipConfig, .Name = "lock-user" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_Credential         = { .Namespace = kConfigNamespace_ChipConfig, .Name = "credential" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_LockUserName       = { .Namespace = kConfigNamespace_ChipConfig, .Name = "lock-user-name" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_CredentialData     = { .Namespace = kConfigNamespace_ChipConfig, .Name = "credential-data" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_UserCredentials    = { .Namespace = kConfigNamespace_ChipConfig, .Name = "user-credential" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_WeekDaySchedules   = { .Namespace = kConfigNamespace_ChipConfig, .Name = "weekday-sched" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_YearDaySchedules   = { .Namespace = kConfigNamespace_ChipConfig, .Name = "yearday-sched" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_HolidaySchedules   = { .Namespace = kConfigNamespace_ChipConfig, .Name = "holiday-sched" };
 // CHIP Counter Keys
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_BootCount = { .Namespace = kConfigNamespace_ChipCounters, .Name = "boot-count" };
-const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_TotalOperationalHours = { .Namespace = kConfigNamespace_ChipCounters,
-                                                                           .Name      = "total-hours" };
-
-#ifdef __no_stub__
-#define NVDM_SEM_TIMEOUT_MS 5
-
-static SemaphoreHandle_t nvdm_sem;
-static StaticSemaphore_t nvdm_sem_struct;
-#endif /* __no_stub__ */
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_BootCount             = { .Namespace = kConfigNamespace_ChipCounters, .Name = "boot-count" };
+const SCM1612SConfig::Key SCM1612SConfig::kConfigKey_TotalOperationalHours = { .Namespace = kConfigNamespace_ChipCounters, .Name = "total-hours" };
 
 #define CONFIG_DIR "/config"
 #define CONFIG_PATH_MAX 128
@@ -339,6 +323,16 @@ CHIP_ERROR SCM1612SConfig::FactoryResetConfig(void)
     }
 
     if (scm_fs_format(configPartitionPath) < 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SCM1612SConfig::ClearNamespace(const char * ns)
+{
+    if (scm_fs_clear_all_config_value(ns) < 0)
     {
         return CHIP_ERROR_INTERNAL;
     }

@@ -106,6 +106,7 @@ config("scm1612s_sdk_config") {
       "-Wl,--wrap=printf",
       "-Wl,--wrap=vprintf",
       "-Wl,--wrap=sprintf",
+      "-Wl,--wrap=remove",
       "-Wl," + crtbegin_o,
       "-Wl," + crtend_o,
     ]
