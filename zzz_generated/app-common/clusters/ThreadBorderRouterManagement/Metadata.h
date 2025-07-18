@@ -57,14 +57,18 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace GetPendingDatasetRequest
 namespace SetActiveDatasetRequest {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(SetActiveDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+    kMetadataEntry(SetActiveDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kManage);
 } // namespace SetActiveDatasetRequest
 namespace SetPendingDatasetRequest {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(SetPendingDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+    kMetadataEntry(SetPendingDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kManage);
 } // namespace SetPendingDatasetRequest
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters
 } // namespace app

@@ -155,6 +155,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     )
     targets.append(
         ApplicationTarget(
+            key="CLOSURE_APP",
+            target=f"{target_prefix}-closure-{suffix}",
+            binary="closure-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
             key="LIT_ICD_APP",
             target=f"{target_prefix}-lit-icd-{suffix}",
             binary="lit-icd-app",
@@ -258,6 +265,20 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             key="CAMERA_APP",
             target=f"{target_prefix}-camera-{suffix}",
             binary="chip-camera-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="JF_CONTROL_APP",
+            target=f"{target_prefix}-jf-control-app",
+            binary="jfc-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="JF_ADMIN_APP",
+            target=f"{target_prefix}-jf-admin-app",
+            binary="jfa-app",
         )
     )
 
@@ -1121,7 +1142,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:134
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:150
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage
@@ -1189,6 +1210,9 @@ def chip_tool_tests(
         ("--lit-icd-app", "LIT_ICD_APP"),
         ("--microwave-oven-app", "CHIP_MICROWAVE_OVEN_APP"),
         ("--rvc-app", "CHIP_RVC_APP"),
+        ("--energy-gateway-app", "ENERGY_GATEWAY_APP"),
+        ("--energy-management-app", "ENERGY_MANAGEMENT_APP"),
+        ("--closure-app", "CLOSURE_APP"),
     ]
 
     for flag, path_key in target_flags:

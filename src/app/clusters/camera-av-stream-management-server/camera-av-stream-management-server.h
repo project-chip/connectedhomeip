@@ -257,89 +257,6 @@ public:
     virtual CHIP_ERROR LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) = 0;
 
     /**
-     * @brief Validates the requested stream usage against the camera's resource management
-     *        and stream priority policies.
-     *
-     * The implementation SHALL ensure:
-     *  - The requested stream usage (streamUsage) is allowed given the current allocation of
-     *    camera resources (e.g. CPU, memory, network bandwidth) and the prioritized stream list.
-     *
-     * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
-     * @param[in] videoStreamId  Optional identifier for the requested video stream.
-     * @param[in] audioStreamId  Optional identifier for the requested audio stream.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
-     */
-    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
-
-    /**
-     * @brief
-     *   Validates that the given VideoStreamID matches a value in AllocatedVideoStreams.
-     *
-     *   This method is called during SolicitOffer command processing when a VideoStreamID
-     *   is present and not null. The implementation must check if the provided ID exists
-     *   in the AllocatedVideoStreams list from the CameraAvStreamManagement cluster.
-     *
-     * @param[in] videoStreamId  The video stream ID to validate.
-     *
-     * @return CHIP_ERROR
-     *   - CHIP_NO_ERROR if the VideoStreamID is valid and matches AllocatedVideoStreams.
-     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
-     */
-    virtual CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) = 0;
-
-    /**
-     * @brief
-     *   Validates that the given AudioStreamID matches a value in AllocatedAudioStreams.
-     *
-     *   This method is called during SolicitOffer command processing when an AudioStreamID
-     *   is present and not null. The implementation must check if the provided ID exists
-     *   in the AllocatedAudioStreams list from the CameraAvStreamManagement cluster.
-     *
-     * @param[in] audioStreamId  The audio stream ID to validate.
-     *
-     * @return CHIP_ERROR
-     *   - CHIP_NO_ERROR if the AudioStreamID is valid and matches AllocatedAudioStreams.
-     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
-     */
-    virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
-
-    /**
-     * @brief Check whether privacy mode is active.
-     *
-     * Reads the SoftLivestreamPrivacyModeEnabled and HardPrivacyModeOn attributes from the CameraAvStreamManagement
-     * cluster. Privacy mode is considered **active** when **either** attribute is true.
-     *
-     * @param[out] isActive Set to true if privacy mode is active, false if inactive.
-     * @return CHIP_NO_ERROR on success, error code if privacy mode state cannot be determined.
-     */
-    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
-
-    /**
-     * @brief Check if there are any allocated video streams.
-     *
-     * This method is called during ProvideOffer command processing when VideoStreamID
-     * is present and null to determine if automatic stream selection is possible.
-     *
-     * @return true if there are allocated video streams available.
-     * @return false if no video streams are currently allocated.
-     */
-    virtual bool HasAllocatedVideoStreams() = 0;
-
-    /**
-     * @brief Check if there are any allocated audio streams.
-     *
-     * This method is called during ProvideOffer command processing when AudioStreamID
-     * is present and null to determine if automatic stream selection is possible.
-     *
-     * @return true if there are allocated audio streams available.
-     * @return false if no audio streams are currently allocated.
-     */
-    virtual bool HasAllocatedAudioStreams() = 0;
-
-    /**
      *  @brief Callback into the delegate once persistent attributes managed by
      *  the Cluster have been loaded from Storage.
      */
@@ -730,6 +647,8 @@ private:
 
     void ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 
+    bool StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+
     /**
      * @brief Inherited from CommandHandlerInterface
      */
@@ -754,6 +673,10 @@ private:
     void HandleSetStreamPriorities(HandlerContext & ctx, const Commands::SetStreamPriorities::DecodableType & req);
 
     void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::CaptureSnapshot::DecodableType & req);
+
+    bool CheckSnapshotStreamsAvailability(HandlerContext & ctx);
+
+    bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
 };
 
 } // namespace CameraAvStreamManagement

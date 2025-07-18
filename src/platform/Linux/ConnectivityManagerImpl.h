@@ -94,28 +94,8 @@ namespace DeviceLayer {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 struct GDBusWpaSupplicant
 {
-    enum class WpaState
-    {
-        INIT,
-        CONNECTING,
-        CONNECTED,
-        NOT_CONNECTED,
-        NO_INTERFACE_PATH,
-        GOT_INTERFACE_PATH,
-        INTERFACE_CONNECTED,
-    };
-
-    enum class WpaScanningState
-    {
-        IDLE,
-        SCANNING,
-    };
-
-    WpaState state             = WpaState::INIT;
-    WpaScanningState scanState = WpaScanningState::IDLE;
     GAutoPtr<WpaSupplicant1> proxy;
     GAutoPtr<WpaSupplicant1Interface> iface;
-    GAutoPtr<WpaSupplicant1BSS> bss;
     GAutoPtr<char> interfacePath;
     GAutoPtr<char> networkPath;
 };
@@ -188,10 +168,10 @@ public:
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
 
 private:
+    bool _IsWiFiInterfaceEnabled() CHIP_REQUIRES(mWpaSupplicantMutex);
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
-    void _ConnectWiFiNetworkAsyncCallback(GObject * sourceObject, GAsyncResult * res);
 #endif
 
 public:
@@ -246,6 +226,7 @@ private:
     void _MaintainOnDemandWiFiAP();
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    void NotifyWiFiConnectivityChange(ConnectivityChange change);
     void UpdateNetworkStatus();
     CHIP_ERROR StopAutoScan();
 
@@ -256,7 +237,6 @@ private:
     void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
-    void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
     CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
@@ -276,7 +256,6 @@ private:
     CHIP_ERROR _StartWiFiManagement();
 
     bool mAssociationStarted = false;
-    BitFlags<ConnectivityFlags> mConnectivityFlag;
     GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
     // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.

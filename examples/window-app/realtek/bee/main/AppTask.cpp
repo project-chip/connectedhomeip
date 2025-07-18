@@ -242,6 +242,11 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
 {
+    if (!chip::DeviceManager::CHIPDeviceManager::GetInstance().IsInitDone())
+    {
+        return;
+    }
+
     ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
 
     AppEvent button_event              = {};

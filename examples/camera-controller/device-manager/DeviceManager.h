@@ -24,6 +24,12 @@
 
 namespace camera {
 
+enum class WebRTCOfferType : uint8_t
+{
+    kProvideOffer = 0,
+    kSolicitOffer = 1
+};
+
 class DeviceManager
 {
 public:
@@ -46,9 +52,11 @@ public:
      *
      * @param nodeId      The node ID of the remote camera device.
      * @param streamUsage The usage of the stream(Recording, LiveView, etc) that this allocation is for.
+     * @param offerType   The type of WebRTC offer to use (ProvideOffer or SolicitOffer).
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or an appropriate error code on failure.
      */
-    CHIP_ERROR AllocateVideoStream(chip::NodeId nodeId, uint8_t streamUsage);
+    CHIP_ERROR AllocateVideoStream(chip::NodeId nodeId, uint8_t streamUsage,
+                                   WebRTCOfferType offerType = WebRTCOfferType::kProvideOffer);
 
     /**
      * @brief Sends a VideoStreamDeallocate command to the device.
@@ -78,6 +86,7 @@ private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
     chip::NodeId mNodeId                                 = chip::kUndefinedNodeId;
     uint8_t mStreamUsage                                 = 0;
+    WebRTCOfferType mOfferType                           = WebRTCOfferType::kProvideOffer;
     std::map<uint16_t, pid_t> mVideoStreamProcesses; // Stream ID -> Process ID mapping
     uint16_t mPendingVideoStreamId = 0;              // Track the stream ID we're setting up
 

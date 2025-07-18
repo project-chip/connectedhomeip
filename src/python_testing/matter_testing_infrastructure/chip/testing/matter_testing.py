@@ -29,23 +29,21 @@ import re
 import shlex
 import sys
 import textwrap
-import threading
-import time
 import typing
-import uuid
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from enum import Enum, IntFlag
+from enum import IntFlag
 from itertools import chain
-from typing import Any, Callable, Iterable, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
+from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
 
@@ -59,18 +57,17 @@ from time import sleep
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
-from chip import discovery
+import chip.testing.global_stash as global_stash
 from chip.ChipStack import ChipStack
-from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
-from chip.exceptions import ChipStackError
+from chip.clusters import Attribute, ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
-from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
+from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
+                                        get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
+from chip.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
 from mobly import asserts, base_test, signals, utils
@@ -90,20 +87,9 @@ _DEFAULT_CONTROLLER_NODE_ID = 112233
 _DEFAULT_DUT_NODE_ID = 0x12344321
 _DEFAULT_TRUST_ROOT_INDEX = 1
 
-# Mobly cannot deal with user config passing of ctypes objects,
-# so we use this dict of uuid -> object to recover items stashed
-# by reference.
-_GLOBAL_DATA = {}
 
-
-def stash_globally(o: object) -> str:
-    id = str(uuid.uuid1())
-    _GLOBAL_DATA[id] = o
-    return id
-
-
-def unstash_globally(id: str) -> Any:
-    return _GLOBAL_DATA.get(id)
+class TestError(Exception):
+    pass
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
@@ -143,129 +129,6 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
     else:
         # On not having found a PAA dir, just return current dir to avoid blow-ups
         return pathlib.Path.cwd()
-
-
-class SimpleEventCallback:
-    def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
-        self._name = name
-        self._expected_cluster_id = expected_cluster_id
-        self._expected_event_id = expected_event_id
-        self._output_queue = output_queue
-
-    def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
-        if (self._expected_cluster_id == event_result.Header.ClusterId and
-                self._expected_event_id == event_result.Header.EventId):
-            self._output_queue.put(event_result)
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-
-class EventChangeCallback:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
-        """This class creates a queue to store received event callbacks, that can be checked by the test script
-           expected_cluster: is the cluster from which the events are expected
-        """
-        self._q: queue.Queue = queue.Queue()
-        self._expected_cluster = expected_cluster
-
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
-        """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
-        urgent = True
-        self._subscription = await dev_ctrl.ReadEvent(node_id,
-                                                      events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(
-                                                          min_interval_sec, max_interval_sec),
-                                                      fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
-        self._subscription.SetEventUpdateCallback(self.__call__)
-        return self._subscription
-
-    def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an event is received.
-           It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
-        if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
-            logging.info(
-                f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
-            self._q.put(res)
-
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
-        """This function allows a test script to block waiting for the specific event to be the next event
-           to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
-        logging.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
-        try:
-            res = self._q.get(block=True, timeout=timeout_sec)
-        except queue.Empty:
-            asserts.fail("Failed to receive a report for the event {}".format(expected_event))
-
-        asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
-        asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
-        logging.info(f"Successfully waited for {expected_event}")
-        return res.Data
-
-    def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
-        """This function returns if an event does not arrive within the timeout specified in seconds.
-           If any event does arrive, an assert failure occurs."""
-        try:
-            res = self._q.get(block=True, timeout=timeout_sec)
-        except queue.Empty:
-            return
-
-        asserts.fail(f"Event reported when not expected {res}")
-
-    def get_last_event(self) -> Optional[Any]:
-        """Flush entire queue, returning last (newest) event only."""
-        last_event: Optional[Any] = None
-        while True:
-            try:
-                last_event = self._q.get(block=False)
-            except queue.Empty:
-                return last_event
-
-    def flush_events(self) -> None:
-        """Flush entire queue, returning nothing."""
-        _ = self.get_last_event()
-        return
-
-    def reset(self) -> None:
-        """Resets state as if no events had ever been received."""
-        self.flush_events()
-
-    @property
-    def event_queue(self) -> queue.Queue:
-        return self._q
-
-
-class AttributeChangeCallback:
-    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-        self._output = queue.Queue()
-        self._expected_attribute = expected_attribute
-
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an attribute is updated.
-           It checks the passed in attribute is the same as the subscribed to attribute and
-           then posts it into the queue for later processing."""
-
-        asserts.assert_equal(path.AttributeType, self._expected_attribute,
-                             f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
-        q = (path, transaction)
-        self._output.put(q)
-
-    def wait_for_report(self):
-        try:
-            path, transaction = self._output.get(block=True, timeout=10)
-        except queue.Empty:
-            asserts.fail(
-                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
-
-        asserts.assert_equal(path.AttributeType, self._expected_attribute,
-                             f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        try:
-            attribute_value = transaction.GetAttribute(path)
-            logging.info(
-                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
-        except KeyError:
-            asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
 
 
 def clear_queue(report_queue: queue.Queue):
@@ -319,492 +182,6 @@ class AttributeMatcher:
                 return self._matcher(report)
 
         return AttributeMatcherFromCallable(description, matcher)
-
-
-def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
-    """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
-
-    Args:
-      - report_queue: the queue that receives all the reports.
-      - endpoint_id: endpoint ID to match for reports to check.
-      - attribute: attribute to match for reports to check.
-      - sequence: list of attribute values in order that are expected.
-      - timeout_sec: number of seconds to wait for.
-
-    *** WARNING: The queue contains every report since the sub was established. Use
-        clear_queue to make it empty. ***
-
-    This will fail current Mobly test with assertion failure if the data is not as expected in order.
-
-    Returns nothing on success so the test can go on.
-    """
-    start_time = time.time()
-    elapsed = 0.0
-    time_remaining = timeout_sec
-
-    sequence_idx = 0
-    actual_values = []
-
-    while time_remaining > 0:
-        expected_value = sequence[sequence_idx]
-        logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
-        try:
-            item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
-
-            # Track arrival of all values for the given attribute.
-            if item.endpoint_id == endpoint_id and item.attribute == attribute:
-                actual_values.append(item.value)
-
-                if item.value == expected_value:
-                    logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
-                    sequence_idx += 1
-                else:
-                    asserts.assert_equal(item.value, expected_value,
-                                         msg=f"Did not get expected attribute value in correct sequence. Sequence so far: {actual_values}")
-
-                # We are done waiting when we have accumulated all results.
-                if sequence_idx == len(sequence):
-                    logging.info("Got all attribute changes, done waiting.")
-                    return
-        except queue.Empty:
-            # No error, we update timeouts and keep going
-            pass
-
-        elapsed = time.time() - start_time
-        time_remaining = timeout_sec - elapsed
-
-    asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
-
-
-class ClusterAttributeChangeAccumulator:
-    """
-    Subscribes to a cluster or single attribute and accumulates attribute reports in a queue.
-
-    If `expected_attribute` is provided, it subscribes only to that specific attribute.
-    Otherwise, it subscribes to all attributes from the cluster.
-
-    Args:
-        expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
-        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional):
-            If provided, subscribes to a single attribute. Defaults to None.
-    """
-
-    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
-        self._expected_cluster = expected_cluster
-        self._expected_attribute = expected_attribute
-        self._subscription = None
-        self._lock = threading.Lock()
-        self._q = queue.Queue()
-        self._endpoint_id = 0
-        self.reset()
-
-    def reset(self):
-        with self._lock:
-            self._attribute_report_counts = {}
-            attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
-                cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-            self._attribute_reports: dict[Any, AttributeValue] = {}
-            if self._expected_attribute is not None:
-                attrs = [self._expected_attribute]
-            for a in attrs:
-                self._attribute_report_counts[a] = 0
-                self._attribute_reports[a] = []
-
-        self.flush_reports()
-
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
-        """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
-        attributes = [(endpoint, self._expected_cluster)]
-        if self._expected_attribute is not None:
-            attributes = [(endpoint, self._expected_attribute)]
-        self._subscription = await dev_ctrl.ReadAttribute(
-            nodeid=node_id,
-            attributes=attributes,
-            reportInterval=(int(min_interval_sec), int(max_interval_sec)),
-            fabricFiltered=fabric_filtered,
-            keepSubscriptions=keepSubscriptions
-        )
-        self._endpoint_id = endpoint
-        self._subscription.SetAttributeUpdateCallback(self.__call__)
-        return self._subscription
-
-    async def cancel(self):
-        """This cancels a subscription."""
-        # Wait for the asyncio.CancelledError to be called before returning
-        try:
-            self._subscription.Shutdown()
-            await asyncio.sleep(5)
-        except asyncio.CancelledError:
-            pass
-
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an attribute report is received.
-           It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
-        valid_report = False
-        if path.ClusterType == self._expected_cluster:
-            if self._expected_attribute is not None:
-                valid_report = path.ClusterId == self._expected_attribute.cluster_id
-            else:
-                valid_report = True
-
-        if valid_report:
-            data = transaction.GetAttribute(path)
-            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
-                                   value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
-            self._q.put(value)
-            with self._lock:
-                self._attribute_report_counts[path.AttributeType] += 1
-                self._attribute_reports[path.AttributeType].append(value)
-
-    def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
-        """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
-
-        Waits for at least `timeout_sec` seconds.
-
-        This is a form of barrier for a set of attribute changes that should all happen together for an action.
-        """
-        start_time = time.time()
-        elapsed = 0.0
-        time_remaining = timeout_sec
-
-        last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_final_values)}
-
-        for element in expected_final_values:
-            logging.info(
-                f"--> Expecting report for value {element.value} for attribute {element.attribute} on endpoint {element.endpoint_id}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
-
-        while time_remaining > 0:
-            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
-            all_reports = self._attribute_reports
-
-            # Recompute all last-value matches
-            for expected_idx, expected_element in enumerate(expected_final_values):
-                last_value = None
-                for report in all_reports.get(expected_element.attribute, []):
-                    if report.endpoint_id == expected_element.endpoint_id:
-                        last_value = report.value
-
-                last_report_matches[expected_idx] = (last_value is not None and last_value == expected_element.value)
-
-            # Determine if all were met
-            if all(last_report_matches.values()):
-                logging.info("Found all expected reports were true.")
-                return
-
-            elapsed = time.time() - start_time
-            time_remaining = timeout_sec - elapsed
-            time.sleep(0.1)
-
-        # If we reach here, there was no early return and we failed to find all the values.
-        logging.error("Reached time-out without finding all expected report values.")
-        logging.info("Values found:")
-        for expected_idx, expected_element in enumerate(expected_final_values):
-            logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
-        asserts.fail("Did not find all expected last report values before time-out")
-
-    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
-        """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
-
-        Waits for at least `timeout_sec` seconds.
-
-        This is a form of barrier for a set of attribute changes that should all happen together for an action.
-
-        Note that this does not check against the "last" value of every attribute, only that each expected
-        report was seen at least once.
-        """
-        start_time = time.time()
-        elapsed = 0.0
-        time_remaining = timeout_sec
-
-        report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_matchers)}
-
-        for matcher in expected_matchers:
-            logging.info(
-                f"--> Matcher waiting: {matcher.description}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
-
-        while time_remaining > 0:
-            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
-            all_reports = self._attribute_reports
-
-            # Recompute all last-value matches
-            for expected_idx, matcher in enumerate(expected_matchers):
-                for attribute, reports in all_reports.items():
-                    for report in reports:
-                        if matcher.matches(report) and not report_matches[expected_idx]:
-                            logging.info(f"  --> Found a match for: {matcher.description}")
-                            report_matches[expected_idx] = True
-
-            # Determine if all were met
-            if all(report_matches.values()):
-                logging.info("Found all expected matchers did match.")
-                return
-
-            elapsed = time.time() - start_time
-            time_remaining = timeout_sec - elapsed
-            time.sleep(0.1)
-
-        # If we reach here, there was no early return and we failed to find all the values.
-        logging.error("Reached time-out without finding all expected report values.")
-        for expected_idx, expected_matcher in enumerate(expected_matchers):
-            logging.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
-        asserts.fail("Did not find all expected reports before time-out")
-
-    def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
-        """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
-
-        Args:
-          - attribute: attribute to match for reports to check.
-          - sequence: list of attribute values in order that are expected.
-          - timeout_sec: number of seconds to wait for.
-
-        *** WARNING: The queue contains every report since the sub was established. Use
-            self.reset() to make it empty. ***
-
-        This will fail current Mobly test with assertion failure if the data is not as expected in order.
-
-        Returns nothing on success so the test can go on.
-        """
-        await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
-                                  attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
-
-    @property
-    def attribute_queue(self) -> queue.Queue:
-        return self._q
-
-    @property
-    def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
-        with self._lock:
-            return self._attribute_report_counts
-
-    @property
-    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
-        with self._lock:
-            return self._attribute_reports.copy()
-
-    def get_last_report(self) -> Optional[Any]:
-        """Flush entire queue, returning last (newest) report only."""
-        last_report: Optional[Any] = None
-        while True:
-            try:
-                last_report = self._q.get(block=False)
-            except queue.Empty:
-                return last_report
-
-    def flush_reports(self) -> None:
-        """Flush entire queue, returning nothing."""
-        _ = self.get_last_report()
-        return
-
-
-@dataclass
-class MatterTestConfig:
-    storage_path: pathlib.Path = pathlib.Path(".")
-    logs_path: pathlib.Path = pathlib.Path(".")
-    paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_controller: Optional[int] = None
-    commission_only: bool = False
-
-    admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
-    case_admin_subject: Optional[int] = None
-    global_test_params: dict = field(default_factory=dict)
-    # List of explicit tests to run by name. If empty, all tests will run
-    tests: List[str] = field(default_factory=list)
-    timeout: typing.Union[int, None] = None
-    endpoint: typing.Union[int, None] = 0
-    app_pid: int = 0
-    pipe_name: typing.Union[str, None] = None
-    fail_on_skipped_tests: bool = False
-
-    commissioning_method: Optional[str] = None
-    in_test_commissioning_method: Optional[str] = None
-    discriminators: List[int] = field(default_factory=list)
-    setup_passcodes: List[int] = field(default_factory=list)
-    commissionee_ip_address_just_for_testing: Optional[str] = None
-    # By default, we start with maximized cert chains, as required for RR-1.1.
-    # This allows cert tests to be run without re-commissioning for RR-1.1.
-    maximize_cert_chains: bool = True
-
-    # By default, let's set validity to 10 years
-    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
-
-    qr_code_content: List[str] = field(default_factory=list)
-    manual_code: List[str] = field(default_factory=list)
-
-    wifi_ssid: Optional[str] = None
-    wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[str] = None
-
-    pics: dict[bool, str] = field(default_factory=dict)
-
-    # Node ID for basic DUT
-    dut_node_ids: List[int] = field(default_factory=list)
-    # Node ID to use for controller/commissioner
-    controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
-    # CAT Tags for default controller/commissioner
-    # By default, we commission with CAT tags specified for RR-1.1
-    # so the cert tests can be run without re-commissioning the device
-    # for this one test. This can be overwritten from the command line
-    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
-
-    # Fabric ID which to use
-    fabric_id: int = 1
-
-    # "Alpha" by default
-    root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
-
-    # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: Optional[pathlib.Path] = None
-
-    trace_to: List[str] = field(default_factory=list)
-
-    # Accepted Terms and Conditions if used
-    tc_version_to_simulate: int = None
-    tc_user_response_to_simulate: int = None
-    # path to device attestation revocation set json file
-    dac_revocation_set_path: Optional[pathlib.Path] = None
-
-    legacy: bool = False
-
-
-class ClusterMapper:
-    """Describe clusters/attributes using schema names."""
-
-    def __init__(self, legacy_cluster_mapping) -> None:
-        self._mapping = legacy_cluster_mapping
-
-    def get_cluster_string(self, cluster_id: int) -> str:
-        mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
-        if not mapping:
-            return f"Cluster Unknown ({cluster_id}, 0x{cluster_id:08X})"
-        else:
-            name = mapping["clusterName"]
-            return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
-
-    def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
-        global_attrs = [item.value for item in GlobalAttributeIds]
-        if attribute_id in global_attrs:
-            return f"Attribute {GlobalAttributeIds(attribute_id).to_name()} {attribute_id}, 0x{attribute_id:04X}"
-        mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
-        if not mapping:
-            return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
-        else:
-            attribute_mapping = mapping["attributes"].get(attribute_id, None)
-
-            if not attribute_mapping:
-                return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
-            else:
-                attribute_name = attribute_mapping["attributeName"]
-                return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
-
-
-@dataclass
-class ClusterPathLocation:
-    endpoint_id: int
-    cluster_id: int
-
-    def __str__(self):
-        return (f'\n       Endpoint: {self.endpoint_id},'
-                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
-
-
-@dataclass
-class AttributePathLocation(ClusterPathLocation):
-    cluster_id: Optional[int] = None
-    attribute_id: Optional[int] = None
-
-    def as_cluster_string(self, mapper: ClusterMapper):
-        desc = f"Endpoint {self.endpoint_id}"
-        if self.cluster_id is not None:
-            desc += f", {mapper.get_cluster_string(self.cluster_id)}"
-        return desc
-
-    def as_string(self, mapper: ClusterMapper):
-        desc = self.as_cluster_string(mapper)
-        if self.cluster_id is not None and self.attribute_id is not None:
-            desc += f", {mapper.get_attribute_string(self.cluster_id, self.attribute_id)}"
-
-        return desc
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n      Attribute:{id_str(self.attribute_id)}')
-
-
-@dataclass
-class EventPathLocation(ClusterPathLocation):
-    event_id: int
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Event:    {id_str(self.event_id)}')
-
-
-@dataclass
-class CommandPathLocation(ClusterPathLocation):
-    command_id: int
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Command:  {id_str(self.command_id)}')
-
-
-@dataclass
-class FeaturePathLocation(ClusterPathLocation):
-    feature_code: str
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Feature:  {self.feature_code}')
-
-
-@dataclass
-class DeviceTypePathLocation:
-    device_type_id: int
-    cluster_id: Optional[int] = None
-
-    def __str__(self):
-        msg = f'\n       DeviceType: {self.device_type_id}'
-        if self.cluster_id:
-            msg += f'\n       ClusterID: {self.cluster_id}'
-        return msg
-
-
-class UnknownProblemLocation:
-    def __str__(self):
-        return '\n      Unknown Locations - see message for more details'
-
-
-ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
-
-# ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
-# appeared in 3.11. To make it JSON serializable easily, multiple inheritance
-# from `str` is used. See https://stackoverflow.com/a/51976841.
-
-
-class ProblemSeverity(str, Enum):
-    NOTE = "NOTE"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-
-
-@dataclass
-class ProblemNotice:
-    test_name: str
-    location: ProblemLocation
-    severity: ProblemSeverity
-    problem: str
-    spec_location: str = ""
-
-    def __str__(self):
-        return (f'\nProblem: {str(self.severity)}'
-                f'\n    test_name: {self.test_name}'
-                f'\n    location: {str(self.location)}'
-                f'\n    problem: {self.problem}'
-                f'\n    spec_location: {self.spec_location}\n')
 
 
 @dataclass
@@ -1040,23 +417,23 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def runner_hook(self) -> TestRunnerHooks:
-        return unstash_globally(self.user_params.get("hooks"))
+        return global_stash.unstash_globally(self.user_params.get("hooks"))
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
-        return unstash_globally(self.user_params.get("matter_test_config"))
+        return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
 
     @property
     def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
-        return unstash_globally(self.user_params.get("default_controller"))
+        return global_stash.unstash_globally(self.user_params.get("default_controller"))
 
     @property
     def matter_stack(self) -> MatterStackState:
-        return unstash_globally(self.user_params.get("matter_stack"))
+        return global_stash.unstash_globally(self.user_params.get("matter_stack"))
 
     @property
     def certificate_authority_manager(self) -> chip.CertificateAuthority.CertificateAuthorityManager:
-        return unstash_globally(self.user_params.get("certificate_authority_manager"))
+        return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
 
     @property
     def dut_node_id(self) -> int:
@@ -1574,15 +951,49 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Returns nothing on success so the test can go on.
         """
+        self.mark_step_range_skipped(starting_step_number, None)
+
+    def mark_step_range_skipped(self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]) -> None:
+        """Mark a range of remaining test steps starting with provided starting step
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally.
+
+            If ending_step_number is provided, it gives the last step to be skipped, as defined in the TestStep.test_plan_number.
+            If ending_step_number is None, all steps until the end of the test will be skipped
+            ending_step_number is optional, and if not provided, all steps until the end of the test will be skipped.
+
+            By providing argument test is more deliberately identifying where test skips are starting from, 
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+            ending_step_number (int,str,None): Number of name of the step to stop skipping the steps (inclusive).
+
+        Returns nothing on success so the test can go on.
+        """
         steps = self.get_test_steps(self.current_test_info.name)
+        starting_step_idx = None
         for idx, step in enumerate(steps):
             if step.test_plan_number == starting_step_number:
                 starting_step_idx = idx
                 break
+        asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
+
+        ending_step_idx = None
+        # If ending_step_number is None, we skip all steps until the end of the test
+        if ending_step_number is not None:
+            for idx, step in enumerate(steps):
+                if step.test_plan_number == ending_step_number:
+                    ending_step_idx = idx
+                    break
+
+            asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
+            asserts.assert_greater(ending_step_idx, starting_step_idx,
+                                   "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
+            skipping_steps = steps[starting_step_idx:ending_step_idx+1]
         else:
-            asserts.fail("mark_all_remaining_steps_skipped was provided with invalid starting_step_num")
-        remaining = steps[starting_step_idx:]
-        for step in remaining:
+            skipping_steps = steps[starting_step_idx:]
+
+        for step in skipping_steps:
             self.skip_step(step.test_plan_number)
 
     def step(self, step: typing.Union[int, str]):
@@ -1612,44 +1023,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
-        setup_payloads = []
-        for qr_code in self.matter_test_config.qr_code_content:
-            try:
-                setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
-            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
-                asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
-
-        for manual_code in self.matter_test_config.manual_code:
-            try:
-                setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
-            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
-                asserts.fail(
-                    f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-
-        infos = []
-        for setup_payload in setup_payloads:
-            info = SetupPayloadInfo()
-            info.passcode = setup_payload.setup_passcode
-            if setup_payload.short_discriminator is not None:
-                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-                info.filter_value = setup_payload.short_discriminator
-            else:
-                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-                info.filter_value = setup_payload.long_discriminator
-            infos.append(info)
-
-        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(self.matter_test_config.setup_passcodes)
-        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(self.matter_test_config.discriminators)
-        asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
-        if self.matter_test_config.discriminators:
-            for idx, discriminator in enumerate(self.matter_test_config.discriminators):
-                info = SetupPayloadInfo()
-                info.passcode = self.matter_test_config.setup_passcodes[idx]
-                info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
-                info.filter_value = discriminator
-                infos.append(info)
-
-        return infos
+        """
+        Get and builds the payload info provided in the execution.
+        Returns:
+            List[SetupPayloadInfo]: List of Payload used by the test case
+        """
+        return get_setup_payload_info_config(self.matter_test_config)
 
     def wait_for_user_input(self,
                             prompt_msg: str,
@@ -1689,8 +1068,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def user_verify_snap_shot(self,
                               prompt_msg: str,
-                              image: bytes) -> Optional[str]:
+                              image: bytes) -> None:
         """Show Image Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
@@ -1698,47 +1078,58 @@ class MatterBaseTest(base_test.BaseTestClass):
             image (bytes): Image data as bytes.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        # Convert bytes to comma separated hex string
-        hex_string = ', '.join(f'{byte:02x}' for byte in image)
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating image validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_image_prompt'):
+            # Convert bytes to comma separated hex string
+            hex_string = ', '.join(f'{byte:02x}' for byte in image)
             self.runner_hook.show_image_prompt(
                 msg=prompt_msg,
                 img_hex_str=hex_string
             )
 
-        logging.info("========= USER PROMPT for Image Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Image Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Image validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
     def user_verify_video_stream(self,
-                                 prompt_msg: str) -> Optional[str]:
+                                 prompt_msg: str) -> None:
         """Show Video Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
             Indicates what is expected from the user.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating video validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
             self.runner_hook.show_video_prompt(msg=prompt_msg)
 
-        logging.info("========= USER PROMPT for Video Stream Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Video Stream Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Video stream validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
 
 def _find_test_class():
@@ -1832,13 +1223,13 @@ def json_named_arg(s: str) -> Tuple[str, object]:
 
 def bool_named_arg(s: str) -> Tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s.lower())
+    match = re.match(regex, s, re.IGNORECASE)
     if not match:
         raise ValueError("Invalid bool argument format, does not match %s" % regex)
 
     name = match.group("name")
     if match.group("truth_value"):
-        value = True if match.group("truth_value") == "true" else False
+        value = True if match.group("truth_value").lower() == "true" else False
     else:
         value = int(match.group("decimal_value")) != 0
 
@@ -2194,18 +1585,6 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     matching = [e for e in wildcard.attributes.keys()
                 if accept_function(wildcard, e)]
     return matching
-
-
-class CommissionDeviceTest(MatterBaseTest):
-    """Test class auto-injected at the start of test list to commission a device when requested"""
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.is_commissioning = True
-
-    def test_run_commissioning(self):
-        if not self.event_loop.run_until_complete(self.commission_devices()):
-            raise signals.TestAbortAll("Failed to commission node(s)")
 
 
 # TODO(#37537): Remove these temporary aliases after transition period

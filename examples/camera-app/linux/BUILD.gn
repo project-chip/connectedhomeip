@@ -43,10 +43,20 @@ config("config") {
     "include/clusters/camera-avsettingsuserlevel-mgmt",
     "include/media-controller",
     "include/transport",
+    "include/uploader",
     "${chip_root}/examples/camera-app/camera-common/include",
     "${chip_root}/examples/camera-app/camera-common/include/media-controller",
+    "${chip_root}/examples/camera-app/camera-common/include/camera-avstream-controller",
     "${chip_root}/examples/camera-app/camera-common/include/transport",
     "${chip_root}/third_party/libdatachannel/repo/include",
+  ]
+}
+
+pkg_config("ffmpeg") {
+  packages = [
+    "libavformat",
+    "libavcodec",
+    "libavutil",
   ]
 }
 
@@ -63,6 +73,9 @@ executable("chip-camera-app") {
 
   configs += [ ":gstreamer" ]
 
+  configs += [ ":ffmpeg" ]
+  libs = [ "curl" ]
+
   sources = [
     "${chip_root}/examples/camera-app/linux/include/media-controller/default-media-controller.h",
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
@@ -71,6 +84,9 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc-provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
+    "${chip_root}/examples/camera-app/linux/src/pushav-clip-recorder.cpp",
+    "${chip_root}/examples/camera-app/linux/src/uploader/pushav-uploader.cpp",
+    "${chip_root}/examples/camera-app/linux/src/webrtc-libdatachannel.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-transport.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",

@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Optional
 from unittest.mock import MagicMock
 
+import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
 from mobly import signals
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
@@ -53,7 +54,7 @@ except ImportError:
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from chip.testing.matter_testing import MatterTestConfig
+    from chip.testing.matter_test_config import MatterTestConfig
 
 _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 
@@ -311,15 +312,15 @@ def run_tests_no_exit(
     # Lazy import to avoid circular dependency
     from typing import TYPE_CHECKING
 
-    from chip.testing.matter_testing import MatterStackState, stash_globally
+    from chip.testing.matter_testing import MatterStackState
     if TYPE_CHECKING:
-        from chip.testing.matter_testing import CommissionDeviceTest
+        from chip.testing.commissioning import CommissionDeviceTest
     else:
         CommissionDeviceTest = None  # Initial placeholder
 
     # Actual runtime import
     if CommissionDeviceTest is None:
-        from chip.testing.matter_testing import CommissionDeviceTest
+        from chip.testing.commissioning import CommissionDeviceTest
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
     #       Mobly deep copies the user params before passing them to the test class and the event
@@ -327,8 +328,6 @@ def run_tests_no_exit(
     # class member.
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
-
-    get_test_info(test_class, matter_test_config)
 
     # Load test config file.
     test_config = generate_mobly_test_config(matter_test_config)
@@ -347,7 +346,7 @@ def run_tests_no_exit(
         for destination in matter_test_config.trace_to:
             tracing_ctx.StartFromString(destination)
 
-        test_config.user_params["matter_stack"] = stash_globally(stack)
+        test_config.user_params["matter_stack"] = global_stash.stash_globally(stack)
 
         # TODO: Steer to right FabricAdmin!
         # TODO: If CASE Admin Subject is a CAT tag range, then make sure to
@@ -360,17 +359,16 @@ def run_tests_no_exit(
                 catTags=matter_test_config.controller_cat_tags,
                 dacRevocationSetPath=matter_test_config.dac_revocation_set_path if matter_test_config.dac_revocation_set_path else ""
             )
-        test_config.user_params["default_controller"] = stash_globally(
+        test_config.user_params["default_controller"] = global_stash.stash_globally(
             default_controller)
-
-        test_config.user_params["matter_test_config"] = stash_globally(
+        test_config.user_params["matter_test_config"] = global_stash.stash_globally(
             matter_test_config)
-        test_config.user_params["hooks"] = stash_globally(hooks)
+        test_config.user_params["hooks"] = global_stash.stash_globally(hooks)
 
         # Execute the test class with the config
         ok = True
 
-        test_config.user_params["certificate_authority_manager"] = stash_globally(
+        test_config.user_params["certificate_authority_manager"] = global_stash.stash_globally(
             stack.certificate_authority_manager)
 
         # Execute the test class with the config
@@ -482,7 +480,8 @@ class MockTestRunner():
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
                  pics: dict[str, bool] = None, paa_trust_store_path=None):
 
-        from chip.testing.matter_testing import MatterStackState, MatterTestConfig
+        from chip.testing.matter_test_config import MatterTestConfig
+        from chip.testing.matter_testing import MatterStackState
 
         self.kvs_storage = 'kvs_admin.json'
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
@@ -512,7 +511,7 @@ class MockTestRunner():
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: 'MatterTestConfig' = None):
-        from chip.testing.matter_testing import MatterTestConfig
+        from chip.testing.matter_test_config import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
 

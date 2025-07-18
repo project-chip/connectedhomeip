@@ -2045,7 +2045,15 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
         return;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    mPairingDelegate->OnCommissioningComplete(nodeId, mTrustedIcacPublicKeyB, mPeerAdminJFAdminClusterEndpointId,
+                                              completionStatus.err);
+    mTrustedIcacPublicKeyB.ClearValue();
+    mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
+#else
     mPairingDelegate->OnCommissioningComplete(nodeId, completionStatus.err);
+#endif
+
     PeerId peerId(GetCompressedFabricId(), nodeId);
     if (completionStatus.err == CHIP_NO_ERROR)
     {
@@ -3561,24 +3569,41 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     {
         if (!params.GetJFAdministratorFabricIndex().HasValue() || !params.GetJFAdminNOC().HasValue() ||
-            params.GetJFAdministratorFabricIndex().Value() == kUndefinedFabricIndex)
+            params.GetJFAdministratorFabricIndex().Value() == kUndefinedFabricIndex || !params.GetJFAdminEndpointId().HasValue() ||
+            params.GetJFAdminEndpointId().Value() == kInvalidEndpointId)
         {
             ChipLogError(Controller, "JCM: No JF Admin Values found");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
 
-        CHIP_ERROR err = ValidateJFAdminNOC(params.GetJFAdminNOC().Value());
+        P256PublicKeySpan jfAdminICACPKSpan;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        /* check the peer Admin NOC */
+        err = ValidateJFAdminNOC(params.GetJFAdminNOC().Value());
 
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "JCM: Cannot validate JFAdminNOC");
+            CommissioningStageComplete(err);
+            return;
         }
 
-        CommissioningStageComplete(err);
+        /* extract and save the public key of the peer Admin ICAC */
+        err = ExtractPublicKeyFromChipCert(params.GetJFAdminICAC().Value(), jfAdminICACPKSpan);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "JCM: Error parsing JFAdminICAC Public Key");
+            CommissioningStageComplete(err);
+            return;
+        }
+        mTrustedIcacPublicKeyB.Emplace(jfAdminICACPKSpan);
+        mPeerAdminJFAdminClusterEndpointId = params.GetJFAdminEndpointId().Value();
 
-        break;
+        CommissioningStageComplete(err);
     }
+    break;
 #endif
 
     case CommissioningStage::kSendVIDVerificationRequest:
