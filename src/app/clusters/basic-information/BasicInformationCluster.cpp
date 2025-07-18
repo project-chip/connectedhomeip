@@ -67,38 +67,11 @@ constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
 
 };
 
-/// a storage buffer that is provided by callers to store string data.
-/// It is sized to support reading any of the underlying data items in the
-/// logic class.
-struct StringReadBuffer
-{
-    static constexpr size_t kMaxStringLength = std::max<size_t>({
-        kFixedLocationLength,                                               //
-        DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength, //
-        DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength,     //
-        DeviceLayer::ConfigurationManager::kMaxPartNumberLength,            //
-        DeviceLayer::ConfigurationManager::kMaxProductLabelLength,          //
-        DeviceLayer::ConfigurationManager::kMaxProductNameLength,           //
-        DeviceLayer::ConfigurationManager::kMaxProductURLLength,            //
-        DeviceLayer::ConfigurationManager::kMaxSerialNumberLength,          //
-        DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength, //
-        DeviceLayer::ConfigurationManager::kMaxUniqueIDLength,              //
-        DeviceLayer::ConfigurationManager::kMaxVendorNameLength,            //
-    });
-    // allow for full string length + a null terminator.
-    char buffer[kMaxStringLength + 1];
-};
-
 static_assert(sizeof(bool) == 1, "I/O assumption for backwards compatibility");
 
-void LogIfReadError(AttributeId attributeId, CHIP_ERROR err)
-{
-    VerifyOrReturn(err != CHIP_NO_ERROR);
-    VerifyOrReturn(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-
-    ChipLogError(Zcl, "BasicInformation: failed to load attribute " ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                 ChipLogValueMEI(attributeId), err.Format());
-}
+constexpr size_t kExpectedFixedLocationLength = 2;
+static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
+              "Fixed location storage must be of size 2");
 
 CHIP_ERROR ClearNullTerminatedStringWhenUnimplemented(CHIP_ERROR status, char * strBuf)
 {
@@ -111,63 +84,74 @@ CHIP_ERROR ClearNullTerminatedStringWhenUnimplemented(CHIP_ERROR status, char * 
     return status;
 }
 
-DataModel::ActionReturnStatus ReadLocation(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
 {
-    static_assert(sizeof(buffer.buffer) >= kFixedLocationLength + 1);
+    ReturnErrorOnFailure(status);
+    return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
+}
 
-    size_t codeLen = 0;
-    CHIP_ERROR err = ConfigurationMgr().GetCountryCode(buffer.buffer, sizeof(buffer.buffer), codeLen);
-    if ((err != CHIP_NO_ERROR) || (codeLen != kFixedLocationLength))
+constexpr size_t kMaxStringLength = std::max({
+    DeviceLayer::ConfigurationManager::kMaxVendorNameLength,
+    DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength,
+    DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength,
+    DeviceLayer::ConfigurationManager::kMaxPartNumberLength,
+    DeviceLayer::ConfigurationManager::kMaxProductURLLength,
+    DeviceLayer::ConfigurationManager::kMaxProductLabelLength,
+    DeviceLayer::ConfigurationManager::kMaxSerialNumberLength,
+    DeviceLayer::ConfigurationManager::kMaxUniqueIDLength,
+});
+
+/// Reads a single device info string. Separate function to optimize for flash cost
+/// as querying strings seems to be a frequent operation.
+CHIP_ERROR ReadConfigurationString(DeviceInstanceInfoProvider * deviceInfoProvider,
+                                   CHIP_ERROR (DeviceInstanceInfoProvider::*getter)(char *, size_t), bool unimplementedAllowed,
+                                   AttributeValueEncoder & encoder)
+{
+    char buffer[kMaxStringLength + 1] = { 0 };
+    CHIP_ERROR status                 = ((deviceInfoProvider)->*(getter))(buffer, sizeof(buffer));
+    if (unimplementedAllowed)
     {
-        static_assert(kFixedLocationLength == 2); // we write a string of size 2
-        strcpy(buffer.buffer, "XX");
-        codeLen = kFixedLocationLength;
+        status = ClearNullTerminatedStringWhenUnimplemented(status, buffer);
     }
-    return encoder.Encode(CharSpan(buffer.buffer, codeLen));
+    return EncodeStringOnSuccess(status, encoder, buffer, kMaxStringLength);
 }
 
-using DeviceInfoStringGetFn = CHIP_ERROR (DeviceInstanceInfoProvider::*)(char * buf, size_t buffSize);
-
-DataModel::ActionReturnStatus ReadVendorName(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadVendorID(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= ConfigurationManager::kMaxVendorNameLength + 1);
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetVendorName(buffer.buffer, sizeof(buffer.buffer)));
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    uint16_t vendorId = 0;
+    ReturnErrorOnFailure(deviceInfoProvider->GetVendorId(vendorId));
+    return aEncoder.Encode(vendorId);
 }
 
-DataModel::ActionReturnStatus ReadProductName(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadProductID(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= ConfigurationManager::kMaxProductNameLength + 1,
-                  "StringReadBuffer for product name is too small");
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetProductName(buffer.buffer, sizeof(buffer.buffer)));
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    uint16_t productId = 0;
+    ReturnErrorOnFailure(deviceInfoProvider->GetProductId(productId));
+    return aEncoder.Encode(productId);
 }
 
-DataModel::ActionReturnStatus ReadHardwareVersionString(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadHardwareVersion(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= ConfigurationManager::kMaxHardwareVersionStringLength + 1,
-                  "StringReadBuffer for hardware version string is too small");
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetHardwareVersionString(buffer.buffer, sizeof(buffer.buffer)));
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    uint16_t hardwareVersion = 0;
+    ReturnErrorOnFailure(deviceInfoProvider->GetHardwareVersion(hardwareVersion));
+    return aEncoder.Encode(hardwareVersion);
 }
 
-DataModel::ActionReturnStatus ReadSoftwareVersionString(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadSoftwareVersion(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= ConfigurationManager::kMaxSoftwareVersionStringLength + 1,
-                  "StringReadBuffer for software version string is too small");
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetSoftwareVersionString(buffer.buffer, sizeof(buffer.buffer)));
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    uint32_t softwareVersion = 0;
+    ReturnErrorOnFailure(configManager.GetSoftwareVersion(softwareVersion));
+    return aEncoder.Encode(softwareVersion);
 }
 
-DataModel::ActionReturnStatus ReadManufacturingDate(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength + 1,
-                  "StringReadBuffer for manufacturing date is too small");
+    constexpr size_t kMaxLen                  = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
+    char manufacturingDateString[kMaxLen + 1] = { 0 };
     uint16_t manufacturingYear;
     uint8_t manufacturingMonth;
     uint8_t manufacturingDayOfMonth;
-    CHIP_ERROR status =
-        GetDeviceInstanceInfoProvider()->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+    CHIP_ERROR status = deviceInfoProvider->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
     // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
     if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -180,74 +164,73 @@ DataModel::ActionReturnStatus ReadManufacturingDate(AttributeValueEncoder & enco
     ReturnErrorOnFailure(status);
 
     // Format is YYYYMMDD
-    snprintf(buffer.buffer, sizeof(buffer.buffer), "%04u%02u%02u", manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear, manufacturingMonth,
+             manufacturingDayOfMonth);
+    return aEncoder.Encode(CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
 }
 
-DataModel::ActionReturnStatus ReadPartNumber(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= DeviceLayer::ConfigurationManager::kMaxPartNumberLength + 1,
-                  "StringReadBuffer for part number is too small");
-    CHIP_ERROR status = GetDeviceInstanceInfoProvider()->GetPartNumber(buffer.buffer, sizeof(buffer.buffer));
-    status            = ClearNullTerminatedStringWhenUnimplemented(status, buffer.buffer);
-    ReturnErrorOnFailure(status);
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    constexpr size_t kMaxLen   = DeviceLayer::ConfigurationManager::kMaxUniqueIDLength;
+    char uniqueId[kMaxLen + 1] = { 0 };
+
+    CHIP_ERROR status = configManager.GetUniqueId(uniqueId, sizeof(uniqueId));
+    status            = ClearNullTerminatedStringWhenUnimplemented(status, uniqueId);
+    return EncodeStringOnSuccess(status, aEncoder, uniqueId, kMaxLen);
 }
 
-DataModel::ActionReturnStatus ReadProductURL(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= DeviceLayer::ConfigurationManager::kMaxProductURLLength + 1,
-                  "StringReadBuffer for product URL is too small");
-    CHIP_ERROR status = GetDeviceInstanceInfoProvider()->GetProductURL(buffer.buffer, sizeof(buffer.buffer));
-    status            = ClearNullTerminatedStringWhenUnimplemented(status, buffer.buffer);
-    ReturnErrorOnFailure(status);
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
+
+    // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
+    constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
+
+    capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
+    capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
+
+    return aEncoder.Encode(capabilityMinima);
 }
 
-DataModel::ActionReturnStatus ReadProductLabel(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadConfigurationVersion(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= DeviceLayer::ConfigurationManager::kMaxProductLabelLength + 1,
-                  "StringReadBuffer for product label is too small");
-    CHIP_ERROR status = GetDeviceInstanceInfoProvider()->GetProductLabel(buffer.buffer, sizeof(buffer.buffer));
-    status            = ClearNullTerminatedStringWhenUnimplemented(status, buffer.buffer);
-    ReturnErrorOnFailure(status);
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    uint32_t configurationVersion = 0;
+    ReturnErrorOnFailure(configManager.GetConfigurationVersion(configurationVersion));
+    return aEncoder.Encode(configurationVersion);
 }
 
-DataModel::ActionReturnStatus ReadSerialNumber(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadLocation(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1,
-                  "StringReadBuffer for serial number is too small");
-    CHIP_ERROR status = GetDeviceInstanceInfoProvider()->GetSerialNumber(buffer.buffer, sizeof(buffer.buffer));
-    status            = ClearNullTerminatedStringWhenUnimplemented(status, buffer.buffer);
-    ReturnErrorOnFailure(status);
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
+    char location[kExpectedFixedLocationLength + 1] = { 0 };
+    size_t codeLen                                  = 0;
+    CharSpan countryCodeSpan;
+
+    CHIP_ERROR err = configManager.GetCountryCode(location, sizeof(location), codeLen);
+    if ((err != CHIP_NO_ERROR) || (codeLen != kExpectedFixedLocationLength))
+    {
+        countryCodeSpan = "XX"_span;
+        err             = CHIP_NO_ERROR;
+    }
+    else
+    {
+        countryCodeSpan = CharSpan{ location, codeLen };
+    }
+    return aEncoder.Encode(countryCodeSpan);
 }
 
-DataModel::ActionReturnStatus ReadUniqueID(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
+inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    static_assert(sizeof(buffer.buffer) >= DeviceLayer::ConfigurationManager::kMaxUniqueIDLength + 1,
-                  "StringReadBuffer for unique ID is too small");
-    CHIP_ERROR status = ConfigurationMgr().GetUniqueId(buffer.buffer, sizeof(buffer.buffer));
-    status            = ClearNullTerminatedStringWhenUnimplemented(status, buffer.buffer);
-    ReturnErrorOnFailure(status);
-    return encoder.Encode(CharSpan::fromCharString(buffer.buffer));
-}
-
-DataModel::ActionReturnStatus ReadProductAppearance(AttributeValueEncoder & encoder)
-{
-    auto * provider = GetDeviceInstanceInfoProvider();
     ProductFinishEnum finish;
-    ReturnErrorOnFailure(provider->GetProductFinish(&finish));
+    ReturnErrorOnFailure(deviceInfoProvider->GetProductFinish(&finish));
 
     ColorEnum color;
-    CHIP_ERROR colorStatus = provider->GetProductPrimaryColor(&color);
+    CHIP_ERROR colorStatus = deviceInfoProvider->GetProductPrimaryColor(&color);
     if (colorStatus != CHIP_NO_ERROR && colorStatus != CHIP_ERROR_NOT_IMPLEMENTED)
     {
         return colorStatus;
     }
 
-    BasicInformation::Structs::ProductAppearanceStruct::Type productAppearance;
+    Structs::ProductAppearanceStruct::Type productAppearance;
     productAppearance.finish = finish;
     if (colorStatus == CHIP_NO_ERROR)
     {
@@ -257,7 +240,17 @@ DataModel::ActionReturnStatus ReadProductAppearance(AttributeValueEncoder & enco
     {
         productAppearance.primaryColor.SetNull();
     }
-    return encoder.Encode(productAppearance);
+
+    return aEncoder.Encode(productAppearance);
+}
+
+void LogIfReadError(AttributeId attributeId, CHIP_ERROR err)
+{
+    VerifyOrReturn(err != CHIP_NO_ERROR);
+    VerifyOrReturn(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    ChipLogError(Zcl, "BasicInformation: failed to load attribute " ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                 ChipLogValueMEI(attributeId), err.Format());
 }
 
 } // namespace
@@ -273,90 +266,67 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
 {
     using namespace BasicInformation::Attributes;
 
-    StringReadBuffer readBuffer;
+    // NOTE: this is NEVER nullptr, using pointer as we have seen converting to reference
+    //       costs some flash (even though code would be more readable that way...)
+    auto * deviceInfoProvider = GetDeviceInstanceInfoProvider();
+    auto & configManager      = ConfigurationMgr();
 
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
-    case ClusterRevision::Id: {
-        uint32_t revision = BasicInformation::kRevision;
-        return encoder.Encode(revision);
-    }
+    case ClusterRevision::Id:
+        return encoder.Encode<uint32_t>(BasicInformation::kRevision);
     case DataModelRevision::Id:
-        return encoder.Encode<uint32_t>(Revision::kDataModelRevision);
+        return encoder.Encode(Revision::kDataModelRevision);
     case Location::Id:
-        return ReadLocation(encoder, readBuffer);
+        return ReadLocation(configManager, encoder);
     case VendorName::Id:
-        return ReadVendorName(encoder, readBuffer);
-    case VendorID::Id: {
-        uint16_t vendorId;
-        ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
-        return encoder.Encode<uint32_t>(vendorId);
-    }
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetVendorName,
+                                       false /* unimplementedAllowed */, encoder);
+    case VendorID::Id:
+        return ReadVendorID(deviceInfoProvider, encoder);
     case ProductName::Id:
-        return ReadProductName(encoder, readBuffer);
-    case ProductID::Id: {
-        uint16_t productId;
-        ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetProductId(productId));
-        return encoder.Encode<uint32_t>(productId);
-    }
-    case HardwareVersion::Id: {
-        uint16_t hardwareVersion;
-        ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetHardwareVersion(hardwareVersion));
-        return encoder.Encode<uint32_t>(hardwareVersion);
-    }
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductName,
+                                       false /* unimplementedAllowed */, encoder);
+    case ProductID::Id:
+        return ReadProductID(deviceInfoProvider, encoder);
+    case HardwareVersion::Id:
+        return ReadHardwareVersion(deviceInfoProvider, encoder);
     case HardwareVersionString::Id:
-        return ReadHardwareVersionString(encoder, readBuffer);
-    case SoftwareVersion::Id: {
-        uint32_t softwareVersion;
-        ReturnErrorOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
-        return encoder.Encode(softwareVersion);
-    }
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetHardwareVersionString,
+                                       false /* unimplementedAllowed */, encoder);
+    case SoftwareVersion::Id:
+        return ReadSoftwareVersion(configManager, encoder);
     case SoftwareVersionString::Id:
-        return ReadSoftwareVersionString(encoder, readBuffer);
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetSoftwareVersionString,
+                                       false /* unimplementedAllowed */, encoder);
     case ManufacturingDate::Id:
-        return ReadManufacturingDate(encoder, readBuffer);
+        return ReadManufacturingDate(deviceInfoProvider, encoder);
     case PartNumber::Id:
-        return ReadPartNumber(encoder, readBuffer);
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetPartNumber,
+                                       true /* unimplementedAllowed */, encoder);
     case ProductURL::Id:
-        return ReadProductURL(encoder, readBuffer);
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductURL,
+                                       true /* unimplementedAllowed */, encoder);
     case ProductLabel::Id:
-        return ReadProductLabel(encoder, readBuffer);
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductLabel,
+                                       true /* unimplementedAllowed */, encoder);
     case SerialNumber::Id:
-        return ReadSerialNumber(encoder, readBuffer);
+        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetSerialNumber,
+                                       true /* unimplementedAllowed */, encoder);
     case UniqueID::Id:
-        return ReadUniqueID(encoder, readBuffer);
-    case CapabilityMinima::Id: {
-        BasicInformation::Structs::CapabilityMinimaStruct::Type data;
-
-        constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
-
-        data.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
-        data.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
-
-        return encoder.Encode(data);
-    }
+        return ReadUniqueID(configManager, encoder);
+    case CapabilityMinima::Id:
+        return ReadCapabilityMinima(encoder);
     case ProductAppearance::Id:
-        return ReadProductAppearance(encoder);
-    case SpecificationVersion::Id: {
-        const uint32_t version = Revision::kSpecificationVersion;
-        return encoder.Encode(version);
-    }
+        return ReadProductAppearance(deviceInfoProvider, encoder);
+    case SpecificationVersion::Id:
+        return encoder.Encode(Revision::kSpecificationVersion);
     case MaxPathsPerInvoke::Id:
-        return encoder.Encode<uint32_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
-    case ConfigurationVersion::Id: {
-        uint32_t configVersion;
-        ReturnErrorOnFailure(ConfigurationMgr().GetConfigurationVersion(configVersion));
-        return encoder.Encode(configVersion);
-    }
-    case NodeLabel::Id:
-        return encoder.Encode(Storage::ShortPascalString(mNodeLabelBuffer).Content());
-    case LocalConfigDisabled::Id:
-        return encoder.Encode(mLocalConfigDisabled);
-    case Reachable::Id:
-        // NOTE: we are always reachable (this is the same node)
-        return encoder.Encode<bool>(true);
+        return encoder.Encode<uint16_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
+    case ConfigurationVersion::Id:
+        return ReadConfigurationVersion(configManager, encoder);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
