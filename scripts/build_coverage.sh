@@ -293,7 +293,7 @@ if [ "$skip_gn" == false ]; then
 
     # Clean the targets to reexecute them
 
-    IFS=' ' read -ra RULES_TO_CLEAR <<<"$(get_rules_to_clean "${TEST_TARGET[@]}")"
+    readarray -t RULES_TO_CLEAR < <(get_rules_to_clean "${TEST_TARGET[@]}")
     if [[ ${#RULES_TO_CLEAR[@]} -gt 0 ]]; then
         ninja -C "$OUTPUT_ROOT" -f toolchain.ninja -t clean -r "${RULES_TO_CLEAR[@]}"
     fi
