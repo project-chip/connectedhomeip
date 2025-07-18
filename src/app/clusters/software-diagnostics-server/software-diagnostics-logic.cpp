@@ -105,12 +105,6 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
             { mEnabledAttributes.enableCurrentHeapUsed, Attributes::CurrentHeapUsed::kMetadataEntry },
             { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
         });
-
-    // ensure we have space for all attributes. We may add at most 4 attributes (which are ALL optional or
-    // guarded by feature maps)
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(4 + DefaultServerCluster::GlobalAttributes().size()));
-
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
 } // namespace Clusters
