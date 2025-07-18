@@ -125,7 +125,7 @@ CHIP_ERROR DefaultServerCluster::AppendAttributes(ReadOnlyBufferBuilder<DataMode
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(append_size));
         ReturnErrorOnFailure(builder.ReferenceExisting(mandatoryAttributes));
 
-        for (const auto entry : optionalAttributes)
+        for (const auto & entry : optionalAttributes)
         {
             if (entry.enabled)
             {
