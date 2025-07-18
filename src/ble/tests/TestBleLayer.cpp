@@ -408,7 +408,7 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
-// Verify connection attempt fails when BleLayer is unitialized
+// Verify connection attempt fails when BleLayer is uninitialized
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 {
     // Simulate BleLayer not being initialized by calling Shutdown
