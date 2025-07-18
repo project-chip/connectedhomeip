@@ -209,7 +209,7 @@ template("qpg_executable") {
         "--xp400x",
         "--flash_start=${flash_start_addr}",
         "--flash_app_start_offset",
-        "0xc400",
+        "0x7400",
         "--compression",
         "lzma",
         "--matter"
