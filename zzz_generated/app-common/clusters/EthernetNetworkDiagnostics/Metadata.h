@@ -65,6 +65,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id,
 } // namespace ResetCounts
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace EthernetNetworkDiagnostics
 } // namespace Clusters
 } // namespace app

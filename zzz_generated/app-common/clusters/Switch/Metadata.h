@@ -35,6 +35,31 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MultiPressMax::Id, Bit
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace SwitchLatched {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SwitchLatched
+namespace InitialPress {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace InitialPress
+namespace LongPress {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LongPress
+namespace ShortRelease {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ShortRelease
+namespace LongRelease {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LongRelease
+namespace MultiPressOngoing {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MultiPressOngoing
+namespace MultiPressComplete {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MultiPressComplete
+
+} // namespace Events
 } // namespace Switch
 } // namespace Clusters
 } // namespace app
