@@ -117,9 +117,9 @@ public:
     // Helper for declaring constructors without too much repetition.
 #if CHIP_CONFIG_ERROR_SOURCE
 #if __cplusplus >= 202002L
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mFile((f)), mLine((l)), mSourceLocation((loc))
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mLine((l)), mFile((f)), mSourceLocation((loc))
 #else
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mFile((f)), mLine((l))
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mLine((l)), mFile((f))
 #endif // __cplusplus >= 202002L
 #else  // CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc)
@@ -396,8 +396,8 @@ private:
     StorageType mError;
 
 #if CHIP_CONFIG_ERROR_SOURCE
-    const char * mFile;
     unsigned int mLine;
+    const char * mFile;
 #if __cplusplus >= 202002L
     std::source_location mSourceLocation;
 #endif // __cplusplus >= 202002L
