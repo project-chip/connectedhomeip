@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-25 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
 #include <clusters/WiFiNetworkDiagnostics/ClusterId.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
@@ -30,62 +31,10 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-struct WiFiNetworkDiagnosticsEnabledAttributes
-{
-    bool enableCurrentMaxRate : 1;
-};
-
-class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
+class WiFiDiagnosticsServerCluster : public DefaultServerCluster
 {
 public:
-    WiFiDiagnosticsServerLogic(DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                               const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
-                               BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mDiagnosticProvider(diagnosticProvider),
-        mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
-    {}
-
-    template <typename T, typename Type>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &), Type & data,
-                               AttributeValueEncoder & aEncoder);
-
-    // These attributes use custom implementations instead of ReadIfSupported because they
-    // provide more detailed logging messages and, in some cases, additional metrics.
-    CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSecurityType(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadWiFiVersion(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadChannelNumber(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadWiFiRssi(AttributeValueEncoder & aEncoder);
-
-    CHIP_ERROR HandleResetCounts()
-    {
-        mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
-        return CHIP_NO_ERROR;
-    }
-
-    // Gets called when the Node detects Node's Wi-Fi connection has been disconnected.
-    void OnDisconnectionDetected(uint16_t reasonCode) override;
-
-    // Gets called when the Node fails to associate or authenticate an access point.
-    void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override;
-
-    // Gets when the Node's connection status to a Wi-Fi network has changed.
-    void OnConnectionStatusChanged(uint8_t connectionStatus) override;
-
-    // Getter methods for private members
-    const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
-    const WiFiNetworkDiagnosticsEnabledAttributes & GetEnabledAttributes() const { return mEnabledAttributes; }
-
-private:
-    DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
-    const WiFiNetworkDiagnosticsEnabledAttributes mEnabledAttributes;
-    const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
-};
-
-class WiFiDiagnosticsServer : public DefaultServerCluster
-{
-public:
-    WiFiDiagnosticsServer(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
+    WiFiDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                           const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
                           BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
         DefaultServerCluster({ endpointId, WiFiNetworkDiagnostics::Id }),

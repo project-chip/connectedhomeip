@@ -21,7 +21,7 @@
  * This file contains the WiFi Network Diagnostics cluster integration code for
  * STATIC/FIXED endpoints only.
  */
-#include "wifi-network-diagnostics-cluster.h"
+#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
@@ -42,7 +42,7 @@ static_assert((WiFiNetworkDiagnostics::StaticApplicationConfig::kFixedClusterCon
 
 namespace {
 
-LazyRegisteredServerCluster<WiFiDiagnosticsServer> gServer;
+LazyRegisteredServerCluster<WiFiDiagnosticsServerCluster> gServer;
 
 // compile-time evaluated method if "is <EP>::WiFiNetworkDiagnostics::<ATTR>" enabled
 constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
@@ -66,7 +66,7 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
 
 } // namespace
 
-// This callback is only called for fixed endpoints.
+// This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
 void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);

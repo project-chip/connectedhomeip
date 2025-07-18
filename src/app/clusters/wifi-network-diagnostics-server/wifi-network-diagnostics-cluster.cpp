@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-25 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,17 +15,12 @@
  *    limitations under the License.
  */
 
-#include "wifi-network-diagnostics-cluster.h"
-
-#include <app/EventLogging.h>
+#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <clusters/WiFiNetworkDiagnostics/Attributes.h>
 #include <clusters/WiFiNetworkDiagnostics/Commands.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <tracing/macros.h>
-#include <tracing/metric_event.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,166 +34,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-template <typename T, typename Type>
-CHIP_ERROR WiFiDiagnosticsServerLogic::ReadIfSupported(CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &), Type & data,
-                                                       AttributeValueEncoder & aEncoder)
-{
-    T value;
-    CHIP_ERROR err = (mDiagnosticProvider.*getter)(value);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        data.SetNonNull(value);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
-    }
-
-    return aEncoder.Encode(data);
-}
-
-CHIP_ERROR WiFiDiagnosticsServerLogic::ReadWiFiBssId(AttributeValueEncoder & aEncoder)
-{
-    Attributes::Bssid::TypeInfo::Type bssid;
-
-    uint8_t bssidBytes[chip::DeviceLayer::kMaxHardwareAddrSize];
-    MutableByteSpan bssidSpan(bssidBytes);
-    if (mDiagnosticProvider.GetWiFiBssId(bssidSpan) == CHIP_NO_ERROR)
-    {
-        if (!bssidSpan.empty())
-        {
-            bssid.SetNonNull(bssidSpan);
-            ChipLogProgress(Zcl, "Node is currently connected to Wi-Fi network with BSSID:");
-            ChipLogByteSpan(Zcl, bssidSpan);
-        }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The WiFi interface is not currently connected.");
-    }
-
-    return aEncoder.Encode(bssid);
-}
-
-CHIP_ERROR WiFiDiagnosticsServerLogic::ReadSecurityType(AttributeValueEncoder & aEncoder)
-{
-    Attributes::SecurityType::TypeInfo::Type securityType;
-    SecurityTypeEnum value = SecurityTypeEnum::kUnspecified;
-
-    if (mDiagnosticProvider.GetWiFiSecurityType(value) == CHIP_NO_ERROR)
-    {
-        securityType.SetNonNull(value);
-        ChipLogProgress(Zcl, "The current type of Wi-Fi security used: %d", to_underlying(value));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
-    }
-
-    return aEncoder.Encode(securityType);
-}
-
-CHIP_ERROR WiFiDiagnosticsServerLogic::ReadWiFiVersion(AttributeValueEncoder & aEncoder)
-{
-    Attributes::WiFiVersion::TypeInfo::Type version;
-    WiFiVersionEnum value = WiFiVersionEnum::kUnknownEnumValue;
-
-    if (mDiagnosticProvider.GetWiFiVersion(value) == CHIP_NO_ERROR)
-    {
-        version.SetNonNull(value);
-        ChipLogProgress(Zcl, "The current 802.11 standard version in use by the Node: %d", to_underlying(value));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The current 802.11 standard version in use by the Node is not available");
-    }
-
-    return aEncoder.Encode(version);
-}
-
-CHIP_ERROR WiFiDiagnosticsServerLogic::ReadChannelNumber(AttributeValueEncoder & aEncoder)
-{
-    Attributes::ChannelNumber::TypeInfo::Type channelNumber;
-    uint16_t value = 0;
-
-    if (mDiagnosticProvider.GetWiFiChannelNumber(value) == CHIP_NO_ERROR)
-    {
-        channelNumber.SetNonNull(value);
-        ChipLogProgress(Zcl, "The channel that Wi-Fi communication is currently operating on is: %d", value);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
-    }
-
-    return aEncoder.Encode(channelNumber);
-}
-
-CHIP_ERROR WiFiDiagnosticsServerLogic::ReadWiFiRssi(AttributeValueEncoder & aEncoder)
-{
-    Attributes::Rssi::TypeInfo::Type rssi;
-    int8_t value = 0;
-
-    if (mDiagnosticProvider.GetWiFiRssi(value) == CHIP_NO_ERROR)
-    {
-        rssi.SetNonNull(value);
-        ChipLogProgress(Zcl, "The current RSSI of the Node's Wi-Fi radio in dB: %d", value);
-        MATTER_LOG_METRIC(chip::Tracing::kMetricWiFiRSSI, value);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
-    }
-
-    return aEncoder.Encode(rssi);
-}
-
-void WiFiDiagnosticsServerLogic::OnDisconnectionDetected(uint16_t reasonCode)
-{
-    MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
-    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
-
-    Events::Disconnection::Type event{ reasonCode };
-    EventNumber eventNumber;
-
-    if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
-    {
-        ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record Disconnection event");
-    }
-}
-
-void WiFiDiagnosticsServerLogic::OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status)
-{
-    MATTER_TRACE_SCOPE("OnAssociationFailureDetected", "WiFiDiagnosticsDelegate");
-    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected");
-
-    Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
-
-    EventNumber eventNumber;
-
-    if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
-    {
-        ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record AssociationFailure event");
-    }
-}
-
-void WiFiDiagnosticsServerLogic::OnConnectionStatusChanged(uint8_t connectionStatus)
-{
-    MATTER_TRACE_SCOPE("OnConnectionStatusChanged", "WiFiDiagnosticsDelegate");
-    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
-
-    Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
-
-    EventNumber eventNumber;
-
-    if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
-    {
-        ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record ConnectionStatus event");
-    }
-}
-
-DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+DataModel::ActionReturnStatus WiFiDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                    AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
@@ -294,9 +130,11 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
-CHIP_ERROR WiFiDiagnosticsServer::Attributes(const ConcreteClusterPath & path,
+CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(13 + DefaultServerCluster::GlobalAttributes().size()));
+
     // mandatory attributes
     ReturnErrorOnFailure(builder.AppendElements({
         Bssid::kMetadataEntry,
@@ -333,9 +171,10 @@ CHIP_ERROR WiFiDiagnosticsServer::Attributes(const ConcreteClusterPath & path,
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
-CHIP_ERROR WiFiDiagnosticsServer::AcceptedCommands(const ConcreteClusterPath & path,
+CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
     {
         ReturnErrorOnFailure(builder.AppendElements({
@@ -345,7 +184,7 @@ CHIP_ERROR WiFiDiagnosticsServer::AcceptedCommands(const ConcreteClusterPath & p
     return CHIP_NO_ERROR;
 }
 
-std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServer::InvokeCommand(const DataModel::InvokeRequest & request,
+std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                   TLV::TLVReader & input_arguments,
                                                                                   CommandHandler * handler)
 {
