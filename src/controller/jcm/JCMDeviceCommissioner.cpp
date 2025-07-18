@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "JCMCommissioner.h"
+#include "JCMDeviceCommissioner.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -155,8 +155,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
                     {
                         if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
                         {
-                            ChipLogError(Controller,
-                                         "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
+                            ChipLogError(Controller, "JCM: Fabric root key size mismatch");
                             return CHIP_ERROR_KEY_NOT_FOUND;
                         }
 
@@ -262,8 +261,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
 
                     if (mInfo.rootPublicKey.AllocatedSize() != Crypto::kP256_PublicKey_Length)
                     {
-                        ChipLogError(Controller,
-                                     "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
+                        ChipLogError(Controller, "JCM: Fabric root key size mismatch");
                         return CHIP_ERROR_KEY_NOT_FOUND;
                     }
 
@@ -519,38 +517,6 @@ void JCMDeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nod
     DeviceCommissioner::CleanupCommissioning(proxy, nodeId, completionStatus);
 
     mInfo.Cleanup();
-}
-
-/*
- * JCMAutoCommissioner override implementation
- */
-CHIP_ERROR JCMAutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
-{
-    ReturnErrorOnFailure(AutoCommissioner::SetCommissioningParameters(params));
-
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    if (params.GetUseJCM().ValueOr(false))
-    {
-        auto extraReadPaths = params.GetExtraReadPaths();
-
-        mTempReadPaths.clear();
-        mTempReadPaths.reserve(extraReadPaths.size() + mExtraReadPaths.size());
-        mTempReadPaths.insert(mTempReadPaths.end(), extraReadPaths.begin(), extraReadPaths.end());
-        mTempReadPaths.insert(mTempReadPaths.end(), mExtraReadPaths.begin(), mExtraReadPaths.end());
-
-        // Set the extra read paths for JCM
-        mParams.SetExtraReadPaths(Span<app::AttributePathParams>(mTempReadPaths.data(), mTempReadPaths.size()));
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-
-    return CHIP_NO_ERROR;
-}
-
-void JCMAutoCommissioner::CleanupCommissioning()
-{
-    mTempReadPaths.clear();
-
-    AutoCommissioner::CleanupCommissioning();
 }
 
 } // namespace JCM

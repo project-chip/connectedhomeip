@@ -20,7 +20,8 @@
 
 #include <commands/icd/ICDCommand.h>
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/jcm/JCMCommissioner.h>
+#include <controller/jcm/JCMAutoCommissioner.h>
+#include <controller/jcm/JCMDeviceCommissioner.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <data-model-providers/codegen/Instance.h>

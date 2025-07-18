@@ -22,7 +22,7 @@
 #include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
-#include <controller/jcm/JCMCommissioner.h>
+#include <controller/jcm/JCMDeviceCommissioner.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
@@ -331,7 +331,7 @@ private:
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     chip::Optional<bool> mExecuteJCM;
-    ::pw::rpc::NanopbClientReader<::ICACCSROptions> rpcStreamGetICACCSR;
+    ::pw::rpc::NanopbClientReader<::RequestOptions> rpcGetStream;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;

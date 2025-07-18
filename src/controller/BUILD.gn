@@ -128,8 +128,10 @@ static_library("controller") {
 
 source_set("jcm") {
   sources = [
-    "jcm/JCMCommissioner.cpp",
-    "jcm/JCMCommissioner.h",
+    "jcm/JCMAutoCommissioner.cpp",
+    "jcm/JCMAutoCommissioner.h",
+    "jcm/JCMDeviceCommissioner.cpp",
+    "jcm/JCMDeviceCommissioner.h",
   ]
   public_deps = [
     "${chip_root}/src/app",

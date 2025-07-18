@@ -131,35 +131,6 @@ private:
     friend class TestJCMCommissioner;
 };
 
-/*
- * JCMAutoCommissioner is a class that handles the Joint Commissioning Management (JCM) process
- * for commissioning Joint Fabric Administrator devices in a CHIP network. It extends the AutoCommissioner class and
- * helps setup for the JCM trust verification process.
- */
-class JCMAutoCommissioner : public AutoCommissioner
-{
-public:
-    JCMAutoCommissioner(){};
-    ~JCMAutoCommissioner(){};
-
-    CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
-    void CleanupCommissioning() override;
-
-private:
-    // Joint Fabric Management: all attributes
-    const std::vector<app::AttributePathParams> mExtraReadPaths = {
-        app::AttributePathParams(app::Clusters::JointFabricAdministrator::Id,
-                                 app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id),
-        app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id,
-                                 app::Clusters::OperationalCredentials::Attributes::Fabrics::Id),
-        app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id,
-                                 app::Clusters::OperationalCredentials::Attributes::NOCs::Id),
-        app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id,
-                                 app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::Id)
-    };
-    std::vector<app::AttributePathParams> mTempReadPaths;
-};
-
 } // namespace JCM
 } // namespace Controller
 } // namespace chip
