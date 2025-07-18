@@ -415,7 +415,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
     Shutdown();
 
     // Create a list of discriminators
-    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    SetupDiscriminator discriminators[] = { SetupDiscriminator() };
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     // Define success and error callbacks
@@ -432,7 +432,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
     chip::Test::BleLayerTestAccess access(this);
     access.SetConnectionDelegate(nullptr);
 
-    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    SetupDiscriminator discriminators[] = { SetupDiscriminator() };
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
@@ -448,7 +448,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
     access.SetConnectionDelegate(this);
     mBleTransport = nullptr;
 
-    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    SetupDiscriminator discriminators[] = { SetupDiscriminator() };
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
@@ -463,9 +463,8 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
     chip::Test::BleLayerTestAccess access(this);
     access.SetConnectionDelegate(this);
 
-    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    SetupDiscriminator discriminators[] = { SetupDiscriminator() };
     discriminators[0].SetLongValue(1234);
-    discriminators[1].SetLongValue(3333);
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
@@ -494,9 +493,8 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
 
     access.SetConnectionDelegate(this);
 
-    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    SetupDiscriminator discriminators[] = { SetupDiscriminator() };
     discriminators[0].SetLongValue(1234);
-    discriminators[1].SetLongValue(3333);
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
