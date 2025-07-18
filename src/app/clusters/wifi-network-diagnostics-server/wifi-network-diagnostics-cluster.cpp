@@ -35,7 +35,7 @@ namespace app {
 namespace Clusters {
 
 DataModel::ActionReturnStatus WiFiDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                   AttributeValueEncoder & encoder)
+                                                                          AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -131,7 +131,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServerCluster::ReadAttribute(const 
 }
 
 CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
-                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(13 + DefaultServerCluster::GlobalAttributes().size()));
 
@@ -172,7 +172,7 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
 }
 
 CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
@@ -185,8 +185,8 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterP
 }
 
 std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                  TLV::TLVReader & input_arguments,
-                                                                                  CommandHandler * handler)
+                                                                                         TLV::TLVReader & input_arguments,
+                                                                                         CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {

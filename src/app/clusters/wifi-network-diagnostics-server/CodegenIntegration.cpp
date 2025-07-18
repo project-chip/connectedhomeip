@@ -21,8 +21,8 @@
  * This file contains the WiFi Network Diagnostics cluster integration code for
  * STATIC/FIXED endpoints only.
  */
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
