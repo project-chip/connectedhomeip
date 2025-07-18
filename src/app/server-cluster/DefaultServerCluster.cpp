@@ -111,7 +111,7 @@ CHIP_ERROR DefaultServerCluster::AppendAttributes(ReadOnlyBufferBuilder<DataMode
                                                   std::initializer_list<const OptionalAttributeEntry> optionalAttributes)
 {
     // determine how much data to append. This should only be called if generally we have something to append
-    size_t append_size = mandatoryAttributes.size() + GlobalAttributes().size();
+    size_t append_size = mandatoryAttributes.size();
     for (const auto & entry : optionalAttributes)
     {
         if (entry.enabled)
@@ -122,7 +122,7 @@ CHIP_ERROR DefaultServerCluster::AppendAttributes(ReadOnlyBufferBuilder<DataMode
 
     if (append_size > 0)
     {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(append_size));
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(append_size + GlobalAttributes().size()));
         ReturnErrorOnFailure(builder.ReferenceExisting(mandatoryAttributes));
 
         for (const auto & entry : optionalAttributes)
