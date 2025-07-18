@@ -24,12 +24,74 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Commission DUT to TH if not already commissioned"
       verification: |
 
       disabled: true
 
-    - label: "Step 2a: TH sends ResetWatermarks to DUT."
+    - label:
+          "Step 2: TH reads a list of ThreadMetrics struct attributes from DUT and saves as thread_metrics_original"
+      PICS: DGSW.S.A0000
+      verification: |
+          ./chip-tool softwarediagnostics read thread-metrics 1 0
+
+          Via the TH (chip-tool), verify:
+          -that ThreadMetrics attribute contains entries with ThreadMetrics Struct.
+          -that the entries are matched with StackFreeMinimum and StackFreeCurrent values of ThreadMetrics.
+
+          [1654697032.107109][7037:7042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0000 DataVersion: 1044289564
+          [1654697032.107255][7037:7042] CHIP:TOO:   ThreadMetrics: 6 entries
+          [1654697032.107333][7037:7042] CHIP:TOO:     [1]: {
+          [1654697032.107376][7037:7042] CHIP:TOO:       Id: 8972
+          [1654697032.107413][7037:7042] CHIP:TOO:       Name: 8972
+          [1654697032.107449][7037:7042] CHIP:TOO:      }
+          [1654697032.107492][7037:7042] CHIP:TOO:     [2]: {
+          [1654697032.107526][7037:7042] CHIP:TOO:       Id: 8971
+          [1654697032.107559][7037:7042] CHIP:TOO:       Name: 8971
+          [1654697032.107591][7037:7042] CHIP:TOO:      }
+          [1654697032.107632][7037:7042] CHIP:TOO:     [3]: {
+          [1654697032.107667][7037:7042] CHIP:TOO:       Id: 8970
+          [1654697032.107700][7037:7042] CHIP:TOO:       Name: 8970
+          [1654697032.107733][7037:7042] CHIP:TOO:      }
+          [1654697032.107774][7037:7042] CHIP:TOO:     [4]: {
+          [1654697032.107808][7037:7042] CHIP:TOO:       Id: 8969
+          [1654697032.107842][7037:7042] CHIP:TOO:       Name: 8969
+          [1654697032.107875][7037:7042] CHIP:TOO:      }
+          [1654697032.107915][7037:7042] CHIP:TOO:     [5]: {
+          [1654697032.107950][7037:7042] CHIP:TOO:       Id: 8968
+          [1654697032.107982][7037:7042] CHIP:TOO:       Name: 8968
+          [1654697032.108015][7037:7042] CHIP:TOO:      }
+          [1654697032.108056][7037:7042] CHIP:TOO:     [6]: {
+          [1654697032.108090][7037:7042] CHIP:TOO:       Id: 8967
+          [1654697032.108122][7037:7042] CHIP:TOO:       Name: 8967
+          [1654697032.108154][7037:7042] CHIP:TOO:      }
+      disabled: true
+
+      - label: "Step 3: TH reads the CurrentHeapUsed attribute from the DUT and saves as current_heap_used_original."
+      PICS: DGSW.S.A0002
+      verification: |
+          ./chip-tool  softwarediagnostics  read current-heap-used 1 0
+
+          Via the TH (chip-tool), verify that CurrentHeapUsed attribute value with in the range of uint64.
+
+          [1663066954.656376][4079:4084] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 2808275719
+          [1663066954.656505][4079:4084] CHIP:TOO:   CurrentHeapUsed: 1389168
+      disabled: true
+
+    - label: "Step 4: TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_original."
+      PICS: DGSW.S.A0003
+
+          ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
+
+          Via the TH (chip-tool), verify:
+          -that CurrentHeapHighWatermark attribute value with in the range of uint64.
+          -that the value is higher than or equal to current_heap_used_original.
+
+          [1663066925.496916][4072:4077] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0003 DataVersion: 2808275719
+          [1663066925.496999][4072:4077] CHIP:TOO:   CurrentHeapHighWatermark: 1389328
+      disabled: true
+
+      - label: "Step 5: TH sends ResetWatermarks to the DUT."
       PICS: DGSW.S.C00.Rsp
       verification: |
           ./chip-tool softwarediagnostics  reset-watermarks 1 0
@@ -69,66 +131,7 @@ tests:
           [1657022305.318359][7266:7271] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label:
-          "Step 2b: TH reads a list of ThreadMetrics struct attributes from DUT."
-      PICS: DGSW.S.A0000
-      verification: |
-          ./chip-tool softwarediagnostics read thread-metrics 1 0
-
-          Via the TH (chip-tool), verify:
-          -that ThreadMetrics attribute contains entries with ThreadMetrics Struct.
-          -that the entries are matched with StackFreeMinimum and StackFreeCurrent values of ThreadMetrics.
-
-          [1654697032.107109][7037:7042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0000 DataVersion: 1044289564
-          [1654697032.107255][7037:7042] CHIP:TOO:   ThreadMetrics: 6 entries
-          [1654697032.107333][7037:7042] CHIP:TOO:     [1]: {
-          [1654697032.107376][7037:7042] CHIP:TOO:       Id: 8972
-          [1654697032.107413][7037:7042] CHIP:TOO:       Name: 8972
-          [1654697032.107449][7037:7042] CHIP:TOO:      }
-          [1654697032.107492][7037:7042] CHIP:TOO:     [2]: {
-          [1654697032.107526][7037:7042] CHIP:TOO:       Id: 8971
-          [1654697032.107559][7037:7042] CHIP:TOO:       Name: 8971
-          [1654697032.107591][7037:7042] CHIP:TOO:      }
-          [1654697032.107632][7037:7042] CHIP:TOO:     [3]: {
-          [1654697032.107667][7037:7042] CHIP:TOO:       Id: 8970
-          [1654697032.107700][7037:7042] CHIP:TOO:       Name: 8970
-          [1654697032.107733][7037:7042] CHIP:TOO:      }
-          [1654697032.107774][7037:7042] CHIP:TOO:     [4]: {
-          [1654697032.107808][7037:7042] CHIP:TOO:       Id: 8969
-          [1654697032.107842][7037:7042] CHIP:TOO:       Name: 8969
-          [1654697032.107875][7037:7042] CHIP:TOO:      }
-          [1654697032.107915][7037:7042] CHIP:TOO:     [5]: {
-          [1654697032.107950][7037:7042] CHIP:TOO:       Id: 8968
-          [1654697032.107982][7037:7042] CHIP:TOO:       Name: 8968
-          [1654697032.108015][7037:7042] CHIP:TOO:      }
-          [1654697032.108056][7037:7042] CHIP:TOO:     [6]: {
-          [1654697032.108090][7037:7042] CHIP:TOO:       Id: 8967
-          [1654697032.108122][7037:7042] CHIP:TOO:       Name: 8967
-          [1654697032.108154][7037:7042] CHIP:TOO:      }
-      disabled: true
-
-    - label: "Step 2c: TH reads CurrentHeapHighWatermark attribute from DUT."
-      PICS: DGSW.S.A0003
-      verification: |
-          ./chip-tool  softwarediagnostics  read current-heap-used 1 0
-
-          Via the TH (chip-tool), verify that CurrentHeapUsed attribute value with in the range of uint64.
-
-          [1663066847.710531][4064:4069] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 2808275719
-          [1663066847.714122][4064:4069] CHIP:TOO:   CurrentHeapUsed: 1389168
-
-
-          ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
-
-          Via the TH (chip-tool), verify:
-          -that CurrentHeapHighWatermark attribute value with in the range of uint64.
-          -that the value is higher than or equal to CurrentHeapUsed.
-
-          [1663066925.496916][4072:4077] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0003 DataVersion: 2808275719
-          [1663066925.496999][4072:4077] CHIP:TOO:   CurrentHeapHighWatermark: 1389328
-      disabled: true
-
-    - label: "Step 2d: TH reads a CurrentHeapUsed attribute value from DUT."
+    - label: "Step 6a: TH reads the CurrentHeapUsed attribute from the DUT and saves as current_heap_used."
       PICS: DGSW.S.A0002
       verification: |
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
@@ -136,5 +139,18 @@ tests:
           Via the TH (chip-tool), verify that CurrentHeapUsed attribute value with in the range of uint64.
 
           [1663066954.656376][4079:4084] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 2808275719
-          [1663066954.656505][4079:4084] CHIP:TOO:   CurrentHeapUsed: 1389360
+          [1663066954.656505][4079:4084] CHIP:TOO:   CurrentHeapUsed: 1389168
+      disabled: true
+
+    - label: "Step 6b: TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_current."
+      PICS: DGSW.S.A0003
+
+          ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
+
+          Via the TH (chip-tool), verify:
+          -that CurrentHeapHighWatermark attribute value with in the range of uint64.
+          -that the value is higher than or equal to current_heap_used.
+
+          [1663066925.496916][4072:4077] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0003 DataVersion: 2808275719
+          [1663066925.496999][4072:4077] CHIP:TOO:   CurrentHeapHighWatermark: 1389328
       disabled: true
