@@ -33,13 +33,13 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
 
-using namespace chip::DeviceLayer;
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BasicInformation;
 using namespace chip::app::Clusters::BasicInformation::Attributes;
+using namespace chip::DeviceLayer;
 
-namespace chip {
-namespace app {
-namespace Clusters {
 namespace {
 
 // fixed size for location strings
@@ -254,6 +254,8 @@ void LogIfReadError(AttributeId attributeId, CHIP_ERROR err)
 }
 
 } // namespace
+//
+namespace chip::app::Clusters {
 
 BasicInformationCluster & BasicInformationCluster::Instance()
 {
@@ -470,6 +472,4 @@ void BasicInformationCluster::OnShutDown()
     mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
 }
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters
