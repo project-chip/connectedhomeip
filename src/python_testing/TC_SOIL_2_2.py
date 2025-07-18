@@ -38,7 +38,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
+from chip.testing.matter_testing import (AttributeSubscriptionHandler, MatterBaseTest, TestStep, default_matter_test_main,
                                          has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 
@@ -80,7 +80,7 @@ class TC_SOIL_2_2(MatterBaseTest):
         attributes = cluster.Attributes
 
         self.step(2)
-        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
