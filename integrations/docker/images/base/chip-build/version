@@ -1,1 +1,1 @@
-148 : Update docker image to add ffmpeg, curl dev packages for cross compile
+152 : [nrfconnect] Fix nRF Connect and VSCode docker images
