@@ -138,6 +138,9 @@ private:
     void OnStationDisconnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    void LogWiFiInfo(void);
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     WiFiAPMode _GetWiFiAPMode(void);
