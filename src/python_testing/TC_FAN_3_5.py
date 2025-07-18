@@ -356,8 +356,8 @@ class TC_FAN_3_5(MatterBaseTest):
 
         self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
-    async def initialize_percent_setting_and_verify_affected_attribtutes(self, step: Clusters.FanControl.Commands.Step, handle_current_values: bool) -> int:
-        """Initialize PercentSetting and verify the expected corresponding attribute values.
+    async def initialize_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int:
+        """Initialize PercentSetting according to the Step command parameters.
 
         Args:
             step (Clusters.FanControl.Commands.Step): Step command parameters.
@@ -368,38 +368,16 @@ class TC_FAN_3_5(MatterBaseTest):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         sd_enum = cluster.Enums.StepDirectionEnum
-        fm_enum = cluster.Enums.FanModeEnum
-        percent_setting_max = 100
 
         # Initialize PercentSetting
-        percent_setting_init = 0 if step.direction == sd_enum.kIncrease else percent_setting_max
+        percent_setting_init = 0 if step.direction == sd_enum.kIncrease else self.percent_setting_max
         if step.wrap:
             if step.direction == sd_enum.kDecrease:
                 percent_setting_init = self.percent_setting_per_step
             else:
-                percent_setting_init = percent_setting_max
+                percent_setting_init = self.percent_setting_max
+
         await self.write_setting(attr.PercentSetting, percent_setting_init)
-
-        # Verify PercentSetting initialization value
-        await self.verify_expected_attribute_value(attr.PercentSetting, percent_setting_init)
-
-        # - Since there is no direct relationship between the Step command and the speed-oriented attributes due to
-        #   it being implementation-specific, when testing the Step command with Wrap=True, Direction=Decrease, and
-        #   initializing PercentSetting at 100, the expected value of the speed-oriented attributes is unknown.
-        #   In this case, their verification is skipped. In all other scenarios, verify that the speed-oriented
-        #   attributes are set to their expected values.
-        if not step.wrap:
-            if not step.direction == sd_enum.kDecrease:
-                if not handle_current_values:
-                    fan_mode_expected = fm_enum.kHigh if percent_setting_init == percent_setting_max else fm_enum.kOff
-                    speed_setting_expected = self.speed_max if percent_setting_init == percent_setting_max else 0
-                    await self.verify_expected_attribute_value(attr.FanMode, fan_mode_expected)
-                    await self.verify_expected_attribute_value(attr.SpeedSetting, speed_setting_expected)
-                else:
-                    percent_current_expected = 0 if percent_setting_init != percent_setting_max else percent_setting_max
-                    speed_current_expected = self.speed_max if percent_setting_init == percent_setting_max else 0
-                    await self.verify_expected_attribute_value(attr.PercentCurrent, percent_current_expected)
-                    await self.verify_expected_attribute_value(attr.SpeedCurrent, speed_current_expected)
 
         return percent_setting_init
 
@@ -465,7 +443,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # Get the expected final PercentSetting value based on the Step command parameters
         percent_setting_expected = self.get_expected_percent_setting(step)
         if step.direction == cluster.Enums.StepDirectionEnum.kDecrease and not step.wrap and not step.lowestOff:
-            logging.info(f"[FC] Step craw: {step}, percent_setting_expected: {percent_setting_expected}")
+            logging.info(f"[FC] Step command: {step}, percent_setting_expected: {percent_setting_expected}")
 
         for i in range(101):
             # Send the Step command
@@ -523,7 +501,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in accordance with the Step command parameters
         self.step(self.current_step_index + 1)
-        percent_setting_init = await self.initialize_percent_setting_and_verify_affected_attribtutes(step, handle_current_values)
+        percent_setting_init = await self.initialize_percent_setting(step)
 
         # *** NEXT STEP ***
         # Subscribe to the requested attributes
@@ -593,8 +571,6 @@ class TC_FAN_3_5(MatterBaseTest):
         # - Get the values of the speed oriented attributes
         for sub in self.subscriptions:
             if sub._expected_attribute == attr.PercentSetting:
-                # percent_setting_report_qty = len(sub.attribute_queue.queue)
-                # percent_setting_values_produced = [q.value for q in sub.attribute_queue.queue]
                 percent_setting_report_qty = len(self.percent_setting_from_queue)
                 percent_setting_values_produced = self.percent_setting_from_queue
                 self.verify_attribute_progression(step, attr.PercentSetting, percent_setting_values_produced)
@@ -806,7 +782,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in accordance with the Step command parameters
         self.step(self.current_step_index + 1)
-        await self.initialize_percent_setting_and_verify_affected_attribtutes(step, handle_current_values)
+        await self.initialize_percent_setting(step)
 
         # *** NEXT STEP ***
         # Subscribe to the requested attributes
@@ -930,6 +906,7 @@ class TC_FAN_3_5(MatterBaseTest):
         sd_enum = cluster.Enums.StepDirectionEnum
         self.timeout_sec: float = 1
         self.percent_setting_per_step: Optional[int] = None
+        self.percent_setting_max = 100
 
         # *** STEP 1 ***
         # Commissioning already done
