@@ -338,16 +338,17 @@ private:
 
     Protocols::InteractionModel::Status ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone);
 
+    Protocols::InteractionModel::Status ValidateTrigger(const ZoneTriggerControlStruct & trigger);
+
     // Utility that matches a given zone's ZoneUse and verices with the given
-    // parameters to check if they match. Used by DoesZoneAlreadyExist().
+    // parameters to check if they match. Used by ZoneAlreadyExists().
     bool DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vector<TwoDCartesianVertexStruct> & vertices,
                                    const TwoDCartesianZoneStorage & zone);
 
     // Utility function to check if a given ZoneUse and a TwoDVertex already
     // exists in mZones.
-    bool DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
-                              const DataModel::Nullable<uint16_t> & excludeZoneId);
-    bool DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices);
+    bool ZoneAlreadyExists(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
+                           const DataModel::Nullable<uint16_t> & excludeZoneId);
 
     /**
      * @brief Inherited from CommandHandlerInterface

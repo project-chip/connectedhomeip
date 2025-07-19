@@ -40,7 +40,7 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import EventChangeCallback
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
@@ -163,6 +163,8 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                                  "ZoneType of created Zone is not of type TwoDCartZone")
             asserts.assert_equal(matchingZone.zoneSource, enums.ZoneSourceEnum.kUser,
                                  "ZoneSource of created Zone is not of type User")
+            asserts.assert_equal(matchingZone.twoDCartesianZone.vertices, zoneVertices,
+                                 "ZoneVertices of created Zone are mismatched")
         else:
             logging.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
             self.skip_step("2")
@@ -184,9 +186,14 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         augDuration = 2
         maxDuration = 8
         blindDuration = 2
+        if self.perZoneSenseSupported:
+            sensitivity = 4
+        else:
+            sensitivity = None
+
         # Create a ZoneTrigger command with a valid ZoneTriggerControlStruct
         zoneTrigger = cluster.Structs.ZoneTriggerControlStruct(
-            zoneID=zoneID1, initialDuration=initDuration, augmentationDuration=augDuration, maxDuration=maxDuration, blindDuration=blindDuration)
+            zoneID=zoneID1, initialDuration=initDuration, augmentationDuration=augDuration, maxDuration=maxDuration, blindDuration=blindDuration, sensitivity=sensitivity)
         try:
             logger.info(f"Create/Update Trigger with ID = {zoneID1}")
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.CreateOrUpdateTrigger(trigger=zoneTrigger))
@@ -226,12 +233,15 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                              "MaxDuration of created Trigger does not match")
         asserts.assert_equal(matchingTrigger.blindDuration, blindDuration,
                              "BlindDuration of created Trigger does not match")
+        if self.perZoneSenseSupported:
+            asserts.assert_equal(matchingTrigger.sensitivity, sensitivity,
+                                 "Sensitivity of created Trigger does not match")
 
         self.step("3")
 
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
         event_delay_seconds = 5.0
         # TODO: Check for self.is_ci
@@ -303,7 +313,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
 
         # Create a ZoneTrigger command with the non-existing ZoneId
         zoneTrigger = cluster.Structs.ZoneTriggerControlStruct(
-            zoneID=newZoneId, initialDuration=10, augmentationDuration=2, maxDuration=50, blindDuration=5)
+            zoneID=newZoneId, initialDuration=10, augmentationDuration=2, maxDuration=50, blindDuration=5, sensitivity=sensitivity)
         try:
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.CreateOrUpdateTrigger(trigger=zoneTrigger))
             asserts.fail("Unexpected success when expecting NOT_FOUND due to new zone id being used")
@@ -353,12 +363,14 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                                  "ZoneType of created Zone is not of type TwoDCartZone")
             asserts.assert_equal(matchingZone.zoneSource, enums.ZoneSourceEnum.kUser,
                                  "ZoneSource of created Zone is not of type User")
+            asserts.assert_equal(matchingZone.twoDCartesianZone.vertices, zoneVertices,
+                                 "ZoneVertices of created Zone are mismatched")
 
             self.step("6a")
 
             # Create a ZoneTrigger command for ZoneID4(Privacy Zone)
             zoneTrigger = cluster.Structs.ZoneTriggerControlStruct(
-                zoneID=zoneID4, initialDuration=10, augmentationDuration=2, maxDuration=50, blindDuration=5)
+                zoneID=zoneID4, initialDuration=10, augmentationDuration=2, maxDuration=50, blindDuration=5, sensitivity=sensitivity)
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.CreateOrUpdateTrigger(trigger=zoneTrigger))
                 asserts.fail("Unexpected success when expecting CONSTRAINT_ERROR due to zone use not being User")

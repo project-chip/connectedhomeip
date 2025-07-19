@@ -55,10 +55,10 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
     def steps_TC_ZONEMGMT_2_2(self) -> list[TestStep]:
         return [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "If DUT supports TwoDCartesianZone and User defined zones, TH sends CreateTwoDCartesianZone command with",
+            TestStep("2", "If DUT supports TwoDCartesianZone and User defined zones, TH sends CreateTwoDCartesianZone command with",
                      " valid parameters",
                      "Verify that the DUT response contains a new zoneId and the corresponding zone information matches."),
-            TestStep("2b", "TH sends RemoveZone command with ZoneID set to the created ZoneID in step 2a ",
+            TestStep("2a", "TH sends RemoveZone command with ZoneID set to the created ZoneID in step 2 ",
                      "Verify that the DUT responds with a Success status code."),
             TestStep("3", "TH sends CreateTwoDCartesianZone command with valid non-duplicated Zone information _MaxUserDefinedZones_ + 1 times",
                      "Verify that the DUT responds with a ResourceExhausted status code at the _MaxUserDefinedZones_ + 1 th command."),
@@ -97,7 +97,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
         self.focusZonesSupported = aFeatureMap & cluster.Bitmaps.Feature.kFocusZones
         self.perZoneSenseSupported = aFeatureMap & cluster.Bitmaps.Feature.kPerZoneSensitivity
 
-        self.step("2a")
+        self.step("2")
         if self.twoDCartSupported and self.userDefinedSupported:
             # Fetch the zones attribute before calling Create
             zonesBeforeCreate = await self.read_single_attribute_check_success(
@@ -143,8 +143,10 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                                  "ZoneType of created Zone is not of type TwoDCartZone")
             asserts.assert_equal(matchingZone.zoneSource, enums.ZoneSourceEnum.kUser,
                                  "ZoneSource of created Zone is not of type User")
+            asserts.assert_equal(matchingZone.twoDCartesianZone.vertices, zoneVertices,
+                                 "ZoneVertices of created Zone are mismatched")
 
-            self.step("2b")
+            self.step("2a")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=zoneID1))
             except InteractionModelError as e:
@@ -329,11 +331,21 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                 cluster.Structs.TwoDCartesianVertexStruct(150, 50),
                 cluster.Structs.TwoDCartesianVertexStruct(100, 200)
             ]
+            selfIntersectingVertices3 = [
+                cluster.Structs.TwoDCartesianVertexStruct(20, 20),
+                cluster.Structs.TwoDCartesianVertexStruct(100, 20),
+                cluster.Structs.TwoDCartesianVertexStruct(70, 20),
+                cluster.Structs.TwoDCartesianVertexStruct(100, 10),
+                cluster.Structs.TwoDCartesianVertexStruct(10, 10)
+            ]
             zoneToCreate1 = cluster.Structs.TwoDCartesianZoneStruct(
                 name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices1,
                 color="#00FFFF")
             zoneToCreate2 = cluster.Structs.TwoDCartesianZoneStruct(
                 name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices2,
+                color="#00FFFF")
+            zoneToCreate3 = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices3,
                 color="#00FFFF")
 
             # Create and send the command with selfIntersectingVertices1
@@ -360,10 +372,22 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                                      "Unexpected error returned when trying to create zone")
                 pass
 
+            # Create and send the command with selfIntersectingVertices3
+            createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
+                zone=zoneToCreate3
+            )
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
+                asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to self intersecting vertices")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.DynamicConstraintError,
+                                     "Unexpected error returned when trying to create zone")
+                pass
+
         else:
             logging.info("TwoDCartZone or UserDefinedZones Feature not supported. Test steps skipped")
+            self.skip_step("2")
             self.skip_step("2a")
-            self.skip_step("2b")
             self.skip_step("3")
             self.skip_step("3a")
             self.skip_step("4")
