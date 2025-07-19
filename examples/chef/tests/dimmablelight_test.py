@@ -52,7 +52,7 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
             cluster=Clusters.Objects.OnOff.id,
             attribute_id=Clusters.Objects.OnOff.Attributes.OnOff.attribute_id,
             type=attributes_service_pb2.AttributeType.ZCL_BOOLEAN_ATTRIBUTE_TYPE
-        )
+        ).data
 
     def _write_on_off_pwrpc(self, device, onOff: bool):
         return device.rpcs.chip.rpc.Attributes.Write(
@@ -71,7 +71,7 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
             cluster=Clusters.Objects.LevelControl.id,
             attribute_id=Clusters.Objects.LevelControl.Attributes.CurrentLevel.attribute_id,
             type=attributes_service_pb2.AttributeType.ZCL_INT8U_ATTRIBUTE_TYPE
-        )
+        ).data
 
     def _write_current_level_pwrpc(self, device, level: int):
         return device.rpcs.chip.rpc.Attributes.Write(
