@@ -280,6 +280,8 @@ public:
 
     const std::vector<ZoneTriggerControlStruct> & GetTriggers() const { return mTriggers; }
 
+    const Optional<ZoneTriggerControlStruct> GetTriggerForZone(uint16_t zoneID);
+
     uint8_t GetMaxUserDefinedZones() const { return mMaxUserDefinedZones; }
     uint8_t GetMaxZones() const { return mMaxZones; }
     uint8_t GetSensitivityMax() const { return mSensitivityMax; }

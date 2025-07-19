@@ -156,6 +156,20 @@ CHIP_ERROR ZoneMgmtServer::ReadAndEncodeTriggers(const AttributeValueEncoder::Li
     return CHIP_NO_ERROR;
 }
 
+const Optional<ZoneTriggerControlStruct> ZoneMgmtServer::GetTriggerForZone(uint16_t zoneID)
+{
+    auto foundTrigger = std::find_if(mTriggers.begin(), mTriggers.end(),
+                                     [&](const ZoneTriggerControlStruct & zoneTrigger) { return zoneTrigger.zoneID == zoneID; });
+
+    // If an item with the zoneID was not found
+    if (foundTrigger == mTriggers.end())
+    {
+        return NullOptional;
+    }
+
+    return MakeOptional(*foundTrigger);
+}
+
 CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t aSensitivity)
 {
     VerifyOrReturnValue(aSensitivity != mSensitivity, CHIP_NO_ERROR);
