@@ -49,7 +49,7 @@ void ApplicationInit()
     }
 
     std::string appPipePath = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
-    if ((!appPipePath.empty()) and (sChipNamedPipeCommands.Start(appPipePath, &sCameraAppCommandDelegate) != CHIP_NO_ERROR))
+    if ((!appPipePath.empty()) && (sChipNamedPipeCommands.Start(appPipePath, &sCameraAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();

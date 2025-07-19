@@ -24,6 +24,8 @@
 #include <vector>
 
 constexpr uint16_t kInvalidZoneID = 65500;
+constexpr uint8_t kTimerPeriod    = 1; // 1 second periodicity for checking event
+                                       // trigger parameters.
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -73,9 +75,29 @@ public:
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 
 private:
+    enum class TriggerState : uint8_t
+    {
+        Idle,            ///< Default state
+        Triggered,       ///< ZoneTrigger event generated
+        InBlindDuration, ///< In Blind duration state after ZoneStopped event
+    };
+
+    struct ZoneTriggerContext
+    {
+        uint32_t timeSinceInitialTrigger     = 0;
+        uint32_t triggerDetectedDuration     = 0;
+        uint32_t prevTriggerDetectedDuration = 0;
+        TriggerState triggerState            = TriggerState::Idle;
+        uint16_t triggerCount                = 0;
+        ZoneTriggerControlStruct triggerCtrl;
+    };
+
     CameraDeviceInterface * mCameraDevice = nullptr;
     // Activity zones;
     std::vector<TwoDCartZone> mTwoDCartZones;
+    std::vector<ZoneTriggerContext> mTriggerContexts;
+
+    static void OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void * appState);
 
     uint16_t GetNewZoneId()
     {
