@@ -313,6 +313,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return None
 
+    def get_restart_flag_file(self) -> str:
+        return self.matter_test_config.restart_flag_file
+
     def get_test_pics(self, test: str) -> list[str]:
         ''' Retrieves a list of top-level PICS that should be checked before running this test
 
@@ -547,7 +550,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
 
-    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
+    async def open_commissioning_window(self,
+                                        dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
+                                        node_id: Optional[int] = None,
+                                        timeout: int = 900) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -563,7 +569,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.fail(e.status, 'Failed to open commissioning window')
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
+            self,
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+            node_id: int,
+            endpoint: int,
+            attribute: object,
+            fabricFiltered: bool = True) -> object:
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
@@ -589,9 +600,15 @@ class MatterBaseTest(base_test.BaseTestClass):
             attrs[endpoint] = attr_ret
         return attrs
 
-    async def read_single_attribute_check_success(
-            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+    async def read_single_attribute_check_success(self,
+                                                  cluster: Clusters.ClusterObjects.ClusterCommand,
+                                                  attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+                                                  dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
+                                                  node_id: Optional[int] = None,
+                                                  endpoint: Optional[int] = None,
+                                                  fabric_filtered: bool = True,
+                                                  assert_on_error: bool = True,
+                                                  test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -620,10 +637,16 @@ class MatterBaseTest(base_test.BaseTestClass):
                 return None
         return attr_ret
 
-    async def read_single_attribute_expect_error(
-            self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
-            fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+    async def read_single_attribute_expect_error(self,
+                                                 cluster: object,
+                                                 attribute: object,
+                                                 error: Status,
+                                                 dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
+                                                 node_id: Optional[int] = None,
+                                                 endpoint: Optional[int] = None,
+                                                 fabric_filtered: bool = True,
+                                                 assert_on_error: bool = True,
+                                                 test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -647,7 +670,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: object, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(
+            self,
+            attribute_value: object,
+            endpoint_id: Optional[int] = None,
+            expect_success: bool = True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -779,7 +806,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             probable_error, probable_file = extract_error_text()
             test_steps = self.get_defined_test_steps(self.current_test_info.name)
-            test_step = str(test_steps[self.current_step_index-1]
+            test_step = str(test_steps[self.current_step_index - 1]
                             ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
             logging.error(textwrap.dedent(f"""
 
@@ -858,8 +885,13 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def _populate_wildcard(self):
         """ Populates self.stored_global_wildcard if not already filled. """
         if self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+            global_wildcard = asyncio.wait_for(
+                self.default_controller.Read(
+                    self.dut_node_id, [
+                        (Clusters.Descriptor), Attribute.AttributePath(
+                            None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+                            None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(
+                            None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = await global_wildcard
 
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
@@ -944,7 +976,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Mark all remaining test steps starting with provided starting step
             starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
             starting_step_number must be provided, and is not derived intentionally.
-            By providing argument test is more deliberately identifying where test skips are starting from, 
+            By providing argument test is more deliberately identifying where test skips are starting from,
             making it easier to validate against the test plan for correctness.
         Args:
             starting_step_number (int,str): Number of name of the step to start skipping the steps.
@@ -953,7 +985,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self.mark_step_range_skipped(starting_step_number, None)
 
-    def mark_step_range_skipped(self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]) -> None:
+    def mark_step_range_skipped(self,
+                                starting_step_number: typing.Union[int,
+                                                                   str],
+                                ending_step_number: typing.Union[int,
+                                                                 str,
+                                                                 None]) -> None:
         """Mark a range of remaining test steps starting with provided starting step
             starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
             starting_step_number must be provided, and is not derived intentionally.
@@ -962,7 +999,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             If ending_step_number is None, all steps until the end of the test will be skipped
             ending_step_number is optional, and if not provided, all steps until the end of the test will be skipped.
 
-            By providing argument test is more deliberately identifying where test skips are starting from, 
+            By providing argument test is more deliberately identifying where test skips are starting from,
             making it easier to validate against the test plan for correctness.
         Args:
             starting_step_number (int,str): Number of name of the step to start skipping the steps.
@@ -989,7 +1026,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
             asserts.assert_greater(ending_step_idx, starting_step_idx,
                                    "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
-            skipping_steps = steps[starting_step_idx:ending_step_idx+1]
+            skipping_steps = steps[starting_step_idx:ending_step_idx + 1]
         else:
             skipping_steps = steps[starting_step_idx:]
 
@@ -1385,6 +1422,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pipe = args.app_pipe
+    config.restart_flag_file = args.restart_flag_file
     if config.app_pipe is not None and not os.path.exists(config.app_pipe):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
@@ -1450,6 +1488,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--restart-flag-file', type=str, default=None,
+                             help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
@@ -1504,10 +1544,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     code_group = parser.add_mutually_exclusive_group(required=False)
 
-    code_group.add_argument('-q', '--qr-code', type=str,
-                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
-    code_group.add_argument('--manual-code', type=str_from_manual_code,
-                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
+    code_group.add_argument('-q', '--qr-code', type=str, metavar="QR_CODE", default=[],
+                            help="QR setup code content (overrides passcode and discriminator)", nargs="+")
+    code_group.add_argument('--manual-code', type=str_from_manual_code, metavar="MANUAL_CODE", default=[],
+                            help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
 
     fabric_group = parser.add_argument_group(
         title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
