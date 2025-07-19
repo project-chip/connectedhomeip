@@ -46,7 +46,7 @@ public:
     int GetPeerConnectionState();
     void Disconnect();
 
-    void WebRTCProviderClientInit(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
+    void WebRTCProviderClientInit(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
     PyChipError SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
                             size_t length);
     void WebRTCProviderClientInitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
