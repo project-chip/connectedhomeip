@@ -64,6 +64,13 @@ JavaVM * sJVM = nullptr;
 JniGlobalReference sAndroidChipPlatformExceptionCls;
 jmethodID sOnLogMessageMethod = nullptr;
 JniGlobalReference sJavaLogCallbackObject;
+
+// Java object containing the listener to notify when a service is resolved.
+// It can be used by an Android application to be notified when the
+//  Operational discovery is done.
+jobject mJListenerObject          = nullptr;
+jmethodID mServiceResolveListener = nullptr;
+
 } // namespace
 
 CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -399,6 +406,11 @@ JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
 {
     using ::chip::Dnssd::HandleResolve;
     HandleResolve(instanceName, serviceType, hostName, address, port, attributes, callbackHandle, contextHandle);
+
+    if (mServiceResolveListener != nullptr)
+    {
+        env->CallVoidMethod(mJListenerObject, mServiceResolveListener, instanceName, serviceType);
+    }
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceBrowse)
@@ -439,4 +451,39 @@ JNI_METHOD(jboolean, updateCommissionableDataProviderData)
     }
 
     return true;
+}
+
+JNI_METHOD(void, setServiceResolveListener)
+(JNIEnv * env, jclass self, jobject jListenerObject)
+{
+    VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "setServiceResolveListener(): Invalid env"));
+
+    if (jListenerObject == nullptr)
+    {
+        // Disable the listener
+        mJListenerObject        = nullptr;
+        mServiceResolveListener = nullptr;
+        return;
+    }
+
+    // Save the java listener (for later use)
+    mJListenerObject     = env->NewWeakGlobalRef(jListenerObject);
+    jclass listenerClass = env->GetObjectClass(jListenerObject);
+
+    if (listenerClass == nullptr)
+    {
+        ChipLogError(Controller, "Failed to get listener class");
+        env->ExceptionClear();
+        JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
+        return;
+    }
+
+    mServiceResolveListener = env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
+    if (mServiceResolveListener == nullptr)
+    {
+        ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
+        env->ExceptionClear();
+        JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
+        return;
+    }
 }
