@@ -17,6 +17,7 @@
 
 #import "MTRMetricsCollector.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
 #import "MTRMetrics.h"
 #import "MTRMetrics_Internal.h"
 #import <MTRUnfairLock.h>
@@ -251,18 +252,45 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     }
 }
 
-- (MTRMetrics *)metricSnapshot:(BOOL)resetCollection
+- (MTRMetrics *)metricSnapshotForCommissioning:(BOOL)resetCollection
 {
     std::lock_guard lock(_lock);
 
+    NSMutableArray * keysToDelete = [NSMutableArray array];
     MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
-    for (NSString * key in _metricsDataCollection) {
-        [metrics setMetricData:_metricsDataCollection[key] forKey:key];
-    }
+    [_metricsDataCollection enumerateKeysAndObjectsUsingBlock:^(NSString * key, MTRMetricData * obj, BOOL * stop) {
+        // Commissioning metric keys predate the encoding of a category, so we need to filter out
+        // all keys that use the encoding scheme here.
+        if (![key hasPrefix:@METRICS_KEY_PREFIX]) {
+            [keysToDelete addObject:key];
+            [metrics setMetricData:obj forKey:key];
+        }
+    }];
 
     // Clear curent stats, if specified
     if (resetCollection) {
-        [_metricsDataCollection removeAllObjects];
+        [_metricsDataCollection removeObjectsForKeys:keysToDelete];
+    }
+    return metrics;
+}
+
+- (MTRMetrics *)metricSnapshotForCategory:(NSString *)category removeMetrics:(BOOL)removeMetrics
+{
+    std::lock_guard lock(_lock);
+
+    NSString * keyPrefix = [NSString stringWithFormat:@METRICS_KEY_PREFIX "%@__", category];
+    NSMutableArray * keysToDelete = [NSMutableArray array];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
+    [_metricsDataCollection enumerateKeysAndObjectsUsingBlock:^(NSString * key, MTRMetricData * obj, BOOL * stop) {
+        if ([key hasPrefix:keyPrefix]) {
+            [keysToDelete addObject:key];
+            [metrics setMetricData:obj forKey:key];
+        }
+    }];
+
+    // Clear curent stats, if specified
+    if (removeMetrics) {
+        [_metricsDataCollection removeObjectsForKeys:keysToDelete];
     }
     return metrics;
 }

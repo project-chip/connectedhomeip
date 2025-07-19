@@ -183,6 +183,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
+- (void)otaTransferComplete:(MTRMetrics *)metrics;
+
 @end
 
 @interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)

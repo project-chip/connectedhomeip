@@ -44,6 +44,7 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic) BOOL forceTimeUpdateShortDelayToZero;
 @property (atomic) BOOL forceTimeSynchronizationLossDetectionCadenceToZero;
+@property (atomic, copy, nullable) MTRDeviceTestDelegateDataHandler onOTATransferEnd;
 @end
 
 @interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate

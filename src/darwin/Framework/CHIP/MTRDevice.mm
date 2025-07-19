@@ -881,6 +881,17 @@ MTR_DIRECT_MEMBERS
     }
 }
 
+#pragma mark - Metrics
+
+- (void)otaTransferComplete:(MTRMetrics *)metrics
+{
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(otaTransferComplete:metrics:)]) {
+            [delegate otaTransferComplete:self metrics:metrics];
+        }
+    }];
+}
+
 @end
 
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
