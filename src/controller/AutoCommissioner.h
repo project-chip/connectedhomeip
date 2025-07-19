@@ -59,6 +59,7 @@ public:
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
 protected:
+    virtual void CleanupCommissioning();
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
     CHIP_ERROR PerformStep(CommissioningStage nextStage);
@@ -90,9 +91,6 @@ private:
     // kThreadNetworkSetup or kCleanup, depending whether network information has
     // been provided that matches the thread/wifi endpoint of the target.
     CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
-
-    // Helper function to allocate memory for a scopedMemoryBuffer and populate it with the data from the input span
-    CHIP_ERROR AllocateMemoryAndCopySpan(Platform::ScopedMemoryBufferWithSize<uint8_t> & scopedBuffer, ByteSpan span);
 
     // Helper function to determine if a scan attempt should be made given the
     // scan attempt commissioning params and the corresponding network endpoint of
@@ -173,12 +171,6 @@ private:
     uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
-
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminRCAC;
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminICAC;
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mJFAdminNOC;
-#endif
 };
 } // namespace Controller
 } // namespace chip
