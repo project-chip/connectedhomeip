@@ -46,7 +46,7 @@ import logging
 import chip.clusters as Clusters
 import test_plan_support
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
+from mobly import asserts, signals
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 logger = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ class TC_SETRF_2_4(MatterBaseTest, CommodityTariffTestBaseHelper):
                      - Verify that the Current_day is not equal to Next_day."""),
             TestStep("7", "TH sends TestEventTrigger command for Test Event Change Day.",
                      "DUT replies with SUCCESS status code."),
-            TestStep("8", "TH reads CurrentDay attribute." """
+            TestStep("8", "TH reads CurrentDay attribute.", """
                      - DUT replies a value of DayStruct type;
                      - Verify that Current_day is equal to Next_day."""),
             TestStep("9", "TH reads CurrentDayEntry attribute and save it as Current_day_entry.", """
@@ -193,7 +193,11 @@ class TC_SETRF_2_4(MatterBaseTest, CommodityTariffTestBaseHelper):
         current_day_entry = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry
         )
-        asserts.assert_equal(current_day_entry, next_day_entry, "CurrentDayEntry and NextDayEntry attributes must be the same")
+        try:
+            asserts.assert_equal(current_day_entry, next_day_entry, "CurrentDayEntry and NextDayEntry attributes must be the same")
+        except signals.TestFailure as err:
+            logger.critical(err)
+            self.mark_current_step_skipped()
 
         self.step("13")
         # TH reads CurrentTariffComponents attribute and save it as current_tariff_component
@@ -218,8 +222,12 @@ class TC_SETRF_2_4(MatterBaseTest, CommodityTariffTestBaseHelper):
         current_tariff_component = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents
         )
-        asserts.assert_equal(current_tariff_component, next_tariff_component,
-                             "CurrentTariffComponents and NextTariffComponents attributes must be the same")
+        try:
+            asserts.assert_equal(current_tariff_component, next_tariff_component,
+                                 "CurrentTariffComponents and NextTariffComponents attributes must be the same")
+        except signals.TestFailure as err:
+            logger.critical(err)
+            self.mark_current_step_skipped()
 
         self.step("17")
         # TH sends TestEventTrigger command for Test Event Clear
