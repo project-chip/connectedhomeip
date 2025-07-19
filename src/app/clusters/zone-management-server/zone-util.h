@@ -34,9 +34,9 @@ namespace ZoneManagement {
 
 enum class OrientationEnum : uint8_t
 {
-    kCollinear        = 0x00,
-    kCounterClockwise = 0x01,
-    kClockwise        = 0x02,
+    kCollinear = 0x00,
+    kOnLeft    = 0x01,
+    kOnRight   = 0x02,
 };
 
 class ZoneUtil
@@ -116,7 +116,7 @@ private:
             return OrientationEnum::kCollinear;
         }
 
-        return (val > 0) ? OrientationEnum::kCounterClockwise : OrientationEnum::kClockwise;
+        return (val > 0) ? OrientationEnum::kOnLeft : OrientationEnum::kOnRight;
     }
 
     // Helper function: Check if segment p1q1 intersects segment p2q2

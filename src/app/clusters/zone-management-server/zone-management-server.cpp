@@ -25,6 +25,7 @@
 #include <app/clusters/zone-management-server/zone-management-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
+#include <clusters/ZoneManagement/Metadata.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -202,6 +203,9 @@ CHIP_ERROR ZoneMgmtServer::Read(const ConcreteReadAttributePath & aPath, Attribu
     {
     case FeatureMap::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mFeatures));
+        break;
+    case ClusterRevision::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(kRevision));
         break;
     case MaxUserDefinedZones::Id:
         VerifyOrReturnError(
@@ -426,6 +430,8 @@ Status ZoneMgmtServer::ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodabl
 {
     VerifyOrReturnError(zone.name.size() <= 32, Status::ConstraintError);
 
+    VerifyOrReturnError(zone.use != ZoneUseEnum::kUnknownEnumValue, Status::ConstraintError);
+
     size_t listCount = 0;
     VerifyOrReturnError(zone.vertices.ComputeSize(&listCount) == CHIP_NO_ERROR, Status::InvalidCommand);
 
@@ -486,7 +492,7 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    if (DoesZoneAlreadyExist(zoneToCreate.use, twoDCartVertices, DataModel::NullNullable))
+    if (ZoneAlreadyExists(zoneToCreate.use, twoDCartVertices, DataModel::NullNullable))
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
         return;
@@ -505,19 +511,17 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
 
     // Call the delegate
     status = mDelegate.CreateTwoDCartesianZone(twoDCartZoneStorage, zoneID);
-    if (status == Status::Success)
-    {
-        ZoneInformationStorage zoneInfo;
-        zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
-
-        AddZone(zoneInfo);
-        mUserDefinedZonesCount++;
-    }
-    else
+    if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
+
+    ZoneInformationStorage zoneInfo;
+    zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
+
+    AddZone(zoneInfo);
+    mUserDefinedZonesCount++;
 
     response.zoneID = zoneID;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -582,7 +586,7 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    if (DoesZoneAlreadyExist(zoneToUpdate.use, twoDCartVertices, DataModel::MakeNullable(zoneID)))
+    if (ZoneAlreadyExists(zoneToUpdate.use, twoDCartVertices, DataModel::MakeNullable(zoneID)))
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
         return;
@@ -600,18 +604,16 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
 
     // Call the delegate
     status = mDelegate.UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
-    if (status == Status::Success)
-    {
-        ZoneInformationStorage zoneInfo;
-        zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
-
-        UpdateZone(zoneID, zoneInfo);
-    }
-    else
+    if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
+
+    ZoneInformationStorage zoneInfo;
+    zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
+
+    UpdateZone(zoneID, zoneInfo);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
@@ -656,10 +658,35 @@ void ZoneMgmtServer::HandleRemoveZone(HandlerContext & ctx, const Commands::Remo
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
+Status ZoneMgmtServer::ValidateTrigger(const ZoneTriggerControlStruct & trigger)
+{
+    VerifyOrReturnError(trigger.initialDuration >= 1 && trigger.initialDuration <= 65535, Status::ConstraintError);
+
+    VerifyOrReturnError(trigger.augmentationDuration <= trigger.initialDuration, Status::ConstraintError);
+
+    VerifyOrReturnError(trigger.maxDuration >= trigger.initialDuration, Status::ConstraintError);
+
+    if (HasFeature(Feature::kPerZoneSensitivity))
+    {
+        VerifyOrReturnError(trigger.sensitivity.Value() >= 1 && trigger.sensitivity.Value() <= mSensitivityMax,
+                            Status::ConstraintError);
+    }
+
+    return Status::Success;
+}
+
 void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
                                                  const Commands::CreateOrUpdateTrigger::DecodableType & commandData)
 {
     ZoneTriggerControlStruct trigger = commandData.trigger;
+
+    Status status = ValidateTrigger(trigger);
+
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
 
     auto foundZone =
         std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & z) { return z.zoneID == trigger.zoneID; });
@@ -676,7 +703,7 @@ void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
         return;
     }
 
-    Status status = AddOrUpdateTrigger(trigger);
+    status = AddOrUpdateTrigger(trigger);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -722,8 +749,8 @@ bool ZoneMgmtServer::DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vecto
                       });
 }
 
-bool ZoneMgmtServer::DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
-                                          const DataModel::Nullable<uint16_t> & excludeZoneId)
+bool ZoneMgmtServer::ZoneAlreadyExists(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
+                                       const DataModel::Nullable<uint16_t> & excludeZoneId)
 {
     for (auto & zone : mZones)
     {
