@@ -10529,6 +10529,23 @@ PICS:
       id: SETRF.S.C01.Tx
 
     #
+    # Commodity Metering Cluster
+    #
+    - label:
+          "Does the device implement the Commodity Metering Cluster as a server?"
+      id: COMMTR.S
+
+    # Server attributes
+    - label: "Does the device implement the MeteredQuantity attribute?"
+      id: COMMTR.S.A0000
+
+    - label: "Does the device implement the MeteredQuantityTimestamp attribute?"
+      id: COMMTR.S.A0001
+
+    - label: "Does the device implement the TariffUnit attribute?"
+      id: COMMTR.S.A0002
+
+    #
     # Meter Identification
     #
     - label:
