@@ -187,7 +187,7 @@ CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t aSensitivity)
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSensitivity));
 
     mDelegate.OnAttributeChanged(Attributes::Sensitivity::Id);
-    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id));
+    MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
 }
@@ -582,7 +582,7 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    if (DoesZoneAlreadyExist(zoneToUpdate.use, twoDCartVertices, DataModel::MakeNullable<uint16_t>(zoneID)))
+    if (DoesZoneAlreadyExist(zoneToUpdate.use, twoDCartVertices, DataModel::MakeNullable(zoneID)))
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
         return;
@@ -652,13 +652,8 @@ void ZoneMgmtServer::HandleRemoveZone(HandlerContext & ctx, const Commands::Remo
         RemoveZone(zoneID);
         mUserDefinedZonesCount--;
     }
-    else
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
