@@ -52,7 +52,7 @@ tests:
           saveAs: MaxMeasuredValueValue
           constraints:
               type: int16s
-              minValue: MinMeasuredValueValue
+              minValue: MinMeasuredValueValue + 1
               maxValue: 32767
 
     - label: "Step 4: TH reads from the DUT the MeasuredValue attribute."
