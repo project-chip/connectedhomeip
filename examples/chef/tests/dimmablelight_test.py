@@ -145,15 +145,15 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
         self.step(5)
         with device_connection as device:
             # Test onOff
-            self._write_on_off_pwrpc(True)
-            asserts.assert_equal(self._read_on_off_pwrpc(), True)
-            self._write_on_off_pwrpc(False)
-            asserts.assert_equal(self._read_on_off_pwrpc(), False)
+            self._write_on_off_pwrpc(device, True)
+            asserts.assert_equal(self._read_on_off_pwrpc(device), True)
+            self._write_on_off_pwrpc(device, False)
+            asserts.assert_equal(self._read_on_off_pwrpc(device), False)
 
             # Test Level control
             for level in [self._MID_BRIGHTNESS_LEVEL, self._MIN_BRIGHTNESS_LEVEL, self._MAX_BRIGHTNESS_LEVEL]:
-                self._write_current_level_pwrpc(level)
-                asserts.assert_equal(self._read_current_level_pwrpc(), level)
+                self._write_current_level_pwrpc(device, level)
+                asserts.assert_equal(self._read_current_level_pwrpc(device), level)
 
 
 if __name__ == "__main__":
