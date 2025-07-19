@@ -179,7 +179,7 @@ while (($#)); do
             enable_pw_rpc=$2
             if [[ "$enable_pw_rpc" != "true" && "$enable_pw_rpc" != "false" ]]; then
                 echo "enable_pw_rpc should have a true/false value, not '$enable_pw_rpc'"
-                exit
+                exit 1
             fi
             shift
             ;;
