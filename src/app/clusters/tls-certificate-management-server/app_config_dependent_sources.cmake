@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-import("${chip_root}/src/app/chip_data_model.gni")
-
-chip_data_model("all-clusters-common") {
-  public_deps = [
-    "${chip_root}/src/app/clusters/tls-certificate-management-server",
-    "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
-    "${chip_root}/src/crypto",
-  ]
-  zap_file = "all-clusters-app.zap"
-  is_server = true
-}
+# This is the equivalent to app_config_dependent_sources.gni
+TARGET_SOURCES(
+        ${APP_TARGET}
+        PRIVATE
+        "${CLUSTER_DIR}/CertificateTableImpl.cpp"
+        "${CLUSTER_DIR}/CertificateTableImpl.h"
+        "${CLUSTER_DIR}/tls-certificate-management-server.cpp"
+        "${CLUSTER_DIR}/tls-certificate-management-server.h"
+)
