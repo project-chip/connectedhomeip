@@ -24,6 +24,7 @@
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
+#include <numeric>
 #include <system/SystemLayerImplDispatch.h>
 
 #include <lib/support/CodeUtils.h>
@@ -88,14 +89,6 @@ namespace System {
         // First time requesting callback for those events: install a dispatch source
         __auto_type dispatchQueue = GetDispatchQueue();
 
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        // Note: if no dispatch queue is available, callbacks most probably will not work, unless,
-        //       as in some tests from a test-specific local loop, the select based event handling is invoked.
-        VerifyOrReturnError(nullptr != dispatchQueue, CHIP_NO_ERROR);
-#else
-        VerifyOrDie(nullptr != dispatchQueue);
-#endif
-
         source = dispatch_source_create(sourceType, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
         VerifyOrReturnError(nullptr != source, CHIP_ERROR_NO_MEMORY);
 
@@ -151,15 +144,14 @@ namespace System {
 #else
     void LayerImplDispatch::HandleSocketsAndTimerEvents(Clock::Timeout timeout)
     {
-        const Clock::Timestamp currentTime = SystemClock().GetMonotonicTimestamp();
-        Clock::Timestamp awakenTime = currentTime + timeout;
+        dispatch_time_t currentTime = dispatch_time(DISPATCH_WALLTIME_NOW, 0);
+        dispatch_time_t awakenTime = dispatch_time(currentTime, std::chrono::nanoseconds(timeout).count());
 
-        TimerList::Node * timer = mTimerList.Earliest();
-        if (timer) {
-            awakenTime = std::min(awakenTime, timer->AwakenTime());
-        }
+        awakenTime = std::reduce(mTimers.cbegin(), mTimers.cend(), awakenTime, [](dispatch_time_t t, const TimerData & data) {
+            return data.walltime < t ? data.walltime : t;
+        });
 
-        const Clock::Timestamp sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : Clock::kZero;
+        const Clock::Timestamp sleepTime = (awakenTime > currentTime) ? Clock::Seconds16(awakenTime - currentTime) : Clock::kZero;
         timeval nextTimeout;
         Clock::ToTimeval(sleepTime, nextTimeout);
 

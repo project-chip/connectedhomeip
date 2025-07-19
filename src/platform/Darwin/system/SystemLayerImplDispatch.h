@@ -28,9 +28,9 @@
 #include <system/SystemLayer.h>
 #include <system/SystemTimer.h>
 
+#include <vector>
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #include <mutex>
-#include <vector>
 #endif
 
 namespace chip {
@@ -55,7 +55,6 @@ public:
 
     // LayerDispatch overrides.
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
-    dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
     void HandleDispatchQueueEvents(Clock::Timeout timeout) override;
     CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) override;
     CHIP_ERROR StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) override;
@@ -119,13 +118,52 @@ protected:
     CHIP_ERROR ClearCallback(SocketWatchToken token, SocketEventFlags flag);
 #endif
 
-    TimerPool<TimerList::Node> mTimerPool;
-    TimerList mTimerList;
-    // List of expired timers being processed right now.  Stored in a member so
-    // we can cancel them.
-    TimerList mExpiredTimers;
-    void EnableTimer(const char * source, TimerList::Node *);
-    void DisableTimer(const char * source, TimerList::Node *);
+    dispatch_queue_t GetDispatchQueue()
+    {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        // We create a suspended serial dispatch queue
+        if (!mDispatchQueue)
+        {
+            mDispatchQueue             = dispatch_queue_create("com.chip.unit_test_fallback", DISPATCH_QUEUE_SERIAL);
+            mHasSuspendedDispatchQueue = true;
+            dispatch_suspend(mDispatchQueue);
+        }
+#endif
+        VerifyOrDie(nullptr != mDispatchQueue);
+        return mDispatchQueue;
+    };
+
+    // Struct to hold some data for every timer (the timer source object, the time that the timer was supposed to fire, the callback
+    // and the state to pass to the callback).
+    struct TimerData
+    {
+        TimerData(dispatch_source_t timerSource, dispatch_time_t walltime, TimerCompleteCallback onComplete, void * appState) :
+            timerSource(timerSource), walltime(walltime), onComplete(onComplete), appState(appState)
+        {}
+
+        dispatch_source_t timerSource;
+        // Sadly, there doesn't seem to be a way to get the remaining or the
+        // end time of a timer from its dispatch_source_t, so we need to store
+        // the end time ourselves.
+        dispatch_time_t walltime;
+        TimerCompleteCallback onComplete;
+        void * appState;
+    };
+    const TimerData * FindTimerData(TimerCompleteCallback onComplete, void * appState)
+    {
+        for (const TimerData & data : mTimers)
+        {
+            if (data.onComplete == onComplete && data.appState == appState)
+            {
+                return &data;
+            }
+        }
+        return nullptr;
+    }
+
+    std::vector<TimerData> mTimers;
+    static void EnableTimer(const char * source, dispatch_source_t timerSource);
+    static void DisableTimer(const char * source, dispatch_source_t timerSource);
     CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel);
     void HandleTimerEvents(Clock::Timeout timeout);
 
@@ -134,21 +172,9 @@ protected:
     dispatch_queue_t mDispatchQueue = nullptr;
 
 private:
-    inline bool HasTimerSource(TimerList::Node * timer)
-    {
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        VerifyOrDie(nullptr != timer->mTimerSource);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    bool mHasSuspendedDispatchQueue = false;
 #endif
-        return nullptr != timer->mTimerSource;
-    }
-
-    inline bool HasDispatchQueue(dispatch_queue_t queue)
-    {
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        VerifyOrDie(nullptr != queue);
-#endif
-        return nullptr != queue;
-    }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     std::mutex mTestQueueMutex;
