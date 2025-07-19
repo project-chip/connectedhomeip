@@ -79,10 +79,11 @@ AppEvent CreateNewEvent(AppEvent::AppEventTypes type)
 void WindowManager::Timer::Start()
 {
     // Starts or restarts the function timer
-    if (osTimerStart(mHandler, pdMS_TO_TICKS(100)) != osOK)
+    osStatus_t status = osTimerStart(mHandler, pdMS_TO_TICKS(100));
+    if (status != osOK)
     {
-        SILABS_LOG("Timer start() failed");
-        appError(CHIP_ERROR_INTERNAL);
+        SILABS_LOG("Timer start() failed with error %ld", status);
+        appError(APP_ERROR_START_TIMER_FAILED);
     }
 
     mIsActive = true;
@@ -512,7 +513,7 @@ WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * cont
     if (mHandler == NULL)
     {
         SILABS_LOG("Timer create failed");
-        appError(CHIP_ERROR_INTERNAL);
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 }
 
@@ -527,12 +528,13 @@ WindowManager::Timer::~Timer()
 
 void WindowManager::Timer::Stop()
 {
-    mIsActive = false;
+    // Abort on osError (-1) as it indicates an unspecified failure with no clear recovery path.
     if (osTimerStop(mHandler) == osError)
     {
         SILABS_LOG("Timer stop() failed");
-        appError(CHIP_ERROR_INTERNAL);
+        appError(APP_ERROR_STOP_TIMER_FAILED);
     }
+    mIsActive = false;
 }
 
 void WindowManager::Timer::TimerCallback(void * timerCbArg)
