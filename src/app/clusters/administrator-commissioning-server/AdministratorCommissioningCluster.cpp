@@ -102,7 +102,7 @@ CHIP_ERROR AdministratorCommissioningCluster::AcceptedCommands(const ConcreteClu
 CHIP_ERROR AdministratorCommissioningCluster::Attributes(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    return AppendAttributes(builder, Span<const DataModel::AttributeEntry>(kMandatoryAttributes), {});
+    return AppendAttributes(builder, Span(kMandatoryAttributes), {});
 }
 
 std::optional<DataModel::ActionReturnStatus> AdministratorCommissioningWithBasicCommissioningWindowCluster::InvokeCommand(
