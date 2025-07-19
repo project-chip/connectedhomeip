@@ -97,31 +97,14 @@ CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<Data
 
 CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    // ensure we have space for all attributes. We may add at most 4 attributes (which are ALL optional or
-    // guarded by feature maps)
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(4 + DefaultServerCluster::GlobalAttributes().size()));
-
-    if (mEnabledAttributes.enableThreadMetrics)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::ThreadMetrics::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableCurrentHeapFree)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapFree::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableCurrentHeapUsed)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapUsed::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableCurrentWatermarks)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapHighWatermark::kMetadataEntry));
-    }
-
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    return DefaultServerCluster::AppendAttributes(
+        builder, Span<const DataModel::AttributeEntry>() /* mandatory */,
+        {
+            { mEnabledAttributes.enableThreadMetrics, Attributes::ThreadMetrics::kMetadataEntry },
+            { mEnabledAttributes.enableCurrentHeapFree, Attributes::CurrentHeapFree::kMetadataEntry },
+            { mEnabledAttributes.enableCurrentHeapUsed, Attributes::CurrentHeapUsed::kMetadataEntry },
+            { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
+        });
 }
 
 } // namespace Clusters
