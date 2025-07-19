@@ -61,7 +61,6 @@ import chip.testing.global_stash as global_stash
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute, ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
-from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
@@ -184,7 +183,6 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
-@dataclass
 class SetupParameters:
     passcode: int
     vendor_id: int = 0xFFF1
