@@ -16,6 +16,130 @@
 # limitations under the License.
 #
 
+function trim_whitespace() {
+    local OLD_SHOPT_EXTGLOB="$(shopt -p extglob)"
+    shopt -s extglob
+
+    while IFS= read -r line; do                        # For every line in stdin
+        local trimmed_line="${line##+([[:space:]])}"   # Remove leading whitespace
+        trimmed_line="${trimmed_line%%+([[:space:]])}" # Remove trailing whitespace
+        echo "$trimmed_line"                           # Output to stdout
+    done
+
+    eval "$OLD_SHOPT_EXTGLOB"
+}
+
+# Parses the input from `ninja -t query` and extracts the input targets.
+function parse_input_targets() {
+    local in_input_block=false
+    while IFS= read -r line; do
+        if [[ "$line" == "input: "* ]]; then
+            rule="${line#input: }"
+            if [[ "$rule" == "phony" ]]; then
+                in_input_block=true
+            elif [[ -n "${POSSIBLE_RULES["$rule"]}" ]]; then
+                RULES["$rule"]=1
+            fi
+        elif [[ "$in_input_block" == false ]]; then
+            continue
+        elif [[ "$line" == "outputs:" ]]; then
+            in_input_block=false
+        elif [[ "$in_input_block" == true && ! -n "${QUERIED_TARGETS["$line"]}" ]]; then
+            NEW_TARGETS["$line"]=1
+        fi
+    done
+}
+
+# Executes a command with lastpipe enabled, allowing the last command in a pipeline to run in the current shell.
+function dowithlastpipe() {
+    # Save the current lastpipe and monitor settings
+    local original_lastpipe_setting="$(shopt -p lastpipe)"
+    local original_monitor_setting
+    if [[ "$-" == *m* ]]; then
+        original_monitor_setting="set -m"
+    else
+        original_monitor_setting="set +m"
+    fi
+
+    # Make sure to restore the original settings on exit
+    trap "
+        eval \"$original_lastpipe_setting\";
+        eval \"$original_monitor_setting\";
+        trap - EXIT
+    " EXIT
+
+    # Enable lastpipe and monitor
+    set +m
+    shopt -s lastpipe
+
+    # Execute the command with lastpipe enabled
+    eval "$@"
+
+    # Return the exit status of the last command
+    return "$?"
+}
+
+# Returns the rules that should be cleaned based on the targets provided.
+# Based on this, ninja -t clean -r <rules> will clean the exact targets that need to be reexecuted for recalculating the coverage.
+function get_rules_to_clean() {
+    declare -A RULES
+
+    # Get all the rules that execute (not build) targets from the toolchain.ninja file
+    readarray -t POSSIBLE_RULES_ARR < <(ninja -C out/coverage -f toolchain.ninja -t rules | grep "__rule")
+
+    declare -A POSSIBLE_RULES
+    for rule in "${POSSIBLE_RULES_ARR[@]}"; do
+        POSSIBLE_RULES["$rule"]=1
+    done
+
+    # This will hold the targets that are already "ninja -t query"-ed
+    declare -A QUERIED_TARGETS
+
+    # This will hold the targets that are to be queried
+    declare -A TARGETS
+    for target in "$@"; do
+        TARGETS["$target"]=1
+    done
+
+    while [[ "${#TARGETS[@]}" -gt 0 ]]; do
+
+        # If at any point we have 'all' in the targets, we can just return all rules
+        if [[ -n ${TARGETS["all"]} ]]; then
+            for rule in "${!POSSIBLE_RULES[@]}"; do
+                echo "$rule"
+            done
+            return 0
+        fi
+
+        # This will hold the results of the last query
+        unset NEW_TARGETS
+        declare -A NEW_TARGETS
+
+        # Query the targets and parse the input targets, if a rule is found, it will be added to RULES
+        dowithlastpipe 'ninja -C out/coverage -t query "${!TARGETS[@]}" | grep "^  " | grep -v "|" | trim_whitespace | parse_input_targets'
+
+        # Mark the queried targets
+        for target in "${!TARGETS[@]}"; do
+            QUERIED_TARGETS["$target"]=1
+        done
+
+        # Clear the TARGETS array for the next iteration
+        unset TARGETS
+        declare -A TARGETS
+
+        # Add the new targets from the last query to TARGETS
+        for target in "${!NEW_TARGETS[@]}"; do
+            TARGETS["$target"]="${NEW_TARGETS["$target"]}"
+        done
+
+    done
+
+    # After all targets are processed, return the rules that were found
+    for rule in "${!RULES[@]}"; do
+        echo "$rule"
+    done
+}
+
 set -e
 
 _install_lcov() {
@@ -38,18 +162,21 @@ _install_lcov() {
 
 _install_lcov
 
-_normpath() {
-    python3 -c "import os.path; print(os.path.normpath('$@'))"
+# Get absolute path from a relative and normalize (e.g "foo/bar/../baz" -> "/path/to/foo/baz")
+_abspath() {
+    python3 -c "import os.path; print(os.path.abspath('$@'))"
 }
 
-CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
+CHIP_ROOT=$(_abspath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
 SUPPORTED_CODE=(core clusters all)
 CODE="core"
+QUIET_FLAG=()
+ACCUMULATE=false
 
 skip_gn=false
-TEST_TARGET=check
+TEST_TARGET=(check)
 
 # By default, do not run YAML or Python tests
 ENABLE_YAML=false
@@ -60,6 +187,8 @@ help() {
     echo
     echo "Misc:"
     echo "    -h, --help              Print this help, then exit."
+    echo "    -q, --quiet             Decrease verbosity level."
+    echo "    -a, --accumulate        Accumulate coverage data from previous runs."
     echo
     echo "Build/Output options:"
     echo "    -o, --output_root=DIR   Set the build output directory."
@@ -76,7 +205,7 @@ help() {
     echo "    --python                In addition to unit tests, run Python-based tests."
     echo "                            Both can be combined if needed."
     echo
-    echo "    --target=TARGET         Specific test target to run for unit tests (e.g. 'TestEmberAttributeBuffer.run')."
+    echo "    --target=TARGET         Specify one or more test targets to run for unit tests (e.g. 'TestEmberAttributeBuffer.run' or 'TestBleLayer.run TestBtpEngine.run')."
     echo
 }
 
@@ -97,6 +226,7 @@ for i in "$@"; do
             ;;
         --target=*)
             TEST_TARGET="${i#*=}"
+            IFS=' ' read -ra TEST_TARGET <<<"$TEST_TARGET"
             shift
             ;;
         -o=* | --output_root=*)
@@ -111,6 +241,14 @@ for i in "$@"; do
             ;;
         --python)
             ENABLE_PYTHON=true
+            shift
+            ;;
+        -q | --quiet)
+            QUIET_FLAG=("--quiet")
+            shift
+            ;;
+        -a | --accumulate)
+            ACCUMULATE=true
             shift
             ;;
         *)
@@ -135,6 +273,12 @@ if [ "$skip_gn" == false ]; then
     # Ensure environment is set
     source "$CHIP_ROOT/scripts/activate.sh"
 
+    # Set coverage data to zero if not accumulating
+    if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
+        lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
+            "${QUIET_FLAG[@]}"
+    fi
+
     # Generate ninja files
     EXTRA_GN_ARGS=""
 
@@ -148,10 +292,17 @@ if [ "$skip_gn" == false ]; then
 
     gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="use_coverage=true $EXTRA_GN_ARGS"
 
+    # Clean the targets to reexecute them
+
+    readarray -t RULES_TO_CLEAR < <(get_rules_to_clean "${TEST_TARGET[@]}")
+    if [[ ${#RULES_TO_CLEAR[@]} -gt 0 ]]; then
+        ninja -C "$OUTPUT_ROOT" -f toolchain.ninja -t clean -r "${RULES_TO_CLEAR[@]}"
+    fi
+
     #
     # 1) Always run unit tests
     #
-    ninja -C "$OUTPUT_ROOT" "$TEST_TARGET"
+    ninja -C "$OUTPUT_ROOT" "${TEST_TARGET[@]}"
 
     #
     # 2) Run YAML tests if requested
@@ -184,70 +335,82 @@ if [ "$skip_gn" == false ]; then
         echo "Running Python tests ..."
         # TODO: run python tests.
     fi
-
-    # ----------------------------------------------------------------------------
-    # Remove objects we do NOT want included in coverage
-    # ----------------------------------------------------------------------------
-    rm -rf "$OUTPUT_ROOT/obj/src/app/app-platform"
-    rm -rf "$OUTPUT_ROOT/obj/src/app/common"
-    rm -rf "$OUTPUT_ROOT/obj/src/app/util/mock"
-    rm -rf "$OUTPUT_ROOT/obj/src/controller/python"
-    rm -rf "$OUTPUT_ROOT/obj/src/lib/dnssd/platform"
-    rm -rf "$OUTPUT_ROOT/obj/src/lib/shell"
-    rm -rf "$OUTPUT_ROOT/obj/src/lwip"
-    rm -rf "$OUTPUT_ROOT/obj/src/platform"
-    rm -rf "$OUTPUT_ROOT/obj/src/tools"
-
-    # Remove unit test objects from coverage
-    find "$OUTPUT_ROOT/obj/src/" -depth -name 'tests' -exec rm -rf {} \;
-
-    # Restrict coverage to 'core' or 'clusters' if specified
-    if [ "$CODE" == "core" ]; then
-        rm -rf "$OUTPUT_ROOT/obj/src/app/clusters"
-    elif [ "$CODE" == "clusters" ]; then
-        mv "$OUTPUT_ROOT/obj/src/app/clusters" "$OUTPUT_ROOT/obj/clusters"
-        rm -rf "$OUTPUT_ROOT/obj/src"
-        mkdir -p "$OUTPUT_ROOT/obj/src"
-        mv "$OUTPUT_ROOT/obj/clusters" "$OUTPUT_ROOT/obj/src/clusters"
-    fi
 fi
 
 # ------------------------------------------------------------------------------
 # Coverage Generation
-# ------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused,gcov,gcov" # Some error types mentioned twice is needed to suppress the warnings.
+LCOV_EXCLUDE_INCLUDE_OPTIONS=()
+
+# Exclude files we do NOT want included in coverage
+# Exclude unit test files from coverage
+if [[ "$skip_gn" == false ]]; then
+    LCOV_EXCLUDE_INCLUDE_OPTIONS=(
+        --exclude "$CHIP_ROOT/zzz_generated/**"
+        --exclude "$CHIP_ROOT/third_party/**"
+        --exclude "/usr/include/**"
+        --exclude "$CHIP_ROOT/src/app/app-platform/**"
+        --exclude "$CHIP_ROOT/src/app/common/**"
+        --exclude "$CHIP_ROOT/src/app/util/mock/**"
+        --exclude "$CHIP_ROOT/src/controller/python/**"
+        --exclude "$CHIP_ROOT/src/lib/dnssd/platform/**"
+        --exclude "$CHIP_ROOT/src/lib/shell/**"
+        --exclude "$CHIP_ROOT/src/lwip/**"
+        --exclude "$CHIP_ROOT/src/platform/**"
+        --exclude "$CHIP_ROOT/src/tools/**"
+        --exclude "**/tests/**"
+    )
+
+    # Restrict coverage to 'core' or 'clusters' if needed
+    if [[ "$CODE" == "core" ]]; then
+        LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
+            --exclude "$CHIP_ROOT/src/app/clusters/**"
+        )
+    elif [[ "$CODE" == "clusters" ]]; then
+        LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
+            --include "$CHIP_ROOT/src/app/clusters/**"
+        )
+    fi
+fi
+
 mkdir -p "$COVERAGE_ROOT"
 
-lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors inconsistent \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
-    --exclude=/usr/include/* \
-    --ignore-errors format,unsupported,inconsistent \
-    --output-file "$COVERAGE_ROOT/lcov_base.info"
+# Capture compile time coverage data
+lcov --capture --initial --directory "$OUTPUT_ROOT/obj/src" \
+    --ignore-errors "$LCOV_IGNORE_ERRORS" \
+    --output-file "$COVERAGE_ROOT/lcov_base.info" \
+    "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
+    "${QUIET_FLAG[@]}"
 
+# Capture runtime coverage data
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors format,unsupported,inconsistent \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
-    --exclude=/usr/include/* \
-    --output-file "$COVERAGE_ROOT/lcov_test.info"
+    --ignore-errors "$LCOV_IGNORE_ERRORS" \
+    --output-file "$COVERAGE_ROOT/lcov_test.info" \
+    "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
+    "${QUIET_FLAG[@]}"
 
-lcov --ignore-errors format,unsupported,inconsistent \
+# Combine them
+lcov --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
-    --output-file "$COVERAGE_ROOT/lcov_final.info"
+    --output-file "$COVERAGE_ROOT/lcov_final.info" \
+    "${QUIET_FLAG[@]}"
 
+# Generate HTML report
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
-    --ignore-errors inconsistent,category,count \
+    --ignore-errors inconsistent,inconsistent,category,count \
     --rc max_message_count=1000 \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
-    --header-title "Matter SDK Coverage Report"
+    --header-title "Matter SDK Coverage Report" \
+    --prefix "$CHIP_ROOT/src" \
+    "${QUIET_FLAG[@]}"
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
 
-HTML_INDEX=$(_normpath "$COVERAGE_ROOT/html/index.html")
+HTML_INDEX=$(_abspath "$COVERAGE_ROOT/html/index.html")
 if [ -f "$HTML_INDEX" ]; then
     echo
     echo "============================================================"
