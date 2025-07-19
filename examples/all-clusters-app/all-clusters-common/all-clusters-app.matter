@@ -7669,7 +7669,7 @@ endpoint 0 {
     emits event MissingTrustedTimeSource;
     callback attribute UTCTime;
     callback attribute granularity;
-    ram      attribute timeSource default = 0x00;
+    callback attribute timeSource;
     callback attribute trustedTimeSource;
     callback attribute defaultNTP;
     callback attribute timeZone;
