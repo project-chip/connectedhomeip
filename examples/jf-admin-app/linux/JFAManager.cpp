@@ -26,13 +26,18 @@
 #include <controller/CHIPCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <platform/KeyValueStoreManager.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Controller;
 using namespace chip::Crypto;
+using namespace chip::Credentials;
+using namespace chip::DeviceLayer::PersistedStorage;
 
 JFAManager JFAManager::sJFA;
+static constexpr const char kJCMICAC[] = "kJCMICAC";
 
 CHIP_ERROR JFAManager::Init(Server & server)
 {
@@ -44,7 +49,7 @@ CHIP_ERROR JFAManager::Init(Server & server)
 
 CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB, uint16_t endpointId)
 {
-    if (jfFabricIndex == kUndefinedFabricId)
+    if (jfFabricIndex == kUndefinedFabricIndex)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -70,24 +75,36 @@ JFARpc * JFAManager::GetJFARpc()
     return mJFARpc;
 }
 
-void JFAManager::HandleCommissioningCompleteEvent()
+void JFAManager::HandleCommissioningCompleteEvent(FabricIndex fabricIndex)
 {
-    for (const auto & fb : mServer->GetFabricTable())
+    auto & fabricTable            = Server::GetInstance().GetFabricTable();
+    const FabricInfo * fabricInfo = fabricTable.FindFabricWithIndex(fabricIndex);
+    CATValues cats;
+
+    if (jfFabricIndex == kUndefinedFabricIndex && fabricInfo)
     {
-        FabricIndex fabricIndex = fb.GetFabricIndex();
-        CATValues cats;
-
-        if ((jfFabricIndex == kUndefinedFabricIndex) && mServer->GetFabricTable().FetchCATs(fabricIndex, cats) == CHIP_NO_ERROR)
+        if (CHIP_NO_ERROR == fabricTable.FetchCATs(fabricIndex, cats) && cats.ContainsIdentifier(kAdminCATIdentifier) &&
+            cats.ContainsIdentifier(kAnchorCATIdentifier))
         {
-            /* When JFA is commissioned, it has to be issued a NOC with Anchor CAT and Administrator CAT */
-            if (cats.ContainsIdentifier(kAdminCATIdentifier) && cats.ContainsIdentifier(kAnchorCATIdentifier))
-            {
-                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
-
-                jfFabricIndex = fabricIndex;
-            }
+            (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
+            jfFabricIndex = fabricIndex;
+            jfFabricId    = fabricInfo->GetFabricId();
         }
     }
+    else if (pendingCrossSignedICAC)
+    {
+        KeyValueStoreMgr().Put(kJCMICAC, crossSignedICACChipCert.data(), crossSignedICACChipCert.size());
+        pendingCrossSignedICAC = false;
+
+        (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
+        jfFabricIndex = fabricIndex;
+        jfFabricId    = fabricInfo->GetFabricId();
+    }
+}
+
+void JFAManager::HandleFailsafeTimerExpired()
+{
+    pendingCrossSignedICAC = false;
 }
 
 void JFAManager::ReleaseSession()
@@ -223,7 +240,31 @@ void JFAManager::OnSendICACSRRequestResponse(void * context,
         jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
     {
         ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");
-        jfaManagerCore->SendCommissioningComplete();
+
+        ByteSpan icacCSR{ icaccsr.icaccsr.data(), icaccsr.icaccsr.size() };
+        uint8_t mRequestBytes[kMaxDERCertLength] = { 0 };
+        MutableByteSpan crossSignedICAC{ mRequestBytes, kMaxDERCertLength };
+
+        if (CHIP_NO_ERROR == jfaManagerCore->GetCrossSignedIcac(jfaManagerCore->jfFabricId, icacCSR, crossSignedICAC))
+        {
+            ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse, GetCrossSignedIcac, no error");
+            uint8_t chipCertBuf[kMaxCHIPCertLength];
+            MutableByteSpan chipCert{ chipCertBuf };
+
+            if (CHIP_NO_ERROR == ConvertX509CertToChipCert(ByteSpan{ crossSignedICAC.data(), crossSignedICAC.size() }, chipCert))
+            {
+                ByteSpan icac = ByteSpan{ chipCert.data(), chipCert.size() };
+                jfaManagerCore->SendAddICAC(icac);
+            }
+            else
+            {
+                ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse, ConvertX509CertToChipCert, error");
+            }
+        }
+        else
+        {
+            ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse, GetCrossSignedIcac, error");
+        }
     }
 }
 
@@ -234,6 +275,45 @@ void JFAManager::OnSendICACSRRequestFailure(void * context, CHIP_ERROR error)
     jfaManagerCore->ReleaseSession();
 
     ChipLogError(JointFabric, "OnSendICACSRRequestFailure: %s\n", chip::ErrorStr(error));
+}
+
+CHIP_ERROR JFAManager::SendAddICAC(ByteSpan & crossSignedICAC)
+{
+
+    JointFabricAdministrator::Commands::AddICAC::Type request;
+
+    request.ICACValue = crossSignedICAC;
+
+    if (!mExchangeMgr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
+    return cluster.InvokeCommand(request, this, OnSendAddICACResponse, OnSendAddICACFailure);
+}
+
+void JFAManager::OnSendAddICACResponse(
+    void * context, const chip::app::Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType & response)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+
+    ChipLogProgress(JointFabric, "OnSendAddICACResponse");
+
+    if (response.statusCode == chip::app::Clusters::JointFabricAdministrator::ICACResponseStatusEnum::kOk)
+    {
+        jfaManagerCore->SendCommissioningComplete();
+    }
+}
+
+void JFAManager::OnSendAddICACFailure(void * context, CHIP_ERROR error)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogError(JointFabric, "OnSendAddICACFailure: %s\n", chip::ErrorStr(error));
 }
 
 CHIP_ERROR JFAManager::SendCommissioningComplete()
@@ -287,6 +367,28 @@ CHIP_ERROR JFAManager::GetIcacCsr(MutableByteSpan & icacCsr)
     if (jfaRpc)
     {
         return jfaRpc->GetICACCSRForJF(icacCsr);
+    }
+
+    return CHIP_ERROR_UNINITIALIZED;
+}
+
+void JFAManager::OnAddICAC(MutableByteSpan & receivedCrossSignedICAC)
+{
+    ChipLogProgress(JointFabric, "OnAddICAC");
+
+    crossSignedICACChipCert = MutableByteSpan{ crossSignedICACChipCertBuf };
+    CopySpanToMutableSpan(ByteSpan{ receivedCrossSignedICAC.data(), receivedCrossSignedICAC.size() }, crossSignedICACChipCert);
+
+    pendingCrossSignedICAC = true;
+}
+
+CHIP_ERROR JFAManager::GetCrossSignedIcac(uint64_t anchorFabricId, ByteSpan & icacCSR, MutableByteSpan & crossSignedICAC)
+{
+    JFARpc * jfaRpc = GetJFARpc();
+
+    if (jfaRpc)
+    {
+        return jfaRpc->GetCrossSignedIcacForJF(anchorFabricId, icacCSR, crossSignedICAC);
     }
 
     return CHIP_ERROR_UNINITIALIZED;
