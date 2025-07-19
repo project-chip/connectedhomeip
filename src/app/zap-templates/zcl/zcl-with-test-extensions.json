@@ -799,12 +799,18 @@
             "ClusterRevision"
         ],
         "Unit Localization": ["TemperatureUnit"],
-        "Zone Management": ["TwoDCartesianMax"],
         "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
         "Thermostat": [
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason"
+        ],
+        "Zone Management": [
+            "MaxUserDefinedZones",
+            "MaxZones",
+            "SensitivityMax",
+            "Sensitivity",
+            "TwoDCartesianMax"
         ]
     },
     "mandatoryDeviceTypes": "0x0016",
