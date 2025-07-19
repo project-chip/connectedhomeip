@@ -261,26 +261,26 @@ class TC_JCM_1_2(MatterBaseTest):
                 )
             except Exception as e:
                 asserts.assert_true(False, f'Exception {e} occured during OJCW')
-    
+
             self.step("2")
             _nodeID = 15
             self.fabric_a_ctrl.send(
                 message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
                 expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
                 timeout=10)
-    
+
             self.step("3")
             # Read JF-Admin NOC on Ecoystem B using jfc-app@EcoB
             response = await devCtrlEcoB.ReadAttribute(
                 nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
                 returnClusterObject=True)
-    
+
             fabricIndex2_noc = None
             for _nocs in response[0][Clusters.OperationalCredentials].NOCs:
                 if _nocs.fabricIndex == 2:
                     fabricIndex2_noc = _nocs.noc
             asserts.assert_is_not_none(fabricIndex2_noc, "No NOC on fabric index 2 found!")
-    
+
             # Search Administrator CAT (FFFF0001) in JF-Admin NOC on Ecosystem B
             noc_tlv_data = chip.tlv.TLVReader(fabricIndex2_noc).get()
             _admin_cat_found = False
@@ -289,7 +289,7 @@ class TC_JCM_1_2(MatterBaseTest):
                     _admin_cat_found = True
                     break
             asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
-    
+
             response = await devCtrlEcoA.ReadAttribute(
                 nodeid=15, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
                 returnClusterObject=True)
