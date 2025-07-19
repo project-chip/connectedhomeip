@@ -309,6 +309,11 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     VerifyOrDie(!IsAwaitingReportResponse()); // Should not be reportable!
     if (IsPriming() || IsChunkedReport())
     {
+        // It might occur that the session on which Subscribe Request was received is replaced with
+        // a new one before all priming reports have been sent. When this happens, the read handler
+        // is switched to the new session but the exchange context is not, as it uses the
+        // kStayAtOldSession policy. Hence, we need to check the session handle before use.
+        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_INCORRECT_STATE);
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
