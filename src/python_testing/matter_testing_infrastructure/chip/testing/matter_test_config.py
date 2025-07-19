@@ -61,9 +61,9 @@ class MatterTestConfig:
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[str] = None
+    thread_operational_dataset: Optional[bytes] = None
 
-    pics: dict[bool, str] = field(default_factory=dict)
+    pics: dict[str, bool] = field(default_factory=dict)
 
     # Node ID for basic DUT
     dut_node_ids: List[int] = field(default_factory=list)
