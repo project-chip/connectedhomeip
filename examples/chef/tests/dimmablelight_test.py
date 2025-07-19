@@ -60,7 +60,7 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
     def steps_TC_DIMMABLELIGHT_PW_RPC(self):
         return [TestStep(1, "[TC_DIMMABLELIGHT_PW_RPC] Create Pw RPC socket connection."),
                 TestStep(2, "[TC_DIMMABLELIGHT_PW_RPC] Test onoff."),
-                TestStep(3, "[TC_DIMMABLELIGHT_PW_RPC] Test level control."),]
+                TestStep(3, "[TC_DIMMABLELIGHT_PW_RPC] Test level control."), ]
 
     @async_test_body
     async def test_TC_DIMMABLELIGHT(self):
