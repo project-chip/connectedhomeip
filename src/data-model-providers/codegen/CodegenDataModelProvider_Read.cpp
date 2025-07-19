@@ -56,7 +56,7 @@ using Protocols::InteractionModel::Status;
 ///
 /// If it returns std::nullopt, then there is no AAI to handle the given path
 /// and processing should figure out the value otherwise (generally from other ember data)
-std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath & path, AttributeAccessInterface * aai,
+std::optional<CHIP_ERROR> TryReadViaAccessInterface(const DataModel::ReadAttributeRequest & request, AttributeAccessInterface * aai,
                                                     AttributeValueEncoder & encoder)
 {
     // Processing can happen only if an attribute access interface actually exists..
@@ -65,12 +65,12 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
         return std::nullopt;
     }
 
-    CHIP_ERROR err = aai->Read(path, encoder);
+    CHIP_ERROR err = aai->Read(request, encoder);
 
     if (err != CHIP_NO_ERROR)
     {
         // Implementation of 8.4.3.2 of the spec for path expansion
-        if (path.mExpanded && (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead)))
+        if (request.path.mExpanded && (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead)))
         {
             return CHIP_NO_ERROR;
         }
@@ -115,7 +115,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
 
     // Read via AAI
     std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
-        request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
+        request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
     VerifyOrReturnError(!aai_result.has_value(), *aai_result);
 
     // At this point, we have to use ember directly to read the data.
