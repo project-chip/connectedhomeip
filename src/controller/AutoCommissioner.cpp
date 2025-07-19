@@ -479,7 +479,17 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kCleanup;
         }
         return CommissioningStage::kEvictPreviousCaseSessions;
-    case CommissioningStage::kEvictPreviousCaseSessions:
+    case CommissioningStage::kEvictPreviousCaseSessions: {
+        if (mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
+        {
+            return CommissioningStage::kWaitForDeviceInstallation;
+        }
+        else
+        {
+            return CommissioningStage::kFindOperationalForStayActive;
+        }
+    }
+    case CommissioningStage::kWaitForDeviceInstallation:
         return CommissioningStage::kFindOperationalForStayActive;
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
         if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)

@@ -126,6 +126,9 @@ const char * StageToString(CommissioningStage stage)
     case kEvictPreviousCaseSessions:
         return "kEvictPreviousCaseSessions";
 
+    case kWaitForDeviceInstallation:
+        return "kWaitForDeviceInstallation";
+
     case kFindOperationalForStayActive:
         return "kFindOperationalForStayActive";
 
@@ -249,6 +252,9 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
 
     case kEvictPreviousCaseSessions:
         return "core_commissioning_stage_evict_previous_case_sessions";
+
+    case kWaitForDeviceInstallation:
+        return "core_commissioning_stage_wait_for_device_installation";
 
     case kFindOperationalForStayActive:
         return "core_commissioning_stage_find_operational_for_stay_active";
