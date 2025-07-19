@@ -20,6 +20,21 @@ source_set("windows") {
   sources = [ "window.h" ]
 }
 
+static_library("connectivity") {
+  sources = [
+    "connectivity.cpp",
+    "connectivity.h",
+  ]
+
+  deps = [
+    ":windows",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 static_library("qrcode") {
   sources = [
     "qrcode.cpp",
