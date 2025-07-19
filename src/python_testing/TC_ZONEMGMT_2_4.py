@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
@@ -68,6 +69,15 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
             TestStep("3", "Trigger the DUT to generate ZoneTriggered event",
                      "Verify that the TH receives the ZoneTriggered event and the ZoneID matches one created in step 2",
                      "Verify that the reason is 0(Motion) and the event has priority set as INFO"),
+            TestStep("3a", "Prevent DUT from detecting motion for period > InitialDuration"),
+            TestStep("3b", "DUT sends the ZoneStopped event",
+                     "Verify that the TH receives the ZoneStopped event and the ZoneID matches one created in step 2",
+                     "Verify that the reason is 0(ActionStopped)"),
+            TestStep("4", "Repeat step 3"),
+            TestStep("4a", "Make the DUT keep detecting motion for a period > MaxDuration"),
+            TestStep("4b", "DUT sends the ZoneStopped event",
+                     "Verify that the TH receives the ZoneStopped event and the ZoneID matches one created in step 2",
+                     "Verify that the reason is 1(Timeout)"),
             TestStep("5", "TH sends CreateOrUpdateTrigger command with a ZoneID that does not exist in the Zones attribute",
                      "Verify that the DUT responds with a NotFound status code."),
             TestStep("6", "If DUT supports TwoDCartesianZone and User defined zones, TH sends CreateTwoDCartesianZone command with",
@@ -169,9 +179,14 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
             (t for t in triggersBeforeCreate if t.zoneID == zoneID1), None)
         asserts.assert_is_none(matchingTrigger, "fTrigger with {zoneID1} already existed in Triggers")
 
+        # Define the parameters of the trigger
+        initDuration = 4
+        augDuration = 2
+        maxDuration = 8
+        blindDuration = 2
         # Create a ZoneTrigger command with a valid ZoneTriggerControlStruct
         zoneTrigger = cluster.Structs.ZoneTriggerControlStruct(
-            zoneID=zoneID1, initialDuration=10, augmentationDuration=2, maxDuration=50, blindDuration=5)
+            zoneID=zoneID1, initialDuration=initDuration, augmentationDuration=augDuration, maxDuration=maxDuration, blindDuration=blindDuration)
         try:
             logger.info(f"Create/Update Trigger with ID = {zoneID1}")
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.CreateOrUpdateTrigger(trigger=zoneTrigger))
@@ -203,13 +218,13 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         matchingTrigger = next(
             (t for t in triggers if t.zoneID == zoneID1), None)
         asserts.assert_is_not_none(matchingTrigger, "fTrigger with {zoneID1} not found")
-        asserts.assert_equal(matchingTrigger.initialDuration, 10,
+        asserts.assert_equal(matchingTrigger.initialDuration, initDuration,
                              "InitialDuration of created Trigger does not match")
-        asserts.assert_equal(matchingTrigger.augmentationDuration, 2,
+        asserts.assert_equal(matchingTrigger.augmentationDuration, augDuration,
                              "AugmentationDuration of created Trigger does not match")
-        asserts.assert_equal(matchingTrigger.maxDuration, 50,
+        asserts.assert_equal(matchingTrigger.maxDuration, maxDuration,
                              "MaxDuration of created Trigger does not match")
-        asserts.assert_equal(matchingTrigger.blindDuration, 5,
+        asserts.assert_equal(matchingTrigger.blindDuration, blindDuration,
                              "BlindDuration of created Trigger does not match")
 
         self.step("3")
@@ -218,17 +233,57 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         dev_ctrl = self.default_controller
         event_listener = EventChangeCallback(cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
-        event_delay_seconds = 10.0
+        event_delay_seconds = 5.0
         # TODO: Check for self.is_ci
         # CI call to trigger zone event.
         self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
         event = event_listener.wait_for_event_report(
             cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
+        asserts.assert_equal(type(event), cluster.Events.ZoneTriggered,
+                             "Incorrect event type")
         asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
-        asserts.assert_equal(event.reason, enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected zoneID on ZoneTriggered")
+        asserts.assert_equal(event.reason, enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected reason on ZoneTriggered")
 
         self.step("3a")
-        # TODO: Event-based tests 3-4
+        # Wait for a duration exceeding the initial duration without triggering
+        # any more events
+        event_delay_seconds = initDuration + 1
+        self.step("3b")
+        event = event_listener.wait_for_event_report(
+            cluster.Events.ZoneStopped, timeout_sec=event_delay_seconds)
+        asserts.assert_equal(type(event), cluster.Events.ZoneStopped,
+                             "Incorrect event type")
+        asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
+        asserts.assert_equal(event.reason, enums.ZoneEventStoppedReasonEnum.kActionStopped, "Unexpected reason on ZoneStopped")
+
+        self.step("4")
+        # Repeat Step 3
+        self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+        event = event_listener.wait_for_event_report(
+            cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
+        asserts.assert_equal(type(event), cluster.Events.ZoneTriggered,
+                             "Incorrect event type")
+        asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
+        asserts.assert_equal(event.reason, enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected reason on ZoneTriggered")
+
+        self.step("4a")
+        # Make the DUT keep detecting motion for period exceeding MaxDuration
+        # time
+        # Generate some activity triggers to facilitate advancing of triggerdetectedDuration
+        # beyond maxduration
+        for i in range(maxDuration):
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+            time.sleep(1)
+
+        event_delay_seconds = maxDuration
+        event = event_listener.wait_for_event_report(
+            cluster.Events.ZoneStopped, timeout_sec=event_delay_seconds)
+
+        self.step("4b")
+        asserts.assert_equal(type(event), cluster.Events.ZoneStopped,
+                             "Incorrect event type")
+        asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
+        asserts.assert_equal(event.reason, enums.ZoneEventStoppedReasonEnum.kTimeout, "Unexpected reason on ZoneStopped")
 
         self.step("5")
 

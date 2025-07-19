@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <zone-manager.h>
 
 using namespace chip;
@@ -130,7 +131,7 @@ CHIP_ERROR ZoneManager::LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTr
 
 CHIP_ERROR ZoneManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogError(Camera, "Persistent attributes loaded");
+    ChipLogProgress(Camera, "Persistent attributes loaded");
 
     return CHIP_NO_ERROR;
 }
@@ -150,11 +151,103 @@ void ZoneManager::OnAttributeChanged(AttributeId attributeId)
     }
 }
 
+void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void * appState)
+{
+    ZoneManager * zoneManager = reinterpret_cast<ZoneManager *>(appState);
+    VerifyOrReturn(zoneManager != nullptr, ChipLogError(Camera, "OnZoneTriggerTimeout: context is null"));
+
+    for (auto trigCtxtIter = zoneManager->mTriggerContexts.begin(); trigCtxtIter != zoneManager->mTriggerContexts.end();)
+    {
+        // Advance time since initial trigger by the timer timeout period
+        trigCtxtIter->timeSinceInitialTrigger += kTimerPeriod;
+
+        // ChipLogProgress(Camera, "Time since initial trigger = %u, triggerDetectedDuration = %u",
+        // trigCtxtIter->timeSinceInitialTrigger, trigCtxtIter->triggerDetectedDuration);
+        if (trigCtxtIter->timeSinceInitialTrigger > trigCtxtIter->triggerDetectedDuration)
+        {
+            // Emit ZoneStopped with reason ActionStopped
+            ChipLogProgress(Camera, "Generating ZoneStopped event for ZoneId = %u with reason:kActionStopped",
+                            trigCtxtIter->triggerCtrl.zoneID);
+            zoneManager->GetZoneMgmtServer()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
+                                                                       ZoneEventStoppedReasonEnum::kActionStopped);
+            trigCtxtIter->triggerState = TriggerState::InBlindDuration;
+            trigCtxtIter               = zoneManager->mTriggerContexts.erase(trigCtxtIter);
+        }
+        else if (trigCtxtIter->timeSinceInitialTrigger > trigCtxtIter->triggerCtrl.maxDuration)
+        {
+            // Emit ZoneStopped with reason Timeout
+            ChipLogProgress(Camera, "Generating ZoneStopped event for ZoneId = %u with reason:kTimeout",
+                            trigCtxtIter->triggerCtrl.zoneID);
+            zoneManager->GetZoneMgmtServer()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
+                                                                       ZoneEventStoppedReasonEnum::kTimeout);
+            trigCtxtIter->triggerState = TriggerState::InBlindDuration;
+            trigCtxtIter               = zoneManager->mTriggerContexts.erase(trigCtxtIter);
+        }
+        else
+        {
+            trigCtxtIter++;
+        }
+    }
+    if (!zoneManager->mTriggerContexts.empty())
+    {
+        // Start the timer again if there are active triggers
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout, zoneManager);
+    }
+}
+
 void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
                                        chip::app::Clusters::ZoneManagement::ZoneEventTriggeredReasonEnum triggerReason)
 {
-    ChipLogProgress(Camera, "Generating ZoneTriggered event for ZoneId = %u", zoneId);
-    GetZoneMgmtServer()->GenerateZoneTriggeredEvent(zoneId, triggerReason);
+    // Ensure that a trigger exists for the zoneId
+    auto trigger = GetZoneMgmtServer()->GetTriggerForZone(zoneId);
+    VerifyOrReturn(trigger.HasValue(), ChipLogError(Camera, "Trigger not found for ZoneId"));
+
+    ChipLogProgress(Camera, "Zone activity detected for ZoneId = %u", zoneId);
+    auto foundTrigCtxt = std::find_if(mTriggerContexts.begin(), mTriggerContexts.end(),
+                                      [&](const ZoneTriggerContext & trigCtxt) { return trigCtxt.triggerCtrl.zoneID == zoneId; });
+
+    // If an item with the zoneID was not found, then this is the first trigger
+    if (foundTrigCtxt == mTriggerContexts.end())
+    {
+        // Generate the event for the initial trigger
+        ChipLogProgress(Camera, "Generating ZoneTriggered event for ZoneId = %u", zoneId);
+        GetZoneMgmtServer()->GenerateZoneTriggeredEvent(zoneId, triggerReason);
+
+        ZoneTriggerContext trigCtxt;
+        trigCtxt.triggerState = TriggerState::Triggered;
+        // Set the TriggerDetectedDuration = InitialDuration
+        trigCtxt.triggerDetectedDuration     = trigger.Value().initialDuration;
+        trigCtxt.prevTriggerDetectedDuration = trigCtxt.triggerDetectedDuration;
+        trigCtxt.triggerCtrl                 = trigger.Value();
+        trigCtxt.triggerCount                = 1;
+        mTriggerContexts.push_back(trigCtxt);
+
+        // Schedule the periodic timer
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout, this);
+    }
+    else
+    {
+        // Zone has already been triggered at least once.
+        foundTrigCtxt->triggerCount++;
+        // Spec logic for advancing triggerDetectedDuration
+        if (foundTrigCtxt->triggerCount <= 2 || foundTrigCtxt->timeSinceInitialTrigger > foundTrigCtxt->prevTriggerDetectedDuration)
+        {
+            ChipLogProgress(Camera, "Trigger detected: Advancing TriggerDetectedDuration for ZoneId = %u, count = %u", zoneId,
+                            foundTrigCtxt->triggerCount);
+            // First increase of triggerDetectedDuration or
+            // timeSinceInitialTrigger is greater than previous
+            // triggerDetectedDuration; Advance the triggerDetectedDuration
+            foundTrigCtxt->prevTriggerDetectedDuration = foundTrigCtxt->triggerDetectedDuration;
+            foundTrigCtxt->triggerDetectedDuration += foundTrigCtxt->triggerCtrl.augmentationDuration;
+            ChipLogProgress(Camera, "prev = %u, current = %u", foundTrigCtxt->prevTriggerDetectedDuration,
+                            foundTrigCtxt->triggerDetectedDuration);
+        }
+        else
+        {
+            ChipLogProgress(Camera, "Trigger detected for ZoneId = %u, but ignored. Count = %u", zoneId,
+                            foundTrigCtxt->triggerCount);
+        }
+    }
 }
 
 void ZoneManager::OnZoneStoppedEvent(uint16_t zoneId, chip::app::Clusters::ZoneManagement::ZoneEventStoppedReasonEnum stopReason)
