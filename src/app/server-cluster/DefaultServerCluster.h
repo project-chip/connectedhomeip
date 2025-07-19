@@ -109,6 +109,35 @@ protected:
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
 
+    /// Marks that a specific attribute has changed value, if `status` is succes.
+    ///
+    /// Will return `status`
+    DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status)
+    {
+        if (status.IsSuccess())
+        {
+            NotifyAttributeChanged(attributeId);
+        }
+        return status;
+    }
+
+    struct OptionalAttributeEntry
+    {
+        bool enabled;                               // is this optional attribute enabled?
+        const DataModel::AttributeEntry & metadata; // Metadata for the attribute
+    };
+
+    /// Appends the given attributes to the builder.
+    ///
+    /// It is very common to have a set of mandatory and a set of optional attributes for a
+    /// cluster. This method allows for a single call to setup all of the given attributes in `builder`:
+    ///   - mandatoryAttributes
+    ///   - optionalAttributes IF AND ONLY IF they are enabled
+    ///   - all of `GlobalAttributes()`
+    CHIP_ERROR AppendAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
+                                Span<const DataModel::AttributeEntry> mandatoryAttributes,
+                                std::initializer_list<const OptionalAttributeEntry> optionalAttributes);
+
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec
 };
