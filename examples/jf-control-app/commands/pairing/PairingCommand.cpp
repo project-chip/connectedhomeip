@@ -67,7 +67,7 @@ CHIP_ERROR PairingCommand::RunCommand()
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
 
-    /* TODO: if JFA is onboarded get the administrator CAT initial version from JF_DS@GroupList (through RPC)    
+    /* TODO: if JFA is onboarded get the administrator CAT initial version from JF_DS@GroupList (through RPC)
      * https://github.com/project-chip/connectedhomeip/issues/39443
      */
     chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
