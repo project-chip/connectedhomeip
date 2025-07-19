@@ -45,6 +45,12 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SU_4_1(MatterBaseTest):
+    """
+
+    """
+    cluster_otap = Clusters.OtaSoftwareUpdateProvider
+    cluster_otar = Clusters.OtaSoftwareUpdateRequestor
+
     def desc_TC_SU_4_1(self) -> str:
         return "[TC-SU-4.1] Verifying Cluster Attributes on OTA-R(DUT)"
 
@@ -58,8 +64,8 @@ class TC_SU_4_1(MatterBaseTest):
     def steps_TC_SU_4_1(self) -> list[TestStep]:
         steps = [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
-            TestStep(1, """TH sends a write request for the DefaultOTAProviders Attribute on the first fabric to the DUT. 
-                     TH2 is set as the default Provider for the fabric."""),
+            TestStep(1, "TH sends a write request for the DefaultOTAProviders Attribute on the first fabric to the DUT. TH2 is set as the default Provider for the fabric.",
+                     "Verify that the write operation for the attribute works and DUT does not respond with any errors."),
             # TestStep(2, "TH..."),
             # TestStep(3, "TH..."),
             # TestStep(4, "TH..."),
@@ -73,13 +79,26 @@ class TC_SU_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SU_4_1(self):
-        cluster_otap = Clusters.OtaSoftwareUpdateProvider
-        cluster_otar = Clusters.OtaSoftwareUpdateRequestor
 
         self.step(0)
 
-    # Read the Steps
+        # Read the Steps
         self.step(1)
+
+        provider = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=1,  # TH2 = node ID 1
+            endpoint=0,
+            fabricIndex=1
+        )
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider])
+
+        resp = await self.write_single_attribute(
+            attribute_value=attr,
+            endpoint_id=0)
+
+        logger.info(f'Step #1: Write DefaultOTAProviders({resp})')
+        # asserts.assert_equal(resp,, "Failed to write DefaultOTAProviders attribute")
+
 
         # self.step(2)
         # self.step(3)
