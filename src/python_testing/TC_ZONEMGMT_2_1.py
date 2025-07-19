@@ -163,8 +163,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.VideoSensorParams
             )
             logger.info(f"Rx'd VideoSensorParams: {videoSensorParams}")
-            asserts.assert_true(twoDCartesianMax.x < videoSensorParams.sensorWidth and twoDCartesianMax.y <
-                                videoSensorParams.sensorHeight, "TwoDCartesianMax should be within the VideoSensorParams dimensions")
+            asserts.assert_true(twoDCartesianMax.x == videoSensorParams.sensorWidth -1 and twoDCartesianMax.y  == videoSensorParams.sensorHeight - 1, "TwoDCartesianMax should be within the VideoSensorParams dimensions")
         else:
             logging.info("TWoDCart Feature not supported. Test steps skipped")
             self.skip_step(8)

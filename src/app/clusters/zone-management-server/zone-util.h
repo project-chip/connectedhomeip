@@ -86,8 +86,8 @@ public:
 private:
     // Helper function: Check if point q lies on segment pr (assuming p, q, r are collinear)
     // Checks if q is within the bounding box defined by p and r.
-    // Ensures that the coordinates of q are greater than the min and lesser
-    // than the max of p and r.
+    // Returns true if the coordinates of q are greater than the min and smaller
+    // than the max of the corresponding coordinates of p and r.
     static bool OnSegment(const TwoDCartesianVertexStruct & p, const TwoDCartesianVertexStruct & q,
                           const TwoDCartesianVertexStruct & r)
     {
@@ -95,14 +95,14 @@ private:
     }
 
     // Helper function: Determine the orientation of the ordered triplet (p, q, r) of vertices.
-    // Employ the cross-product computation(Determinant of the coordinate matrix) of
+    // Employ the cross-product computation (determinant of the coordinate matrix) of
     // vectors pq and pr to find the direction of the Z axis.
-    // The sign of the Determinant is used to infer the direction of cross-product vector
+    // The sign of the determinant is used to infer the direction of the cross-product vector
     // and hence the orientation of the 3 coordinates. A value of 0 indicates that the points
     // are collinear.
     // Using the right-hand rule Z > 0 means pointing upward from the 2D
-    // plane(counter-clockwise rotation) and Z < 0 means pointing downward into
-    // the 2D plane(clock-wise rotation).
+    // plane (counter-clockwise rotation) and Z < 0 means pointing downward into
+    // the 2D plane (clock-wise rotation).
     // 0 --> p, q and r are collinear
     // 1 --> Counterclockwise
     // 2 --> Clockwise
@@ -116,14 +116,14 @@ private:
             return OrientationEnum::kCollinear;
         }
 
-        return (val > 0) ? OrientationEnum::kCounterClockwise : OrientationEnum::kClockwise; // Counterclockwise or Clockwise
+        return (val > 0) ? OrientationEnum::kCounterClockwise : OrientationEnum::kClockwise;
     }
 
     // Helper function: Check if segment p1q1 intersects segment p2q2
     static bool DoSegmentsIntersect(const TwoDCartesianVertexStruct & p1, const TwoDCartesianVertexStruct & q1,
                                     const TwoDCartesianVertexStruct & p2, const TwoDCartesianVertexStruct & q2)
     {
-        // Segment 1(p1q1) and first vertex of Segment 2(p2)
+        // Segment 1 (p1q1) and first vertex of Segment 2 (p2)
         OrientationEnum o1 = CrossProduct(p1, q1, p2);
         // Segment 1(p1q1) and second vertex of Segment 2(q2)
         OrientationEnum o2 = CrossProduct(p1, q1, q2);
