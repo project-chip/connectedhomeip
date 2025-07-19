@@ -47,15 +47,17 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
             endpoint=self._DIMMABLELIGHT_ENDPOINT, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
 
     def _read_on_off_pwrpc(self, device):
-        return device.rpcs.chip.rpc.Attributes.Read(
+        result = device.rpcs.chip.rpc.Attributes.Read(
             endpoint=self._DIMMABLELIGHT_ENDPOINT,
             cluster=Clusters.Objects.OnOff.id,
             attribute_id=Clusters.Objects.OnOff.Attributes.OnOff.attribute_id,
             type=attributes_service_pb2.AttributeType.ZCL_BOOLEAN_ATTRIBUTE_TYPE
-        ).data
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+        return result.response.data_bool
 
     def _write_on_off_pwrpc(self, device, onOff: bool):
-        return device.rpcs.chip.rpc.Attributes.Write(
+        result = device.rpcs.chip.rpc.Attributes.Write(
             data=attributes_service_pb2.AttributeData(data_bool=onOff),
             metadata=attributes_service_pb2.AttributeMetadata(
                 endpoint=self._DIMMABLELIGHT_ENDPOINT,
@@ -64,18 +66,21 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
                 type=attributes_service_pb2.AttributeType.ZCL_BOOLEAN_ATTRIBUTE_TYPE
             )
         )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
 
     def _read_current_level_pwrpc(self, device):
-        return device.rpcs.chip.rpc.Attributes.Read(
+        result = device.rpcs.chip.rpc.Attributes.Read(
             endpoint=self._DIMMABLELIGHT_ENDPOINT,
             cluster=Clusters.Objects.LevelControl.id,
             attribute_id=Clusters.Objects.LevelControl.Attributes.CurrentLevel.attribute_id,
             type=attributes_service_pb2.AttributeType.ZCL_INT8U_ATTRIBUTE_TYPE
-        ).data
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+        return result.response.data_uint8
 
     def _write_current_level_pwrpc(self, device, level: int):
-        return device.rpcs.chip.rpc.Attributes.Write(
-            data=attributes_service_pb2.AttributeData(data_bool=level),
+        result = device.rpcs.chip.rpc.Attributes.Write(
+            data=attributes_service_pb2.AttributeData(data_uint8=level),
             metadata=attributes_service_pb2.AttributeMetadata(
                 endpoint=self._DIMMABLELIGHT_ENDPOINT,
                 cluster=Clusters.Objects.LevelControl.id,
@@ -83,6 +88,7 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
                 type=attributes_service_pb2.AttributeType.ZCL_INT8U_ATTRIBUTE_TYPE
             )
         )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
 
     def desc_TC_DIMMABLELIGHT(self) -> str:
         return "[TC_DIMMABLELIGHT] chef dimmablelight functionality test."
