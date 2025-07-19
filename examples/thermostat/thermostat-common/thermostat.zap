@@ -5162,6 +5162,22 @@
               "reportableChange": 0
             },
             {
+              "name": "ThermostatRunningMode",
+              "code": 30,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ThermostatRunningModeEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "PresetTypes",
               "code": 72,
               "mfgCode": null,
@@ -5363,7 +5379,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x123",
+              "defaultValue": "0x323",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

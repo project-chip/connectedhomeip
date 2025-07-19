@@ -2941,6 +2941,7 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     persist  attribute systemMode default = 0x01;
+    ram      attribute thermostatRunningMode default = 0;
     callback attribute presetTypes;
     ram      attribute numberOfPresets default = 0;
     ram      attribute activePresetHandle;
@@ -2953,7 +2954,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x123;
+    ram      attribute featureMap default = 0x323;
     ram      attribute clusterRevision default = 8;
 
     handle command SetpointRaiseLower;
