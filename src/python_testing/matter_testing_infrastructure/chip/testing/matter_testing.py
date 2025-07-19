@@ -862,6 +862,37 @@ class MatterBaseTest(base_test.BaseTestClass):
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = await global_wildcard
 
+    async def cluster_guard(self, endpoint: int, cluster: ClusterObjects.Cluster, skip_step: bool = True):
+        """Similar to attribute_guard. While the `skip_step` argument is set to True (default), and after
+           checking a condition it returns False, it marks the test step as skipped; if it returns True,
+           the test step is executed.
+           If the `skip_step` argument is set to False, no test step is skipped, and the function will
+           return True or False depending on the condition.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if await self.cluster_guard(condition1_needs_to_be_true_to_execute):
+                  # executes step 1
+
+              self.step("2")
+              if await self.cluster_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2
+
+              self.step("3")
+              if await self.cluster_guard(Clusters.FanControl, skip_step=False):
+                  # handle logic if True
+
+              self.step("4")
+              if await self.cluster_guard(Clusters.DoorLock, skip_step=False):
+                  # handle logic if False
+           """
+        await self._populate_wildcard()
+        cluster_condition = _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster)
+        if not cluster_condition:
+            if skip_step:
+                self.mark_current_step_skipped()
+        return cluster_condition
+
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
@@ -1611,6 +1642,7 @@ _get_all_matching_endpoints = decorators._get_all_matching_endpoints
 _has_feature = decorators._has_feature
 _has_command = decorators._has_command
 _has_attribute = decorators._has_attribute
+_has_cluster = decorators._has_cluster
 
 default_matter_test_main = runner.default_matter_test_main
 get_test_info = runner.get_test_info
