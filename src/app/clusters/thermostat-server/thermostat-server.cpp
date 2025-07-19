@@ -526,6 +526,19 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
+void GenerateSetpointEvent(chip::EndpointId endpoint, SystemModeEnum systemMode, Optional<BitMask<OccupancyBitmap>> occupancy,
+                           SetpointGetter getter)
+{
+    int16_t setpoint;
+    auto status = getter(endpoint, &setpoint);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "GenerateSetpointEvent failed to queue event: could not get set point");
+        return;
+    }
+    GenerateSetpointChangeEvent(endpoint, systemMode, occupancy, NullOptional, setpoint);
+}
+
 CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Thermostat::Id);
@@ -756,20 +769,7 @@ void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, Fabr
     }
 }
 
-void GenerateSetpointEvent(const ConcreteAttributePath & attributePath, SystemModeEnum systemMode,
-                       Optional<BitMask<OccupancyBitmap>> occupancy, SetpointGetter getter)
-{
-    int16_t setpoint;
-    auto status = getter(attributePath.mEndpointId, &setpoint);
-    if (status != Status::Success)
-    {
-        ChipLogError(Zcl, "EmitSetpointChangeEvent failed to queue event: could not get set point");
-        return;
-    }
-    EmitSetpointChangeEvent(attributePath.mEndpointId, systemMode, occupancy, NullOptional, setpoint);
-}
-
-void EmitEvents(const ConcreteAttributePath & attributePath)
+void ThermostatAttrAccess::GenerateEvents(const ConcreteAttributePath & attributePath)
 {
     switch (attributePath.mAttributeId)
     {
@@ -781,26 +781,27 @@ void EmitEvents(const ConcreteAttributePath & attributePath)
         }
         else
         {
-            EmitSystemModeChangeEvent(attributePath.mEndpointId, NullOptional, systemMode);
+            GenerateSystemModeChangeEvent(attributePath.mEndpointId, NullOptional, systemMode);
         }
         break;
     }
     case OccupiedHeatingSetpoint::Id:
-        EmitSetpointEvent(attributePath, SystemModeEnum::kHeat,
-                          MakeOptional(OccupancyBitmap::kOccupied), OccupiedHeatingSetpoint::Get);
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kHeat, MakeOptional(OccupancyBitmap::kOccupied),
+                              OccupiedHeatingSetpoint::Get);
         break;
     case OccupiedCoolingSetpoint::Id:
-        EmitSetpointEvent(attributePath, SystemModeEnum::kCool,
-                          chip::Optional<chip::BitMask<OccupancyBitmap>>(OccupancyBitmap::kOccupied), OccupiedCoolingSetpoint::Get);
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool,
+                              chip::Optional<chip::BitMask<OccupancyBitmap>>(OccupancyBitmap::kOccupied),
+                              OccupiedCoolingSetpoint::Get);
         break;
     case UnoccupiedHeatingSetpoint::Id:
-        EmitSetpointEvent(attributePath, SystemModeEnum::kHeat, chip::Optional<chip::BitMask<OccupancyBitmap>>(0),
-                          UnoccupiedHeatingSetpoint::Get);
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kHeat, chip::Optional<chip::BitMask<OccupancyBitmap>>(0),
+                              UnoccupiedHeatingSetpoint::Get);
 
         break;
     case UnoccupiedCoolingSetpoint::Id:
-        EmitSetpointEvent(attributePath, SystemModeEnum::kCool, chip::Optional<chip::BitMask<OccupancyBitmap>>(0),
-                          UnoccupiedCoolingSetpoint::Get);
+        GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool, chip::Optional<chip::BitMask<OccupancyBitmap>>(0),
+                              UnoccupiedCoolingSetpoint::Get);
 
         break;
     case LocalTemperature::Id: {
@@ -811,7 +812,7 @@ void EmitEvents(const ConcreteAttributePath & attributePath)
         }
         else
         {
-            EmitLocalTemperatureChangeEvent(attributePath.mEndpointId, local_temperature);
+            GenerateLocalTemperatureChangeEvent(attributePath.mEndpointId, local_temperature);
         }
         break;
     }
@@ -823,7 +824,7 @@ void EmitEvents(const ConcreteAttributePath & attributePath)
         }
         else
         {
-            EmitOccupancyChangeEvent(attributePath.mEndpointId, chip::Optional<chip::BitMask<OccupancyBitmap>>(), occupancy);
+            GenerateOccupancyChangeEvent(attributePath.mEndpointId, chip::Optional<chip::BitMask<OccupancyBitmap>>(), occupancy);
         }
         break;
     }
@@ -835,8 +836,8 @@ void EmitEvents(const ConcreteAttributePath & attributePath)
         }
         else
         {
-            EmitRunningStateChangeEvent(attributePath.mEndpointId, chip::Optional<chip::BitMask<RelayStateBitmap>>(),
-                                        running_state);
+            GenerateRunningStateChangeEvent(attributePath.mEndpointId, chip::Optional<chip::BitMask<RelayStateBitmap>>(),
+                                            running_state);
         }
         break;
     }
@@ -848,7 +849,7 @@ void EmitEvents(const ConcreteAttributePath & attributePath)
         }
         else
         {
-            EmitRunningModeChangeEvent(attributePath.mEndpointId, Optional<ThermostatRunningModeEnum>(), running_mode);
+            GenerateRunningModeChangeEvent(attributePath.mEndpointId, Optional<ThermostatRunningModeEnum>(), running_mode);
         }
         break;
     }
@@ -892,7 +893,7 @@ void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttribu
     }
     if (featureMap.Has(Feature::kEvents))
     {
-        EmitEvents(attributePath);
+        gThermostatAttrAccess.GenerateEvents(attributePath);
     }
     if (clearActivePreset)
     {
@@ -1265,13 +1266,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {

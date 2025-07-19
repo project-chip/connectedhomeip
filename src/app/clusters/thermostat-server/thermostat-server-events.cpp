@@ -25,7 +25,13 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
-void GenerateSystemModeChangeEvent(EndpointId endpoint, Optional<SystemModeEnum> previousSystemMode, SystemModeEnum currentSystemMode)
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
+void GenerateSystemModeChangeEvent(EndpointId endpoint, Optional<SystemModeEnum> previousSystemMode,
+                                   SystemModeEnum currentSystemMode)
 {
     Events::SystemModeChange::Type event;
     EventNumber eventNumber;
@@ -36,11 +42,11 @@ void GenerateSystemModeChangeEvent(EndpointId endpoint, Optional<SystemModeEnum>
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to emit SystemModeChange event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to generate SystemModeChange event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-void EmitLocalTemperatureChangeEvent(EndpointId endpoint, DataModel::Nullable<int16_t> currentLocalTemperature)
+void GenerateLocalTemperatureChangeEvent(EndpointId endpoint, DataModel::Nullable<int16_t> currentLocalTemperature)
 {
     Events::LocalTemperatureChange::Type event;
     EventNumber eventNumber;
@@ -50,12 +56,12 @@ void EmitLocalTemperatureChangeEvent(EndpointId endpoint, DataModel::Nullable<in
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to emit LocalTemperatureChange event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to generate LocalTemperatureChange event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-void EmitOccupancyChangeEvent(EndpointId endpoint, Optional<BitMask<OccupancyBitmap>> previousOccupancy,
-                              BitMask<OccupancyBitmap> currentOccupancy)
+void GenerateOccupancyChangeEvent(EndpointId endpoint, Optional<BitMask<OccupancyBitmap>> previousOccupancy,
+                                  BitMask<OccupancyBitmap> currentOccupancy)
 {
     Events::OccupancyChange::Type event;
     EventNumber eventNumber;
@@ -66,12 +72,12 @@ void EmitOccupancyChangeEvent(EndpointId endpoint, Optional<BitMask<OccupancyBit
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to emit OccupancyChange event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to generate OccupancyChange event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-void EmitSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, Optional<BitMask<OccupancyBitmap>> occupancy,
-                             Optional<int16_t> previousSetpoint, int16_t currentSetpoint)
+void GenerateSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, Optional<BitMask<OccupancyBitmap>> occupancy,
+                                 Optional<int16_t> previousSetpoint, int16_t currentSetpoint)
 {
     Events::SetpointChange::Type event;
     EventNumber eventNumber;
@@ -84,12 +90,12 @@ void EmitSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, Opt
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to emit SetpointChange event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to generate SetpointChange event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-void EmitRunningStateChangeEvent(EndpointId endpoint, Optional<BitMask<RelayStateBitmap>> previousRunningState,
-                                 BitMask<RelayStateBitmap> currentRunningState)
+void GenerateRunningStateChangeEvent(EndpointId endpoint, Optional<BitMask<RelayStateBitmap>> previousRunningState,
+                                     BitMask<RelayStateBitmap> currentRunningState)
 {
     Events::RunningStateChange::Type event;
     EventNumber eventNumber;
@@ -100,12 +106,12 @@ void EmitRunningStateChangeEvent(EndpointId endpoint, Optional<BitMask<RelayStat
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to emit RunningStateChange event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to generate RunningStateChange event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-void EmitRunningModeChangeEvent(EndpointId endpoint, Optional<ThermostatRunningModeEnum> previousRunningMode,
-                                ThermostatRunningModeEnum currentRunningMode)
+void GenerateRunningModeChangeEvent(EndpointId endpoint, Optional<ThermostatRunningModeEnum> previousRunningMode,
+                                    ThermostatRunningModeEnum currentRunningMode)
 {
     Events::RunningModeChange::Type event;
     EventNumber eventNumber;
@@ -116,12 +122,12 @@ void EmitRunningModeChangeEvent(EndpointId endpoint, Optional<ThermostatRunningM
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to emit RunningModeChange event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to generate RunningModeChange event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-void EmitActiveScheduleChangeEvent(EndpointId endpoint, Optional<DataModel::Nullable<ByteSpan>> previousScheduleHandle,
-                                   DataModel::Nullable<ByteSpan> currentScheduleHandle)
+void GenerateActiveScheduleChangeEvent(EndpointId endpoint, Optional<DataModel::Nullable<ByteSpan>> previousScheduleHandle,
+                                       DataModel::Nullable<ByteSpan> currentScheduleHandle)
 {
     Events::ActiveScheduleChange::Type event;
     EventNumber eventNumber;
@@ -132,12 +138,12 @@ void EmitActiveScheduleChangeEvent(EndpointId endpoint, Optional<DataModel::Null
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to emit ActiveScheduleChange event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to generate ActiveScheduleChange event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-void EmitActivePresetChangeEvent(EndpointId endpoint, Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
-                                 DataModel::Nullable<ByteSpan> currentPresetHandle)
+void GenerateActivePresetChangeEvent(EndpointId endpoint, Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
+                                     DataModel::Nullable<ByteSpan> currentPresetHandle)
 {
     Events::ActivePresetChange::Type event;
     EventNumber eventNumber;
@@ -148,6 +154,11 @@ void EmitActivePresetChangeEvent(EndpointId endpoint, Optional<DataModel::Nullab
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to emit ActivePresetChange event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to generate ActivePresetChange event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
+
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip
