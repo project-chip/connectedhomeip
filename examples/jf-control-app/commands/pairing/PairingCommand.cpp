@@ -66,8 +66,18 @@ CHIP_ERROR PairingCommand::RunCommand()
         static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
+
+    /* TODO: if JFA is onboarded get the administrator CAT initial version from JF_DS@GroupList (through RPC)    
+     * https://github.com/project-chip/connectedhomeip/issues/39443
+     */
     chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
     NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
+
+    /* TODO: if JFA is onboarded get the Anchor CAT initial version from JF_DS@GroupList (through RPC)
+     * https://github.com/project-chip/connectedhomeip/issues/39443
+     */
+    chip::CASEAuthTag anchorCAT   = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
+    NodeId anchorCaseAdminSubject = NodeIdFromCASEAuthTag(anchorCAT);
 
     // This check is to ensure that the --anchor and --jcm options are not used together.  If they are return an immediate error.
     if (mJCM.ValueOr(false) && mAnchor.ValueOr(false))
@@ -91,8 +101,6 @@ CHIP_ERROR PairingCommand::RunCommand()
             return CHIP_ERROR_NOT_CONNECTED;
         }
 
-        chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
-
         // JFA will be issued a NOC with Anchor CAT and Administrator CAT
         mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
     }
@@ -110,15 +118,24 @@ CHIP_ERROR PairingCommand::RunCommand()
         mSkipCommissioningComplete = MakeOptional(true);
     }
 
+    mDeviceIsICD = false;
+
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
 
-    // All the AddNOC commands invoked by JFC will have
-    // the value below for the CaseAdminSubject field
-    (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
-        ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
+    if (mJCM.ValueOr(false))
+    {
+        // JFA-B will be issued a NOC with Administrator CAT
+        mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT });
 
-    mDeviceIsICD = false;
+        (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
+            ->SetCredentialIssuerCaseAdminSubject(anchorCaseAdminSubject);
+    }
+    else
+    {
+        (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
+            ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
+    }
 
     if (mCASEAuthTags.HasValue() && mCASEAuthTags.Value().size() <= kMaxSubjectCATAttributeCount)
     {
