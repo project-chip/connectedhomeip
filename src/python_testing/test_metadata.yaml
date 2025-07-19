@@ -65,6 +65,10 @@ not_automated:
       reason: Shared code for TC_EGC, not a standalone test
     - name: TC_SEPRTestBase.py
       reason: Shared code for TC_SEPR, not a standalone test
+    - name: TC_COMMTR_TestBase.py
+      reason: Shared code for TC_COMMTR, not a standalone test
+    - name: TC_MTRIDTestBase.py
+      reason: Shared code for TC_MTRID, not a standalone test
     - name: TestConformanceTest.py
       reason:
           Unit test of the conformance test (TC_DeviceConformance) - does not
