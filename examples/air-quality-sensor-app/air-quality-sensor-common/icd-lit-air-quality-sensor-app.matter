@@ -2827,11 +2827,24 @@ endpoint 0 {
     callback attribute idleModeDuration;
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;
+    callback attribute registeredClients;
+    callback attribute ICDCounter;
+    callback attribute clientsSupportedPerFabric;
+    ram      attribute userActiveModeTriggerHint;
+    ram      attribute userActiveModeTriggerInstruction;
+    callback attribute operatingMode;
+    callback attribute maximumCheckInBackOff;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
+
+    handle command RegisterClient;
+    handle command RegisterClientResponse;
+    handle command UnregisterClient;
+    handle command StayActiveRequest;
+    handle command StayActiveResponse;
   }
 }
 endpoint 1 {
