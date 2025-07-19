@@ -106,7 +106,7 @@ public:
     /// Appends the given attributes to the builder.
     ///
     /// It is very common to have a set of mandatory and a set of optional attributes for a
-    /// cluster. This method allows for a single call to setup all of the given attributes in `builder`:
+    /// cluster. This method allows for a single call to set up all of the given attributes in `builder`:
     ///   - mandatoryAttributes
     ///   - optionalAttributes IF AND ONLY IF they are enabled
     ///   - all of `GlobalAttributes()`
