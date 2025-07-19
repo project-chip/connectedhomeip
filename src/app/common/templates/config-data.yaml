@@ -65,6 +65,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Closure Control
     - Closure Dimension
     - OTA Software Update Provider
+    - Commodity Tariff
     - Joint Fabric Administrator
 
 # We need a more configurable way of deciding which clusters have which init functions....
