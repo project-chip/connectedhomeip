@@ -159,7 +159,8 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
             # Test Level control
             for level in [self._MID_BRIGHTNESS_LEVEL, self._MIN_BRIGHTNESS_LEVEL, self._MAX_BRIGHTNESS_LEVEL]:
                 self._write_current_level_pwrpc(device, level)
-                asserts.assert_equal(self._read_current_level_pwrpc(device), level)
+                asserts.assert_equal(
+                    self._read_current_level_pwrpc(device), level)
 
 
 if __name__ == "__main__":
