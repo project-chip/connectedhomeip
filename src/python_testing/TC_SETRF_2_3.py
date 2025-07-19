@@ -171,7 +171,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
         # Verify that the list length is equal to 5
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
         if val is not NullValue:
-            matter_asserts.assert_list(val, "DayEntries attribute must return a list", 5, 5)
+            matter_asserts.assert_list(val, "DayEntries attribute must return a list", 15, 15)
             matter_asserts.assert_list_element_type(
                 val, cluster.Structs.DayEntryStruct, "DayEntries attribute must contain DayEntryStruct elements")
             for item in val:
@@ -182,7 +182,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
         # Verify that the list length is equal to 3
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
         if val is not NullValue:
-            matter_asserts.assert_list(val, "DayPatterns attribute must return a list", 3, 3)
+            matter_asserts.assert_list(val, "DayPatterns attribute must return a list", 2, 2)
             matter_asserts.assert_list_element_type(
                 val, cluster.Structs.DayPatternStruct, "DayPatterns attribute must contain DayPatternStruct elements")
             for item in val:
@@ -226,7 +226,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
         # Verify that the list length is equal to 4
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
         if val is not NullValue:
-            matter_asserts.assert_list(val, "TariffPeriods attribute must return a list", 4, 4)
+            matter_asserts.assert_list(val, "TariffPeriods attribute must return a list", 5, 5)
             matter_asserts.assert_list_element_type(
                 val, cluster.Structs.TariffPeriodStruct, "TariffPeriods attribute must contain TariffPeriodStruct elements")
             for item in val:
@@ -251,7 +251,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
         # Verify that the list length is equal to 4
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
         if val is not NullValue:
-            matter_asserts.assert_list(val, "DayEntries attribute must return a list", 4, 4)
+            matter_asserts.assert_list(val, "DayEntries attribute must return a list", 7, 7)
             matter_asserts.assert_list_element_type(
                 val, cluster.Structs.DayEntryStruct, "DayEntries attribute must contain DayEntryStruct elements")
             for item in val:
@@ -262,7 +262,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
         # Verify that the list length is equal to 2
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
         if val is not NullValue:
-            matter_asserts.assert_list(val, "DayPatterns attribute must return a list", 2, 2)
+            matter_asserts.assert_list(val, "DayPatterns attribute must return a list", 1, 1)
             matter_asserts.assert_list_element_type(
                 val, cluster.Structs.DayPatternStruct, "DayPatterns attribute must contain DayPatternStruct elements")
             for item in val:

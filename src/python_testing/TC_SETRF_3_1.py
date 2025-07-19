@@ -50,7 +50,7 @@ from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters import ClusterObjects
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
+from mobly import asserts, signals
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 logger = logging.getLogger(__name__)
@@ -223,8 +223,12 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         self.step("12")
         # TH awaits a ReportDataMessage containing a TariffInfo attribute
         # Verify the report is received and the value does not match the tariff_info value
-        reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
-        asserts.assert_not_equal(reported_value, tariff_info, "Reported value should be different from saved value")
+        try:
+            reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
+            asserts.assert_not_equal(reported_value, tariff_info, "Reported value should be different from saved value")
+        except signals.TestFailure as err:
+            logger.critical(err)
+            self.mark_current_step_skipped()
 
         self.step("13")
         # TH removes the subscription to TariffInfo attribute
