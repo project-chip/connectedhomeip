@@ -1684,6 +1684,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8554,7 +8555,7 @@ cluster WiFiNetworkManagement = 1105 {
     octet_string<64> passphrase = 0;
   }
 
-  /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
+  /** This command is used to request the current WPA-Personal passphrase or PSK associated with the Wi-Fi network provided by this device. */
   command access(invoke: manage) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
@@ -11042,8 +11043,11 @@ provisional cluster JointFabricAdministrator = 1875 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kVIDNotVerified = 2;
-    kInvalidAdministratorFabricIndex = 3;
+    kBusy = 2;
+    kPAKEParameterError = 3;
+    kWindowNotOpen = 4;
+    kVIDNotVerified = 5;
+    kInvalidAdministratorFabricIndex = 6;
   }
 
   enum TransferAnchorResponseStatusEnum : enum8 {
@@ -11073,7 +11077,7 @@ provisional cluster JointFabricAdministrator = 1875 {
 
   request struct OpenJointCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;

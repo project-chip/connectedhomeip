@@ -1038,6 +1038,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2945,6 +2946,10 @@ endpoint 1 {
     ram      attribute activePresetHandle;
     callback attribute presets;
     ram      attribute setpointHoldExpiryTimestamp;
+    callback attribute maxThermostatSuggestions;
+    callback attribute thermostatSuggestions;
+    callback attribute currentThermostatSuggestion;
+    callback attribute thermostatSuggestionNotFollowingReason;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2952,7 +2957,10 @@ endpoint 1 {
     ram      attribute clusterRevision default = 8;
 
     handle command SetpointRaiseLower;
+    handle command AddThermostatSuggestionResponse;
     handle command SetActivePresetRequest;
+    handle command AddThermostatSuggestion;
+    handle command RemoveThermostatSuggestion;
     handle command AtomicResponse;
     handle command AtomicRequest;
   }
