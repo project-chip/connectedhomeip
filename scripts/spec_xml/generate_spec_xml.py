@@ -377,6 +377,8 @@ def dump_ids_from_data_model_dirs():
     version_device_types: dict[str, IdToSupportedDict] = {}
     data_model_path = paths.get_data_model_path()
     data_model_dirs = [d for d in os.listdir(data_model_path) if os.path.isdir(os.path.join(data_model_path, d))]
+    # Don't include master right now - it's in progress, not official
+    data_model_dirs = sorted([d for d in data_model_dirs if 'master' not in d])
     for dir in data_model_dirs:
         clusters, _ = build_xml_clusters(Path(os.path.join(data_model_path, dir, 'clusters')))
         device_types, _ = build_xml_device_types(Path(os.path.join(data_model_path, dir, 'device_types')))
