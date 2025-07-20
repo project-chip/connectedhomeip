@@ -37,7 +37,6 @@ from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import AttributeValue, TestStep, async_test_body, default_matter_test_main
-
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
 
