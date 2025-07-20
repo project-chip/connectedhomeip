@@ -298,7 +298,7 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
             if (priceJson["Price"].isDouble())
             {
                 double priceValue = priceJson["Price"].asDouble();
-                tmp_price.price   = MakeOptional(static_cast<int64_t>(priceValue * 100));
+                tmp_price.price   = MakeOptional(static_cast<int64_t>((priceValue * 100.0) + 0.5));
             }
             else if (priceJson["Price"].isInt64())
             {
@@ -447,7 +447,7 @@ CHIP_ERROR JsonParser<DayPatternStructType, DayPatternsDataClass>::ParseFromJson
 
     // Helper function to parse hex string
     auto parseHexString = [](const std::string & hexStr) -> std::optional<uint8_t> {
-        if (!hexStr.empty() && hexStr.size() >= 3 && hexStr[0] == '0' && (hexStr[1] != 'x' || hexStr[1] != 'X'))
+        if (!hexStr.empty() && hexStr.size() >= 3 && hexStr[0] == '0' && (hexStr[1] == 'x' || hexStr[1] == 'X'))
         {
             return static_cast<uint8_t>(std::stoul(hexStr.substr(2), nullptr, 16));
         }
@@ -699,7 +699,11 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         return false;
     }
 
-    assert(!UpdCtx.DayEntryKeyIDs.empty());
+    if (UpdCtx.DayEntryKeyIDs.empty())
+    {
+        ChipLogError(NotSpecified, "DayEntryKeyIDs cannot be empty");
+        return false;
+    }
     assert(!UpdCtx.TariffComponentKeyIDs.empty());
 
     assert(!UpdCtx.TariffPeriodsDayEntryIDs.empty());        // Something went wrong if TariffPeriods has no DayEntries IDs

@@ -46,7 +46,7 @@ CommodityTariffDelegate * CommodityTariff::GetCommodityTariffDelegate()
     CommodityTariffInstance * mInst = GetCommodityTariffInstance();
     VerifyOrDieWithMsg(mInst != nullptr, AppServer, "CommodityTariffInstance is null");
     CommodityTariffDelegate * dg = mInst->GetDelegate();
-    VerifyOrDieWithMsg(dg != nullptr, AppServer, "CommodityTariffInstance is null");
+    VerifyOrDieWithMsg(dg != nullptr, AppServer, "CommodityTariffDelegate is null");
 
     return dg;
 }
@@ -118,7 +118,7 @@ CHIP_ERROR CommodityTariffInit(EndpointId endpointId)
 
     if (!gCommodityTariffInstance)
     {
-        ChipLogError(AppServer, "Failed to allocate memory for CommodityTariffManager");
+        ChipLogError(AppServer, "Failed to allocate memory for CommodityTariffInstance");
         gCommodityTariffInstance.reset();
         return CHIP_ERROR_NO_MEMORY;
     }
