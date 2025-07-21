@@ -33,8 +33,6 @@ using namespace chip::app::Clusters::CommodityTariff::Structs;
 using namespace chip::app::CommodityTariffAttrsDataMgmt;
 using namespace CommodityTariffConsts;
 
-// static constexpr size_t kAuxSwitchesSettingsMax = 8;
-
 #define VerifyOrReturnError_LogSend(expr, code, ...)                                                                               \
     do                                                                                                                             \
     {                                                                                                                              \
