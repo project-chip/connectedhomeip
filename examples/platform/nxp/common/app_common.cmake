@@ -94,9 +94,9 @@ if (CONFIG_DIAG_LOGS_DEMO)
 endif()
 
 if(CONFIG_CHIP_SE05X)
-    list(FIND EXTRA_MCUX_MODULES "${CHIP_ROOT}/third_party/simw-top-mini/repo" se_index)
+    list(FIND EXTRA_MCUX_MODULES "${CHIP_ROOT}/third_party/simw-top-mini/repo/matter" se_index)
     if(se_index EQUAL -1)
-        message(FATAL_ERROR "MCUX_MODULES must include ${CHIP_ROOT}/third_party/simw-top-mini/repo in the application when CONFIG_CHIP_SE05X is enabled")
+        message(FATAL_ERROR "MCUX_MODULES must include ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter in the application when CONFIG_CHIP_SE05X is enabled")
     endif()
 endif()
 
