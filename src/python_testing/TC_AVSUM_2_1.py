@@ -204,6 +204,8 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                 asserts.assert_equal(len(foundids), len(set(foundids)), "DPTZStreams has non-unique values")
                 if allocatedstream not in foundids:
                     asserts.assert_fail("DPTZStreams does not contain known allocated video stream id")
+            else:
+                asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")
         else:
             logging.info("DPTZ Feature not supported. Test step skipped")
             self.skip_step(11)
