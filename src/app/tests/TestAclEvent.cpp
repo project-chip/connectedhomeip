@@ -389,6 +389,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     EXPECT_FALSE(GetExchangeManager().GetNumActiveExchanges());
 }
 
+// This DefaultServerCluster is only used for Testing the case where EventInfo() returns a Failure
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
@@ -447,8 +448,10 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
     CodegenDataModelProvider model;
     ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
 
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    engine->SetDataModelProvider(&model);
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
+    auto * engine                                 = chip::app::InteractionModelEngine::GetInstance();
+    mOldProvider                                  = engine->SetDataModelProvider(&model);
+
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     GenerateEvents();
@@ -493,6 +496,8 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
 
     engine->Shutdown();
     EXPECT_FALSE(GetExchangeManager().GetNumActiveExchanges());
+
+    InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
 }
 
 } // namespace app
