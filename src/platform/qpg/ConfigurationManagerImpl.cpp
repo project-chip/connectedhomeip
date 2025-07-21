@@ -156,6 +156,11 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
+void ConfigurationManagerImpl::InitiateFactoryResetSkipReboot()
+{
+    PlatformMgr().ScheduleWork(DoFactoryReset, true);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                uint32_t & value)
 {
@@ -277,9 +282,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    // Restart the system.
-    ChipLogProgress(DeviceLayer, "System restarting");
-    qvCHIP_ResetSystem();
+    if (!arg)
+    {
+        // Restart the system.
+        ChipLogProgress(DeviceLayer, "System restarting");
+        qvCHIP_ResetSystem();
+    }
 }
 
 ConfigurationManager & ConfigurationMgrImpl()
