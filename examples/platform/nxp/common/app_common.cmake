@@ -41,10 +41,6 @@ if (CONFIG_CHIP_APP_COMMON)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/include
     )
-    target_compile_definitions(app
-        PRIVATE
-        APP_QUEUE_TICKS_TO_WAIT=${CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT}
-    )
 
     if (CONFIG_APP_FREERTOS_OS)
         target_sources(app PRIVATE
@@ -255,8 +251,8 @@ if (CONFIG_CHIP_APP_OTA_REQUESTOR)
     endif()
     if (CONFIG_CHIP_APP_PLATFORM_OTA_UTILS)
         target_sources(app PRIVATE
-            # Use the example provided by mcxw71_k32w1 platform until a common solution is proposed.
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71_k32w1/ota/OtaUtils.cpp
+            # Use the example provided by mcxw71 platform until a common solution is proposed.
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/ota/OtaUtils.cpp
         )
     endif()
 endif()
@@ -281,8 +277,8 @@ if (CONFIG_CHIP_APP_UI_FEEDBACK)
             )
         else()
             target_sources(app PRIVATE
-                # Use the example provided by mcxw71_k32w1 platform until a common solution is proposed.
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71_k32w1/util/LedOnOff.cpp
+                # Use the example provided by mcxw71 platform until a common solution is proposed.
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/util/LedOnOff.cpp
             )
         endif()
     endif()
