@@ -27,7 +27,11 @@ namespace {
 
 TEST(ChipErrorTest, RangeConstructor)
 {
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
     ChipError error(ChipError::Range::kSDK, /*value=*/1, __FILE__, __LINE__);
+#else
+    ChipError error(ChipError::Range::kSDK, /*value=*/1);
+#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
     EXPECT_EQ(error.GetLine(), 30u);
@@ -41,7 +45,11 @@ TEST(ChipErrorTest, RangeConstructor)
 
 TEST(ChipErrorTest, SdkPartConstructor)
 {
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
     ChipError error(ChipError::SdkPart::kCore, /*code=*/1, __FILE__, __LINE__);
+#else
+    ChipError error(ChipError::SdkPart::kCore, /*code=*/1);
+#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
     EXPECT_EQ(error.GetLine(), 44u);
@@ -55,7 +63,11 @@ TEST(ChipErrorTest, SdkPartConstructor)
 
 TEST(ChipErrorTest, StorageTypeConstructor)
 {
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
     ChipError error(/*error=*/1, __FILE__, __LINE__);
+#else
+    ChipError error(/*error=*/1);
+#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
     EXPECT_EQ(error.AsInteger(), 1u);
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
