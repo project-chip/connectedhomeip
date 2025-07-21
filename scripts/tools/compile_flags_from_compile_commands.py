@@ -14,15 +14,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "click",
+#     "coloredlogs",
+# ]
+# ///
+#
 # Parse a compile_commands.json and extract relevant compiler arguments to allow
 # file compilation for godbolt tests. Use to test out code and generate
 # assembly.
-#
-# TODO: examples
-#
-#  create_godbolt_cpp_properties.py --help
-#
 import json
 import logging
 import shlex
