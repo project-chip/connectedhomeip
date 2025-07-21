@@ -80,7 +80,8 @@ class TC_DGSW_2_2(MatterBaseTest):
     def steps_TC_DGSW_2_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "DUT sends an event report to TH. TH reads a list of SoftwareFault struct from DUT.",
+            TestStep(2, "TH subscribes to the SoftwareDiagnostics cluster in the DUT to receive SoftwareFault events. "
+                     "The DUT is triggered to emit a SoftwareFault event. Wait for the SoftwareFault event to arrive.",
                      "Validate the SoftwareFault event fields."
                      "The Id field of the struct is mandatory and shall be set with software thread ID that last software fault occurred."
                      "Name field shall be set to vendor specific name strings that last software fault occurred."
@@ -96,6 +97,9 @@ class TC_DGSW_2_2(MatterBaseTest):
         # STEP 1: Commission DUT (already done)
         self.step(1)
 
+        # STEP 2: DUT sends an event report to TH. TH reads a list of SoftwareFault structs from DUT.
+        self.step(2)
+
         # Create and start an EventSubscriptionHandler to subscribe for events
         events_callback = EventSubscriptionHandler(expected_cluster=Clusters.SoftwareDiagnostics)
         await events_callback.start(
@@ -103,9 +107,6 @@ class TC_DGSW_2_2(MatterBaseTest):
             self.dut_node_id,            # DUT's node id
             endpoint                     # The endpoint on which we expect SoftwareDiagnostics events
         )
-
-        # STEP 2: DUT sends an event report to TH. TH reads a list of SoftwareFault structs from DUT.
-        self.step(2)
 
         # Trigger a SoftwareFault event on the DUT
         await self.send_software_fault_test_event_trigger()
