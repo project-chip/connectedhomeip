@@ -35,13 +35,18 @@
 #include <lib/core/CHIPError.h>
 #include <system/SystemConfig.h>
 
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#include <source_location>
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/err.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #ifdef __cplusplus
 
-#if CHIP_CONFIG_ERROR_SOURCE
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
+// Fallback to filename/line if source location support is not available.
 #define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code, __FILE__, __LINE__)
 #else // CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code)
@@ -51,8 +56,13 @@ namespace chip {
 namespace System {
 
 namespace Internal {
-extern CHIP_ERROR MapErrorPOSIX(int code);
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+extern CHIP_ERROR MapErrorPOSIX(int code, std::source_location location = std::source_location::current());
+#elif CHIP_CONFIG_ERROR_SOURCE
 extern CHIP_ERROR MapErrorPOSIX(int code, const char * file, unsigned int line);
+#else
+extern CHIP_ERROR MapErrorPOSIX(int code);
+#endif
 } // namespace Internal
 
 extern const char * DescribeErrorPOSIX(CHIP_ERROR code);

@@ -54,16 +54,24 @@ namespace Internal {
  *
  *  @return The mapped POSIX network or OS error.
  */
-DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, std::source_location location)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
+    return (aError == 0 ? CHIP_NO_ERROR
+                        : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), location));
 }
-
+#elif CHIP_CONFIG_ERROR_SOURCE
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, const char * file, unsigned int line)
 {
     return (aError == 0 ? CHIP_NO_ERROR
                         : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), file, line));
 }
+#else
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
+{
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
+}
+#endif
 } // namespace Internal
 
 /**
