@@ -33,6 +33,8 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
               GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
 namespace {
+
+// Determine if the configurable version of the general diagnostics cluster with additonal command options is needed
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
 LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
 #else
@@ -72,9 +74,13 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
     };
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-    const GeneralDiagnosticsFunctionsConfig functionsConfig
-    {
-        .enablePosixTime =
+const GeneralDiagnosticsFunctionsConfig functionsConfig
+{
+    /*
+    Only consider real time if time sync cluster is actually enabled. If it's not
+    enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+    */
+    .enablePosixTime =
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             true,
 #else

@@ -170,7 +170,7 @@ HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandP
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     if (posix_time_ms.count() != 0)
     {
-        response.posixTimeMs.SetNonNull(static_cast<uint64_t>(posix_time_ms.count()));
+        response.posixTimeMs.SetNonNull(posix_time_ms.count());
     }
     handler.AddResponse(commandPath, response);
     return std::nullopt;
