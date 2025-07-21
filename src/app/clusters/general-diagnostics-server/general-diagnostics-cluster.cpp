@@ -484,10 +484,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
         {
             return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data);
         }
-        else
-        {
-            return HandleTimeSnapshot(*handler, request.path, request_data);
-        }
+        return HandleTimeSnapshot(*handler, request.path, request_data);
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
         if (mFunctionConfig.enablePayloadSnaphot)
