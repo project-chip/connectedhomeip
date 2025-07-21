@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.11"
 # dependencies = [
 #     "click",
 #     "coloredlogs",
