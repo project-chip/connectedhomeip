@@ -1755,6 +1755,28 @@ class ChipDeviceControllerBase():
         # An empty list is the expected return for sending group write attribute.
         return []
 
+    def TestOnlyCancelReceiveBdxData(self, future: asyncio.Future) -> None:
+        '''
+        Cancels a pending BDX receive transaction associated with the given future.
+
+        This method is used in test scenarios where a controller has prepared to receive
+        a BDX transfer by calling `TestOnlyPrepareToReceiveBdxData`, but the transfer
+        never occurs (e.g., an inline response is received instead).
+
+        The future must be the same object originally returned by `TestOnlyPrepareToReceiveBdxData`.
+
+        Args:
+            future (asyncio.Future): The future representing the expected BDX transfer.
+
+        Raises:
+            ValueError: If no transaction is associated with the provided future.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+
+        Bdx.CancelReceiveBdxData(future).raise_on_error()
+
     def TestOnlyPrepareToReceiveBdxData(self) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.

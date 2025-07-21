@@ -15,12 +15,14 @@
 #    limitations under the License.
 #
 
+from __future__ import annotations
+
 import asyncio
 import builtins
 import ctypes
 from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_char_p, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional
 
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 from . import BdxTransfer
@@ -33,6 +35,8 @@ _OnTransferObtainedCallbackFunct = CFUNCTYPE(
 _OnFailedToObtainTransferCallbackFunct = CFUNCTYPE(None, py_object, PyChipError)
 _OnDataReceivedCallbackFunct = CFUNCTYPE(None, py_object, c_uint8_p, c_size_t)
 _OnTransferCompletedCallbackFunct = CFUNCTYPE(None, py_object, PyChipError)
+
+_future_to_transaction: Dict[asyncio.Future, AsyncTransferObtainedTransaction] = {}
 
 
 class AsyncTransferObtainedTransaction:
@@ -113,6 +117,38 @@ def _OnTransferCompletedCallback(transaction: AsyncTransferCompletedTransaction,
     transaction.handleResult(result)
 
 
+def CancelReceiveBdxData(future: Future) -> PyChipError:
+    '''
+    Cancels an in-progress expectation for a BDX transfer.
+
+    This is used when a BDX receiver has registered a future to receive an incoming BDX transfer,
+    but the transfer never arrives or should be aborted. This function retrieves the associated
+    transaction object and instructs the native layer to stop waiting for the transfer.
+
+    Args:
+        future (Future): The asyncio Future originally passed to PrepareToReceiveBdxData.
+
+    Returns:
+        PyChipError: The result of calling pychip_Bdx_StopExpectingBdxTransfer.
+
+    Raises:
+        ValueError: If no transaction is associated with the given future.
+    '''
+    handle = GetLibraryHandle()
+
+    transaction = _future_to_transaction.get(future)
+    if transaction is None:
+        raise ValueError("No transaction found for the provided future")
+
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+    res = builtins.chipStack.Call(
+        lambda: handle.pychip_Bdx_StopExpectingBdxTransfer(ctypes.py_object(transaction))
+    )
+    if not res.is_success:
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+    return res
+
+
 def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError:
     ''' Prepares the BDX system for a BDX transfer. The BDX transfer is set as the future's result. This must be called
     before the BDX transfer is initiated.
@@ -122,16 +158,25 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError
     handle = GetLibraryHandle()
     transaction = AsyncTransferObtainedTransaction(future=future, event_loop=asyncio.get_running_loop(), data=data)
 
+    # Store the mapping
+    _future_to_transaction[future] = transaction
+
+    # Automatically remove the mapping when the future completes
+    def _on_done(fut: Future):
+        _future_to_transaction.pop(fut, None)
+    future.add_done_callback(_on_done)
+
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = builtins.chipStack.Call(
         lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+        _future_to_transaction.pop(future, None)  # Clean up if failed
     return res
 
 
-def PrepareToReceiveBdxData(future: Future) -> PyChipError:
+def PrepareToReceiveBdxData(future: Future) -> Tuple[PyChipError, AsyncTransferObtainedTransaction]:
     ''' Prepares the BDX system for a BDX transfer where this device receives data. This must be called before the BDX
     transfer is initiated.
 
