@@ -97,12 +97,15 @@ source ~/.bashrc
 nvm install 22
 nvm use 22
 
+# for the compiler path for arm-none-eabi-g++ to be correct, this may be needed
+source scripts/activate
+
 # Checkout compiler explorer and build
 git clone https://github.com/compiler-explorer/compiler-explorer.git out/compiler-explorer
 cd out/compiler-explorer
 
 # generate a relevant config file, like:
-echo "compilers:gcc-arm-none-eabi-g++"                       >etc/config/c++.local.properties
+echo "compilers=gcc-arm-none-eabi-g++"                       >etc/config/c++.local.properties
 echo "compiler.gcc-arm-none-eabi-g++.name=arm-none-eabi-g++" >>etc/config/c++.local.properties
 echo "compiler.gcc-arm-none-eabi-g++.exe=arm-none-eabi-g++" >>etc/config/c++.local.properties
 
