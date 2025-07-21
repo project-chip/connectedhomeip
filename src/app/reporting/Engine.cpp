@@ -294,15 +294,10 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         // we still fall through into "ValidateClusterPath" to try to return a `better code`
         // (i.e. say invalid endpoint or cluser), however if path seems ok we will
         // return unsupported event as we failed to get event metadata.
-        outStatus = StatusIB(Status::UnsupportedEvent);
+        outStatus = StatusIB(DataModel::ValidateClusterPath(provider, path, Status::UnsupportedEvent));
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        // set up the status as "OK" as long as validation below works
-        outStatus = StatusIB(Status::Success);
-
-        requestPath.entityId = path.mEventId;
-    }
+    requestPath.entityId = path.mEventId;
 
     Status status = DataModel::ValidateClusterPath(provider, path, Status::Success);
     if (status != Status::Success)
@@ -320,7 +315,10 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
     }
     ReturnErrorOnFailure(err);
 
-    // Status set above: could be success, but also UnsupportedEvent
+    // set up the status as "OK" Since all above checks passed
+    outStatus = StatusIB(Status::Success);
+
+    // Status was set above = Success
     return CHIP_NO_ERROR;
 }
 
