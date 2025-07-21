@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace {{cluster.name}} {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount = {{cluster.commands|length}};
+inline constexpr uint32_t kGeneratedCommandsCount = {{cluster.structs|select("response_struct")|list|length}};
+
 {% for command in cluster.commands -%}
 namespace {{command.name | name_for_id_usage}} {
 inline constexpr CommandId Id = {{ "0x%08X" | format(command.code)}};

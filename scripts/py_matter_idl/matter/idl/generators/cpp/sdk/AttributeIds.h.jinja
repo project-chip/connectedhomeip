@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace {{cluster.name}} {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = {{cluster.attributes|length}};
+
 {% for attribute in cluster.attributes -%}
 namespace {{attribute.definition.name | name_for_id_usage}} {
    {%- if attribute is global_attribute %}
