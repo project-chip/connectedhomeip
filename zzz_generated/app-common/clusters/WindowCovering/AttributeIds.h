@@ -13,6 +13,7 @@ namespace Clusters {
 namespace WindowCovering {
 namespace Attributes {
 
+// Total number of attributes supported by the cluster, including global attributes
 inline constexpr uint32_t kAttributesCount = 27;
 
 namespace Type {

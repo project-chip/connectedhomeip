@@ -12,8 +12,8 @@ namespace Clusters {
 namespace GeneralDiagnostics {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 3;
-inline constexpr uint32_t kGeneratedCommandsCount = 2;
+inline constexpr uint32_t kAcceptedCommandsCount  = 3; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 2; // Total number of commands with a response supported by the cluster
 
 namespace TestEventTrigger {
 inline constexpr CommandId Id = 0x00000000;

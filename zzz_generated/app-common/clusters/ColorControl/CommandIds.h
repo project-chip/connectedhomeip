@@ -12,8 +12,8 @@ namespace Clusters {
 namespace ColorControl {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 19;
-inline constexpr uint32_t kGeneratedCommandsCount = 0;
+inline constexpr uint32_t kAcceptedCommandsCount  = 19; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 0;  // Total number of commands with a response supported by the cluster
 
 namespace MoveToHue {
 inline constexpr CommandId Id = 0x00000000;

@@ -13,6 +13,7 @@ namespace Clusters {
 namespace ElectricalGridConditions {
 namespace Attributes {
 
+// Total number of attributes supported by the cluster, including global attributes
 inline constexpr uint32_t kAttributesCount = 8;
 
 namespace LocalGenerationAvailable {

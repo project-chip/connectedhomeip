@@ -12,8 +12,8 @@ namespace Clusters {
 namespace TlsCertificateManagement {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 9;
-inline constexpr uint32_t kGeneratedCommandsCount = 6;
+inline constexpr uint32_t kAcceptedCommandsCount  = 9; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 6; // Total number of commands with a response supported by the cluster
 
 namespace ProvisionRootCertificate {
 inline constexpr CommandId Id = 0x00000000;

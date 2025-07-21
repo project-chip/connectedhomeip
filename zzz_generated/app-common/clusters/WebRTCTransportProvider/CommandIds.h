@@ -12,8 +12,8 @@ namespace Clusters {
 namespace WebRTCTransportProvider {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 5;
-inline constexpr uint32_t kGeneratedCommandsCount = 2;
+inline constexpr uint32_t kAcceptedCommandsCount  = 5; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 2; // Total number of commands with a response supported by the cluster
 
 namespace SolicitOffer {
 inline constexpr CommandId Id = 0x00000000;

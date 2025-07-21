@@ -13,6 +13,7 @@ namespace Clusters {
 namespace EthernetNetworkDiagnostics {
 namespace Attributes {
 
+// Total number of attributes supported by the cluster, including global attributes
 inline constexpr uint32_t kAttributesCount = 14;
 
 namespace PHYRate {

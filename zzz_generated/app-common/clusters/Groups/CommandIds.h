@@ -12,8 +12,8 @@ namespace Clusters {
 namespace Groups {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 6;
-inline constexpr uint32_t kGeneratedCommandsCount = 4;
+inline constexpr uint32_t kAcceptedCommandsCount  = 6; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 4; // Total number of commands with a response supported by the cluster
 
 namespace AddGroup {
 inline constexpr CommandId Id = 0x00000000;

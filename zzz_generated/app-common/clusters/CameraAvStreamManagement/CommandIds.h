@@ -12,8 +12,8 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 10;
-inline constexpr uint32_t kGeneratedCommandsCount = 4;
+inline constexpr uint32_t kAcceptedCommandsCount  = 10; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 4;  // Total number of commands with a response supported by the cluster
 
 namespace AudioStreamAllocate {
 inline constexpr CommandId Id = 0x00000000;

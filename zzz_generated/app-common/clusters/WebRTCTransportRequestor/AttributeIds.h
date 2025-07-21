@@ -13,6 +13,7 @@ namespace Clusters {
 namespace WebRTCTransportRequestor {
 namespace Attributes {
 
+// Total number of attributes supported by the cluster, including global attributes
 inline constexpr uint32_t kAttributesCount = 6;
 
 namespace CurrentSessions {

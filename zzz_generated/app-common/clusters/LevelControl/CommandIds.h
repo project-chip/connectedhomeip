@@ -12,8 +12,8 @@ namespace Clusters {
 namespace LevelControl {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 9;
-inline constexpr uint32_t kGeneratedCommandsCount = 0;
+inline constexpr uint32_t kAcceptedCommandsCount  = 9; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 0; // Total number of commands with a response supported by the cluster
 
 namespace MoveToLevel {
 inline constexpr CommandId Id = 0x00000000;

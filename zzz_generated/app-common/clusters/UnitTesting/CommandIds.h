@@ -12,8 +12,8 @@ namespace Clusters {
 namespace UnitTesting {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 28;
-inline constexpr uint32_t kGeneratedCommandsCount = 16;
+inline constexpr uint32_t kAcceptedCommandsCount  = 28; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 16; // Total number of commands with a response supported by the cluster
 
 namespace Test {
 inline constexpr CommandId Id = 0x00000000;

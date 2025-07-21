@@ -12,8 +12,8 @@ namespace Clusters {
 namespace OperationalState {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 4;
-inline constexpr uint32_t kGeneratedCommandsCount = 1;
+inline constexpr uint32_t kAcceptedCommandsCount  = 4; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = 1; // Total number of commands with a response supported by the cluster
 
 namespace Pause {
 inline constexpr CommandId Id = 0x00000000;
