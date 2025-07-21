@@ -35,6 +35,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Supported::Id, BitFlag
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace Notify {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Notify
+
+} // namespace Events
 } // namespace RefrigeratorAlarm
 } // namespace Clusters
 } // namespace app

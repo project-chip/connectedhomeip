@@ -201,7 +201,7 @@
         "COMMISSIONING_CLUSTER": [],
         "COMMODITY_METERING_CLUSTER": ["commodity-metering-server"],
         "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
-        "COMMODITY_TARIFF_CLUSTER": [],
+        "COMMODITY_TARIFF_CLUSTER": ["commodity-tariff-server"],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
         "CONTENT_CONTROL_CLUSTER": ["content-control-server"],
         "CONTENT_APP_OBSERVER_CLUSTER": ["content-app-observer"],
