@@ -473,7 +473,6 @@ JNI_METHOD(void, setServiceResolveListener)
     if (listenerClass == nullptr)
     {
         ChipLogError(Controller, "Failed to get listener class");
-        env->ExceptionClear();
         JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
         return;
     }
@@ -482,7 +481,6 @@ JNI_METHOD(void, setServiceResolveListener)
     if (mServiceResolveListener == nullptr)
     {
         ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
-        env->ExceptionClear();
         JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
         return;
     }
