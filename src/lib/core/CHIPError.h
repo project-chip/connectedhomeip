@@ -155,7 +155,8 @@ public:
      * This checks that the numeric value is constant and well-formed.
      * (In C++20 this could be replaced by a consteval constructor.)
      */
-#if CHIP_CONFIG_ERROR_SOURCE
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
+// Fallback to filename/line if source location support is not available.
 #define CHIP_SDK_ERROR(part, code)                                                                                                 \
     (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value, __FILE__, __LINE__))
 #else // CHIP_CONFIG_ERROR_SOURCE
