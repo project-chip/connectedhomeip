@@ -78,8 +78,8 @@ using the following instructions:
 - compile compiler-explorer from source
 - add the relevant compiler settings (TODO)
 
-The following instructions should work on a `chip-build-vscode` image. Note that the
-UI will be exposed on port 10240 (i.e. redirect this as needed).
+The following instructions should work on a `chip-build-vscode` image. Set the
+port accordingly (default is 10240)
 
 ```sh
 
@@ -94,5 +94,5 @@ nvm use 22
 # Checkout compiler explorer and build
 git clone https://github.com/compiler-explorer/compiler-explorer.git out/compiler-explorer
 cd out/compiler-explorer
-make EXTRA_ARGS="--language c++"
+make EXTRA_ARGS="--language c++ --port 8000"
 ```
