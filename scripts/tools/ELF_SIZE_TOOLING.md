@@ -76,12 +76,13 @@ using the following instructions:
 
 - install node 20 or above (if you do not have it installed yet)
 - compile compiler-explorer from source
+- Set up a local C++ config in `etc/config/c++.local.properties`, often `gcc-arm-none-eabi-g++` as a compiler
 - add the relevant compiler settings:
   - compile a sample application using the relevant variant. For example
     `./scripts/build/build_examples.py --target efr32-brd2703a-lock build`
-  - This will create a compile_commands.json that compiler arguments
-    for building files. Convert those arguments into a file in
-    `etc/config/c++.local.properties`
+  - This will create a compile_commands.json that contains compiler arguments
+    to compile files. We have a tool `compile_flags_from_compile_commands.py`
+    to extract relevant compile flags.
 
 The following instructions should work on a `chip-build-vscode` image. Set the
 port accordingly (default is 10240)
@@ -99,5 +100,23 @@ nvm use 22
 # Checkout compiler explorer and build
 git clone https://github.com/compiler-explorer/compiler-explorer.git out/compiler-explorer
 cd out/compiler-explorer
+
+# generate a relevant config file, like:
+echo "compilers:gcc-arm-none-eabi-g++"                       >etc/config/c++.local.properties
+echo "compiler.gcc-arm-none-eabi-g++.name=arm-none-eabi-g++" >>etc/config/c++.local.properties
+echo "compiler.gcc-arm-none-eabi-g++.exe=arm-none-eabi-g++" >>etc/config/c++.local.properties
+
+# Build and run, ready for testing
 make EXTRA_ARGS="--language c++ --port 8000"
+```
+
+You can get compile flags (generally include paths are important) via
+`scripts/tools/compile_flags_from_compile_commands.py`. Here is an
+example invocation
+
+```sh
+scripts/tools/compile_flags_from_compile_commands.py \
+    -c out/efr32-brd2703a-lock/compile_commands.json \
+    flags basic-information \
+| wl-copy
 ```
