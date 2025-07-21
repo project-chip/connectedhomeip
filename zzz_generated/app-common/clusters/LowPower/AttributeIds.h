@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace LowPower {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 5;
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

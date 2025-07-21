@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 12;
+
 namespace MaxUserDefinedZones {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MaxUserDefinedZones

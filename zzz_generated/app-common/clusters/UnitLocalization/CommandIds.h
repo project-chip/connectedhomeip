@@ -10,7 +10,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace UnitLocalization {
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 0;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
+} // namespace Commands
 } // namespace UnitLocalization
 } // namespace Clusters
 } // namespace app

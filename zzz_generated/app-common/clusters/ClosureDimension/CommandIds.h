@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace ClosureDimension {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 2;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace SetTarget {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SetTarget

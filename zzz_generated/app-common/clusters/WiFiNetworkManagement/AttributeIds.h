@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace WiFiNetworkManagement {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace Ssid {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Ssid

@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace LevelControl {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 9;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace MoveToLevel {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace MoveToLevel

@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace BasicInformation {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 29;
+
 namespace DataModelRevision {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace DataModelRevision

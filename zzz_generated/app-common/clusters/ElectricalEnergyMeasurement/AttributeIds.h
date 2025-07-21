@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 11;
+
 namespace Accuracy {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Accuracy

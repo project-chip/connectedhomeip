@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace Switch {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 8;
+
 namespace NumberOfPositions {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace NumberOfPositions

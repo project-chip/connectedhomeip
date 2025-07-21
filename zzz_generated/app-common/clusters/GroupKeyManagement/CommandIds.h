@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace GroupKeyManagement {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 4;
+inline constexpr uint32_t kGeneratedCommandsCount = 2;
+
 namespace KeySetWrite {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace KeySetWrite

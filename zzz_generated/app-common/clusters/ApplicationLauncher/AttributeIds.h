@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ApplicationLauncher {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace CatalogList {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace CatalogList

@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace FanControl {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 1;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace Step {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Step

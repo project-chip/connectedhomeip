@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 6;
+inline constexpr uint32_t kGeneratedCommandsCount = 2;
+
 namespace AllocatePushTransport {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AllocatePushTransport

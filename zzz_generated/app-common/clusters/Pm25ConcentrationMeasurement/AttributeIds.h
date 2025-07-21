@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace Pm25ConcentrationMeasurement {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 16;
+
 namespace MeasuredValue {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MeasuredValue

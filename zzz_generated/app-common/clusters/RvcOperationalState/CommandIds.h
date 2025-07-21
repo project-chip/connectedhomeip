@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace RvcOperationalState {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 3;
+inline constexpr uint32_t kGeneratedCommandsCount = 1;
+
 namespace Pause {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Pause

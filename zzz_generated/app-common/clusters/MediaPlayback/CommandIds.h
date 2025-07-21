@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace MediaPlayback {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 14;
+inline constexpr uint32_t kGeneratedCommandsCount = 1;
+
 namespace Play {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Play

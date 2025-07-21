@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace Timer {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 8;
+
 namespace SetTime {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace SetTime

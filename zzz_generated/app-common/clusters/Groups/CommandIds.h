@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace Groups {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 6;
+inline constexpr uint32_t kGeneratedCommandsCount = 4;
+
 namespace AddGroup {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AddGroup

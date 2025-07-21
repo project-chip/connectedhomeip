@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 13;
+
 namespace VendorName {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace VendorName

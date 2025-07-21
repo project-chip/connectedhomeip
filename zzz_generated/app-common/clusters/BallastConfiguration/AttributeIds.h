@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace BallastConfiguration {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 19;
+
 namespace PhysicalMinLevel {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace PhysicalMinLevel

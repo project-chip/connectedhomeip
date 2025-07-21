@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace EcosystemInformation {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace DeviceDirectory {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace DeviceDirectory

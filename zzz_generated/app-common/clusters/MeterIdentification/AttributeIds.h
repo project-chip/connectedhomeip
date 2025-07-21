@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace MeterIdentification {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 10;
+
 namespace MeterType {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MeterType

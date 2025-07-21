@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace GroupKeyManagement {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 9;
+
 namespace GroupKeyMap {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace GroupKeyMap

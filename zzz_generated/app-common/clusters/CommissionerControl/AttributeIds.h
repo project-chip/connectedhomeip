@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 6;
+
 namespace SupportedDeviceCategories {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedDeviceCategories

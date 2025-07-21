@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace OccupancySensing {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 19;
+
 namespace Occupancy {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Occupancy

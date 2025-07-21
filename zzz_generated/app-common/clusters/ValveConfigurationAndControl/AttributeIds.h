@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ValveConfigurationAndControl {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 16;
+
 namespace OpenDuration {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace OpenDuration

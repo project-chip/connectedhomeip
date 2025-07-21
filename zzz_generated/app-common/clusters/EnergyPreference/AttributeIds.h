@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace EnergyPreference {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 10;
+
 namespace EnergyBalances {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace EnergyBalances

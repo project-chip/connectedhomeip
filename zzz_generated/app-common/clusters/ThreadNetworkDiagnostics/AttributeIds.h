@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ThreadNetworkDiagnostics {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 70;
+
 namespace Channel {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Channel

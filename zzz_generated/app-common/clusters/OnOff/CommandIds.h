@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace OnOff {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 6;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace Off {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Off

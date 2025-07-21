@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace UnitTesting {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 95;
+
 namespace Boolean {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Boolean

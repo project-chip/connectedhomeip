@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace DoorLock {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 50;
+
 namespace LockState {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace LockState

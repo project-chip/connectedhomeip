@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 11;
+
 namespace HeaterTypes {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace HeaterTypes

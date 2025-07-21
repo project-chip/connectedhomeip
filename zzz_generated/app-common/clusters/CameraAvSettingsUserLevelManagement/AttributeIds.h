@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 14;
+
 namespace MPTZPosition {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MPTZPosition

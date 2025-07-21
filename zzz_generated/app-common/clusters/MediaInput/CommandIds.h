@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace MediaInput {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 4;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace SelectInput {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SelectInput

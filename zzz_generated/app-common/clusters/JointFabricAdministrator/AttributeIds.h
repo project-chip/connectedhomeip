@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace JointFabricAdministrator {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 6;
+
 namespace AdministratorFabricIndex {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace AdministratorFabricIndex

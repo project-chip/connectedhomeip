@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ThreadNetworkDirectory {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 8;
+
 namespace PreferredExtendedPanID {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace PreferredExtendedPanID

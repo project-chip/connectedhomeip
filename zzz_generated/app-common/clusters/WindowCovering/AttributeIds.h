@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 27;
+
 namespace Type {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Type

@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ElectricalGridConditions {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 8;
+
 namespace LocalGenerationAvailable {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace LocalGenerationAvailable

@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace UnitTesting {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 28;
+inline constexpr uint32_t kGeneratedCommandsCount = 16;
+
 namespace Test {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Test

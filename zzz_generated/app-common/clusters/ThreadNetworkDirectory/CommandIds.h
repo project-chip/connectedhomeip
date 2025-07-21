@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace ThreadNetworkDirectory {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 3;
+inline constexpr uint32_t kGeneratedCommandsCount = 1;
+
 namespace AddNetwork {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AddNetwork

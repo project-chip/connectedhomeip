@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 18;
+
 namespace UTCTime {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace UTCTime

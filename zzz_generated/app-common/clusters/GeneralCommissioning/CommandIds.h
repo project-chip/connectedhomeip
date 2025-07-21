@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace GeneralCommissioning {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 4;
+inline constexpr uint32_t kGeneratedCommandsCount = 4;
+
 namespace ArmFailSafe {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ArmFailSafe

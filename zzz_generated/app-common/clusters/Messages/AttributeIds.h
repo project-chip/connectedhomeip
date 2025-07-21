@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace Messages {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace Messages {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Messages

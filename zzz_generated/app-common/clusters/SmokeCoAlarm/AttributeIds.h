@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace SmokeCoAlarm {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 18;
+
 namespace ExpressedState {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace ExpressedState

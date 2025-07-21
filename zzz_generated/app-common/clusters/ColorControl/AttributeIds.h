@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ColorControl {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 57;
+
 namespace CurrentHue {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace CurrentHue

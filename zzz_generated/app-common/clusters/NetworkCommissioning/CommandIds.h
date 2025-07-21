@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 7;
+inline constexpr uint32_t kGeneratedCommandsCount = 4;
+
 namespace ScanNetworks {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ScanNetworks

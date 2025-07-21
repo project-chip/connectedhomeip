@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace CommodityMetering {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 9;
+
 namespace MeteredQuantity {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MeteredQuantity

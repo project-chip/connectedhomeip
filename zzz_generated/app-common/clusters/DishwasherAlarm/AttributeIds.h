@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace DishwasherAlarm {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 9;
+
 namespace Mask {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Mask

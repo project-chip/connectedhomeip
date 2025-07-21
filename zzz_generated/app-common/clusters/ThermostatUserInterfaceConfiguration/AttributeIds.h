@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ThermostatUserInterfaceConfiguration {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 8;
+
 namespace TemperatureDisplayMode {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace TemperatureDisplayMode

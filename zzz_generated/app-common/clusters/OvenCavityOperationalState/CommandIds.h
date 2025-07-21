@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace OvenCavityOperationalState {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 2;
+inline constexpr uint32_t kGeneratedCommandsCount = 1;
+
 namespace Stop {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace Stop

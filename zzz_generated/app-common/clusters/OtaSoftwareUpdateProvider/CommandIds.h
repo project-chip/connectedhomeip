@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace OtaSoftwareUpdateProvider {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 3;
+inline constexpr uint32_t kGeneratedCommandsCount = 2;
+
 namespace QueryImage {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace QueryImage

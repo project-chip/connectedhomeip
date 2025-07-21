@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace ScenesManagement {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 8;
+inline constexpr uint32_t kGeneratedCommandsCount = 7;
+
 namespace AddScene {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AddScene

@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace LocalizationConfiguration {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace ActiveLocale {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace ActiveLocale

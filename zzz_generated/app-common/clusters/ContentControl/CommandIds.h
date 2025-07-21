@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace ContentControl {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 10;
+inline constexpr uint32_t kGeneratedCommandsCount = 1;
+
 namespace UpdatePIN {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace UpdatePIN

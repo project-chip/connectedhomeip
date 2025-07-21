@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace FanControl {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 17;
+
 namespace FanMode {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace FanMode

@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace IcdManagement {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 15;
+
 namespace IdleModeDuration {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace IdleModeDuration

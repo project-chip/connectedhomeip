@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ActivatedCarbonFilterMonitoring {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 11;
+
 namespace Condition {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Condition

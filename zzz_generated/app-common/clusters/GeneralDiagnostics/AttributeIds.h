@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace GeneralDiagnostics {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 14;
+
 namespace NetworkInterfaces {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace NetworkInterfaces

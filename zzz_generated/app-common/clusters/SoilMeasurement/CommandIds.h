@@ -10,7 +10,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace SoilMeasurement {
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 0;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
+} // namespace Commands
 } // namespace SoilMeasurement
 } // namespace Clusters
 } // namespace app

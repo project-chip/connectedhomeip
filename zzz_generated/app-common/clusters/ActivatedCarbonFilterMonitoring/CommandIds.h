@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace ActivatedCarbonFilterMonitoring {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 1;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace ResetCondition {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ResetCondition

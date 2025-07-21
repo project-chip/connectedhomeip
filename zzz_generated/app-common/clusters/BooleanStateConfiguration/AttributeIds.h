@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace BooleanStateConfiguration {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 13;
+
 namespace CurrentSensitivityLevel {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace CurrentSensitivityLevel

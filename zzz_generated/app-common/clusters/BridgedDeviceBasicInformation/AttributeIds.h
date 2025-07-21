@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace BridgedDeviceBasicInformation {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 23;
+
 namespace VendorName {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace VendorName

@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace ModeSelect {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 11;
+
 namespace Description {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Description

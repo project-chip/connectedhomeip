@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 9;
+inline constexpr uint32_t kGeneratedCommandsCount = 3;
+
 namespace SetpointRaiseLower {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SetpointRaiseLower

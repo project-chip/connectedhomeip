@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace PumpConfigurationAndControl {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 28;
+
 namespace MaxPressure {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MaxPressure

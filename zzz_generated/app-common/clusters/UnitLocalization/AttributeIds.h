@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace UnitLocalization {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace TemperatureUnit {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace TemperatureUnit

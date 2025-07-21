@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace BridgedDeviceBasicInformation {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 1;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace KeepActive {
 inline constexpr CommandId Id = 0x00000080;
 } // namespace KeepActive

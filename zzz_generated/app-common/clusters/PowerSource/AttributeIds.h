@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace PowerSource {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 37;
+
 namespace Status {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Status

@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace MediaPlayback {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 16;
+
 namespace CurrentState {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace CurrentState

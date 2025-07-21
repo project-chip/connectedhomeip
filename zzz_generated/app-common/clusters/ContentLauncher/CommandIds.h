@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace ContentLauncher {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 2;
+inline constexpr uint32_t kGeneratedCommandsCount = 1;
+
 namespace LaunchContent {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace LaunchContent

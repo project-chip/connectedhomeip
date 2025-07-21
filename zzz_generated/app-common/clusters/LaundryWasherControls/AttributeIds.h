@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace LaundryWasherControls {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 9;
+
 namespace SpinSpeeds {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace SpinSpeeds

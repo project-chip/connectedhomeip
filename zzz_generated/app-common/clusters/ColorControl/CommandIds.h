@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace ColorControl {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 19;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace MoveToHue {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace MoveToHue

@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace RvcRunMode {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace SupportedModes {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes

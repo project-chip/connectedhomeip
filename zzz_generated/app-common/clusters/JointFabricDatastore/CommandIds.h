@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace JointFabricDatastore {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 20;
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace AddKeySet {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AddKeySet

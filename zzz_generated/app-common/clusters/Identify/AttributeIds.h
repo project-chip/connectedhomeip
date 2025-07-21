@@ -12,6 +12,9 @@ namespace app {
 namespace Clusters {
 namespace Identify {
 namespace Attributes {
+
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace IdentifyTime {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace IdentifyTime

@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 namespace Commands {
+
+inline constexpr uint32_t kAcceptedCommandsCount  = 2;
+inline constexpr uint32_t kGeneratedCommandsCount = 2;
+
 namespace GetTariffComponent {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace GetTariffComponent
