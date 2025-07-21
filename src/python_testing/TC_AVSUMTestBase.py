@@ -255,6 +255,4 @@ class AVSUMTestBase:
             return response.videoStreamID
 
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-
-   
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")   

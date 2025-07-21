@@ -199,7 +199,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
 
                 for streams in dptz_streams_dut:
                     asserts.assert_greater_equal(streams.videoStreamID, 0, "Provided video stream id is out of range")
-                    foundids.append(streams.videoStreamID)     
+                    foundids.append(streams.videoStreamID)
 
                 asserts.assert_equal(len(foundids), len(set(foundids)), "DPTZStreams has non-unique values")
                 if allocatedstream not in foundids:
