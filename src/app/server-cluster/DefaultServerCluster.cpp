@@ -123,7 +123,7 @@ CHIP_ERROR DefaultServerCluster::AppendAttributes(ReadOnlyBufferBuilder<DataMode
     if (append_size > 0)
     {
         // NOTE: ReferenceExisting will APPEND data (and use heap) when some data already
-        //       existsin the the builder. This is why we ensure AppendCapacity for everything
+        //       exists in the builder. This is why we ensure AppendCapacity for everything
         //       so that we do not perform extra allocations.
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(append_size + GlobalAttributes().size()));
         ReturnErrorOnFailure(builder.ReferenceExisting(mandatoryAttributes));
