@@ -59,7 +59,6 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0028" name="Basic Information Cluster" revision="5">
   <revisionHistory>
-    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
     <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
     <revision revision="4" summary="Updated conformance for UniqueID to mandatory"/>
