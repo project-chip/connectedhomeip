@@ -319,7 +319,8 @@ CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersionString(const std::string & softwareVersionString)
 {
-    return WriteConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, softwareVersionString.c_str(), softwareVersionString.length());
+    return WriteConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, softwareVersionString.c_str(),
+                               softwareVersionString.length());
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
@@ -330,7 +331,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
     if (PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SoftwareVersionString))
     {
         ReturnErrorOnFailure(ReadConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, buf, bufSize, outLen));
-        buf[outLen] = '\0';  // Null-terminate the string read from the config.
+        buf[outLen] = '\0'; // Null-terminate the string read from the config.
         return CHIP_NO_ERROR;
     }
 

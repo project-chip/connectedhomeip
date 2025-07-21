@@ -759,7 +759,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         gExampleDeviceInstanceInfoProvider.SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value());
 
     if (LinuxDeviceOptions::GetInstance().softwareVersionString.HasValue())
-        reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()).StoreSoftwareVersionString(LinuxDeviceOptions::GetInstance().softwareVersionString.Value());
+        reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr())
+            .StoreSoftwareVersionString(LinuxDeviceOptions::GetInstance().softwareVersionString.Value());
 
     if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
         gExampleDeviceInstanceInfoProvider.SetHardwareVersionString(
