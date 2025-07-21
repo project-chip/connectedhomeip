@@ -33,7 +33,6 @@ chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
 sl_use_subscription_syncing = true
 chip_enable_icd_lit = true
-chip_enable_icd_dsls = true
 
 # Openthread Configuration flags
 sl_transport_idle_interval_ms = 2100000  # 35 minutes Idle Intervals
