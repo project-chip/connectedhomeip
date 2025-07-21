@@ -60,7 +60,9 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             TestStep(8, "Read and verify MPTZPosition attribute, if supported."),
             TestStep(9, "Read and verify MaxPresets attribute, if supported."),
             TestStep(10, "Read and verify MPTZPresets attribute, if supported."),
-            TestStep(11, "Read and verify DPTZStreams attribute, if supported"),
+            TestStep(11, "Verify the DPTZStreams attribute is present if the DPTZ feature is supported"),
+            TestStep(12, "Ensure that a video stream has been allocated, store the streamID"),
+            TestStep(13, "Read the DPTZStreams attribute. Verify the streamIDs are unique, and the allocated streamID is present"),
         ]
         return steps
 
@@ -189,9 +191,11 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.DPTZStreams.attribute_id, attribute_list,
                               "DPTZStreams attribute is a mandatory attribute if DPTZ.")
 
+            self.step(12)
             # Make sure we have at least one video stream
             allocatedstream = await self.video_stream_allocate_command(endpoint)
 
+            self.step(13)
             dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.DPTZStreams)
             if dptz_streams_dut is not None:
                 # Verify that all elements in the list are unique
@@ -209,6 +213,8 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         else:
             logging.info("DPTZ Feature not supported. Test step skipped")
             self.skip_step(11)
+            self.skip_step(12)
+            self.skip_step(13)
 
 
 if __name__ == "__main__":
