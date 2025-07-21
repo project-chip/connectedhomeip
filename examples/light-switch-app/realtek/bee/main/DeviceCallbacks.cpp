@@ -69,7 +69,7 @@ bool sIsReceiveLedStopcmd  = false;
 
 extern "C" void SetSystemLedState(bool state)
 {
-    ChipLogProgress(DeviceLayer, "set SYSTEM_STATE_LED state %d",state);
+    ChipLogProgress(DeviceLayer, "set SYSTEM_STATE_LED state %d", state);
     systemStatusLED.Set(state);
     sIsReceiveLedStopcmd = !state;
 }

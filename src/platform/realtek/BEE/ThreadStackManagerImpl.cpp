@@ -69,11 +69,11 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-	ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit");
-	err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit");
+    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
 #else
-	ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit");
-	err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit");
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
 #endif
 
 exit:

@@ -52,9 +52,9 @@ extern int GetEntropy(uint8_t * buf, size_t bufSize);
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>,
+                                     public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>,
 #else
-    public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>,
+                                     public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>,
 #endif
                                      public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>
 {

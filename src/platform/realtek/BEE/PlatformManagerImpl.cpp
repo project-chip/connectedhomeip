@@ -42,8 +42,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-	// Initialize LwIP.
-	tcpip_init(NULL, NULL);
+    // Initialize LwIP.
+    tcpip_init(NULL, NULL);
 #endif
 
     chip::Crypto::add_entropy_source(app_entropy_source, NULL, 1);
