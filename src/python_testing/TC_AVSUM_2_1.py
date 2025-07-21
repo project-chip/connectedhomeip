@@ -189,13 +189,21 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.DPTZStreams.attribute_id, attribute_list,
                               "DPTZStreams attribute is a mandatory attribute if DPTZ.")
 
+            # Make sure we have at least one video stream
+            allocatedstream = await self.video_stream_allocate_command(endpoint)
+
             dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.DPTZStreams)
             if dptz_streams_dut is not None:
                 # Verify that all elements in the list are unique
-                asserts.assert_equal(len(dptz_streams_dut), len(
-                    set(dptz_streams_dut)), "DPTZStreams has non-unique values")
+                foundids = []
+
                 for streams in dptz_streams_dut:
-                    asserts.assert_greater_equal(streams.videostreamid, 0, "Provided video stream id is out of range")
+                    asserts.assert_greater_equal(streams.videoStreamID, 0, "Provided video stream id is out of range")
+                    foundids.append(streams.videoStreamID)     
+
+                asserts.assert_equal(len(foundids), len(set(foundids)), "DPTZStreams has non-unique values")
+                if allocatedstream not in foundids:
+                    asserts.assert_fail("DPTZStreams does not contain known allocated video stream id")
         else:
             logging.info("DPTZ Feature not supported. Test step skipped")
             self.skip_step(11)
