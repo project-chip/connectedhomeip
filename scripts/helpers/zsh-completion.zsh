@@ -78,14 +78,16 @@ compdef _matter_build_examples scripts/build/build_examples.py
 # Get the list of commands from the output of the chip-tool,
 # where each command is prefixed with the ' | * ' string.
 function _matter_chip_tool_commands() {
-  compadd -- $("$@" --help 2>&1 | awk '/ [|] [*] /{ print $3 }')
+  local -a commands=(${(f)"$("${@}" --help 2>&1 | awk '/ [|] [*] /{ print $3 }')"})
+  compadd -- "${commands[@]}"
 }
 
 
 # Get the list of options from the output of the chip-tool,
 # where each option starts with the '[--' string.
 function _matter_chip_tool_command_options() {
-    compadd -- $("$@" --help 2>&1 | awk -F'[[]|[]]' '/^[[]--/{ print $2 }')
+  local -a options=( ${(f)"$("$@" --help 2>&1 | awk -F'[[]|[]]' '/^[[]--/{ print $2 }')"} )
+  compadd -- "${options[@]}"
 }
 
 
