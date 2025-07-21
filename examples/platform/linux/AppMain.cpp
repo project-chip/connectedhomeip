@@ -508,19 +508,6 @@ public:
         return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
     }
 
-    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override
-    {
-        // Check if it was set from the command line or fall back to default provider.
-        if (mSoftwareVersionString.has_value())
-        {
-            VerifyOrReturnError(CanFitInNullTerminatedString(mSoftwareVersionString.value(), bufSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-            CopyString(buf, bufSize, mSoftwareVersionString.value().c_str());
-            return CHIP_NO_ERROR;
-        }
-
-        return mDefaultProvider->GetSoftwareVersionString(buf, bufSize);
-    }
-
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
     {
         return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
@@ -772,8 +759,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         gExampleDeviceInstanceInfoProvider.SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value());
 
     if (LinuxDeviceOptions::GetInstance().softwareVersionString.HasValue())
-        gExampleDeviceInstanceInfoProvider.SetSoftwareVersionString(
-            LinuxDeviceOptions::GetInstance().softwareVersionString.Value());
+        reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()).StoreSoftwareVersionString(LinuxDeviceOptions::GetInstance().softwareVersionString.Value());
 
     if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
         gExampleDeviceInstanceInfoProvider.SetHardwareVersionString(

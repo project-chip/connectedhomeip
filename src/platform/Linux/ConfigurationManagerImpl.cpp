@@ -317,6 +317,27 @@ CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
     return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersionString(const std::string & softwareVersionString)
+{
+    return WriteConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, softwareVersionString.c_str(), softwareVersionString.length());
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    size_t outLen;
+
+    // First try to get this value from the config.
+    if (PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SoftwareVersionString))
+    {
+        ReturnErrorOnFailure(ReadConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, buf, bufSize, outLen));
+        buf[outLen] = '\0';  // Null-terminate the string read from the config.
+        return CHIP_NO_ERROR;
+    }
+
+    // Not found in config; call Generic impl which refers to a string defined at compile time.
+    return GenericConfigurationManagerImpl<Internal::PosixConfig>::GetSoftwareVersionString(buf, bufSize);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
     return ReadConfigValue(PosixConfig::kCounterKey_RebootCount, rebootCount);
