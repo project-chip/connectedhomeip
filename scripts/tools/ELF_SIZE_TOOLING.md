@@ -61,3 +61,38 @@ ADDED,104,"chip::app::DataModel::ValidateClusterPath(chip::app::DataModel::Provi
 ADDED,224,"chip::app::WriteHandler::CheckWriteAllowed(chip::Access::SubjectDescriptor const&, chip::app::ConcreteDataAttributePath const&)"
 
 ```
+
+## Looking at assembly code
+
+For general tests, the [Godbolt compiler explorer](https://godbolt.org) is a great resource.
+
+### Locally running compiler explorer
+
+There are cases where you may want to investigate how CHIP code is compiled
+and the CHIP include/build options can be quite complex. In this case, you
+can run the compiler explorer from
+[source](https://github.com/compiler-explorer/compiler-explorer) locally
+using the following instructions:
+
+- install node 20 or above (if you do not have it installed yet)
+- compile compiler-explorer from source
+- add the relevant compiler settings (TODO)
+
+The following instructions should work on a `chip-build-vscode` image. Note that the
+UI will be exposed on port 10240 (i.e. redirect this as needed).
+
+```sh
+
+# Install NVM to get node modules available
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+source ~/.bashrc
+
+# Install Node 22 (20 is minimum required, newer is better)
+nvm install 22
+nvm use 22
+
+# Checkout compiler explorer and build
+git clone https://github.com/compiler-explorer/compiler-explorer.git out/compiler-explorer
+cd out/compiler-explorer
+make EXTRA_ARGS="--language c++"
+```
