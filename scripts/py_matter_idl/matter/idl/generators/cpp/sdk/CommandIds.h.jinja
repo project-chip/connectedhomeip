@@ -12,8 +12,8 @@ namespace Clusters {
 namespace {{cluster.name}} {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount = {{cluster.commands|length}};
-inline constexpr uint32_t kGeneratedCommandsCount = {{cluster.structs|select("response_struct")|list|length}};
+inline constexpr uint32_t kAcceptedCommandsCount = {{cluster.commands|length}}; // Total number of commands without a response supported by the cluster
+inline constexpr uint32_t kGeneratedCommandsCount = {{cluster.structs|select("response_struct")|list|length}}; // Total number of commands with a response supported by the cluster 
 
 {% for command in cluster.commands -%}
 namespace {{command.name | name_for_id_usage}} {
