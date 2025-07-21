@@ -714,6 +714,8 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
 
 
 def convert_args_to_matter_config(args: argparse.Namespace):
+    logging.info('args are as follows:------------------------------------')
+    logging.info(args)
     # Lazy import to avoid circular dependency
     from chip.testing.matter_testing import MatterTestConfig
 
@@ -762,6 +764,8 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
     # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
     config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
+    logging.info('config is as follows:------------------------------------')
+    logging.info(config.global_test_params)
 
     return config
 
