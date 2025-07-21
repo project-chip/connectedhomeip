@@ -57,7 +57,11 @@ class TC_DGSW_2_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the ThreadMetrics attribute",
-                     "The data type in each field of the struct must match the value listed in the specification(s) Table in 11.12.6.1"),
+                     "The data type in each field of the struct must match the value listed in the specification(s) Table in 11.12.6.1"
+                     "ThreadMetrics Struct. The Id field of the list is mandatory and shall match with Node assigned ID unique-per-thread."
+                     "Name field shall be set to vendor specific strings. StackFreeCurrent field shall indicates the current amount of stack memory, in bytes, not being utilized by the respective thread."
+                     "StackFreeMinimum field shall indicate the minimum amount of available stack memory in bytes. "
+                     "This value can be reset by a node reboot. StackSize field shall indicate the amount of memory allocated for use by the respective thread."),
             TestStep(3, "Read the CurrentHeapFree attribute",
                      "The value will indicate the current amount of unutilized heap memory in bytes."),
             TestStep(4, "Read the CurrentHeapUsed attribute",
