@@ -11585,6 +11585,26 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetPINCodeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userID", indent + 1, value.userID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userStatus", indent + 1, value.userStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userType", indent + 1, value.userType));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("PINCode", indent + 1, value.PINCode));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetUserStatusResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userID", indent + 1, value.userID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userStatus", indent + 1, value.userStatus));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -11620,6 +11640,26 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("localStartTime", indent + 1, value.localStartTime));
     ReturnErrorOnFailure(DataModelLogger::LogValue("localEndTime", indent + 1, value.localEndTime));
     ReturnErrorOnFailure(DataModelLogger::LogValue("operatingMode", indent + 1, value.operatingMode));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetUserTypeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userID", indent + 1, value.userID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userType", indent + 1, value.userType));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetRFIDCodeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userID", indent + 1, value.userID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userStatus", indent + 1, value.userStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userType", indent + 1, value.userType));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("RFIDCode", indent + 1, value.RFIDCode));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -22969,6 +23009,16 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
     case DoorLock::Id: {
         switch (path.mCommandId)
         {
+        case DoorLock::Commands::GetPINCodeResponse::Id: {
+            DoorLock::Commands::GetPINCodeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetPINCodeResponse", 1, value);
+        }
+        case DoorLock::Commands::GetUserStatusResponse::Id: {
+            DoorLock::Commands::GetUserStatusResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetUserStatusResponse", 1, value);
+        }
         case DoorLock::Commands::GetWeekDayScheduleResponse::Id: {
             DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -22983,6 +23033,16 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetHolidayScheduleResponse", 1, value);
+        }
+        case DoorLock::Commands::GetUserTypeResponse::Id: {
+            DoorLock::Commands::GetUserTypeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetUserTypeResponse", 1, value);
+        }
+        case DoorLock::Commands::GetRFIDCodeResponse::Id: {
+            DoorLock::Commands::GetRFIDCodeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetRFIDCodeResponse", 1, value);
         }
         case DoorLock::Commands::GetUserResponse::Id: {
             DoorLock::Commands::GetUserResponse::DecodableType value;
