@@ -235,8 +235,11 @@ CHIP_ERROR CodeDrivenDataModelProvider::ServerClusters(EndpointId endpointId,
     {
         for (const auto & path : serverCluster->GetPaths())
         {
-            ReturnErrorOnFailure(
-                out.Append({ path.mClusterId, serverCluster->GetDataVersion(path), serverCluster->GetClusterFlags(path) }));
+            if (path.mEndpointId == endpointId)
+            {
+                ReturnErrorOnFailure(
+                    out.Append({ path.mClusterId, serverCluster->GetDataVersion(path), serverCluster->GetClusterFlags(path) }));
+            }
         }
     }
     return CHIP_NO_ERROR;

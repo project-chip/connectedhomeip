@@ -225,6 +225,10 @@ public:
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
+        if (startupCalled)
+        {
+            return CHIP_NO_ERROR;
+        }
         startupCalled = true;
         return DefaultServerCluster::Startup(context);
     }
@@ -850,12 +854,11 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownNotCalledWhenRemovingFrom
 // Check that multiple paths for a single cluster are handled correctly
 TEST_F(TestCodeDrivenDataModelProvider, ServerClustersMultiPath)
 {
-    // mockServerCluster1 and mockServerCluster2 are global.
-    static ServerClusterInterface * sServerClustersArray[] = { &descriptorClusterEP1, &mockServerClusterMultiPath };
+    static ServerClusterInterface * sServerClustersArray[] = { &descriptorClusterEP3, &mockServerClusterMultiPath };
 
-    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id)
-                          .SetComposition(endpointEntry1.compositionPattern)
-                          .SetParentId(endpointEntry1.parentId)
+    auto build_pair = SpanEndpoint::Builder(endpointEntry3.id)
+                          .SetComposition(endpointEntry3.compositionPattern)
+                          .SetParentId(endpointEntry3.parentId)
                           .SetServerClusters(Span<ServerClusterInterface *>(sServerClustersArray))
                           .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
@@ -866,14 +869,14 @@ TEST_F(TestCodeDrivenDataModelProvider, ServerClustersMultiPath)
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
-    ASSERT_EQ(mProvider.ServerClusters(endpointEntry1.id, builder), CHIP_NO_ERROR);
+    ASSERT_EQ(mProvider.ServerClusters(3, builder), CHIP_NO_ERROR);
 
     auto serverClusters = builder.TakeBuffer();
     ASSERT_EQ(serverClusters.size(), 3u);
 
-    EXPECT_EQ(serverClusters[0].clusterId, descriptorClusterEP1.GetPaths()[0].mClusterId);
-    EXPECT_EQ(serverClusters[0].dataVersion, descriptorClusterEP1.GetDataVersion({}));
-    EXPECT_EQ(serverClusters[0].flags, descriptorClusterEP1.GetClusterFlags({}));
+    EXPECT_EQ(serverClusters[0].clusterId, descriptorClusterEP3.GetPaths()[0].mClusterId);
+    EXPECT_EQ(serverClusters[0].dataVersion, descriptorClusterEP3.GetDataVersion({}));
+    EXPECT_EQ(serverClusters[0].flags, descriptorClusterEP3.GetClusterFlags({}));
 
     EXPECT_EQ(serverClusters[1].clusterId, mockServerClusterMultiPath.GetPaths()[0].mClusterId);
     EXPECT_EQ(serverClusters[1].dataVersion, mockServerClusterMultiPath.GetDataVersion({}));
@@ -1173,4 +1176,76 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
     auto result                                        = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Failure));
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, SingleServerClusterInterfaceWithMultipleClustersAndMultipleEndpoints)
+{
+    // This multi-path cluster instance serves a cluster on endpoint 1 (cluster 10) and a different cluster on endpoint 2 (cluster 30).
+    static MockServerCluster multiPathCluster({ { 1, 10 }, { 2, 30 } }, 1, {});
+
+    // Setup for Endpoint 1
+    static MockServerCluster descriptorClusterEP1({ 1, chip::app::Clusters::Descriptor::Id }, 1, {});
+    static ServerClusterInterface * serverClustersEP1[] = { &descriptorClusterEP1, &multiPathCluster };
+
+    auto build_pair1 = SpanEndpoint::Builder(1).SetServerClusters(Span<ServerClusterInterface *>(serverClustersEP1)).Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair1));
+    auto ep1Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair1)));
+    mEndpointStorage.push_back(std::move(ep1Provider));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back()));
+    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+
+    // Setup for Endpoint 2
+    static MockServerCluster descriptorClusterEP2({ 2, chip::app::Clusters::Descriptor::Id }, 1, {});
+    static ServerClusterInterface * serverClustersEP2[] = { &descriptorClusterEP2, &multiPathCluster };
+
+    auto build_pair2 = SpanEndpoint::Builder(2).SetServerClusters(Span<ServerClusterInterface *>(serverClustersEP2)).Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair2));
+    auto ep2Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair2)));
+    mEndpointStorage.push_back(std::move(ep2Provider));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back()));
+    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+
+    // Verification for Endpoint 1.
+    // Should return its own clusters (Descriptor) and only the path from the multi-path cluster that is on endpoint 1 (cluster 10).
+    {
+        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
+        ASSERT_EQ(mProvider.ServerClusters(1, builder), CHIP_NO_ERROR);
+        auto serverClusters = builder.TakeBuffer();
+        ASSERT_EQ(serverClusters.size(), 2u);
+
+        std::vector<ClusterId> expectedIds = { 10u, chip::app::Clusters::Descriptor::Id };
+        std::vector<ClusterId> actualIds;
+        for (const auto & c : serverClusters)
+        {
+            actualIds.push_back(c.clusterId);
+        }
+        std::sort(actualIds.begin(), actualIds.end());
+        std::sort(expectedIds.begin(), expectedIds.end());
+        EXPECT_EQ(actualIds, expectedIds);
+    }
+
+    // Verification for Endpoint 2.
+    // Should return its own clusters (Descriptor) and only the path from the multi-path cluster that is on endpoint 2 (cluster 30).
+    {
+        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
+        ASSERT_EQ(mProvider.ServerClusters(2, builder), CHIP_NO_ERROR);
+        auto serverClusters = builder.TakeBuffer();
+        ASSERT_EQ(serverClusters.size(), 2u);
+
+        std::vector<ClusterId> expectedIds = { 30u, chip::app::Clusters::Descriptor::Id };
+        std::vector<ClusterId> actualIds;
+        for (const auto & c : serverClusters)
+        {
+            actualIds.push_back(c.clusterId);
+        }
+        std::sort(actualIds.begin(), actualIds.end());
+        std::sort(expectedIds.begin(), expectedIds.end());
+        EXPECT_EQ(actualIds, expectedIds);
+    }
+
+    // Verification for a non-existent endpoint. This should return CHIP_ERROR_NOT_FOUND.
+    {
+        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
+        ASSERT_EQ(mProvider.ServerClusters(99, builder), CHIP_ERROR_NOT_FOUND);
+    }
 }
