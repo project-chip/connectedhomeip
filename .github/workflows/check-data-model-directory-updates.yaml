@@ -43,7 +43,7 @@ jobs:
 
       - name: Build Python REPL
         run: |
-             scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable_ble false'
+             scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable_ble false --extra_packages lxml'
 
       - name: Check for changes to master data_model directory without a SHA update
         if: (!contains(github.event.pull_request.labels.*.name, 'data-model-file-structural-change-dm-tt-use-only'))
