@@ -133,6 +133,16 @@ public:
 #endif
 
     /**
+     *  Helper macro to construct a CHIP_ERROR from a range and a value.
+     */
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
+// Fallback to filename/line if source location support is not available.
+#define CHIP_GENERIC_ERROR(range, value) ::chip::ChipError(range, value, __FILE__, __LINE__)
+#else
+#define CHIP_GENERIC_ERROR(range, value) ::chip::ChipError(range, value)
+#endif
+
+    /**
      * Construct a CHIP_ERROR for SdkPart @a part with @a code.
      *
      * @note
@@ -442,13 +452,8 @@ using CHIP_ERROR = ::chip::ChipError;
                    ::chip::to_underlying(::chip::Protocols::InteractionModel::Status::type))
 
 // Defines a runtime-value for a chip-error that contains a global IM Status.
-#if CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status_value)                                                                            \
-    ::chip::ChipError(::chip::ChipError::SdkPart::kIMGlobalStatus, ::chip::to_underlying(status_value), __FILE__, __LINE__)
-#else
-#define CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status_value)                                                                            \
-    ::chip::ChipError(::chip::ChipError::SdkPart::kIMGlobalStatus, ::chip::to_underlying(status_value))
-#endif // CHIP_CONFIG_ERROR_SOURCE
+    CHIP_GENERIC_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, ::chip::to_underlying(status_value))
 
 //
 // type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
@@ -457,13 +462,8 @@ using CHIP_ERROR = ::chip::ChipError;
 
 // Defines a runtime-value for a chip-error that contains a cluster-specific error status.
 // Must not be used with cluster-specific success status codes.
-#if CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(status_value)                                                                           \
-    ::chip::ChipError(::chip::ChipError::SdkPart::kIMClusterStatus, status_value, __FILE__, __LINE__)
-#else
-#define CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(status_value)                                                                           \
-    ::chip::ChipError(::chip::ChipError::SdkPart::kIMClusterStatus, status_value)
-#endif // CHIP_CONFIG_ERROR_SOURCE
+    CHIP_GENERIC_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, status_value)
 
 // clang-format off
 
