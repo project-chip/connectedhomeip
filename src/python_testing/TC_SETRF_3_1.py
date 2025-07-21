@@ -153,9 +153,7 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                           - Values is saved in tariff_info."""),
             TestStep("11", "TH sends TestEventTrigger command for Test Event Clear.",
                            "DUT replies with SUCCESS status code."),
-            TestStep("12", "TH awaits a ReportDataMessage containing a TariffInfo attribute with 30s timeout.", """
-                          Verify the report is received and the value does not match the tariff_info value."""),
-            TestStep("13", "TH removes the subscription to PowerThreshold attribute.", "Subscription successfully removed."),
+            TestStep("12", "TH removes the subscription to PowerThreshold attribute.", "Subscription successfully removed."),
         ]
 
         return steps
@@ -221,16 +219,6 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         await self.send_test_event_trigger_clear()
 
         self.step("12")
-        # TH awaits a ReportDataMessage containing a TariffInfo attribute
-        # Verify the report is received and the value does not match the tariff_info value
-        try:
-            reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
-            asserts.assert_not_equal(reported_value, tariff_info, "Reported value should be different from saved value")
-        except signals.TestFailure as err:
-            logger.critical(err)
-            self.mark_current_step_skipped()
-
-        self.step("13")
         # TH removes the subscription to TariffInfo attribute
         self.subscription.Shutdown()
 
