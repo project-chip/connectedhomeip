@@ -25,7 +25,6 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <esp_timer.h>
@@ -80,8 +79,9 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
     return err;
 }
 
-CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime([[maybe_unused]] Microseconds64 aNewCurTime)
 {
+    (void) aNewCurTime;
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
