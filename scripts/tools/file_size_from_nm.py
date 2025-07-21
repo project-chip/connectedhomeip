@@ -487,12 +487,12 @@ def build_treemap(
                 data["name_with_size"][idx] = f"{label}: {total_size}"
             else:
                 # The "full name" is generally quite long, so shorten it...
-                data["name_with_size"][idx] = f"{data["short_name"][idx]}: {total_size}"
+                data["name_with_size"][idx] = f"{data['short_name'][idx]}: {total_size}"
         else:
             # When using object files, the paths hare are the full "foo::bar::....::method"
             # so clean them up a bit
             short_name = shorten_name(data["short_name"][idx])
-            data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
+            data["name_with_size"][idx] = f"{short_name}: {data['size'][idx]}"
 
     extra_args = {}
     if color is not None:

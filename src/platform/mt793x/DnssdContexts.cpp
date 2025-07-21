@@ -187,11 +187,11 @@ CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterCon
 MdnsContexts::~MdnsContexts()
 {
     std::vector<GenericContext *>::const_iterator iter = mContexts.cbegin();
-    while (iter != mContexts.cend())
+    for (auto context : mContexts)
     {
-        Delete(*iter);
-        mContexts.erase(iter);
+        Delete(context);
     }
+    mContexts.clear();
 }
 
 CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
