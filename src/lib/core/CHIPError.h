@@ -115,13 +115,27 @@ public:
     ChipError() = default;
 
     /**
+     * Helper macro to provide a source location arguments to the ChipError constructor.
+     */
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#define CHIP_ERROR_SOURCE_LOCATION_NULL , std::source_location()
+#define CHIP_ERROR_SOURCE_LOCATION , std::source_location::current()
+#elif CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_ERROR_SOURCE_LOCATION_NULL , nullptr, 0
+#define CHIP_ERROR_SOURCE_LOCATION , __FILE__, __LINE__
+#else
+#define CHIP_ERROR_SOURCE_LOCATION_NULL
+#define CHIP_ERROR_SOURCE_LOCATION
+#endif
+
+    /**
      * Construct a CHIP_ERROR encapsulating @a value inside the Range @a range.
      *
      * @note
      *  The result is valid only if CanEncapsulate() is true.
      */
 #if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-    constexpr ChipError(Range range, ValueType value, std::source_location location = std::source_location::current()) :
+    constexpr ChipError(Range range, ValueType value, std::source_location location = std::source_location()) :
         mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))), mSourceLocation(location)
     {}
 #elif CHIP_CONFIG_ERROR_SOURCE
@@ -135,12 +149,7 @@ public:
     /**
      *  Helper macro to construct a CHIP_ERROR from a range and a value.
      */
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
-// Fallback to filename/line if source location support is not available.
-#define CHIP_GENERIC_ERROR(range, value) ::chip::ChipError(range, value, __FILE__, __LINE__)
-#else
-#define CHIP_GENERIC_ERROR(range, value) ::chip::ChipError(range, value)
-#endif
+#define CHIP_GENERIC_ERROR(range, value) ::chip::ChipError(range, value CHIP_ERROR_SOURCE_LOCATION)
 
     /**
      * Construct a CHIP_ERROR for SdkPart @a part with @a code.
@@ -149,7 +158,7 @@ public:
      *  The macro version CHIP_SDK_ERROR checks that the numeric value is constant and well-formed.
      */
 #if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-    constexpr ChipError(SdkPart part, uint8_t code, std::source_location location = std::source_location::current()) :
+    constexpr ChipError(SdkPart part, uint8_t code, std::source_location location = std::source_location()) :
         mError(MakeInteger(part, code)), mSourceLocation(location)
     {}
 #elif CHIP_CONFIG_ERROR_SOURCE
@@ -165,13 +174,8 @@ public:
      * This checks that the numeric value is constant and well-formed.
      * (In C++20 this could be replaced by a consteval constructor.)
      */
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
-// Fallback to filename/line if source location support is not available.
 #define CHIP_SDK_ERROR(part, code)                                                                                                 \
-    (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value, __FILE__, __LINE__))
-#else // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value))
-#endif // CHIP_CONFIG_ERROR_SOURCE
+    (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value CHIP_ERROR_SOURCE_LOCATION))
 
     /**
      * Construct a CHIP_ERROR from the underlying storage type.
@@ -180,7 +184,7 @@ public:
      *  This is intended to be used only in foreign function interfaces.
      */
 #if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-    explicit constexpr ChipError(StorageType error, std::source_location location = std::source_location::current()) :
+    explicit constexpr ChipError(StorageType error, std::source_location location = std::source_location()) :
         mError(error), mSourceLocation(location)
     {}
 #elif CHIP_CONFIG_ERROR_SOURCE
@@ -481,18 +485,9 @@ using CHIP_ERROR = ::chip::ChipError;
  *
  */
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#if __cplusplus < 202002L
-#define CHIP_NO_ERROR                                          CHIP_ERROR(0, __FILE__, __LINE__)
-#else // __cplusplus < 202002L
-#define CHIP_NO_ERROR                                          CHIP_ERROR(0)
-#endif // __cplusplus < 202002L
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0 CHIP_ERROR_SOURCE_LOCATION)
 #else // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#if __cplusplus < 202002L
-#define CHIP_NO_ERROR                                          CHIP_ERROR(0)
-#else // __cplusplus < 202002L
-// Do not store source location to save space for the no-error case.
-#define CHIP_NO_ERROR                                          CHIP_ERROR(0, std::source_location())
-#endif // __cplusplus < 202002L
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0 CHIP_ERROR_SOURCE_LOCATION_NULL)
 #endif // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**

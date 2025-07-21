@@ -137,13 +137,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err)
  */
 DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
 {
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-    return Internal::MapErrorPOSIX(-aError, std::source_location());
-#elif CHIP_CONFIG_ERROR_SOURCE
-    return Internal::MapErrorPOSIX(-aError, nullptr, 0);
-#else
-    return Internal::MapErrorPOSIX(-aError);
-#endif
+    return Internal::MapErrorPOSIX(-aError CHIP_ERROR_SOURCE_LOCATION_NULL);
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

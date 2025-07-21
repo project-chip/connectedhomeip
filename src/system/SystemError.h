@@ -45,19 +45,14 @@
 
 #ifdef __cplusplus
 
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus < 202002L
-// Fallback to filename/line if source location support is not available.
-#define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code, __FILE__, __LINE__)
-#else // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code)
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code CHIP_ERROR_SOURCE_LOCATION)
 
 namespace chip {
 namespace System {
 
 namespace Internal {
 #if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-extern CHIP_ERROR MapErrorPOSIX(int code, std::source_location location = std::source_location::current());
+extern CHIP_ERROR MapErrorPOSIX(int code, std::source_location location);
 #elif CHIP_CONFIG_ERROR_SOURCE
 extern CHIP_ERROR MapErrorPOSIX(int code, const char * file, unsigned int line);
 #else
