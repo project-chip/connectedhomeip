@@ -123,3 +123,9 @@ scripts/tools/compile_flags_from_compile_commands.py \
     flags basic-information \
 | wl-copy
 ```
+
+You may want to enable highlighting via `More->Settings` and have:
+
+- Site theme (as applicable)
+- Line highlighting colour scheme as Rainbow (clearer code as opposed
+  to just gray scale)

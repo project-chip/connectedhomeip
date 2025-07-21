@@ -74,6 +74,13 @@ class CompileCommand:
                     path = os.path.abspath(os.path.join(self.dir, path))
                     arg = f"{p}{path}"
                     break
+
+                # for defines, we have defines like `-DMBEDTLS_CONFIG_FILE="efr32-chip-mbedtls-config.h"`
+                # This does not parse well for godbolt and we have to add extra quotes so that this becomes
+                # `-DMBEDTLS_CONFIG_FILE='"efr32-chip-mbedtls-config.h"'`
+                if arg.startswith("-D") and "=" in arg and arg.endswith('"'):
+                    arg = arg.replace('="', '=\'"') + "'"
+
                 self.args.append(arg)
             index += 1
 
