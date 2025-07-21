@@ -16,6 +16,7 @@
 
 import contextlib
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -76,11 +77,11 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
         cmd.append(f'INCLUDE_IN_PROGRESS={" ".join(CURRENT_IN_PROGRESS_DEFINES)}')
     cmd.append(target)
     if dry_run:
-        print(cmd)
+        logging.info(cmd)
         return ''
     else:
         ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
-        print(ret)
+        logging.info(ret)
         return ret
 
 
@@ -158,11 +159,11 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
 
 
 def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    print('Generating main spec to get file include list - this may take a few minutes')
+    logging.info('Generating main spec to get file include list - this may take a few minutes')
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    print('Generating cluster spec to get file include list - this may take a few minutes')
+    logging.info('Generating cluster spec to get file include list - this may take a few minutes')
     cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
-    print('Generating device type library to get file include list - this may take a few minutes')
+    logging.info('Generating device type library to get file include list - this may take a few minutes')
     device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
     namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
 
@@ -176,7 +177,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
             cmd.extend([d])
 
     if (dry_run):
-        print(cmd)
+        logging.info(cmd)
         return
     subprocess.run(cmd)
     # Remove all the files that weren't compiled into the spec
@@ -191,7 +192,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
             continue
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in cluster_files:
-            print(f'Removing {adoc} as it was not in the generated spec document')
+            logging.info(f'Removing {adoc} as it was not in the generated spec document')
             os.remove(os.path.join(clusters_output_dir, filename))
 
     for filename in os.listdir(device_types_output_dir):
@@ -200,13 +201,13 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
             continue
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in device_type_files:
-            print(f'Removing {adoc} as it was not in the generated spec document')
+            logging.info(f'Removing {adoc} as it was not in the generated spec document')
             os.remove(os.path.join(device_types_output_dir, filename))
 
     for filename in os.listdir(namespaces_output_dir):
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in namespace_files:
-            print(f'Removing {adoc} as it was not in the generated spec document')
+            logging.info(f'Removing {adoc} as it was not in the generated spec document')
             os.remove(os.path.join(namespaces_output_dir, filename))
 
 
@@ -225,11 +226,12 @@ def cleanup_old_spec_dms(output_dir):
         '''
         changed = False
         filename = os.path.join(output_dir, 'device_types', 'DoorLock.xml')
+        if not os.path.exists(filename):
+            return
         with open(filename, 'rt+') as file:
             tree = etree.parse(file)
             root = tree.getroot()
             for feature_tag in root.iter('feature'):
-                print(feature_tag.attrib.get('name', ''))
                 if feature_tag.attrib.get('name', '') == 'FPG':
                     feature_tag.attrib['name'] = 'FGP'
                     changed = True
@@ -278,6 +280,8 @@ def cleanup_old_spec_dms(output_dir):
         '''
         changed = False
         filename = os.path.join(output_dir, 'device_types', 'BaseDeviceType.xml')
+        if not os.path.exists(filename):
+            return
         with open(filename, 'rt+') as file:
             tree = etree.parse(file)
             root = tree.getroot()
@@ -286,7 +290,7 @@ def cleanup_old_spec_dms(output_dir):
                 new_xml = etree.fromstring(missing_pre_1_3_base_device_type_clusters)
                 device_type = root.find('deviceType')
                 if device_type is None:
-                    print("Unable to locate device type tag in BaseDeviceType")
+                    logging.error("Unable to locate device type tag in BaseDeviceType")
                     return
                 device_type.append(new_xml)
                 changed = True
@@ -299,6 +303,8 @@ def cleanup_old_spec_dms(output_dir):
         # gets pushed through.
         changed = False
         filename = os.path.join(output_dir, 'device_types', 'RootNodeDeviceType.xml')
+        if not os.path.exists(filename):
+            return
         with open(filename, 'rt+') as file:
             tree = etree.parse(file)
             root = tree.getroot()
@@ -331,7 +337,7 @@ def dump_versions(scraper, spec_root, output_dir):
         with open(tag_file, 'wt', encoding='utf8') as output:
             output.write(f'{tag[0].split("/")[-1]}\n')
     else:
-        print(f"WARNING: no tag found for sha {sha}")
+        logging.warning(f"WARNING: no tag found for sha {sha}")
         with contextlib.suppress(FileNotFoundError):
             os.remove(tag_file)
 
@@ -392,12 +398,12 @@ def dump_ids_from_data_model_dirs():
         # TODO: create provisional
 
         def device_type_support_str(d):
-            print(f"checking device type for {d.name} for {dir}")
+            logging.info(f"checking device type for {d.name} for {dir}")
             dt_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
                 [], 0, 0).decision == ConformanceDecision.MANDATORY]
             provisional = [clusters[c].name for c in dt_mandatory if clusters[c].is_provisional]
             if provisional:
-                print(f"Found provisional mandatory clusters {provisional} in device type {d.name} for revision {dir}")
+                logging.info(f"Found provisional mandatory clusters {provisional} in device type {d.name} for revision {dir}")
                 return "P"
             return "C"
 

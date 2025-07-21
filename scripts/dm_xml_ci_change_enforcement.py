@@ -54,10 +54,11 @@ def check_dm_directory(dir):
         scripts_dir = os.path.dirname(os.path.realpath(__file__))
         generate_file = os.path.join(scripts_dir, 'spec_xml', 'generate_spec_xml.py')
         # we're not using the scraper or spec, so it doesn't matter here
-        cmd = f'python3 {generate_file} --scraper x --spec-root x --output-dir {dir} --include-in-progress None --skip-scrape'
-        output = subprocess.check_output(cmd, shell=True).decode()
-        cmd = f'git diff HEAD --name-only -- {dir}'
-        output = subprocess.check_output(cmd, shell=True).decode()
+        cmd_list = ['python3', generate_file, '--scraper', 'x', '--spec-root', 'x',
+                    '--output-dir', dir, '--include-in-progress', 'None', '--skip-scrape']
+        subprocess.run(cmd_list, check=True)
+        cmd_list = ['git', 'diff', 'HEAD', '--name-only', '--', dir]
+        output = subprocess.check_output(cmd_list).decode()
         if output:
             print(f"Data model directory {dir} files do not match DM generation script output")
             print(output)
