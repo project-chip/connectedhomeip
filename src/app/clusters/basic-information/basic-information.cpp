@@ -143,7 +143,7 @@ inline CHIP_ERROR ReadSoftwareVersionString(DeviceLayer::ConfigurationManager & 
 {
     constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
     char softwareVersionString[kMaxLen + 1] = { 0 };
-    ReturnErrorOnFailure(configManager.GetSoftwareVersionString(softwareVersionString, kMaxLen));
+    ReturnErrorOnFailure(configManager.GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString)));
     return aEncoder.Encode(CharSpan(softwareVersionString, strnlen(softwareVersionString, kMaxLen)));
 }
 

@@ -331,7 +331,8 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
     if (PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_SoftwareVersionString))
     {
         ReturnErrorOnFailure(ReadConfigValueStr(PosixConfig::kConfigKey_SoftwareVersionString, buf, bufSize, outLen));
-        buf[outLen] = '\0'; // Null-terminate the string read from the config.
+        VerifyOrReturnError(outLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        buf[outLen] = 0; // Null-terminate the string read from the config.
         return CHIP_NO_ERROR;
     }
 
