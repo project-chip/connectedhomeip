@@ -76,7 +76,12 @@ using the following instructions:
 
 - install node 20 or above (if you do not have it installed yet)
 - compile compiler-explorer from source
-- add the relevant compiler settings (TODO)
+- add the relevant compiler settings:
+  - compile a sample application using the relevant variant. For example
+    `./scripts/build/build_examples.py --target efr32-brd2703a-lock build`
+  - This will create a compile_commands.json that compiler arguments
+    for building files. Convert those arguments into a file in
+    `etc/config/c++.local.properties`
 
 The following instructions should work on a `chip-build-vscode` image. Set the
 port accordingly (default is 10240)
