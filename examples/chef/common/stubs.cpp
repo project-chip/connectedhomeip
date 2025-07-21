@@ -79,8 +79,8 @@ void InitIdentifyCluster()
             std::make_unique<struct Identify>(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
     }
 }
+} // namespace
 #endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
-}
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
