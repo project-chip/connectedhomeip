@@ -143,9 +143,9 @@ std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler &
 }
 
 /*
- * This builds upon the HandleTimeSnapshot function used by the default general diagnostic cluster class,
- * but also considers real posix time. This is put into a seperate function and called in a seperate class so
- * that it will be used only for the cases where needed, to avoid frequently reporting unsynced time.
+ This builds upon the HandleTimeSnapshot function used by the default general diagnostic cluster class, but also 
+ considers real posix time. This is a separate function called in a separate class as there are some cases 
+ (that can be determined statically) where we don't want to record posix time and pay the codesize cost for it.
  */
 std::optional<DataModel::ActionReturnStatus>
 HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandPath & commandPath,
