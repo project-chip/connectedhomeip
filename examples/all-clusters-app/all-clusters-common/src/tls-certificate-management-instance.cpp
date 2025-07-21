@@ -95,21 +95,28 @@ struct RefEncodableClientCert
         MutableByteSpan targetBytes(certBytes);
         ReturnErrorOnFailure(CopySpanToMutableSpan(src.clientCertificate.Value(), targetBytes));
 
-        auto srcIter = src.intermediateCertificates.Value().begin();
-        uint8_t i    = 0;
-        while (srcIter.Next())
+        if (src.intermediateCertificates.HasValue())
         {
-            VerifyOrReturnError(i < kMaxIntermediateCerts, CHIP_ERROR_NO_MEMORY);
-            MutableByteSpan targetIntermediateBytes(intermediateCertBytes[i]);
-            ReturnErrorOnFailure(CopySpanToMutableSpan(srcIter.GetValue(), targetIntermediateBytes));
-            intermediateCerts[i++] = targetIntermediateBytes;
+            auto srcIter = src.intermediateCertificates.Value().begin();
+            uint8_t i    = 0;
+            while (srcIter.Next())
+            {
+                VerifyOrReturnError(i < kMaxIntermediateCerts, CHIP_ERROR_NO_MEMORY);
+                MutableByteSpan targetIntermediateBytes(intermediateCertBytes[i]);
+                ReturnErrorOnFailure(CopySpanToMutableSpan(srcIter.GetValue(), targetIntermediateBytes));
+                intermediateCerts[i++] = targetIntermediateBytes;
+            }
+            ReturnErrorOnFailure(srcIter.GetStatus());
+            certificate->intermediateCertificates.SetValue(List<ByteSpan>(intermediateCerts.data(), i));
         }
-        ReturnErrorOnFailure(srcIter.GetStatus());
+        else
+        {
+            certificate->intermediateCertificates.ClearValue();
+        }
 
         certificate->fabricIndex = fabric;
         certificate->ccdid       = src.ccdid;
         certificate->clientCertificate.SetValue(targetBytes);
-        certificate->intermediateCertificates.SetValue(List<ByteSpan>(intermediateCerts.data(), i));
         return CHIP_NO_ERROR;
     }
 };
@@ -298,7 +305,7 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::ClientCertsForFabric(Endpoin
     VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     uint8_t numClientCerts;
-    mCertificateTable.GetRootCertificateCount(fabric, numClientCerts);
+    mCertificateTable.GetClientCertificateCount(fabric, numClientCerts);
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
     ScopedMemoryBuffer<RefEncodableClientCert> clientCertificatePayloads;
     ScopedMemoryBuffer<ClientCertStructType> clientCertificates;
