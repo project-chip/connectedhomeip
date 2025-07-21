@@ -481,9 +481,18 @@ using CHIP_ERROR = ::chip::ChipError;
  *
  */
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#if __cplusplus < 202002L
 #define CHIP_NO_ERROR                                          CHIP_ERROR(0, __FILE__, __LINE__)
-#else // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#else // __cplusplus < 202002L
 #define CHIP_NO_ERROR                                          CHIP_ERROR(0)
+#endif // __cplusplus < 202002L
+#else // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#if __cplusplus < 202002L
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0)
+#else // __cplusplus < 202002L
+// Do not store source location to save space for the no-error case.
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0, std::source_location())
+#endif // __cplusplus < 202002L
 #endif // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
