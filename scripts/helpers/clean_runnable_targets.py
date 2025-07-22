@@ -17,8 +17,8 @@
 #
 
 import os
-import sys
 import subprocess
+import sys
 
 # Calculate OUTPUT_ROOT, equivalent to the Bash variable
 # This navigates two directories up from the script's location and then into 'out/coverage'
