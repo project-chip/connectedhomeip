@@ -60,13 +60,9 @@ public:
         return aEncoder.Encode(data);
     }
 
-    // These attributes use custom implementations instead of ReadIfSupported because they
-    // provide more detailed logging messages and, in some cases, additional metrics.
+    // WiFiBssId use custom implementations instead of ReadIfSupported because it
+    // provide more detailed logging messages.
     CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSecurityType(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadWiFiVersion(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadChannelNumber(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadWiFiRssi(AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR HandleResetCounts()
     {
