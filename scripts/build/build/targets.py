@@ -48,7 +48,7 @@ class BuildTargetCommon(BuildTarget):
 
 
 def BuildHostTestRunnerTarget():
-    target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
+    target = BuildTargetCommon(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
     target.AppendFixedTargets([
         TargetPart(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE),
@@ -64,7 +64,7 @@ def BuildHostTestRunnerTarget():
 
 
 def BuildHostFakeTarget():
-    target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
+    target = BuildTargetCommon(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
     target.AppendFixedTargets([
         TargetPart('fake', board=HostBoard.FAKE),
@@ -99,7 +99,7 @@ def BuildHostTarget():
     cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (
         native_board_name != HostBoard.ARM64.BoardName())
 
-    target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
+    target = BuildTargetCommon(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
     board_parts = [
         TargetPart(native_board_name, board=HostBoard.NATIVE),
@@ -666,7 +666,7 @@ def BuildStm32Target():
 
 
 def BuildTizenTarget():
-    target = BuildTarget('tizen', TizenBuilder)
+    target = BuildTargetCommon('tizen', TizenBuilder)
 
     # board
     target.AppendFixedTargets([

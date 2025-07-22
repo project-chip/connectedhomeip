@@ -366,12 +366,14 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
+                 debug=True,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
-                 minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
+                 minmdns_high_verbosity=False, imgui_ui=False,
+                 crypto_library: Optional[HostCryptoLibrary] = None,
                  enable_test_event_triggers=None,
                  enable_dnssd_tests: Optional[bool] = None,
                  chip_casting_simplified: Optional[bool] = None,
@@ -389,6 +391,8 @@ class HostBuilder(GnBuilder):
         self.extra_gn_options = []
         self.build_env = {}
         self.fuzzing_type = fuzzing_type
+
+        self.extra_gn_options.append('is_debug=' + str(debug).lower())
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
