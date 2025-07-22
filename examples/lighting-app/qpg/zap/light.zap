@@ -42,7 +42,7 @@
         "profileId": 259,
         "label": "MA-otarequestor",
         "name": "MA-otarequestor",
-        "deviceTypeOrder": 0
+        "deviceTypeOrder": 1
       },
       "deviceTypes": [
         {
@@ -50,20 +50,13 @@
           "profileId": 259,
           "label": "MA-otarequestor",
           "name": "MA-otarequestor",
-          "deviceTypeOrder": 0
+          "deviceTypeOrder": 1
         },
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
           "name": "MA-rootdevice",
-          "deviceTypeOrder": 0
-        },
-        {
-          "code": 18,
-          "profileId": 259,
-          "label": "MA-otarequestor",
-          "name": "MA-otarequestor",
           "deviceTypeOrder": 1
         },
         {
@@ -75,13 +68,13 @@
         }
       ],
       "deviceVersions": [
-        3,
         1,
-        1
+        1,
+        0
       ],
       "deviceIdentifiers": [
-        22,
         18,
+        22,
         17
       ],
       "deviceTypeName": "MA-otarequestor",
@@ -3315,7 +3308,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3331,7 +3324,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3685,6 +3678,30 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SetVIDVerificationStatement",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SignVIDVerificationRequest",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SignVIDVerificationResponse",
+              "code": 14,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
               "isEnabled": 1
             }
           ],
@@ -5563,7 +5580,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5579,7 +5596,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5595,7 +5612,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5611,7 +5628,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
