@@ -54,7 +54,7 @@ namespace Internal {
  *
  *  @return The mapped POSIX network or OS error.
  */
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, std::source_location location)
 {
     return (aError == 0 ? CHIP_NO_ERROR

@@ -35,9 +35,9 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/TypeTraits.h>
 
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 #include <source_location>
-#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#endif
 
 namespace chip {
 
@@ -117,7 +117,7 @@ public:
     /**
      * Helper macro to provide a source location arguments to the ChipError constructor.
      */
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 #define CHIP_ERROR_SOURCE_LOCATION_NULL , std::source_location()
 #define CHIP_ERROR_SOURCE_LOCATION , std::source_location::current()
 #elif CHIP_CONFIG_ERROR_SOURCE
@@ -134,7 +134,7 @@ public:
      * @note
      *  The result is valid only if CanEncapsulate() is true.
      */
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     constexpr ChipError(Range range, ValueType value, std::source_location location = std::source_location()) :
         mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))), mSourceLocation(location)
     {}
@@ -157,7 +157,7 @@ public:
      * @note
      *  The macro version CHIP_SDK_ERROR checks that the numeric value is constant and well-formed.
      */
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     constexpr ChipError(SdkPart part, uint8_t code, std::source_location location = std::source_location()) :
         mError(MakeInteger(part, code)), mSourceLocation(location)
     {}
@@ -183,7 +183,7 @@ public:
      * @note
      *  This is intended to be used only in foreign function interfaces.
      */
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     explicit constexpr ChipError(StorageType error, std::source_location location = std::source_location()) :
         mError(error), mSourceLocation(location)
     {}
@@ -320,7 +320,7 @@ public:
      */
     const char * GetFile() const
     {
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
         return mSourceLocation.file_name();
 #else
         return mFile;
@@ -335,19 +335,19 @@ public:
      */
     unsigned int GetLine() const
     {
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
         return mSourceLocation.line();
 #else
         return mLine;
 #endif
     }
 
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     /**
      * Get the source_location of the point where the error occurred.
      */
     const std::source_location & GetSourceLocation() { return mSourceLocation; }
-#endif // __cplusplus >= 202002L
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
@@ -412,7 +412,7 @@ private:
 
     StorageType mError;
 
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     std::source_location mSourceLocation;
 #elif CHIP_CONFIG_ERROR_SOURCE
     unsigned int mLine;

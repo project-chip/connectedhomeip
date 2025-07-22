@@ -35,7 +35,7 @@
 #include <lib/core/CHIPError.h>
 #include <system/SystemConfig.h>
 
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 #include <source_location>
 #endif
 
@@ -51,7 +51,7 @@ namespace chip {
 namespace System {
 
 namespace Internal {
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 extern CHIP_ERROR MapErrorPOSIX(int code, std::source_location location);
 #elif CHIP_CONFIG_ERROR_SOURCE
 extern CHIP_ERROR MapErrorPOSIX(int code, const char * file, unsigned int line);
