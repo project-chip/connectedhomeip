@@ -100,7 +100,7 @@ class TC_CNET_4_9(MatterBaseTest):
         return '[TC-CNET-4.9] [Wi-Fi] Verification for RemoveNetwork Command [DUT-Server]'
 
     def pics_TC_CNET_4_9(self):
-        return ['CNET.S']
+        return ['CNET.S.F00']
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
@@ -109,12 +109,6 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # Commissioning is already done
         self.step("Precondition")
-
-        feature_map = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.FeatureMap)
-        if not (feature_map & Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface):
-            logging.info('Device does not support WiFi on endpoint, skipping remaining steps')
-            self.mark_all_remaining_steps_skipped(1)
-            return
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(1)
