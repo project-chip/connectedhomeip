@@ -247,7 +247,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-network-manager-ipv6only \
     --target linux-arm64-terms-and-conditions-ipv6only \
     --target linux-arm64-water-leak-detector-ipv6only \
-    --target linux-arm64-camera-ipv6only \
+    --target linux-arm64-camera-clang-ipv6only \
     --target linux-arm64-camera-controller-ipv6only \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
@@ -277,7 +277,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
     && mv out/linux-arm64-terms-and-conditions-ipv6only/chip-terms-and-conditions-app out/chip-terms-and-conditions-app \
     && mv out/linux-arm64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
-    && mv out/linux-arm64-camera-ipv6only/chip-camera-app out/chip-camera-app \
+    && mv out/linux-arm64-camera-clang-ipv6only/chip-camera-app out/chip-camera-app \
     && mv out/linux-arm64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
     ;; \
     *) ;; \
