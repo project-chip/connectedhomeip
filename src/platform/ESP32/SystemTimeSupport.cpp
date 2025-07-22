@@ -79,10 +79,26 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
     return err;
 }
 
-CHIP_ERROR ClockImpl::SetClock_RealTime([[maybe_unused]] Microseconds64 aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
-    (void) aNewCurTime;
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    struct timeval tv;
+    tv.tv_sec  = static_cast<time_t>(aNewCurTime.count() / UINT64_C(1000000));
+    tv.tv_usec = static_cast<long>(aNewCurTime.count() % UINT64_C(1000000));
+    if (settimeofday(&tv, nullptr) != 0)
+    {
+        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : CHIP_ERROR_POSIX(errno);
+    }
+#if CHIP_PROGRESS_LOGGING
+    {
+        const time_t timep = tv.tv_sec;
+        struct tm calendar;
+        localtime_r(&timep, &calendar);
+        char time_str[64];
+        strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S UTC", &calendar);
+        ChipLogProgress(DeviceLayer, "Real time clock set to %ld (%s)", static_cast<long>(tv.tv_sec), time_str);
+    }
+#endif // CHIP_PROGRESS_LOGGING
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Clock
