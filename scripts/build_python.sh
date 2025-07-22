@@ -50,6 +50,7 @@ declare install_jupyterlab=no
 declare -a extra_packages
 declare -a extra_gn_args
 declare chip_build_controller_dynamic_server=true
+declare enable_pw_rpc=false
 
 help() {
 
@@ -82,6 +83,7 @@ Input Options:
   -z, --pregen_dir DIRECTORY                                Directory where generated zap files have been pre-generated.
   -ds, --chip_build_controller_dynamic_server <true/false>  Enable dynamic server in controller.
                                                             Defaults to $chip_build_controller_dynamic_server.
+  -pw  --enable_pw_rpc <true/false>                         Build Pw Python wheels. Defaults to $enable_pw_rpc.
 "
 }
 
@@ -173,6 +175,14 @@ while (($#)); do
             chip_build_controller_dynamic_server=$2
             shift
             ;;
+        --enable_pw_rpc | -pw)
+            enable_pw_rpc=$2
+            if [[ "$enable_pw_rpc" != "true" && "$enable_pw_rpc" != "false" ]]; then
+                echo "enable_pw_rpc should have a true/false value, not '$enable_pw_rpc'"
+                exit 1
+            fi
+            shift
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -195,6 +205,7 @@ fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
 echo "  chip_support_webrtc_python_bindings=true"
+echo "  enable_pw_rpc=\"$enable_pw_rpc\""
 
 if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
     echo "In addition, the following extra args will added to gn command line: ${extra_gn_args[*]}"
@@ -270,6 +281,16 @@ fi
 
 if [ -n "$extra_packages" ]; then
     WHEEL+=("${extra_packages[@]}")
+fi
+
+if [[ "$enable_pw_rpc" == "true" ]]; then
+    echo "Installing Pw RPC Python wheels"
+    PWRPC_ROOT="$CHIP_ROOT/examples/common/pigweed/rpc_console"
+    PWRPC_OUTPUT_ROOT="$OUTPUT_ROOT/pwrpc"
+    gn --root="$PWRPC_ROOT" gen "$PWRPC_OUTPUT_ROOT"
+    # Compile Python wheels
+    ninja -C "$PWRPC_OUTPUT_ROOT" chip_rpc_wheel
+    WHEEL+=("$PWRPC_OUTPUT_ROOT"/chip_rpc_console_wheels/*.whl)
 fi
 
 if [ -n "$install_virtual_env" ]; then
