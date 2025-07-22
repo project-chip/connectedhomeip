@@ -308,21 +308,24 @@ def _find_test_class():
     Raises:
       SystemExit: Raised if the number of test classes is not exactly one.
     """
-    # Import MatterBaseTest here to avoid circular dependency
-    from chip.testing.matter_testing import MatterBaseTest
+    def get_subclasses(cls: Any):
+        subclasses = utils.find_subclasses_in_module([cls], sys.modules['__main__'])
+        subclasses = [c for c in subclasses if c.__name__ != cls.__name__]
+        return subclasses
 
-    subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
-    subclasses = [c for c in subclasses
-                  if c.__name__ != "MatterBaseTest"
-                  and c.__module__ == '__main__']
+    def has_subclasses(cls: Any):
+        return get_subclasses(cls) != []
 
-    if len(subclasses) != 1:
+    subclasses_matter_test_base = get_subclasses(MatterBaseTest)
+    leaf_subclasses = [s for s in subclasses_matter_test_base if not has_subclasses(s)]
+
+    if len(leaf_subclasses) != 1:
         print(
             'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
-            str([subclass.__name__ for subclass in subclasses]))
+            str([subclass.__name__ for subclass in leaf_subclasses]))
         sys.exit(1)
 
-    return subclasses[0]
+    return leaf_subclasses[0]
 
 
 def default_matter_test_main():
