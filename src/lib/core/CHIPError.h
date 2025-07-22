@@ -114,6 +114,11 @@ public:
 
     ChipError() = default;
 
+    static constexpr ::chip::ChipError MapPlatformError(::chip::ChipError::Range range, uint32_t code)
+    {
+        return static_cast<ChipError>(MakeField(kRangeStart, to_underlying(range)) | MakeField(kValueStart, code));
+    }
+
     // Helper for declaring constructors without too much repetition.
 #if CHIP_CONFIG_ERROR_SOURCE
 #if __cplusplus >= 202002L
@@ -417,6 +422,17 @@ public:
         static_assert(MakeInteger(PART, SCODE) != 0, "value is zero");
         static constexpr StorageType value = MakeInteger(PART, SCODE);
     };
+    /**
+     * Helper for constructing error constants for platform errors.
+     *
+     * This template ensures that the numeric value is constant and well-formed.
+     */
+    template <Range PART, uint32_t PlatformCode>
+    struct PlatformErrorConstant
+    {
+        static_assert(MakeInteger(PART, PlatformCode) != 0, "value is zero");
+        static constexpr uint32_t value = MakeInteger(PART, PlatformCode);
+    };
 };
 
 } // namespace chip
@@ -434,6 +450,7 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_APPLICATION_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kApplication, (e))
 
 #define CHIP_CORE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kCore, (e))
+#define MATTER_PLATFORM_ERROR(e) (::chip::ChipError(::chip::ChipError::MapPlatformError(::chip::ChipError::Range::kPlatform, (e))))
 
 #define CHIP_IM_GLOBAL_STATUS(type)                                                                                                \
     CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus,                                                                    \
