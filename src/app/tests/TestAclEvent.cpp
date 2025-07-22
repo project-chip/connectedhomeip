@@ -228,18 +228,20 @@ public:
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
 
         Access::GetAccessControl().Finish();
         Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
 
         mAccessControlDelegate                          = static_cast<TestAccessControlDelegate *>(GetTestAccessControlDelegate());
         mAccessControlDelegate->mNumOfTimesAclIsChecked = 0;
+
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
@@ -491,13 +493,12 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
 
     EXPECT_FALSE(engine->GetNumActiveReadClients());
 
-    model.Registry().Unregister(&fakeClusterServer);
-    model.Shutdown();
-
     engine->Shutdown();
     EXPECT_FALSE(GetExchangeManager().GetNumActiveExchanges());
+    engine->SetDataModelProvider(mOldProvider);
 
-    InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+    model.Registry().Unregister(&fakeClusterServer);
+    model.Shutdown();
 }
 
 } // namespace app
