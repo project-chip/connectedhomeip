@@ -44,10 +44,8 @@ class TestBleEndPoint : public ::testing::Test, public BleApplicationDelegate, p
 public:
     static void SetUpTestSuite()
     {
-        CHIP_ERROR err = Platform::MemoryInit();
-        ASSERT_EQ(err, CHIP_NO_ERROR);
-        err = DeviceLayer::SystemLayer().Init();
-        ASSERT_EQ(err, CHIP_NO_ERROR);
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(DeviceLayer::SystemLayer().Init(), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()
     {
