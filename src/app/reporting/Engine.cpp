@@ -292,13 +292,14 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
     {
         // cannot get event data to validate. Event is not supported.
         // we still fall through into "ValidateClusterPath" to try to return a `better code`
-        // (i.e. say invalid endpoint or cluser), however if path seems ok we will
+        // (i.e. say invalid endpoint or cluster), however if path seems ok we will
         // return unsupported event as we failed to get event metadata.
         outStatus = StatusIB(DataModel::ValidateClusterPath(provider, path, Status::UnsupportedEvent));
         return CHIP_NO_ERROR;
     }
-    requestPath.entityId = path.mEventId;
 
+    // Although EventInfo() was successful, we still need to Validate Cluster Path since providers MAY return CHIP_NO_ERROR although
+    // events are unknown.
     Status status = DataModel::ValidateClusterPath(provider, path, Status::Success);
     if (status != Status::Success)
     {
@@ -306,6 +307,8 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         outStatus = StatusIB(status);
         return CHIP_NO_ERROR;
     }
+
+    requestPath.entityId = path.mEventId;
 
     // Per spec, the required-privilege ACL check is performed only after path existence is validated
     err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
