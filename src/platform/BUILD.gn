@@ -22,6 +22,13 @@ import("${chip_root}/src/system/system.gni")
 
 import("device.gni")
 
+import("${chip_root}/build/chip/chip_version.gni")
+
+gen_sdk_version("matter_sdk_version") {
+  filename = "MatterSdkVersion.h"
+  directory = "${root_gen_dir}/include"
+}
+
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 
@@ -481,6 +488,7 @@ if (chip_device_platform != "none") {
   source_set("platform_base") {
     public_deps = [
       ":platform_config_header",
+      ":matter_sdk_version",
       "${chip_root}/src/app/icd/server:icd-server-config",
       "${chip_root}/src/ble",
       "${chip_root}/src/credentials:build_time_header",

@@ -27,3 +27,22 @@ declare_args() {
   # CHIP extra version string.
   chip_version_extra = ""
 }
+
+
+template("gen_sdk_version") {
+  action(target_name) {
+    filename = invoker.filename
+    directory = invoker.directory
+
+    outputs = [ "${directory}/${filename}" ]
+
+    script = "${chip_root}/build/chip/write_sdk_version_header.py"
+
+    args = [
+      "--output",
+      filename,
+      "--gen-dir",
+      rebase_path(directory, root_build_dir),
+    ]
+  }
+}

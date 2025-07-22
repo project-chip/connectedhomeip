@@ -56,6 +56,8 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #endif
 
+#include <MatterSdkVersion.h>
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Platform;
@@ -114,6 +116,7 @@ enum
     kDeviceOption_TestEventTriggerEnableKey,
     kTraceTo,
     kOptionSimulateNoInternalTime,
+    kOptionPayloadVersion,
 #if defined(PW_RPC_ENABLED)
     kOptionRpcServerPort,
 #endif
@@ -251,6 +254,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
 #endif
+    { "payload-version", kNoArgument, kOptionPayloadVersion },
     {}
 };
 
@@ -280,6 +284,9 @@ const char * sDeviceOptionHelp =
     "  --thread\n"
     "       Enable Thread management via ot-agent.\n"
 #endif // CHIP_ENABLE_OPENTHREAD
+    "\n"
+    "  --payload-version\n"
+    "       Print the Matter SDK version used to build this binary.\n"
     "\n"
     "  --version <version>\n"
     "       The version indication provides versioning of the setup payload.\n"
@@ -922,6 +929,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
+    case kOptionPayloadVersion:
+        printf("matter-sdk version %s\n", CHIP_SDK_VERSION);
+        exit(0);
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
