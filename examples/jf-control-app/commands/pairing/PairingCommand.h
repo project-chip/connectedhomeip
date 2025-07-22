@@ -260,14 +260,10 @@ public:
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     /////////// JCMTrustVerificationDelegate /////////
-    void OnProgressUpdate(JCMDeviceCommissioner & commissioner,
-                          JCMTrustVerificationStage stage,
-                          JCMTrustVerificationInfo & info,
+    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
                           JCMTrustVerificationError error);
-    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner,
-                             JCMTrustVerificationInfo & info);
-    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner,
-                          JCMTrustVerificationInfo & info);
+    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
+    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);

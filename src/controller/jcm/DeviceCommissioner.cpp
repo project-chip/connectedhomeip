@@ -449,8 +449,7 @@ void DeviceCommissioner::PerformTrustVerificationStage(TrustVerificationStage ne
     }
 }
 
-void DeviceCommissioner::TrustVerificationStageFinished(TrustVerificationStage completedStage,
-                                                           TrustVerificationError error)
+void DeviceCommissioner::TrustVerificationStageFinished(TrustVerificationStage completedStage, TrustVerificationError error)
 {
     ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", EnumToString(completedStage).c_str());
 

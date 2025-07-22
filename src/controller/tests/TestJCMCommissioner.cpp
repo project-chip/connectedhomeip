@@ -70,14 +70,14 @@ public:
         commissioner.ContinueAfterVendorIDVerification(mShouldVerifyVendorId);
     }
 
-    int mProgressUpdates                 = 0;
-    TrustVerificationStage mLastStage = TrustVerificationStage::kIdle;
-    TrustVerificationError mLastError = TrustVerificationError::kSuccess;
-    bool mAskedForConsent                = false;
-    bool mShouldConsent                  = true;
-    bool mAskedForVendorIdVerification   = false;
-    bool mShouldVerifyVendorId           = true;
-    VendorId mLastVendorId               = VendorId::Common;
+    int mProgressUpdates               = 0;
+    TrustVerificationStage mLastStage  = TrustVerificationStage::kIdle;
+    TrustVerificationError mLastError  = TrustVerificationError::kSuccess;
+    bool mAskedForConsent              = false;
+    bool mShouldConsent                = true;
+    bool mAskedForVendorIdVerification = false;
+    bool mShouldVerifyVendorId         = true;
+    VendorId mLastVendorId             = VendorId::Common;
 };
 
 class MockClusterStateCache : public ClusterStateCache

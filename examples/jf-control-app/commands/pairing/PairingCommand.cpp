@@ -39,10 +39,10 @@ using namespace ::chip;
 using namespace ::chip::Controller;
 using namespace chip::Credentials;
 
-using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
-using JCMTrustVerificationStage    = chip::Controller::JCM::TrustVerificationStage;
-using JCMTrustVerificationError    = chip::Controller::JCM::TrustVerificationError;
-using JCMTrustVerificationInfo     = chip::Controller::JCM::TrustVerificationInfo;
+using JCMDeviceCommissioner     = chip::Controller::JCM::DeviceCommissioner;
+using JCMTrustVerificationStage = chip::Controller::JCM::TrustVerificationStage;
+using JCMTrustVerificationError = chip::Controller::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo  = chip::Controller::JCM::TrustVerificationInfo;
 
 NodeId PairingCommand::GetAnchorNodeId()
 {
@@ -67,8 +67,7 @@ CHIP_ERROR PairingCommand::SetAnchorNodeId(NodeId value)
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
-    chip::Controller::JCM::DeviceCommissioner & commissioner =
-        static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
+    chip::Controller::JCM::DeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
 
@@ -703,11 +702,10 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             Credentials::P256PublicKeySpan adminICACPKSpan;
 
             memset(&request, 0, sizeof(request));
-            request.node_id = nodeId;
-            request.jcm     = mJCM.ValueOr(false);
-            JCMDeviceCommissioner & commissioner =
-                static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
-            JCMTrustVerificationInfo & info = commissioner.GetTrustVerificationInfo();
+            request.node_id                      = nodeId;
+            request.jcm                          = mJCM.ValueOr(false);
+            JCMDeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
+            JCMTrustVerificationInfo & info      = commissioner.GetTrustVerificationInfo();
             /* extract and save the public key of the peer Admin ICAC */
             err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.Span(), adminICACPKSpan);
             if (err != CHIP_NO_ERROR)
@@ -903,24 +901,20 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
     }
 }
 
-void PairingCommand::OnProgressUpdate(JCMDeviceCommissioner & commissioner,
-                                      JCMTrustVerificationStage stage,
-                                      JCMTrustVerificationInfo & info,
-                                      JCMTrustVerificationError error)
+void PairingCommand::OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage,
+                                      JCMTrustVerificationInfo & info, JCMTrustVerificationError error)
 {
     ChipLogProgress(Controller, "JCM: Trust Verification progress: %d", static_cast<int>(stage));
 }
 
-void PairingCommand::OnAskUserForConsent(JCMDeviceCommissioner & commissioner,
-                                         JCMTrustVerificationInfo & info)
+void PairingCommand::OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
 {
     ChipLogProgress(Controller, "Asking user for consent for vendor ID: %u", info.adminVendorId);
 
     commissioner.ContinueAfterUserConsent(true);
 }
 
-void PairingCommand::OnVerifyVendorId(JCMDeviceCommissioner & commissioner,
-                                      JCMTrustVerificationInfo & info)
+void PairingCommand::OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info.adminVendorId);
 

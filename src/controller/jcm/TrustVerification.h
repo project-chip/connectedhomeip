@@ -145,8 +145,7 @@ inline std::string EnumToString(TrustVerificationStage stage)
     }
 }
 
-typedef void (*TrustVerificationCompleteCallback)(void * context, TrustVerificationInfo & info,
-                                                     TrustVerificationError result);
+typedef void (*TrustVerificationCompleteCallback)(void * context, TrustVerificationInfo & info, TrustVerificationError result);
 
 /**
  * A delegate that can be notified of progress as the JCM Trust Verification check proceeds.
@@ -156,8 +155,8 @@ class DLL_EXPORT TrustVerificationDelegate
 public:
     virtual ~TrustVerificationDelegate() = default;
 
-    virtual void OnProgressUpdate(DeviceCommissioner & commissioner, TrustVerificationStage stage,
-                                  TrustVerificationInfo & info, TrustVerificationError error)         = 0;
+    virtual void OnProgressUpdate(DeviceCommissioner & commissioner, TrustVerificationStage stage, TrustVerificationInfo & info,
+                                  TrustVerificationError error)                                       = 0;
     virtual void OnAskUserForConsent(DeviceCommissioner & commissioner, TrustVerificationInfo & info) = 0;
     virtual void OnVerifyVendorId(DeviceCommissioner & commissioner, TrustVerificationInfo & info)    = 0;
 };

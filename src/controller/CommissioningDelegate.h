@@ -24,7 +24,7 @@
 #include <controller/CommissioneeDeviceProxy.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <controller/jcm/TrustVerification.h> // nogncheck
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#endif                                        // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -873,13 +873,14 @@ public:
      * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: None
      */
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, TimeZoneResponseInfo
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                                         ,JCM::TrustVerificationError
+                  ,
+                  JCM::TrustVerificationError
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                                         >
+                  >
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
