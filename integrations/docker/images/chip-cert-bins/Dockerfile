@@ -185,6 +185,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-water-leak-detector-ipv6only \
     --target linux-x64-camera-ipv6only \
     --target linux-x64-camera-controller-ipv6only \
+    --target linux-x64-closure-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -215,6 +216,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
     && mv out/linux-x64-camera-ipv6only/chip-camera-app out/chip-camera-app \
     && mv out/linux-x64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
+    && mv && mv out/linux-x64-closure-ipv6only/chip-closure-app out/chip-closure-app \
     ;; \
     "linux/arm64")\
     set -x \
@@ -249,6 +251,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-water-leak-detector-ipv6only \
     --target linux-arm64-camera-clang-ipv6only \
     --target linux-arm64-camera-controller-ipv6only \
+    --target linux-arm64-closure-ipv6only \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -279,6 +282,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
     && mv out/linux-arm64-camera-clang-ipv6only/chip-camera-app out/chip-camera-app \
     && mv out/linux-arm64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
+    && mv out/linux-arm64-closure-ipv6only/chip-closure-app out/chip-closure-app \
     ;; \
     *) ;; \
     esac
@@ -324,6 +328,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-terms-and-condit
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/water-leak-detector-app apps/water-leak-detector-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-app apps/chip-camera-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-controller apps/chip-camera-controller
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-closure-app apps/chip-closure-app
 
 # Create symbolic links for now since this allows users to use existing configurations
 # for running just `app-name` instead of `apps/app-name`
