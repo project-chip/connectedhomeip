@@ -76,6 +76,13 @@ public:
      */
     void ClearFilters();
 
+    /*
+     * @brief Check if the scope is enabled
+     * @param scope The scope to check
+     * @return true if the scope is enabled or if no filters are set, false otherwise
+     */
+    bool IsEnabled(const char * scope);
+
 private:
     using ValueType = MetricEvent::Value::Type;
     CircularDiagnosticBuffer * mStorageInstance;
@@ -94,13 +101,6 @@ private:
      * @brief Initialize the default filters
      */
     void InitializeDefaultFilters();
-
-    /*
-     * @brief Check if the scope is enabled
-     * @param scope The scope to check
-     * @return true if the scope is enabled or if no filters are set, false otherwise
-     */
-    bool IsEnabled(const char * scope);
 };
 
 } // namespace Diagnostics
