@@ -107,7 +107,8 @@ class CompileCommand:
             print(flag)
 
     def __str__(self):
-        return f"[{self.dir}: {self.file}] -> \n      {'\n      '.join(self.args)}"
+        prefix = "\n      " # have all args on newlines with an indent
+        return f"[{self.dir}: {self.file}] -> {prefix}{prefix.join(self.args)}"
 
 
 class ParsedCommands:
