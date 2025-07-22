@@ -171,7 +171,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
         asserts.assert_true(
             len(allocatedVideoStreams) != 0, "AllocatedVideoStreams must not be empty"
         )
-        
+
         allocatedVideoStream = allocatedVideoStreams[0]
         videoStreamId = allocatedVideoStream.videoStreamID
 
@@ -222,7 +222,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                     "streamUsage": Globals.Enums.StreamUsageEnum.kInternal,
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
-                    "endpointID": 1, # TODO: Revisit TLS arguments once TLSCM cluster is available.
+                    "endpointID": 1,  # TODO: Revisit TLS arguments once TLSCM cluster is available.
                     "url": "https://localhost:1234/streams/1",
                     "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
                     "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
