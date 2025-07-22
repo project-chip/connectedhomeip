@@ -66,9 +66,12 @@ class TC_SU_4_1(MatterBaseTest):
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH sends a write request for the DefaultOTAProviders Attribute on the first fabric to the DUT. TH2 is set as the default Provider for the fabric.",
                      "Verify that the write operation for the attribute works and DUT does not respond with any errors."),
-            # TestStep(2, "TH..."),
-            # TestStep(3, "TH..."),
-            # TestStep(4, "TH..."),
+            TestStep(2, "TH sends a read request to read the DefaultOTAProviders Attribute on the first fabric to the DUT.",
+                     "Verify that the attribute value is set to TH2 as the default OTA provider for the fabric."),
+            TestStep(3, "TH sends a write request for the DefaultOTAProviders Attribute on the second fabric to the DUT. TH3 is set as the default Provider for the fabric.",
+                     "Verify that the write operation for the attribute works and DUT does not respond with any errors."),
+            TestStep(4, "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT."
+                     "Verify that the attribute value is set to TH2 as the default OTA provider for the first fabric and TH3 for the second fabric.")
             # TestStep(5, "TH..."),
             # TestStep(6, "TH..."),
             # TestStep(7, "TH..."),
@@ -79,30 +82,147 @@ class TC_SU_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SU_4_1(self):
+        # ------------------------------------------------------------------------------------
+        # Manual Setup
+        # ------------------------------------------------------------------------------------
+        # 1. Launch OTA Provider (TH2) from Terminal 1:
+        #     ./out/debug/chip-ota-provider-app --filepath firmware_v2.ota
+        # 2. Manually commission the OTA Provider using Node ID 1 (Terminal 2):
+        #     ./out/chip-tool/chip-tool pairing onnetwork 1 20202021
+        # 3. Launch OTA Requestor (TH1 / DUT) from Terminal 3:
+        #     ./out/debug/chip-ota-requestor-app \
+        #         --discriminator 1234 \
+        #         --passcode 20202021 \
+        #         --secured-device-port 5541 \
+        #         --autoApplyImage \
+        #         --KVS /tmp/chip_kvs_requestor
+        # 4. Run Python test with commission Provisioner/Requestor (Terminal 2):
+        #     python3 src/python_testing/TC_SU_4_1.py \
+        #         --commissioning-method on-network \
+        #         --discriminator 1234 \
+        #         --passcode 20202021 \
+        #         --vendor-id 65521 \
+        #         --product-id 32769 \
+        #         --nodeId 2
+        # ------------------------------------------------------------------------------------
 
         self.step(0)
 
         # Read the Steps
+
+        # Step 1: Read the DefaultOTAProviders attribute on the DUT (TH1, NodeID=2)
         self.step(1)
 
-        provider = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=1,  # TH2 = node ID 1
+        node_id = self.dut_node_id  # DUT is TH1, NodeID=2
+        logger.info(f'Step #1 - node_id (DUT - TH1): {node_id}')
+
+        # Read current value of DefaultOTAProviders attribute on the DUT (TH1)
+        default_otap_info = await self.read_single_attribute_check_success(
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+        logger.info(f'Step #1 - Read DefaultOTAProviders value on DUT (TH1): {default_otap_info}')
+
+        # TH2 (Provider, NodeID=1) is the OTA Provider for fabric 1
+        provider_fabric1_th2 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=1,  # TH2 (OTA Provider) Node ID 1
             endpoint=0,
             fabricIndex=1
         )
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider])
 
+        # Providers list with the first provider
+        providers_list = []
+        providers_list.append(provider_fabric1_th2)
+        logger.info(f'Step #1 - providers_list added provider_fabric1_th2: {providers_list}')
+
+        # DefaultOTAProviders attribute with the provider list
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list)
+
+        # Write the DefaultOTAProviders attribute to the DUT (TH1)
         resp = await self.write_single_attribute(
             attribute_value=attr,
-            endpoint_id=0)
+            endpoint_id=0
+        )
+        logger.info(f'Step #1 - Write DefaultOTAProviders response: {resp}')
 
-        logger.info(f'Step #1: Write DefaultOTAProviders({resp})')
-        # asserts.assert_equal(resp,, "Failed to write DefaultOTAProviders attribute")
+        # Verify write succeeded (response code 0)
+        asserts.assert_equal(resp, 0, "Failed to write DefaultOTAProviders attribute")
+
+        self.step(2)
+        # Verify DefaultOTAProviders attribute on the DUT (TH1) after write
+        default_otap_info = await self.read_single_attribute_check_success(
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+        logger.info(f'Step #2 - default_otap_info: {default_otap_info}')
+
+        # Verify that the provider list is not empty (expecting at least one provider)
+        asserts.assert_true(len(default_otap_info) > 0, "DefaultOTAProviders list is empty")
+        actual_provider = default_otap_info[0]
+        logger.info(f'Step #2 - Read DefaultOTAProviders value after write on DUT (TH1): {actual_provider}')
+
+        # Verify the actual provider matches the expected OTA Provider (TH2)
+        # TH1 = DUT (NodeID=2), TH2 = OTA Provider (NodeID=1)
+        asserts.assert_equal(actual_provider.providerNodeID, provider_fabric1_th2.providerNodeID, "Mismatch in providerNodeID")
+        asserts.assert_equal(actual_provider.endpoint, provider_fabric1_th2.endpoint, "Mismatch in endpoint")
+        asserts.assert_equal(actual_provider.fabricIndex, provider_fabric1_th2.fabricIndex, "Mismatch in fabricIndex")
+        logger.info("Step #2 - DefaultOTAProviders attribute matches expected values.")
+
+        self.step(3)
+
+        provider_fabric2_th3 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=3,  # TH3 (OTA Provider) Node ID 3
+            endpoint=0,
+            fabricIndex=2
+        )
+
+        default_otap_info = await self.read_single_attribute_check_success(
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+        logger.info(f'Step #3 - default_otap_info: {default_otap_info}')
+
+        # Add second provider (TH3 for fabric 2) to the providers list
+        providers_list.append(provider_fabric2_th3)
+        logger.info(f'Step #3 - providers_list added provider_fabric2_th3: {providers_list}')
+
+        attr_cls = self.cluster_otar.Attributes.DefaultOTAProviders
+        logger.info(f"DEBUG - Attribute class: {attr_cls}")
+        logger.info(f"DEBUG - Expected value type: {getattr(attr_cls, 'value_type', 'No value_type attribute')}")
+        logger.info(f"DEBUG - Attributes/methods of DefaultOTAProviders: {dir(attr_cls)}")
+
+        # Update attribute with new providers list  (TH2 for fabric 1, TH3 for fabric 2)
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider_fabric2_th3])
+
+        # Write updated DefaultOTAProviders attribute to DUT (TH1)
+        resp = await self.write_single_attribute(
+            attribute_value=attr,
+            endpoint_id=0
+        )
+        logger.info(f'Step #3 - Write DefaultOTAProviders response with two providers: {resp}')
+        asserts.assert_equal(resp, 0, "Failed to write DefaultOTAProviders attribute with two providers")
+
+        # Step 4: Verify both providers are set correctly on DUT (TH1)
+        self.step(4)
+
+        default_otap_info = await self.read_single_attribute_check_success(
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+        logger.info(f'Step #4 - default_otap_info: {default_otap_info}')
+
+        # Verify that the DefaultOTAProviders attribute list contains two providers
+        asserts.assert_equal(len(default_otap_info), 2, "DefaultOTAProviders list length mismatch")
+
+        # Verify the second provider corresponds to TH3 for fabric 2
+        actual_provider_fabric2 = default_otap_info[1]
+        logger.info(f'Step #4 - Read DefaultOTAProviders provider for fabric 2 on DUT (TH1): {actual_provider_fabric2}')
+
+        # Verify the actual provider matches the expected OTA Provider (TH3)
+        # TH1 = DUT (NodeID=2), TH3 = OTA Provider (NodeID=3)
+        asserts.assert_equal(actual_provider_fabric2.providerNodeID,
+                             provider_fabric2_th3.providerNodeID, "Mismatch in providerNodeID")
+        asserts.assert_equal(actual_provider_fabric2.endpoint, provider_fabric2_th3.endpoint, "Mismatch in endpoint")
+        asserts.assert_equal(actual_provider_fabric2.fabricIndex, provider_fabric2_th3.fabricIndex, "Mismatch in fabricIndex")
+        logger.info("Step #4 - DefaultOTAProviders attribute matches expected providers for fabric 1 (TH2) and fabric 2 (TH3).")
 
 
-        # self.step(2)
-        # self.step(3)
-        # self.step(4)
         # self.step(5)
         # self.step(6)
         # self.step(7)
