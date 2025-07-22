@@ -26,7 +26,7 @@ script_dir = os.path.dirname(__file__)
 OUTPUT_ROOT = os.path.abspath(os.path.join(script_dir, '..', '..', 'out', 'coverage'))
 
 
-def parse_input_targets(query_output_lines, possible_rules_set, rules_set, new_targets_set, queried_targets_set):
+def parse_input_targets(query_output_lines, possible_rules_set, rules_set, new_targets_set):
     """
     Parses the input from `ninja -t query` output.
     It extracts input targets and identifies associated rules, updating the provided sets.
@@ -36,7 +36,6 @@ def parse_input_targets(query_output_lines, possible_rules_set, rules_set, new_t
         possible_rules_set (set): A set of all rules considered 'possible' for cleaning.
         rules_set (set): A set to store rules that need to be cleaned (populated by this function).
         new_targets_set (set): A set to store new targets found that need further querying.
-        queried_targets_set (set): A set of targets that have already been queried.
     """
     in_input_block = False
     for line in query_output_lines:
@@ -113,8 +112,7 @@ def get_rules_to_clean(initial_targets):
                 filtered_query_lines,
                 possible_rules_set,
                 rules_to_clean,
-                new_targets,
-                queried_targets
+                new_targets
             )
 
         except subprocess.CalledProcessError as e:
@@ -140,7 +138,7 @@ if __name__ == "__main__":
     targets_from_cli = sys.argv[1:]
 
     if not targets_from_cli:
-        print("Usage: python ninja_clean_utility.py <target1> [target2 ...]", file=sys.stderr)
+        print(f"Usage: {sys.argv[0]} <target1> [target2 ...]", file=sys.stderr)
         sys.exit(1)
 
     print(f"Determining rules to clean for targets: {targets_from_cli}")
