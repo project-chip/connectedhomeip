@@ -90,9 +90,10 @@ rt_sdk("sdk") {
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
 
   # For matter with BR feature, increase FreeRTOS heap size and enable TBR cluster
+  # Additionnaly in the context of OTBR support the freeRTOS heap should be big enough to allow to handle a large number of  mDNS packets
   if (chip_enable_wifi && chip_enable_openthread) {
     defines += [
-      "configTOTAL_HEAP_SIZE=(size_t)(170 * 1024)",
+      "configTOTAL_HEAP_SIZE=(size_t)(250 * 1024)",
       "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
     ]
   }
