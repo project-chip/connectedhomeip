@@ -52,7 +52,7 @@ class TC_BRBINFO_3_2(MatterBaseTest):
         steps = [
             TestStep(1, "TH reads ConfigurationVersion and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
-            TestStep(2, " On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
+            TestStep(2, "On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
             TestStep(3, "TH reads ConfigurationVersion from the DUT (same endpoint as in step 1)",
                      "Verify that the value is higher than the value of initialConfigurationVersion"),
         ]
