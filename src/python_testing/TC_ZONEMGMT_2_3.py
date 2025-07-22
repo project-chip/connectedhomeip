@@ -343,7 +343,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
 
             # Test to check zone update with self intersecting shapes. Command
             # shall return DynamicConstraintError status code.
-            # This step uses 3 different self-intersecting shapes to test the
+            # This step uses different self-intersecting shapes to test the
             # DUT
             self.step("7")
             # Form the self intersecting test zone polygons
@@ -367,6 +367,29 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
                 cluster.Structs.TwoDCartesianVertexStruct(100, 10),
                 cluster.Structs.TwoDCartesianVertexStruct(10, 10)
             ]
+            # Degenerate zones with duplicate vertices and subsequent
+            # self-intersection
+            selfIntersectingVertices4 = [
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 1),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(0, 1),
+            ]
+            selfIntersectingVertices5 = [
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 1),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0),
+            ]
+            selfIntersectingVertices6 = [
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(0, 1)
+            ]
             zoneToUpdate1 = cluster.Structs.TwoDCartesianZoneStruct(
                 name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices1,
                 color="#00FFFF")
@@ -376,6 +399,16 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             zoneToUpdate3 = cluster.Structs.TwoDCartesianZoneStruct(
                 name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices3,
                 color="#00FFFF")
+            zoneToUpdate4 = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices4,
+                color="#00FFFF")
+            zoneToUpdate5 = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices5,
+                color="#00FFFF")
+            zoneToUpdate6 = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices6,
+                color="#00FFFF")
+
             # Update and send the command with selfIntersectingVertices1
             updateTwoDCartesianCmd = commands.UpdateTwoDCartesianZone(
                 zoneID=zoneID1, zone=zoneToUpdate1
@@ -403,6 +436,42 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             # Update and send the command with selfIntersectingVertices3
             updateTwoDCartesianCmd = commands.UpdateTwoDCartesianZone(
                 zoneID=zoneID1, zone=zoneToUpdate3
+            )
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=updateTwoDCartesianCmd)
+                asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to self intersecting vertices")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.DynamicConstraintError,
+                                     "Unexpected error returned when trying to update zone")
+                pass
+
+            # Update and send the command with selfIntersectingVertices4
+            updateTwoDCartesianCmd = commands.UpdateTwoDCartesianZone(
+                zoneID=zoneID1, zone=zoneToUpdate4
+            )
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=updateTwoDCartesianCmd)
+                asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to self intersecting vertices")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.DynamicConstraintError,
+                                     "Unexpected error returned when trying to update zone")
+                pass
+
+            # Update and send the command with selfIntersectingVertices5
+            updateTwoDCartesianCmd = commands.UpdateTwoDCartesianZone(
+                zoneID=zoneID1, zone=zoneToUpdate5
+            )
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=updateTwoDCartesianCmd)
+                asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to self intersecting vertices")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.DynamicConstraintError,
+                                     "Unexpected error returned when trying to update zone")
+                pass
+
+            # Update and send the command with selfIntersectingVertices5
+            updateTwoDCartesianCmd = commands.UpdateTwoDCartesianZone(
+                zoneID=zoneID1, zone=zoneToUpdate6
             )
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=updateTwoDCartesianCmd)

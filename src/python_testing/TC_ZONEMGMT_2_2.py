@@ -338,6 +338,29 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                 cluster.Structs.TwoDCartesianVertexStruct(100, 10),
                 cluster.Structs.TwoDCartesianVertexStruct(10, 10)
             ]
+            # Degenerate zones with duplicate vertices and subsequent
+            # self-intersection
+            selfIntersectingVertices4 = [
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 1),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(0, 1),
+            ]
+            selfIntersectingVertices5 = [
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 1),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0),
+            ]
+            selfIntersectingVertices6 = [
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(0, 1)
+            ]
             zoneToCreate1 = cluster.Structs.TwoDCartesianZoneStruct(
                 name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices1,
                 color="#00FFFF")
@@ -346,6 +369,15 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                 color="#00FFFF")
             zoneToCreate3 = cluster.Structs.TwoDCartesianZoneStruct(
                 name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices3,
+                color="#00FFFF")
+            zoneToCreate4 = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices4,
+                color="#00FFFF")
+            zoneToCreate5 = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices5,
+                color="#00FFFF")
+            zoneToCreate6 = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices6,
                 color="#00FFFF")
 
             # Create and send the command with selfIntersectingVertices1
@@ -375,6 +407,42 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
             # Create and send the command with selfIntersectingVertices3
             createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
                 zone=zoneToCreate3
+            )
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
+                asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to self intersecting vertices")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.DynamicConstraintError,
+                                     "Unexpected error returned when trying to create zone")
+                pass
+
+            # Create and send the command with selfIntersectingVertices3
+            createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
+                zone=zoneToCreate4
+            )
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
+                asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to self intersecting vertices")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.DynamicConstraintError,
+                                     "Unexpected error returned when trying to create zone")
+                pass
+
+            # Create and send the command with selfIntersectingVertices3
+            createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
+                zone=zoneToCreate5
+            )
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
+                asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to self intersecting vertices")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.DynamicConstraintError,
+                                     "Unexpected error returned when trying to create zone")
+                pass
+
+            # Create and send the command with selfIntersectingVertices3
+            createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
+                zone=zoneToCreate6
             )
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
