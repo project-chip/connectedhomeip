@@ -51,6 +51,7 @@ declare -a extra_packages
 declare -a extra_gn_args
 declare chip_build_controller_dynamic_server=true
 declare enable_pw_rpc=false
+declare enable_webrtc=true
 
 help() {
 
@@ -68,6 +69,7 @@ Input Options:
                                                             By default it is $chip_detail_logging.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is $chip_mdns.
+  -w, --enable_webrtc       <true/false>                    Enable WebRTC support in the controller (default=$enable_webrtc)
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
@@ -116,6 +118,14 @@ while (($#)); do
             enable_ipv4=$2
             if [[ "$enable_ipv4" != "true" && "$enable_ipv4" != "false" ]]; then
                 echo "enable_ipv4 should have a true/false value, not '$enable_ipv4'"
+                exit
+            fi
+            shift
+            ;;
+        --enable_webrtc | -w)
+            enable_webrtc=$2
+            if [[ "$enable_webrtc" != "true" && "$enable_webrtc" != "false" ]]; then
+                echo "enable_webrtc should have a true/false value, not '$enable_webrtc'"
                 exit
             fi
             shift
@@ -204,7 +214,7 @@ if [[ -n $wifi_paf_config ]]; then
 fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
-echo "  chip_support_webrtc_python_bindings=true"
+echo "  chip_support_webrtc_bindings=\"$enable_webrtc\""
 echo "  enable_pw_rpc=\"$enable_pw_rpc\""
 
 if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
@@ -242,7 +252,7 @@ gn_args=(
     "chip_inet_config_enable_ipv4=$enable_ipv4"
     "chip_crypto=\"openssl\""
     "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
-    "chip_support_webrtc_python_bindings=true"
+    "chip_support_webrtc_bindings=$enable_webrtc"
 )
 if [[ -n "$chip_mdns" ]]; then
     gn_args+=("chip_mdns=\"$chip_mdns\"")
