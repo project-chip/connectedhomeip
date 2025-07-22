@@ -88,7 +88,7 @@ void pychip_webrtc_client_set_state_change_callback(WebRTCClientHandle handle, O
     chip::webrtc::webrtc_client_set_state_change_callback(handle, cb);
 }
 
-void pychip_webrtc_provider_client_init(WebRTCClientHandle handle, uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+void pychip_webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
 {
     chip::webrtc::webrtc_provider_client_init(handle, nodeId, fabricIndex, endpoint);
 }
