@@ -158,7 +158,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryResetSkipReboot()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset, true);   // true to skip reboot
+    PlatformMgr().ScheduleWork(DoFactoryReset, true); // true to skip reboot
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
