@@ -453,34 +453,66 @@ JNI_METHOD(jboolean, updateCommissionableDataProviderData)
     return true;
 }
 
+
 JNI_METHOD(void, setServiceResolveListener)
 (JNIEnv * env, jclass self, jobject jListenerObject)
 {
     VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "setServiceResolveListener(): Invalid env"));
 
+    // Clean up old global ref if it exists
+    if (mJListenerObject != nullptr)
+    {
+        env->DeleteGlobalRef(mJListenerObject);
+        mJListenerObject = nullptr;
+    }
+    mServiceResolveListener = nullptr;
+
     if (jListenerObject == nullptr)
     {
-        // Disable the listener
-        mJListenerObject        = nullptr;
-        mServiceResolveListener = nullptr;
+        // Listener disabled
         return;
     }
 
-    // Save the java listener (for later use)
-    mJListenerObject     = env->NewWeakGlobalRef(jListenerObject);
-    jclass listenerClass = env->GetObjectClass(jListenerObject);
+    mJListenerObject = env->NewGlobalRef(jListenerObject);
+    if (mJListenerObject == nullptr)
+    {
+        ChipLogError(Controller, "Failed to create weak global ref for listener");
+        JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
+        return;
+    }
 
+    jclass listenerClass = env->GetObjectClass(jListenerObject);
     if (listenerClass == nullptr)
     {
         ChipLogError(Controller, "Failed to get listener class");
+
+        // If an exception is already pending, do not throw another one
+        if (env->ExceptionCheck())
+        {
+            // An exception occured
+            return;
+        }
+
         JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
         return;
     }
 
     mServiceResolveListener = env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
+
+    // Clean up local reference to listenerClass
+    env->DeleteLocalRef(listenerClass);
+
     if (mServiceResolveListener == nullptr)
     {
         ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
+
+        // If an exception is already pending, do not throw another one
+        if (env->ExceptionCheck())
+        {
+            // An exception occured
+            return;
+        }
+
         JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
         return;
     }
