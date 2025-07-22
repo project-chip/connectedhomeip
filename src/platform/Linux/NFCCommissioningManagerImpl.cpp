@@ -59,7 +59,7 @@ namespace {} // namespace
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #endif
 
-#define CHECK(f, rv)                                                                                                               \
+#define CHECK_FOR_SCARD_SUCCESS(f, rv)                                                                                                               \
     if (SCARD_S_SUCCESS != rv)                                                                                                     \
     {                                                                                                                              \
         ChipLogError(DeviceLayer, "%s : %s", f, pcsc_stringify_error(rv));                                                         \
@@ -530,7 +530,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::StartNFCProcessingThread()
 {
     // Creates an Application Context to the PC/SC Resource Manager.
     long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
-    CHECK("SCardEstablishContext", result)
+    CHECK_FOR_SCARD_SUCCESS("SCardEstablishContext", result)
 
     lastTagInstanceUsed = nullptr;
 
@@ -552,9 +552,10 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 
     if (!mThreadRunning)
     {
-        if (StartNFCProcessingThread() != CHIP_NO_ERROR)
+        CHIP_ERROR err = StartNFCProcessingThread();
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Failed to start NFCProcessing Thread");
+            ChipLogError(DeviceLayer, "Failed to start NFCProcessing Thread: %s", ErrorStr(err));
             return false;
         }
     }
@@ -695,7 +696,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
     DWORD dwReaders;
 
     result = SCardListReaders(hPcscContext, NULL, NULL, &dwReaders);
-    CHECK("SCardListReaders", result)
+    CHECK_FOR_SCARD_SUCCESS("SCardListReaders", result)
 
     // dwReaders now contains "mszReaders" data size
     // Allocate a buffer where we will store "mszReaders" multi-string.
@@ -707,7 +708,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
     }
 
     result = SCardListReaders(hPcscContext, NULL, mszReaders, &dwReaders);
-    CHECK("SCardListReaders", result)
+    CHECK_FOR_SCARD_SUCCESS("SCardListReaders", result)
 
     // "mszReaders" contains a multi-string with list of readers.
     // Each reader name is separated by a null character ('\0') and ended by a double null character
