@@ -42,7 +42,12 @@ public:
     void OnGatheringComplete(std::function<void()> callback);
     void OnStateChange(std::function<void(int)> callback);
 
-    const char * GetLocalDescription();
+    /* Call to fetch the local session description string. This is used by the
+     * Python binding layer to get the local SDP string with ice candidates
+     * Should be called after setting local/remote SDP and GatheringComplete.
+     */
+    const char * GetLocalSessionDescriptionInternal();
+
     int GetPeerConnectionState();
     void Disconnect();
 

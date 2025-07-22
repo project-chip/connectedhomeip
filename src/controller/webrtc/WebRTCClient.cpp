@@ -205,7 +205,7 @@ void WebRTCClient::Disconnect()
     mLocalCandidates.clear();
 }
 
-const char * WebRTCClient::GetLocalDescription()
+const char * WebRTCClient::GetLocalSessionDescriptionInternal()
 {
     if (mPeerConnection == nullptr)
     {

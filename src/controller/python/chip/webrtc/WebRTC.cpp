@@ -131,7 +131,7 @@ const char * webrtc_get_local_description(WebRTCClientHandle handle)
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        return it->second->GetLocalDescription();
+        return it->second->GetLocalSessionDescriptionInternal();
     }
     return "";
 }

@@ -112,11 +112,6 @@ class PeerConnection(WebRTCClient):
         self._ice_candidates.gathering_complete = True
         return self._ice_candidates.candidates
 
-    async def wait_for_gathering_complete(self) -> None:
-        """Waits indefinitely until the local ICE candidates are gathered."""
-        await self.get_local_ice_candidates()
-        return
-
     def set_remote_ice_candidates(self, remote_candidates: list[str]) -> None:
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
@@ -139,6 +134,22 @@ class PeerConnection(WebRTCClient):
             asyncio.TimeoutError: If timeout period is elapsed waiting.
         """
         return await self._local_events[Events.ANSWER].get(timeout_sec)
+
+    async def get_local_description_with_ice_candidates(self) -> str:
+        """Retrieves the local SDP including ICE candidates.
+        Waits for ICE Gathering Complete first. Then fetches the local description and returns it.
+
+        Returns:
+            str: The local SDP description including ICE candidates.
+
+        Raises:
+            RuntimeError: If no local sdp is available. This indicates invalid state.
+        """
+        await self.get_local_ice_candidates()
+        sdp = self.get_local_description()
+        if len(sdp) == 0:
+            raise RuntimeError("Invalid State: No local sdp available")
+        return sdp
 
     def set_remote_answer(self, answer_sdp: str) -> None:
         """Sets the remote SDP answer for the WebRTC peer connection.
