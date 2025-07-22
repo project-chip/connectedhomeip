@@ -6,8 +6,7 @@ from pathlib import Path
 import click
 from chip.testing.matter_testing import MatterTestConfig
 from chip.testing.runner import generate_mobly_test_config
-        from the python script steps. In order to use this generator, the test
-from chip.testing import decorators
+
 #!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2024 Project CHIP Authors
@@ -25,7 +24,6 @@ from chip.testing import decorators
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 
 
 def indent_multiline(multiline: str, num_spaces: int) -> str:
