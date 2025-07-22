@@ -520,10 +520,12 @@
  *
  *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
  *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ *  Since CHIP_NO_ERROR is used in many places and tracking it adds marginal debugging value, it is
+ *  disabled by default.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 0
+#endif // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
