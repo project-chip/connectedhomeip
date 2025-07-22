@@ -453,7 +453,6 @@ JNI_METHOD(jboolean, updateCommissionableDataProviderData)
     return true;
 }
 
-
 JNI_METHOD(void, setServiceResolveListener)
 (JNIEnv * env, jclass self, jobject jListenerObject)
 {
