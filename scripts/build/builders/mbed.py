@@ -79,35 +79,16 @@ class MbedBoard(Enum):
             raise Exception('Unknown board type: %r' % self)
 
 
-class MbedProfile(Enum):
-    RELEASE = auto()
-    DEVELOP = auto()
-    DEBUG = auto()
-
-    @property
-    def ProfileName(self):
-        if self == MbedProfile.RELEASE:
-            return 'release'
-        elif self == MbedProfile.DEVELOP:
-            return 'develop'
-        elif self == MbedProfile.DEBUG:
-            return 'debug'
-        else:
-            raise Exception('Unknown board type: %r' % self)
-
-
 class MbedBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
                  app: MbedApp = MbedApp.LOCK,
                  board: MbedBoard = MbedBoard.CY8CPROTO_062_4343W,
-                 profile: MbedProfile = MbedProfile.RELEASE,
                  ):
         super(MbedBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
-        self.profile = profile
         self.toolchain = "GCC_ARM"
         self.mbed_os_path = os.path.join(
             self.root, 'third_party', 'mbed-os', 'repo')
