@@ -38,9 +38,7 @@
 import asyncio
 import enum
 import logging
-
 import chip.clusters as Clusters
-
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep)
 from mobly import asserts

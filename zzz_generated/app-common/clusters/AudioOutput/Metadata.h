@@ -42,6 +42,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RenameOutput::Id
 } // namespace RenameOutput
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace AudioOutput
 } // namespace Clusters
 } // namespace app
