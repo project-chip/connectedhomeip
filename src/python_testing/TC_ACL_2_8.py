@@ -432,9 +432,9 @@ class TC_ACL_2_8(MatterBaseTest):
             TestStep(8, "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1"),
             TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F2"),
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements if new list encoding is used, 3 elements if legacy list encoding is used, and MUST NOT contain any element with FabricIndex F2"),
             TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F1"),
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements if new list encoding is used, 3 elements if legacy list encoding is used, and MUST NOT contain any element with FabricIndex F1"),
             TestStep(11, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                      "Test succeeds with legacy list encoding mechanism"),
         ]
