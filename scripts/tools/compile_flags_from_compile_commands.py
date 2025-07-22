@@ -29,7 +29,7 @@
 # Example usages (via uv run script to auto-create an env - see https://github.com/astral-sh/uv)
 #
 #  - Get the flags corresponding to a file matching the regex `basic-information` (first match)
-#     uv run --script ./compile_flags_from_compile_commands.py -c some_path/compile_commands.json flags basic-information
+#     uv run --script ./compile_flags_from_compile_commands.py -c sme_path/compile_commands.json flags basic-information
 #
 #  - Get the flags corresponding to a file matching the regex `basic-information` (first match) and save it to the clipboard
 #     uv run --script ./compile_flags_from_compile_commands.py      \
@@ -150,7 +150,7 @@ class ParsedCommands:
 
         if len(matches) > 1:
             logging.warning(
-                "Multiple matches found: %d matches for %s", len(matches), expr
+                "Multiple matches found: %d matches for %s", len(matches), reg_expr
             )
             for m in matches:
                 logging.warning("  match: %s", m["file"])
