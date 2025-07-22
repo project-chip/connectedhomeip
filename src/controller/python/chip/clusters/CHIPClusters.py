@@ -13492,6 +13492,7 @@ class ChipClusters:
                     "connectionID": "int",
                     "activationReason": "int",
                     "timeControl": "TransportMotionTriggerTimeControlStruct",
+                    "userDefined": "bytes",
                 },
             },
             0x00000006: {

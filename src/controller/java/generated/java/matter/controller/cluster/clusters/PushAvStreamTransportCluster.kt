@@ -237,6 +237,7 @@ class PushAvStreamTransportCluster(
     connectionID: UShort,
     activationReason: UByte,
     timeControl: PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct?,
+    userDefined: ByteArray?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 5u
@@ -252,6 +253,9 @@ class PushAvStreamTransportCluster(
 
     val TAG_TIME_CONTROL_REQ: Int = 2
     timeControl?.let { timeControl.toTlv(ContextSpecificTag(TAG_TIME_CONTROL_REQ), tlvWriter) }
+
+    val TAG_USER_DEFINED_REQ: Int = 3
+    userDefined?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_DEFINED_REQ), userDefined) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
