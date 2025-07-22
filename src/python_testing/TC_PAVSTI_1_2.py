@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
     def desc_TC_PAVSTI_1_2(self) -> str:
-        return "[TC-PAVSTI-2.2] Validate Transport allocation with an ExpiryTime with Server as DUT"
+        return "[TC-PAVSTI-1.2] Verify transmission with trigger type as Continuous and ensure privacy settings are checked if supported."
 
     def pics_TC_PAVSTI_1_2(self):
         return ["PAVST.S"]
@@ -55,51 +55,56 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
+                "TH Reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                "Verify that list is not empty.",
+            ),
+            TestStep(
+                5,
                 "TH writes SoftRecordingPrivacyModeEnabled as True",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                5,
+                6,
                 "TH writes SoftLiveStreamPrivacyModeEnabled as True",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                6,
+                7,
                 "TH sends the AllocatePushTransport command with valid parameters and TriggerType = Continuous",
                 "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct. Store ConnectionID as aConnectionID.",
             ),
             TestStep(
-                7,
+                8,
                 "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active",
                 "DUT responds with INVALID_IN_STATE status code.",
             ),
             TestStep(
-                8,
+                9,
                 "TH writes SoftRecordingPrivacyModeEnabled as False",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                9,
+                10,
                 "TH writes SoftLiveStreamPrivacyModeEnabled as False",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                10,
+                11,
                 "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active.",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                11,
+                12,
                 "View the video stream in TH UI",
                 "Verify the transmitted video stream is of CMAF Format.",
             ),
             TestStep(
-                12,
+                13,
                 "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Inactive.",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                13,
+                14,
                 "View the video stream in TH UI",
                 "Verify the transmission of video stream has stopped.",
             ),
@@ -127,17 +132,12 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd CurrentConnections: {currentConnections}")
         if len(currentConnections) > 0:
             for connectionId in currentConnections:
-                try:
-                    await self.send_single_cmd(
-                        cmd=pushavCluster.Commands.DeallocatePushTransport(
-                            ConnectionID=connectionId
-                        ),
-                        endpoint=endpoint,
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_true(
-                        e.status == Status.Success, "Unexpected error occured"
-                    )
+                await self.send_single_cmd(
+                    cmd=pushavCluster.Commands.DeallocatePushTransport(
+                        connectionID=connectionId
+                    ),
+                    endpoint=endpoint,
+                )
 
         self.step(2)
         supportedFormats = await self.read_single_attribute_check_success(
@@ -157,8 +157,8 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 format.ingestMethod == pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest
             )
             asserts.assert_true(
-                (validContainerformat & isValidIngestMethod),
-                "(ContainerFormat & IngestMethod) must be defined values",
+                (validContainerformat and isValidIngestMethod),
+                "(ContainerFormat and IngestMethod) must be defined values",
             )
 
         self.step(3)
@@ -175,6 +175,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
         allocatedVideoStream = allocatedVideoStreams[0]
         videoStreamId = allocatedVideoStream.videoStreamID
 
+        self.step(4)
         allocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=avsmCluster,
@@ -187,7 +188,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
         allocatedAudioStream = allocatedAudioStreams[0]
         audioStreamId = allocatedAudioStream.audioStreamID
 
-        self.step(4)
+        self.step(5)
         if self.pics_guard(self.check_pics("AVSM.S.F0003")):
             aFeatureMap = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=avsmCluster, attribute=avsmAttr.FeatureMap
@@ -204,7 +205,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 "Error when trying to write SoftRecordingPrivacyModeEnabled",
             )
 
-        self.step(5)
+        self.step(6)
         if self.pics_guard(self.check_pics("AVSM.S.F0003")):
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint
@@ -215,10 +216,10 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 "Error when trying to write SoftLivestreamPrivacyModeEnabled",
             )
 
-        self.step(6)
+        self.step(7)
         allocatePushTransportResponse = await self.send_single_cmd(
             cmd=pushavCluster.Commands.AllocatePushTransport(
-                {
+                transportOptions={
                     "streamUsage": Globals.Enums.StreamUsageEnum.kInternal,
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
@@ -242,12 +243,12 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
             allocatePushTransportResponse.transportConfiguration.connectionID
         )
 
-        self.step(7)
+        self.step(8)
         if self.pics_guard(self.check_pics("AVSM.S.F0003")):
             try:
                 await self.send_single_cmd(
                     cmd=pushavCluster.Commands.SetTransportStatus(
-                        aConnectionID, pushavCluster.Enums.TransportStatusEnum.kActive
+                        connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kActive
                     ),
                     endpoint=endpoint,
                 )
@@ -261,7 +262,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                     "Unexpected error returned when expecting INVALID_IN_STATE due to SoftPrivacy mode set to True",
                 )
 
-        self.step(8)
+        self.step(9)
         if self.pics_guard(self.check_pics("AVSM.S.F0003")):
             result = await self.write_single_attribute(
                 avsmAttr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint
@@ -272,7 +273,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 "Error when trying to write SoftRecordingPrivacyModeEnabled",
             )
 
-        self.step(9)
+        self.step(10)
         if self.pics_guard(self.check_pics("AVSM.S.F0003")):
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint
@@ -283,13 +284,14 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 "Error when trying to write SoftLivestreamPrivacyModeEnabled",
             )
 
-        self.step(10)
+        self.step(11)
         await self.send_single_cmd(
-            cmd=pushavCluster.Commands.SetTransportStatus(aConnectionID, pushavCluster.Enums.TransportStatusEnum.kActive),
+            cmd=pushavCluster.Commands.SetTransportStatus(
+                connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kActive),
             endpoint=endpoint,
         )
 
-        self.step(11)
+        self.step(12)
         # TODO: Add a step to allow user to verify this through TH UI.
         if not self.check_pics("PICS_SDK_CI_ONLY"):
             user_response = self.wait_for_user_input(
@@ -299,13 +301,14 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
             )
             asserts.assert_equal(user_response.lower(), "y")
 
-        self.step(12)
+        self.step(13)
         await self.send_single_cmd(
-            cmd=pushavCluster.Commands.SetTransportStatus(aConnectionID, pushavCluster.Enums.TransportStatusEnum.kInactive),
+            cmd=pushavCluster.Commands.SetTransportStatus(
+                connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kInactive),
             endpoint=endpoint,
         )
 
-        self.step(13)
+        self.step(14)
         # TODO: Add a step to allow user to verify this through TH UI.
         if not self.check_pics("PICS_SDK_CI_ONLY"):
             user_response = self.wait_for_user_input(

@@ -18,7 +18,6 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters import Globals
-from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
@@ -28,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
     def desc_TC_PAVSTI_1_1(self) -> str:
-        return "[TC-PAVSTI-2.2] Validate Transport allocation with an ExpiryTime with Server as DUT"
+        return "[TC-PAVSTI-1.1] Verify transmission when trigger type is Manual."
 
     def pics_TC_PAVSTI_1_1(self):
         return ["PAVST.S"]
@@ -112,17 +111,12 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd CurrentConnections: {currentConnections}")
         if len(currentConnections) > 0:
             for connectionId in currentConnections:
-                try:
-                    await self.send_single_cmd(
-                        cmd=pushavCluster.Commands.DeallocatePushTransport(
-                            ConnectionID=connectionId
-                        ),
-                        endpoint=endpoint,
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_true(
-                        e.status == Status.Success, "Unexpected error occured"
-                    )
+                await self.send_single_cmd(
+                    cmd=pushavCluster.Commands.DeallocatePushTransport(
+                        connectionID=connectionId
+                    ),
+                    endpoint=endpoint,
+                )
 
         self.step(2)
         supportedFormats = await self.read_single_attribute_check_success(
@@ -142,8 +136,8 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
                 format.ingestMethod == pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest
             )
             asserts.assert_true(
-                (validContainerformat & isValidIngestMethod),
-                "(ContainerFormat & IngestMethod) must be defined values",
+                (validContainerformat and isValidIngestMethod),
+                "(ContainerFormat and IngestMethod) must be defined values",
             )
 
         self.step(3)
@@ -167,7 +161,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
         )
         logger.info(f"Rx'd AllocatedAudioStreams: {allocatedAudioStreams}")
         asserts.assert_true(
-            len(allocatedAudioStreams) != 0, "AllocatedAudioStreams must not be e   mpty"
+            len(allocatedAudioStreams) != 0, "AllocatedAudioStreams must not be empty"
         )
         allocatedAudioStream = allocatedAudioStreams[0]
         audioStreamId = allocatedAudioStream.audioStreamID
@@ -175,7 +169,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
         self.step(5)
         allocatePushTransportResponse = await self.send_single_cmd(
             cmd=pushavCluster.Commands.AllocatePushTransport(
-                {
+                transportOptions={
                     "streamUsage": Globals.Enums.StreamUsageEnum.kInternal,
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
@@ -201,15 +195,15 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
             allocatePushTransportResponse.transportConfiguration.connectionID
         )
         await self.send_single_cmd(
-            cmd=pushavCluster.Commands.SetTransportStatus(aConnectionID, pushavCluster.Enums.TransportStatusEnum.kActive),
+            cmd=pushavCluster.Commands.SetTransportStatus(connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kActive),
             endpoint=endpoint,
         )
 
         self.step(7)
         await self.send_single_cmd(
             cmd=pushavCluster.Commands.ManuallyTriggerTransport(
-                aConnectionID,
-                pushavCluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
+                connectionID=aConnectionID,
+                activationReason=pushavCluster.Enums.TriggerActivationReasonEnum.kUserInitiated
             ),
             endpoint=endpoint,
         )
@@ -226,7 +220,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
 
         self.step(9)
         await self.send_single_cmd(
-            cmd=pushavCluster.Commands.SetTransportStatus(aConnectionID, pushavCluster.Enums.TransportStatusEnum.kInactive),
+            cmd=pushavCluster.Commands.SetTransportStatus(connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kInactive),
             endpoint=endpoint,
         )
 
