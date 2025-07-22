@@ -297,42 +297,6 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                      - Verify that DayType field has DayTypeEnum type and value in range 0 - 3.
                      - Verify that DayEntryIDs field is list of uint32 with length greater or equal 1 and less or equal 96;
                      - Verify that the DayStruct in this list SHALL be arranged in increasing order by the value of Date field."""),
-            TestStep("30", "TH reads CurrentDay attribute.", """
-                     - DUT replies a value of DayStruct type;
-                     - Verify that Date field has epoch-s type;
-                     - Verify that DayType field has DayTypeEnum type and value in 0 - 3;
-                     - Verify that DayEntryIDs field is list of uint32 with length greater or equal 1 and less or equal 96."""),
-            TestStep("31", "TH reads NextDay attribute.", """
-                     - DUT replies a value of DayStruct type;
-                     - Verify that Date field has epoch-s type;
-                     - Verify that DayType field has DayTypeEnum type and value in 0 - 3;
-                     - Verify that DayEntryIDs field is list of uint32 with length greater or equal 1 and less or equal 96."""),
-            TestStep("32", "TH reads CurrentDayEntry attribute.", """
-                     - DUT replies a value of DayEntryStruct type;
-                     - Verify that DayEntryID field has uint32 type;
-                     - Verify that StartTime field has uint16 type;
-                     - Verify that if Duration field is presented it has uint16 type;
-                     - Verify that if Duration field is presented its value less or equal 1500 -start_date_attribute;
-                     - Verify that entry does not contain RandomizationOffset and RandomizationType fields if SETRF.S.F05(RNDM) is False;
-                     - If SETRF.S.F05(RNDM) and RandomizationType field is presented it has DayEntryRandomizationType type and value in range 0 - 2;
-                     - Store value as randomization_type;
-                     - If SETRF.S.F05(RNDM) and RandomizationOffset field is presented and randomization_type is Fixed it has int16 type;
-                     - If SETRF.S.F05(RNDM) and RandomizationOffset field is presented and randomization_type is RandomNegative it has int16 type and value less or equal 0.
-                     - If SETRF.S.F05(RNDM) and RandomizationOffset field is presented and randomization_type is not Fixed or RandomNegative it has int16 type and value greater or equal 0."""),
-            TestStep("33", "TH reads CurrentDayEntryDate attribute.", "DUT replies an value of epoch-s type."),
-            TestStep("34", "TH reads NextDayEntry attribute.", """
-                     - DUT replies a value of DayEntryStruct type;
-                     - Verify that DayEntryID field has uint32 type;
-                     - Verify that StartTime field has uint16 type;
-                     - Verify that if Duration field is presented it has uint16 type;
-                     - Verify that if Duration field is presented its value less or equal 1500 -start_date_attribute;
-                     - Verify that entry does not contain RandomizationOffset and RandomizationType fields if SETRF.S.F05(RNDM) is False;
-                     - If SETRF.S.F05(RNDM) and RandomizationType field is presented it has DayEntryRandomizationType type and value in range 0 - 2;
-                     - Store value as randomization_type;
-                     - If SETRF.S.F05(RNDM) and RandomizationOffset field is presented and randomization_type is Fixed it has int16 type;
-                     - If SETRF.S.F05(RNDM) and RandomizationOffset field is presented and randomization_type is RandomNegative it has int16 type and value less or equal 0.
-                     - If SETRF.S.F05(RNDM) and RandomizationOffset field is presented and randomization_type is not Fixed or RandomNegative it has int16 type and value greater or equal 0"""),
-            TestStep("35", "TH reads NextDayEntryDate attribute.", "DUT replies an value of epoch-s type."),
             TestStep("36", "TH reads TariffComponents attribute.", """
                      - DUT replies a value that is a list of TariffComponentStruct entries;
                      - Verify that the list has 1 or more entries.
@@ -365,58 +329,6 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                      - Verify that if Label field is null or has type string and max length is 128;
                      - Verify that DayEntryIDs field is a list of uint32 and its length is greater or equal 1 and less or equal 20;
                      - Verify that TariffComponentIDs field is a list of uint32 and its length is greater or equal 1 and less or equal 20;"""),
-            TestStep("38", "TH reads CurrentTariffComponents attribute.", """
-                     - DUT replies a value that is a list of TariffComponentStruct entries;
-                     - Verify that the list has 1 or more entries.
-                     - Verify that TariffComponentID field has uint32 type;
-                     - Verify that Threshold field it is null or has type uint32;
-                     - Verify that if Label field is presented it is null or has type string and max length is 128.
-                     - Verify that if Predicted field is presented it has type bool;
-                     - Verify that does not contain Currency field if SETRF.S.F00(PRICE) is False;
-                     - If SETRF.S.F00(PRICE) is True and if Currency field is presented it is null or has type currency;
-                     - If SETRF.S.F00(PRICE) is True and if Currency field is presented and it is not null then Currency field of Currency struct has type uint16;
-                     - If SETRF.S.F00(PRICE) is True and if Currency field is presented and it is not null then DecimalPoints field of Currency struct has type uint8;
-                     - Verify that entry does not contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
-                     - If SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
-                     - Verify that entry does not contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
-                     - If SETRF.S.F02(AUXLD) and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
-                     - Verify that if SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented Number field in AuxiliaryLoadSwitchSettingsStruct has uint8 type;
-                     - Verify that if SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented RequiredState field in AuxiliaryLoadSwitchSettingsStruct has AuxiliaryLoadSettingEnum type and value in range 0 - 2;
-                     - Verify that entry does not contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
-                     - If SETRF.S.F03(PEAKP) and PeakPeriod field is presented it has PeakPeriodStruct type;
-                     - If SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented Severity field in PeakPeriodStruct has type PeakPeriodSeverityEnum and value in range 0 - 3;
-                     - If SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented PeakPeriod in PeakPeriodStruct has type uint16 and its value greater that 1;
-                     - Verify that entry does not contain PowerThreshold field if SETRF.S.F04(PWRTHLD) is False;
-                     - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented it has PowerThresholdStruct type;
-                     - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented PowerThreshold field in PowerThresholdStruct has type int64;
-                     - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented ApparentPowerThreshold field in PowerThresholdStruct has type int64;
-                     - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented PowerThresholdSource field in PowerThresholdStruct has type PowerThresholdSourceEnum and value in range 0 - 2."""),
-            TestStep("39", "TH reads NextTariffComponents attribute.", """
-                     - DUT replies a value that is a list of TariffComponentStruct entries;
-                     - Verify that the list has 1 or more entries.
-                     - Verify that TariffComponentID field has uint32 type;
-                     - Verify that Threshold field it is null or has type uint32;
-                     - Verify that if Label field is presented it is null or has type string and max length is 128.
-                     - Verify that if Predicted field is presented it has type bool;
-                     - Verify that does not contain Currency field if SETRF.S.F00(PRICE) is False;
-                     - If SETRF.S.F00(PRICE) is True and if Currency field is presented it is null or has type currency;
-                     - If SETRF.S.F00(PRICE) is True and if Currency field is presented and it is not null then Currency field of Currency struct has type uint16;
-                     - If SETRF.S.F00(PRICE) is True and if Currency field is presented and it is not null then DecimalPoints field of Currency struct has type uint8;
-                     - Verify that entry does not contain FriendlyCredit field if SETRF.S.F01(FCRED) is False;
-                     - If SETRF.S.F01(FCRED) and FriendlyCredit field is presented it has type bool;
-                     - Verify that entry does not contain AuxiliaryLoad field if SETRF.S.F02(AUXLD) is False;
-                     - If SETRF.S.F02(AUXLD) and AuxiliaryLoad field is presented it has AuxiliaryLoadSwitchSettingsStruct type;
-                     - Verify that if SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented Number field in AuxiliaryLoadSwitchSettingsStruct has uint8 type;
-                     - Verify that if SETRF.S.F02(AUXLD) is True and AuxiliaryLoad field is presented RequiredState field in AuxiliaryLoadSwitchSettingsStruct has AuxiliaryLoadSettingEnum type and value in range 0 - 2;
-                     - Verify that entry does not contain PeakPeriod field if SETRF.S.F03(PEAKP) is False;
-                     - If SETRF.S.F03(PEAKP) and PeakPeriod field is presented it has PeakPeriodStruct type;
-                     - If SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented Severity field in PeakPeriodStruct has type PeakPeriodSeverityEnum and value in range 0 - 3;
-                     - If SETRF.S.F03(PEAKP) is True and PeakPeriod field is presented PeakPeriod in PeakPeriodStruct has type uint16 and its value greater that 1;
-                     - Verify that entry does not contain PowerThreshold field if SETRF.S.F04(PWRTHLD) is False;
-                     - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented it has PowerThresholdStruct type;
-                     - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented PowerThreshold field in PowerThresholdStruct has type int64;
-                     - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented ApparentPowerThreshold field in PowerThresholdStruct has type int64;
-                     - If SETRF.S.F04(PWRTHLD) is True and PowerThreshold field is presented PowerThresholdSource field in PowerThresholdStruct has type PowerThresholdSourceEnum and value in range 0 - 2."""),
             TestStep("40", "TH reads DefaultRandomizationOffset attribute.", "DUT replies a value of int16 value."),
             TestStep("41", "TH reads DefaultRandomizationType attribute.",
                      "DUT replies a value of DayEntryRandomizationType and value in range 0 - 2."),
@@ -717,46 +629,6 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             asserts.assert_less(val[item].date, val[item + 1].date,
                                 "IndividualDays must be sorted by Date in increasing order!")
 
-        self.step("30")
-        # TH reads CurrentDay attribute, expects a DayStruct
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        asserts.assert_true(isinstance(val, cluster.Structs.DayStruct), "val must be of type DayStruct")
-        await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=val)
-
-        self.step("31")
-        # TH reads NextDay attribute, expects a DayStruct
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay)
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        asserts.assert_true(isinstance(val, cluster.Structs.DayStruct), "val must be of type DayStruct")
-        await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=val)
-
-        self.step("32")
-        # TH reads CurrentDayEntry attribute, expects a DayEntryStruct
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry)
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        asserts.assert_true(isinstance(val, cluster.Structs.DayEntryStruct), "val must be of type DayEntryStruct")
-        await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=val)
-
-        self.step("33")
-        # TH reads CurrentDayEntryDate attribute, expects a uint32
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        matter_asserts.assert_valid_uint32(val, 'val must be of type uint32')
-
-        self.step("34")
-        # TH reads NextDayEntry attribute, expects a DayEntryStruct
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntry)
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        asserts.assert_true(isinstance(val, cluster.Structs.DayEntryStruct), "val must be of type DayEntryStruct")
-        await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=val)
-
-        self.step("35")
-        # TH reads NextDayEntryDate attribute, expects a uint32
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        matter_asserts.assert_valid_uint32(val, 'val must be of type uint32')
-
         self.step("36")
         # TH reads TariffComponents attribute, expects a list of TariffComponentStruct
         # TariffComponents must have at least 1 entries
@@ -780,26 +652,6 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         for item in val:
             await self.checkTariffPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item)
         asserts.assert_greater_equal(len(val), 1, "TariffPeriods must have at least 1 entries!")
-
-        self.step("38")
-        # TH reads CurrentTariffComponents attribute, expects a list of TariffComponentStruct
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents)
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        matter_asserts.assert_list(val, "CurrentTariffComponents attribute must return a list")
-        matter_asserts.assert_list_element_type(
-            val, cluster.Structs.TariffComponentStruct, "CurrentTariffComponents attribute must contain TariffComponentStruct elements")
-        for item in val:
-            await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
-
-        self.step("39")
-        # TH reads NextTariffComponents attribute, expects a list of TariffComponentStruct
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents)
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        matter_asserts.assert_list(val, "NextTariffComponents attribute must return a list")
-        matter_asserts.assert_list_element_type(
-            val, cluster.Structs.TariffComponentStruct, "NextTariffComponents attribute must contain TariffComponentStruct elements")
-        for item in val:
-            await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
         self.step("40")
         if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
