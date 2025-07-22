@@ -38,6 +38,7 @@ from unittest.mock import MagicMock
 import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
 # Add imports for argument parsing dependencies
+from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.pics import read_pics_from_file
 from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
