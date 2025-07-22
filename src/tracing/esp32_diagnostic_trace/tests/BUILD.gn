@@ -26,5 +26,7 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/tracing/esp32_diagnostic_trace:diagnostic_storage",
+    "${chip_root}/src/tracing/esp32_diagnostic_trace:esp32_diagnostic_tracing",
+    "${chip_root}/src/platform",
   ]
 }
