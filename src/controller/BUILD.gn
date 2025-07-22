@@ -70,7 +70,6 @@ static_library("controller") {
     "DevicePairingDelegate.h",
     "ExampleOperationalCredentialsIssuer.h",
     "SetUpCodePairer.h",
-    "jcm/JCMTrustVerification.h",
   ]
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
@@ -126,15 +125,18 @@ static_library("controller") {
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
-source_set("jcm") {
-  sources = [
-    "jcm/JCMAutoCommissioner.cpp",
-    "jcm/JCMAutoCommissioner.h",
-    "jcm/JCMDeviceCommissioner.cpp",
-    "jcm/JCMDeviceCommissioner.h",
-  ]
-  public_deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/controller:controller",
-  ]
+if (chip_device_config_enable_joint_fabric) {
+  source_set("jcm") {
+    sources = [
+      "jcm/AutoCommissioner.cpp",
+      "jcm/AutoCommissioner.h",
+      "jcm/DeviceCommissioner.cpp",
+      "jcm/DeviceCommissioner.h",
+      "jcm/VerificationDelegate.h",
+    ]
+    public_deps = [
+      "${chip_root}/src/app",
+      "${chip_root}/src/controller:controller",
+    ]
+  }
 }

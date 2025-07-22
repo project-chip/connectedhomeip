@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "JCMAutoCommissioner.h"
+#include "AutoCommissioner.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -34,11 +34,11 @@ namespace Controller {
 namespace JCM {
 
 /*
- * JCMAutoCommissioner override implementation
+ * AutoCommissioner override implementation
  */
-CHIP_ERROR JCMAutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
+CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
-    ReturnErrorOnFailure(AutoCommissioner::SetCommissioningParameters(params));
+    ReturnErrorOnFailure(chip::Controller::AutoCommissioner::SetCommissioningParameters(params));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     if (params.GetUseJCM().ValueOr(false))
@@ -58,11 +58,11 @@ CHIP_ERROR JCMAutoCommissioner::SetCommissioningParameters(const CommissioningPa
     return CHIP_NO_ERROR;
 }
 
-void JCMAutoCommissioner::CleanupCommissioning()
+void AutoCommissioner::CleanupCommissioning()
 {
     mTempReadPaths.clear();
 
-    AutoCommissioner::CleanupCommissioning();
+    chip::Controller::AutoCommissioner::CleanupCommissioning();
 }
 
 } // namespace JCM

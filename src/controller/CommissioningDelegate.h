@@ -22,7 +22,9 @@
 #include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
-#include <controller/jcm/JCMTrustVerification.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#include <controller/jcm/TrustVerification.h> // nogncheck
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -873,7 +875,11 @@ public:
      */
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
                                          ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, TimeZoneResponseInfo, JCM::JCMTrustVerificationError>
+                                         NetworkCommissioningStatusInfo, TimeZoneResponseInfo
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                                         ,JCM::TrustVerificationError
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                                         >
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

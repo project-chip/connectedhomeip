@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "JCMDeviceCommissioner.h"
+#include "DeviceCommissioner.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -34,16 +34,16 @@ namespace Controller {
 namespace JCM {
 
 /*
- * JCMDeviceCommissioner public interface and override implementation
+ * DeviceCommissioner public interface and override implementation
  */
-CHIP_ERROR JCMDeviceCommissioner::StartJCMTrustVerification()
+CHIP_ERROR DeviceCommissioner::StartJCMTrustVerification()
 {
-    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+    TrustVerificationError error = TrustVerificationError::kSuccess;
 
     ChipLogProgress(Controller, "JCM: Starting Trust Verification");
 
-    TrustVerificationStageFinished(JCMTrustVerificationStage::kIdle, error);
-    if (error != JCMTrustVerificationError::kSuccess)
+    TrustVerificationStageFinished(TrustVerificationStage::kIdle, error);
+    if (error != TrustVerificationError::kSuccess)
     {
         ChipLogError(Controller, "JCM: Failed to start Trust Verification: %s", EnumToString(error).c_str());
         return CHIP_ERROR_INTERNAL;
@@ -52,31 +52,31 @@ CHIP_ERROR JCMDeviceCommissioner::StartJCMTrustVerification()
     return CHIP_NO_ERROR;
 }
 
-void JCMDeviceCommissioner::ContinueAfterUserConsent(bool consent)
+void DeviceCommissioner::ContinueAfterUserConsent(bool consent)
 {
-    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+    TrustVerificationError error = TrustVerificationError::kSuccess;
 
     if (!consent)
     {
-        error = JCMTrustVerificationError::kUserDeniedConsent;
+        error = TrustVerificationError::kUserDeniedConsent;
     }
 
-    TrustVerificationStageFinished(JCMTrustVerificationStage::kAskingUserForConsent, error);
+    TrustVerificationStageFinished(TrustVerificationStage::kAskingUserForConsent, error);
 }
 
-void JCMDeviceCommissioner::ContinueAfterVendorIDVerification(bool verified)
+void DeviceCommissioner::ContinueAfterVendorIDVerification(bool verified)
 {
-    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+    TrustVerificationError error = TrustVerificationError::kSuccess;
 
     if (!verified)
     {
-        error = JCMTrustVerificationError::kVendorIdVerificationFailed;
+        error = TrustVerificationError::kVendorIdVerificationFailed;
     }
 
-    TrustVerificationStageFinished(JCMTrustVerificationStage::kPerformingVendorIDVerification, error);
+    TrustVerificationStageFinished(TrustVerificationStage::kPerformingVendorIDVerification, error);
 }
 
-CHIP_ERROR JCMDeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -127,7 +127,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommiss
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseOperationalCredentials(ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -247,7 +247,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -319,7 +319,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
     return err;
 }
 
-CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
+CHIP_ERROR DeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
 {
     using namespace OperationalCredentials::Attributes;
 
@@ -328,7 +328,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningI
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     if (!params.GetUseJCM().ValueOr(false))
     {
-        return DeviceCommissioner::ParseExtraCommissioningInfo(info, params);
+        return chip::Controller::DeviceCommissioner::ParseExtraCommissioningInfo(info, params);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
@@ -353,23 +353,23 @@ CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningI
         return err;
     }
 
-    return DeviceCommissioner::ParseExtraCommissioningInfo(info, params);
+    return chip::Controller::DeviceCommissioner::ParseExtraCommissioningInfo(info, params);
 }
 
-JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation()
+TrustVerificationError DeviceCommissioner::VerifyAdministratorInformation()
 {
     ChipLogProgress(Controller, "JCM: Verify joint fabric administrator endpoint and fabric index");
 
     if (mInfo.adminEndpointId == kInvalidEndpointId)
     {
         ChipLogError(Controller, "JCM: Administrator endpoint ID not found!");
-        return JCMTrustVerificationError::kInvalidAdministratorEndpointId;
+        return TrustVerificationError::kInvalidAdministratorEndpointId;
     }
 
     if (mInfo.adminFabricIndex == kUndefinedFabricIndex)
     {
         ChipLogError(Controller, "JCM: Administrator fabric index not found!");
-        return JCMTrustVerificationError::kInvalidAdministratorFabricIndex;
+        return TrustVerificationError::kInvalidAdministratorFabricIndex;
     }
 
     CATValues cats;
@@ -378,7 +378,7 @@ JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation(
 
     if (!cats.ContainsIdentifier(kAdminCATIdentifier))
     {
-        return JCMTrustVerificationError::kInvalidAdministratorCAT;
+        return TrustVerificationError::kInvalidAdministratorCAT;
     }
 
     ChipLogProgress(Controller, "JCM: Administrator endpoint ID: %d", mInfo.adminEndpointId);
@@ -386,71 +386,71 @@ JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation(
     ChipLogProgress(Controller, "JCM: Administrator vendor ID: %d", mInfo.adminVendorId);
     ChipLogProgress(Controller, "JCM: Administrator fabric ID: %llu", static_cast<unsigned long long>(mInfo.adminFabricId));
 
-    return JCMTrustVerificationError::kSuccess;
+    return TrustVerificationError::kSuccess;
 }
 
-JCMTrustVerificationError JCMDeviceCommissioner::PerformVendorIDVerificationProcedure()
+TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure()
 {
     ChipLogProgress(Controller, "Performing Vendor ID Verification Procedure");
 
     if (mTrustVerificationDelegate == nullptr)
     {
         ChipLogError(Controller, "JCM: TrustVerificationDelegate is not set");
-        return JCMTrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
+        return TrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
     }
 
     mTrustVerificationDelegate->OnVerifyVendorId(*this, mInfo);
-    return JCMTrustVerificationError::kAsync; // Indicate that this is an async operation
+    return TrustVerificationError::kAsync; // Indicate that this is an async operation
 }
 
-JCMTrustVerificationError JCMDeviceCommissioner::AskUserForConsent()
+TrustVerificationError DeviceCommissioner::AskUserForConsent()
 {
     ChipLogProgress(Controller, "JCM: Asking user for consent");
     if (mTrustVerificationDelegate == nullptr)
     {
         ChipLogError(Controller, "JCM: TrustVerificationDelegate is not set");
-        return JCMTrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
+        return TrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
     }
 
     mTrustVerificationDelegate->OnAskUserForConsent(*this, mInfo);
-    return JCMTrustVerificationError::kAsync; // Indicate that this is an async operation
+    return TrustVerificationError::kAsync; // Indicate that this is an async operation
 }
 
-void JCMDeviceCommissioner::PerformTrustVerificationStage(JCMTrustVerificationStage nextStage)
+void DeviceCommissioner::PerformTrustVerificationStage(TrustVerificationStage nextStage)
 {
-    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+    TrustVerificationError error = TrustVerificationError::kSuccess;
 
     switch (nextStage)
     {
-    case JCMTrustVerificationStage::kVerifyingAdministratorInformation:
+    case TrustVerificationStage::kVerifyingAdministratorInformation:
         error = VerifyAdministratorInformation();
         break;
-    case JCMTrustVerificationStage::kPerformingVendorIDVerification:
+    case TrustVerificationStage::kPerformingVendorIDVerification:
         error = PerformVendorIDVerificationProcedure();
         break;
-    case JCMTrustVerificationStage::kAskingUserForConsent:
+    case TrustVerificationStage::kAskingUserForConsent:
         error = AskUserForConsent();
         break;
-    case JCMTrustVerificationStage::kComplete:
-        error = JCMTrustVerificationError::kSuccess;
+    case TrustVerificationStage::kComplete:
+        error = TrustVerificationError::kSuccess;
         break;
-    case JCMTrustVerificationStage::kError:
-        error = JCMTrustVerificationError::kInternalError;
+    case TrustVerificationStage::kError:
+        error = TrustVerificationError::kInternalError;
         break;
     default:
         ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(nextStage));
-        error = JCMTrustVerificationError::kInternalError;
+        error = TrustVerificationError::kInternalError;
         break;
     }
 
-    if (error != JCMTrustVerificationError::kAsync)
+    if (error != TrustVerificationError::kAsync)
     {
         TrustVerificationStageFinished(nextStage, error);
     }
 }
 
-void JCMDeviceCommissioner::TrustVerificationStageFinished(JCMTrustVerificationStage completedStage,
-                                                           JCMTrustVerificationError error)
+void DeviceCommissioner::TrustVerificationStageFinished(TrustVerificationStage completedStage,
+                                                           TrustVerificationError error)
 {
     ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", EnumToString(completedStage).c_str());
 
@@ -459,13 +459,13 @@ void JCMDeviceCommissioner::TrustVerificationStageFinished(JCMTrustVerificationS
         mTrustVerificationDelegate->OnProgressUpdate(*this, completedStage, mInfo, error);
     }
 
-    if (error != JCMTrustVerificationError::kSuccess)
+    if (error != TrustVerificationError::kSuccess)
     {
         OnTrustVerificationComplete(error);
         return;
     }
 
-    if (completedStage == JCMTrustVerificationStage::kComplete || completedStage == JCMTrustVerificationStage::kError)
+    if (completedStage == TrustVerificationStage::kComplete || completedStage == TrustVerificationStage::kError)
     {
         ChipLogProgress(Controller, "JCM: Trust Verification already complete or error");
         OnTrustVerificationComplete(error);
@@ -473,45 +473,45 @@ void JCMDeviceCommissioner::TrustVerificationStageFinished(JCMTrustVerificationS
     }
 
     auto nextStage = GetNextTrustVerificationStage(completedStage);
-    if (nextStage == JCMTrustVerificationStage::kError)
+    if (nextStage == TrustVerificationStage::kError)
     {
-        OnTrustVerificationComplete(JCMTrustVerificationError::kInternalError);
+        OnTrustVerificationComplete(TrustVerificationError::kInternalError);
         return;
     }
 
     PerformTrustVerificationStage(nextStage);
 }
 
-JCMTrustVerificationStage JCMDeviceCommissioner::GetNextTrustVerificationStage(JCMTrustVerificationStage currentStage)
+TrustVerificationStage DeviceCommissioner::GetNextTrustVerificationStage(TrustVerificationStage currentStage)
 {
-    JCMTrustVerificationStage nextStage = JCMTrustVerificationStage::kIdle;
+    TrustVerificationStage nextStage = TrustVerificationStage::kIdle;
 
     switch (currentStage)
     {
-    case JCMTrustVerificationStage::kIdle:
-        nextStage = JCMTrustVerificationStage::kVerifyingAdministratorInformation;
+    case TrustVerificationStage::kIdle:
+        nextStage = TrustVerificationStage::kVerifyingAdministratorInformation;
         break;
-    case JCMTrustVerificationStage::kVerifyingAdministratorInformation:
-        nextStage = JCMTrustVerificationStage::kPerformingVendorIDVerification;
+    case TrustVerificationStage::kVerifyingAdministratorInformation:
+        nextStage = TrustVerificationStage::kPerformingVendorIDVerification;
         break;
-    case JCMTrustVerificationStage::kPerformingVendorIDVerification:
-        nextStage = JCMTrustVerificationStage::kAskingUserForConsent;
+    case TrustVerificationStage::kPerformingVendorIDVerification:
+        nextStage = TrustVerificationStage::kAskingUserForConsent;
         break;
-    case JCMTrustVerificationStage::kAskingUserForConsent:
-        nextStage = JCMTrustVerificationStage::kComplete;
+    case TrustVerificationStage::kAskingUserForConsent:
+        nextStage = TrustVerificationStage::kComplete;
         break;
     default:
         ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(currentStage));
-        nextStage = JCMTrustVerificationStage::kError;
+        nextStage = TrustVerificationStage::kError;
         break;
     }
 
     return nextStage;
 }
 
-void JCMDeviceCommissioner::OnTrustVerificationComplete(JCMTrustVerificationError error)
+void DeviceCommissioner::OnTrustVerificationComplete(TrustVerificationError error)
 {
-    if (error == JCMTrustVerificationError::kSuccess)
+    if (error == TrustVerificationError::kSuccess)
     {
         ChipLogProgress(Controller, "JCM: Administrator Device passed JCM Trust Verification");
 
@@ -522,15 +522,15 @@ void JCMDeviceCommissioner::OnTrustVerificationComplete(JCMTrustVerificationErro
         ChipLogError(Controller, "JCM: Failed in verifying JCM Trust Verification: err %s", EnumToString(error).c_str());
 
         CommissioningDelegate::CommissioningReport report;
-        report.Set<JCMTrustVerificationError>(error);
+        report.Set<TrustVerificationError>(error);
 
         CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
     }
 }
 
-void JCMDeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
+void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
-    DeviceCommissioner::CleanupCommissioning(proxy, nodeId, completionStatus);
+    chip::Controller::DeviceCommissioner::CleanupCommissioning(proxy, nodeId, completionStatus);
 
     mInfo.Cleanup();
 }

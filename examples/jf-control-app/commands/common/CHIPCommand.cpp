@@ -20,8 +20,8 @@
 
 #include <commands/icd/ICDCommand.h>
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/jcm/JCMAutoCommissioner.h>
-#include <controller/jcm/JCMDeviceCommissioner.h>
+#include <controller/jcm/AutoCommissioner.h>
+#include <controller/jcm/DeviceCommissioner.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -43,12 +43,12 @@ std::map<CHIPCommand::CommissionerIdentity, std::unique_ptr<chip::Controller::De
 std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 
 using DeviceControllerFactory      = chip::Controller::DeviceControllerFactory;
-using JCMAutoCommissioner          = chip::Controller::JCM::JCMAutoCommissioner;
-using JCMDeviceCommissioner        = chip::Controller::JCM::JCMDeviceCommissioner;
-using JCMTrustVerificationDelegate = chip::Controller::JCM::JCMTrustVerificationDelegate;
-using JCMTrustVerificationStage    = chip::Controller::JCM::JCMTrustVerificationStage;
-using JCMTrustVerificationError    = chip::Controller::JCM::JCMTrustVerificationError;
-using JCMTrustVerificationInfo     = chip::Controller::JCM::JCMTrustVerificationInfo;
+using JCMAutoCommissioner          = chip::Controller::JCM::AutoCommissioner;
+using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
+using JCMTrustVerificationDelegate = chip::Controller::JCM::TrustVerificationDelegate;
+using JCMTrustVerificationStage    = chip::Controller::JCM::TrustVerificationStage;
+using JCMTrustVerificationError    = chip::Controller::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo     = chip::Controller::JCM::TrustVerificationInfo;
 
 constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;

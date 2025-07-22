@@ -22,13 +22,19 @@
 #include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
-#include <controller/jcm/JCMDeviceCommissioner.h>
+#include <controller/jcm/DeviceCommissioner.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <optional>
+
+using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
+using JCMTrustVerificationDelegate = chip::Controller::JCM::TrustVerificationDelegate;
+using JCMTrustVerificationStage    = chip::Controller::JCM::TrustVerificationStage;
+using JCMTrustVerificationError    = chip::Controller::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo     = chip::Controller::JCM::TrustVerificationInfo;
 
 enum class PairingMode
 {
@@ -60,7 +66,7 @@ constexpr char kAnchorNodeIdKey[] = "AnchorNodeId";
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
-                       public chip::Controller::JCM::JCMTrustVerificationDelegate,
+                       public JCMTrustVerificationDelegate,
                        public chip::Credentials::DeviceAttestationDelegate
 
 {
@@ -254,14 +260,14 @@ public:
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     /////////// JCMTrustVerificationDelegate /////////
-    void OnProgressUpdate(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
-                          chip::Controller::JCM::JCMTrustVerificationStage stage,
-                          chip::Controller::JCM::JCMTrustVerificationInfo & info,
-                          chip::Controller::JCM::JCMTrustVerificationError error);
-    void OnAskUserForConsent(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
-                             chip::Controller::JCM::JCMTrustVerificationInfo & info);
-    void OnVerifyVendorId(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
-                          chip::Controller::JCM::JCMTrustVerificationInfo & info);
+    void OnProgressUpdate(JCMDeviceCommissioner & commissioner,
+                          JCMTrustVerificationStage stage,
+                          JCMTrustVerificationInfo & info,
+                          JCMTrustVerificationError error);
+    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner,
+                             JCMTrustVerificationInfo & info);
+    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner,
+                          JCMTrustVerificationInfo & info);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);

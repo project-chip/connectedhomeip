@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "JCMTrustVerification.h"
+#include "TrustVerification.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -40,18 +40,18 @@ namespace Controller {
 namespace JCM {
 
 /*
- * JCMDeviceCommissioner is a class that handles the Joint Commissioning Management (JCM) process
+ * DeviceCommissioner is a class that handles the Joint Commissioning Management (JCM) process
  * for commissioning Joint Fabric Administrator devices in a CHIP network. It extends the DeviceCommissioner class and
  * implements the JCM trust verification process.
  */
-class JCMDeviceCommissioner : public DeviceCommissioner
+class DeviceCommissioner : public chip::Controller::DeviceCommissioner
 {
 public:
-    // The constructor initializes the JCMCommissioner with a reference to this device commissioner
-    JCMDeviceCommissioner() {}
-    ~JCMDeviceCommissioner() {}
+    // The constructor initializes the DeviceCommissioner with a reference to this device commissioner
+    DeviceCommissioner() {}
+    ~DeviceCommissioner() {}
 
-    void RegisterTrustVerificationDelegate(JCMTrustVerificationDelegate * trustVerificationDelegate)
+    void RegisterTrustVerificationDelegate(TrustVerificationDelegate * trustVerificationDelegate)
     {
         ChipLogProgress(Controller, "JCM: Setting trust verification delegate");
         mTrustVerificationDelegate = trustVerificationDelegate;
@@ -84,9 +84,9 @@ public:
     void ContinueAfterVendorIDVerification(bool verified);
 
     /*
-     * GetJCMTrustVerificationInfo is a method that returns the JCM trust verification information.
+     * GetTrustVerificationInfo is a method that returns the JCM trust verification information.
      */
-    JCMTrustVerificationInfo & GetJCMTrustVerificationInfo() { return mInfo; }
+    TrustVerificationInfo & GetTrustVerificationInfo() { return mInfo; }
 
 protected:
     // Override ParseExtraCommissioningInfo to parse JCM administrator info
@@ -101,13 +101,13 @@ private:
     CHIP_ERROR ParseTrustedRoot(ReadCommissioningInfo & info);
 
     // JCM commissioning trust verification steps
-    JCMTrustVerificationError VerifyAdministratorInformation();
-    JCMTrustVerificationError PerformVendorIDVerificationProcedure();
-    JCMTrustVerificationError AskUserForConsent();
+    TrustVerificationError VerifyAdministratorInformation();
+    TrustVerificationError PerformVendorIDVerificationProcedure();
+    TrustVerificationError AskUserForConsent();
 
-    JCMTrustVerificationStage GetNextTrustVerificationStage(JCMTrustVerificationStage currentStage);
-    void PerformTrustVerificationStage(JCMTrustVerificationStage nextStage);
-    void TrustVerificationStageFinished(JCMTrustVerificationStage completedStage, JCMTrustVerificationError error);
+    TrustVerificationStage GetNextTrustVerificationStage(TrustVerificationStage currentStage);
+    void PerformTrustVerificationStage(TrustVerificationStage nextStage);
+    void TrustVerificationStageFinished(TrustVerificationStage completedStage, TrustVerificationError error);
 
     /*
      * OnTrustVerificationComplete is a callback method that is called when the JCM trust verification process is complete.
@@ -115,10 +115,10 @@ private:
      *
      * @param result The result of the JCM trust verification process.
      */
-    virtual void OnTrustVerificationComplete(JCMTrustVerificationError error);
+    virtual void OnTrustVerificationComplete(TrustVerificationError error);
 
     // Trust verification delegate for the commissioning client
-    JCMTrustVerificationDelegate * mTrustVerificationDelegate = nullptr;
+    TrustVerificationDelegate * mTrustVerificationDelegate = nullptr;
 
     // JCM trust verification info
     // This structure contains the information needed for JCM trust verification
@@ -126,9 +126,9 @@ private:
     // It is used to store the results of the trust verification process
     // and is passed to the JCM trust verification delegate
     // when the trust verification process is complete
-    JCMTrustVerificationInfo mInfo;
+    TrustVerificationInfo mInfo;
 
-    friend class TestJCMCommissioner;
+    friend class TestCommissioner;
 };
 
 } // namespace JCM

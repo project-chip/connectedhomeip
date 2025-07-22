@@ -20,8 +20,8 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <controller/CommissioningDelegate.h>
-#include <controller/jcm/JCMAutoCommissioner.h>
-#include <controller/jcm/JCMDeviceCommissioner.h>
+#include <controller/jcm/AutoCommissioner.h>
+#include <controller/jcm/DeviceCommissioner.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
@@ -46,33 +46,33 @@ namespace chip {
 namespace Controller {
 namespace JCM {
 
-class MockJCMTrustVerificationDelegate : public JCMTrustVerificationDelegate
+class MockTrustVerificationDelegate : public TrustVerificationDelegate
 {
 public:
-    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
-                          JCMTrustVerificationError error) override
+    void OnProgressUpdate(DeviceCommissioner & commissioner, TrustVerificationStage stage, TrustVerificationInfo & info,
+                          TrustVerificationError error) override
     {
         mProgressUpdates++;
         mLastStage = stage;
         mLastError = error;
     }
 
-    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) override
+    void OnAskUserForConsent(DeviceCommissioner & commissioner, TrustVerificationInfo & info) override
     {
         mAskedForConsent = true;
         mLastVendorId    = info.adminVendorId;
         commissioner.ContinueAfterUserConsent(mShouldConsent);
     }
 
-    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) override
+    void OnVerifyVendorId(DeviceCommissioner & commissioner, TrustVerificationInfo & info) override
     {
         mAskedForVendorIdVerification = true;
         commissioner.ContinueAfterVendorIDVerification(mShouldVerifyVendorId);
     }
 
     int mProgressUpdates                 = 0;
-    JCMTrustVerificationStage mLastStage = JCMTrustVerificationStage::kIdle;
-    JCMTrustVerificationError mLastError = JCMTrustVerificationError::kSuccess;
+    TrustVerificationStage mLastStage = TrustVerificationStage::kIdle;
+    TrustVerificationError mLastError = TrustVerificationError::kSuccess;
     bool mAskedForConsent                = false;
     bool mShouldConsent                  = true;
     bool mAskedForVendorIdVerification   = false;
@@ -243,24 +243,24 @@ private:
     MockClusterStateCacheCallback mClusterStateCacheCallback;
 };
 
-class TestableJCMDeviceCommissioner : public JCMDeviceCommissioner
+class TestableDeviceCommissioner : public DeviceCommissioner
 {
 public:
-    void OnTrustVerificationComplete(JCMTrustVerificationError result) override
+    void OnTrustVerificationComplete(TrustVerificationError result) override
     {
         mResult = result;
 
-        ChipLogProgress(Controller, "TestableJCMDeviceCommissioner::OnTrustVerificationComplete called with result: %hu",
+        ChipLogProgress(Controller, "TestableDeviceCommissioner::OnTrustVerificationComplete called with result: %hu",
                         static_cast<uint16_t>(result));
     }
 
-    JCMTrustVerificationError mResult;
+    TrustVerificationError mResult;
 };
 
-class TestJCMCommissioner : public chip::Test::AppContext
+class TestCommissioner : public chip::Test::AppContext
 {
 public:
-    TestJCMCommissioner() { mInfo.attributes = &mClusterStateCache; }
+    TestCommissioner() { mInfo.attributes = &mClusterStateCache; }
 
     static void SetUpTestSuite()
     {
@@ -290,7 +290,7 @@ protected:
     {
         chip::Test::AppContext::SetUp();
 
-        mDeviceCommissioner = new JCMDeviceCommissioner();
+        mDeviceCommissioner = new DeviceCommissioner();
         mDeviceCommissioner->RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -316,17 +316,17 @@ protected:
     }
 
 private:
-    JCMAutoCommissioner mAutoCommissioner;
-    JCMDeviceCommissioner * mDeviceCommissioner = nullptr;
-    MockJCMTrustVerificationDelegate mTrustVerificationDelegate;
+    AutoCommissioner mAutoCommissioner;
+    DeviceCommissioner * mDeviceCommissioner = nullptr;
+    MockTrustVerificationDelegate mTrustVerificationDelegate;
     MockClusterStateCache mClusterStateCache;
     ReadCommissioningInfo mInfo;
     CommissioningParameters mCommissioningParams;
 };
 
-TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestTrustVerificationStageFinishedProgressesThroughStages)
+TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgressesThroughStages)
 {
-    TestableJCMDeviceCommissioner commissioner;
+    TestableDeviceCommissioner commissioner;
 
     // Simulate user consenting
     mTrustVerificationDelegate.mShouldConsent = true;
@@ -335,24 +335,24 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestTrustVerificationStageFinishedProgr
     // Set up the mock ReadCommissioningInfo
     commissioner.ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
 
-    JCMTrustVerificationStage stage = JCMTrustVerificationStage::kIdle;
-    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+    TrustVerificationStage stage = TrustVerificationStage::kIdle;
+    TrustVerificationError error = TrustVerificationError::kSuccess;
 
     // Start at Started, advance through all stages
 
     // Advance to kAskUserForConsent (should trigger consent)
     commissioner.TrustVerificationStageFinished(stage, error);
     EXPECT_EQ(mTrustVerificationDelegate.mProgressUpdates, 5); // Progress not incremented for consent
-    EXPECT_EQ(mTrustVerificationDelegate.mLastStage, JCMTrustVerificationStage::kComplete);
-    EXPECT_EQ(mTrustVerificationDelegate.mLastError, JCMTrustVerificationError::kSuccess);
+    EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kComplete);
+    EXPECT_EQ(mTrustVerificationDelegate.mLastError, TrustVerificationError::kSuccess);
     EXPECT_TRUE(mTrustVerificationDelegate.mAskedForConsent);
     EXPECT_TRUE(mTrustVerificationDelegate.mAskedForVendorIdVerification);
     EXPECT_EQ(mTrustVerificationDelegate.mLastVendorId, chip::VendorId(65521));
 }
 
-TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestTrustVerificationStageFinishedHandlesUserConsent)
+TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedHandlesUserConsent)
 {
-    TestableJCMDeviceCommissioner commissioner;
+    TestableDeviceCommissioner commissioner;
     mTrustVerificationDelegate.mShouldConsent = false; // Simulate user rejecting consent
     commissioner.RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
 
@@ -360,34 +360,34 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestTrustVerificationStageFinishedHandl
     commissioner.mInfo.adminFabricIndex = 1;
     commissioner.mInfo.adminEndpointId  = 1;
 
-    JCMTrustVerificationStage stage = JCMTrustVerificationStage::kPerformingVendorIDVerification;
-    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+    TrustVerificationStage stage = TrustVerificationStage::kPerformingVendorIDVerification;
+    TrustVerificationError error = TrustVerificationError::kSuccess;
 
     commissioner.TrustVerificationStageFinished(stage, error);
     EXPECT_TRUE(mTrustVerificationDelegate.mAskedForConsent);
     EXPECT_EQ(mTrustVerificationDelegate.mProgressUpdates, 2); // Only OnProgressUpdate called for error
-    EXPECT_EQ(mTrustVerificationDelegate.mLastStage, JCMTrustVerificationStage::kAskingUserForConsent);
-    EXPECT_EQ(mTrustVerificationDelegate.mLastError, JCMTrustVerificationError::kUserDeniedConsent);
+    EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kAskingUserForConsent);
+    EXPECT_EQ(mTrustVerificationDelegate.mLastError, TrustVerificationError::kUserDeniedConsent);
 }
 
-TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestTrustVerificationStageFinishedHandlesError)
+TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedHandlesError)
 {
-    TestableJCMDeviceCommissioner commissioner;
+    TestableDeviceCommissioner commissioner;
     mTrustVerificationDelegate.mShouldVerifyVendorId = false; // Simulate vendor id verification failure
     commissioner.RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
 
-    JCMTrustVerificationStage stage = JCMTrustVerificationStage::kVerifyingAdministratorInformation;
-    JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
+    TrustVerificationStage stage = TrustVerificationStage::kVerifyingAdministratorInformation;
+    TrustVerificationError error = TrustVerificationError::kSuccess;
 
     // Simulate error at operational credentials stage
     commissioner.TrustVerificationStageFinished(stage, error);
     EXPECT_EQ(mTrustVerificationDelegate.mProgressUpdates, 2);
-    EXPECT_EQ(mTrustVerificationDelegate.mLastStage, JCMTrustVerificationStage::kPerformingVendorIDVerification);
-    EXPECT_EQ(mTrustVerificationDelegate.mLastError, JCMTrustVerificationError::kVendorIdVerificationFailed);
+    EXPECT_EQ(mTrustVerificationDelegate.mLastStage, TrustVerificationStage::kPerformingVendorIDVerification);
+    EXPECT_EQ(mTrustVerificationDelegate.mLastError, TrustVerificationError::kVendorIdVerificationFailed);
 }
 
 // Test getting admin fabric index and endpoint ID
-TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseAdminFabricIndexAndEndpointId)
+TEST_F_FROM_FIXTURE(TestCommissioner, TestParseAdminFabricIndexAndEndpointId)
 {
     // Call the method directly to test it
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseAdminFabricIndexAndEndpointId(mInfo));
@@ -398,7 +398,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseAdminFabricIndexAndEndpointId)
 }
 
 // Test getting operational credentials
-TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseOperationalCredentials)
+TEST_F_FROM_FIXTURE(TestCommissioner, TestParseOperationalCredentials)
 {
     // Set up the prerequisites for ParseTrustedRoot
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseAdminFabricIndexAndEndpointId(mInfo));
@@ -419,7 +419,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseOperationalCredentials)
 }
 
 // Test getting trusted root
-TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseTrustedRoot)
+TEST_F_FROM_FIXTURE(TestCommissioner, TestParseTrustedRoot)
 {
     // Set up the prerequisites for ParseTrustedRoot
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseAdminFabricIndexAndEndpointId(mInfo));
@@ -444,7 +444,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseTrustedRoot)
 }
 
 // Test parsing administrator info
-TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseExtraCommissioningInfo)
+TEST_F_FROM_FIXTURE(TestCommissioner, TestParseExtraCommissioningInfo)
 {
     // Call the method directly to test it
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams));

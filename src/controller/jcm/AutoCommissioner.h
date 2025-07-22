@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "JCMTrustVerification.h"
+#include "TrustVerification.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -40,15 +40,15 @@ namespace Controller {
 namespace JCM {
 
 /*
- * JCMAutoCommissioner is a class that handles the Joint Commissioning Management (JCM) process
+ * AutoCommissioner is a class that handles the Joint Commissioning Management (JCM) process
  * for commissioning Joint Fabric Administrator devices in a CHIP network. It extends the AutoCommissioner class and
  * helps setup for the JCM trust verification process.
  */
-class JCMAutoCommissioner : public AutoCommissioner
+class AutoCommissioner : public chip::Controller::AutoCommissioner
 {
 public:
-    JCMAutoCommissioner(){};
-    ~JCMAutoCommissioner(){};
+    AutoCommissioner(){};
+    ~AutoCommissioner(){};
 
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
     void CleanupCommissioning() override;

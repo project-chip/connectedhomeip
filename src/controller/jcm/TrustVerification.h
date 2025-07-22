@@ -30,7 +30,7 @@ namespace Controller {
 
 namespace JCM {
 
-struct JCMTrustVerificationInfo
+struct TrustVerificationInfo
 {
     EndpointId adminEndpointId   = kInvalidEndpointId;
     FabricIndex adminFabricIndex = kUndefinedFabricIndex;
@@ -56,7 +56,7 @@ struct JCMTrustVerificationInfo
     }
 };
 
-enum class JCMTrustVerificationError : uint16_t
+enum class TrustVerificationError : uint16_t
 {
     kSuccess = 0,
     kAsync   = 1,
@@ -71,9 +71,9 @@ enum class JCMTrustVerificationError : uint16_t
     kInternalError = 200,
 };
 
-class JCMDeviceCommissioner;
+class DeviceCommissioner;
 
-enum JCMTrustVerificationStage : uint8_t
+enum TrustVerificationStage : uint8_t
 {
     kIdle,
     kVerifyingAdministratorInformation,
@@ -84,31 +84,31 @@ enum JCMTrustVerificationStage : uint8_t
 };
 
 /*
- * EnumToString is a utility function that converts a JCMTrustVerificationError enum value
+ * EnumToString is a utility function that converts a TrustVerificationError enum value
  * to its string representation for logging purposes.
  *
- * @param error The JCMTrustVerificationError to convert.
- * @return A string representation of the JCMTrustVerificationError.
+ * @param error The TrustVerificationError to convert.
+ * @return A string representation of the TrustVerificationError.
  */
-inline std::string EnumToString(JCMTrustVerificationError error)
+inline std::string EnumToString(TrustVerificationError error)
 {
     switch (error)
     {
-    case JCMTrustVerificationError::kSuccess:
+    case TrustVerificationError::kSuccess:
         return "SUCCESS";
-    case JCMTrustVerificationError::kAsync:
+    case TrustVerificationError::kAsync:
         return "ASYNC_OPERATION";
-    case JCMTrustVerificationError::kInvalidAdministratorEndpointId:
+    case TrustVerificationError::kInvalidAdministratorEndpointId:
         return "INVALID_ADMINISTRATOR_ENDPOINT_ID";
-    case JCMTrustVerificationError::kInvalidAdministratorFabricIndex:
+    case TrustVerificationError::kInvalidAdministratorFabricIndex:
         return "INVALID_ADMINISTRATOR_FABRIC_INDEX";
-    case JCMTrustVerificationError::kInvalidAdministratorCAT:
+    case TrustVerificationError::kInvalidAdministratorCAT:
         return "INVALID_ADMINISTRATOR_CAT";
-    case JCMTrustVerificationError::kTrustVerificationDelegateNotSet:
+    case TrustVerificationError::kTrustVerificationDelegateNotSet:
         return "TRUST_VERIFICATION_DELEGATE_NOT_SET";
-    case JCMTrustVerificationError::kUserDeniedConsent:
+    case TrustVerificationError::kUserDeniedConsent:
         return "USER_DENIED_CONSENT";
-    case JCMTrustVerificationError::kInternalError:
+    case TrustVerificationError::kInternalError:
         return "INTERNAL_ERROR";
 
     default:
@@ -117,13 +117,13 @@ inline std::string EnumToString(JCMTrustVerificationError error)
 }
 
 /*
- * EnumToString is a utility function that converts a JCMTrustVerificationStage enum value
+ * EnumToString is a utility function that converts a TrustVerificationStage enum value
  * to its string representation for logging purposes.
  *
- * @param stage The JCMTrustVerificationStage to convert.
- * @return A string representation of the JCMTrustVerificationStage.
+ * @param stage The TrustVerificationStage to convert.
+ * @return A string representation of the TrustVerificationStage.
  */
-inline std::string EnumToString(JCMTrustVerificationStage stage)
+inline std::string EnumToString(TrustVerificationStage stage)
 {
     switch (stage)
     {
@@ -145,21 +145,21 @@ inline std::string EnumToString(JCMTrustVerificationStage stage)
     }
 }
 
-typedef void (*JCMTrustVerificationCompleteCallback)(void * context, JCMTrustVerificationInfo & info,
-                                                     JCMTrustVerificationError result);
+typedef void (*TrustVerificationCompleteCallback)(void * context, TrustVerificationInfo & info,
+                                                     TrustVerificationError result);
 
 /**
  * A delegate that can be notified of progress as the JCM Trust Verification check proceeds.
  */
-class DLL_EXPORT JCMTrustVerificationDelegate
+class DLL_EXPORT TrustVerificationDelegate
 {
 public:
-    virtual ~JCMTrustVerificationDelegate() = default;
+    virtual ~TrustVerificationDelegate() = default;
 
-    virtual void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage,
-                                  JCMTrustVerificationInfo & info, JCMTrustVerificationError error)         = 0;
-    virtual void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) = 0;
-    virtual void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)    = 0;
+    virtual void OnProgressUpdate(DeviceCommissioner & commissioner, TrustVerificationStage stage,
+                                  TrustVerificationInfo & info, TrustVerificationError error)         = 0;
+    virtual void OnAskUserForConsent(DeviceCommissioner & commissioner, TrustVerificationInfo & info) = 0;
+    virtual void OnVerifyVendorId(DeviceCommissioner & commissioner, TrustVerificationInfo & info)    = 0;
 };
 
 } // namespace JCM
