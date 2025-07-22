@@ -120,6 +120,7 @@ public:
 
     void OnConnectWiFiNetwork();
     void OnScanWiFiNetworkDone();
+    void UpdateWiFiAuthmode();
     CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
     static WiseWiFiDriver & GetInstance()
     {
