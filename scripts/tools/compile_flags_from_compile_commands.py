@@ -80,7 +80,7 @@ class CompileCommand:
                 index += 1  # skip this and next argument
             elif arg not in {"-MMD"}:
 
-                # convert relative paths in absolute paths for incldues to absolute
+                # convert relative paths in absolute paths for includes to absolute
                 # so if '-I' is not absolute, adjust
                 prefixes = ["-I", "-isystem"]
                 for p in prefixes:
