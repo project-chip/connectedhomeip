@@ -628,10 +628,11 @@ TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
 {
     // Create a 1-byte packet and fill it with data.
     auto packet0 = System::PacketBufferHandle::New(10);
+    ASSERT_FALSE(packet0.IsNull());
     packet0->SetDataLength(1);
     auto * data0 = packet0->Start();
     ASSERT_NE(data0, nullptr);
-    std::iota(data0, data0 + 1, 0);
+    data0[0] = 0;
 
     // Send the packet and check that the newest unacked sent sequence number is 0.
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
