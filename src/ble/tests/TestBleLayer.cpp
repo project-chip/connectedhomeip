@@ -57,7 +57,6 @@ class TestBleLayer : public BleLayer,
                      public BleConnectionDelegate,
                      private BleLayerDelegate,
                      private BlePlatformDelegate,
-                     public BleConnectionDelegate,
                      public ::testing::Test
 {
 public:
@@ -139,6 +138,16 @@ public:
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override {}
     void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {}
     CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
+                             OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
+                             OnConnectionErrorFunct onConnectionError) override
+    {
+        if (discriminators.empty())
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return CHIP_NO_ERROR;
+    }
 
     ///
     // Implementation of BleLayerDelegate
@@ -169,22 +178,6 @@ public:
     }
     CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
     {
-        return CHIP_NO_ERROR;
-    }
-
-    ///
-    // Implementation of BleConnectionDelegate
-    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override {}
-    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {}
-    CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
-    CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
-                             OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
-                             OnConnectionErrorFunct onConnectionError) override
-    {
-        if (discriminators.empty())
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
         return CHIP_NO_ERROR;
     }
 
@@ -419,7 +412,7 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
-  
+
 // This test creats new ble connection by discriminator and simulates error
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
 {
@@ -483,8 +476,6 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
 // Verify connection fails when Ble Transport Layer is missing
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
 {
-    chip::Test::BleLayerTestAccess access(this);
-    access.SetConnectionDelegate(this);
     mBleTransport = nullptr;
 
     SetupDiscriminator discriminators[] = { SetupDiscriminator() };
