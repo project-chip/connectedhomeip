@@ -135,4 +135,4 @@ You may want to enable highlighting via `More->Settings` and have:
 -   Line highlighting color scheme as Rainbow (clearer code as opposed to just
     gray scale)
 
-![image](./godbolt_example.png.png)
+![image](./godbolt_example.png)
