@@ -156,6 +156,20 @@ TEST(TestStringBuilder, TestFormat)
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
     }
+
+    {
+        char str[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0' };
+        StringBuilder<14> builder(CharSpan(str, sizeof(str)));
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        char str[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0' };
+        StringBuilder<14> builder(str, sizeof(str));
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
 }
 
 TEST(TestStringBuilder, TestFormatOverflow)
@@ -247,6 +261,20 @@ TEST(TestStringBuilder, TestFormatOverflow)
     {
         uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
         StringBuilder<14> builder(ByteSpan(bytes, sizeof(bytes)), false);
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        char str[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
+        StringBuilder<14> builder(CharSpan(str, sizeof(str)), false);
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        char str[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
+        StringBuilder<14> builder(str, sizeof(str), false);
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
     }
@@ -358,6 +386,20 @@ TEST(TestStringBuilder, TestOverflowMarker)
     {
         uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
         StringBuilder<14> builder(ByteSpan(bytes, sizeof(bytes)));
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
+    }
+
+    {
+        char str[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
+        StringBuilder<14> builder(CharSpan(str, sizeof(str)));
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
+    }
+
+    {
+        char str[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
+        StringBuilder<14> builder(str, sizeof(str));
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
     }
