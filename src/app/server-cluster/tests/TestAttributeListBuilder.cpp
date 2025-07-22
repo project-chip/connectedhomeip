@@ -70,13 +70,12 @@ TEST_F(TestAttributeListBuilder, Append)
         const AttributeEntry optional3_meta(12, kNoFlags, Access::Privilege::kView, std::nullopt);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(AttributeListBuilder(builder).Append({},
-                                                       {
-                                                           { .enabled = true, .metadata = optional1_meta },
-                                                           { .enabled = false, .metadata = optional2_meta },
-                                                           { .enabled = true, .metadata = optional3_meta },
-                                                       }),
-                  CHIP_NO_ERROR);
+        const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
+            { .enabled = true, .metadata = optional1_meta },
+            { .enabled = false, .metadata = optional2_meta },
+            { .enabled = true, .metadata = optional3_meta },
+        };
+        ASSERT_EQ(AttributeListBuilder(builder).Append({}, Span(optionalEntries)), CHIP_NO_ERROR);
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
@@ -94,12 +93,11 @@ TEST_F(TestAttributeListBuilder, Append)
         const AttributeEntry optional2_meta(11, kNoFlags, Access::Privilege::kView, std::nullopt);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(AttributeListBuilder(builder).Append(Span(mandatory),
-                                                       {
-                                                           { .enabled = true, .metadata = optional1_meta },
-                                                           { .enabled = false, .metadata = optional2_meta },
-                                                       }),
-                  CHIP_NO_ERROR);
+        const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
+            { .enabled = true, .metadata = optional1_meta },
+            { .enabled = false, .metadata = optional2_meta },
+        };
+        ASSERT_EQ(AttributeListBuilder(builder).Append(Span(mandatory), Span(optionalEntries)), CHIP_NO_ERROR);
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
         ASSERT_EQ(result.size(), 2 + global_attribute_count);

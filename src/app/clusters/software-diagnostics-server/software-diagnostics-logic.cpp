@@ -99,14 +99,16 @@ CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<Data
 CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(
-        Span<const DataModel::AttributeEntry>() /* mandatory */,
-        {
+
+    const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
             { mEnabledAttributes.enableThreadMetrics, Attributes::ThreadMetrics::kMetadataEntry },
             { mEnabledAttributes.enableCurrentHeapFree, Attributes::CurrentHeapFree::kMetadataEntry },
             { mEnabledAttributes.enableCurrentHeapUsed, Attributes::CurrentHeapUsed::kMetadataEntry },
             { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
-        });
+    };
+
+
+    return listBuilder.Append(Span<const DataModel::AttributeEntry>() /* mandatory */, Span(optionalEntries));
 }
 
 } // namespace Clusters

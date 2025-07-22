@@ -53,7 +53,7 @@ public:
     ///   - optionalAttributes IF AND ONLY IF they are enabled
     ///   - all of `GlobalAttributes()`
     CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                      std::initializer_list<const OptionalAttributeEntry> optionalAttributes);
+                      Span<const OptionalAttributeEntry> optionalAttributes);
 
 private:
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & mBuilder;

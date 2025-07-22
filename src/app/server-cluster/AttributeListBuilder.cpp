@@ -22,7 +22,7 @@ namespace chip {
 namespace app {
 
 CHIP_ERROR AttributeListBuilder::Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                                        std::initializer_list<const OptionalAttributeEntry> optionalAttributes)
+                                        Span<const OptionalAttributeEntry> optionalAttributes)
 {
     // determine how much data to append. This should only be called if generally we have something to append
     size_t append_size = mandatoryAttributes.size();
