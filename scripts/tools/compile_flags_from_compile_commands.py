@@ -205,7 +205,7 @@ def files(compile_commands, file_expr):
         entries = compile_commands.json_data
 
     for entry in entries:
-        print("%s" % entry["file"])
+        print(entry["file"])
 
 
 if __name__ == "__main__":
