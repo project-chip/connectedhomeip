@@ -17,6 +17,7 @@
  */
 
 #include "EnergyGatewayAppCommonMain.h"
+#include "CommodityMeteringInstance.h"
 #include "CommodityPriceMain.h"
 #include "ElectricalGridConditionsMain.h"
 #include "MeterIdentificationInstance.h"

@@ -38,7 +38,7 @@ import typing
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main)
 from chip.tlv import uint
@@ -154,11 +154,11 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         if not is_countdown_time_supported:
             logging.info("CountdownTime attribute not supported, skipping test")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped("2c")
             return
 
         self.step("2c")
-        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         self.step("2d")
@@ -219,7 +219,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                     logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
@@ -258,7 +258,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
             self.step("4c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 
@@ -268,7 +268,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("4e")
         try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen), timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyOpened position failed: {e}")
 
@@ -310,7 +310,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         else:
             self.step("5b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 

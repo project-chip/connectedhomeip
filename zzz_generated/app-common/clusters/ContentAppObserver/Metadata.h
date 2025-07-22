@@ -27,6 +27,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ContentAppMessag
 } // namespace ContentAppMessage
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ContentAppObserver
 } // namespace Clusters
 } // namespace app
