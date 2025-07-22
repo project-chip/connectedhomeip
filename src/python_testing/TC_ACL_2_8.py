@@ -31,10 +31,8 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import random
-import subprocess
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -456,7 +454,7 @@ class TC_ACL_2_8(MatterBaseTest):
         # First, clean up TH1 and TH2 controllers
         if hasattr(self, 'th1'):
             try:
-                logging.info(f"Shutting down TH1 controller")
+                logging.info("Shutting down TH1 controller")
                 await self.th1.Shutdown()
                 delattr(self, 'th1')
             except Exception as e:
@@ -464,7 +462,7 @@ class TC_ACL_2_8(MatterBaseTest):
 
         if hasattr(self, 'th2'):
             try:
-                logging.info(f"Shutting down TH2 controller")
+                logging.info("Shutting down TH2 controller")
                 await self.th2.Shutdown()
                 delattr(self, 'th2')
             except Exception as e:
