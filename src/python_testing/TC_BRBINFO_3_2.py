@@ -83,7 +83,7 @@ class TC_BRBINFO_3_2(MatterBaseTest):
             self.write_to_app_pipe(command_dict)
         else:
             self.wait_for_user_input(
-                prompt_msg="Change the configuration version in a way which results in functionality to be added or removed, then continue")
+                prompt_msg="On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode), then continue")
 
         self.step(3)
         newConfigurationVersion = await self.read_brbinfo_attribute_expect_success(endpoint=endpoint, attribute=attributes.ConfigurationVersion)
