@@ -160,12 +160,14 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     {
         status = *readable_status;
     }
-    // Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
-    else if (auto required_privilege_access_status =
-                 ValidateReadAttributeACL(subjectDescriptor, path, entry->GetReadPrivilege().value());
-             required_privilege_access_status.has_value())
+    // Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege.
+    // entry->GetReadPrivilege() is guaranteed to have a value, since that condition is checked in the previous condition (inside
+    // ValidateAttributeIsReadable()).
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    else if (auto required_privilege_status = ValidateReadAttributeACL(subjectDescriptor, path, entry->GetReadPrivilege().value());
+             required_privilege_status.has_value())
     {
-        status = *required_privilege_access_status;
+        status = *required_privilege_status;
     }
     else if (IsSupportedGlobalAttributeNotInMetadata(readRequest.path.mAttributeId))
     {
