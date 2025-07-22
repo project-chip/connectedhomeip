@@ -402,6 +402,13 @@ class TC_ACL_2_8(MatterBaseTest):
                 event.Data.fabricIndex,
                 f1,
                 "Should not contain event with FabricIndex F1")
+        
+         # Re-running test using the legacy list writing mechanism
+        if not force_legacy_encoding:
+            self.step(11)
+            logging.info("*** Rerunning test using the legacy list writing mechanism now ***")
+        else:
+            self.skip_step(11)
 
     def desc_TC_ACL_2_8(self) -> str:
         return "[TC-ACL-2.8] ACL multi-fabric"
@@ -428,6 +435,8 @@ class TC_ACL_2_8(MatterBaseTest):
                      "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F2"),
             TestStep(10, "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
                      "Result is SUCCESS, value is list of AccessControlEntryChanged containing 2 elements, and MUST NOT contain any element with FabricIndex F1"),
+            TestStep(11, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
+                     "Test succeeds with legacy list encoding mechanism"),
         ]
         return steps
 
