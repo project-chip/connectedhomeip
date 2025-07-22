@@ -312,7 +312,10 @@ def _find_test_class():
     from chip.testing.matter_testing import MatterBaseTest
 
     subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
-    subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
+    subclasses = [c for c in subclasses
+                  if c.__name__ != "MatterBaseTest"
+                  and c.__module__ == '__main__']
+
     if len(subclasses) != 1:
         print(
             'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
