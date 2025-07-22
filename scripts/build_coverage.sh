@@ -237,10 +237,12 @@ if [[ "$skip_gn" == false ]]; then
 
     # Restrict coverage to 'core' or 'clusters' if needed
     if [[ "$CODE" == "core" ]]; then
+        # --exclude code in 'app/clusters' folder 
         LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
             --exclude "$CHIP_ROOT/src/app/clusters/**"
         )
     elif [[ "$CODE" == "clusters" ]]; then
+        # "--include" code in 'app/clusters' folder, meaning "include ONLY the code in the 'app/clusters' folder in the coverage report."
         LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
             --include "$CHIP_ROOT/src/app/clusters/**"
         )
