@@ -36,14 +36,13 @@ namespace app {
 class AttributeListBuilder
 {
 public:
-    AttributeListBuilder(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) : mBuilder(builder){}
+    AttributeListBuilder(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) : mBuilder(builder) {}
 
     struct OptionalAttributeEntry
     {
         bool enabled;                               // Is this optional attribute enabled?
         const DataModel::AttributeEntry & metadata; // Metadata for the attribute
     };
-
 
     /// Appends the given attributes to the builder.
     ///

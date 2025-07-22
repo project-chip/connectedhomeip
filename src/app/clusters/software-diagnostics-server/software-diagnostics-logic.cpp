@@ -101,12 +101,11 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-            { mEnabledAttributes.enableThreadMetrics, Attributes::ThreadMetrics::kMetadataEntry },
-            { mEnabledAttributes.enableCurrentHeapFree, Attributes::CurrentHeapFree::kMetadataEntry },
-            { mEnabledAttributes.enableCurrentHeapUsed, Attributes::CurrentHeapUsed::kMetadataEntry },
-            { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
+        { mEnabledAttributes.enableThreadMetrics, Attributes::ThreadMetrics::kMetadataEntry },
+        { mEnabledAttributes.enableCurrentHeapFree, Attributes::CurrentHeapFree::kMetadataEntry },
+        { mEnabledAttributes.enableCurrentHeapUsed, Attributes::CurrentHeapUsed::kMetadataEntry },
+        { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
     };
-
 
     return listBuilder.Append(Span<const DataModel::AttributeEntry>() /* mandatory */, Span(optionalEntries));
 }
