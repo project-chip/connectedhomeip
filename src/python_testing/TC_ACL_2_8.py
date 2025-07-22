@@ -298,21 +298,24 @@ class TC_ACL_2_8(MatterBaseTest):
             fabricFiltered=True
         )
 
-        logging.info(f"All AccessControlEntryChanged events (step 9): {events}")
-
         if force_legacy_encoding:
             asserts.assert_equal(len(events), 3, "Should have exactly 3 events")
-            added_event, removed_event, added_event2 = self._get_relevant_acl_events(
-                events, self.th1.nodeId, [self.th1.nodeId, 1111])
-            logging.info(f"TH1 Events: added_event={added_event}, removed_event={removed_event}, added_event2={added_event2}")
+        else:
+            asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
 
-            self._verify_acl_event(
-                added_event,
-                NullValue,
-                0,
-                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                self.th1.nodeId,
-                f1)
+        # Unified event extraction
+        result = self._get_relevant_acl_events(events, self.th1.nodeId, [self.th1.nodeId, 1111])
+        added_event = result[0]
+        self._verify_acl_event(
+            added_event,
+            NullValue,
+            0,
+            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+            self.th1.nodeId,
+            f1)
+        relevant_events = [added_event]
+        if force_legacy_encoding:
+            removed_event, added_event2 = result[1], result[2]
             self._verify_acl_event(
                 removed_event,
                 self.th1.nodeId,
@@ -327,24 +330,9 @@ class TC_ACL_2_8(MatterBaseTest):
                 Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
                 [self.th1.nodeId, 1111],
                 f1)
-            for event in [added_event, removed_event, added_event2]:
-                asserts.assert_not_equal(
-                    event.Data.fabricIndex,
-                    f2,
-                    "Should not contain event with FabricIndex F2")
-
+            relevant_events.extend([removed_event, added_event2])
         else:
-            asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
-            added_event, changed_event = self._get_relevant_acl_events(events, self.th1.nodeId, [self.th1.nodeId, 1111])
-            logging.info(f"TH1 Events: added_event={added_event}, changed_event={changed_event}")
-
-            self._verify_acl_event(
-                added_event,
-                NullValue,
-                0,
-                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                self.th1.nodeId,
-                f1)
+            changed_event = result[1]
             self._verify_acl_event(
                 changed_event,
                 self.th1.nodeId,
@@ -352,11 +340,12 @@ class TC_ACL_2_8(MatterBaseTest):
                 Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
                 [self.th1.nodeId, 1111],
                 f1)
-            for event in [added_event, changed_event]:
-                asserts.assert_not_equal(
-                    event.Data.fabricIndex,
-                    f2,
-                    "Should not contain event with FabricIndex F2")
+            relevant_events.append(changed_event)
+        for event in relevant_events:
+            asserts.assert_not_equal(
+                event.Data.fabricIndex,
+                f2,
+                "Should not contain event with FabricIndex F2")
 
         self.step(10)
         # TH2 reads AccessControlEntryChanged events
@@ -368,17 +357,21 @@ class TC_ACL_2_8(MatterBaseTest):
 
         if force_legacy_encoding:
             asserts.assert_equal(len(events), 3, "Should have exactly 3 events")
-            added_event, removed_event, added_event2 = self._get_relevant_acl_events(
-                events, self.th2.nodeId, [self.th2.nodeId, 2222])
-            logging.info(f"TH2 Events: added_event={added_event}, removed_event={removed_event}, added_event2={added_event2}")
+        else:
+            asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
 
-            self._verify_acl_event(
-                added_event,
-                NullValue,
-                0,
-                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                self.th2.nodeId,
-                f2)
+        result = self._get_relevant_acl_events(events, self.th2.nodeId, [self.th2.nodeId, 2222])
+        added_event = result[0]
+        self._verify_acl_event(
+            added_event,
+            NullValue,
+            0,
+            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+            self.th2.nodeId,
+            f2)
+        relevant_events = [added_event]
+        if force_legacy_encoding:
+            removed_event, added_event2 = result[1], result[2]
             self._verify_acl_event(
                 removed_event,
                 self.th2.nodeId,
@@ -393,24 +386,9 @@ class TC_ACL_2_8(MatterBaseTest):
                 Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
                 [self.th2.nodeId, 2222],
                 f2)
-            for event in [added_event, removed_event, added_event2]:
-                asserts.assert_not_equal(
-                    event.Data.fabricIndex,
-                    f1,
-                    "Should not contain event with FabricIndex F1")
-
+            relevant_events.extend([removed_event, added_event2])
         else:
-            asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
-            added_event, changed_event = self._get_relevant_acl_events(events, self.th2.nodeId, [self.th2.nodeId, 2222])
-            logging.info(f"TH2 Events: added_event={added_event}, changed_event={changed_event}")
-
-            self._verify_acl_event(
-                added_event,
-                NullValue,
-                0,
-                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                self.th2.nodeId,
-                f2)
+            changed_event = result[1]
             self._verify_acl_event(
                 changed_event,
                 self.th2.nodeId,
@@ -418,12 +396,12 @@ class TC_ACL_2_8(MatterBaseTest):
                 Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
                 [self.th2.nodeId, 2222],
                 f2)
-
-            for event in [added_event, changed_event]:
-                asserts.assert_not_equal(
-                    event.Data.fabricIndex,
-                    f1,
-                    "Should not contain event with FabricIndex F1")
+            relevant_events.append(changed_event)
+        for event in relevant_events:
+            asserts.assert_not_equal(
+                event.Data.fabricIndex,
+                f1,
+                "Should not contain event with FabricIndex F1")
 
     def desc_TC_ACL_2_8(self) -> str:
         return "[TC-ACL-2.8] ACL multi-fabric"
