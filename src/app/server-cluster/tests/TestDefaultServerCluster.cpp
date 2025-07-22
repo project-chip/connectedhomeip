@@ -67,16 +67,9 @@ public:
     void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
 };
 
-// initialize memory as ReadOnlyBufferBuilder may allocate
-struct TestDefaultServerCluster : public ::testing::Test
-{
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-};
-
 } // namespace
 
-TEST_F(TestDefaultServerCluster, TestDataVersion)
+TEST(TestDefaultServerCluster, TestDataVersion)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
@@ -85,13 +78,13 @@ TEST_F(TestDefaultServerCluster, TestDataVersion)
     ASSERT_EQ(cluster.GetDataVersion({ 1, 2 }), v1 + 1);
 }
 
-TEST_F(TestDefaultServerCluster, TestFlagsDefault)
+TEST(TestDefaultServerCluster, TestFlagsDefault)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
     ASSERT_EQ(cluster.GetClusterFlags({ 1, 2 }).Raw(), 0u);
 }
 
-TEST_F(TestDefaultServerCluster, ListWriteNotification)
+TEST(TestDefaultServerCluster, ListWriteNotification)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
@@ -100,7 +93,7 @@ TEST_F(TestDefaultServerCluster, ListWriteNotification)
     cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure);
 }
 
-TEST_F(TestDefaultServerCluster, AttributesDefault)
+TEST(TestDefaultServerCluster, AttributesDefault)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
@@ -128,7 +121,7 @@ TEST_F(TestDefaultServerCluster, AttributesDefault)
     }
 }
 
-TEST_F(TestDefaultServerCluster, ListWriteIsANoop)
+TEST(TestDefaultServerCluster, ListWriteIsANoop)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
@@ -139,7 +132,7 @@ TEST_F(TestDefaultServerCluster, ListWriteIsANoop)
                                            DataModel::ListWriteOperation::kListWriteSuccess);
 }
 
-TEST_F(TestDefaultServerCluster, CommandsDefault)
+TEST(TestDefaultServerCluster, CommandsDefault)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
@@ -152,7 +145,7 @@ TEST_F(TestDefaultServerCluster, CommandsDefault)
     ASSERT_TRUE(generatedCommands.TakeBuffer().empty());
 }
 
-TEST_F(TestDefaultServerCluster, WriteAttributeDefault)
+TEST(TestDefaultServerCluster, WriteAttributeDefault)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
@@ -165,7 +158,7 @@ TEST_F(TestDefaultServerCluster, WriteAttributeDefault)
     ASSERT_FALSE(decoder.TriedDecode());
 }
 
-TEST_F(TestDefaultServerCluster, InvokeDefault)
+TEST(TestDefaultServerCluster, InvokeDefault)
 {
     FakeDefaultServerCluster cluster({ 1, 2 });
 
@@ -178,7 +171,7 @@ TEST_F(TestDefaultServerCluster, InvokeDefault)
               Status::UnsupportedCommand);
 }
 
-TEST_F(TestDefaultServerCluster, NotifyAttributeChanged)
+TEST(TestDefaultServerCluster, NotifyAttributeChanged)
 {
     constexpr ClusterId kEndpointId = 321;
     constexpr ClusterId kClusterId  = 1122;
@@ -200,83 +193,4 @@ TEST_F(TestDefaultServerCluster, NotifyAttributeChanged)
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 234));
-}
-
-TEST_F(TestDefaultServerCluster, AppendAttributes)
-{
-    const size_t global_attribute_count = DefaultServerCluster::GlobalAttributes().size();
-
-    constexpr BitFlags<DataModel::AttributeQualityFlags> kNoFlags;
-
-    // Only mandatory attributes
-    {
-        const AttributeEntry mandatory[] = {
-            { 1, kNoFlags, Access::Privilege::kView, std::nullopt },
-            { 2, kNoFlags, Access::Privilege::kView, std::nullopt },
-        };
-
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(DefaultServerCluster::AppendAttributes(builder, Span<const AttributeEntry>(mandatory), {}), CHIP_NO_ERROR);
-
-        ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
-        ASSERT_EQ(result.size(), 2 + global_attribute_count);
-        ASSERT_EQ(result[0].attributeId, 1u);
-        ASSERT_EQ(result[1].attributeId, 2u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
-    }
-
-    // Only optional attributes
-    {
-        const AttributeEntry optional1_meta(10, kNoFlags, Access::Privilege::kView, std::nullopt);
-        const AttributeEntry optional2_meta(11, kNoFlags, Access::Privilege::kView, std::nullopt);
-        const AttributeEntry optional3_meta(12, kNoFlags, Access::Privilege::kView, std::nullopt);
-
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(DefaultServerCluster::AppendAttributes(builder, {},
-                                                         {
-                                                             { .enabled = true, .metadata = optional1_meta },
-                                                             { .enabled = false, .metadata = optional2_meta },
-                                                             { .enabled = true, .metadata = optional3_meta },
-                                                         }),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
-        ASSERT_EQ(result.size(), 2 + global_attribute_count);
-        ASSERT_EQ(result[0].attributeId, 10u);
-        ASSERT_EQ(result[1].attributeId, 12u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
-    }
-
-    // Mix of mandatory and optional attributes
-    {
-        const AttributeEntry mandatory[] = {
-            { 1, kNoFlags, Access::Privilege::kView, std::nullopt },
-        };
-        const AttributeEntry optional1_meta(10, kNoFlags, Access::Privilege::kView, std::nullopt);
-        const AttributeEntry optional2_meta(11, kNoFlags, Access::Privilege::kView, std::nullopt);
-
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(DefaultServerCluster::AppendAttributes(builder, Span<const AttributeEntry>(mandatory),
-                                                         {
-                                                             { .enabled = true, .metadata = optional1_meta },
-                                                             { .enabled = false, .metadata = optional2_meta },
-                                                         }),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
-        ASSERT_EQ(result.size(), 2 + global_attribute_count);
-        ASSERT_EQ(result[0].attributeId, 1u);
-        ASSERT_EQ(result[1].attributeId, 10u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
-    }
-
-    // No attributes
-    {
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(DefaultServerCluster::AppendAttributes(builder, {}, {}), CHIP_NO_ERROR);
-
-        ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
-        ASSERT_EQ(result.size(), global_attribute_count);
-        ASSERT_EQ(result[0].attributeId, Globals::Attributes::ClusterRevision::Id);
-    }
 }

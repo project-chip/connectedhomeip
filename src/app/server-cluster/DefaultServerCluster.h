@@ -97,23 +97,6 @@ public:
     /// Returns all global attributes that the spec defines in `7.13 Global Elements / Table 93: Global Attributes`
     static Span<const DataModel::AttributeEntry> GlobalAttributes();
 
-    struct OptionalAttributeEntry
-    {
-        bool enabled;                               // Is this optional attribute enabled?
-        const DataModel::AttributeEntry & metadata; // Metadata for the attribute
-    };
-
-    /// Appends the given attributes to the builder.
-    ///
-    /// It is very common to have a set of mandatory and a set of optional attributes for a
-    /// cluster. This method allows for a single call to set up all of the given attributes in `builder`:
-    ///   - mandatoryAttributes
-    ///   - optionalAttributes IF AND ONLY IF they are enabled
-    ///   - all of `GlobalAttributes()`
-    static CHIP_ERROR AppendAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
-                                       Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                                       std::initializer_list<const OptionalAttributeEntry> optionalAttributes);
-
 protected:
     const ConcreteClusterPath mPath;
     ServerClusterContext * mContext = nullptr;

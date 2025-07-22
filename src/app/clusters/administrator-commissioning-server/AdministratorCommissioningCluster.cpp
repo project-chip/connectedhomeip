@@ -16,6 +16,7 @@
 #include "AdministratorCommissioningCluster.h"
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AdministratorCommissioning/Commands.h>
 #include <lib/support/CodeUtils.h>
 
@@ -102,7 +103,9 @@ CHIP_ERROR AdministratorCommissioningCluster::AcceptedCommands(const ConcreteClu
 CHIP_ERROR AdministratorCommissioningCluster::Attributes(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    return AppendAttributes(builder, Span(kMandatoryAttributes), {});
+
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryAttributes), {});
 }
 
 std::optional<DataModel::ActionReturnStatus> AdministratorCommissioningWithBasicCommissioningWindowCluster::InvokeCommand(

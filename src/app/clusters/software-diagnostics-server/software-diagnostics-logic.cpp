@@ -16,6 +16,7 @@
  */
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/CodeUtils.h>
 
@@ -97,8 +98,9 @@ CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<Data
 
 CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    return DefaultServerCluster::AppendAttributes(
-        builder, Span<const DataModel::AttributeEntry>() /* mandatory */,
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(
+        Span<const DataModel::AttributeEntry>() /* mandatory */,
         {
             { mEnabledAttributes.enableThreadMetrics, Attributes::ThreadMetrics::kMetadataEntry },
             { mEnabledAttributes.enableCurrentHeapFree, Attributes::CurrentHeapFree::kMetadataEntry },

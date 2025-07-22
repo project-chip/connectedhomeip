@@ -106,42 +106,6 @@ void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
     mContext->interactionContext->dataModelChangeListener->MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
 }
 
-CHIP_ERROR DefaultServerCluster::AppendAttributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder,
-                                                  Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                                                  std::initializer_list<const OptionalAttributeEntry> optionalAttributes)
-{
-    // determine how much data to append. This should only be called if generally we have something to append
-    size_t append_size = mandatoryAttributes.size();
-    for (const auto & entry : optionalAttributes)
-    {
-        if (entry.enabled)
-        {
-            append_size++;
-        }
-    }
-
-    if (append_size > 0)
-    {
-        // NOTE: ReferenceExisting will APPEND data (and use heap) when some data already
-        //       exists in the builder. This is why we ensure AppendCapacity for everything
-        //       so that we do not perform extra allocations.
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(append_size + GlobalAttributes().size()));
-        ReturnErrorOnFailure(builder.ReferenceExisting(mandatoryAttributes));
-
-        for (const auto & entry : optionalAttributes)
-        {
-            if (entry.enabled)
-            {
-                ReturnErrorOnFailure(builder.Append(entry.metadata));
-            }
-        }
-    }
-
-    // NOTE: ReferenceExisting will APPEND data (and use heap) when some data already
-    //       existsin the the builder.
-    return builder.ReferenceExisting(DefaultServerCluster::GlobalAttributes());
-}
-
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const ConcreteClusterPath &) const
 {
     return {};
