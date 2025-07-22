@@ -26,8 +26,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#else
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
-
+#endif
 #include "os_task.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -65,9 +68,13 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit");
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit");
+    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+#else
     ChipLogProgress(DeviceLayer, "GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit");
     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
-    SuccessOrExit(err);
+#endif
 
 exit:
     return err;
