@@ -347,7 +347,8 @@ class AndroidBuilder(Builder):
             gn_args["target_cpu"] = self.board.TargetCpuName()
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
-            gn_args["is_debug"] = self.debug
+            if not self.debug:
+                gn_args["is_debug"] = False
             if exampleName == "chip-test":
                 gn_args["chip_build_test_static_libraries"] = False
 

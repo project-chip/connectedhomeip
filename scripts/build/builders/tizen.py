@@ -121,7 +121,8 @@ class TizenBuilder(GnBuilder):
             self.extra_gn_options.append('strip_symbols=true')
             self.build_command = 'check'
 
-        self.extra_gn_options.append('is_debug=' + str(debug).lower())
+        if not debug:
+            self.extra_gn_options.append('is_debug=false')
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
         if not enable_thread:

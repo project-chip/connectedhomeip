@@ -392,7 +392,8 @@ class HostBuilder(GnBuilder):
         self.build_env = {}
         self.fuzzing_type = fuzzing_type
 
-        self.extra_gn_options.append('is_debug=' + str(debug).lower())
+        if not debug:
+            self.extra_gn_options.append('is_debug=false')
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
