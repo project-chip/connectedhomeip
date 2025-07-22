@@ -772,7 +772,7 @@ jobs:
                   retention-days: 5
 
     repl_tests_darwin:
-        name: REPL Tests - Darwin
+        name: REPL Tests - Darwin (Build Only)
 
         strategy:
             matrix:
