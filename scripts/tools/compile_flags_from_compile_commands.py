@@ -71,36 +71,36 @@ class CompileCommand:
         self.compiler = args[0]
         self.args = []
 
-        index = 1  # start from 1 to remove compiler path
-        while index < len(args):
-            arg = args[index]
+        args = iter(args[1:])
+        for arg in args:
             # Command contains some things we want to strip out:
             #  -c, -o for compile/output, MF and MMD for dependency generation
             if arg in {"-c", "-o", "-MF"}:
-                index += 1  # skip this and next argument
-            elif arg not in {"-MMD"}:
+                next(args, None) # skip next argument
+                continue
+            if arg in {"-MMD"}:
+                continue
 
-                # convert relative paths in absolute paths for incldues to absolute
-                # so if '-I' is not absolute, adjust
-                prefixes = ["-I", "-isystem"]
-                for p in prefixes:
-                    if not arg.startswith(p):
-                        continue
-                    if arg.startswith(p + "/"):
-                        continue
-                    path = arg[len(p):]  # full path
-                    path = os.path.abspath(os.path.join(self.dir, path))
-                    arg = f"{p}{path}"
-                    break
+            # convert relative paths in absolute paths for incldues to absolute
+            # so if '-I' is not absolute, adjust
+            prefixes = ["-I", "-isystem"]
+            for p in prefixes:
+                if not arg.startswith(p):
+                    continue
+                if arg.startswith(p + "/"):
+                    continue
+                path = arg[len(p):]  # full path
+                path = os.path.abspath(os.path.join(self.dir, path))
+                arg = f"{p}{path}"
+                break
 
-                # for defines, we have defines like `-DMBEDTLS_CONFIG_FILE="efr32-chip-mbedtls-config.h"`
-                # This does not parse well for godbolt and we have to add extra quotes so that this becomes
-                # `-DMBEDTLS_CONFIG_FILE='"efr32-chip-mbedtls-config.h"'`
-                if arg.startswith("-D") and "=" in arg and arg.endswith('"'):
-                    arg = arg.replace('="', "='\"") + "'"
+            # for defines, we have defines like `-DMBEDTLS_CONFIG_FILE="efr32-chip-mbedtls-config.h"`
+            # This does not parse well for godbolt and we have to add extra quotes so that this becomes
+            # `-DMBEDTLS_CONFIG_FILE='"efr32-chip-mbedtls-config.h"'`
+            if arg.startswith("-D") and "=" in arg and arg.endswith('"'):
+                arg = arg.replace('="', "='\"") + "'"
 
-                self.args.append(arg)
-            index += 1
+            self.args.append(arg)
 
     def print_flags(self):
         for flag in self.args:
@@ -125,7 +125,6 @@ class ParsedCommands:
 
     def all_matching(self, reg_expr: str) -> List[Any]:
         r = re.compile(reg_expr)
-        matches = []
 
         # JSON data is a list of entries:
         # {
@@ -133,13 +132,7 @@ class ParsedCommands:
         #    "directory": the build directory for this file
         #    "command": the build command (generally a arm-none-eabi-g++)
         # }
-        for v in self.json_data:
-            for _ in re.finditer(r, v["file"]):
-                # if at least one match, return it
-                matches.append(v)
-                break
-
-        return matches
+        return [e for e in self.json_data if re.search(r, e["file"])]
 
     def find(self, reg_expr: str) -> Optional[CompileCommand]:
         """
