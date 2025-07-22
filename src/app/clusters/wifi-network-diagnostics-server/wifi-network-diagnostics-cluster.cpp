@@ -49,16 +49,20 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServerCluster::ReadAttribute(const 
         return mLogic.ReadWiFiBssId(encoder);
     }
     case Attributes::SecurityType::Id: {
-        return mLogic.ReadSecurityType(encoder);
+        Attributes::SecurityType::TypeInfo::Type securityType;
+        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiSecurityType, securityType, encoder);
     }
     case WiFiVersion::Id: {
-        return mLogic.ReadWiFiVersion(encoder);
+        Attributes::WiFiVersion::TypeInfo::Type version;
+        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiVersion, version, encoder);
     }
     case ChannelNumber::Id: {
-        return mLogic.ReadChannelNumber(encoder);
+        Attributes::ChannelNumber::TypeInfo::Type channelNumber;
+        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiChannelNumber, channelNumber, encoder);
     }
     case Rssi::Id: {
-        return mLogic.ReadWiFiRssi(encoder);
+        Attributes::Rssi::TypeInfo::Type rssi;
+        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiRssi, rssi, encoder);
     }
     case BeaconLostCount::Id: {
         if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
