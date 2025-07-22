@@ -157,7 +157,7 @@ class ParsedCommands:
 @click.group()
 @click.option(
     "--log-level",
-    default="FATAL",
+    default="FATAL", # default on purpose so that wl-copy/xclip just works
     show_default=True,
     type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output.",
