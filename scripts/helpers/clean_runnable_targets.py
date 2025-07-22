@@ -25,6 +25,7 @@ import subprocess
 script_dir = os.path.dirname(__file__)
 OUTPUT_ROOT = os.path.abspath(os.path.join(script_dir, '..', '..', 'out', 'coverage'))
 
+
 def parse_input_targets(query_output_lines, possible_rules_set, rules_set, new_targets_set, queried_targets_set):
     """
     Parses the input from `ninja -t query` output.
@@ -47,14 +48,15 @@ def parse_input_targets(query_output_lines, possible_rules_set, rules_set, new_t
             if rule == "phony":
                 in_input_block = True
             elif rule in possible_rules_set:
-                rules_set.add(rule) # Add rule to the set
+                rules_set.add(rule)  # Add rule to the set
         elif not in_input_block:
             continue
         elif trimmed_line == "outputs:":
             in_input_block = False
         # Add new targets only if they haven't been queried already
         elif in_input_block:
-            new_targets_set.add(trimmed_line) # Add new target to the set
+            new_targets_set.add(trimmed_line)  # Add new target to the set
+
 
 def get_rules_to_clean(initial_targets):
     """
@@ -67,9 +69,9 @@ def get_rules_to_clean(initial_targets):
     Returns:
         list: A list of rule names that should be cleaned.
     """
-    rules_to_clean = set() # Stores rules identified for cleaning (now a set)
-    queried_targets = set() # Stores targets that have already been queried
-    targets_to_query = set(initial_targets) # Targets for the current iteration
+    rules_to_clean = set()  # Stores rules identified for cleaning (now a set)
+    queried_targets = set()  # Stores targets that have already been queried
+    targets_to_query = set(initial_targets)  # Targets for the current iteration
 
     # Get all the rules that execute targets from the toolchain.ninja file
     # Equivalent to: ninja -C out/coverage -f toolchain.ninja -t rules | grep "__rule"
@@ -86,13 +88,12 @@ def get_rules_to_clean(initial_targets):
         print(f"Stderr: {e.stderr}", file=sys.stderr)
         sys.exit(1)
 
-
     while targets_to_query:
 
         if "all" in targets_to_query:
             return list(possible_rules_set)
 
-        new_targets = set() # Stores targets discovered in the current query that need future querying
+        new_targets = set()  # Stores targets discovered in the current query that need future querying
 
         # Query the targets and parse their inputs
         query_cmd = ['ninja', '-C', OUTPUT_ROOT, '-t', 'query'] + list(targets_to_query)
@@ -101,7 +102,7 @@ def get_rules_to_clean(initial_targets):
                 query_cmd,
                 capture_output=True, text=True, check=True
             )
-            
+
             # Lines starting with a space and not containing '|' are relevant input targets
             filtered_query_lines = [
                 line for line in query_process.stdout.splitlines()
@@ -111,8 +112,8 @@ def get_rules_to_clean(initial_targets):
             parse_input_targets(
                 filtered_query_lines,
                 possible_rules_set,
-                rules_to_clean, 
-                new_targets,    
+                rules_to_clean,
+                new_targets,
                 queried_targets
             )
 
@@ -132,6 +133,7 @@ def get_rules_to_clean(initial_targets):
     # After all targets are processed, return the rules that were found
     return list(rules_to_clean)
 
+
 # Main script execution
 if __name__ == "__main__":
     # Get command-line arguments (targets to clean)
@@ -143,13 +145,13 @@ if __name__ == "__main__":
 
     print(f"Determining rules to clean for targets: {targets_from_cli}")
     rules_to_clear = get_rules_to_clean(targets_from_cli)
-    
+
     if rules_to_clear:
         try:
             # Construct the ninja clean command with the identified rules
             clean_cmd = ['ninja', '-C', OUTPUT_ROOT, '-f', 'toolchain.ninja', '-t', 'clean', '-r'] + rules_to_clear
 
-            subprocess.run(clean_cmd, check=True) # `check=True` raises CalledProcessError on non-zero exit code
+            subprocess.run(clean_cmd, check=True)  # `check=True` raises CalledProcessError on non-zero exit code
             print("Ninja clean command executed successfully.")
         except subprocess.CalledProcessError as e:
             print(f"Error executing ninja clean command: {e}", file=sys.stderr)
