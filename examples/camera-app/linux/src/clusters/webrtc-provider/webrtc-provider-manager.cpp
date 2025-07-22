@@ -69,7 +69,7 @@ void WebRTCProviderManager::SetMediaController(MediaController * mediaController
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                                      bool & outDeferredOffer)
 {
-    if (!mPeerConnection)
+    if (mPeerConnection == nullptr)
     {
         // Re-initialization of PeerConnection is needed
         Init();
@@ -172,7 +172,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 {
     ChipLogProgress(Camera, "HandleProvideOffer called");
 
-    if (!mPeerConnection)
+    if (mPeerConnection == nullptr)
     {
         // Re-initialization of PeerConnection is needed
         Init();
