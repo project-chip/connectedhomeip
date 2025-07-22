@@ -13,7 +13,7 @@
 # limitations under the License.
 
 name:
-    3.3.24 [TC-DD-3.24] NFC-based commissioning [DUT as Commissionee]
+    3.3.23 [TC-DD-3.23] NFC-based commissioning [DUT as Commissionee]
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
