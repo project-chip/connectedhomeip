@@ -25,12 +25,29 @@
 # Parse a compile_commands.json and extract relevant compiler arguments to allow
 # file compilation for godbolt tests. Use to test out code and generate
 # assembly.
+#
+# Example usages (via uv run script to auto-create an env - see https://github.com/astral-sh/uv)
+#
+#  - Get the flags corresponding to a file matching the regex `basic-information` (first match)
+#     uv run --script ./compile_flags_from_compile_commands.py -c some_path/compile_commands.json flags basic-information
+#
+#  - Get the flags corresponding to a file matching the regex `basic-information` (first match) and save it to the clipboard
+#     uv run --script ./compile_flags_from_compile_commands.py      \
+#        -c some_path/compile_commands.json flags basic-information \
+#        | wl-copy
+#
+#  - List all files in compile_commands
+#     uv run --script ./compile_flags_from_compile_commands.py -c some_path/compile_commands.json files
+#
+#  - List all files in compile_commands that match an expression
+#     uv run --script ./compile_flags_from_compile_commands.py -c some_path/compile_commands.json files --matching basic-info
+#
 import json
 import logging
 import shlex
 import os
 import re
-from typing import Optional
+from typing import Any, List, Optional
 
 
 import coloredlogs
@@ -72,7 +89,7 @@ class CompileCommand:
                         continue
                     if arg.startswith(p + "/"):
                         continue
-                    path = arg[len(p):] # full path
+                    path = arg[len(p) :]  # full path
                     path = os.path.abspath(os.path.join(self.dir, path))
                     arg = f"{p}{path}"
                     break
@@ -81,7 +98,7 @@ class CompileCommand:
                 # This does not parse well for godbolt and we have to add extra quotes so that this becomes
                 # `-DMBEDTLS_CONFIG_FILE='"efr32-chip-mbedtls-config.h"'`
                 if arg.startswith("-D") and "=" in arg and arg.endswith('"'):
-                    arg = arg.replace('="', '=\'"') + "'"
+                    arg = arg.replace('="', "='\"") + "'"
 
                 self.args.append(arg)
             index += 1
@@ -98,11 +115,15 @@ class ParsedCommands:
     def __init__(self, path: str):
         logging.info("Processing json %s", path)
         self.json_data = json.load(open(path, "r"))
+
+        # data is a list of entries. We sort them since this as a sideffect places `/src/` before
+        # '/third_party/' and when multi-matching things, this makes for better best-guess matches
+        self.json_data.sort(key=lambda a: a["file"])
+
         logging.info("Done. Loaded %d entries", len(self.json_data))
 
-
-    def find(self, expr: str) -> Optional[CompileCommand]:
-        r = re.compile(expr)
+    def all_matching(self, reg_expr: str) -> List[Any]:
+        r = re.compile(reg_expr)
         matches = []
 
         # JSON data is a list of entries:
@@ -116,17 +137,27 @@ class ParsedCommands:
                 # if at least one match, return it
                 matches.append(v)
                 break
+
+        return matches
+
+    def find(self, reg_expr: str) -> Optional[CompileCommand]:
+        """
+        Returns the FIRST match of reg_expr, processed as a CompileCommmand
+        """
+        matches = self.all_matching(reg_expr)
+
         if not matches:
             return None
+
         if len(matches) > 1:
             logging.warning(
                 "Multiple matches found: %d matches for %s", len(matches), expr
             )
             for m in matches:
                 logging.warning("  match: %s", m["file"])
+
         entry = matches[0]
         return CompileCommand(entry["directory"], entry["file"], entry["command"])
-
 
 
 @click.group()
@@ -161,6 +192,19 @@ def flags(compile_commands, file_expr):
     logging.info("Compiler settings for %s", f.file)
     logging.debug("File data: %s", f)
     f.print_flags()
+
+
+@main.command()
+@click.argument("file_expr", required=False)
+@click.pass_obj
+def files(compile_commands, file_expr):
+    if file_expr:
+        entries = compile_commands.all_matching(file_expr)
+    else:
+        entries = compile_commands.json_data
+
+    for entry in entries:
+        print("%s" % entry["file"])
 
 
 if __name__ == "__main__":
