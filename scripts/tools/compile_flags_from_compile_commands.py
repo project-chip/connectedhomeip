@@ -76,7 +76,7 @@ class CompileCommand:
             # Command contains some things we want to strip out:
             #  -c, -o for compile/output, MF and MMD for dependency generation
             if arg in {"-c", "-o", "-MF"}:
-                next(args, None) # skip next argument
+                next(args, None)  # skip next argument
                 continue
             if arg in {"-MMD"}:
                 continue
@@ -157,7 +157,7 @@ class ParsedCommands:
 @click.group()
 @click.option(
     "--log-level",
-    default="FATAL", # default on purpose so that wl-copy/xclip just works
+    default="FATAL",  # default on purpose so that wl-copy/xclip just works
     show_default=True,
     type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output.",
