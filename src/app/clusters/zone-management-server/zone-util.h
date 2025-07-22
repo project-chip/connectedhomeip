@@ -25,6 +25,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <set>
 #include <vector>
 
 namespace chip {
@@ -54,6 +55,13 @@ public:
     {
         size_t vertexCount = vertices.size();
 
+        // Check if there are duplicate vertices in the polygon
+        if (ZoneHasDuplicates(vertices))
+        {
+            ChipLogDetail(Zcl, "Zone has duplicate vertices");
+            return true;
+        }
+
         // Iterate through all pairs of non-adjacent segments
         for (size_t i = 0; i < vertexCount; ++i)
         {
@@ -67,14 +75,17 @@ public:
                 TwoDCartesianVertexStruct q2 = vertices[(j + 1) % vertexCount];
 
                 // Skip segments that share an endpoint (i.e., adjacent segments)
-                if (AreTwoDCartVerticesEqual(p1, p2) || AreTwoDCartVerticesEqual(p1, q2) || AreTwoDCartVerticesEqual(q1, p2) ||
-                    AreTwoDCartVerticesEqual(q1, q2))
+                if (vertexCount > 3 &&
+                    (AreTwoDCartVerticesEqual(p1, p2) || AreTwoDCartVerticesEqual(p1, q2) || AreTwoDCartVerticesEqual(q1, p2) ||
+                     AreTwoDCartVerticesEqual(q1, q2)))
                 {
                     continue;
                 }
 
                 if (DoSegmentsIntersect(p1, q1, p2, q2))
                 {
+                    ChipLogDetail(Zcl, "Zone segment[(%u,%u),(%u,%u)] intersects with segment[(%u,%u),(%u,%u)]", p1.x, p1.y, q1.x,
+                                  q1.y, p2.x, p2.y, q2.x, q2.y);
                     return true; // Found a self-intersection
                 }
             }
@@ -96,7 +107,8 @@ private:
 
     // Helper function: Determine the orientation of the ordered triplet (p, q, r) of vertices.
     // Employ the cross-product computation (determinant of the coordinate matrix) of
-    // vectors pq and pr to find the direction of the Z axis.
+    // vectors pq and pr to find the direction of the Z axis. The rotation
+    // considered is from vector pq to pr.
     // The sign of the determinant is used to infer the direction of the cross-product vector
     // and hence the orientation of the 3 coordinates. A value of 0 indicates that the points
     // are collinear.
@@ -155,6 +167,33 @@ private:
         if (o4 == OrientationEnum::kCollinear && OnSegment(p2, q1, q2))
         {
             return true; // p2, q2 and q1 are collinear and q1 lies on segment p2q2
+        }
+
+        return false;
+    }
+
+    struct VertexComparator
+    {
+        bool operator()(const TwoDCartesianVertexStruct & a, const TwoDCartesianVertexStruct & b) const
+        {
+            if (a.x != b.x)
+            {
+                return a.x < b.x;
+            }
+            return a.y < b.y;
+        }
+    };
+
+    static bool ZoneHasDuplicates(const std::vector<TwoDCartesianVertexStruct> & zoneVertices)
+    {
+        std::set<TwoDCartesianVertexStruct, VertexComparator> seenVertices;
+
+        for (const auto & vertex : zoneVertices)
+        {
+            if (!seenVertices.insert(vertex).second)
+            {
+                return true;
+            }
         }
 
         return false;
