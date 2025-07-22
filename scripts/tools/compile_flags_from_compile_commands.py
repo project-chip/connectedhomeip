@@ -113,7 +113,9 @@ class CompileCommand:
 class ParsedCommands:
     def __init__(self, path: str):
         logging.info("Processing json %s", path)
-        self.json_data = json.load(open(path, "r"))
+
+        with open(path, "r") as f:
+            self.json_data = json.load(f)
 
         # data is a list of entries. We sort them since this as a sideffect places `/src/` before
         # '/third_party/' and when multi-matching things, this makes for better best-guess matches
