@@ -30,8 +30,6 @@ from mobly import asserts
 #
 
 
-
-
 def get_pid(name):
     pid = None
 

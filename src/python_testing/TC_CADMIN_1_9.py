@@ -31,6 +31,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from chip.testing.matter_testing import CustomCommissioningParameters, TestStep
+from support_modules.cadmin_support import CADMINBaseTest
+from mobly import asserts
 import logging
 from copy import deepcopy
 from time import sleep
@@ -62,9 +65,6 @@ class TC_CADMIN_1_9(MatterBaseTest):
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
-from chip.testing.matter_testing import CustomCommissioningParameters, TestStep
-from mobly import asserts
-from support_modules.cadmin_support import CADMINBaseTest
 
 
 class TC_CADMIN_1_9(CADMINBaseTest):

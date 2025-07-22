@@ -43,7 +43,6 @@ from chip.testing.matter_testing import TestStep
 from support_modules.cadmin_support import CADMINBaseTest
 
 
-
 class TC_CADMIN_1_22_24(CADMINBaseTest):
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:

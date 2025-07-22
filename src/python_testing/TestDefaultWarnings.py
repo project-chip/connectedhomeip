@@ -22,8 +22,6 @@ from chip.testing import runner
 #
 
 
-
-
 class TestDefaultChecker(MatterBaseTest):
     ''' This is a unit-style test of the defaults test. It runs the individual test functions against mocks.'''
 

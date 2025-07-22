@@ -36,8 +36,6 @@ from mobly import asserts
 #
 
 
-
-
 @dataclass
 class ArlData:
     have_arl: bool

@@ -28,8 +28,6 @@ from chip.testing import runner
 #
 
 
-
-
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:
     # Really simple device with one endpoint that includes scenes management, which is provisional
     # I'm ONLY populating the global attributes since the conformance test only uses these.

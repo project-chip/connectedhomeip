@@ -14,15 +14,15 @@ from chip.clusters import Attribute
 from mobly import signals
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
-    from matter_yamltests.hooks import TestRunnerHooks
+   from matter_yamltests.hooks import TestRunnerHooks
     from chip.tracing import TracingContext
 from typing import TYPE_CHECKING
-    from chip.testing.matter_test_config import MatterTestConfig
-      from chip.testing.matter_testing import default_matter_test_main
+   from chip.testing.matter_test_config import MatterTestConfig
+       from chip.testing.matter_testing import default_matter_test_main
     from chip.testing.matter_testing import _find_test_class, parse_matter_test_args
     from typing import TYPE_CHECKING
     from chip.testing.matter_testing import MatterStackState
-        from chip.testing.commissioning import CommissionDeviceTest
+       from chip.testing.commissioning import CommissionDeviceTest
         from chip.testing.commissioning import CommissionDeviceTest
         from chip.testing.matter_test_config import MatterTestConfig
         from chip.testing.matter_testing import MatterStackState
@@ -44,7 +44,6 @@ from chip.testing import decorators
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 
 
 try:
@@ -264,7 +263,6 @@ def default_matter_test_main():
         default_matter_test_main()
     """
 
-
     matter_test_config = parse_matter_test_args()
 
     # Find the test class in the test script.
@@ -326,10 +324,10 @@ def run_tests_no_exit(
     # Actual runtime import
     if CommissionDeviceTest is None:
 
-    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
-    #       Mobly deep copies the user params before passing them to the test class and the event
-    # loop is not serializable. So, we are setting the event loop as a test
-    # class member.
+        # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
+        #       Mobly deep copies the user params before passing them to the test class and the event
+        # loop is not serializable. So, we are setting the event loop as a test
+        # class member.
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 
@@ -483,7 +481,6 @@ class MockTestRunner():
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
                  pics: dict[str, bool] = None, paa_trust_store_path=None):
-
 
         self.kvs_storage = 'kvs_admin.json'
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,

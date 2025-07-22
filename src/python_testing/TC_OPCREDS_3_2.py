@@ -41,7 +41,7 @@ from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
-from chip.testing import decorators, runner
+                               from chip.testing import decorators, runner
                                verify_commissioning_successful, verify_success)
 
 

@@ -41,8 +41,6 @@ block until epected reports are received or fail on timeouts
 """
 
 
-
-
 class EventSubscriptionHandler:
     """
     Handles subscription-based event reporting. It sets up and manages event subscriptions for a specific cluster or event ID,

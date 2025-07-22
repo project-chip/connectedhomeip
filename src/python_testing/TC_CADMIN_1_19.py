@@ -42,7 +42,6 @@ from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
 
 
-
 class TC_CADMIN_1_19(CADMINBaseTest):
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [

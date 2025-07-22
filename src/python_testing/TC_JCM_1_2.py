@@ -52,7 +52,6 @@ from chip.testing import decorators, runner
 
 class TC_JCM_1_2(MatterBaseTest):
 
-
     ANCHOR_CAT = 0xFFFE0001
 
     @decorators.async_test_body

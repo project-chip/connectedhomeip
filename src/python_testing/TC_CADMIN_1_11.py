@@ -47,8 +47,6 @@ from support_modules.cadmin_support import CADMINBaseTest
 from chip.testing import decorators, runner
 
 
-
-
 class TC_CADMIN_1_11(CADMINBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode is None:
