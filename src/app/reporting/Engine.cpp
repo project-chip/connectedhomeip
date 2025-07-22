@@ -154,12 +154,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     {
         status = *access_status;
     }
-    else if (IsSupportedGlobalAttributeNotInMetadata(readRequest.path.mAttributeId))
-    {
-        // Global attributes are NOT directly handled by data model providers, instead
-        // the are routed through metadata.
-        status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
-    }
     else if (auto readable_status = ValidateAttributeIsReadable(dataModel, path, entry); readable_status.has_value())
     {
         status = *readable_status;
@@ -170,6 +164,12 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
              required_privilege_access_status.has_value())
     {
         status = *required_privilege_access_status;
+    }
+    else if (IsSupportedGlobalAttributeNotInMetadata(readRequest.path.mAttributeId))
+    {
+        // Global attributes are NOT directly handled by data model providers, instead
+        // they are routed through metadata.
+        status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
     }
     else
     {
@@ -273,6 +273,13 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         outStatus = StatusIB(Status::Success);
 
         requestPath.entityId = path.mEventId;
+
+        err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
+        if (IsTranslatableAclError(path, err, outStatus))
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
     }
 
     Status status = DataModel::ValidateClusterPath(provider, path, Status::Success);
@@ -282,14 +289,6 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         outStatus = StatusIB(status);
         return CHIP_NO_ERROR;
     }
-
-    // Per spec, the required-privilege ACL check is performed only after path existence is validated
-    err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
-    if (IsTranslatableAclError(path, err, outStatus))
-    {
-        return CHIP_NO_ERROR;
-    }
-    ReturnErrorOnFailure(err);
 
     // Status set above: could be success, but also UnsupportedEvent
     return CHIP_NO_ERROR;
