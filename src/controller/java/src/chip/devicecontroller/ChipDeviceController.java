@@ -268,6 +268,29 @@ public class ChipDeviceController {
     }
   }
 
+  /**
+   * Pair a device connected through NFC.
+   *
+   * @param deviceId the node ID to assign to the device
+   * @param setupPincode the pincode for the device
+   * @param params Parameters representing commissioning arguments. see detailed in {@link
+   *     CommissionParameters}
+   */
+  public void pairDeviceThroughNfc(
+      long deviceId,
+      long setupPincode,
+      @Nonnull CommissionParameters params) {
+
+    Log.d(TAG, "Pairing device with ID: " + deviceId + " through NFC");
+    pairDeviceThroughNfc(
+        deviceControllerPtr,
+        deviceId,
+        setupPincode,
+        params.getCsrNonce(),
+        params.getNetworkCredentials(),
+        params.getICDRegistrationInfo());
+  }
+
   /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceWithAddress(long, String, int, int, long, CommissionParameters)}. */
   public void pairDeviceWithAddress(
       long deviceId,
@@ -1622,6 +1645,14 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long deviceId,
       int connectionId,
+      long pinCode,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo);
+
+  private native void pairDeviceThroughNfc(
+      long deviceControllerPtr,
+      long deviceId,
       long pinCode,
       @Nullable byte[] csrNonce,
       NetworkCredentials networkCredentials,
