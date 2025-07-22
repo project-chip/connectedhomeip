@@ -423,7 +423,7 @@ TEST_F(TestBleLayer, StartConnectFailsIfCalledTwice)
 
     ep->Abort();
 
- // This test creats new ble connection by discriminator and simulates error
+// This test creats new ble connection by discriminator and simulates error
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
 {
     // Start new connection
