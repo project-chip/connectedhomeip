@@ -75,14 +75,14 @@ the compiler explorer from
 [source](https://github.com/compiler-explorer/compiler-explorer) locally using
 the following instructions:
 
-- install node 20 or above (if you do not have it installed yet)
-- compile compiler-explorer from source
-- Set up a local C++ config in `etc/config/c++.local.properties`, often
+-   install node 20 or above (if you do not have it installed yet)
+-   compile compiler-explorer from source
+-   Set up a local C++ config in `etc/config/c++.local.properties`, often
     `gcc-arm-none-eabi-g++` as a compiler
-- add the relevant compiler settings:
-  - compile a sample application using the relevant variant. For example
+-   add the relevant compiler settings:
+    -   compile a sample application using the relevant variant. For example
         `./scripts/build/build_examples.py --target efr32-brd2703a-lock build`
-  - This will create a compile_commands.json that contains compiler
+    -   This will create a compile_commands.json that contains compiler
         arguments to compile files. We have a tool
         `compile_flags_from_compile_commands.py` to extract relevant compile
         flags.
@@ -129,8 +129,8 @@ scripts/tools/compile_flags_from_compile_commands.py \
 
 You may want to enable highlighting via `More->Settings` and have:
 
-- Site theme (as applicable)
-- Line highlighting colour scheme as Rainbow (clearer code as opposed to just
+-   Site theme (as applicable)
+-   Line highlighting colour scheme as Rainbow (clearer code as opposed to just
     gray scale)
 
 ![image](./godbolt_example.png.png)
