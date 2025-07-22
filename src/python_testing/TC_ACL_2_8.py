@@ -104,6 +104,16 @@ class TC_ACL_2_8(MatterBaseTest):
 
         return (added_event, removed_event, added_event2)
 
+    async def _shutdown_controller(self, controller_name: str):
+        if hasattr(self, controller_name):
+            try:
+                controller = getattr(self, controller_name)
+                logging.info(f"Shutting down {controller_name.upper()} controller")
+                await controller.Shutdown()
+                delattr(self, controller_name)
+            except Exception as e:
+                logging.warning(f"Error cleaning up {controller_name.upper()}: {e}")
+
     def _verify_acl_event(
             self,
             event,
@@ -452,21 +462,8 @@ class TC_ACL_2_8(MatterBaseTest):
         logging.info("Cleaning up fabrics between test runs")
 
         # First, clean up TH1 and TH2 controllers
-        if hasattr(self, 'th1'):
-            try:
-                logging.info("Shutting down TH1 controller")
-                await self.th1.Shutdown()
-                delattr(self, 'th1')
-            except Exception as e:
-                logging.warning(f"Error cleaning up TH1: {e}")
-
-        if hasattr(self, 'th2'):
-            try:
-                logging.info("Shutting down TH2 controller")
-                await self.th2.Shutdown()
-                delattr(self, 'th2')
-            except Exception as e:
-                logging.warning(f"Error cleaning up TH2: {e}")
+        await self._shutdown_controller('th1')
+        await self._shutdown_controller('th2')
 
         # Reset step counter and run second test with legacy encoding
         self.current_step_index = 0
