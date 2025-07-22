@@ -526,8 +526,12 @@ void NFCCommissioningManagerImpl::_Shutdown()
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
 
-CHIP_ERROR NFCCommissioningManagerImpl::StartNFCProcessingThread()
+CHIP_ERROR NFCCommissioningManagerImpl::EnsureProcessingThreadStarted()
 {
+    if (mThreadRunning) {
+        return CHIP_NO_ERROR;
+    }
+
     // Creates an Application Context to the PC/SC Resource Manager.
     long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
     CHECK_FOR_SCARD_SUCCESS("SCardEstablishContext", result)
@@ -550,14 +554,11 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 {
     bool canSendToPeer = false;
 
-    if (!mThreadRunning)
+    CHIP_ERROR err = EnsureProcessingThreadStarted();
+    if (err != CHIP_NO_ERROR)
     {
-        CHIP_ERROR err = StartNFCProcessingThread();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Failed to start NFCProcessing Thread: %s", ErrorStr(err));
-            return false;
-        }
+        ChipLogError(DeviceLayer, "Failed to start NFCProcessing Thread: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
     }
 
     // nfcShortId is used to find the peer device
@@ -609,10 +610,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
 {
     std::shared_ptr<TagInstance> targetedTagInstance = nullptr;
 
-    if (!mThreadRunning)
-    {
-        ReturnErrorOnFailure(StartNFCProcessingThread());
-    }
+    ReturnErrorOnFailure(EnsureProcessingThreadStarted());
 
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();

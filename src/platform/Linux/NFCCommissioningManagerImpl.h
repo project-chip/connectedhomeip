@@ -180,7 +180,7 @@ private:
     void NfcThreadMain();
     void EnqueueMessage(std::unique_ptr<NFCMessage> message);
 
-    CHIP_ERROR StartNFCProcessingThread();
+    CHIP_ERROR EnsureProcessingThreadStarted();
 };
 
 /**
