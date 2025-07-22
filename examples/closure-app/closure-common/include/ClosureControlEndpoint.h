@@ -55,9 +55,7 @@ public:
                                                             const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
 
-    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
     bool IsReadyToMove() override;
-    bool IsManualLatchingNeeded() override;
     ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;
@@ -177,6 +175,22 @@ private:
     ClosureControlDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
+
+    /**
+     * @brief Updates the current state of the closure control endpoint from the target state.
+     *
+     * This function retrieves the target state and updates the current state accordingly.
+     * It ensures that the current state reflects the latest target position, latch status, and speed.
+     */
+    void UpdateCurrentStateFromTargetState();
+
+    /**
+     * @brief Maps a TargetPositionEnum value to the corresponding CurrentPositionEnum value.
+     *
+     * @param value The TargetPositionEnum value to be mapped.
+     * @return CurrentPositionEnum The corresponding CurrentPositionEnum value.
+     */
+    CurrentPositionEnum MapTargetPositionToCurrentPositioning(TargetPositionEnum value);
 };
 
 } // namespace ClosureControl

@@ -93,6 +93,7 @@ class HostApp(Enum):
     CAMERA_CONTROLLER = auto()
     JF_CONTROL = auto()
     JF_ADMIN = auto()
+    CLOSURE = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -179,6 +180,8 @@ class HostApp(Enum):
             return 'jf-control-app'
         elif self == HostApp.JF_ADMIN:
             return 'jf-admin-app/linux'
+        elif self == HostApp.CLOSURE:
+            return 'closure-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -313,6 +316,9 @@ class HostApp(Enum):
             yield 'jfc-app'
         elif self == HostApp.JF_ADMIN:
             yield 'jfa-app'
+        elif self == HostApp.CLOSURE:
+            yield 'closure-app'
+            yield 'closure-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -509,6 +515,7 @@ class HostBuilder(GnBuilder):
 
         if enable_webrtc:
             self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
+            self.extra_gn_options.append('chip_build_controller_dynamic_server=true')
 
         if terms_and_conditions_required is not None:
             if terms_and_conditions_required:
