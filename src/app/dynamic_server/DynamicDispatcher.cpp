@@ -119,6 +119,10 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
     {
         return 1;
     }
+    else if (endpoint == kWebRTCProviderDynamicEndpointId && cluster == WebRTCTransportProvider::Id)
+    {
+        return 1;
+    }
 
     return UINT16_MAX;
 }
@@ -146,7 +150,7 @@ uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
     {
         return 0;
     }
-    else if (endpoint == kWebRTCRequesterDynamicEndpointId)
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId || endpoint == kWebRTCProviderDynamicEndpointId)
     {
         return 1;
     }
@@ -178,7 +182,10 @@ Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool 
     {
         return MakeOptional(WebRTCTransportRequestor::Id);
     }
-
+    else if (endpoint == kWebRTCProviderDynamicEndpointId && n == 1 && server)
+    {
+        return MakeOptional(WebRTCTransportProvider::Id);
+    }
     return NullOptional;
 }
 
@@ -201,7 +208,7 @@ uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 
     if (endpoint == kWebRTCRequesterDynamicEndpointId && server)
     {
-        return 1;
+        return 2; // Provider and Requestor share the same endpoint
     }
 
     return 0;
@@ -232,6 +239,12 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
         (mask & MATTER_CLUSTER_FLAG_SERVER))
     {
         return 0;
+    }
+
+    if (endpoint == kWebRTCProviderDynamicEndpointId && clusterId == WebRTCTransportProvider::Id &&
+        (mask & MATTER_CLUSTER_FLAG_SERVER))
+    {
+        return 1;
     }
 
     return UINT8_MAX;
@@ -275,7 +288,7 @@ const CommandId acceptedWebRTCRequestorCommands[] = { Clusters::WebRTCTransportR
 
 const CommandId generatedWebRTCRequestorCommands[] = { kInvalidCommandId };
 
-const EmberAfCluster webRTCReqeustorCluster{
+const EmberAfCluster webRTCRequestorCluster{
     .clusterId            = Clusters::WebRTCTransportRequestor::Id,
     .attributes           = nullptr,
     .attributeCount       = 0,
@@ -288,7 +301,30 @@ const EmberAfCluster webRTCReqeustorCluster{
     .eventCount           = 0,
 };
 
-const EmberAfEndpointType webRTCRequestorEndpoint{ .cluster = &webRTCReqeustorCluster, .clusterCount = 1, .endpointSize = 0 };
+const CommandId acceptedWebRTCProviderCommands[]  = { Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id,
+                                                      Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id,
+                                                      Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id,
+                                                      Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id,
+                                                      Clusters::WebRTCTransportProvider::Commands::EndSession::Id,
+                                                      kInvalidCommandId };
+const CommandId generatedWebRTCProviderCommands[] = { kInvalidCommandId };
+
+const EmberAfCluster webRTCProviderCluster{
+    .clusterId            = Clusters::WebRTCTransportProvider::Id,
+    .attributes           = nullptr,
+    .attributeCount       = 0,
+    .clusterSize          = 0,
+    .mask                 = MATTER_CLUSTER_FLAG_SERVER,
+    .functions            = nullptr,
+    .acceptedCommandList  = acceptedWebRTCProviderCommands,
+    .generatedCommandList = generatedWebRTCProviderCommands,
+    .eventList            = nullptr,
+    .eventCount           = 0,
+};
+
+const EmberAfCluster webRTCTransportClusters[] = { webRTCRequestorCluster, webRTCProviderCluster };
+
+const EmberAfEndpointType webRTCTransportEndpoint{ .cluster = webRTCTransportClusters, .clusterCount = 2, .endpointSize = 0 };
 
 } // namespace
 
@@ -300,7 +336,7 @@ const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
     }
     else if (endpoint == kWebRTCRequesterDynamicEndpointId)
     {
-        return &webRTCRequestorEndpoint;
+        return &webRTCTransportEndpoint; // Provider and Requestor share the same endpoint
     }
 
     return nullptr;
@@ -315,7 +351,12 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId c
 
     if (endpoint == kWebRTCRequesterDynamicEndpointId && cluster == Clusters::WebRTCTransportRequestor::Id)
     {
-        return &webRTCReqeustorCluster;
+        return &webRTCRequestorCluster;
+    }
+
+    if (endpoint == kWebRTCProviderDynamicEndpointId && cluster == Clusters::WebRTCTransportProvider::Id)
+    {
+        return &webRTCProviderCluster;
     }
 
     return nullptr;
@@ -399,9 +440,14 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
         return &otaProviderCluster;
     }
 
-    if ((endpointType == &webRTCRequestorEndpoint) && (clusterId == Clusters::WebRTCTransportRequestor::Id))
+    if ((endpointType == &webRTCTransportEndpoint) && (clusterId == Clusters::WebRTCTransportRequestor::Id))
     {
-        return &webRTCReqeustorCluster;
+        return &webRTCRequestorCluster;
+    }
+
+    if ((endpointType == &webRTCTransportEndpoint) && (clusterId == Clusters::WebRTCTransportProvider::Id))
+    {
+        return &webRTCProviderCluster;
     }
 
     return nullptr;

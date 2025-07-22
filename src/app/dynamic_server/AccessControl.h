@@ -19,6 +19,7 @@
 
 constexpr chip::EndpointId kOtaProviderDynamicEndpointId     = 0;
 constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
+constexpr chip::EndpointId kWebRTCProviderDynamicEndpointId  = 1;
 
 namespace chip {
 namespace app {
