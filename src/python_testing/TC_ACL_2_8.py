@@ -31,9 +31,9 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import random
-import asyncio
 import subprocess
 
 import chip.clusters as Clusters
@@ -52,7 +52,8 @@ class TC_ACL_2_8(MatterBaseTest):
             raise AssertionError(f"No events found for {acec_event} to determine the latest event number.")
         return max([e.Header.EventNumber for e in events])
 
-    def _get_relevant_acl_events(self, all_events: list, expected_add_subject_node_id: int, expected_change_subject_node_ids: list) -> tuple:
+    def _get_relevant_acl_events(self, all_events: list, expected_add_subject_node_id: int,
+                                 expected_change_subject_node_ids: list) -> tuple:
         """
         Extracts the most recent 'added' and 'changed' events for a specific node from all events.
 
@@ -89,7 +90,8 @@ class TC_ACL_2_8(MatterBaseTest):
             e.Data.latestValue.subjects == [expected_add_subject_node_id] and
             e.Header.EventNumber > added_event.Header.EventNumber
         )]
-        asserts.assert_true(len(removed_events) > 0, f"Expected 'removed' event for node {expected_add_subject_node_id} not found after the 'added' event")
+        asserts.assert_true(len(removed_events) > 0,
+                            f"Expected 'removed' event for node {expected_add_subject_node_id} not found after the 'added' event")
         removed_event = sorted(removed_events, key=lambda e: e.Header.EventNumber)[-1]
 
         added_new_events = [e for e in all_events if (
@@ -97,7 +99,9 @@ class TC_ACL_2_8(MatterBaseTest):
             set(e.Data.latestValue.subjects) == set(expected_change_subject_node_ids) and
             e.Header.EventNumber > removed_event.Header.EventNumber
         )]
-        asserts.assert_true(len(added_new_events) > 0, f"Expected 'added' event for new subjects {expected_change_subject_node_ids} not found after the 'removed' event")
+        asserts.assert_true(
+            len(added_new_events) > 0,
+            f"Expected 'added' event for new subjects {expected_change_subject_node_ids} not found after the 'removed' event")
         added_event2 = sorted(added_new_events, key=lambda e: e.Header.EventNumber)[-1]
 
         return (added_event, removed_event, added_event2)
@@ -140,24 +144,24 @@ class TC_ACL_2_8(MatterBaseTest):
         # Open commissioning window with default controller
         self.discriminator = random.randint(0, 4095)
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, 
-            timeout=900, 
-            iteration=10000, 
-            discriminator=self.discriminator, 
+            nodeid=self.dut_node_id,
+            timeout=900,
+            iteration=10000,
+            discriminator=self.discriminator,
             option=1
         )
-        
+
         # Create a new certificate authority and fabric admin for TH1
         th1_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th1_fabric_admin = th1_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=random.randint(1, 100000))
         self.th1 = th1_fabric_admin.NewController(nodeId=1, useTestCommissioner=True)
-        
+
         # Commission TH1 through the commissioning window
         setupPinCode = params.setupPinCode
         await self.th1.CommissionOnNetwork(
-            nodeId=self.dut_node_id, 
+            nodeId=self.dut_node_id,
             setupPinCode=setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, 
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.discriminator
         )
 
@@ -290,7 +294,8 @@ class TC_ACL_2_8(MatterBaseTest):
 
         if force_legacy_encoding:
             asserts.assert_equal(len(events), 3, "Should have exactly 3 events")
-            added_event, removed_event, added_event2 = self._get_relevant_acl_events(events, self.th1.nodeId, [self.th1.nodeId, 1111])
+            added_event, removed_event, added_event2 = self._get_relevant_acl_events(
+                events, self.th1.nodeId, [self.th1.nodeId, 1111])
             logging.info(f"TH1 Events: added_event={added_event}, removed_event={removed_event}, added_event2={added_event2}")
 
             self._verify_acl_event(
@@ -319,7 +324,6 @@ class TC_ACL_2_8(MatterBaseTest):
                     event.Data.fabricIndex,
                     f2,
                     "Should not contain event with FabricIndex F2")
-
 
         else:
             asserts.assert_equal(len(events), 2, "Should have exactly 2 events")
@@ -356,7 +360,8 @@ class TC_ACL_2_8(MatterBaseTest):
 
         if force_legacy_encoding:
             asserts.assert_equal(len(events), 3, "Should have exactly 3 events")
-            added_event, removed_event, added_event2 = self._get_relevant_acl_events(events, self.th2.nodeId, [self.th2.nodeId, 2222])
+            added_event, removed_event, added_event2 = self._get_relevant_acl_events(
+                events, self.th2.nodeId, [self.th2.nodeId, 2222])
             logging.info(f"TH2 Events: added_event={added_event}, removed_event={removed_event}, added_event2={added_event2}")
 
             self._verify_acl_event(
@@ -444,10 +449,10 @@ class TC_ACL_2_8(MatterBaseTest):
     async def test_TC_ACL_2_8(self):
         # First run with new list method
         await self.internal_test_TC_ACL_2_8(force_legacy_encoding=False)
-        
+
         # --- Simplified cleanup between test runs ---
         logging.info("Cleaning up fabrics between test runs")
-        
+
         # First, clean up TH1 and TH2 controllers
         if hasattr(self, 'th1'):
             try:
@@ -456,7 +461,7 @@ class TC_ACL_2_8(MatterBaseTest):
                 delattr(self, 'th1')
             except Exception as e:
                 logging.warning(f"Error cleaning up TH1: {e}")
-        
+
         if hasattr(self, 'th2'):
             try:
                 logging.info(f"Shutting down TH2 controller")
@@ -464,12 +469,12 @@ class TC_ACL_2_8(MatterBaseTest):
                 delattr(self, 'th2')
             except Exception as e:
                 logging.warning(f"Error cleaning up TH2: {e}")
-        
+
         # Reset step counter and run second test with legacy encoding
         self.current_step_index = 0
         logging.info("Starting second test run with legacy encoding")
         await self.internal_test_TC_ACL_2_8(force_legacy_encoding=True)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
-                                                                

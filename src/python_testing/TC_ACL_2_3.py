@@ -275,7 +275,7 @@ class TC_ACL_2_3(MatterBaseTest):
             [(0, ac_extension_attr(value=extensions_list11))],
             forceLegacyListEncoding=force_legacy_encoding
         )
-        
+
         logging.info(f"Write result: {str(result11)}")
         asserts.assert_equal(
             result11[0].Status,
