@@ -16,6 +16,13 @@
 #include <ble/BleLayer.h>
 #include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
+
+namespace { // === test‑only constants ===
+constexpr uint16_t kBleTestMtu           = 247;
+constexpr uint16_t kBleTestFragmentSize  = 100;
+constexpr uint16_t kBleTestScratchBufLen = 16;
+} // namespace
+
 namespace chip {
 namespace Ble {
 
@@ -79,15 +86,19 @@ public:
     CHIP_ERROR CompleteCentralHandshake(BLEEndPoint * ep)
     {
         ReturnErrorOnFailure(ep->StartConnect());
+
         bool ok = mBleLayer.HandleWriteConfirmation(mPendingConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID);
         VerifyOrReturnError(ok, CHIP_ERROR_INTERNAL);
+
         ok = mBleLayer.HandleSubscribeComplete(mPendingConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID);
         VerifyOrReturnError(ok, CHIP_ERROR_INTERNAL);
+
         BleTransportCapabilitiesResponseMessage resp;
-        resp.mSelectedProtocolVersion  = CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION;
-        resp.mFragmentSize             = 100;
-        resp.mWindowSize               = BLE_MAX_RECEIVE_WINDOW_SIZE;
-        System::PacketBufferHandle buf = System::PacketBufferHandle::New(16);
+        resp.mSelectedProtocolVersion = CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION;
+        resp.mFragmentSize            = kBleTestFragmentSize;
+        resp.mWindowSize              = BLE_MAX_RECEIVE_WINDOW_SIZE;
+
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(kBleTestScratchBufLen);
         ReturnErrorOnFailure(resp.Encode(buf));
         ReturnErrorOnFailure(ep->Receive(std::move(buf)));
         return CHIP_NO_ERROR;
@@ -118,7 +129,7 @@ protected:
         return CHIP_NO_ERROR;
     }
 
-    uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return 247; }
+    uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return kBleTestMtu; }
     CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *) override
     {
         return CHIP_NO_ERROR;
@@ -136,7 +147,7 @@ protected:
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID *, const ChipBleUUID *,
-                              System::PacketBufferHandle buf) override
+                              System::PacketBufferHandle) override
     {
         mPendingConnObj = connObj;
         return CHIP_NO_ERROR;
@@ -175,7 +186,7 @@ TEST_F(TestBleEndPoint, StartConnectSendsCapabilitiesRequest)
     BleTransportCapabilitiesRequestMessage req;
     ASSERT_EQ(BleTransportCapabilitiesRequestMessage::Decode(mLastWriteBuf, req), CHIP_NO_ERROR);
     EXPECT_EQ(req.mWindowSize, BLE_MAX_RECEIVE_WINDOW_SIZE);
-    EXPECT_EQ(req.mMtu, 247u);
+    EXPECT_EQ(req.mMtu, static_cast<uint16_t>(kBleTestMtu));
     uint8_t majorSupported = req.mSupportedProtocolVersions[0] & 0x0F; // lower 4 bits of first byte
     EXPECT_EQ(majorSupported, static_cast<uint8_t>(CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION));
 
