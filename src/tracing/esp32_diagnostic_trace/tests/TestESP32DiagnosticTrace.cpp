@@ -487,7 +487,7 @@ TEST(ESP32DiagnosticsTest, CaseInsensitiveFiltering)
     CHIP_ERROR err = diagnostics.AddFilter("TestScope");
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    // The filtering should be case-sensitive (based on MurmurHash implementation)
+    // The filtering should be case-insensitive (based on MurmurHash implementation using tolower())
     EXPECT_TRUE(diagnostics.IsEnabled("TestScope"));
     EXPECT_TRUE(diagnostics.IsEnabled("testscope"));
     EXPECT_TRUE(diagnostics.IsEnabled("TESTSCOPE"));
