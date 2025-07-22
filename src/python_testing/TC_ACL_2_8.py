@@ -402,7 +402,7 @@ class TC_ACL_2_8(MatterBaseTest):
                 event.Data.fabricIndex,
                 f1,
                 "Should not contain event with FabricIndex F1")
-        
+
          # Re-running test using the legacy list writing mechanism
         if not force_legacy_encoding:
             self.step(11)
