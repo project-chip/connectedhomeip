@@ -52,7 +52,7 @@ CHIP_ERROR AttributeListBuilder::Append(Span<const DataModel::AttributeEntry> ma
     }
 
     // NOTE: ReferenceExisting will APPEND data (and use heap) when some data already
-    //       existsin the the builder.
+    //       exists in the builder.
     return mBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes());
 }
 
