@@ -528,7 +528,8 @@ void NFCCommissioningManagerImpl::_Shutdown()
 
 CHIP_ERROR NFCCommissioningManagerImpl::EnsureProcessingThreadStarted()
 {
-    if (mThreadRunning) {
+    if (mThreadRunning)
+    {
         return CHIP_NO_ERROR;
     }
 
