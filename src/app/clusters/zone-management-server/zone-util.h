@@ -50,6 +50,50 @@ public:
         return v1.x == v2.x && v1.y == v2.y;
     }
 
+    /**
+     * Algorithm for Checking Self-Intersection of a Zone
+     * --------------------------------------------------
+     *
+     * 1. If any vertex is repeated in the ordered list of vertices:
+     *      a. This causes smaller or no loops in the polygon and creates degenerate
+     *         cases violating the definition of a simple polygon.
+     *         Return "True" for self-intersection.
+     *         Note: We are also simplifying by rejecting consecutive repeated vertices.
+     * 2. Go through the list of vertices:
+     *      a. Pick unique non-adjacent edges(p1q1 and p2q2) to check for self-intersection.
+     *         For a zone with only 3 vertices, where all edges are adjacent to
+     *         each other, pick them for checking self-intersection.
+     *      b. If SegmentsIntersect(p1q1, p2q2):
+     *           i. Return "True" for self-intersection.
+     * 3. Return "False" for self-intersection.
+     *
+     * Algorithm for SegmentsIntersect(p1q1, p2q2)
+     * -------------------------------------------
+     * 1. If points p1 and q1 lie on the opposite sides of segment p2q2 AND
+     *    points p2 and q2 lie on opposite sides of segment p1q1:
+     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
+     *         This is figured out by evaluating the Orientation(OnLeft,
+     *         OnRight, Collinear) of a point 'r' w.r.t a segment 'pq'.
+     * 2. If p2 lies on p1q1(collinear and p2 lies on segment p1q1)
+     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
+     * 3. If q2 lies on p1q1(collinear and q2 lies on segment p1q1)
+     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
+     * 4. If p1 lies on p2q2(collinear and p1 lies on segment p2q2)
+     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
+     * 5. If q1 lies on p2q2(collinear and q1 lies on segment p2q2)
+     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
+     *
+     * Algorithm for Orientation(p, q, r)
+     * ----------------------------------
+     * 1. Compute cross-product of vectors pq and pr.
+     * 2. If cross-product > 0:
+     *      Point r lies to the left of vector pq(Counter-clockwise from pq to pr)
+     *    Else if cross-product < 0:
+     *      Point r lies to the right of vector pq(Clockwise from pq to pr)
+     *    Else
+     *      Point r is collinear with pq
+     */
+
     // Method to check for self-intersecting zones
     static bool IsZoneSelfIntersecting(const std::vector<TwoDCartesianVertexStruct> & vertices)
     {
