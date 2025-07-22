@@ -237,7 +237,7 @@ if [[ "$skip_gn" == false ]]; then
 
     # Restrict coverage to 'core' or 'clusters' if needed
     if [[ "$CODE" == "core" ]]; then
-        # --exclude code in 'app/clusters' folder 
+        # --exclude code in 'app/clusters' folder
         LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
             --exclude "$CHIP_ROOT/src/app/clusters/**"
         )
