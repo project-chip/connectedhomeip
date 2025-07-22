@@ -18,6 +18,7 @@
 #include <pw_unit_test/framework.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticEntry.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 
 using namespace chip;
 using namespace chip::Tracing;
@@ -227,6 +228,270 @@ TEST(DiagnosticStorageTest, RetrieveBufferUnderrun)
         err = circularBuffer.ClearBuffer(readEntries);
         EXPECT_EQ(err, CHIP_NO_ERROR);
     }
+}
+
+// Test for ESP32Diagnostics Filter Functionality
+TEST(ESP32DiagnosticsTest, DefaultFiltersInitialization)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    // Test that default filters are enabled
+    EXPECT_TRUE(diagnostics.IsEnabled("PASESession"));
+    EXPECT_TRUE(diagnostics.IsEnabled("CASESession"));
+    EXPECT_TRUE(diagnostics.IsEnabled("NetworkCommissioning"));
+    EXPECT_TRUE(diagnostics.IsEnabled("GeneralCommissioning"));
+    EXPECT_TRUE(diagnostics.IsEnabled("OperationalCredentials"));
+    EXPECT_TRUE(diagnostics.IsEnabled("CASEServer"));
+    EXPECT_TRUE(diagnostics.IsEnabled("Fabric"));
+
+    // Test that non-default scopes are not enabled
+    EXPECT_FALSE(diagnostics.IsEnabled("CustomScope"));
+    EXPECT_FALSE(diagnostics.IsEnabled("AnotherScope"));
+}
+
+TEST(ESP32DiagnosticsTest, AddFilter)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    // Clear default filters for clean testing
+    diagnostics.ClearFilters();
+
+    // Initially no scopes should be enabled when no filters are set
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope")); // All enabled when no filters
+
+    // Add a filter
+    CHIP_ERROR err = diagnostics.AddFilter("TestScope");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Now only the added scope should be enabled
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope"));
+    EXPECT_FALSE(diagnostics.IsEnabled("AnotherScope"));
+
+    // Add another filter
+    err = diagnostics.AddFilter("AnotherScope");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Both scopes should now be enabled
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope"));
+    EXPECT_TRUE(diagnostics.IsEnabled("AnotherScope"));
+    EXPECT_FALSE(diagnostics.IsEnabled("ThirdScope"));
+}
+
+TEST(ESP32DiagnosticsTest, AddFilterDuplicate)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    diagnostics.ClearFilters();
+
+    // Add a filter
+    CHIP_ERROR err = diagnostics.AddFilter("TestScope");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Add the same filter again - should succeed without error
+    err = diagnostics.AddFilter("TestScope");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Scope should still be enabled
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope"));
+}
+
+TEST(ESP32DiagnosticsTest, AddFilterInvalidArguments)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    // Test null scope
+    CHIP_ERROR err = diagnostics.AddFilter(nullptr);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test empty scope
+    err = diagnostics.AddFilter("");
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(ESP32DiagnosticsTest, RemoveFilter)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    diagnostics.ClearFilters();
+
+    // Add some filters
+    CHIP_ERROR err = diagnostics.AddFilter("TestScope1");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = diagnostics.AddFilter("TestScope2");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Verify both are enabled
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope1"));
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope2"));
+
+    // Remove one filter
+    err = diagnostics.RemoveFilter("TestScope1");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Only the remaining scope should be enabled
+    EXPECT_FALSE(diagnostics.IsEnabled("TestScope1"));
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope2"));
+
+    // Remove the last filter
+    err = diagnostics.RemoveFilter("TestScope2");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Now all scopes should be enabled (no filters set)
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope1"));
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope2"));
+    EXPECT_TRUE(diagnostics.IsEnabled("AnyScope"));
+}
+
+TEST(ESP32DiagnosticsTest, RemoveFilterInvalidArguments)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    // Test null scope
+    CHIP_ERROR err = diagnostics.RemoveFilter(nullptr);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test empty scope
+    err = diagnostics.RemoveFilter("");
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test removing non-existent filter
+    diagnostics.ClearFilters();
+    err = diagnostics.AddFilter("ExistingScope");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = diagnostics.RemoveFilter("NonExistentScope");
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(ESP32DiagnosticsTest, ClearFilters)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    // Add some filters
+    CHIP_ERROR err = diagnostics.AddFilter("TestScope1");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = diagnostics.AddFilter("TestScope2");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Verify filters are working
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope1"));
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope2"));
+    EXPECT_FALSE(diagnostics.IsEnabled("AnotherScope"));
+
+    // Clear all filters
+    diagnostics.ClearFilters();
+
+    // Now all scopes should be enabled
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope1"));
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope2"));
+    EXPECT_TRUE(diagnostics.IsEnabled("AnotherScope"));
+    EXPECT_TRUE(diagnostics.IsEnabled("AnyScope"));
+}
+
+TEST(ESP32DiagnosticsTest, IsEnabledWithNoFilters)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    // Clear all filters
+    diagnostics.ClearFilters();
+
+    // When no filters are set, all scopes should be enabled
+    EXPECT_TRUE(diagnostics.IsEnabled("AnyScope"));
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope"));
+    EXPECT_TRUE(diagnostics.IsEnabled("RandomScope"));
+}
+
+TEST(ESP32DiagnosticsTest, FilteringInTraceOperations)
+{
+    uint8_t buffer[1024];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    // Clear filters and add specific ones
+    diagnostics.ClearFilters();
+    CHIP_ERROR err = diagnostics.AddFilter("EnabledScope");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Clear storage to ensure clean test
+    storageBuffer.ClearBuffer();
+    EXPECT_TRUE(storageBuffer.IsBufferEmpty());
+
+    // Test TraceBegin with enabled scope
+    diagnostics.TraceBegin("TestLabel1", "EnabledScope");
+
+    // Test TraceBegin with disabled scope
+    diagnostics.TraceBegin("TestLabel2", "DisabledScope");
+
+    // Test TraceInstant with enabled scope
+    diagnostics.TraceInstant("InstantLabel1", "EnabledScope");
+
+    // Test TraceInstant with disabled scope
+    diagnostics.TraceInstant("InstantLabel2", "DisabledScope");
+
+    // Verify storage contains only enabled scope entries
+    EXPECT_FALSE(storageBuffer.IsBufferEmpty());
+
+    uint8_t retrieveBuffer[1024];
+    MutableByteSpan span(retrieveBuffer, sizeof(retrieveBuffer));
+    uint32_t readEntries = 0;
+
+    err = storageBuffer.Retrieve(span, readEntries);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Should have 2 entries (both from EnabledScope)
+    EXPECT_EQ(readEntries, 2U);
+
+    // Decode and verify entries
+    TLVReader reader;
+    reader.Init(retrieveBuffer, span.size());
+
+    for (uint32_t i = 0; i < readEntries; ++i)
+    {
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+
+        DiagnosticEntry decoded;
+        err = Decode(reader, decoded);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        // Both entries should have "EnabledScope" as their string value
+        EXPECT_STREQ(decoded.stringValue, "EnabledScope");
+        EXPECT_EQ(decoded.type, ValueType::kCharString);
+    }
+}
+
+TEST(ESP32DiagnosticsTest, CaseInsensitiveFiltering)
+{
+    uint8_t buffer[512];
+    CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
+    ESP32Diagnostics diagnostics(&storageBuffer);
+
+    diagnostics.ClearFilters();
+
+    // Add filter with specific case
+    CHIP_ERROR err = diagnostics.AddFilter("TestScope");
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // The filtering should be case-sensitive (based on MurmurHash implementation)
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope"));
+    EXPECT_TRUE(diagnostics.IsEnabled("testscope"));
+    EXPECT_TRUE(diagnostics.IsEnabled("TESTSCOPE"));
+    EXPECT_TRUE(diagnostics.IsEnabled("TestSCOPE"));
 }
 
 } // namespace
