@@ -12,8 +12,11 @@ namespace Clusters {
 namespace ThreadNetworkDiagnostics {
 namespace Commands {
 
-inline constexpr uint32_t kAcceptedCommandsCount  = 1; // Total number of commands without a response supported by the cluster
-inline constexpr uint32_t kGeneratedCommandsCount = 0; // Total number of commands with a response supported by the cluster
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 1;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
 
 namespace ResetCounts {
 inline constexpr CommandId Id = 0x00000000;
