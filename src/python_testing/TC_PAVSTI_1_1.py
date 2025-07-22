@@ -195,7 +195,8 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
             allocatePushTransportResponse.transportConfiguration.connectionID
         )
         await self.send_single_cmd(
-            cmd=pushavCluster.Commands.SetTransportStatus(connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kActive),
+            cmd=pushavCluster.Commands.SetTransportStatus(
+                connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kActive),
             endpoint=endpoint,
         )
 
@@ -220,7 +221,8 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
 
         self.step(9)
         await self.send_single_cmd(
-            cmd=pushavCluster.Commands.SetTransportStatus(connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kInactive),
+            cmd=pushavCluster.Commands.SetTransportStatus(
+                connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kInactive),
             endpoint=endpoint,
         )
 
