@@ -64,25 +64,28 @@ ADDED,224,"chip::app::WriteHandler::CheckWriteAllowed(chip::Access::SubjectDescr
 
 ## Looking at assembly code
 
-For general tests, the [Godbolt compiler explorer](https://godbolt.org) is a great resource.
+For general tests, the [Godbolt compiler explorer](https://godbolt.org) is a
+great resource.
 
 ### Locally running compiler explorer
 
-There are cases where you may want to investigate how CHIP code is compiled
-and the CHIP include/build options can be quite complex. In this case, you
-can run the compiler explorer from
-[source](https://github.com/compiler-explorer/compiler-explorer) locally
-using the following instructions:
+There are cases where you may want to investigate how CHIP code is compiled and
+the CHIP include/build options can be quite complex. In this case, you can run
+the compiler explorer from
+[source](https://github.com/compiler-explorer/compiler-explorer) locally using
+the following instructions:
 
-- install node 20 or above (if you do not have it installed yet)
-- compile compiler-explorer from source
-- Set up a local C++ config in `etc/config/c++.local.properties`, often `gcc-arm-none-eabi-g++` as a compiler
-- add the relevant compiler settings:
-  - compile a sample application using the relevant variant. For example
-    `./scripts/build/build_examples.py --target efr32-brd2703a-lock build`
-  - This will create a compile_commands.json that contains compiler arguments
-    to compile files. We have a tool `compile_flags_from_compile_commands.py`
-    to extract relevant compile flags.
+-   install node 20 or above (if you do not have it installed yet)
+-   compile compiler-explorer from source
+-   Set up a local C++ config in `etc/config/c++.local.properties`, often
+    `gcc-arm-none-eabi-g++` as a compiler
+-   add the relevant compiler settings:
+    -   compile a sample application using the relevant variant. For example
+        `./scripts/build/build_examples.py --target efr32-brd2703a-lock build`
+    -   This will create a compile_commands.json that contains compiler
+        arguments to compile files. We have a tool
+        `compile_flags_from_compile_commands.py` to extract relevant compile
+        flags.
 
 The following instructions should work on a `chip-build-vscode` image. Set the
 port accordingly (default is 10240)
@@ -114,8 +117,8 @@ make EXTRA_ARGS="--language c++ --port 8000"
 ```
 
 You can get compile flags (generally include paths are important) via
-`scripts/tools/compile_flags_from_compile_commands.py`. Here is an
-example invocation
+`scripts/tools/compile_flags_from_compile_commands.py`. Here is an example
+invocation
 
 ```sh
 scripts/tools/compile_flags_from_compile_commands.py \
@@ -126,6 +129,6 @@ scripts/tools/compile_flags_from_compile_commands.py \
 
 You may want to enable highlighting via `More->Settings` and have:
 
-- Site theme (as applicable)
-- Line highlighting colour scheme as Rainbow (clearer code as opposed
-  to just gray scale)
+-   Site theme (as applicable)
+-   Line highlighting colour scheme as Rainbow (clearer code as opposed to just
+    gray scale)

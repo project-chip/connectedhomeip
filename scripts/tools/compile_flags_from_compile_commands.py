@@ -44,14 +44,13 @@
 #
 import json
 import logging
-import shlex
 import os
 import re
+import shlex
 from typing import Any, List, Optional
 
-
-import coloredlogs
 import click
+import coloredlogs
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -89,7 +88,7 @@ class CompileCommand:
                         continue
                     if arg.startswith(p + "/"):
                         continue
-                    path = arg[len(p) :]  # full path
+                    path = arg[len(p):]  # full path
                     path = os.path.abspath(os.path.join(self.dir, path))
                     arg = f"{p}{path}"
                     break
