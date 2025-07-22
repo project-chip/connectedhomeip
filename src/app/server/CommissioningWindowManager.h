@@ -88,6 +88,12 @@ public:
                                                Crypto::Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
                                                FabricIndex fabricIndex, VendorId vendorId);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    CHIP_ERROR OpenJointCommissioningWindow(System::Clock::Seconds32 commissioningTimeout, uint16_t discriminator,
+                                            Crypto::Spake2pVerifier & verifier, uint32_t iterations, ByteSpan salt,
+                                            FabricIndex fabricIndex, VendorId vendorId);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     void CloseCommissioningWindow();
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum CommissioningWindowStatusForCluster() const;
@@ -190,6 +196,11 @@ private:
         app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     bool mIsBLE = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Boolean that tracks whether we are currently in a Joint Commissioning Mode.
+    bool mJCM = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     PASESession mPairingSession;
 

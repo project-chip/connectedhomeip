@@ -103,6 +103,7 @@ void ClosureManager::Init()
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 2 set successfully");
     VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 3 set successfully");
+
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
     if (pTestEventDelegate != nullptr)
@@ -119,6 +120,20 @@ void ClosureManager::Init()
     }
 }
 
+void ClosureManager::Shutdown()
+{
+    TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+
+    if (pTestEventDelegate != nullptr)
+    {
+        pTestEventDelegate->RemoveHandler(&mClosureEndpoint1.GetDelegate());
+    }
+    else
+    {
+        ChipLogError(AppServer, "TestEventTriggerDelegate is null, cannot remove handler for delegate");
+    }
+}
+
 CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint & closureControlEndpoint)
 {
     ChipLogProgress(AppServer, "ClosureControlEndpoint SetInitialState");
@@ -127,7 +142,7 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
 
     DataModel::Nullable<GenericOverallCurrentState> overallState(GenericOverallCurrentState(
         MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), MakeOptional(DataModel::MakeNullable(true))));
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallCurrentState(overallState));
     DataModel::Nullable<GenericOverallTargetState> overallTarget(
         GenericOverallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
