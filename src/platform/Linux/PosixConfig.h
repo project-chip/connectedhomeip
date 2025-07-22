@@ -78,7 +78,6 @@ public:
     static const Key kConfigKey_Spake2pVerifier;
     static const Key kConfigKey_VendorId;
     static const Key kConfigKey_ProductId;
-    static const Key kConfigKey_SoftwareVersionString;
 
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;

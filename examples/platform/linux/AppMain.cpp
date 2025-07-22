@@ -536,7 +536,6 @@ public:
     void SetProductName(const std::string & buf) { mProductName = buf; }
     void SetSerialNumber(const std::string & buf) { mSerialNumber = buf; }
     void SetHardwareVersionString(const std::string & buf) { mHardwareVersionString = buf; }
-    void SetSoftwareVersionString(const std::string & buf) { mSoftwareVersionString = buf; }
 
 private:
     DeviceInstanceInfoProvider * mDefaultProvider;
@@ -548,7 +547,6 @@ private:
     std::optional<std::string> mProductName;
     std::optional<std::string> mSerialNumber;
     std::optional<std::string> mHardwareVersionString;
-    std::optional<std::string> mSoftwareVersionString;
 
     static inline bool CanFitInNullTerminatedString(const std::string & candidate, size_t bufSizeIncludingNull)
     {
@@ -757,10 +755,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     if (LinuxDeviceOptions::GetInstance().serialNumber.HasValue())
         gExampleDeviceInstanceInfoProvider.SetSerialNumber(LinuxDeviceOptions::GetInstance().serialNumber.Value());
-
-    if (LinuxDeviceOptions::GetInstance().softwareVersionString.HasValue())
-        reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr())
-            .StoreSoftwareVersionString(LinuxDeviceOptions::GetInstance().softwareVersionString.Value());
 
     if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
         gExampleDeviceInstanceInfoProvider.SetHardwareVersionString(

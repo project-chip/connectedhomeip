@@ -152,7 +152,6 @@ enum
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
     kDeviceOption_HardwareVersionString,
-    kDeviceOption_SoftwareVersionString,
     kDeviceOption_SerialNumber,
 };
 
@@ -178,7 +177,6 @@ OptionDef sDeviceOptionDefs[] = {
     { "vendor-name", kArgumentRequired, kDeviceOption_VendorName },
     { "product-name", kArgumentRequired, kDeviceOption_ProductName },
     { "hardware-version-string", kArgumentRequired, kDeviceOption_HardwareVersionString },
-    { "software-version-string", kArgumentRequired, kDeviceOption_SoftwareVersionString },
     { "serial-number", kArgumentRequired, kDeviceOption_SerialNumber },
     { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
@@ -298,9 +296,6 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --hardware-version-string <string>\n"
     "       The HardwareVersionString used in the basic information cluster.\n"
-    "\n"
-    "  --software-version-string <string>\n"
-    "       The SoftwareVersionString used in the basic information cluster.\n"
     "\n"
     "  --serial-number <serial_number>\n"
     "       The serial number specified by vendor.\n"
@@ -563,10 +558,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_HardwareVersionString:
         LinuxDeviceOptions::GetInstance().hardwareVersionString.SetValue(std::string{ aValue });
-        break;
-
-    case kDeviceOption_SoftwareVersionString:
-        LinuxDeviceOptions::GetInstance().softwareVersionString.SetValue(std::string{ aValue });
         break;
 
     case kDeviceOption_SerialNumber:
