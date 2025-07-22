@@ -125,6 +125,8 @@ scripts/tools/compile_flags_from_compile_commands.py \
     -c out/efr32-brd2703a-lock/compile_commands.json \
     flags basic-information \
 | wl-copy
+
+# NOTE: could also use `xclip -selection clipboard` for X11 systems
 ```
 
 You may want to enable highlighting via `More->Settings` and have:
