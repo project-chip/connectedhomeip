@@ -130,7 +130,7 @@ scripts/tools/compile_flags_from_compile_commands.py \
 You may want to enable highlighting via `More->Settings` and have:
 
 -   Site theme (as applicable)
--   Line highlighting colour scheme as Rainbow (clearer code as opposed to just
+-   Line highlighting color scheme as Rainbow (clearer code as opposed to just
     gray scale)
 
 ![image](./godbolt_example.png.png)
