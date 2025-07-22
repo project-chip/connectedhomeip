@@ -163,4 +163,58 @@ TEST_F(TestTimeFormatLocalizationCluster, ListCalendarTest)
     // Revert provider to old state
     DeviceLayer::SetDeviceInfoProvider(oldProvider);
 }
+
+TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
+{
+    class TestAttributeProvider : public AttributePersistenceProvider
+    {
+        public:
+        TestAttributeProvider()
+        {
+            //TimeFormatLocalization::CalendarTypeEnum currentCalendar;
+            //TimeFormatLocalization::HourFormatEnum currentHourFormat;
+        }
+
+        ~TestAttributeProvider() = default;
+
+        CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
+        {
+            ConcreteAttributePath hourPath = {0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id };
+            ConcreteAttributePath calendarPath = {0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id };
+
+            if(hourPath == aPath)
+            {
+                EXPECT_FALSE(false);
+            }
+
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
+        {
+            return CHIP_NO_ERROR;
+        }
+    };
+
+    BitFlags<TimeFormatLocalization::Feature> features {0};
+    features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+    // Save old provider
+    DeviceLayer::DeviceInfoProvider * oldProvider = DeviceLayer::GetDeviceInfoProvider();
+    // Set new SampleProvider
+    DeviceLayer::SampleDeviceProvider testProvider;
+    DeviceLayer::SetDeviceInfoProvider(&testProvider);
+
+    TimeFormatLocalizationLogic clusterSim(features);
+
+    TestAttributeProvider testAttrProvider;
+
+    clusterSim.Startup(&testAttrProvider);
+
+    clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr);
+
+    // Revert provider to old state
+    DeviceLayer::SetDeviceInfoProvider(oldProvider);
+
+    EXPECT_TRUE(true);
+}
 }

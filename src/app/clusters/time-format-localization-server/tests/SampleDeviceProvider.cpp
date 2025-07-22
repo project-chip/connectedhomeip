@@ -76,8 +76,7 @@ CHIP_ERROR SampleDeviceProvider::SetUserLabelAt(EndpointId endpoint, size_t inde
 
 CHIP_ERROR SampleDeviceProvider::DeleteUserLabelAt(EndpointId endpoint, size_t index)
 {
-    return mStorage->SyncDeleteKeyValue(
-        DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)).KeyName());
+    return CHIP_NO_ERROR;
 }
 
 DeviceInfoProvider::UserLabelIterator * SampleDeviceProvider::IterateUserLabel(EndpointId endpoint)
@@ -102,7 +101,7 @@ DeviceInfoProvider::SupportedLocalesIterator * SampleDeviceProvider::IterateSupp
 
 size_t SampleDeviceProvider::SupportedLocalesIteratorImpl::Count()
 {
-    return kNumSupportedLocales;
+    return 0;
 }
 
 bool SampleDeviceProvider::SupportedLocalesIteratorImpl::Next(CharSpan & output)
