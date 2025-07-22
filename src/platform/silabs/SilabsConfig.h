@@ -107,7 +107,7 @@ public:
     using Key = uint32_t;
 
     // NVM3 key base offsets used by the CHIP Device Layer.
-    // ** Key base can range from 0x72 to 0x7F **
+    // ** Key base can range from 0x2 to 0xF **
     // Persistent config values set at manufacturing time. Retained during factory reset.
     static constexpr uint8_t kMatterFactory_KeyBase = 0x2;
     // Persistent config values set at runtime. Cleared during factory reset.

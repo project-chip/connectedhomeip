@@ -35,10 +35,13 @@
 
 #include <FreeRTOS.h>
 #include <semphr.h>
+
+namespace {
 // Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
 // for an application controlled re-entrance protection
-static SemaphoreHandle_t nvm3_Sem;
-static StaticSemaphore_t nvm3_SemStruct;
+SemaphoreHandle_t nvm3_Sem;
+StaticSemaphore_t nvm3_SemStruct;
+} // namespace
 
 void nvm3_lockBegin(void)
 {
