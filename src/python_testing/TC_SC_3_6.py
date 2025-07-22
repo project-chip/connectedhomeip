@@ -45,10 +45,10 @@ from typing import List
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClustersObjects
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
-from chip.testing import decorators, runner
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic
 #       to some internal behavior assumptions of the SDK we are making relative to the write to

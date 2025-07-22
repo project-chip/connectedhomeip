@@ -42,9 +42,9 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
+from chip.testing import decorators, runner
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
-from chip.testing import decorators, runner
 
 
 class TC_CADMIN_1_11(CADMINBaseTest):

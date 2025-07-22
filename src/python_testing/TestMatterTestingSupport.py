@@ -22,12 +22,12 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
-from chip.testing.matter_testing import (MatterBaseTest, parse_matter_test_args, matchers)
+from chip.testing import decorators, runner, timeoperations
+from chip.testing.matter_testing import MatterBaseTest, matchers, parse_matter_test_args
 from chip.testing.pics import parse_pics, parse_pics_xml
-from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists
+from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from chip.testing import decorators, runner, timeoperations
 from chip.tlv import uint
 from mobly import asserts, signals
 

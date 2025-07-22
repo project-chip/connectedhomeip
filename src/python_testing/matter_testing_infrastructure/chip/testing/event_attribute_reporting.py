@@ -6,12 +6,14 @@ import threading
 import time
 from datetime import datetime, timezone
 from typing import Any, Iterable, Optional
+
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import Status
+from chip.testing import decorators
 from chip.testing.matter_testing import AttributeMatcher, AttributeValue
 from mobly import asserts
-from chip.testing import decorators
+
 #
 #    Copyright (c) 2022-2025 Project CHIP Authors
 #    All rights reserved.

@@ -44,10 +44,10 @@ import chip.clusters as Clusters
 import chip.tlv
 from chip import CertificateAuthority
 from chip.storage import PersistentStorage
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_JCM_1_1(MatterBaseTest):

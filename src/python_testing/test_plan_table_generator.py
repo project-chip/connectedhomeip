@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+
 import click
 from chip.testing.matter_testing import MatterTestConfig
 from chip.testing.runner import generate_mobly_test_config

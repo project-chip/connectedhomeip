@@ -1,7 +1,8 @@
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

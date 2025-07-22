@@ -57,7 +57,6 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
-from mobly import asserts
 import logging
 import os
 import random
@@ -67,9 +66,10 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep
-from chip.testing import decorators, runner
+from mobly import asserts
 
 
 class TC_CCTRL_2_2(MatterBaseTest):

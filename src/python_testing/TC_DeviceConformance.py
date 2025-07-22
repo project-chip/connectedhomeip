@@ -39,6 +39,7 @@
 from typing import Callable
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                              evaluate_feature_choice_conformance)
@@ -50,7 +51,6 @@ from chip.testing.problem_notices import (AttributePathLocation, ClusterPathLoca
                                           ProblemNotice, ProblemSeverity)
 from chip.testing.spec_parsing import CommandType, XmlDeviceType
 from chip.tlv import uint
-from chip.testing import decorators, runner
 
 
 def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:

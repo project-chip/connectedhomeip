@@ -37,9 +37,9 @@ import random
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_ACL_2_4(MatterBaseTest):

@@ -1,12 +1,14 @@
 import logging
 import time
 from typing import Optional
+
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep)
-from mobly import asserts
 from chip.testing import decorators, runner
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

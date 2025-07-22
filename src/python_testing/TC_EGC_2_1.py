@@ -4,6 +4,7 @@ from chip.testing import decorators, matter_asserts, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

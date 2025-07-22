@@ -50,11 +50,11 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
-from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 

@@ -40,8 +40,8 @@ import logging
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest
 from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 

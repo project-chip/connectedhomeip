@@ -40,9 +40,8 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
-from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
-                               from chip.testing import decorators, runner
-                               verify_commissioning_successful, verify_success)
+from test_plan_support import (chip.testing, commission_from_existing, commission_if_required, decorators, from, import,
+                               read_attribute, remove_fabric, runner, verify_commissioning_successful, verify_success)
 
 
 def verify_fabric(controller: str) -> str:

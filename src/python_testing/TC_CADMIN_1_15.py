@@ -39,10 +39,10 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mdns_discovery.mdns_discovery import MdnsDiscovery
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_CADMIN_1_15(MatterBaseTest):

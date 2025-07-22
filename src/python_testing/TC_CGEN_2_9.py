@@ -41,9 +41,9 @@ import logging
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.commissioning import ROOT_ENDPOINT_ID
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_CGEN_2_9(MatterBaseTest):

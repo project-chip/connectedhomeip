@@ -2,15 +2,17 @@ import logging
 import queue
 import time
 from datetime import datetime, timedelta
+
 import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep)
+from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.

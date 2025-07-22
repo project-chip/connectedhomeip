@@ -31,11 +31,11 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
+from chip.testing import decorators
 from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import (MatterBaseTest)
+from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.runner import MockTestRunner
 from mobly import asserts
-from chip.testing import decorators
 
 
 def get_clusters(endpoints: list[int]) -> Attribute.AsyncReadTransaction.ReadResponse:

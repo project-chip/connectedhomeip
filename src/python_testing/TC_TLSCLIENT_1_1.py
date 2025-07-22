@@ -1,12 +1,14 @@
 from typing import Union
+
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep)
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

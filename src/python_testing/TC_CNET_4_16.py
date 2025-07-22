@@ -1,9 +1,11 @@
 import logging
+
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from matter_testing_infrastructure.chip.testing.matter_asserts import assert_valid_uint8
 from mobly import asserts
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

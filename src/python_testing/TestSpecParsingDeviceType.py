@@ -1,18 +1,19 @@
 import re
 import xml.etree.ElementTree as ElementTree
+
 import chip.clusters as Clusters
 from chip.clusters import Attribute
+from chip.testing import decorators, runner
 from chip.testing.conformance import conformance_allowed
 from chip.testing.matter_testing import MatterBaseTest
-from chip.testing.spec_parsing import (
-    PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
-    parse_single_device_type)
+from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
+                                       parse_single_device_type)
 from chip.tlv import uint
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests, get_supersets
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.

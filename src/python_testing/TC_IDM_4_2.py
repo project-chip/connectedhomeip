@@ -43,10 +43,10 @@ from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 '''
 Category:

@@ -39,10 +39,10 @@ import os
 import tempfile
 
 import websockets
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 SERVER_URI = "ws://localhost:9002"
 

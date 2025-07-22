@@ -39,10 +39,10 @@ from time import sleep
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_WebRTCRequestor_2_1(MatterBaseTest):

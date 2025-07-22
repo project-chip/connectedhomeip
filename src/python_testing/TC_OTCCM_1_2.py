@@ -37,9 +37,9 @@
 
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from modebase_cluster_check import ModeBaseClusterChecks
-from chip.testing import decorators, runner
 
 cluster_otccm_mode = Clusters.OvenMode
 

@@ -66,9 +66,9 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep
-from chip.testing import decorators, runner
 from mobly import asserts
 
 

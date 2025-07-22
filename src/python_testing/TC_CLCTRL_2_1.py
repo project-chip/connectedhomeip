@@ -37,10 +37,10 @@ import typing
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_CLCTRL_2_1(MatterBaseTest):

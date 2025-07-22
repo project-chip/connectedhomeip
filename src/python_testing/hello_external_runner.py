@@ -4,11 +4,13 @@ import subprocess
 import sys
 from multiprocessing import Process
 from multiprocessing.managers import BaseManager
-from chip.testing.matter_test_config import MatterTestConfig
 
-from hello_test import HelloTest
-from matter.yamltests.hooks import TestRunnerHooks
 from chip.testing import decorators, runner
+from chip.testing.matter_test_config import MatterTestConfig
+from hello_test import HelloTest
+
+from matter.yamltests.hooks import TestRunnerHooks
+
 #!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2023 Project CHIP Authors

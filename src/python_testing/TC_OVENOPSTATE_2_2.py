@@ -39,9 +39,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
-from chip.testing import decorators, runner
 
 
 class TC_OVENOPSTATE_2_2(MatterBaseTest, TC_OPSTATE_BASE):

@@ -6,19 +6,20 @@ import re
 import sys
 from binascii import hexlify, unhexlify
 from typing import Optional
+
 import chip.clusters as Clusters
 import nest_asyncio
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
-                                         TestStep)
+from chip.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep
 from chip.testing.pics import accepted_cmd_pics_str
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
 from ecdsa.keys import BadSignatureError
 from mobly import asserts
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

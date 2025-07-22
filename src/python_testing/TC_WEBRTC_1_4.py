@@ -39,12 +39,12 @@ import logging
 
 from chip.ChipDeviceCtrl import TransportPayloadCapability
 from chip.clusters import Objects, WebRTCTransportProvider
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.webrtc import PeerConnection, WebRTCManager
 from mobly import asserts
 from TC_WEBRTC_Utils import WebRTCTestHelper
 from test_plan_support import commission_if_required
-from chip.testing import decorators, runner
 
 
 class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):

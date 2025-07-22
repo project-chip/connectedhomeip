@@ -1,10 +1,12 @@
 import ipaddress
 from datetime import timedelta
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (MatterBaseTest)
 from chip.testing import decorators, runner, timeoperations
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
+
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.

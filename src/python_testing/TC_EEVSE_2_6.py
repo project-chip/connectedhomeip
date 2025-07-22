@@ -45,11 +45,11 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
-from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 

@@ -44,8 +44,8 @@ import logging
 import chip.clusters as Clusters
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, matchers, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
-from chip.testing import decorators, runner, matchers
 from mobly import asserts
 
 # If DUT supports `MaxPathsPerInvoke > 1`, additional command line argument

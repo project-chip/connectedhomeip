@@ -1,10 +1,12 @@
 import logging
+
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

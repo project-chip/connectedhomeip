@@ -39,9 +39,9 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 # These below variables are used to test the AccessControl cluster Extension attribute and come from the test plan here: https://github.com/CHIP-Specifications/chip-test-plans/blob/59e8c45b8e7c24d5ce130b166520ff4f7bd935b6/src/cluster/AccessControl.adoc#tc-acl-2-6-accesscontrolentrychanged-event:~:text=D_OK_EMPTY%3A%20%221718%22%20which%20is%20an%20octstr%20of%20length%202%20containing%20valid%20TLV%3A
 D_OK_EMPTY = bytes.fromhex('1718')

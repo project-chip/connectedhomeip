@@ -41,11 +41,11 @@ import typing
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep)
+from chip.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:

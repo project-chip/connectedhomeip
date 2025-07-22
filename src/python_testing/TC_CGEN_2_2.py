@@ -45,9 +45,9 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackException
 from chip.interaction_model import InteractionModelError
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 

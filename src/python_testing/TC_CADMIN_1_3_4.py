@@ -50,10 +50,11 @@ import base64
 import logging
 import random
 from time import sleep
-from chip.testing import decorators, runner
+
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import TestStep
 from chip.tlv import TLVReader
 from mobly import asserts

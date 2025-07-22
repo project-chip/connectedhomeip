@@ -39,10 +39,10 @@ import random
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, send_command
-from chip.testing import decorators, runner
 
 
 def verify_noc() -> str:

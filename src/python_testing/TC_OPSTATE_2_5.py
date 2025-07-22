@@ -40,8 +40,8 @@
 
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 

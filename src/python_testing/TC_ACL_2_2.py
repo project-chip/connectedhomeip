@@ -32,9 +32,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_ACL_2_2(MatterBaseTest):

@@ -38,9 +38,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import runner
 
 logger = logging.getLogger(__name__)
 

@@ -41,9 +41,9 @@ from typing import cast
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 

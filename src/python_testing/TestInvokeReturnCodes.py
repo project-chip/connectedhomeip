@@ -36,9 +36,9 @@
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TestInvokeReturnCodes(MatterBaseTest):

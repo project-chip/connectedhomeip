@@ -44,8 +44,8 @@ import chip.discovery as Discovery
 from chip import ChipUtility
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, matchers, runner
 from chip.testing.matter_testing import MatterBaseTest
-from chip.testing import decorators, runner, matchers
 from mobly import asserts
 
 

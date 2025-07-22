@@ -35,9 +35,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest
 from drlk_2_x_common import DRLK_COMMON
-from chip.testing import decorators, runner
 
 # Configurable parameters:
 # - userIndex: userIndex to use when creating a user on the DUT for testing purposes

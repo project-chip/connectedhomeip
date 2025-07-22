@@ -40,9 +40,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 sensorTrigger = 0x0080_0000_0000_0000
 sensorUntrigger = 0x0080_0000_0000_0001

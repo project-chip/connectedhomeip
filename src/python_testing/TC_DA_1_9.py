@@ -49,9 +49,9 @@ import signal
 import subprocess
 
 from chip import ChipDeviceCtrl
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_DA_1_9(MatterBaseTest):

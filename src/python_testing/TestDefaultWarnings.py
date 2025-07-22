@@ -1,9 +1,11 @@
 from typing import Callable
+
 import chip.clusters as Clusters
 import TC_DefaultWarnings
+from chip.testing import runner
 from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import runner
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

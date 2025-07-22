@@ -35,8 +35,8 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing import decorators, runner
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import AttributeValue, TestStep
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest

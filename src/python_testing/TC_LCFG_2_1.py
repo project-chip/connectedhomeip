@@ -1,12 +1,14 @@
 import logging
 import random
+
 import chip.clusters as Clusters
 import langcodes
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.matter_asserts import assert_non_empty_string
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

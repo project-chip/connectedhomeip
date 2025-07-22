@@ -1,12 +1,14 @@
 import logging
 import time
+
 import chip.clusters as Clusters
 import test_plan_support
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.

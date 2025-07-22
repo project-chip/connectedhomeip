@@ -36,10 +36,10 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.fault_injection import CHIPFaultId
 from chip.interaction_model import InteractionModelError
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_SC_3_5(MatterBaseTest):

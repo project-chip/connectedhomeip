@@ -40,8 +40,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest
 from chip.testing import decorators, runner, timeoperations
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

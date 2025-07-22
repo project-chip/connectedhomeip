@@ -38,8 +38,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest
 from chip.testing import decorators, matchers, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 ''' Integration test of batch commands using UnitTesting Cluster

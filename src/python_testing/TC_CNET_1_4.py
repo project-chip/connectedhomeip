@@ -38,9 +38,9 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 kRootEndpointId = 0
 kSecondaryNetworkInterfaceDeviceTypeId = 0x0019

@@ -41,10 +41,10 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
+from chip.testing import decorators, matchers, runner
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators, runner, matchers
 
 
 class TC_TIMESYNC_2_13(MatterBaseTest):

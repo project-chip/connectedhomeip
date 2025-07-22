@@ -65,11 +65,11 @@ import tempfile
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
+from chip.testing import decorators, matchers, runner
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep)
+from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators, runner, matchers
 
 
 class TC_ECOINFO_2_1(MatterBaseTest):

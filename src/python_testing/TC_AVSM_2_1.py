@@ -38,8 +38,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 
 logger = logging.getLogger(__name__)
 

@@ -7,27 +7,21 @@ import typing
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from unittest.mock import MagicMock
+
 import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
+from chip.testing import decorators
+from chip.testing.commissioning import CommissionDeviceTest
+from chip.testing.matter_test_config import MatterTestConfig
+from chip.testing.matter_testing import MatterStackState, _find_test_class, default_matter_test_main, parse_matter_test_args
+from chip.tracing import TracingContext
+from matter_yamltests.hooks import TestRunnerHooks
 from mobly import signals
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
-   from matter_yamltests.hooks import TestRunnerHooks
-    from chip.tracing import TracingContext
-from typing import TYPE_CHECKING
-   from chip.testing.matter_test_config import MatterTestConfig
-       from chip.testing.matter_testing import default_matter_test_main
-    from chip.testing.matter_testing import _find_test_class, parse_matter_test_args
-    from typing import TYPE_CHECKING
-    from chip.testing.matter_testing import MatterStackState
-       from chip.testing.commissioning import CommissionDeviceTest
-        from chip.testing.commissioning import CommissionDeviceTest
-        from chip.testing.matter_test_config import MatterTestConfig
-        from chip.testing.matter_testing import MatterStackState
-        from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing import decorators
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.

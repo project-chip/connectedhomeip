@@ -20,8 +20,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest
 from chip.testing import decorators, runner, timeoperations
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python

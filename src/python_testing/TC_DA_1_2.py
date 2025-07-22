@@ -42,8 +42,8 @@ import re
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing import conversions, decorators, matchers, runner
+from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import TLVReader
 from cryptography import x509

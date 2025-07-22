@@ -20,9 +20,9 @@ import logging
 import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters.Types import NullValue
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 # Thread TLV Type mapping for operational dataset parsing
 THREAD_TLV_TYPE_MAP = {

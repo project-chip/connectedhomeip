@@ -9,6 +9,7 @@ import typing
 from dataclasses import dataclass
 from pprint import pformat, pprint
 from typing import Any, Optional
+
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
@@ -18,6 +19,7 @@ from chip.testing.conformance import ConformanceException
 from chip.testing.matter_testing import MatterTestConfig, ProblemNotice
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 from mobly import asserts
+
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.

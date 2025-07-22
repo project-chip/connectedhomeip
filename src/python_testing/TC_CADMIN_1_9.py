@@ -31,9 +31,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from chip.testing.matter_testing import CustomCommissioningParameters, TestStep
-from support_modules.cadmin_support import CADMINBaseTest
-from mobly import asserts
 import logging
 from copy import deepcopy
 from time import sleep
@@ -42,8 +39,10 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from support_modules.cadmin_support import CADMINSupport
 from chip.testing import decorators, runner
+from chip.testing.matter_testing import CustomCommissioningParameters, TestStep
+from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest, CADMINSupport
 
 
 class TC_CADMIN_1_9(MatterBaseTest):

@@ -1,7 +1,9 @@
 import logging
 from enum import StrEnum
 from typing import Any
+
 import chip.clusters as Clusters
+from chip.testing import runner
 from chip.testing.basic_composition import arls_populated
 from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
@@ -9,7 +11,7 @@ from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clus
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests
-from chip.testing import runner
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.

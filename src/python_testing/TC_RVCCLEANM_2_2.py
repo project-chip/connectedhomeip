@@ -40,9 +40,9 @@
 import enum
 
 import chip.clusters as Clusters
+from chip.testing import decorators, matchers, runner
 from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators, runner, matchers
 
 
 class RvcStatusEnum(enum.IntEnum):

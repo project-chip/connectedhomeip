@@ -37,9 +37,9 @@
 import chip.clusters as Clusters
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest
-from chip.testing import decorators, runner
 from mobly import asserts
 
 

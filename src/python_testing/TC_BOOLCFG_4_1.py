@@ -34,9 +34,9 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_BOOLCFG_4_1(MatterBaseTest):

@@ -37,9 +37,9 @@ import random
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-from mobly import asserts
 from chip.testing import decorators, runner
 from chip.testing.matter_testing import TestStep
+from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
 
 

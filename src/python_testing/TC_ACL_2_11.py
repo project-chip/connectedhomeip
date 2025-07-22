@@ -47,10 +47,10 @@ from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, 
 from chip.clusters.Objects import AccessControl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.basic_composition import arls_populated
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, decorators
-from chip.testing import decorators, runner
 from mobly import asserts
 
 

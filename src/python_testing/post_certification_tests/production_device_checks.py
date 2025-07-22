@@ -36,7 +36,6 @@
 # pip install opencv-python requests click_option_group
 # python src/python_testing/post_certification_tests/production_device_checks.py
 
-from chip.testing import decorators, runner
 import asyncio
 import base64
 import hashlib
@@ -55,6 +54,7 @@ from pathlib import Path
 import chip.clusters as Clusters
 import cv2
 import requests
+from chip.testing import decorators, runner
 from mobly import asserts
 
 DEFAULT_CHIP_ROOT = os.path.abspath(

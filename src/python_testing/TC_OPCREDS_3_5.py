@@ -39,8 +39,8 @@ import random
 from datetime import timedelta
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 

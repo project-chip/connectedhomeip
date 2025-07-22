@@ -38,10 +38,10 @@ import logging
 import time
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class TC_PS_2_3(MatterBaseTest):

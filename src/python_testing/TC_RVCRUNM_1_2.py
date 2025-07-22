@@ -37,9 +37,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators, runner
 from modebase_cluster_check import ModeBaseClusterChecks
 
 cluster_rvcrunm_mode = Clusters.RvcRunMode

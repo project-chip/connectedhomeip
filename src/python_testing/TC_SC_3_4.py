@@ -42,9 +42,9 @@
 
 from chip.exceptions import ChipStackError
 from chip.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
+from chip.testing import decorators, runner
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 CHIP_ERROR_CODES = {
     "CHIP_ERROR_INVALID_CASE_PARAMETER": 0x54,

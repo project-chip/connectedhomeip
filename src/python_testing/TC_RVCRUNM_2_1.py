@@ -42,9 +42,9 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.testing import decorators, matchers, runner
 from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators, runner, matchers
 
 # This test requires several additional command line arguments
 # run with

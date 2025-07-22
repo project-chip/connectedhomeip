@@ -64,10 +64,10 @@ import tempfile
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
