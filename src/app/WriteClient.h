@@ -251,14 +251,24 @@ public:
         return EncodeAttribute(attributePath, value.Value(), aDataVersion);
     }
 
+    enum class TestListEncodingOverride
+    {
+        kNoOverride,
+        kForceLegacyEncoding
+    };
+
     /**
      * Encode an attribute value which is already encoded into a TLV. The TLVReader is expected to be initialized and the read head
      * is expected to point to the element to be encoded.
      *
      * Note: When encoding lists with this function, you may receive more than one write status for a single list. You can refer
      * to ChunkedWriteCallback.h for a high level API which will merge status codes for chunked write requests.
+     *
+     * Note: forceLegacyListEncoding is used by Test Harness and Python Tests to test backward compatibility and ensure end devices
+     * support legacy WriteClients
      */
-    CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data);
+    CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
+                                      TestListEncodingOverride encodingBehavior = TestListEncodingOverride::kNoOverride);
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will

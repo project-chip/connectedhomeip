@@ -20,9 +20,9 @@
 #include <app/icd/server/ICDServerConfig.h>
 
 namespace {
-#ifdef ENABLE_CHIP_SHELL
+#if defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER
 bool ps_requirement_added = false;
-#endif // ENABLE_CHIP_SHELL
+#endif // ENABLE_CHIP_SHELL && CHIP_CONFIG_ENABLE_ICD_SERVER
 } // namespace
 
 #ifdef __cplusplus
