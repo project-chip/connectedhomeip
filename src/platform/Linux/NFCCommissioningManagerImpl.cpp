@@ -59,7 +59,7 @@ namespace {} // namespace
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #endif
 
-#define CHECK_FOR_SCARD_SUCCESS(f, rv)                                                                                                               \
+#define CHECK_FOR_SCARD_SUCCESS(f, rv)                                                                                             \
     if (SCARD_S_SUCCESS != rv)                                                                                                     \
     {                                                                                                                              \
         ChipLogError(DeviceLayer, "%s : %s", f, pcsc_stringify_error(rv));                                                         \
