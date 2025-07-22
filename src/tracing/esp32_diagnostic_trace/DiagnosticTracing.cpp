@@ -149,7 +149,7 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
         ReturnOnFailure(mStorageInstance->Store(entry));
         break;
     case ValueType::kChipErrorCode:
-        ChipLogDetail(DeviceLayer, "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
+        ChipLogDetail(DeviceLayer, "The value of %s is error with code %" PRIu32, event.key(), event.ValueErrorCode());
         break;
     case ValueType::kUndefined:
         ChipLogDetail(DeviceLayer, "The value of %s is undefined", event.key());
