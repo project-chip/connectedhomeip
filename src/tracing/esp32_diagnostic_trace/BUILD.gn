@@ -44,15 +44,5 @@ static_library("backend") {
 source_set("esp32_diagnostic_tracing") {
   public = [ "include/matter/tracing/macros_impl.h" ]
   public_configs = [ ":tracing" ]
-  deps = [ ":backend" ]
-}
-
-source_set("diagnostic_storage") {
-  sources = [
-    "DiagnosticEntry.cpp",
-    "DiagnosticEntry.h",
-    "DiagnosticStorage.cpp",
-    "DiagnosticStorage.h",
-  ]
-  public_deps = [ "${chip_root}/src/lib/core" ]
+  public_deps = [ ":backend" ]
 }

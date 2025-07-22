@@ -125,7 +125,7 @@ void ESP32Diagnostics::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 
 void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 {
-#if CONFIG_ENABLE_ONLY_TRACES
+#ifdef CONFIG_ENABLE_ONLY_TRACES
     return;
 #endif // CONFIG_ENABLE_ONLY_TRACES
     VerifyOrReturn(mStorageInstance != nullptr, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
@@ -162,7 +162,7 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 
 void ESP32Diagnostics::TraceCounter(const char * label)
 {
-#if CONFIG_ENABLE_ONLY_TRACES
+#ifdef CONFIG_ENABLE_ONLY_TRACES
     return;
 #endif // CONFIG_ENABLE_ONLY_TRACES
     ESPDiagnosticCounter & counter = ESPDiagnosticCounter::GetInstance();
@@ -172,7 +172,7 @@ void ESP32Diagnostics::TraceCounter(const char * label)
 
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
 {
-#if CONFIG_ENABLE_ONLY_METRICS
+#ifdef CONFIG_ENABLE_ONLY_METRICS
     return;
 #endif // CONFIG_ENABLE_ONLY_METRICS
     VerifyOrReturn(IsEnabled(group));
@@ -183,7 +183,7 @@ void ESP32Diagnostics::TraceEnd(const char * label, const char * group) {}
 
 void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
 {
-#if CONFIG_ENABLE_ONLY_METRICS
+#ifdef CONFIG_ENABLE_ONLY_METRICS
     return;
 #endif // CONFIG_ENABLE_ONLY_METRICS
     VerifyOrReturn(IsEnabled(value));
