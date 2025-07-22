@@ -299,6 +299,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id,
 } // namespace ResetCounts
 
 } // namespace Commands
+
+namespace Events {
+namespace ConnectionStatus {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ConnectionStatus
+namespace NetworkFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace NetworkFaultChange
+
+} // namespace Events
 } // namespace ThreadNetworkDiagnostics
 } // namespace Clusters
 } // namespace app

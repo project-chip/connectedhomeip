@@ -50,6 +50,13 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace GetDetailedForecastRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace PriceChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PriceChange
+
+} // namespace Events
 } // namespace CommodityPrice
 } // namespace Clusters
 } // namespace app

@@ -60,6 +60,10 @@ namespace NetworkRecoveryReason {
 inline constexpr AttributeId Id = 0x0000000B;
 } // namespace NetworkRecoveryReason
 
+namespace IsCommissioningWithoutPower {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace IsCommissioningWithoutPower
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

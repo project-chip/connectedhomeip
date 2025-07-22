@@ -37,7 +37,7 @@ extern "C" {
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
                                              const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
-                                             uint16_t busyWaitMs, bool suppressResponse);
+                                             uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload);
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                                    uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
@@ -352,7 +352,7 @@ void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onComman
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
                                              const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
-                                             uint16_t busyWaitMs, bool suppressResponse)
+                                             uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -364,7 +364,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
         std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
-                                        /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
+                                        /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse, allowLargePayload);
 
     app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                          (app::CommandPathFlags::kEndpointIdValid) };

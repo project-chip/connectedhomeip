@@ -90,6 +90,22 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CancelRequest::I
 } // namespace CancelRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace PowerAdjustStart {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PowerAdjustStart
+namespace PowerAdjustEnd {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PowerAdjustEnd
+namespace Paused {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Paused
+namespace Resumed {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Resumed
+
+} // namespace Events
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app

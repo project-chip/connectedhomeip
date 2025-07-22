@@ -55,8 +55,12 @@
 #endif
 
 #ifndef APP_TASK_STACK_SIZE
+#ifdef CONFIG_APP_TASK_STACK_SIZE
+#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) CONFIG_APP_TASK_STACK_SIZE / sizeof(portSTACK_TYPE))
+#else
 #define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) 6144 / sizeof(portSTACK_TYPE))
-#endif
+#endif // CONFIG_APP_TASK_STACK_SIZE
+#endif // APP_TASK_STACK_SIZE
 
 #ifndef APP_TASK_PRIORITY
 #define APP_TASK_PRIORITY 2
@@ -67,8 +71,12 @@
 #endif
 
 #ifndef APP_QUEUE_TICKS_TO_WAIT
+#ifdef CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT
+#define APP_QUEUE_TICKS_TO_WAIT CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT
+#else
 #define APP_QUEUE_TICKS_TO_WAIT portMAX_DELAY
-#endif
+#endif // CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT
+#endif // APP_QUEUE_TICKS_TO_WAIT
 
 using namespace chip;
 using namespace chip::TLV;

@@ -55,17 +55,15 @@ class TC_AVSM_2_2(MatterBaseTest):
     def steps_TC_AVSM_2_2(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
-            TestStep(
-                1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify SNP is supported"
-            ),
+            TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify SNP is supported"),
             TestStep(
                 2,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 0.",
             ),
             TestStep(
                 3,
-                "TH reads SnapshotCapabilities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads SnapshotCapabilities attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aSnapshotCapabilities.",
             ),
             TestStep(
@@ -78,13 +76,12 @@ class TC_AVSM_2_2(MatterBaseTest):
             ),
             TestStep(
                 6,
-                "TH sends the SnapshotStreamAllocate command with valid values of ImageCodec, MaxFrameRate, MinResolution=MaxResolution=Resolution from aSnapshotCapabilities,",
-                "WatermarkEnabled to aWatermark, OSDEnabled to aOSD, and Quality set to 90.",
+                "TH sends the SnapshotStreamAllocate command with valid values of ImageCodec, MaxFrameRate, MinResolution=MaxResolution=Resolution from aSnapshotCapabilities, WatermarkEnabled to aWatermark, OSDEnabled to aOSD, and Quality set to 90.",
                 "DUT responds with SnapshotStreamAllocateResponse command with a valid SnapshotStreamID.",
             ),
             TestStep(
                 7,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 1.",
             ),
             TestStep(
@@ -110,7 +107,7 @@ class TC_AVSM_2_2(MatterBaseTest):
             TestStep(
                 12,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with MinResolution set to {0,0} (outside of valid range).",
-                "DUT responds with a CONSTRAINT_ERROR status code."
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 13,
@@ -167,7 +164,7 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
                 watermarkEnabled=watermark,
-                OSDEnabled=osd
+                OSDEnabled=osd,
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
@@ -194,12 +191,10 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
                 watermarkEnabled=watermark,
-                OSDEnabled=osd
+                OSDEnabled=osd,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)"
-            )
+            asserts.fail("Unexpected success when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
@@ -217,12 +212,10 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=0,
                 watermarkEnabled=watermark,
-                OSDEnabled=osd
+                OSDEnabled=osd,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to Quality set to 0 (below valid range)"
-            )
+            asserts.fail("Unexpected success when expecting CONSTRAINT_ERROR due to Quality set to 0 (below valid range)")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
@@ -240,12 +233,10 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=101,
                 watermarkEnabled=watermark,
-                OSDEnabled=osd
+                OSDEnabled=osd,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to Quality set to 101 (above valid range)"
-            )
+            asserts.fail("Unexpected success when expecting CONSTRAINT_ERROR due to Quality set to 101 (above valid range)")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
@@ -263,12 +254,10 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
                 watermarkEnabled=watermark,
-                OSDEnabled=osd
+                OSDEnabled=osd,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)"
-            )
+            asserts.fail("Unexpected success when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
@@ -286,11 +275,11 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
                 watermarkEnabled=watermark,
-                OSDEnabled=osd
+                OSDEnabled=osd,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range)"
+            asserts.fail(
+                "Unexpected success when expecting CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range)",
             )
         except InteractionModelError as e:
             asserts.assert_equal(
@@ -309,11 +298,11 @@ class TC_AVSM_2_2(MatterBaseTest):
                 maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=0, height=0),
                 quality=90,
                 watermarkEnabled=watermark,
-                OSDEnabled=osd
+                OSDEnabled=osd,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range)"
+            asserts.fail(
+                "Unexpected success when expecting CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range)",
             )
         except InteractionModelError as e:
             asserts.assert_equal(

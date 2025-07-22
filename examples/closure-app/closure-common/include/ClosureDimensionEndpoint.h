@@ -47,14 +47,34 @@ using Protocols::InteractionModel::Status;
 class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    ClosureDimensionDelegate() {}
+    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
                            const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                       const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
-    bool IsManualLatchingNeeded() override { return false; }
+
+    /**
+     * @brief Retrieves the endpoint for this instance.
+     *
+     * @return The endpoint (EndpointId) for this instance.
+     */
+    EndpointId GetEndpoint() const { return mEndpoint; }
+
+    /**
+     * @brief Function to get the present target direction for the step command.
+     */
+    StepDirectionEnum GetStepCommandTargetDirection() const { return mStepCommandTargetDirection; }
+
+    /**
+     * @brief Function to save the present target direction of the step command.
+     */
+    void SetStepCommandTargetDirection(StepDirectionEnum direction) { mStepCommandTargetDirection = direction; }
+
+private:
+    EndpointId mEndpoint                          = kInvalidEndpointId;
+    StepDirectionEnum mStepCommandTargetDirection = StepDirectionEnum::kUnknownEnumValue;
 };
 
 /**
@@ -74,7 +94,7 @@ class ClosureDimensionEndpoint
 {
 public:
     ClosureDimensionEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {}
 
     /**
@@ -102,8 +122,8 @@ public:
      * @brief Handles the completion of a stop motion action.
      *
      * This function is called when a motion action has been stopped.
-     * It should update the internal state of the closure dimension endpoint to reflect
-     * the completion of the stop motion action.
+     * It updates the internal state of the closure dimension endpoint to reflect the
+     * stopping of the motion action.
      */
     void OnStopMotionActionComplete();
 
@@ -111,8 +131,8 @@ public:
      * @brief Handles the completion of the stop calibration action.
      *
      * This function is called when the calibration action has been stopped.
-     * It should update the internal state of the closure dimension endpoint to reflect
-     * the completion of the stop calibration action.
+     * It updates the internal state of the closure dimension endpoint to reflect the
+     * stopping of the calibration action.
      */
     void OnStopCalibrateActionComplete();
 
@@ -136,12 +156,36 @@ public:
      */
     void OnMoveToActionComplete();
 
+    /**
+     * @brief Handles the completion of a panel motion action for closure Panel endpoint.
+     *
+     * This function is called when a panel motion action has been completed.
+     * It updates the internal state of the closure panel endpoint to reflect
+     * the completion of the panel motion action.
+     */
+    void OnPanelMotionActionComplete();
+
+    /**
+     * @brief Retrieves the endpoint ID associated with this Closure Dimension endpoint.
+     *
+     * @return The EndpointId of this Closure Dimension endpoint.
+     */
+    EndpointId GetEndpointId() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
+
+    /**
+     * @brief Updates the current state of the closure dimension endpoint from the target state.
+     *
+     * This function retrieves the target state and updates the current state accordingly.
+     * It ensures that the current state reflects the latest target position, latch status, and speed.
+     */
+    void UpdateCurrentStateFromTargetState();
 };
 
 } // namespace ClosureDimension

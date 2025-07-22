@@ -16,7 +16,14 @@
 #
 
 """
-This module contains classes and functions related to device event and attribute repporting
+This module provides classes to manage and validate subscription-based event and attribute reporting.
+
+Classes:
+    EventSubscriptionHandler: Handles subscription to events.
+    AttributeSubscriptionHandler: Manages subscriptions to specific attributes.
+
+Both classes allow tests to start and manage subscriptions, queue received updates asynchronously and 
+block until epected reports are received or fail on timeouts
 """
 
 import asyncio
@@ -35,30 +42,59 @@ from chip.testing.matter_testing import AttributeMatcher, AttributeValue
 from mobly import asserts
 
 
-class SimpleEventCallback:
-    def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
-        self._name = name
-        self._expected_cluster_id = expected_cluster_id
+class EventSubscriptionHandler:
+    """
+    Handles subscription-based event reporting. It sets up and manages event subscriptions for a specific cluster or event ID,
+    captures incoming event reports through a callback and stores them for validation and processing.
+
+    It supports two usage modes:
+        1. Cluster mode: Pass a 'ClusterObjects.Cluster' to subscribe to all events in a cluster.
+        2. Event ID mode: Pass 'expected_cluster_id' and 'expected_event_id' to subscribe to a specific event.
+
+    Attributes:
+        _expected_cluster: The cluster object to match.
+        _expected_cluster_id: The cluster ID to match against incoming event headers.
+        _expected_event_id: The specific event ID to match.
+        _q: Internal queue that stores matching EventReadResult objects.
+    """
+
+    def __init__(self, *, expected_cluster: Optional[ClusterObjects.Cluster] = None, expected_cluster_id: Optional[int] = None, expected_event_id: Optional[int] = None):
+        is_cluster_mode = expected_cluster is not None
+        is_id_mode = all(x is not None for x in (expected_cluster_id, expected_event_id))
+
+        if not (is_cluster_mode ^ is_id_mode):
+            raise ValueError("Failed argument inputs in EventSubscriptionHandler. You should use Cluster or ClusterId and EventId")
+
+        self._expected_cluster = expected_cluster
+        self._expected_cluster_id = expected_cluster_id if expected_cluster_id is not None else expected_cluster.id
         self._expected_event_id = expected_event_id
-        self._output_queue = output_queue
+        self._subscription = None
+        self._q: queue.Queue = queue.Queue()
 
     def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
-        if (self._expected_cluster_id == event_result.Header.ClusterId and
-                self._expected_event_id == event_result.Header.EventId):
-            self._output_queue.put(event_result)
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-
-class EventChangeCallback:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
-        """This class creates a queue to store received event callbacks, that can be checked by the test script
-           expected_cluster: is the cluster from which the events are expected
         """
-        self._q: queue.Queue = queue.Queue()
-        self._expected_cluster = expected_cluster
+        Callback invoked when an event report is received via subscription. This enqueued the event for later processing.
+
+        Parameters:
+            event_result (EventReadResult): The result of the received event (includinng header and payload).
+            transaction (SubscriptionTransaction): Associated subscription transaction.
+
+        Notes:
+            If an expected_event_id is set, only events with that ID will be accepted.
+        """
+
+        if event_result.Status != Status.Success:
+            return
+
+        header = event_result.Header
+        if header.ClusterId != self._expected_cluster_id:
+            return
+
+        if self._expected_event_id is not None and header.EventId != self._expected_event_id:
+            return
+
+        logging.info(f"[EventSubscriptionHandler] Received event: {header}")
+        self._q.put(event_result)
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
@@ -69,14 +105,6 @@ class EventChangeCallback:
                                                       fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
-
-    def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an event is received.
-           It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
-        if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
-            logging.info(
-                f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
-            self._q.put(res)
 
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
@@ -124,60 +152,40 @@ class EventChangeCallback:
     def event_queue(self) -> queue.Queue:
         return self._q
 
+    def get_size(self) -> int:
+        return self._q.qsize()
 
-class AttributeChangeCallback:
-    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-        self._output = queue.Queue()
-        self._expected_attribute = expected_attribute
-
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an attribute is updated.
-           It checks the passed in attribute is the same as the subscribed to attribute and
-           then posts it into the queue for later processing."""
-
-        asserts.assert_equal(path.AttributeType, self._expected_attribute,
-                             f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
-        q = (path, transaction)
-        self._output.put(q)
-
-    def wait_for_report(self):
-        try:
-            path, transaction = self._output.get(block=True, timeout=10)
-        except queue.Empty:
-            asserts.fail(
-                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
-
-        asserts.assert_equal(path.AttributeType, self._expected_attribute,
-                             f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        try:
-            attribute_value = transaction.GetAttribute(path)
-            logging.info(
-                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
-        except KeyError:
-            asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
+    def get_event_from_queue(self, block: bool, timeout: int):
+        return self._q.get(block, timeout)
 
 
-class ClusterAttributeChangeAccumulator:
+class AttributeSubscriptionHandler:
     """
-    Subscribes to a cluster or single attribute and accumulates attribute reports in a queue.
+    Callback class to handle attribute subscription reports. This class manages the reception. filtering and queuing of attribute update reports.
 
-    If `expected_attribute` is provided, it subscribes only to that specific attribute.
-    Otherwise, it subscribes to all attributes from the cluster.
+    It provides methods to wait for specific updates, validate expected final values and track changes for verification.
 
-    Args:
-        expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
-        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional):
-            If provided, subscribes to a single attribute. Defaults to None.
+    Attributes;
+        _expected_cluster: The cluster type to subscribe to.
+        _expected_attribute: The attribute within the cluster expected to receive updates.
+        _q: Queue storing AttributeValue instances for received updates.
+        _attribute_reports: Dictionary holding history of all received reports by attribute.
+        _attribute_report_counts: Dictionary counting the number of reports received per attribute.
     """
 
-    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
+    def __init__(self, expected_cluster: ClusterObjects.Cluster = None, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
+
+        if expected_cluster is None:
+            raise ValueError("Missing argument. Expected Cluster attribute is missing in AttributeSubscriptionHandler constructor")
+
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
         self._subscription = None
-        self._lock = threading.Lock()
         self._q = queue.Queue()
         self._endpoint_id = 0
+        self._attribute_report_counts = None
+        self._attribute_reports = None
+        self._lock = threading.Lock()
         self.reset()
 
     def reset(self):
@@ -220,24 +228,54 @@ class ClusterAttributeChangeAccumulator:
             pass
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an attribute report is received.
-           It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        """
+        Callback invoked when an attribute  repoort is received via subscription.
+
+        It extracts tha value using the transaction object, wraps into an AttributeValue, enqueues it for later processing,
+        and stores it in internal history for verification.
+
+        Parameters:
+            path (TypedAttributePath): Contains cluster and attribute metadata for the report.
+            transaction (SubscriptionTransaction): Provides access to the actual reported value.
+        """
+
         valid_report = False
-        if path.ClusterType == self._expected_cluster:
-            if self._expected_attribute is not None:
-                valid_report = path.ClusterId == self._expected_attribute.cluster_id
-            else:
+        if self._expected_attribute:
+            if path.AttributeType == self._expected_attribute:
+                valid_report = True
+        elif self._expected_cluster:
+            if path.ClusterType == self._expected_cluster:
                 valid_report = True
 
         if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
+            logging.info(f"[AttributeSubscriptionHandler] Received attribute report: {path.AttributeType} = {data}")
             self._q.put(value)
-            with self._lock:
-                self._attribute_report_counts[path.AttributeType] += 1
-                self._attribute_reports[path.AttributeType].append(value)
+            if self._lock:
+                with self._lock:
+                    self._attribute_report_counts[path.AttributeType] += 1
+                    self._attribute_reports[path.AttributeType].append(value)
+
+    def wait_for_attribute_report(self):
+        """
+        Blocks and waits for a single attribute report to arrive in the queue.
+
+        This method dequeues one report, validates it and return its value.
+        """
+
+        try:
+            item = self._q.get(block=True, timeout=10)
+            attribute_value = item.value
+            logging.info(
+                f"[AttributeSubscriptionHandler] Got attribute subscription report. Attribute {item.attribute}. Updated value: {attribute_value}. SubscriptionId: {item.value}")
+        except queue.Empty:
+            asserts.fail(
+                f"[AttributeSubscriptionHandler] Failed to receive a report for the {self._expected_attribute} attribute change")
+
+        asserts.assert_equal(item.attribute, self._expected_attribute,
+                             f"[AttributeSubscriptionHandler] Received incorrect report. Expected: {self._expected_attribute}, received: {item.attribute}")
 
     def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
         """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
@@ -349,8 +387,44 @@ class ClusterAttributeChangeAccumulator:
 
         Returns nothing on success so the test can go on.
         """
-        await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
-                                  attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
+
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        sequence_idx = 0
+        actual_values = []
+
+        while time_remaining > 0:
+            expected_value = sequence[sequence_idx]
+            logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {self._endpoint_id}")
+            logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+            try:
+                item: AttributeValue = self._q.get(block=True, timeout=time_remaining)
+
+                # Track arrival of all values for the given attribute.
+                if item.endpoint_id == self._endpoint_id and item.attribute == attribute:
+                    actual_values.append(item.value)
+
+                    if item.value == expected_value:
+                        logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
+                        sequence_idx += 1
+                    else:
+                        asserts.assert_equal(item.value, expected_value,
+                                             msg=f"Did not get expected attribute value in correct sequence. Sequence so far: {actual_values}")
+
+                    # We are done waiting when we have accumulated all results.
+                    if sequence_idx == len(sequence):
+                        logging.info("Got all attribute changes, done waiting.")
+                        return
+            except queue.Empty:
+                # No error, we update timeouts and keep going
+                pass
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+
+        asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
 
     @property
     def attribute_queue(self) -> queue.Queue:
@@ -379,59 +453,3 @@ class ClusterAttributeChangeAccumulator:
         """Flush entire queue, returning nothing."""
         _ = self.get_last_report()
         return
-
-
-def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
-    """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
-
-    Args:
-      - report_queue: the queue that receives all the reports.
-      - endpoint_id: endpoint ID to match for reports to check.
-      - attribute: attribute to match for reports to check.
-      - sequence: list of attribute values in order that are expected.
-      - timeout_sec: number of seconds to wait for.
-
-    *** WARNING: The queue contains every report since the sub was established. Use
-        clear_queue to make it empty. ***
-
-    This will fail current Mobly test with assertion failure if the data is not as expected in order.
-
-    Returns nothing on success so the test can go on.
-    """
-    start_time = time.time()
-    elapsed = 0.0
-    time_remaining = timeout_sec
-
-    sequence_idx = 0
-    actual_values = []
-
-    while time_remaining > 0:
-        expected_value = sequence[sequence_idx]
-        logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
-        try:
-            item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
-
-            # Track arrival of all values for the given attribute.
-            if item.endpoint_id == endpoint_id and item.attribute == attribute:
-                actual_values.append(item.value)
-
-                if item.value == expected_value:
-                    logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
-                    sequence_idx += 1
-                else:
-                    asserts.assert_equal(item.value, expected_value,
-                                         msg=f"Did not get expected attribute value in correct sequence. Sequence so far: {actual_values}")
-
-                # We are done waiting when we have accumulated all results.
-                if sequence_idx == len(sequence):
-                    logging.info("Got all attribute changes, done waiting.")
-                    return
-        except queue.Empty:
-            # No error, we update timeouts and keep going
-            pass
-
-        elapsed = time.time() - start_time
-        time_remaining = timeout_sec - elapsed
-
-    asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")

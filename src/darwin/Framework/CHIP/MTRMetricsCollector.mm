@@ -20,6 +20,7 @@
 #import "MTRMetrics.h"
 #import "MTRMetrics_Internal.h"
 #import <MTRUnfairLock.h>
+#include <controller/CommissioningDelegate.h>
 #import <os/lock.h>
 #include <platform/Darwin/Tracing.h>
 #include <system/SystemClock.h>
@@ -242,7 +243,11 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
 
     // Add to the collection only if it does not exist as yet or pick latest value for instant event
     if (![_metricsDataCollection valueForKey:metricsKey] || event.type() == MetricEvent::Type::kInstantEvent) {
-        [_metricsDataCollection setValue:data forKey:metricsKey];
+        // If this is the commissioning staging event, skip the cleanup to track the last stage completed in case of error
+        // For all other events, just capture the value
+        if (strcmp(event.key(), chip::Tracing::kMetricDeviceCommissionerCommissionStage) != 0 || event.ValueUInt32() != chip::Controller::CommissioningStage::kCleanup) {
+            [_metricsDataCollection setValue:data forKey:metricsKey];
+        }
     }
 }
 

@@ -14,8 +14,9 @@ Linux.
 
 ### 1. Prerequisites
 
-Before building, you must install the necessary GStreamer libraries and
-development packages, which are used for video processing and streaming.
+Before building, you must install the necessary GStreamer, FFmpeg, curl
+libraries and development packages, which are used for video processing,
+streaming, recording and uploading.
 
 ```
 sudo apt update
@@ -25,7 +26,11 @@ sudo apt install \
   gstreamer1.0-plugins-bad \
   gstreamer1.0-libav \
   libgstreamer1.0-dev \
-  libgstreamer-plugins-base1.0-dev
+  libgstreamer-plugins-base1.0-dev \
+  libavcodec-dev \
+  libavformat-dev \
+  libavutil-dev \
+  libcurl4-openssl-dev
 ```
 
 ### 2. Building
@@ -72,7 +77,7 @@ environment to ensure all dependencies are correct.
 1. Pull the Cross-Compilation Docker Image
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:140
+docker pull ghcr.io/project-chip/chip-build-crosscompile:150
 ```
 
 2. Run the Docker Container This command starts an interactive shell inside the
@@ -80,7 +85,7 @@ docker pull ghcr.io/project-chip/chip-build-crosscompile:140
    container's /var/connectedhomeip directory.
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:140 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:150 /bin/bash
 ```
 
 3. Build Inside the Container From within the Docker container's shell, execute

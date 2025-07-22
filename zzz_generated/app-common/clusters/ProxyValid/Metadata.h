@@ -21,6 +21,8 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {} // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ProxyValid
 } // namespace Clusters
 } // namespace app

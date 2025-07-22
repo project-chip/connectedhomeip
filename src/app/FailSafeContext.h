@@ -58,6 +58,9 @@ public:
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
     void SetUpdateTermsAndConditionsHasBeenInvoked() { mUpdateTermsAndConditionsHasBeenInvoked = true; }
     void RecordSetVidVerificationStatementHasBeenInvoked() { mSetVidVerificationStatementHasBeenInvoked = true; }
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    void SetAddICACHasBeenInvoked() { mAddICACHasBeenInvoked = true; }
+#endif
 
     /**
      * @brief
@@ -95,6 +98,9 @@ public:
     bool IsCsrRequestForUpdateNoc() const { return mIsCsrRequestForUpdateNoc; }
     bool UpdateTermsAndConditionsHasBeenInvoked() const { return mUpdateTermsAndConditionsHasBeenInvoked; }
     bool HasSetVidVerificationStatementHasBeenInvoked() const { return mSetVidVerificationStatementHasBeenInvoked; }
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    bool AddICACCommandHasBeenInvoked() const { return mAddICACHasBeenInvoked; }
+#endif
 
     FabricIndex GetFabricIndex() const
     {
@@ -117,6 +123,9 @@ private:
     FabricIndex mFabricIndex                        = kUndefinedFabricIndex;
     bool mUpdateTermsAndConditionsHasBeenInvoked    = false;
     bool mSetVidVerificationStatementHasBeenInvoked = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    bool mAddICACHasBeenInvoked = false;
+#endif
 
     /**
      * @brief
@@ -153,6 +162,9 @@ private:
         mIsCsrRequestForUpdateNoc                  = false;
         mUpdateTermsAndConditionsHasBeenInvoked    = false;
         mSetVidVerificationStatementHasBeenInvoked = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        mAddICACHasBeenInvoked = false;
+#endif
     }
 
     void FailSafeTimerExpired();

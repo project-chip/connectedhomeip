@@ -2367,6 +2367,17 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
         }
         return value;
     }
+    case Attributes::IsCommissioningWithoutPower::Id: {
+        using TypeInfo = Attributes::IsCommissioningWithoutPower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
     default: {
         // Not a known GeneralCommissioning attribute.
         break;
@@ -10914,14 +10925,10 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.speed = nil;
             }
-            if (cppValue.Value().secureState.HasValue()) {
-                if (cppValue.Value().secureState.Value().IsNull()) {
-                    value.secureState = nil;
-                } else {
-                    value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value().Value()];
-                }
-            } else {
+            if (cppValue.Value().secureState.IsNull()) {
                 value.secureState = nil;
+            } else {
+                value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value()];
             }
         }
         return value;
@@ -12628,6 +12635,81 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             value = nil;
         } else {
             value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::MaxThermostatSuggestions::Id: {
+        using TypeInfo = Attributes::MaxThermostatSuggestions::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::ThermostatSuggestions::Id: {
+        using TypeInfo = Attributes::ThermostatSuggestions::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRThermostatClusterThermostatSuggestionStruct * newElement_0;
+                newElement_0 = [MTRThermostatClusterThermostatSuggestionStruct new];
+                newElement_0.uniqueID = [NSNumber numberWithUnsignedChar:entry_0.uniqueID];
+                newElement_0.presetHandle = AsData(entry_0.presetHandle);
+                newElement_0.effectiveTime = [NSNumber numberWithUnsignedInt:entry_0.effectiveTime];
+                newElement_0.expirationTime = [NSNumber numberWithUnsignedInt:entry_0.expirationTime];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::CurrentThermostatSuggestion::Id: {
+        using TypeInfo = Attributes::CurrentThermostatSuggestion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRThermostatClusterThermostatSuggestionStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRThermostatClusterThermostatSuggestionStruct new];
+            value.uniqueID = [NSNumber numberWithUnsignedChar:cppValue.Value().uniqueID];
+            value.presetHandle = AsData(cppValue.Value().presetHandle);
+            value.effectiveTime = [NSNumber numberWithUnsignedInt:cppValue.Value().effectiveTime];
+            value.expirationTime = [NSNumber numberWithUnsignedInt:cppValue.Value().expirationTime];
+        }
+        return value;
+    }
+    case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
+        using TypeInfo = Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value().Raw()];
         }
         return value;
     }
@@ -20782,8 +20864,8 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         }
         return value;
     }
-    case Attributes::TariffUnit::Id: {
-        using TypeInfo = Attributes::TariffUnit::TypeInfo;
+    case Attributes::MeasurementType::Id: {
+        using TypeInfo = Attributes::MeasurementType::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -20793,7 +20875,22 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.Value())];
+        }
+        return value;
+    }
+    case Attributes::MaximumMeteredQuantities::Id: {
+        using TypeInfo = Attributes::MaximumMeteredQuantities::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
         }
         return value;
     }
@@ -21739,6 +21836,17 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         } else {
             value.myEnum = nil;
         }
+        return value;
+    }
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
+        using TypeInfo = Attributes::UnsupportedAttributeRequiringAdminPrivilege::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
         return value;
     }
     case Attributes::Unsupported::Id: {

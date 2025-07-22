@@ -36,8 +36,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, meteredQuantity);
     case Attributes::MeteredQuantityTimestamp::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, meteredQuantityTimestamp);
-    case Attributes::TariffUnit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, tariffUnit);
+    case Attributes::MeasurementType::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, measurementType);
+    case Attributes::MaximumMeteredQuantities::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maximumMeteredQuantities);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

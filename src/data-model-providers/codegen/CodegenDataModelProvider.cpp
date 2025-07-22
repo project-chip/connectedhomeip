@@ -40,7 +40,6 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -111,8 +110,7 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
         attribute.IsReadOnly() ? std::nullopt : std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)));
 
     // NOTE: we do NOT provide additional info for:
-    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
-    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
+    //    - IsExternal/IsAutomaticallyPersisted is not used by IM handling
     //    - Several specification flags are not available (reportable, quieter reporting,
     //      fixed, source attribution)
 

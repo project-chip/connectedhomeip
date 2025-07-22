@@ -227,6 +227,11 @@ namespace GlobalStruct {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(GlobalStruct::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace GlobalStruct
+namespace UnsupportedAttributeRequiringAdminPrivilege {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(UnsupportedAttributeRequiringAdminPrivilege::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kAdminister, Access::Privilege::kAdminister);
+} // namespace UnsupportedAttributeRequiringAdminPrivilege
 namespace Unsupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Unsupported::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -515,6 +520,19 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace TestDifferentVendorMeiRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace TestEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestEvent
+namespace TestFabricScopedEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestFabricScopedEvent
+namespace TestDifferentVendorMeiEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestDifferentVendorMeiEvent
+
+} // namespace Events
 } // namespace UnitTesting
 } // namespace Clusters
 } // namespace app

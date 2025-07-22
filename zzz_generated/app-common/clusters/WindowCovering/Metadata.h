@@ -149,6 +149,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GoToTiltPercenta
 } // namespace GoToTiltPercentage
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app

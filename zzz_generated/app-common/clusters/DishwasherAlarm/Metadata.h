@@ -49,6 +49,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ModifyEnabledAla
 } // namespace ModifyEnabledAlarms
 
 } // namespace Commands
+
+namespace Events {
+namespace Notify {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Notify
+
+} // namespace Events
 } // namespace DishwasherAlarm
 } // namespace Clusters
 } // namespace app

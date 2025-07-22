@@ -69,7 +69,7 @@ Git: 0.7-summer-2025-ncr-23-g816a9defd
     <item fieldId="1" name="PrimaryColor" type="ColorEnum" isNullable="true" min="0x00" max="0x14"/>
   </struct>
 
-  <cluster singleton="true">
+  <cluster>
     <name>Basic Information</name>
     <domain>CHIP</domain>
     <code>0x0028</code>

@@ -37,6 +37,7 @@ public:
         kSetTargetAction,
         kStepAction,
         kPanelLatchAction,
+        kPanelUnLatchAction, // New action for unlatching the panel before SetTarget
 
         kInvalidAction
     };
@@ -49,6 +50,14 @@ public:
      */
     void Init();
 
+    /**
+     * @brief Shuts down the ClosureManager.
+     *
+     * This method clear up the necessary resources and configurations required
+     * for the Closure Application to shutdown properly.
+     */
+    void Shutdown();
+
     static ClosureManager & GetInstance() { return sInstance; }
 
     /**
@@ -60,6 +69,28 @@ public:
      * @return Status::Success if the calibration command is successfully processed.
      */
     chip::Protocols::InteractionModel::Status OnCalibrateCommand();
+
+    /**
+     * @brief Sets the initial state for the ClosureControlEndpoint.
+     *
+     * This method initializes the closure control instance with default values and configurations.
+     *
+     * @param closureControlEndpoint The ClosureControlEndpoint to be initialized.
+     *
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if initialization fails.
+     */
+    CHIP_ERROR SetClosureControlInitialState(chip::app::Clusters::ClosureControl::ClosureControlEndpoint & closureControlEndpoint);
+
+    /**
+     * @brief Sets the initial state for the ClosureDimensionEndpoint.
+     *
+     * This method initializes the closure panel instance with default values and configurations.
+     *
+     * @param closurePanelEndpoint The ClosureDimensionEndpoint to be initialized.
+     *
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if initialization fails.
+     */
+    CHIP_ERROR SetClosurePanelInitialState(chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint & closurePanelEndpoint);
 
     /**
      * @brief Handles the "MoveTo" command for the closure manager.
@@ -142,29 +173,69 @@ private:
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
 
     /**
-     * @brief Stores the current endpoint ID being managed or operated on.
+     * @brief Gets the current panel instance being operated on.
      *
-     * Initialized to an invalid endpoint ID and updated as needed during operations.
+     * This method returns a pointer to the ClosureDimensionEndpoint instance
+     * corresponding to the current endpoint ID.
+     *
+     * @return Pointer to the current panel instance, or nullptr if not found.
      */
-    chip::EndpointId mCurrentEndpointId = chip::kInvalidEndpointId;
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * GetCurrentPanelInstance(chip::EndpointId endpointId);
 
     /**
-     * @brief Tracks the current action being performed by the ClosureManager.
+     * @brief Tracks the endpoint's current action being performed by the ClosureManager.
      *
+     * These variables are used to determine the type of action currently being executed on the closure endpoints.
      * Initialized to an invalid action and updated as needed during operations.
      */
-    ClosureAction mCurrentAction = ClosureAction::kInvalidAction;
+    ClosureAction mEp1CurrentAction = ClosureAction::kInvalidAction;
+    ClosureAction mEp2CurrentAction = ClosureAction::kInvalidAction;
+    ClosureAction mEp3CurrentAction = ClosureAction::kInvalidAction;
 
     /**
-     * @brief Timer callback handler for closure actions.
+     * @brief Timer callback handlers for closure actions over specific endpoints.
      *
-     * This static method is called when the timer for a closure action expires.
+     * These static methods are called when the timer for a closure action expires.
      * It is responsible for handling the completion or progression of closure-related actions.
      *
      * @param layer Pointer to the system layer that triggered the timer.
      * @param aAppState Application-specific state or context passed to the timer.
      */
-    static void HandleClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp1ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp2ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp3ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+
+    /**
+     * @brief Handles the step action for a panel endpoint.
+     *
+     * This method updates the current position of the panel endpoint based on the step action
+     * and checks if the target position is reached. If so, it performs the latch action
+     * if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel step action should be handled.
+     */
+    void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the SetTarget motion action for a panel endpoint.
+     *
+     * This method Performs the update the current positions of panel endpoint to next position
+     * and when target position is reached, it performs the latch action if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
+     */
+    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the unlatch action for a closure panel.
+     *
+     * This method performs the unlatch action if required for the specified closure panel endpoint.
+     * It updates the current state of the panel and sets the target state accordingly and then calls
+     * HandlePanelSetTargetAction to move the panel to the target position.
+     *
+     * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
+     */
+    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
 
     /**
      * @brief Handles the completion of a Calibrate action.
@@ -204,7 +275,7 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandleSetTargetActionComplete();
+    void HandlePanelSetTargetActionComplete(chip::EndpointId endpointId);
 
     /**
      * @brief Handles the completion of a Step action.
@@ -214,10 +285,35 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandleStepActionComplete();
+    void HandlePanelStepActionComplete(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the motion action for the closure system.
+     *
+     * This method is called when a move-to action has been initiated,
+     * allowing for any necessary updates or state changes.
+     */
+    void HandleClosureMotionAction();
+
+    /**
+     * @brief Calculates the next position for a panel based on the closure panel state.
+     *
+     * This function determines the next position by incrementing or decrementing current position of the panel
+     * by a fixed step (1000 units) towards the target position, ensuring it does not overshoot the target.
+     *
+     * @param[in]  currentState   The current state of the panel, containing the current position.
+     * @param[in]  targetState    The target state of the panel, containing the desired position.
+     * @param[out] nextPosition   A reference to a Nullable object that will be updated with the next current position.
+     *
+     * @return true if the next position was updated and movement is required; false if no update is needed
+     *         or if either the current or target position is not set.
+     */
+    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
+                              const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
+                              chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
 
     bool mIsCalibrationActionInProgress = false;
-    bool mIsMoveToActionInProgress      = false;
-    bool mIsSetTargetActionInProgress   = false;
-    bool mIsStepActionInProgress        = false;
+    bool mEp1MotionInProgress           = false;
+    bool mEp2MotionInProgress           = false;
+    bool mEp3MotionInProgress           = false;
 };

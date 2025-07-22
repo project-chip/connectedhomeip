@@ -30,23 +30,26 @@ TEST(TestPascalString, TestCharStringOperations)
     {
         ShortPascalString str(buffer);
 
-        ASSERT_TRUE(str.SetLength(0));
+        ASSERT_TRUE(str.SetContentLength(0));
         ASSERT_TRUE(str.Content().data_equal(""_span));
-        ASSERT_EQ(str.GetLength(), 0u);
-        ASSERT_EQ(str.PascalContent().size(), 1u);
-        ASSERT_EQ(str.Buffer().size(), 8u);
-        ASSERT_EQ(str.Buffer().data(), buffer);
+        ASSERT_EQ(str.GetContentLength(), 0u);
+
+        // Valid data includes size (1 byte) + content (0 bytes)
+        ASSERT_EQ(str.ContentWithLenPrefix().size(), 1u);
+        ASSERT_EQ(str.RawFullBuffer().size(), 8u);
+        ASSERT_EQ(str.RawFullBuffer().data(), reinterpret_cast<uint8_t *>(buffer));
 
         ASSERT_TRUE(str.SetValue("foo"_span));
         ASSERT_TRUE(str.Content().data_equal("foo"_span));
-        ASSERT_EQ(str.GetLength(), 3u);
-        ASSERT_EQ(str.PascalContent().size(), 4u);
-        ASSERT_EQ(str.Buffer().size(), 8u);
-        ASSERT_EQ(str.Buffer().data(), buffer);
+        ASSERT_EQ(str.GetContentLength(), 3u);
+        // Valid data includes size (1 byte) + content (3 bytes)
+        ASSERT_EQ(str.ContentWithLenPrefix().size(), 4u);
+        ASSERT_EQ(str.RawFullBuffer().size(), 8u);
+        ASSERT_EQ(str.RawFullBuffer().data(), reinterpret_cast<uint8_t *>(buffer));
 
         // exactly 7 bytes can be stored, since one is reserved for size
         ASSERT_TRUE(str.SetValue("1234567"_span));
-        ASSERT_EQ(str.GetLength(), 7u);
+        ASSERT_EQ(str.GetContentLength(), 7u);
         ASSERT_TRUE(str.Content().data_equal("1234567"_span));
 
         // 8 bytes is too long
@@ -56,19 +59,21 @@ TEST(TestPascalString, TestCharStringOperations)
     {
         LongPascalString str(buffer);
 
-        ASSERT_TRUE(str.SetLength(0));
+        ASSERT_TRUE(str.SetContentLength(0));
         ASSERT_TRUE(str.Content().data_equal(""_span));
-        ASSERT_EQ(str.GetLength(), 0u);
-        ASSERT_EQ(str.PascalContent().size(), 2u);
+        ASSERT_EQ(str.GetContentLength(), 0u);
+        // Valid data includes size (2 bytes) + content (0 bytes)
+        ASSERT_EQ(str.ContentWithLenPrefix().size(), 2u);
 
         ASSERT_TRUE(str.SetValue("foo"_span));
         ASSERT_TRUE(str.Content().data_equal("foo"_span));
-        ASSERT_EQ(str.GetLength(), 3u);
-        ASSERT_EQ(str.PascalContent().size(), 5u);
+        ASSERT_EQ(str.GetContentLength(), 3u);
+        // Valid data includes size (2 bytes) + content (3 bytes)
+        ASSERT_EQ(str.ContentWithLenPrefix().size(), 5u);
 
         // exactly 6 bytes can be stored, since two are reserved for size
         ASSERT_TRUE(str.SetValue("123456"_span));
-        ASSERT_EQ(str.GetLength(), 6u);
+        ASSERT_EQ(str.GetContentLength(), 6u);
         ASSERT_TRUE(str.Content().data_equal("123456"_span));
 
         // 7 bytes is too long
@@ -83,24 +88,24 @@ TEST(TestPascalString, TestByteStringOperations)
     {
         ShortPascalBytes str(buffer);
 
-        ASSERT_TRUE(str.SetLength(0));
+        ASSERT_TRUE(str.SetContentLength(0));
         ASSERT_TRUE(str.Content().empty());
-        ASSERT_EQ(str.GetLength(), 0u);
-        ASSERT_EQ(str.PascalContent().size(), 1u);
-        ASSERT_EQ(str.Buffer().size(), 8u);
-        ASSERT_EQ(str.Buffer().data(), buffer);
+        ASSERT_EQ(str.GetContentLength(), 0u);
+        ASSERT_EQ(str.ContentWithLenPrefix().size(), 1u);
+        ASSERT_EQ(str.RawFullBuffer().size(), 8u);
+        ASSERT_EQ(str.RawFullBuffer().data(), buffer);
 
         const uint8_t foo[] = { 1, 2, 3 };
         ASSERT_TRUE(str.SetValue(ByteSpan(foo)));
         ASSERT_TRUE(str.Content().data_equal(ByteSpan(foo)));
-        ASSERT_EQ(str.GetLength(), 3u);
-        ASSERT_EQ(str.PascalContent().size(), 4u);
-        ASSERT_EQ(str.Buffer().size(), 8u);
+        ASSERT_EQ(str.GetContentLength(), 3u);
+        ASSERT_EQ(str.ContentWithLenPrefix().size(), 4u);
+        ASSERT_EQ(str.RawFullBuffer().size(), 8u);
 
         // exactly 7 bytes can be stored, since one is reserved for size
         const uint8_t fits[] = { 1, 2, 3, 4, 5, 6, 7 };
         ASSERT_TRUE(str.SetValue(ByteSpan(fits)));
-        ASSERT_EQ(str.GetLength(), 7u);
+        ASSERT_EQ(str.GetContentLength(), 7u);
         ASSERT_TRUE(str.Content().data_equal(ByteSpan(fits)));
 
         // 8 bytes is too long
@@ -111,24 +116,24 @@ TEST(TestPascalString, TestByteStringOperations)
     {
         LongPascalBytes str(buffer);
 
-        ASSERT_TRUE(str.SetLength(0));
+        ASSERT_TRUE(str.SetContentLength(0));
         ASSERT_TRUE(str.Content().empty());
-        ASSERT_EQ(str.GetLength(), 0u);
-        ASSERT_EQ(str.PascalContent().size(), 2u);
-        ASSERT_EQ(str.Buffer().size(), 8u);
-        ASSERT_EQ(str.Buffer().data(), buffer);
+        ASSERT_EQ(str.GetContentLength(), 0u);
+        ASSERT_EQ(str.ContentWithLenPrefix().size(), 2u);
+        ASSERT_EQ(str.RawFullBuffer().size(), 8u);
+        ASSERT_EQ(str.RawFullBuffer().data(), buffer);
 
         const uint8_t foo[] = { 1, 2, 3 };
         ASSERT_TRUE(str.SetValue(ByteSpan(foo)));
         ASSERT_TRUE(str.Content().data_equal(ByteSpan(foo)));
-        ASSERT_EQ(str.GetLength(), 3u);
-        ASSERT_EQ(str.PascalContent().size(), 5u);
-        ASSERT_EQ(str.Buffer().size(), 8u);
+        ASSERT_EQ(str.GetContentLength(), 3u);
+        ASSERT_EQ(str.ContentWithLenPrefix().size(), 5u);
+        ASSERT_EQ(str.RawFullBuffer().size(), 8u);
 
         // exactly 6 bytes can be stored, since two are reserved for size
         const uint8_t fits[] = { 1, 2, 3, 4, 5, 6 };
         ASSERT_TRUE(str.SetValue(ByteSpan(fits)));
-        ASSERT_EQ(str.GetLength(), 6u);
+        ASSERT_EQ(str.GetContentLength(), 6u);
         ASSERT_TRUE(str.Content().data_equal(ByteSpan(fits)));
 
         // 7 bytes is too long
@@ -156,16 +161,16 @@ TEST(TestPascalString, TestNullability)
         ShortPascalBytes s(buffer);
 
         ASSERT_FALSE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 0U);
+        ASSERT_EQ(s.GetContentLength(), 0U);
 
         s.SetNull();
         ASSERT_TRUE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 0U);
+        ASSERT_EQ(s.GetContentLength(), 0U);
 
         const uint8_t foo[] = { 1, 2, 3 };
         ASSERT_TRUE(s.SetValue(ByteSpan(foo)));
         ASSERT_FALSE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 3U);
+        ASSERT_EQ(s.GetContentLength(), 3U);
     }
 
     {
@@ -173,16 +178,16 @@ TEST(TestPascalString, TestNullability)
         LongPascalBytes s(buffer);
 
         ASSERT_FALSE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 0U);
+        ASSERT_EQ(s.GetContentLength(), 0U);
 
         s.SetNull();
         ASSERT_TRUE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 0U);
+        ASSERT_EQ(s.GetContentLength(), 0U);
 
         const uint8_t foo[] = { 1, 2, 3 };
         ASSERT_TRUE(s.SetValue(ByteSpan(foo)));
         ASSERT_FALSE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 3U);
+        ASSERT_EQ(s.GetContentLength(), 3U);
     }
 
     {
@@ -190,15 +195,15 @@ TEST(TestPascalString, TestNullability)
         LongPascalString s(buffer);
 
         ASSERT_FALSE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 0U);
+        ASSERT_EQ(s.GetContentLength(), 0U);
 
         s.SetNull();
         ASSERT_TRUE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 0U);
+        ASSERT_EQ(s.GetContentLength(), 0U);
 
         ASSERT_TRUE(s.SetValue("test"_span));
         ASSERT_FALSE(s.IsNull());
-        ASSERT_EQ(s.GetLength(), 4U);
+        ASSERT_EQ(s.GetContentLength(), 4U);
     }
 }
 
@@ -246,6 +251,13 @@ TEST(TestPascalString, TestIsValid)
         buff[0] = 3;
         ASSERT_TRUE(LongPascalBytes::IsValid(ByteSpan(buff)));
     }
+}
+
+TEST(TestPascalString, SupportConstAccess)
+{
+    // a const buffer should be viewable as a pascal string
+    const char buffer[8] = { 4, 't', 'e', 's', 't', 'a', 'b', 'c' };
+    ASSERT_TRUE(ShortConstPascalString(buffer).Content().data_equal("test"_span));
 }
 
 } // namespace

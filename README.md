@@ -1,3 +1,9 @@
+# Documentation links
+
+-   [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
+-   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
+-   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
+
 # Matter
 
 [![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/build.yaml)
@@ -29,11 +35,10 @@
 
 **Tests**
 
+[![Tests](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/tests.yaml)
 [![Unit / Integration Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Integration%20Tests/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/unit_integration_test.yaml)
 [![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/cirque.yaml)
 [![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/qemu.yaml)
-
--   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
 
 **Tools**
 
@@ -42,9 +47,6 @@
 **Documentation**
 
 [![Documentation Build](https://github.com/project-chip/connectedhomeip/actions/workflows/docbuild.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/docbuild.yaml)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
-
--   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
 
 # About
 

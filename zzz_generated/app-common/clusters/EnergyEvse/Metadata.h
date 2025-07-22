@@ -155,6 +155,28 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace ClearTargets
 
 } // namespace Commands
+
+namespace Events {
+namespace EVConnected {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EVConnected
+namespace EVNotDetected {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EVNotDetected
+namespace EnergyTransferStarted {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EnergyTransferStarted
+namespace EnergyTransferStopped {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EnergyTransferStopped
+namespace Fault {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Fault
+namespace RFID {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RFID
+
+} // namespace Events
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app

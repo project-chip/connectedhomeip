@@ -50,6 +50,7 @@ namespace app {
 namespace reporting {
 namespace {
 
+using DataModel::ReadFlags;
 using Protocols::InteractionModel::Status;
 
 /// Returns the status of ACL validation.
@@ -127,8 +128,28 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
     return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess) : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
 }
 
+/// Checks that the given attribute path corresponds to a readable attribute. If not, it
+/// will return the corresponding failure status.
+std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataModel, const ConcreteReadAttributePath & path)
+{
+    DataModel::AttributeFinder finder(dataModel);
+
+    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+    if (!entry.has_value())
+    {
+        return DataModel::ValidateClusterPath(dataModel, path, Status::UnsupportedAttribute);
+    }
+
+    if (!entry->GetReadPrivilege().has_value())
+    {
+        return Status::UnsupportedRead;
+    }
+
+    return std::nullopt;
+}
+
 DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
-                                                  bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
+                                                  BitFlags<ReadFlags> flags, AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
@@ -138,7 +159,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     DataModel::ReadAttributeRequest readRequest;
 
-    readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered, isFabricFiltered);
+    readRequest.readFlags         = flags;
     readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
@@ -158,11 +179,12 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     reportBuilder.Checkpoint(checkpoint);
 
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
+    bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
-    //       explicitly ignores that case). This means that global attribute reads as well as ReadAttribute
-    //       can be passed invalid paths when an invalid Read is detected and must handle them.
+    //       explicitly ignores that case).
+    //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
     //
     //       See https://github.com/project-chip/connectedhomeip/issues/37410
 
@@ -175,6 +197,10 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         // Global attributes are NOT directly handled by data model providers, instead
         // the are routed through metadata.
         status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
+    }
+    else if (auto readable_status = ValidateAttributeIsReadable(dataModel, path); readable_status.has_value())
+    {
+        status = *readable_status;
     }
     else
     {
@@ -448,9 +474,12 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
+            BitFlags<ReadFlags> flags;
+            flags.Set(ReadFlags::kFabricFiltered, apReadHandler->IsFabricFiltered());
+            flags.Set(ReadFlags::kAllowsLargePayload, apReadHandler->AllowsLargePayload());
             DataModel::ActionReturnStatus status =
-                RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
-                                    apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
+                RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(), flags,
+                                    attributeReportIBs, pathForRetrieval, &encodeState);
             if (status.IsError())
             {
                 // Operation error set, since this will affect early return or override on status encoding

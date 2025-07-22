@@ -31,5 +31,4 @@ public:
 
 private:
     static CHIP_ERROR InitOpenThread(void);
-    static CHIP_ERROR InitWiFi(void);
 };

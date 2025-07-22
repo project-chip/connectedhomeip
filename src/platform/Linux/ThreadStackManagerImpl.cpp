@@ -546,14 +546,47 @@ CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
-    guint64 extAddr = openthread_border_router_get_extended_address(mProxy.get());
 
-    for (size_t i = 0; i < sizeof(extAddr); i++)
+    // The ExtendedAddress d-bus property from otbr-agent is defined to not emit changed signals.
+    // This means the generated api, which uses a caching proxy underneath, will not obtain a value
+    // and will always return NULL. In order to retrieve the value in this case, we must directly
+    // call the Get function to get it, then we manually cache locally since it does not change.
+    if (std::all_of(mExtendedAddress, mExtendedAddress + sizeof(mExtendedAddress), [](uint8_t v) { return v == 0; }))
     {
-        buf[sizeof(uint64_t) - i - 1] = (extAddr & UINT8_MAX);
-        extAddr >>= CHAR_BIT;
+        GAutoPtr<GError> err;
+        GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                                                           g_variant_new("(ss)", "io.openthread.BorderRouter", "ExtendedAddress"),
+                                                           G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
+
+        VerifyOrReturnError(err == nullptr, CHIP_ERROR_INTERNAL,
+                            ChipLogError(DeviceLayer, "openthread: failed to read ExtendedAddress property: %s", err->message));
+
+        VerifyOrReturnError(response, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to get a response for ExtendedAddress property"));
+
+        GAutoPtr<GVariant> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+        VerifyOrReturnError(tupleContent, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to find tuple in ExtendedAddress response"));
+
+        GAutoPtr<GVariant> value(g_variant_get_variant(tupleContent.get()));
+
+        VerifyOrReturnError(value, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to find tuple value in ExtendedAddress response"));
+
+        VerifyOrReturnError(g_variant_is_of_type(value.get(), G_VARIANT_TYPE_UINT64), CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: ExtendedAddress property returned unexpected type: %s",
+                                         g_variant_get_type_string(value.get())));
+
+        guint64 address_value = g_variant_get_uint64(value.get());
+        for (size_t i = 0; i < sizeof(address_value); i++)
+        {
+            mExtendedAddress[sizeof(mExtendedAddress) - i - 1] = (address_value & UINT8_MAX);
+            address_value >>= CHAR_BIT;
+        }
     }
 
+    memcpy(buf, mExtendedAddress, sizeof(mExtendedAddress));
     return CHIP_NO_ERROR;
 }
 

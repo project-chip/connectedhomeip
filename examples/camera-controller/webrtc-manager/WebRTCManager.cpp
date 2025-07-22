@@ -343,6 +343,13 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    // At least one of Video Stream ID and Audio Stream ID has to be present
+    if (!videoStreamId.HasValue() && !audioStreamId.HasValue())
+    {
+        ChipLogError(Zcl, "One of VideoStreamID or AudioStreamID must be present");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     // Store the stream ID for the callback
     if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
     {
@@ -361,14 +368,20 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
     return err;
 }
 
-CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage)
+CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage, Optional<app::DataModel::Nullable<uint16_t>> videoStreamId,
+                                       Optional<app::DataModel::Nullable<uint16_t>> audioStreamId)
 {
     ChipLogProgress(Camera, "Sending SolicitOffer command to the peer device");
 
-    CHIP_ERROR err = mWebRTCProviderClient.SolicitOffer(streamUsage, kWebRTCRequesterDynamicEndpointId,
-                                                        MakeOptional(DataModel::NullNullable), // "Null" for video
-                                                        MakeOptional(DataModel::NullNullable)  // "Null" for audio
-    );
+    // At least one of Video Stream ID and Audio Stream ID has to be present
+    if (!videoStreamId.HasValue() && !audioStreamId.HasValue())
+    {
+        ChipLogError(Zcl, "One of VideoStreamID or AudioStreamID must be present");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    CHIP_ERROR err =
+        mWebRTCProviderClient.SolicitOffer(streamUsage, kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId);
 
     if (err != CHIP_NO_ERROR)
     {

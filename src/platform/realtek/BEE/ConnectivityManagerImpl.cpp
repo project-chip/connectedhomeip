@@ -36,6 +36,13 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/dns.h>
+#include <lwip/ip_addr.h>
+#include <lwip/nd6.h>
+#include <lwip/netif.h>
+#endif
+
 using namespace ::chip;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;

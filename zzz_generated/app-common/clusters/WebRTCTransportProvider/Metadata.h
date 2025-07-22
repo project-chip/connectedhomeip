@@ -57,6 +57,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace EndSession
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace WebRTCTransportProvider
 } // namespace Clusters
 } // namespace app

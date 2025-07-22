@@ -19,13 +19,13 @@
 #pragma once
 
 #include "transport.h"
-#include <rtc/rtc.hpp>
+#include "webrtc-abstract.h"
 
 // Derived class for WebRTC transport
 class WebrtcTransport : public Transport
 {
 public:
-    WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::shared_ptr<rtc::PeerConnection> mPeerConnection);
+    WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::shared_ptr<WebRTCPeerConnection> peerConnection);
 
     ~WebrtcTransport();
 
@@ -45,17 +45,17 @@ public:
     bool CanSendAudio() override;
 
     // Set video track for the transport
-    void SetVideoTrack(std::shared_ptr<rtc::Track> videoTrack);
+    void SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack);
 
     // Set audio track for the transport
-    void SetAudioTrack(std::shared_ptr<rtc::Track> audioTrack);
+    void SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack);
 
 private:
     uint16_t mSessionID;
     uint64_t mNodeID;
     uint32_t mAudioSampleTimestamp;
     uint32_t mVideoSampleTimestamp;
-    std::shared_ptr<rtc::PeerConnection> mPeerConnection;
-    std::shared_ptr<rtc::Track> mVideoTrack;
-    std::shared_ptr<rtc::Track> mAudioTrack;
+    std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
+    std::shared_ptr<WebRTCTrack> mVideoTrack;
+    std::shared_ptr<WebRTCTrack> mAudioTrack;
 };

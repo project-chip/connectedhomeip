@@ -70,6 +70,16 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace FindTransport
 
 } // namespace Commands
+
+namespace Events {
+namespace PushTransportBegin {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PushTransportBegin
+namespace PushTransportEnd {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PushTransportEnd
+
+} // namespace Events
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

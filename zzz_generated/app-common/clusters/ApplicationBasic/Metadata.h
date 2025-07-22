@@ -57,6 +57,8 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ApplicationBasic
 } // namespace Clusters
 } // namespace app

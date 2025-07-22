@@ -72,6 +72,9 @@ CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId end
     mVideoStreamAllocate.minKeyFrameInterval = kMinKeyFrameInterval;
     mVideoStreamAllocate.maxKeyFrameInterval = kMaxKeyFrameInterval;
 
+    mVideoStreamAllocate.watermarkEnabled.SetValue(false);
+    mVideoStreamAllocate.OSDEnabled.SetValue(false);
+
     mEndpointId  = endpointId;
     mCommandType = CommandType::kVideoStreamAllocate;
     return mCommissioner->GetConnectedDevice(nodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);

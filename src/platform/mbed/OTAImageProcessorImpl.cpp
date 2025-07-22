@@ -48,7 +48,7 @@ int OTAImageProcessorImpl::MemoryTest()
     bd_size_t erase_size;
     bd_size_t full_size;
     size_t buffer_size;
-    char * buffer = nullptr;
+    Platform::ScopedMemoryBuffer<char> buffer;
 
     if (!mBlockDevice)
     {
@@ -85,11 +85,16 @@ int OTAImageProcessorImpl::MemoryTest()
     // data to a block.
     buffer_size = sizeof("Hello Storage!") + program_size - 1;
     buffer_size = buffer_size - (buffer_size % program_size);
-    buffer      = new char[buffer_size];
+    if (!buffer.Calloc(buffer_size))
+    {
+        ChipLogError(SoftwareUpdate, "Buffer allocation failed");
+        ret = 1;
+        goto exit;
+    }
 
     // Read what is currently stored on the block device. We haven't written
     // yet so this may be garbage
-    ret = mBlockDevice->read(buffer, 0, buffer_size);
+    ret = mBlockDevice->read(buffer.Get(), 0, buffer_size);
     if (ret)
     {
         ChipLogError(SoftwareUpdate, "Block device read failed [%d]", ret);
@@ -124,10 +129,10 @@ int OTAImageProcessorImpl::MemoryTest()
     }
 
     // Clear the buffer so we don't get old data
-    memset(buffer, 0x0, buffer_size);
+    memset(buffer.Get(), 0x0, buffer_size);
 
     // Read the data from the first block
-    ret = mBlockDevice->read(buffer, 0, buffer_size);
+    ret = mBlockDevice->read(buffer.Get(), 0, buffer_size);
     if (ret)
     {
         ChipLogError(SoftwareUpdate, "Block device read failed [%d]", ret);
@@ -141,7 +146,7 @@ int OTAImageProcessorImpl::MemoryTest()
         {
             if (i + j < buffer_size)
             {
-                ChipLogProgress(SoftwareUpdate, "%02x ", buffer[i + j]);
+                ChipLogProgress(SoftwareUpdate, "%02x ", buffer.Get()[i + j]);
             }
             else
             {
@@ -153,11 +158,11 @@ int OTAImageProcessorImpl::MemoryTest()
     ChipLogProgress(SoftwareUpdate, "---\n");
 
     // Clear the buffer so we don't get old data
-    memset(buffer, 0x0, buffer_size);
+    memset(buffer.Get(), 0x0, buffer_size);
     // Update buffer with our string we want to store
-    Platform::CopyString(buffer, buffer_size, "Hello Storage!");
+    Platform::CopyString(buffer.Get(), buffer_size, "Hello Storage!");
 
-    ret = mBlockDevice->program(buffer, 0, buffer_size);
+    ret = mBlockDevice->program(buffer.Get(), 0, buffer_size);
     if (ret)
     {
         ChipLogError(SoftwareUpdate, "Block device program failed [%d]", ret);
@@ -165,11 +170,11 @@ int OTAImageProcessorImpl::MemoryTest()
     }
 
     // Clear the buffer so we don't get old data
-    memset(buffer, 0x0, buffer_size);
+    memset(buffer.Get(), 0x0, buffer_size);
 
     // Read the data from the first block, note that the program_size must be
     // a multiple of the read_size, so we don't have to check for alignment
-    ret = mBlockDevice->read(buffer, 0, buffer_size);
+    ret = mBlockDevice->read(buffer.Get(), 0, buffer_size);
     if (ret)
     {
         ChipLogError(SoftwareUpdate, "Block device read failed [%d]", ret);
@@ -183,7 +188,7 @@ int OTAImageProcessorImpl::MemoryTest()
         {
             if (i + j < buffer_size)
             {
-                ChipLogProgress(SoftwareUpdate, "%02x ", buffer[i + j]);
+                ChipLogProgress(SoftwareUpdate, "%02x ", buffer.Get()[i + j]);
             }
             else
             {
@@ -191,11 +196,11 @@ int OTAImageProcessorImpl::MemoryTest()
             }
         }
 
-        ChipLogProgress(SoftwareUpdate, " %.*s", buffer_size - i, &buffer[i]);
+        ChipLogProgress(SoftwareUpdate, " %s", NullTerminated(&buffer.Get()[i], buffer_size - i).c_str());
     }
     ChipLogProgress(SoftwareUpdate, "---\n");
 
-    ret = strcmp(buffer, "Hello Storage!");
+    ret = strcmp(buffer.Get(), "Hello Storage!");
     if (ret)
     {
         ChipLogError(SoftwareUpdate, "Data compare failed");
@@ -209,11 +214,6 @@ exit:
     if (ret)
     {
         ChipLogError(SoftwareUpdate, "--- MEMORY TEST FAILED ---");
-    }
-
-    if (buffer)
-    {
-        delete buffer;
     }
     // Deinitialize the block device
     ret = mBlockDevice->deinit();

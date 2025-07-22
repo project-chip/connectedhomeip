@@ -68,11 +68,15 @@
 namespace chip {
 namespace Test {
 
-constexpr chip::ClusterId kTestDeniedClusterId1  = 1000;
-constexpr chip::ClusterId kTestDeniedClusterId2  = 3;
-constexpr chip::ClusterId kTestClusterId         = 6;
+constexpr EndpointId kTestEndpointId            = 1;
+constexpr EndpointId kTestDeniedEndpointId      = 66;
+constexpr EndpointId kTestUnsupportedEndpointId = 77;
+
+constexpr ClusterId kTestDeniedClusterId2     = 3;
+constexpr ClusterId kTestUnsupportedClusterId = 77;
+constexpr ClusterId kTestClusterId            = 6;
+
 constexpr uint8_t kTestFieldValue1               = 1;
-constexpr chip::EndpointId kTestEndpointId       = 1;
 constexpr chip::DataVersion kTestDataVersion1    = 3;
 constexpr chip::DataVersion kRejectedDataVersion = 1;
 

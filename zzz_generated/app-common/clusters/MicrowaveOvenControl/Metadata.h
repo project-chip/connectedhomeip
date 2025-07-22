@@ -70,6 +70,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddMoreTime::Id,
 } // namespace AddMoreTime
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace MicrowaveOvenControl
 } // namespace Clusters
 } // namespace app

@@ -47,6 +47,19 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceOTAProvi
 } // namespace AnnounceOTAProvider
 
 } // namespace Commands
+
+namespace Events {
+namespace StateTransition {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateTransition
+namespace VersionApplied {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace VersionApplied
+namespace DownloadError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DownloadError
+
+} // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace Clusters
 } // namespace app

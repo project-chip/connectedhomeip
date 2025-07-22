@@ -38,6 +38,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Microwave Oven Control
     - Chime
     - Camera AV Stream Management
+    - Push AV Stream Transport
     - Commissioner Control
     - Commodity Price
     - Energy EVSE
@@ -65,6 +66,8 @@ CommandHandlerInterfaceOnlyClusters:
     - Closure Control
     - Closure Dimension
     - OTA Software Update Provider
+    - Commodity Tariff
+    - Joint Fabric Administrator
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369

@@ -857,10 +857,15 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
 {
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
     ResolveContext * resolveContext = AllocateResolveContext();
-    CHIP_ERROR error                = CHIP_NO_ERROR;
-    resolveContext->mInstance       = this;
-    resolveContext->mCallback       = callback;
-    resolveContext->mContext        = context;
+    if (resolveContext == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to allocate resolve context");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    resolveContext->mInstance = this;
+    resolveContext->mCallback = callback;
+    resolveContext->mContext  = context;
 
     if (!interface.IsPresent())
     {

@@ -84,19 +84,9 @@ namespace Dnssd {
         }
         ReturnErrorOnFailure(error);
 
-        std::shared_ptr<bool> livenessTracker = mLivenessTracker;
-
-        auto onTimeout = ^{
-            VerifyOrReturn(*livenessTracker);
-            VerifyOrReturn(nullptr != this->mOnRegisterRecordCallback);
-
-            auto registerRecordCallback = this->mOnRegisterRecordCallback;
-            this->mOnRegisterRecordCallback = nullptr;
-            registerRecordCallback(kDNSServiceErr_Timeout);
-        };
         auto & systemLayer = static_cast<System::LayerDispatch &>(chip::DeviceLayer::SystemLayer());
         auto delay = System::Clock::Seconds16(kRegisterRecordTimeoutInSeconds);
-        return systemLayer.StartTimerWithBlock(onTimeout, delay);
+        return systemLayer.StartTimer(delay, OnRegisterRecordTimeout, this);
     }
 
     CHIP_ERROR HostNameRegistrar::RegisterInterface(uint32_t interfaceId, uint16_t rtype, const void * rdata, uint16_t rdlen)
@@ -113,7 +103,11 @@ namespace Dnssd {
             NetworkMonitor::Stop();
         }
         StopSharedConnection();
+
         mOnRegisterRecordCallback = nullptr;
+
+        auto & systemLayer = static_cast<System::LayerDispatch &>(chip::DeviceLayer::SystemLayer());
+        systemLayer.CancelTimer(OnRegisterRecordTimeout, this);
     }
 
     CHIP_ERROR HostNameRegistrar::StartSharedConnection()
@@ -157,11 +151,26 @@ namespace Dnssd {
             return;
         }
 
+        RunOnRegisterRecordCallback(context, err);
+    }
+
+    void HostNameRegistrar::OnRegisterRecordTimeout(System::Layer * layer, void * appState)
+    {
+        RunOnRegisterRecordCallback(appState, kDNSServiceErr_Timeout);
+    }
+
+    void HostNameRegistrar::RunOnRegisterRecordCallback(void * context, DNSServiceErrorType error)
+    {
         auto * self = static_cast<HostNameRegistrar *>(context);
+
+        auto & systemLayer = static_cast<System::LayerDispatch &>(chip::DeviceLayer::SystemLayer());
+        systemLayer.CancelTimer(OnRegisterRecordTimeout, self);
+
         VerifyOrReturn(nullptr != self->mOnRegisterRecordCallback);
+
         auto registerRecordCallback = self->mOnRegisterRecordCallback;
         self->mOnRegisterRecordCallback = nullptr;
-        registerRecordCallback(err);
+        registerRecordCallback(error);
     }
 
 } // namespace Dnssd

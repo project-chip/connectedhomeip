@@ -73,7 +73,7 @@ const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation   = { kConfigN
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode          = { kConfigNamespace_ChipConfig, "country-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability   = { kConfigNamespace_ChipConfig, "location-capability" };
 const PosixConfig::Key PosixConfig::kConfigKey_ConfigurationVersion = { kConfigNamespace_ChipConfig, "configuration-version" };
-const PosixConfig::Key PosixConfig::kConfigKey_UniqueId             = { kConfigNamespace_ChipFactory, "unique-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_UniqueId             = { kConfigNamespace_ChipConfig, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -205,6 +205,24 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
     err = storage->ReadValueStr(key.Name, buf, bufSize, outLen);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND && key == kConfigKey_UniqueId)
+    {
+        // Special case for UniqueId, which used to be (erroneously) stored in the Factory namespace.
+        // If it is not found in the Config namespace, try reading from Factory. If we find it there,
+        // we will copy it to the Config namespace and write an empty value to the Factory namespace.
+        err = gChipLinuxFactoryStorage.ReadValueStr(kConfigKey_UniqueId.Name, buf, bufSize, outLen);
+        if (err == CHIP_NO_ERROR && outLen > 0)
+        {
+            // If any of these steps fail, ignore the error and just return the existing
+            // err == CHIP_NO_ERROR, since we successfully returned the UniqueId from Factory.
+            SuccessOrExit(/* ignored = */ storage->WriteValueStr(kConfigKey_UniqueId.Name, buf));
+            SuccessOrExit(/* ignored = */ storage->Commit());
+            SuccessOrExit(/* ignored = */ gChipLinuxFactoryStorage.WriteValueStr(kConfigKey_UniqueId.Name, ""));
+            SuccessOrExit(/* ignored = */ gChipLinuxFactoryStorage.Commit());
+            ChipLogProgress(DeviceLayer, "NVS migrated %s from %s to %s namespace", key.Name, kConfigNamespace_ChipFactory,
+                            key.Namespace);
+        }
+    }
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         outLen = 0;
@@ -214,7 +232,6 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     {
         err = (buf == nullptr) ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    SuccessOrExit(err);
 
 exit:
     return err;

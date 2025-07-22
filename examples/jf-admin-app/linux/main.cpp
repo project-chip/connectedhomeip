@@ -49,6 +49,8 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 void ApplicationInit()
 {
     JFAMgr().Init(Server::GetInstance());
+    Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr());
+
     DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 }
 

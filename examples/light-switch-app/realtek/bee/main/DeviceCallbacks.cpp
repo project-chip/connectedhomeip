@@ -65,6 +65,14 @@ constexpr uint32_t kInitOTARequestorDelaySec = 3;
 bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sHaveBLEConnections   = false;
+bool sIsReceiveLedStopcmd  = false;
+
+extern "C" void SetSystemLedState(bool state)
+{
+    ChipLogProgress(DeviceLayer, "set SYSTEM_STATE_LED state %d", state);
+    systemStatusLED.Set(state);
+    sIsReceiveLedStopcmd = !state;
+}
 
 namespace LedConsts {
 constexpr uint32_t kBlinkRate_ms{ 500 };
@@ -103,7 +111,7 @@ void DeviceCallbacks::UpdateStatusLED()
     // rate of 100ms.
     //
     // Otherwise, blink the LED for a very short time.
-    if (sIsNetworkProvisioned && sIsNetworkEnabled)
+    if ((sIsNetworkProvisioned && sIsNetworkEnabled) || sIsReceiveLedStopcmd)
     {
         systemStatusLED.Set(false);
     }
