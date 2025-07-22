@@ -112,9 +112,9 @@ class TC_CNET_4_23(MatterBaseTest):
         for endpoint, value in feature_map_response.items():
             feature_dict = value.get(Clusters.Objects.NetworkCommissioning, {})
             feature_map = feature_dict.get(Clusters.Objects.NetworkCommissioning.Attributes.FeatureMap, None)
-            if feature_map == kWiFiFeature:
+            if bool(feature_map & Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface):
                 wifi_endpoint = endpoint
-            elif feature_map == kThreadFeature:
+            elif bool(feature_map & Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface):
                 thread_endpoint = endpoint
             else:
                 continue
