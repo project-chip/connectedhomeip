@@ -16,130 +16,6 @@
 # limitations under the License.
 #
 
-function trim_whitespace() {
-    local OLD_SHOPT_EXTGLOB="$(shopt -p extglob)"
-    shopt -s extglob
-
-    while IFS= read -r line; do                        # For every line in stdin
-        local trimmed_line="${line##+([[:space:]])}"   # Remove leading whitespace
-        trimmed_line="${trimmed_line%%+([[:space:]])}" # Remove trailing whitespace
-        echo "$trimmed_line"                           # Output to stdout
-    done
-
-    eval "$OLD_SHOPT_EXTGLOB"
-}
-
-# Parses the input from `ninja -t query` and extracts the input targets.
-function parse_input_targets() {
-    local in_input_block=false
-    while IFS= read -r line; do
-        if [[ "$line" == "input: "* ]]; then
-            rule="${line#input: }"
-            if [[ "$rule" == "phony" ]]; then
-                in_input_block=true
-            elif [[ -n "${POSSIBLE_RULES["$rule"]}" ]]; then
-                RULES["$rule"]=1
-            fi
-        elif [[ "$in_input_block" == false ]]; then
-            continue
-        elif [[ "$line" == "outputs:" ]]; then
-            in_input_block=false
-        elif [[ "$in_input_block" == true && ! -n "${QUERIED_TARGETS["$line"]}" ]]; then
-            NEW_TARGETS["$line"]=1
-        fi
-    done
-}
-
-# Executes a command with lastpipe enabled, allowing the last command in a pipeline to run in the current shell.
-function dowithlastpipe() {
-    # Save the current lastpipe and monitor settings
-    local original_lastpipe_setting="$(shopt -p lastpipe)"
-    local original_monitor_setting
-    if [[ "$-" == *m* ]]; then
-        original_monitor_setting="set -m"
-    else
-        original_monitor_setting="set +m"
-    fi
-
-    # Make sure to restore the original settings on exit
-    trap "
-        eval \"$original_lastpipe_setting\";
-        eval \"$original_monitor_setting\";
-        trap - EXIT
-    " EXIT
-
-    # Enable lastpipe and monitor
-    set +m
-    shopt -s lastpipe
-
-    # Execute the command with lastpipe enabled
-    eval "$@"
-
-    # Return the exit status of the last command
-    return "$?"
-}
-
-# Returns the rules that should be cleaned based on the targets provided.
-# Based on this, ninja -t clean -r <rules> will clean the exact targets that need to be reexecuted for recalculating the coverage.
-function get_rules_to_clean() {
-    declare -A RULES
-
-    # Get all the rules that execute (not build) targets from the toolchain.ninja file
-    readarray -t POSSIBLE_RULES_ARR < <(ninja -C out/coverage -f toolchain.ninja -t rules | grep "__rule")
-
-    declare -A POSSIBLE_RULES
-    for rule in "${POSSIBLE_RULES_ARR[@]}"; do
-        POSSIBLE_RULES["$rule"]=1
-    done
-
-    # This will hold the targets that are already "ninja -t query"-ed
-    declare -A QUERIED_TARGETS
-
-    # This will hold the targets that are to be queried
-    declare -A TARGETS
-    for target in "$@"; do
-        TARGETS["$target"]=1
-    done
-
-    while [[ "${#TARGETS[@]}" -gt 0 ]]; do
-
-        # If at any point we have 'all' in the targets, we can just return all rules
-        if [[ -n ${TARGETS["all"]} ]]; then
-            for rule in "${!POSSIBLE_RULES[@]}"; do
-                echo "$rule"
-            done
-            return 0
-        fi
-
-        # This will hold the results of the last query
-        unset NEW_TARGETS
-        declare -A NEW_TARGETS
-
-        # Query the targets and parse the input targets, if a rule is found, it will be added to RULES
-        dowithlastpipe 'ninja -C out/coverage -t query "${!TARGETS[@]}" | grep "^  " | grep -v "|" | trim_whitespace | parse_input_targets'
-
-        # Mark the queried targets
-        for target in "${!TARGETS[@]}"; do
-            QUERIED_TARGETS["$target"]=1
-        done
-
-        # Clear the TARGETS array for the next iteration
-        unset TARGETS
-        declare -A TARGETS
-
-        # Add the new targets from the last query to TARGETS
-        for target in "${!NEW_TARGETS[@]}"; do
-            TARGETS["$target"]="${NEW_TARGETS["$target"]}"
-        done
-
-    done
-
-    # After all targets are processed, return the rules that were found
-    for rule in "${!RULES[@]}"; do
-        echo "$rule"
-    done
-}
-
 set -e
 
 _install_lcov() {
@@ -176,7 +52,7 @@ QUIET_FLAG=()
 ACCUMULATE=false
 
 skip_gn=false
-TEST_TARGET=(check)
+TEST_TARGETS=(check)
 
 # By default, do not run YAML or Python tests
 ENABLE_YAML=false
@@ -225,8 +101,8 @@ for i in "$@"; do
             shift
             ;;
         --target=*)
-            TEST_TARGET="${i#*=}"
-            IFS=' ' read -ra TEST_TARGET <<<"$TEST_TARGET"
+            TEST_TARGETS="${i#*=}"
+            IFS=' ' read -ra TEST_TARGETS <<<"$TEST_TARGETS"
             shift
             ;;
         -o=* | --output_root=*)
@@ -294,15 +170,12 @@ if [ "$skip_gn" == false ]; then
 
     # Clean the targets to reexecute them
 
-    readarray -t RULES_TO_CLEAR < <(get_rules_to_clean "${TEST_TARGET[@]}")
-    if [[ ${#RULES_TO_CLEAR[@]} -gt 0 ]]; then
-        ninja -C "$OUTPUT_ROOT" -f toolchain.ninja -t clean -r "${RULES_TO_CLEAR[@]}"
-    fi
+    "$CHIP_ROOT/scripts/helpers/clean_runnable_targets.py" "${TEST_TARGETS[@]}"
 
     #
     # 1) Always run unit tests
     #
-    ninja -C "$OUTPUT_ROOT" "${TEST_TARGET[@]}"
+    ninja -C "$OUTPUT_ROOT" "${TEST_TARGETS[@]}"
 
     #
     # 2) Run YAML tests if requested
