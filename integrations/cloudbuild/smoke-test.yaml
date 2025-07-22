@@ -44,8 +44,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "ghcr.io/project-chip/chip-build-vscode:140"
-      # TODO: use more recent image once NRF builds are fixed
+    - name: "ghcr.io/project-chip/chip-build-vscode:150"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv

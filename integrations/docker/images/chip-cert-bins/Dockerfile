@@ -49,18 +49,27 @@ RUN set -x \
     git \
     git-lfs \
     gperf \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-tools \
     iproute2 \
     jq \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
     libcairo2-dev \
+    libcurl4-openssl-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
     libgif-dev \
     libgirepository1.0-dev \
     libglib2.0-dev \
+    libgstreamer1.0-0 \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
     libical-dev \
     libjpeg-dev \
     libmbedtls-dev \
@@ -68,8 +77,8 @@ RUN set -x \
     libncursesw5-dev \
     libnspr4-dev \
     libpango1.0-dev \
+    libpcsclite-dev \
     libpixman-1-dev \
-    libpcsclite1 \
     libreadline-dev \
     libssl-dev \
     libtool \
@@ -82,7 +91,6 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
-    pcscd \
     python3 \
     python3-dev \
     python3-pip \
@@ -175,6 +183,8 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-network-manager-ipv6only \
     --target linux-x64-terms-and-conditions-ipv6only \
     --target linux-x64-water-leak-detector-ipv6only \
+    --target linux-x64-camera-ipv6only \
+    --target linux-x64-camera-controller-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -203,6 +213,8 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
     && mv out/linux-x64-terms-and-conditions-ipv6only/chip-terms-and-conditions-app out/chip-terms-and-conditions-app \
     && mv out/linux-x64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
+    && mv out/linux-x64-camera-ipv6only/chip-camera-app out/chip-camera-app \
+    && mv out/linux-x64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
     ;; \
     "linux/arm64")\
     set -x \
@@ -235,6 +247,8 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-network-manager-ipv6only \
     --target linux-arm64-terms-and-conditions-ipv6only \
     --target linux-arm64-water-leak-detector-ipv6only \
+    --target linux-arm64-camera-ipv6only \
+    --target linux-arm64-camera-controller-ipv6only \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -263,6 +277,8 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-network-manager-ipv6only/matter-network-manager-app out/matter-network-manager-app \
     && mv out/linux-arm64-terms-and-conditions-ipv6only/chip-terms-and-conditions-app out/chip-terms-and-conditions-app \
     && mv out/linux-arm64-water-leak-detector-ipv6only/water-leak-detector-app out/water-leak-detector-app \
+    && mv out/linux-arm64-camera-ipv6only/chip-camera-app out/chip-camera-app \
+    && mv out/linux-arm64-camera-controller-ipv6only/chip-camera-controller out/chip-camera-controller \
     ;; \
     *) ;; \
     esac
@@ -274,7 +290,7 @@ FROM ubuntu:24.04
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
-RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip
+RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip libpcsclite1 pcscd
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
 RUN mkdir apps
@@ -306,6 +322,8 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-data-mo
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/matter-network-manager-app apps/matter-network-manager-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-terms-and-conditions-app apps/chip-terms-and-conditions-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/water-leak-detector-app apps/water-leak-detector-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-app apps/chip-camera-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-controller apps/chip-camera-controller
 
 # Create symbolic links for now since this allows users to use existing configurations
 # for running just `app-name` instead of `apps/app-name`

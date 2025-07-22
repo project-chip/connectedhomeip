@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +15,34 @@
  *    limitations under the License.
  */
 
-#include <lib/support/TimeUtils.h>
+#pragma once
 
-namespace chip {
-namespace System {
-namespace Clock {
+struct AppEvent;
+using EventHandler = void (*)(const AppEvent &);
 
-CHIP_ERROR InitClock_RealTime();
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_Timer = 0,
+        kEventType_TurnOn,
+        kEventType_Install,
+    };
 
-} // namespace Clock
-} // namespace System
-} // namespace chip
+    uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } ClusterEvent;
+    };
+
+    EventHandler Handler;
+};
