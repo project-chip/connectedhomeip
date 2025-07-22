@@ -110,6 +110,7 @@ public:
 #endif
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
+    void InitiateFactoryReset(bool reboot) override;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     void NotifyOfAdvertisementStart() override;
 #else
