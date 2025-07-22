@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabThreadType
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
@@ -37,6 +37,14 @@ from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
 from .target import BuildTarget, TargetPart
+
+
+class BuildTargetCommon(BuildTarget):
+    """Target builder with common modifiers."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.AppendModifier('no-debug', debug=False)
 
 
 def BuildHostTestRunnerTarget():
@@ -366,7 +374,7 @@ def BuildNuttXTarget():
 
 
 def BuildAndroidTarget():
-    target = BuildTarget('android', AndroidBuilder)
+    target = BuildTargetCommon('android', AndroidBuilder)
 
     # board
     target.AppendFixedTargets([
@@ -397,9 +405,6 @@ def BuildAndroidTarget():
         TargetPart('virtual-device-app',
                    app=AndroidApp.VIRTUAL_DEVICE_APP),
     ])
-
-    # Modifiers
-    target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
 
     return target
 

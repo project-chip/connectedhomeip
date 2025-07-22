@@ -127,31 +127,17 @@ class AndroidApp(Enum):
             return None
 
 
-class AndroidProfile(Enum):
-    RELEASE = auto()
-    DEBUG = auto()
-
-    @property
-    def ProfileName(self):
-        if self == AndroidProfile.RELEASE:
-            return 'release'
-        elif self == AndroidProfile.DEBUG:
-            return 'debug'
-        else:
-            raise Exception('Unknown profile type: %r' % self)
-
-
 class AndroidBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
                  board: AndroidBoard,
                  app: AndroidApp,
-                 profile: AndroidProfile = AndroidProfile.DEBUG):
+                 debug=True):
         super(AndroidBuilder, self).__init__(root, runner)
         self.board = board
         self.app = app
-        self.profile = profile
+        self.debug = debug
 
     def validate_build_environment(self):
         for k in ["ANDROID_NDK_HOME", "ANDROID_HOME"]:
@@ -361,6 +347,7 @@ class AndroidBuilder(Builder):
             gn_args["target_cpu"] = self.board.TargetCpuName()
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
+            gn_args["is_debug"] = self.debug
             if exampleName == "chip-test":
                 gn_args["chip_build_test_static_libraries"] = False
 
@@ -372,8 +359,6 @@ class AndroidBuilder(Builder):
 
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
-            if self.profile != AndroidProfile.DEBUG:
-                gn_args["is_debug"] = False
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
@@ -573,7 +558,7 @@ class AndroidBuilder(Builder):
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
-            if (self.profile != AndroidProfile.DEBUG):
+            if not self.debug:
                 self.stripSymbols()
 
     def build_outputs(self):
