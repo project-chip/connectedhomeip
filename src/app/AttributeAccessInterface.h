@@ -21,6 +21,7 @@
 #include <app/AttributeReportBuilder.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <lib/core/CHIPError.h>
 
 /**
@@ -51,7 +52,7 @@ public:
     /**
      * Callback for reading attributes.
      *
-     * @param [in] aPath indicates which exact data is being read.
+     * @param [in] aRequest indicates which exact data is being read along with attributes of how data is being read.
      * @param [in] aEncoder the AttributeValueEncoder to use for encoding the
      *             data.
      *
@@ -65,6 +66,17 @@ public:
      *    this case, Ember attribute access will happen for the read. This may
      *    involve reading from the attribute store or external attribute
      *    callbacks.
+     */
+    virtual CHIP_ERROR Read(const DataModel::ReadAttributeRequest & aRequest, AttributeValueEncoder & aEncoder)
+    {
+        return Read(aRequest.path, aEncoder);
+    }
+
+    /**
+     * A simpler version of Read(const ReadAttributeRequest & request, AttributeValueEncoder & aEncoder)
+     * which takes simply the path being read, for backwards compatibility.
+     *
+     * @param [in] aPath indicates which exact data is being read.
      */
     virtual CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
 

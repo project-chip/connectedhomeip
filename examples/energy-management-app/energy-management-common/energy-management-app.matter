@@ -1151,6 +1151,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2969,9 +2970,11 @@ endpoint 1 {
     callback attribute supplyState;
     callback attribute faultState;
     callback attribute chargingEnabledUntil;
+    callback attribute dischargingEnabledUntil;
     callback attribute circuitCapacity;
     callback attribute minimumChargeCurrent;
     callback attribute maximumChargeCurrent;
+    callback attribute maximumDischargeCurrent;
     callback attribute userMaximumChargeCurrent;
     callback attribute randomizationDelayWindow;
     callback attribute nextChargeStartTime;
@@ -2979,9 +2982,13 @@ endpoint 1 {
     callback attribute nextChargeRequiredEnergy;
     callback attribute nextChargeTargetSoC;
     callback attribute approximateEVEfficiency;
+    callback attribute stateOfCharge;
+    callback attribute batteryCapacity;
+    callback attribute vehicleID;
     callback attribute sessionID;
     callback attribute sessionDuration;
     callback attribute sessionEnergyCharged;
+    callback attribute sessionEnergyDischarged;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
