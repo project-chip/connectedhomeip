@@ -154,7 +154,8 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     CHIP_ERROR err = RemoveExpiredSuggestions(delegate);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to RemoveExpiredSuggestions at endpoint %u with error: %" CHIP_ERROR_FORMAT, endpoint, err.Format());
+        ChipLogError(Zcl, "Failed to RemoveExpiredSuggestions at endpoint %u with error: %" CHIP_ERROR_FORMAT, endpoint,
+                     err.Format());
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
@@ -181,7 +182,8 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to AppendToThermostatSuggestionsList at endpoint %u with error: %" CHIP_ERROR_FORMAT, endpoint, err.Format());
+        ChipLogError(Zcl, "Failed to AppendToThermostatSuggestionsList at endpoint %u with error: %" CHIP_ERROR_FORMAT, endpoint,
+                     err.Format());
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
@@ -214,7 +216,8 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
 
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList at endpoint %u with uniqueID: %u status:" ChipLogFormatIMStatus,
+        ChipLogError(Zcl,
+                     "Failed to RemoveFromThermostatSuggestionsList at endpoint %u with uniqueID: %u status:" ChipLogFormatIMStatus,
                      endpoint, commandData.uniqueID, ChipLogValueIMStatus(status));
         commandObj->AddStatus(commandPath, status);
         return true;
