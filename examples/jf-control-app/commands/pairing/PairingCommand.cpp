@@ -727,6 +727,8 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             if (!call.active())
             {
                 ChipLogError(JointFabric, "RPC: OwnershipTransfer Call Error");
+                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                return;
                 // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
             }
 
