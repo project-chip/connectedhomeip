@@ -266,7 +266,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
             // secure state requires the closure to meet all of the following conditions based on feature support:
             // If the Positioning feature is supported, then the Position field of OverallCurrentState is FullyClosed.
             // If the MotionLatching feature is supported, then the Latch field of OverallCurrentState is True.
-    
+
             if (mConformance.HasFeature(Feature::kPositioning))
             {
                 VerifyOrReturnError(incomingOverallCurrentState.position.HasValue() && !incomingOverallCurrentState.position.Value().IsNull(),
