@@ -45,7 +45,7 @@ declare chip_mdns=minimal
 declare chip_case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
-declare install_pytest_requirements=yes
+declare install_pytest_deps=yes
 declare install_jupyterlab=no
 declare -a extra_packages
 declare -a extra_gn_args
@@ -78,7 +78,7 @@ Input Options:
                                                             Defaults to $clean_virtual_env.
   --include_pytest_deps  <yes|no>                           Install requirements.txt for running scripts/tests and
                                                             src/python_testing scripts.
-                                                            Defaults to $install_pytest_requirements.
+                                                            Defaults to $install_pytest_deps.
   -j, --jupyter-lab                                         Install jupyterlab requirements.
   -E, --extra_packages PACKAGE                              Install extra Python packages from PyPI.
                                                             May be specified multiple times.
@@ -100,16 +100,16 @@ while (($#)); do
         --enable_ble | -b)
             enable_ble=$2
             if [[ "$enable_ble" != "true" && "$enable_ble" != "false" ]]; then
-                echo "enable_ble should have a true/false value, not '$enable_ble'"
-                exit
+                echo "Error: --enable_ble/-b should have a true/false value, not '$enable_ble'" >&2
+                exit 1
             fi
             shift
             ;;
         --enable_wifi_paf | -p)
             declare wifi_paf_arg="$2"
             if [[ "$wifi_paf_arg" != "true" && "$wifi_paf_arg" != "false" ]]; then
-                echo "enable_wifi_paf should have a true/false value, not '$wifi_paf_arg'"
-                exit
+                echo "Error: --enable_wifi_paf/-p should have a true/false value, not '$wifi_paf_arg'" >&2
+                exit 1
             fi
             wifi_paf_config="chip_device_config_enable_wifipaf=$wifi_paf_arg"
             shift
@@ -117,24 +117,24 @@ while (($#)); do
         --enable_ipv4 | -4)
             enable_ipv4=$2
             if [[ "$enable_ipv4" != "true" && "$enable_ipv4" != "false" ]]; then
-                echo "enable_ipv4 should have a true/false value, not '$enable_ipv4'"
-                exit
+                echo "Error: --enable_ipv4/-4 should have a true/false value, not '$enable_ipv4'" >&2
+                exit 1
             fi
             shift
             ;;
         --enable_webrtc | -w)
             enable_webrtc=$2
             if [[ "$enable_webrtc" != "true" && "$enable_webrtc" != "false" ]]; then
-                echo "enable_webrtc should have a true/false value, not '$enable_webrtc'"
-                exit
+                echo "Error: --enable_webrtc/-w should have a true/false value, not '$enable_webrtc'" >&2
+                exit 1
             fi
             shift
             ;;
         --chip_detail_logging | -d)
             chip_detail_logging=$2
             if [[ "$chip_detail_logging" != "true" && "$chip_detail_logging" != "false" ]]; then
-                echo "chip_detail_logging should have a true/false value, not '$chip_detail_logging'"
-                exit
+                echo "Error: --chip_detail_logging/-d should have a true/false value, not '$chip_detail_logging'" >&2
+                exit 1
             fi
             shift
             ;;
@@ -153,16 +153,16 @@ while (($#)); do
         --clean_virtual_env | -c)
             clean_virtual_env=$2
             if [[ "$clean_virtual_env" != "yes" && "$clean_virtual_env" != "no" ]]; then
-                echo "clean_virtual_env should have a yes/no value, not '$clean_virtual_env'"
-                exit
+                echo "Error: --clean_virtual_env/-c should have a yes/no value, not '$clean_virtual_env'" >&2
+                exit 1
             fi
             shift
             ;;
         --include_pytest_deps)
-            install_pytest_requirements=$2
-            if [[ "$install_pytest_requirements" != "yes" && "$install_pytest_requirements" != "no" ]]; then
-                echo "install_pytest_requirements should have a yes/no value, not '$install_pytest_requirements'"
-                exit
+            install_pytest_deps=$2
+            if [[ "$install_pytest_deps" != "yes" && "$install_pytest_deps" != "no" ]]; then
+                echo "Error: --include_pytest_deps should have a yes/no value, not '$install_pytest_deps'" >&2
+                exit 1
             fi
             shift
             ;;
@@ -188,7 +188,7 @@ while (($#)); do
         --enable_pw_rpc | -pw)
             enable_pw_rpc=$2
             if [[ "$enable_pw_rpc" != "true" && "$enable_pw_rpc" != "false" ]]; then
-                echo "enable_pw_rpc should have a true/false value, not '$enable_pw_rpc'"
+                echo "Error: --enable_pw_rpc/-pw should have a true/false value, not '$enable_pw_rpc'" >&2
                 exit 1
             fi
             shift
@@ -280,7 +280,7 @@ WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 # Add the matter_testing_infrastructure wheel
 WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing*.whl)
 
-if [ "$install_pytest_requirements" = "yes" ]; then
+if [ "$install_pytest_deps" = "yes" ]; then
     # Add wheels with YAML testing support.
     WHEEL+=(
         # Add matter-idl as well as matter-yamltests depends on it.
@@ -321,7 +321,7 @@ if [ -n "$install_virtual_env" ]; then
 
     "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/setup/requirements.build.txt"
 
-    if [ "$install_pytest_requirements" = "yes" ]; then
+    if [ "$install_pytest_deps" = "yes" ]; then
         echo_blue "Installing python test dependencies ..."
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
