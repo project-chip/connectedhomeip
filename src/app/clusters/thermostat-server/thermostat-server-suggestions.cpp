@@ -47,14 +47,14 @@ CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
 
     uint32_t currentMatterEpochTimestampInSeconds = 0;
     CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
 
     for (int i = static_cast<int>(delegate->GetNumberOfThermostatSuggestions() - 1); i >= 0; i--)
     {
 
         ThermostatSuggestionStructWithOwnedMembers suggestion;
         err = delegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        ReturnErrorOnFailure(err);
 
         if (suggestion.GetExpirationTime() <= Seconds32(currentMatterEpochTimestampInSeconds))
         {
