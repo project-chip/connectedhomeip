@@ -90,6 +90,8 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     if (true) // Set this to false for debug purpose
     {
+        clipInfo.mHasAudio    = true;
+        clipInfo.mHasVideo    = true;
         clipInfo.mUrl         = transportOptions.url.data();
         clipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
         if (transportOptions.triggerOptions.maxPreRollLen.HasValue())
@@ -328,7 +330,13 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     }
 }
 
-void PushAVTransport::setTransportStatus(TransportStatusEnum status)
+void PushAVTransport::SetTLSCertPath(std::string rootCert, std::string devCert, std::string devKey)
+{
+    mCertPath.mRootCert = rootCert;
+    mCertPath.mDevCert  = devCert;
+    mCertPath.mDevKey   = devKey;
+}
+void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
 {
     if (mTransportStatus == status)
     {
@@ -340,16 +348,7 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
     if (status == TransportStatusEnum::kActive)
     {
         ChipLogProgress(Camera, "PushAVTransport transport status changed to active");
-        mCanSendVideo = true;
-        mCanSendAudio = true;
 
-        clipInfo.mHasVideo = true;
-        clipInfo.mHasAudio = true;
-
-        // TODO Fetch these values from TLS Cluster
-        mCertPath.mRootCert = "/tmp/pavstest/certs/server/root.pem";
-        mCertPath.mDevCert  = "/tmp/pavstest/certs/device/dev.pem";
-        mCertPath.mDevKey   = "/tmp/pavstest/certs/device/dev.key";
         uploader            = std::make_unique<PushAVUploader>(mCertPath);
         uploader->Start();
         InitializeRecorder();
@@ -358,9 +357,14 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
         {
             recorder->Start();
             mStreaming = true;
+            if (IsStreaming())
+            {
+                ChipLogProgress(Camera, "Ready to stream");
+            }
         }
         else
         {
+            // Check if activationTime is set (non-default)
             if (recorder->mClipInfo.activationTime == std::chrono::steady_clock::time_point())
             {
                 ChipLogProgress(Camera, "No active trigger to start recording");
@@ -388,9 +392,13 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
     }
     else if (status == TransportStatusEnum::kInactive)
     {
+        ChipLogProgress(Camera, "PushAVTransport transport status change requested to inactive");
+        mStreaming    = false; // Stop streaming
         mCanSendVideo = false;
         mCanSendAudio = false;
         recorder.reset();
+        ChipLogError(Camera, "Recorder destruction done");
+        InitializeRecorder();
         uploader.reset();
 
         ChipLogProgress(Camera, "PushAVTransport transport status changed to inactive");
@@ -399,7 +407,18 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
 
 bool PushAVTransport::IsStreaming()
 {
-    return (mStreaming && (mTransportStatus == TransportStatusEnum::kActive));
+    if (mStreaming && (mTransportStatus == TransportStatusEnum::kActive))
+    {
+        mCanSendVideo = true;
+        mCanSendAudio = true;
+        return true;
+    }
+    else
+    {
+        mCanSendVideo = false;
+        mCanSendAudio = false;
+        return false;
+    }
 }
 
 bool PushAVTransport::CanSendPacketsToRecorder()

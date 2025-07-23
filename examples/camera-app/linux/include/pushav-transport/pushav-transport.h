@@ -66,12 +66,12 @@ public:
     uint16_t GetPreRollLength();
 
     // Set Transport status
-    void setTransportStatus(TransportStatusEnum status);
+    void SetTransportStatus(TransportStatusEnum status);
 
     void TriggerTransport(TriggerActivationReasonEnum activationReason);
 
     // Get Transport status
-    TransportStatusEnum getTransportStatus() { return mTransportStatus; }
+    bool GetTransportStatus() { return (mTransportStatus == TransportStatusEnum::kInactive); } // 0:Active 1:Inactive
 
     void ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions, AudioStreamStruct mAudioStreamParams,
                                    VideoStreamStruct mVideoStreamParams);
@@ -83,6 +83,7 @@ public:
     void InitializeRecorder();
     bool CanSendPacketsToRecorder();
     void readFromFile(char * filename, uint8_t ** videoBuffer, size_t * videoBufferBytes);
+    void SetTLSCertPath(std::string rootCert, std::string devCert, std::string devKey);
 
 private:
     bool isRecorderInitialized                   = false;
