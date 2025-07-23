@@ -69,8 +69,6 @@ class MdnsDiscovery:
 
     DISCOVERY_TIMEOUT_SEC = 15
 
-    ip_version = IPVersion.All
-
     def __init__(self, verbose_logging: bool = False):
         """
         Initializes the MdnsDiscovery instance.
@@ -92,7 +90,7 @@ class MdnsDiscovery:
         self.interfaces = self._get_ipv6_addresses()
 
         # An instance of Zeroconf to manage mDNS operations.
-        self._azc = AsyncZeroconf(ip_version=self.ip_version, interfaces=self.interfaces)
+        self._azc = AsyncZeroconf(interfaces=self.interfaces)
 
         # A dictionary to store discovered services.
         self._discovered_services = {}
@@ -260,7 +258,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'SRV', service name '{service_name}'")
 
-        async with AsyncZeroconf(ip_version=self.ip_version) as azc:
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             mdns_service_info = None
 
             # Adds service listener
@@ -327,7 +325,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'TXT', service name '{service_name}'")
 
-        async with AsyncZeroconf(ip_version=self.ip_version) as azc:
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             mdns_service_info = None
 
             # Adds service listener
@@ -389,7 +387,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'AAAA',  hostname '{hostname}'")
 
-        async with AsyncZeroconf(ip_version=self.ip_version) as azc:
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             # Perform AAAA query
             addr_resolver = AddressResolverIPv6(server=hostname)
 
@@ -402,7 +400,7 @@ class MdnsDiscovery:
                 return None
 
             # Get IPv6 addresses
-            ipv6_addresses = addr_resolver.ip_addresses_by_version(version=self.ip_version)
+            ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
             if ipv6_addresses:
                 quada_records: list[QuadaRecord] = [
                     QuadaRecord.build(ipv6)
@@ -671,7 +669,7 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        async with AsyncZeroconf(ip_version=self.ip_version) as azc:
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             mdns_service_info = None
             discovery_timeout_sec = 3
 
