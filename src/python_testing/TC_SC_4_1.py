@@ -34,10 +34,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import ipaddress
 import logging
 import re
-from asyncio import sleep
 from typing import Any
 
 import chip.clusters as Clusters
@@ -99,27 +97,10 @@ class TC_SC_4_1(MatterBaseTest):
 
     @staticmethod
     def is_valid_dns_sd_instance_name(name: str) -> bool:
-        """
-        Validates that the DNS-SD instance name is a 64-bit randomly selected ID,
-        expressed as a 16-character hexadecimal string using capital letters.
-
-        Args:
-            name (str): The DNS-SD instance name to validate.
-
-        Returns:
-            bool: True if valid, False otherwise.
-        """
         return bool(re.fullmatch(r'[A-F0-9]{16}', name))
 
     @staticmethod
     def is_valid_hostname(hostname: str) -> bool:
-        """ Verifies that the hostname is derived from a 48-bit or 64-bit MAC address,
-        expressed as a 12-character or 16-character uppercase hexadecimal string.
-        Args:
-            hostname (str): The hostname to verify.
-        Returns:
-            bool: True if the hostname is valid, False otherwise.
-        """
         # Remove '.local' suffix if present
         hostname = hostname.rstrip('.')
         if hostname.endswith('.local'):
@@ -165,10 +146,7 @@ class TC_SC_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_4_1(self):
-        cluster = Clusters.Objects.IcdManagement
-        attr = cluster.Attributes
         long_discriminator = 3840
-        short_discriminator = 15
         self.endpoint = self.get_endpoint(default=1)
         self.endpoint = 1
         active_mode_threshold_ms = None

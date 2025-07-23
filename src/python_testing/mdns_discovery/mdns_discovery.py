@@ -793,7 +793,7 @@ class MdnsDiscovery:
 
         if not results:
             # No usable IPv6, fallback to Zeroconf default
-            logger.info(f"\n\nDefaulting to InterfaceChoice.All\n")
+            logger.info("\n\nDefaulting to InterfaceChoice.All\n")
             return InterfaceChoice.All
 
         logger.info(f"\n\nDiscovered IPv6 addresses: {results}\n")
