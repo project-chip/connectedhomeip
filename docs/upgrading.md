@@ -156,7 +156,7 @@ Changes for implementation:
 
 -   Old
 
-```cpps
+```cpp
     for (auto && cmd : {
              Disable::Id,
              EnableCharging::Id,
