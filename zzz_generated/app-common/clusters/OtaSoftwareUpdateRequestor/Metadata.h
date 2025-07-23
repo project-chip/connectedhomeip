@@ -43,7 +43,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(UpdateStateProgress::I
 namespace Commands {
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceOTAProvider::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+                                                                Access::Privilege::kAdminister);
 } // namespace AnnounceOTAProvider
 
 } // namespace Commands
