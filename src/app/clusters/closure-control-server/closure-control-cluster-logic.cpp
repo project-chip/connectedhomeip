@@ -260,7 +260,8 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        // SecureState can only be true if the closure meets the required conditions for a secure state, preventing unauthorized or undetectable access.
+        // SecureState can only be true if the closure meets the required conditions for a secure state, preventing unauthorized or
+        // undetectable access.
         if (!incomingOverallCurrentState.secureState.IsNull() && incomingOverallCurrentState.secureState.Value())
         {
             // secure state requires the closure to meet all of the following conditions based on feature support:
@@ -269,7 +270,8 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
 
             if (mConformance.HasFeature(Feature::kPositioning))
             {
-                VerifyOrReturnError(incomingOverallCurrentState.position.HasValue() && !incomingOverallCurrentState.position.Value().IsNull(),
+                VerifyOrReturnError(incomingOverallCurrentState.position.HasValue() &&
+                                        !incomingOverallCurrentState.position.Value().IsNull(),
                                     CHIP_ERROR_INVALID_ARGUMENT);
                 VerifyOrReturnError(incomingOverallCurrentState.position.Value().Value() == CurrentPositionEnum::kFullyClosed,
                                     CHIP_ERROR_INVALID_ARGUMENT);
@@ -277,7 +279,8 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
 
             if (mConformance.HasFeature(Feature::kMotionLatching))
             {
-                VerifyOrReturnError(incomingOverallCurrentState.latch.HasValue() && !incomingOverallCurrentState.latch.Value().IsNull(),
+                VerifyOrReturnError(incomingOverallCurrentState.latch.HasValue() &&
+                                        !incomingOverallCurrentState.latch.Value().IsNull(),
                                     CHIP_ERROR_INVALID_ARGUMENT);
                 VerifyOrReturnError(incomingOverallCurrentState.latch.Value().Value() == true, CHIP_ERROR_INVALID_ARGUMENT);
             }

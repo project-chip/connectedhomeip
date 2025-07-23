@@ -813,7 +813,7 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSecureStateWithPos
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
         GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), NullOptional,
-                                    NullOptional, DataModel::MakeNullable(true)));
+                                   NullOptional, DataModel::MakeNullable(true)));
     EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
 
     DataModel::Nullable<GenericOverallCurrentState> readValue;
@@ -832,8 +832,7 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSecureStateWithMot
     mockContext.ResetReportedAttributeId();
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
-        GenericOverallCurrentState(NullOptional, Optional(false),
-                                    NullOptional, DataModel::MakeNullable(true)));
+        GenericOverallCurrentState(NullOptional, Optional(false), NullOptional, DataModel::MakeNullable(true)));
     EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
 
     DataModel::Nullable<GenericOverallCurrentState> readValue;
@@ -852,8 +851,8 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidSecureStateWithPosit
     mockContext.ResetReportedAttributeId();
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
-        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), NullOptional,
-                                    NullOptional, DataModel::MakeNullable(true)));
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), NullOptional, NullOptional,
+                                   DataModel::MakeNullable(true)));
     EXPECT_NE(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
 
     DataModel::Nullable<GenericOverallCurrentState> readValue;
@@ -876,8 +875,7 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidSecureStateWithMotio
     mockContext.ResetReportedAttributeId();
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
-        GenericOverallCurrentState(NullOptional, Optional(true),
-                                    NullOptional, DataModel::MakeNullable(true)));
+        GenericOverallCurrentState(NullOptional, Optional(true), NullOptional, DataModel::MakeNullable(true)));
     EXPECT_NE(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
 
     DataModel::Nullable<GenericOverallCurrentState> readValue;
@@ -901,7 +899,7 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidSecureStateWithPosit
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
         GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(false),
-                                    NullOptional, DataModel::MakeNullable(false)));
+                                   NullOptional, DataModel::MakeNullable(false)));
     EXPECT_NE(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_INVALID_ARGUMENT);
 
     DataModel::Nullable<GenericOverallCurrentState> readValue;
