@@ -50,6 +50,11 @@ enum class OptionalBasicInformationAttributes : uint16_t
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
+    // NOTE: Instead of separate classes, you may choose to use the ::Instance()
+    //       singleton. Constructor is public to save a bit of flash (can use a global variable
+    //       instead of static variables which add thread safety/synchronization)
+    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }) {}
+
     static BasicInformationCluster & Instance();
 
     const BitFlags<OptionalBasicInformationAttributes> & OptionalAttributes() const { return mEnabledOptionalAttributes; }
@@ -71,7 +76,6 @@ public:
     void OnShutDown() override;
 
 private:
-    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }) {}
 
     BitFlags<OptionalBasicInformationAttributes> mEnabledOptionalAttributes;
 

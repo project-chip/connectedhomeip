@@ -254,14 +254,16 @@ void LogIfReadError(AttributeId attributeId, CHIP_ERROR err)
                  ChipLogValueMEI(attributeId), err.Format());
 }
 
+BasicInformationCluster gInstance;
+
+
 } // namespace
-//
+
 namespace chip::app::Clusters {
 
 BasicInformationCluster & BasicInformationCluster::Instance()
 {
-    static BasicInformationCluster instance;
-    return instance;
+    return gInstance;
 }
 
 DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
