@@ -66,7 +66,7 @@ def ValidateTargetNames(context, parameter, values):
     """
     for value in values:
         if ':' in value:
-            value = value.split(':')[0] # skip the directory name
+            value = value.split(':')[0]  # skip the directory name
         if not any(target.StringIntoTargetParts(value.lower())
                    for target in build.targets.BUILD_TARGETS):
             raise click.BadParameter(
