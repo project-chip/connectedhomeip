@@ -570,6 +570,62 @@ void RunAndValidateSequence(AttributeInstructionListType list)
     DataSeriesGenerator generator(&cache.GetBufferedCallback(), list);
     generator.Generate(dataCallbackValidator);
 
+    // Check that iteration of the ClusterStateCache does the right thing.
+    //
+    // The basic idea is that we make a copy of our instruction list, iterate
+    // the cache in some way and remove instructions matching the observed paths
+    // from the copy.  Then we test whether all the things we expected to be
+    // removed got removed.
+    auto NewPathRemovalFunction = [](AttributeInstructionListType & list) {
+        return [&list](const ConcreteAttributePath & path) {
+            size_t sizeBeforeErase = list.size();
+            // Remove all instructions matching the path; there might have been
+            // multiple such instructions, but the path can be present in the
+            // cache only once.
+            list.erase(std::remove_if(
+                           list.begin(), list.end(),
+                           [&path](const AttributeInstruction & instruction) { return instruction.GetAttributePath() == path; }),
+                       list.end());
+
+            // We should have had an instruction for this path.
+            EXPECT_NE(list.size(), sizeBeforeErase);
+
+            return CHIP_NO_ERROR;
+        };
+    };
+
+    {
+        AttributeInstructionListType listCopy(list);
+        ConcreteClusterPath clusterPath = listCopy[0].GetAttributePath();
+        cache.ForEachAttribute(clusterPath.mEndpointId, clusterPath.mClusterId, NewPathRemovalFunction(listCopy));
+
+        // Should have removed all instructions matching this cluster instance.
+        for (auto & instruction : listCopy)
+        {
+            EXPECT_FALSE(clusterPath == instruction.GetAttributePath());
+        }
+    }
+
+    {
+        AttributeInstructionListType listCopy(list);
+        ClusterId cluster = listCopy[0].GetAttributePath().mClusterId;
+        cache.ForEachAttribute(cluster, NewPathRemovalFunction(listCopy));
+
+        // Should have removed all instructions matching this cluster id.
+        for (auto & instruction : listCopy)
+        {
+            EXPECT_NE(instruction.GetAttributePath().mClusterId, cluster);
+        }
+    }
+
+    {
+        AttributeInstructionListType listCopy(list);
+        cache.ForEachAttribute(NewPathRemovalFunction(listCopy));
+
+        // We should have had things in the cache for all our instructions.
+        EXPECT_EQ(listCopy.size(), 0u);
+    }
+
     // Now verify that we would do the right thing when encoding our data
     // versions.
 
