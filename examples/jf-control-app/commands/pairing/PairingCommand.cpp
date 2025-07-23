@@ -726,10 +726,10 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             auto call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
             if (!call.active())
             {
+                // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle as an error.
                 ChipLogError(JointFabric, "RPC: OwnershipTransfer Call Error");
                 SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
                 return;
-                // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
             }
 
             err = WaitForResponse(call);
