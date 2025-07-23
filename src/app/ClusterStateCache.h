@@ -434,13 +434,13 @@ public:
     template <typename IteratorFunc>
     CHIP_ERROR ForEachAttribute(IteratorFunc func) const
     {
-        for (auto & endpointIter : mCache)
+        for (const auto & [endpointId, endpointState] : mCache)
         {
-            for (auto & clusterIter : endpointIter.second)
+            for (const auto & [clusterId, clusterState] : endpointState)
             {
-                for (auto & attributeIter : clusterIter.second.mAttributes)
+                for (const auto & [attributeId, _] : clusterState.mAttributes)
                 {
-                    const ConcreteAttributePath path(endpointIter.first, clusterIter.first, attributeIter.first);
+                    const ConcreteAttributePath path(endpointId, clusterId, attributeId);
                     ReturnErrorOnFailure(func(path));
                 }
             }
