@@ -36,23 +36,27 @@
 import datetime
 import random
 import string
-from typing import Dict, Optional, Set, Union
+from typing import Dict, Optional, Union
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.commissioning import CustomCommissioningParameters
+from chip.testing.conversions import hex_from_bytes
 from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches,
                                          type_matches)
-from chip.tlv import uint
+from chip.tlv import TLVWriter
 from chip.utils import CommissioningBuildingBlocks
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric import ec, rsa, utils
 from cryptography.x509 import CertificateBuilder, random_serial_number
 from cryptography.x509.oid import NameOID
+from ecdsa.curves import curve_by_name
 from mobly import asserts
+from pyasn1.codec.der.decoder import decode as der_decoder
+from pyasn1.error import PyAsn1Error
+from pyasn1_modules import rfc2986, rfc5480
 
 
 class TC_TLSCERT(MatterBaseTest):
@@ -374,24 +378,25 @@ class TC_TLSCERT(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "CR1 opens commissioning window on DUT",
                      "Commissioning window should open"),
-            TestStep(3, "CR2 fully commissions DUT_CE", "DUT should fully commission"),
-            TestStep(4, "Create two distinct, valid, self-signed, DER-encoded x509 certificates"),
-            TestStep(5, "Read ProvisionedClientCertificates"),
-            TestStep(6, "Sends the RemoveClientCertificate command for any certificates found in step 4"),
-            TestStep(7, "Sends the ProvisionClientCertificate command to the TlsCertificateManagement cluster",
+            TestStep(3, "Create two distinct, valid, self-signed, DER-encoded x509 certificates"),
+            TestStep(4, "Read ProvisionedClientCertificates"),
+            TestStep(5, "Sends the RemoveClientCertificate command for any certificates found in step 4"),
+            TestStep(6, "Sends the TLSClientCSR command"),
+            TestStep(7, "Validates the CSR and nonce signature"),
+            TestStep(8, "Sends the ProvisionClientCertificate command to the TlsCertificateManagement cluster",
                      "Verify that the DUT sends ProvisionClientCertificateResponse."),
-            TestStep(8, "Sends another ProvisionClientCertificate command to the TlsCertificateManagement cluster",
+            TestStep(9, "Sends another ProvisionClientCertificate command to the TlsCertificateManagement cluster",
                      "Verify a new ID is generated."),
-            TestStep(9, "Read ProvisionedClientCertificates to from CR1"),
-            TestStep(10, "Read ProvisionedClientCertificates to from CR2"),
-            TestStep(11, "Read ProvisionedClientCertificates to make sure certificates from step 2 and 3 are present"),
-            TestStep(12, "Sends the FindClientCertificate command specifying a CCDID from step 2",
+            TestStep(10, "Read ProvisionedClientCertificates to from CR1"),
+            TestStep(11, "Read ProvisionedClientCertificates to from CR2"),
+            TestStep(12, "Read ProvisionedClientCertificates to make sure certificates from step 2 and 3 are present"),
+            TestStep(13, "Sends the FindClientCertificate command specifying a CCDID from step 2",
                      "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-            TestStep(13, "Sends the FindClientCertificate command specifying a CCDID from step 3",
+            TestStep(14, "Sends the FindClientCertificate command specifying a CCDID from step 3",
                      "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-            TestStep(14, "Sends the FindClientCertificate command specifying null for CCDID",
+            TestStep(15, "Sends the FindClientCertificate command specifying null for CCDID",
                      "Verify the DUT sends FindClientCertificateResponse with both certificates"),
-            TestStep(15, "Sends the RemoveClientCertificate for both certificates added",
+            TestStep(16, "Sends the RemoveClientCertificate for both certificates added",
                      "Verify the DUT sends success status"),
         ]
         return steps
@@ -424,6 +429,8 @@ class TC_TLSCERT(MatterBaseTest):
         self.step(3)
         first_nonce = random.randbytes(32)
         first_cert = self.gen_cert()
+        second_nonce = random.randbytes(32)
+        second_cert = self.gen_cert()
 
         self.step(4)
         attribute_certs = await cr1_cmd.read_tls_cert_attribute(attributes.ProvisionedClientCertificates)
@@ -437,15 +444,59 @@ class TC_TLSCERT(MatterBaseTest):
         self.assert_valid_ccdid(response.ccdid)
 
         self.step(7)
-        await cr1_cmd.send_provision_client_command(ccdid=response.ccdid, certificate=first_cert)
+        # Verify der encoded and PKCS #10 (rfc2986 is PKCS #10) - next two requirements
+        try:
+            temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
+        except PyAsn1Error:
+            asserts.fail("Unable to decode CSR - improperly formatted DER")
+        layer1 = dict(temp)
+
+        # Verify public key is 256 bytes
+        csr = x509.load_der_x509_csr(response.csr)
+        csr_pubkey = csr.public_key()
+        asserts.assert_equal(csr_pubkey.key_size, 256, "Incorrect key size")
+
+        # Verify signature algorithm is ecdsa-with-SHA156
+        signature_algorithm = dict(layer1['signatureAlgorithm'])['algorithm']
+        asserts.assert_equal(signature_algorithm, rfc5480.ecdsa_with_SHA256, "CSR specifies incorrect signature key algorithm")
+
+        # Verify signature is valid
+        asserts.assert_true(csr.is_signature_valid, "Signature is invalid")
+
+        # Verify response.nonce is octet string of length 32
+        try:
+            # response.nonce is an octet string if it can be converted to an int
+            int(hex_from_bytes(response.nonce), 16)
+        except ValueError:
+            asserts.fail("Returned CSR nonce is not an octet string")
+
+        # Verify response.nonce is valid signature
+        nocsr_elements = dict(
+            [
+                (1, response.csr),
+                (2, first_nonce),
+            ]
+        )
+        writer = TLVWriter()
+        writer.put(None, nocsr_elements)
+
+        baselen = curve_by_name("NIST256p").baselen
+        signature_raw_r = int(hex_from_bytes(response.nonce[:baselen]), 16)
+        signature_raw_s = int(hex_from_bytes(response.nonce[baselen:]), 16)
+
+        nocsr_signature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
+        csr_pubkey.verify(signature=nocsr_signature, data=writer.encoding, signature_algorithm=ec.ECDSA(hashes.SHA256()))
 
         self.step(8)
+        await cr1_cmd.send_provision_client_command(ccdid=response.ccdid, certificate=first_cert)
+
+        self.step(9)
         if not self.skip_cr2:
             response2 = await cr2_cmd.send_provision_client_command(ccdid=response.ccdid, certificate=second_cert)
             self.assert_valid_ccdid(response2.caid)
             asserts.assert_not_equal(response.caid, response2.caid, "CCDID should be unique")
 
-        self.step(9)
+        self.step(10)
         attribute_certs = await cr1_cmd.read_tls_cert_attribute(attributes.ProvisionedClientCertificates)
         asserts.assert_greater_equal(len(attribute_certs), 1, "Expected at least 1 certificate")
         found_certs = dict()
@@ -456,7 +507,7 @@ class TC_TLSCERT(MatterBaseTest):
         asserts.assert_in(response.ccdid, found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
         asserts.assert_equal(found_certs[response.ccdid], first_cert, "Expected matching certificate detail")
 
-        self.step(10)
+        self.step(11)
         if not self.skip_cr2:
             attribute_certs = await cr2_cmd.read_tls_cert_attribute(attribute=attributes.ProvisionedClientCertificates)
             asserts.assert_greater_equal(len(attribute_certs), 1, "Expected at least 1 certificate")
@@ -468,19 +519,19 @@ class TC_TLSCERT(MatterBaseTest):
             asserts.assert_in(response2.ccdid, found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
             asserts.assert_equal(found_certs[response2.ccdid], second_cert, "Expected matching certificate detail")
 
-        self.step(11)
+        self.step(12)
         find_response = await cr1_cmd.send_find_client_command(ccdid=response.ccdid)
         asserts.assert_equal(len(find_response.certificateDetails), 1, "Expected single certificate")
         asserts.assert_equal(find_response.certificateDetails[0].clientCertificate, first_cert)
 
-        self.step(12)
+        self.step(13)
         if not self.skip_cr2:
             find_response2 = await cr2_cmd.send_find_client_command(ccdid=response.ccdid)
             asserts.assert_equal(len(find_response2.certificateDetails), 1, "Expected single certificate")
             asserts.assert_equal(find_response2.certificateDetails[0].clientCertificate,
                                  second_cert, "Expected matching certificate detail")
 
-        self.step(13)
+        self.step(14)
         find_all_response = await cr1_cmd.send_find_client_command()
         asserts.assert_greater_equal(len(find_all_response.certificateDetails), 1, "Expected at least 1 certificate")
         found_certs = dict()
@@ -489,7 +540,7 @@ class TC_TLSCERT(MatterBaseTest):
         asserts.assert_in(response.ccdid, found_certs, "FindClientCertificate should contain provisioned client cert")
         asserts.assert_equal(found_certs[response.ccdid], first_cert, "Expected matching certificate detail")
 
-        self.step(14)
+        self.step(15)
         if not self.skip_cr2:
             find_all_response = await cr2_cmd.send_find_client_command()
             asserts.assert_greater_equal(len(find_all_response.certificateDetails), 1, "Expected at least 1 certificate")
@@ -499,7 +550,7 @@ class TC_TLSCERT(MatterBaseTest):
             asserts.assert_in(response2.ccdid, found_certs, "FindClientCertificate should contain provisioned client cert")
             asserts.assert_equal(found_certs[response2.ccdid], second_cert, "Expected matching certificate detail")
 
-        self.step(15)
+        self.step(16)
         await cr1_cmd.send_remove_client_command(ccdid=response.ccdid)
         if not self.skip_cr2:
             await cr2_cmd.send_remove_client_command(ccdid=response2.ccdid)

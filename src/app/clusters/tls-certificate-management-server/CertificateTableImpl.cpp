@@ -49,6 +49,12 @@ enum class TagCertificate : uint8_t
     kClientCertDetail
 };
 
+enum class NocsrElements : uint8_t
+{
+    kCsr      = 1,
+    kCsrNonce = 2,
+};
+
 enum class CertificateType : uint8_t
 {
     kClient,
@@ -630,9 +636,25 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
     ReturnErrorOnFailure(keyPair.Initialize(Crypto::ECPKeyTarget::ECDSA));
     nextAvailable->certificateId.SetValue(localId);
     nextAvailable->endpoint = mEndpointId;
-    id                      = localId;
 
-    return CHIP_NO_ERROR;
+    id            = localId;
+    size_t csrLen = csr.size();
+    ReturnErrorOnFailure(keyPair.NewCertificateSigningRequest(csr.data(), csrLen));
+    csr.reduce_size(csrLen);
+
+    // Build nocsr_elements_message per spec
+    std::array<uint8_t, 128> nocsrElementsMessage;
+    TLV::TLVWriter writer;
+    writer.Init(MutableByteSpan(nocsrElementsMessage));
+    TLV::TLVType container;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(NocsrElements::kCsr), csr));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(NocsrElements::kCsrNonce), nonce));
+    ReturnErrorOnFailure(writer.EndContainer(container));
+
+    Crypto::P256ECDSASignature signatureBuffer;
+    ReturnErrorOnFailure(keyPair.ECDSA_sign_msg(nocsrElementsMessage.data(), writer.GetLengthWritten(), signatureBuffer));
+    return CopySpanToMutableSpan(signatureBuffer.Span(), nonceSignature);
 }
 
 CHIP_ERROR CertificateTableImpl::UpdateClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, ClientBuffer & buffer,
