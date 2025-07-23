@@ -1072,7 +1072,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     ConcreteCommandPath kFindCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::FindTransport::Id };
     Commands::FindTransport::DecodableType findCommandData;
     // As connectionID is static, the new allocated connectionID will be 2.
-    findCommandData.connectionID.SetValue(DataModel::MakeNullable(allocatedConnectionID));
+    findCommandData.connectionID.SetNonNull(allocatedConnectionID);
 
     server.GetLogic().HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
 
