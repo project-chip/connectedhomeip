@@ -51,6 +51,13 @@ class TC_ACL_2_6(MatterBaseTest):
 
         return max(e.Header.EventNumber for e in events)
 
+    def _validate_event_fields(self, event, expected_change_type, expected_latest_value, fabric_index):
+        asserts.assert_equal(event.changeType, expected_change_type, "Unexpected change type")
+        asserts.assert_equal(event.latestValue, expected_latest_value, "Unexpected latestValue")
+        asserts.assert_equal(event.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
+        asserts.assert_equal(event.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
+        asserts.assert_equal(event.fabricIndex, fabric_index, "FabricIndex should match current fabric index")
+
     # Compare events by their relevant fields instead of string representation
     def event_key(self, event):
         # Extract only the fields we care about for comparison
@@ -180,57 +187,19 @@ class TC_ACL_2_6(MatterBaseTest):
         if force_legacy_encoding:
             asserts.assert_true(len(read_events) == 3, f"Expected 3 events from read, but got {len(read_events)}")
             e1, e2, e3 = read_events
-
             # Event 1: Removed (admin)
-            asserts.assert_equal(
-                e1.changeType,
-                Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
-                "Expected Removed change type")
-            asserts.assert_equal(e1.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
-            asserts.assert_equal(e1.latestValue, acl_entries[0], "LatestValue should match admin ACL entry")
-            asserts.assert_equal(e1.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
-            asserts.assert_equal(e1.fabricIndex, f1, "FabricIndex should be the current fabric index")
-
+            self._validate_event_fields(e1, Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved, acl_entries[0], f1)
             # Event 2: Added (admin)
-            asserts.assert_equal(e2.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, "Expected Added change type")
-            asserts.assert_equal(e2.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
-            asserts.assert_equal(e2.latestValue, acl_entries[0], "LatestValue should match admin ACL entry")
-            asserts.assert_equal(e2.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
-            asserts.assert_equal(e2.fabricIndex, f1, "FabricIndex should be the current fabric index")
-
+            self._validate_event_fields(e2, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, acl_entries[0], f1)
             # Event 3: Added (operate/group)
-            asserts.assert_equal(e3.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, "Expected Added change type")
-            asserts.assert_equal(e3.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
-            asserts.assert_equal(e3.latestValue, acl_entries[1], "LatestValue should match operate/group ACL entry")
-            asserts.assert_equal(e3.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
-            asserts.assert_equal(e3.fabricIndex, f1, "FabricIndex should be the current fabric index")
-
+            self._validate_event_fields(e3, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, acl_entries[1], f1)
         else:
             asserts.assert_true(len(read_events) == 2, f"Expected 2 events from read, but got {len(read_events)}")
-
             e0, e1 = read_events
             # First event: changed for admin
-            asserts.assert_equal(e0.changeType,
-                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
-                                 "Expected Changed change type for first event")
-            asserts.assert_equal(e0.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
-            asserts.assert_equal(e0.latestValue, acl_entries[0], "First event LatestValue should match admin ACL entry")
-            asserts.assert_equal(e0.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
-            asserts.assert_equal(e0.fabricIndex, f1, "FabricIndex should be the current fabric index")
-
+            self._validate_event_fields(e0, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, acl_entries[0], f1)
             # Second event: added for operate/group
-            asserts.assert_equal(e1.changeType,
-                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                                 "Expected Added change type for second event")
-            asserts.assert_equal(e1.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
-            asserts.assert_equal(e1.latestValue, acl_entries[1], "Second event LatestValue should match operate/group ACL entry")
-            asserts.assert_equal(e1.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
-            asserts.assert_equal(e1.fabricIndex, f1, "FabricIndex should be the current fabric index")
+            self._validate_event_fields(e1, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, acl_entries[1], f1)
 
         # Set comparison for debugging
         subscription_event_set = set(self.event_key(e) for e in received_subscription_events)
