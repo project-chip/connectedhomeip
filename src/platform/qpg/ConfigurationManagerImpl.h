@@ -19,7 +19,7 @@
  *    @file
  *          Provides an implementation of the ConfigurationManager object
  *          for Qorvo QPG platforms.
-*/
+ */
 
 #pragma once
 
