@@ -453,7 +453,8 @@ void ConnectivityManagerImpl::DriveAPState()
                 SystemLayer().ScheduleLambda([apTimeout, this] {
                     CHIP_ERROR ret = CHIP_NO_ERROR;
                     ret            = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, this);
-                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed: %" CHIP_ERROR_FORMAT, ret.Format()));
+                    VerifyOrReturn(ret == CHIP_NO_ERROR,
+                                   ChipLogError(DeviceLayer, "StartTimer failed: %" CHIP_ERROR_FORMAT, ret.Format()));
                 });
             }
             else
