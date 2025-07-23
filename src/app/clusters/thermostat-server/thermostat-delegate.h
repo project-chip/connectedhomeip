@@ -192,7 +192,7 @@ public:
     /**
      * @brief Removes a suggestion from the ThermostatSuggestions attribute list maintained by the delegate.
      *        If the index being removed is the current thermostat suggestion, the server should set the CurrentThermostatSuggestion
-     *        attribute to null.
+     *        attribute to null. This API preserves the order of the thermostat suggestion entries during removal.
      *        Note: The caller of this API has the responsibility to mark the relevant attributes dirty.
      *
      * @param[in] indexToRemove The index of the thermostat suggestion to remove from the list.

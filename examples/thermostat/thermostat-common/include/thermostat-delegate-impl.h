@@ -130,7 +130,7 @@ private:
 
     void SetCurrentThermostatSuggestion(size_t index);
 
-    bool FindInList(uint8_t uniqueIDToFind);
+    bool HaveSuggestionWithID(uint8_t uniqueIDToFind);
 
     uint8_t mNumberOfPresets;
 

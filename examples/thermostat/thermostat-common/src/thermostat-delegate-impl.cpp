@@ -355,9 +355,9 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
 {
     uint8_t maxUniqueId = 0;
 
-    for (size_t index = 0; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList); index++)
+    for (auto & suggestion : Span(mThermostatSuggestions, mNextFreeIndexInThermostatSuggestionsList))
     {
-        uint8_t existingUniqueID = mThermostatSuggestions[index].GetUniqueID();
+        uint8_t existingUniqueID = suggestion.GetUniqueID();
         if (existingUniqueID > maxUniqueId)
         {
             maxUniqueId = existingUniqueID;
@@ -369,7 +369,7 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
     // If overflow occurs, check for next available uniqueID.
     if (uniqueID == 0)
     {
-        while (FindInList(uniqueID))
+        while (HaveSuggestionWithID(uniqueID))
         {
             uniqueID++;
             if (uniqueID == UINT8_MAX)
@@ -389,9 +389,9 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
 CHIP_ERROR ThermostatDelegate::StartExpirationTimer(Seconds32 timeout)
 {
     ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
-                    timeoutInSecs.count());
+                    timeout.count());
     mIsExpirationTimerRunning = true;
-    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(timeoutInSecs), TimerExpiredCallback,
+    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(timeout), TimerExpiredCallback,
                                                  static_cast<void *>(this));
 }
 
@@ -475,7 +475,7 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
 
         // Check for the least effective time that is less than the current timestamp.
         Seconds32 effectiveTime = suggestion.GetEffectiveTime();
-        if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentMatterEpochTimestampInSeconds)
+        if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentMatterEpochTimestamp)
         {
             minEffectiveTimeValue           = effectiveTime;
             minEffectiveTimeSuggestionIndex = index;

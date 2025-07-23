@@ -39,6 +39,8 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+namespace {
+
 CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -47,37 +49,19 @@ CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
     CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    for (int i = static_cast<int>(delegate->GetNumberOfThermostatSuggestions() - 1);
-         i >= 0 && delegate->GetNumberOfThermostatSuggestions() > 0; i--)
+    for (int i = static_cast<int>(delegate->GetNumberOfThermostatSuggestions() - 1); i >= 0; i--)
     {
-        ThermostatSuggestionStructWithOwnedMembers suggestion;
 
-        err = delegate->GetThermostatSuggestionAtIndex(i, suggestion);
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            return CHIP_NO_ERROR;
-        }
+        ThermostatSuggestionStructWithOwnedMembers suggestion;
+        err = delegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
         if (suggestion.GetExpirationTime() <= Seconds32(currentMatterEpochTimestampInSeconds))
         {
-            err = delegate->RemoveFromThermostatSuggestionsList(i);
+            err = delegate->RemoveFromThermostatSuggestionsList(static_cast<size_t>(i));
         }
     }
     return err;
-}
-
-void ReEvaluationTimerExpiredCallback(System::Layer * systemLayer, void * appState)
-{
-    auto ctx = static_cast<Delegate *>(appState);
-    if (ctx == nullptr)
-    {
-        ChipLogError(Zcl, "TimerExpiredCallback: Failed to ReEvaluateCurrentSuggestion since context is null");
-        return;
-    }
-
-    RemoveExpiredSuggestions(ctx);
-    ctx->ReEvaluateCurrentSuggestion();
 }
 
 Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueIDToRemove)
@@ -87,7 +71,6 @@ Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueID
     size_t uniqueIDMatchedIndex = 0;
     CHIP_ERROR err              = CHIP_NO_ERROR;
 
-    size_t index = 0;
     for (size_t index = 0; true; ++index)
     {
         ThermostatSuggestionStructWithOwnedMembers suggestion;
@@ -102,13 +85,14 @@ Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueID
             uniqueIDMatchedIndex = index;
             break;
         }
-        index++;
     };
 
     err = delegate->RemoveFromThermostatSuggestionsList(uniqueIDMatchedIndex);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, Status::Failure);
     return Status::Success;
 }
+
+} // anonymous namespace
 
 bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AddThermostatSuggestion::DecodableType & commandData)
@@ -130,7 +114,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     auto delegate       = GetDelegate(endpoint);
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null");
+        ChipLogError(Zcl, "Delegate is null for endpoint %u", endpoint);
         commandObj->AddStatus(commandPath, Status::InvalidInState);
         return true;
     }
@@ -170,7 +154,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     CHIP_ERROR err = RemoveExpiredSuggestions(delegate);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to RemoveExpiredSuggestions with error: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to RemoveExpiredSuggestions at endpoint %u with error: %" CHIP_ERROR_FORMAT, endpoint, err.Format());
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
@@ -179,8 +163,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     err              = delegate->GetUniqueID(uniqueID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to AppendToThermostatSuggestionsList. No UniqueID was not found. error: %" CHIP_ERROR_FORMAT,
-                     err.Format());
+        ChipLogError(Zcl, "Failed to GetUniqueID at endpoint %u with error: %" CHIP_ERROR_FORMAT, endpoint, err.Format());
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
@@ -198,7 +181,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to AppendToThermostatSuggestionsList with error: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Failed to AppendToThermostatSuggestionsList at endpoint %u with error: %" CHIP_ERROR_FORMAT, endpoint, err.Format());
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
@@ -206,7 +189,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ThermostatSuggestions::Id);
 
     // Re-evaluate the current thermostat suggestion.
-    DeviceLayer::SystemLayer().StartTimer(Seconds32(0), ReEvaluationTimerExpiredCallback, reinterpret_cast<void *>(delegate));
+    delegate->ReEvaluateCurrentSuggestion();
 
     Commands::AddThermostatSuggestionResponse::Type response;
     response.uniqueID = uniqueID;
@@ -222,7 +205,7 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
     auto delegate       = GetDelegate(endpoint);
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null");
+        ChipLogError(Zcl, "Delegate is null for endpoint %u", endpoint);
         commandObj->AddStatus(commandPath, Status::InvalidInState);
         return true;
     }
@@ -231,16 +214,17 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
 
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList with uniqueID: %u status:" ChipLogFormatIMStatus,
-                     commandData.uniqueID, ChipLogValueIMStatus(status));
+        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList at endpoint %u with uniqueID: %u status:" ChipLogFormatIMStatus,
+                     endpoint, commandData.uniqueID, ChipLogValueIMStatus(status));
         commandObj->AddStatus(commandPath, status);
         return true;
     }
 
     MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ThermostatSuggestions::Id);
 
-    // Re-evaluate the current thermostat suggestion.
-    DeviceLayer::SystemLayer().StartTimer(Seconds32(0), ReEvaluationTimerExpiredCallback, reinterpret_cast<void *>(delegate));
+    // Remove expired suggestions if any and re-evaluate the current thermostat suggestion.
+    RemoveExpiredSuggestions(delegate);
+    delegate->ReEvaluateCurrentSuggestion();
 
     commandObj->AddStatus(commandPath, Status::Success);
     return true;
