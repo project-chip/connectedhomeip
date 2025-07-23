@@ -100,8 +100,8 @@ class TC_SU_4_1(MatterBaseTest):
                      "Verify that the attribute value is set to TH2 as the default OTA provider for the fabric."),
             TestStep(3, "TH sends a write request for the DefaultOTAProviders Attribute on the second fabric to the DUT. TH3 is set as the default Provider for the fabric.",
                      "Verify that the write operation for the attribute works and DUT does not respond with any errors."),
-            # TestStep(4, "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT."
-            #          "Verify that the attribute value is set to TH2 as the default OTA provider for the first fabric and TH3 for the second fabric.")
+            TestStep(4, "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT."
+                     "Verify that the attribute value is set to TH2 as the default OTA provider for the first fabric and TH3 for the second fabric.")
             # TestStep(5, "TH..."),
             # TestStep(6, "TH..."),
             # TestStep(7, "TH..."),
@@ -146,8 +146,8 @@ class TC_SU_4_1(MatterBaseTest):
         th1 = self.default_controller
         th1_node_id = self.dut_node_id
         th1_fabric_id = th1.fabricId
-        logger.info(f'Step #1 - TH1 NodeID (DUT): {th1_node_id}')
-        logger.info(f'Step #1 - TH1 FabricID: {th1_fabric_id}')
+        logger.info(f'Step #1 - DUT NodeID (OTA Requestor): {th1_node_id}')
+        logger.info(f'Step #1 - TH1 FabricID (Should be Fabric 1): {th1_fabric_id}')
 
         # Read the actual value of DefaultOTAProviders attribute on the DUT (TH1, NodeID=2)
         actual_otap_info = await self.read_single_attribute_check_success(
@@ -180,7 +180,7 @@ class TC_SU_4_1(MatterBaseTest):
         asserts.assert_equal(resp, 0, "Failed to write DefaultOTAProviders attribute")
 
         self.step(2)
-        # Verify DefaultOTAProviders attribute on the DUT (TH1) after write
+        # Verify DefaultOTAProviders attribute on the DUT (TH1) after write (using TH1 on Fabric 1)
         actual_otap_info = await self.read_single_attribute_check_success(
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
@@ -226,78 +226,59 @@ class TC_SU_4_1(MatterBaseTest):
             filter=long_discriminator)
         logger.info(f'Step #3 - TH3 Commissioning response: {resp}')
 
-        # # Establishing TH3 controller
-        # th3_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        # th3_fabric_admin = th3_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th2.fabricId + 1)
-        # self.th3 = th3_fabric_admin.NewController(nodeId=3, useTestCommissioner=True)
+        # Use TH3 controller (already commissioned) to write DefaultOTAProviders on fabric 2
+        # TH3 is the OTA Provider (NodeID=3) for fabric 2
+        provider_th3_for_fabric2 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=th3.nodeId,  # TH3 is the OTA Provider (NodeID=3)
+            endpoint=0,
+            fabricIndex=th3.fabricId    # Fabric ID from TH3
+        )
 
-        # provider_fabric2_th3 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-        #     providerNodeID=3,  # TH3 (OTA Provider) Node ID 3
-        #     endpoint=0,
-        #     fabricIndex=2
-        # )
+        # Update attribute with new providers list  (TH3 for fabric 2)
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider_th3_for_fabric2])
 
-        # default_otap_info = await self.read_single_attribute_check_success(
-        #     cluster=self.cluster_otar,
-        #     attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
-        # logger.info(f'Step #3 - default_otap_info: {default_otap_info}')
+        # Write updated DefaultOTAProviders attribute to DUT (TH1)
+        resp = await th3.WriteAttribute(
+            attributes=[(0, attr)],
+            nodeid=self.dut_node_id,
+        )
+        logger.info(f'Step #3 - Write DefaultOTAProviders response: {resp}')
+        asserts.assert_equal(resp[0].Status, 0, "Failed to write DefaultOTAProviders attribute")
 
-        # # Add second provider (TH3 for fabric 2) to the providers list
-        # providers_list.append(provider_fabric2_th3)
-        # logger.info(f'Step #3 - providers_list added provider_fabric2_th3: {providers_list}')
+        self.step(4)
 
-        # attr_cls = self.cluster_otar.Attributes.DefaultOTAProviders
-        # logger.info(f"DEBUG - Attribute class: {attr_cls}")
-        # logger.info(f"DEBUG - Expected value type: {getattr(attr_cls, 'value_type', 'No value_type attribute')}")
-        # logger.info(f"DEBUG - Attributes/methods of DefaultOTAProviders: {dir(attr_cls)}")
+        # Read the actual value of DefaultOTAProviders attribute on the TH3
+        th3_actual_otap_info = await self.read_single_attribute_check_success(
+            dev_ctrl=th3,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
 
-        # # # Update attribute with new providers list  (TH2 for fabric 1, TH3 for fabric 2)
-        # # attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider_fabric2_th3])
+        # Get the first provider from the list for verification
+        actual_provider = th3_actual_otap_info[0]
+        logger.info(f'Step #4 - Read DefaultOTAProviders attribute on DUT using TH3: {th3_actual_otap_info}')
 
-        # # # Write updated DefaultOTAProviders attribute to DUT (TH1)
-        # # resp = await self.write_single_attribute(
-        # #     attribute_value=attr,
-        # #     endpoint_id=0
-        # # )
-        # # logger.info(f'Step #3 - Write DefaultOTAProviders response with two providers: {resp}')
-        # # asserts.assert_equal(resp, 0, "Failed to write DefaultOTAProviders attribute with two providers")
+        # Verify the actual provider matches the expected OTA Provider (TH3) (NodeID=3)
+        asserts.assert_equal(actual_provider.providerNodeID, provider_th3_for_fabric2.providerNodeID, "Mismatch in providerNodeID")
+        asserts.assert_equal(actual_provider.endpoint, provider_th3_for_fabric2.endpoint, "Mismatch in endpoint")
+        asserts.assert_equal(actual_provider.fabricIndex, provider_th3_for_fabric2.fabricIndex, "Mismatch in fabricIndex")
+        logger.info("Step #4 - DefaultOTAProviders attribute matches expected values.")
 
-        # # 3a - Write provider para fabric 1
-        # attr_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(
-        #     value=[provider_fabric1_th2]
-        # )
-        # resp = await self.write_single_attribute(attribute_value=attr_fabric1, endpoint_id=0)
-        # asserts.assert_equal(resp, 0, "Failed to write provider for fabric 1")
+        # Also verify from TH1 (fabric 1) still have TH2 as is OTA provider
+        th1_actual_otap_info = await self.read_single_attribute_check_success(
+            dev_ctrl=th1,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
 
-        # # 3b - Write provider para fabric 2
-        # attr_fabric2 = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(
-        #     value=[provider_fabric2_th3]
-        # )
-        # resp = await self.write_single_attribute(attribute_value=attr_fabric2, endpoint_id=0)
-        # asserts.assert_equal(resp, 0, "Failed to write provider for fabric 2")
+        actual_provider = th1_actual_otap_info[0]
+        logger.info(f'Step #4 - Read DefaultOTAProviders attribute on DUT using TH1: {th1_actual_otap_info}')
 
-        # # Step 4: Verify both providers are set correctly on DUT (TH1)
-        # self.step(4)
-
-        # default_otap_info = await self.read_single_attribute_check_success(
-        #     cluster=self.cluster_otar,
-        #     attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
-        # logger.info(f'Step #4 - default_otap_info: {default_otap_info}')
-
-        # # Verify that the DefaultOTAProviders attribute list contains two providers
-        # asserts.assert_equal(len(default_otap_info), 2, "DefaultOTAProviders list length mismatch")
-
-        # # Verify the second provider corresponds to TH3 for fabric 2
-        # actual_provider_fabric2 = default_otap_info[1]
-        # logger.info(f'Step #4 - Read DefaultOTAProviders provider for fabric 2 on DUT (TH1): {actual_provider_fabric2}')
-
-        # # Verify the actual provider matches the expected OTA Provider (TH3)
-        # # TH1 = DUT (NodeID=2), TH3 = OTA Provider (NodeID=3)
-        # asserts.assert_equal(actual_provider_fabric2.providerNodeID,
-        #                      provider_fabric2_th3.providerNodeID, "Mismatch in providerNodeID")
-        # asserts.assert_equal(actual_provider_fabric2.endpoint, provider_fabric2_th3.endpoint, "Mismatch in endpoint")
-        # asserts.assert_equal(actual_provider_fabric2.fabricIndex, provider_fabric2_th3.fabricIndex, "Mismatch in fabricIndex")
-        # logger.info("Step #4 - DefaultOTAProviders attribute matches expected providers for fabric 1 (TH2) and fabric 2 (TH3).")
+        # Verify the actual provider matches the expected OTA Provider (TH2) (NodeID=1)
+        asserts.assert_equal(actual_provider.providerNodeID, provider_th2_for_fabric1.providerNodeID,
+                             "Mismatch in providerNodeID (fabric 1)")
+        asserts.assert_equal(actual_provider.endpoint, provider_th2_for_fabric1.endpoint, "Mismatch in endpoint (fabric 1)")
+        asserts.assert_equal(actual_provider.fabricIndex, provider_th2_for_fabric1.fabricIndex,
+                             "Mismatch in fabricIndex (fabric 1)")
+        logger.info("Step #4 - DefaultOTAProviders attribute matches expected values from TH1 view.")
 
         # self.step(5)
         # self.step(6)
