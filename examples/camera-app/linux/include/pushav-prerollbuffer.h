@@ -23,14 +23,14 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <transport.h>
 #include <unordered_map>
 #include <unordered_set>
-
 struct BufferSink
 {
-    std::function<void(const char *, size_t, const std::string &)> sendAudio;
-    std::function<void(const char *, size_t, const std::string &)> sendVideo;
     int64_t requestedPreBufferLengthMs; // 0 means live only
+    int64_t minKeyframeIntervalMs;
+    Transport * transport;
 };
 
 struct PreRollFrame
@@ -45,21 +45,19 @@ struct PreRollFrame
 class PreRollBuffer
 {
 public:
-    PreRollBuffer(int64_t maxPreBufferLengthMs, size_t maxTotalBytes);
+    PreRollBuffer(size_t maxTotalBytes);
     void PushFrameToBuffer(const std::string & streamKey, const char * data, size_t size);
     void RegisterTransportToBuffer(BufferSink * sink, const std::unordered_set<std::string> & streamKeys);
     void DeregisterTransportFromBuffer(BufferSink * sink);
     int64_t NowMs() const;
-    int64_t GetMaxPreBufferLengthMs() const { return maxPreBufferLengthMs; }
 
 private:
     void PushBufferToTransport();
-    void TrimBuffer(std::deque<std::shared_ptr<PreRollFrame>> & buffer);
+    void TrimBuffer();
 
-    int64_t maxPreBufferLengthMs;
     size_t maxTotalBytes;
+    size_t contentBufferSize;
 
     std::unordered_map<std::string, std::deque<std::shared_ptr<PreRollFrame>>> buffers;
-    std::unordered_map<std::string, size_t> bufferSizes;
     std::unordered_map<BufferSink *, std::unordered_set<std::string>> sinkSubscriptions;
 };
