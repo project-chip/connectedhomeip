@@ -28,7 +28,7 @@ class BuildTarget:
         tuple of target name and output directory.
         """
         if ':' in target:
-            name, output_dir = target.split(':')
+            name, output_dir = target.split(':', 1)
         else:
             name, output_dir = target, None
         return BuildTarget(name, output_dir)

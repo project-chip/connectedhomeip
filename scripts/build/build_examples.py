@@ -176,7 +176,7 @@ before running this script.
         ninja_jobs=ninja_jobs, runner=runner
     )
 
-    requested_targets = [build.BuildTarget.From(target) for target in set([t.lower() for t in target])]
+    requested_targets = [build.BuildTarget.From(target) for target in {t.lower() for t in target}]
 
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_link_map_file=enable_link_map_file,
