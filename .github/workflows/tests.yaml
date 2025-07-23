@@ -370,6 +370,14 @@ jobs:
             matrix:
                 build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
+                os: [
+                    macos-13, # 13 - x64
+                    macos-13-xlarge, # 13 - arm64
+                    macos-14, # 14 - arm64
+                    macos-14-large, # 14 - x64
+                    macos-15, # 15 - arm64
+                    macos-15-large # 15 - x64
+                    ]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
@@ -377,7 +385,7 @@ jobs:
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-13
+        runs-on: ${{matrix.os}}
 
         steps:
             - name: Checkout
