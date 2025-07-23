@@ -453,13 +453,16 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
 #endif
 
-    if (se05x_host_gpio_init() != 0) {
+    if (se05x_host_gpio_init() != 0)
+    {
         ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_init function");
         ChipLogError(NotSpecified, "SE05x - Crypto operations offloaded to secure element will fail");
     }
-    else {
+    else
+    {
         ChipLogDetail(Crypto, "SE05x - Turn OFF secure Element");
-        if (se05x_host_gpio_set_value(0) != 0) {
+        if (se05x_host_gpio_set_value(0) != 0)
+        {
             ChipLogError(NotSpecified, "SE05x - Failed to set the GPIO connected to SE05x to low");
         }
     }
@@ -865,7 +868,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     se05x_close_session();
 
     ChipLogDetail(Crypto, "SE05x - De-initialize GPIO after Session Close");
-    if (se05x_host_gpio_deinit() != 0) {
+    if (se05x_host_gpio_deinit() != 0)
+    {
         ChipLogError(NotSpecified, "SE05x - Failed to de-initialize GPIO connected to SE05x");
     }
 

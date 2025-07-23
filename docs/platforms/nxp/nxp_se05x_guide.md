@@ -13,8 +13,8 @@
 
 ## Introduction
 
-The integration of SE05x Secure Element in Matter stack can be used to offload required
-crypto operations of matter to SE05x.
+The integration of SE05x Secure Element in Matter stack can be used to offload
+required crypto operations of matter to SE05x.
 
 The following crypto operations are supported using SE05x,
 
@@ -26,29 +26,28 @@ The following crypto operations are supported using SE05x,
 -   HMAC
 -   Spake2P
 
-
 <a name="supported_platforms"></a>
 
 ## Supported Platforms
 
 The integration of secure element is done with the following platforms
 
-
 ### NXP i.MX 8M Mini EVK
 
-Integration of SE05x with i.MX 8M Mini EVK is demonstrated using the thermostat example.
-Refer [i.MX 8M Mini EVK](nxp_imx8m_linux_examples.md) to set up the build environment.
+Integration of SE05x with i.MX 8M Mini EVK is demonstrated using the thermostat
+example. Refer [i.MX 8M Mini EVK](nxp_imx8m_linux_examples.md) to set up the
+build environment.
 
 #### Hardware connections
 
-- Connections using OM-SE051ARD board :
+-   Connections using OM-SE051ARD board :
 
-    | Signal      | i.MX 8M Pin        | OM-SE051ARD Pin  |
-    |-------------|--------------------|------------------|
-    | I2C SDA     | J801_SDA           | J2_9             |
-    | I2C SCL     | J801_SCL           | J2_10            |
-    | 3V3         | J801_VCC           | J8_4             |
-    | GND         | J801_GND           | J8_7             |
+    | Signal  | i.MX 8M Pin | OM-SE051ARD Pin |
+    | ------- | ----------- | --------------- |
+    | I2C SDA | J801_SDA    | J2_9            |
+    | I2C SCL | J801_SCL    | J2_10           |
+    | 3V3     | J801_VCC    | J8_4            |
+    | GND     | J801_GND    | J8_7            |
 
 
 #### Build the example as
@@ -59,31 +58,37 @@ Refer [i.MX 8M Mini EVK](nxp_imx8m_linux_examples.md) to set up the build enviro
     ninja -C out
 ```
 
-Refer [SE05x Crypto Configurations](#se05x_crypto_configurations) sections to control what crypto operations to be offloaded to SE05x.
+Refer [SE05x Crypto Configurations](#se05x_crypto_configurations) sections to
+control what crypto operations to be offloaded to SE05x.
 
-Refer [SE05x Type Configurations](#se05x_type_configurations) sections to select the correct variant of secure element connected.
+Refer [SE05x Type Configurations](#se05x_type_configurations) sections to select
+the correct variant of secure element connected.
 
 
 ### RW61x
 
-Integration of SE05x with RW61x is demonstrated using the thermostat and all cluster app.
-Refer [RW61x](nxp_rw61x_guide.md) to set up the build environment.
+Integration of SE05x with RW61x is demonstrated using the thermostat and all
+cluster app. Refer [RW61x](nxp_rw61x_guide.md) to set up the build environment.
 
 #### Hardware connections and Building the example with SE05x
 
-Refer [RW61x and SE05x Connection](./nxp_examples_freertos_platforms.md#se05x_secure_element_with_rw61x)
+Refer
+[RW61x and SE05x Connection](./nxp_examples_freertos_platforms.md#se05x_secure_element_with_rw61x)
 
-Refer [SE05x Crypto Configurations](#se05x_crypto_configurations) sections to control what crypto operations to be offloaded to SE05x.
+Refer [SE05x Crypto Configurations](#se05x_crypto_configurations) sections to
+control what crypto operations to be offloaded to SE05x.
 
-Refer [SE05x Type Configurations](#se05x_type_configurations) sections to select the correct variant of secure element connected.
+Refer [SE05x Type Configurations](#se05x_type_configurations) sections to select
+the correct variant of secure element connected.
 
 
 <a name="se05x_crypto_configurations"></a>
 
 ## SE05x Crypto Configurations
 
-Use the config file `src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h` to
-enable / disable offloading required crypto operation on SE05x.
+Use the config file
+`src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h` to enable /
+disable offloading required crypto operation on SE05x.
 
 ```
 /*
@@ -124,7 +129,6 @@ enable / disable offloading required crypto operation on SE05x.
 #define ENABLE_SE05X_DEVICE_ATTESTATION 0
 ```
 
-
 <a name="se05x_type_configurations"></a>
 
 ## SE05x Type Configuration
@@ -157,7 +161,6 @@ SE050E is enabled by default.
 #define SSS_HAVE_APPLET_SE050_E 1
 ```
 
-
 <a name="device_attestation"></a>
 
 # Device attestation
@@ -179,8 +182,7 @@ ninja -C out se05x_dev_attest_key_prov
 ./out/se05x_dev_attest_key_prov
 ```
 
-The example is currently supported for i.MX 8M Mini EVK and RW61x with only GN Build system.
-
+The example is currently supported for i.MX 8M Mini EVK and RW61x.
 
 <a name="scp03"></a>
 
@@ -189,7 +191,9 @@ The example is currently supported for i.MX 8M Mini EVK and RW61x with only GN B
 To enable SCP03 authentication with SE05x, build the example with option
 
 For GN Build system -
+
 ```
 gn gen out --args="chip_se05x_auth=\"scp03\""
 ```
+
 Ensure to enable CMAC (MBEDTLS_CMAC_C) in mbedtls config file used.

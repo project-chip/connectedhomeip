@@ -270,26 +270,29 @@ The complete Border Router guide is located [here](./nxp_otbr_guide.md).
 
 ### Hardware connections
 
-- Connections using OM-SE051ARD board :
+-   Connections using OM-SE051ARD board :
 
-    | Signal      | FRDM-RW612 Pin     | OM-SE051ARD Pin  |
-    |-------------|--------------------|------------------|
-    | I2C SDA     | J1_2               | J2_9             |
-    | I2C SCL     | J1_4               | J2_10            |
-    | 3V3         | J3_8               | J8_4             |
-    | GND         | J3_14              | J8_7             |
+    | Signal  | FRDM-RW612 Pin | OM-SE051ARD Pin |
+    | ------- | -------------- | --------------- |
+    | I2C SDA | J1_2           | J2_9            |
+    | I2C SCL | J1_4           | J2_10           |
+    | 3V3     | J3_8           | J8_4            |
+    | GND     | J3_14          | J8_7            |
 
 ### Build options
 
--   Build the example with below options to offload crypto operations to SE05x using CMAKE configuration :
+-   Build the example with below options to offload crypto operations to SE05x
+    using CMAKE configuration :
 
 ```
 -DCONFIG_CHIP_SE05X=y
 -DCONFIG_CHIP_CRYPTO_PLATFORM=y
 ```
 
-Example  :
-```
-ubuntu@ubuntu-Latitude-5420:~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y -DCONFIG_CHIP_CRYPTO_PLATFORM=y
-```
+Example :
+
+ ```
+ ubuntu@ubuntu-Latitude-5420:~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y -DCONFIG_CHIP_CRYPTO_PLATFORM=y
+ ```
+
 Refer [SE05x](nxp_se05x_guide.md) for more details on configurations of SE05x.

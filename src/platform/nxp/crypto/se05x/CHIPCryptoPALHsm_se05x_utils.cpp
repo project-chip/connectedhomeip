@@ -86,11 +86,11 @@ CHIP_ERROR se05x_session_open(void)
     }
 
     ChipLogDetail(Crypto, "Turn ON SE05x secure element before session open");
-    if (se05x_host_gpio_set_value(1) != 0) {
+    if (se05x_host_gpio_set_value(1) != 0)
+    {
         ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_set_value(1) function");
         return CHIP_ERROR_INTERNAL;
     }
-
 
     memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
 
@@ -139,7 +139,8 @@ CHIP_ERROR se05x_close_session(void)
     }
 
     ChipLogDetail(Crypto, "Turn OFF SE05x secure element after session close");
-    if (se05x_host_gpio_set_value(0) != 0) {
+    if (se05x_host_gpio_set_value(0) != 0)
+    {
         ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_set_value(0) function");
         return CHIP_ERROR_INTERNAL;
     }

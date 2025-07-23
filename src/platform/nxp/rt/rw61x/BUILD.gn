@@ -259,7 +259,9 @@ static_library("nxp_platform") {
   ]
 
   if (nxp_crypto_impl == "se05x") {
-    deps += [ "${chip_root}/src/platform/nxp/crypto/${nxp_crypto_impl}:nxp_crypto_lib", ]
+    deps += [
+      "${chip_root}/src/platform/nxp/crypto/${nxp_crypto_impl}:nxp_crypto_lib",
+    ]
   }
 
   public_configs = [ ":nxp_platform_config" ]

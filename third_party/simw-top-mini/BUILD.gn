@@ -40,8 +40,8 @@ config("se05x_config") {
 
   # defines += ["FLOW_VERBOSE"]
 
-  if (chip_device_platform == "nxp"){
-    if (nxp_platform == "rt/rw61x"){
+  if (chip_device_platform == "nxp") {
+    if (nxp_platform == "rt/rw61x") {
       defines += [
         "AX_EMBEDDED",
         "FRDM_RW612",
@@ -73,7 +73,7 @@ config("se05x_config") {
     include_dirs += [ "repo" ]
   }
 
-  if (chip_device_platform == "nxp"){
+  if (chip_device_platform == "nxp") {
     if (nxp_platform == "rt/rw61x") {
       include_dirs += [
         "${chip_root}/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/board",
@@ -87,6 +87,7 @@ config("se05x_config") {
 
 static_library("se05x") {
   sources = [
+    "repo/demos/se05x_host_gpio/se05x_host_gpio.c",
     "repo/hostlib/hostLib/libCommon/infra/global_platf.c",
     "repo/hostlib/hostLib/libCommon/infra/sm_apdu.c",
     "repo/hostlib/hostLib/libCommon/infra/sm_connect.c",
@@ -111,7 +112,6 @@ static_library("se05x") {
     "repo/sss/src/se05x/fsl_sss_se05x_apis.c",
     "repo/sss/src/se05x/fsl_sss_se05x_mw.c",
     "repo/sss/src/se05x/fsl_sss_se05x_policy.c",
-    "repo/demos/se05x_host_gpio/se05x_host_gpio.c",
   ]
 
   if (chip_se05x_auth == "scp03") {
@@ -149,19 +149,19 @@ static_library("se05x") {
       ]
     }
   }
-  if (chip_device_platform == "nxp"){
-    if (nxp_platform == "rt/rw61x"){
+  if (chip_device_platform == "nxp") {
+    if (nxp_platform == "rt/rw61x") {
       sources += [
-        "repo/hostlib/hostLib/platform/rt/rw61x/i2c_rw612.c",
-        "repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
         "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/drivers/flexcomm/i2c/fsl_i2c.c",
         "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/rtos/freertos/freertos-drivers/flexcomm/i2c/fsl_i2c_freertos.c",
+        "repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
+        "repo/hostlib/hostLib/platform/rt/rw61x/i2c_rw612.c",
       ]
     }
   }
 
-  if (chip_device_platform == "nxp"){
-    if (nxp_platform == "rt/rw61x"){
+  if (chip_device_platform == "nxp") {
+    if (nxp_platform == "rt/rw61x") {
       deps = [ "${chip_root}/third_party/nxp/nxp_matter_support/gn_build:nxp_sdk" ]
     }
   }
