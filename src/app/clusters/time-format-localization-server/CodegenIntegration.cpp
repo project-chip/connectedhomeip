@@ -35,12 +35,12 @@ LazyRegisteredServerCluster<TimeFormatLocalizationCluster> gServer;
 
 }
 
-void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint) 
+void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 {
 
 }
 
-void emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint) 
+void emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
@@ -63,7 +63,7 @@ void emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
     }
 }
 
-void emberAfTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint) 
+void emberAfTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
 {
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
@@ -74,7 +74,7 @@ void emberAfTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
     {
         ChipLogError(AppServer, "TimeFormatLocalization unregister error");
     }
-    
+
     gServer.Destroy();
 }
 
@@ -82,7 +82,7 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
     const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value) {
 
     return Protocols::InteractionModel::Status::Success;
-    
+
 }
 
 void MatterTimeFormatLocalizationPluginServerInitCallback()

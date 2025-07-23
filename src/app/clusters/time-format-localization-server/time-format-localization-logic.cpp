@@ -30,7 +30,7 @@ class AutoReleaseIterator
 {
 public:
     using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
-    
+
     AutoReleaseIterator(Iterator * value) : mIterator(value) {}
     ~AutoReleaseIterator()
     {
@@ -39,10 +39,10 @@ public:
             mIterator->Release();
         }
     }
-    
+
     bool IsValid() const { return mIterator != nullptr; }
     bool Next(TimeFormatLocalization::CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
-    
+
 private:
     Iterator * mIterator;
 };
@@ -75,7 +75,7 @@ void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrPro
     setHourFormat(hourFormat);
 }
 
-CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const 
+CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const
 {
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnValue(provider != nullptr, aEncoder.EncodeEmptyList());
@@ -114,18 +114,18 @@ bool TimeFormatLocalizationLogic::IsSupportedCalendarType(TimeFormatLocalization
         {
             *validCalendar = type;
         }
-        
+
         if (type == reqCalendar)
         {
             found = true;
             break;
         }
     }
-    
+
     return found;
 }
 
-TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveCalendarType() 
+TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveCalendarType()
 {
     return mCalendarType;
 }
@@ -138,7 +138,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFor
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
-    
+
     CHIP_ERROR result = mAttrProvider->WriteValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id},
     {reinterpret_cast<const uint8_t *>(&rHour), sizeof(rHour)});
     if(result == CHIP_NO_ERROR)
@@ -182,13 +182,13 @@ TimeFormatLocalization::HourFormatEnum TimeFormatLocalizationLogic::GetHourForma
     return mHourFormat;
 }
 
-CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) 
+CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     // Ensure capacity just in case
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(3 + DefaultServerCluster::GlobalAttributes().size()));
     // Mandatory attributes
     ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry));
-    
+
     // These attributes depend on the Feature CalendarFormat (CALFMT)
     if(mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {

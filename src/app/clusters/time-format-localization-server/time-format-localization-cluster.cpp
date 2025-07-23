@@ -25,7 +25,7 @@ namespace Clusters {
 TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features) :
 DefaultServerCluster ({endpointId, TimeFormatLocalization::Id}), mLogic(features) { }
 
-CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context) 
+CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
@@ -96,7 +96,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
     }
 }
 
-CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) 
+CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     return mLogic.Attributes(builder);
 }
