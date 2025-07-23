@@ -207,19 +207,30 @@ void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerConte
     VerifyOrReturn(req.caid.IsNull() || req.caid.Value() <= kMaxRootCertId,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
+    DataModel::Nullable<Tls::TLSCAID> foundId;
+    auto lookupResult = mDelegate.LookupRootCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                                 req.certificate, [&](auto & certificate) -> CHIP_ERROR {
+                                                     foundId = certificate.caid;
+                                                     return CHIP_NO_ERROR;
+                                                 });
+    if (lookupResult != CHIP_ERROR_NOT_FOUND && foundId != req.caid)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
+        return;
+    }
+
     ProvisionRootCertificateResponse::Type response;
     auto status = mDelegate.ProvisionRootCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req,
                                               response.caid);
 
-    if (status.IsSuccess())
-    {
-        VerifyOrDieWithMsg(response.caid <= kMaxRootCertId, NotSpecified, "Spec requires CAID to be < kMaxRootCertId");
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    }
-    else
+    if (!status.IsSuccess())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
     }
+
+    VerifyOrDieWithMsg(response.caid <= kMaxRootCertId, NotSpecified, "Spec requires CAID to be < kMaxRootCertId");
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void TlsCertificateManagementServer::HandleFindRootCertificate(HandlerContext & ctx, const FindRootCertificate::DecodableType & req)
@@ -261,13 +272,13 @@ void TlsCertificateManagementServer::HandleLookupRootCertificate(HandlerContext 
                                                                  const LookupRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: LookupRootCertificate");
-    auto result = mDelegate.LookupRootCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
-                                           req.fingerprint, [&](auto & certificate) -> CHIP_ERROR {
-                                               LookupRootCertificateResponse::Type response;
-                                               response.caid = certificate.caid;
-                                               ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-                                               return CHIP_NO_ERROR;
-                                           });
+    auto result = mDelegate.LookupRootCertByFingerprint(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                                        req.fingerprint, [&](auto & certificate) -> CHIP_ERROR {
+                                                            LookupRootCertificateResponse::Type response;
+                                                            response.caid = certificate.caid;
+                                                            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                                            return CHIP_NO_ERROR;
+                                                        });
     if (result == CHIP_ERROR_NOT_FOUND)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
@@ -328,6 +339,18 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
     VerifyOrReturn(!detail.clientCertificate.HasValue() || detail.clientCertificate.Value().size() <= kSpecMaxCertBytes,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
+    DataModel::Nullable<Tls::TLSCCDID> foundId;
+    auto lookupResult = mDelegate.LookupClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                                   detail.clientCertificate.Value(), [&](auto & certificate) -> CHIP_ERROR {
+                                                       foundId = certificate.ccdid;
+                                                       return CHIP_NO_ERROR;
+                                                   });
+    if (lookupResult != CHIP_ERROR_NOT_FOUND && foundId != req.ccdid)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
+        return;
+    }
+
     auto status = mDelegate.ProvisionClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -374,13 +397,14 @@ void TlsCertificateManagementServer::HandleLookupClientCertificate(HandlerContex
                                                                    const LookupClientCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: LookupClientCertificate");
-    auto result = mDelegate.LookupClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
-                                             req.fingerprint, [&](auto & certificate) -> CHIP_ERROR {
-                                                 LookupClientCertificateResponse::Type response;
-                                                 response.ccdid = certificate.ccdid;
-                                                 ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-                                                 return CHIP_NO_ERROR;
-                                             });
+    auto result =
+        mDelegate.LookupClientCertByFingerprint(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                                req.fingerprint, [&](auto & certificate) -> CHIP_ERROR {
+                                                    LookupClientCertificateResponse::Type response;
+                                                    response.ccdid = certificate.ccdid;
+                                                    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                                    return CHIP_NO_ERROR;
+                                                });
     if (result == CHIP_ERROR_NOT_FOUND)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);

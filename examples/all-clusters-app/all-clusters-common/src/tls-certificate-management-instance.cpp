@@ -215,9 +215,9 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::FindRootCert(EndpointId matt
     return loadedCallback(callbackCert->inlineCertificate);
 }
 
-CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                   const ByteSpan & fingerprint,
-                                                                   LoadedRootCertificateCallback loadedCallback) const
+CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCertByFingerprint(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                                const ByteSpan & fingerprint,
+                                                                                LoadedRootCertificateCallback loadedCallback) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
@@ -239,6 +239,16 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCert(EndpointId ma
         }
         return CHIP_ERROR_NOT_FOUND;
     });
+}
+
+CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                   const ByteSpan & certificate,
+                                                                   LoadedRootCertificateCallback loadedCallback) const
+{
+    std::array<uint8_t, chip::Crypto::kSHA1_Hash_Length> fingerprintPayload = { 0 };
+    MutableByteSpan calculatedFingerprint(fingerprintPayload);
+    ReturnErrorOnFailure(Hash_SHA1(certificate.data(), certificate.size(), fingerprintPayload.data()));
+    return LookupRootCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
 CHIP_ERROR TlsCertificateManagementCommandDelegate::RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
@@ -340,9 +350,10 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::FindClientCert(EndpointId ma
     return loadedCallback(callbackCert->inlineCertificate);
 }
 
-CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                     const ByteSpan & fingerprint,
-                                                                     LoadedClientCertificateCallback loadedCallback) const
+CHIP_ERROR
+TlsCertificateManagementCommandDelegate::LookupClientCertByFingerprint(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                       const ByteSpan & fingerprint,
+                                                                       LoadedClientCertificateCallback loadedCallback) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
@@ -363,6 +374,16 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupClientCert(EndpointId 
         }
         return CHIP_ERROR_NOT_FOUND;
     });
+}
+
+CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                     const ByteSpan & certificate,
+                                                                     LoadedClientCertificateCallback loadedCallback) const
+{
+    std::array<uint8_t, chip::Crypto::kSHA1_Hash_Length> fingerprintPayload = { 0 };
+    MutableByteSpan calculatedFingerprint(fingerprintPayload);
+    ReturnErrorOnFailure(Hash_SHA1(certificate.data(), certificate.size(), fingerprintPayload.data()));
+    return LookupClientCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
 CHIP_ERROR TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)

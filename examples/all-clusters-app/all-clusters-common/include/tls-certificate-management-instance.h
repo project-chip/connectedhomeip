@@ -48,7 +48,9 @@ public:
 
     CHIP_ERROR FindRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id,
                             LoadedRootCertificateCallback loadedCallback) const override;
-    CHIP_ERROR LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+    CHIP_ERROR LookupRootCertByFingerprint(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+                                           LoadedRootCertificateCallback loadedCallback) const override;
+    CHIP_ERROR LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & certificate,
                               LoadedRootCertificateCallback loadedCallback) const override;
     CHIP_ERROR RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override;
 
@@ -66,7 +68,9 @@ public:
 
     CHIP_ERROR FindClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id,
                               LoadedClientCertificateCallback loadedCallback) const override;
-    CHIP_ERROR LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+    CHIP_ERROR LookupClientCertByFingerprint(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+                                             LoadedClientCertificateCallback loadedCallback) const override;
+    CHIP_ERROR LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & certificate,
                                 LoadedClientCertificateCallback loadedCallback) const override;
     CHIP_ERROR RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
 

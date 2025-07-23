@@ -214,7 +214,14 @@ public:
      * @param[out] loadedCallback The lambda to execute with the loaded root cert.
      * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
      */
-    virtual CHIP_ERROR LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+    virtual CHIP_ERROR LookupRootCertByFingerprint(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+                                                   LoadedRootCertificateCallback loadedCallback) const = 0;
+
+    /**
+     * @brief Like LookupRootCertByFingerprint except looks up by the certificate instead of fingerprint.
+     * Implementations will generally fingerprint the certificate & delegate.
+     */
+    virtual CHIP_ERROR LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & cert,
                                       LoadedRootCertificateCallback loadedCallback) const = 0;
     /**
      * @brief Removes the root certificate with the given ID
@@ -301,8 +308,16 @@ public:
      * @param[out] loadedCallback The lambda to execute with the loaded client cert.
      * @return NotFound if no mapping is found.
      */
-    virtual CHIP_ERROR LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+    virtual CHIP_ERROR LookupClientCertByFingerprint(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+                                                     LoadedClientCertificateCallback loadedCallback) const = 0;
+
+    /**
+     * @brief Like LookupClientCertByFingerprint except looks up by the certificate instead of fingerprint.
+     * Implementations will generally fingerprint the certificate & delegate.
+     */
+    virtual CHIP_ERROR LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & certificate,
                                         LoadedClientCertificateCallback loadedCallback) const = 0;
+
     /**
      * @brief Removes the client certificate with the given ID
      *
