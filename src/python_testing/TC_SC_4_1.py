@@ -36,7 +36,7 @@
 
 import logging
 import re
-from typing import Any
+from typing import Any, Optional, Union, Tuple
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -54,6 +54,12 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 '''
 
 PICS_MCORE_ROLE_COMMISSIONEE = "MCORE.ROLE.COMMISSIONEE"
+TCP_PICS_STR = "MCORE.SC.TCP"
+ONE_HOUR_IN_MS = 3600000
+MAX_SAT_VALUE = 65535
+MAX_T_VALUE = 6
+LONG_DISCRIMINATOR = 3840
+CM_SUBTYPE = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
 
 class DiscriminatorLength(Enum):
@@ -111,6 +117,16 @@ class TC_SC_4_1(MatterBaseTest):
         return bool(pattern.match(hostname))
 
     @staticmethod
+    def get_vendor_subtype(subtypes: list[str]) -> Optional[str]:
+        pattern = re.compile(rf'^(_V(\d+))\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}$')
+        return next((s for s in subtypes if pattern.fullmatch(s)), None)
+
+    @staticmethod
+    def get_devtype_subtype(subtypes: list[str]) -> Optional[str]:
+        pattern = re.compile(rf'^(_T([1-9]\d*))\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}$')
+        return next((s for s in subtypes if pattern.fullmatch(s)), None)
+
+    @staticmethod
     def is_valid_discriminator_subtype(
         subtypes: list[str],
         discriminator_length: DiscriminatorLength
@@ -128,15 +144,57 @@ class TC_SC_4_1(MatterBaseTest):
         return False
 
     @staticmethod
-    def is_valid_vendor_subtype(subtypes: list[str]) -> bool:
-        pattern = re.compile(rf'^(_V(\d+))\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}$')
+    def is_valid_vendor_subtype(subtype: str) -> bool:
+        return 0 <= int(subtype.split('_V')[1].split('.')[0]) <= 65535
 
-        for subtype in subtypes:
-            match = pattern.fullmatch(subtype)
-            if match and 0 <= int(match.group(2)) <= 65535:
-                return True
+    @staticmethod
+    def is_valid_devtype_subtype(subtype: str) -> bool:
+        return int(subtype.split('_T')[1].split('.')[0]) >= 1
 
-        return False
+    @staticmethod
+    def verify_d_key(txt_record: dict) -> bool:
+        value = txt_record.get('D')
+        return value is not None and value.isdigit() and 1 <= int(value) <= 9999 and not value.startswith('0')
+
+    @staticmethod
+    def is_valid_key_decimal_value(input_value, max_value: int) -> Union[bool, Tuple[bool, str]]:
+        try:
+            input_float = float(input_value)
+            input_int = int(input_float)
+
+            if str(input_value).startswith("0") and input_int != 0:
+                return (False, f"Input ({input_value}) has leading zeros.")
+
+            if input_float != input_int:
+                return (False, f"Input ({input_value}) is not an integer.")
+
+            if input_int <= max_value:
+                return (True, f"Input ({input_value}) is valid.")
+            else:
+                return (False, f"Input ({input_value}) exceeds the allowed value {max_value}.")
+        except ValueError:
+            return (False, f"Input ({input_value}) is not a valid decimal number.")
+
+    @staticmethod
+    def is_valid_vp_key(value: str) -> bool:
+        parts = value.split('+')
+
+        if not (1 <= len(parts) <= 2):
+            return False
+
+        try:
+            vendor_id = int(parts[0])
+            if not (0 <= vendor_id <= 65535):
+                return False
+
+            if len(parts) == 2:
+                product_id = int(parts[1])
+                if not (0 <= product_id <= 65535):
+                    return False
+
+            return True
+        except ValueError:
+            return False
 
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
@@ -146,9 +204,7 @@ class TC_SC_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_4_1(self):
-        long_discriminator = 3840
         self.endpoint = self.get_endpoint(default=1)
-        self.endpoint = 1
         active_mode_threshold_ms = None
         supports_icd = False
 
@@ -182,7 +238,7 @@ class TC_SC_4_1(MatterBaseTest):
             nodeid=self.dut_node_id,
             timeout=600,
             iteration=10000,
-            discriminator=long_discriminator,
+            discriminator=LONG_DISCRIMINATOR,
             option=1
         )
 
@@ -216,30 +272,84 @@ class TC_SC_4_1(MatterBaseTest):
                             f"Invalid server hostname: {commissionable_service.server}")
 
         # Get commissionable subtypes
-        sub_types = await mdns.get_commissionable_subtypes(
-            log_output=True,
-        )
+        subtypes = await mdns.get_commissionable_subtypes(log_output=True)
 
         # Validate that the long discriminator commissionable subtype is a 12-bit long discriminator,
         # encoded as a variable-length decimal number in ASCII text, omitting any leading zeros
         asserts.assert_true(
-            self.is_valid_discriminator_subtype(sub_types, DiscriminatorLength.LONG),
+            self.is_valid_discriminator_subtype(subtypes, DiscriminatorLength.LONG),
             "Invalid long discriminator commissionable subtype or not present."
         )
 
         # Validate that the short discriminator commissionable subtype is a 4-bit long discriminator,
         # encoded as a variable-length decimal number in ASCII text, omitting any leading zeros
         asserts.assert_true(
-            self.is_valid_discriminator_subtype(sub_types, DiscriminatorLength.SHORT),
+            self.is_valid_discriminator_subtype(subtypes, DiscriminatorLength.SHORT),
             "Invalid short discriminator commissionable subtype or not present."
         )
 
-        # Validate that the vendor commissionable subtype is a 16-bit vendor id, encoded
-        # as a variable-length decimal number in ASCII text, omitting any leading zeros
-        asserts.assert_true(
-            self.is_valid_vendor_subtype(sub_types),
-            "Invalid vendor commissionable subtype or not present."
-        )
+        # If the vendor commissionable subtype is present, validate it's a
+        # 16-bit vendor id, encoded as a variable-length decimal number in
+        # ASCII text, omitting any leading zeros
+        vendor_subtype = self.get_vendor_subtype(subtypes)
+        if vendor_subtype:
+            asserts.assert_true(
+                self.is_valid_vendor_subtype(vendor_subtype),
+                f"Invalid vendor commissionable subtype: {vendor_subtype}."
+            )
+
+        # If the devtype commissionable subtype is present, validate it's a
+        # variable length decimal number in ASCII without leading zeros
+        devtype_subtype = self.get_devtype_subtype(subtypes)
+        if devtype_subtype:
+            asserts.assert_true(
+                self.is_valid_devtype_subtype(devtype_subtype),
+                f"Invalid devtype commissionable subtype: {devtype_subtype}."
+            )
+
+        # Verify presence of the _CM subtype
+        asserts.assert_in(CM_SUBTYPE, subtypes, f"{CM_SUBTYPE} subtype not present.")
+
+        # Verify D TXT record key is present, which represents the discriminator
+        # and must be encoded as a variable-length decimal value with up to 4
+        # digits omitting any leading zeros
+        asserts.assert_true(self.verify_d_key(commissionable_service.txt_record), "D key is invalid or not present.")
+        
+        # If VP TXT record key is present, verify it contain at least Vendor ID
+        # and if Product ID is present, values must be separated by a + sign
+        vp_key = commissionable_service.txt_record['VP']
+        if vp_key:
+            asserts.assert_true(self.is_valid_vp_key(vp_key), f"Invalid VP key: {vp_key}")
+
+        # If SAI TXT record key is present, SII key must be an unsigned integer with
+        # units of milliseconds and shall be encoded as a variable length decimal
+        # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
+        sii_key = commissionable_service.txt_record['SII']
+        if sii_key:
+            result, message = self.is_valid_key_decimal_value(sii_key, ONE_HOUR_IN_MS)        
+            asserts.assert_true(result, message)
+
+        # If SAI TXT record key is present, SAI key must be an unsigned integer with
+        # units of milliseconds and shall be encoded as a variable length decimal
+        # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
+        sai_key = commissionable_service.txt_record['SAI']
+        if sai_key:
+            result, message = self.is_valid_key_decimal_value(sai_key, ONE_HOUR_IN_MS)        
+            asserts.assert_true(result, message)
+
+        # - If the SAT TXT record key is present, verify that it is a decimal value with
+        #   no leading zeros and is less than or equal to 65535
+        sat_key = commissionable_service.txt_record['SAT']
+        if sat_key:
+            result, message = self.is_valid_key_decimal_value(sat_key, MAX_SAT_VALUE)
+            asserts.assert_true(result, message)
+
+            # - If the SAT TXT record key is present and supports_icd is true, verify that
+            #   the value is equal to active_mode_threshold
+            if supports_icd:
+                logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
+                asserts.assert_equal(int(sat_key), active_mode_threshold_ms)
+
 
 
 if __name__ == "__main__":
