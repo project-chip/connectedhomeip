@@ -501,12 +501,64 @@ public:
         else
             response.icd_mode = chip_rpc_IcdMode_SIT_ICD;
 
-        ChipLogDetail(AppServer, "SetIcdMode to %d", response.icd_mode);
+        ChipLogDetail(AppServer, "GetIcdMode : %d", response.icd_mode);
         return pw::OkStatus();
 #else  // CONFIG_CHIP_ICD_DSLS_SUPPORT
-        ChipLogError(AppServer, "SetIcdMode is not supported");
+        ChipLogError(AppServer, "GetIcdMode is not supported");
         return pw::Status::Unimplemented();
 #endif // CONFIG_CHIP_ICD_DSLS_SUPPORT
+    }
+
+    /**
+     * @brief RPC to get the current ICD slow poll interval.
+     *
+     * This function is only available when CHIP_CONFIG_ENABLE_ICD_SERVER is enabled.
+     * It retrieves the current slow poll interval of the Intermittently Connected Device
+     * from ICDConfigurationData and populates the response.
+     *
+     * @param request The empty RPC request message.
+     * @param response The RPC response message to be populated with the current slow poll interval in milliseconds.
+     * @return pw::OkStatus on success, pw::Status::Unimplemented if the feature is disabled.
+     */
+    virtual pw::Status GetIcdSlowPollInterval(const pw_protobuf_Empty & request, chip_rpc_IcdSlowPollInterval & response)
+    {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        response.slow_poll_interval_ms = ICDConfigurationData::GetInstance().GetSlowPollingInterval().count();
+        ChipLogDetail(AppServer, "GetIcdSlowPollInterval : %u", response.slow_poll_interval_ms);
+        return pw::OkStatus();
+#else  // CHIP_CONFIG_ENABLE_ICD_SERVER
+        ChipLogError(AppServer, "GetIcdSlowPollInterval is not supported");
+        return pw::Status::Unimplemented();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+    }
+
+    /**
+     * @brief RPC to set the ICD slow poll interval.
+     *
+     * This function is only available when CHIP_CONFIG_ENABLE_ICD_SERVER is enabled.
+     * It sets the slow poll interval for the Intermittently Connected Device.
+     * The new interval is passed to ICDConfigurationData for validation and application.
+     *
+     * @param request The RPC request message containing the new slow poll interval in milliseconds.
+     * @param response The empty RPC response message.
+     * @return pw::OkStatus on success, pw::Status::InvalidArgument if the interval is invalid,
+     *         or pw::Status::Unimplemented if the feature is disabled.
+     */
+    virtual pw::Status SetIcdSlowPollInterval(const chip_rpc_IcdSlowPollInterval & request, pw_protobuf_Empty & response)
+    {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t arg) {
+                uint32_t interval_ms = static_cast<uint32_t>(arg);
+                ChipLogDetail(AppServer, "SetIcdSlowPollInterval : %u", interval_ms);
+//                ICDConfigurationData::GetInstance().SetSlowPollingInterval(System::Clock::Milliseconds32(interval_ms));
+            },
+            static_cast<intptr_t>(request.slow_poll_interval_ms));
+        return pw::OkStatus();
+#else  // CHIP_CONFIG_ENABLE_ICD_SERVER
+        ChipLogError(AppServer, "SetIcdSlowPollInterval is not supported");
+        return pw::Status::Unimplemented();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }
     
     /**

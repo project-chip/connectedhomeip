@@ -33,6 +33,10 @@ message IcdDeviceMode {
   IcdMode icd_mode =1;
 }
 
+message IcdSlowPollInterval {
+  uint32 slow_poll_interval_ms = 1;
+}
+
 message MetadataForProvider {
   bytes tlv = 1;
 }
@@ -63,10 +67,12 @@ service Device {
   rpc GetDeviceInfo(pw.protobuf.Empty) returns (DeviceInfo){}
   rpc GetDeviceState(pw.protobuf.Empty) returns (DeviceState){}
   rpc GetIcdMode(pw.protobuf.Empty) returns (IcdDeviceMode){}
+  rpc GetIcdSlowPollInterval(pw.protobuf.Empty) returns (IcdSlowPollInterval){}
   rpc GetPairingState(pw.protobuf.Empty) returns (PairingState){}
   rpc GetSpakeInfo(pw.protobuf.Empty) returns (SpakeInfo){}
   rpc Reboot(RebootRequest) returns (pw.protobuf.Empty){}
   rpc SetIcdMode(IcdDeviceMode) returns (pw.protobuf.Empty){}
+  rpc SetIcdSlowPollInterval(IcdSlowPollInterval) returns (pw.protobuf.Empty){}
   rpc SetPairingInfo(PairingInfo) returns (pw.protobuf.Empty){}
   rpc SetPairingState(PairingState) returns (pw.protobuf.Empty){}
   rpc SetOtaMetadataForProvider(MetadataForProvider) returns (pw.protobuf.Empty){}
