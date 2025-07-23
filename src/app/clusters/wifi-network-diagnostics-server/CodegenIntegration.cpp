@@ -77,7 +77,7 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     uint32_t rawFeatureMap;
     if (FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
     {
-        ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpointId);
+        ChipLogError(AppServer, "Failed to get feature map for endpoint %u, defaulting to 0", endpointId);
         rawFeatureMap = 0;
     }
     DeviceLayer::GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&gServer.Cluster().GetLogic());
