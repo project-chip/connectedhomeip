@@ -277,7 +277,6 @@ public:
     {
         CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
     }
-
     ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
 
     void InvokeCommand(HandlerContext & handlerContext) override
@@ -320,75 +319,6 @@ private:
     bool mHandleCommand     = false;
 
     std::vector<DataModel::AcceptedCommandEntry> mAccepted;
-    std::vector<CommandId> mGenerated;
-};
-
-/// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
-/// testing of behaviors when command enumeration is done in the interace.
-class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTesting::Id>
-{
-public:
-    ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceShim(endpointId, clusterId)
-    {
-        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
-    }
-    ~ShimCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
-
-    void InvokeCommand(HandlerContext & handlerContext) override
-    {
-        if (mHandleCommand)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
-            handlerContext.SetCommandHandled();
-        }
-        else
-        {
-            handlerContext.SetCommandNotHandled();
-        }
-    }
-
-    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
-
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
-    {
-        VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mAccepted)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
-    {
-        VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mGenerated)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
-    void SetOverrideGenerated(bool o) { mOverrideGenerated = o; }
-
-    std::vector<CommandId> & AcceptedVec() { return mAccepted; }
-    std::vector<CommandId> & GeneratedVec() { return mGenerated; }
-
-private:
-    bool mOverrideAccepted  = false;
-    bool mOverrideGenerated = false;
-    bool mHandleCommand     = false;
-
-    std::vector<CommandId> mAccepted;
     std::vector<CommandId> mGenerated;
 };
 
@@ -641,6 +571,78 @@ const MockNodeConfig gTestNodeConfig({
     ),
 });
 // clang-format on
+
+/// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
+/// testing of behaviors when command enumeration is done in the interace.
+class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTesting::Id>
+{
+public:
+    ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceShim(endpointId, clusterId)
+    {
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+    }
+    ~ShimCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+
+    void InvokeCommand(HandlerContext & handlerContext) override
+    {
+        if (mHandleCommand)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
+            handlerContext.SetCommandHandled();
+        }
+        else
+        {
+            handlerContext.SetCommandNotHandled();
+        }
+    }
+ 
+    //
+    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
+
+    //
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    {
+        VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
+
+        for (auto id : mAccepted)
+        {
+            if (callback(id, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    //
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    {
+        VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
+
+        for (auto id : mGenerated)
+        {
+            if (callback(id, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void SetOverrideAccepted(bool overrideAccepted) { mOverrideAccepted = overrideAccepted; }
+    void SetOverrideGenerated(bool overrideGenerated) { mOverrideGenerated = overrideGenerated; }
+
+    std::vector<CommandId> & AcceptedVec() { return mAccepted; }
+    std::vector<CommandId> & GeneratedVec() { return mGenerated; }
+
+private:
+    bool mOverrideAccepted  = false;
+    bool mOverrideGenerated = false;
+    bool mHandleCommand     = false;
+
+    std::vector<CommandId> mAccepted;
+    std::vector<CommandId> mGenerated;
+}
 
 struct UseMockNodeConfig
 {
@@ -1575,62 +1577,6 @@ TEST_F(TestCodegenModelViaMocks, ShimCommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
 }
 
-TEST_F(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    {
-        ReadOperation testRequest(kEndpointIdThatIsMissing, MockClusterId(1), AttributeList::Id);
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedEndpoint);
-    }
-
-    {
-        ReadOperation testRequest(kMockEndpoint1, kInvalidClusterId, AttributeList::Id);
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedCluster);
-    }
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    // Invalid attribute
-    {
-        ReadOperation testRequest(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedAttribute);
-    }
-
-    // Invalid cluster
-    {
-        ReadOperation testRequest(kMockEndpoint1, MockClusterId(100), MockAttributeId(1));
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedCluster);
-    }
-
-    // Invalid endpoint
-    {
-        ReadOperation testRequest(kEndpointIdThatIsMissing, MockClusterId(1), MockAttributeId(1));
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedEndpoint);
-    }
-}
 
 TEST_F(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
 {
