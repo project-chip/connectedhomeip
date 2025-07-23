@@ -422,7 +422,7 @@ TEST_F(TestBleLayer, StartConnectFailsIfCalledTwice)
     EXPECT_EQ(ep->StartConnect(), CHIP_ERROR_INCORRECT_STATE); // second should fail
 
     ep->Abort();
-
+}
 // This test creats new ble connection by discriminator and simulates error
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
 {
