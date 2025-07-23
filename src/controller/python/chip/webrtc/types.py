@@ -14,7 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint8, c_uint64, c_void_p
+from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint8, c_uint16, c_void_p
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
@@ -25,10 +25,10 @@ GatheringCompleteCallbackType = CFUNCTYPE(None)
 StateChangeCallback = CFUNCTYPE(None, c_int)
 
 # Callback types for WebRTCRequestor server
-OnOfferCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_char_p)
-OnAnswerCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_char_p)
-OnICECandidatesCallbackFunct = CFUNCTYPE(c_int, c_uint64, POINTER(c_char_p), c_int)
-OnEndCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_uint8)
+OnOfferCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
+OnAnswerCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
+OnICECandidatesCallbackFunct = CFUNCTYPE(c_int, c_uint16, POINTER(c_char_p), c_int)
+OnEndCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_uint8)
 
 
 class PeerConnectionState(Enum):

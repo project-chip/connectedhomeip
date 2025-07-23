@@ -125,12 +125,15 @@ void webrtc_client_set_local_description_callback(WebRTCClientHandle handle, Loc
 void webrtc_client_set_ice_candidate_callback(WebRTCClientHandle handle, IceCandidateCallback cb, void * user_data);
 
 /**
- * @brief Retrieves the local description of the WebRTC client associated with the given handle.
+ * @brief Retrieves the local SDP description of the WebRTC client associated with the given handle.
+ * This function should be called after setting local/remote SDP.
  *
- * Called when latest sdp is required.
+ * Called when latest sdp is required. Like when there is need for SDP to contain ice candidates, this function should
+ * be called after gathering is complete.
  *
  * @param handle The handle of the WebRTC client.
- * @return const char* A pointer to the local description string, or empty string if the client is not found.
+ * @return const char* A pointer to the local description string, or empty string (invalid SDP) if the client/PeerConnection
+ * is not found.
  */
 const char * webrtc_get_local_description(WebRTCClientHandle handle);
 
@@ -176,7 +179,7 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
  *
  * @note This function assumes that the handle is valid and exists in the global clients map.
  */
-void webrtc_provider_client_init(WebRTCClientHandle handle, uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
+void webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
 
 /**
  * @brief Initializes the WebRTC client handle with webrtc provider client command sender callbacks.

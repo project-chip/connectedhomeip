@@ -179,6 +179,8 @@ private:
     // Private methods
     void NfcThreadMain();
     void EnqueueMessage(std::unique_ptr<NFCMessage> message);
+
+    CHIP_ERROR EnsureProcessingThreadStarted();
 };
 
 /**

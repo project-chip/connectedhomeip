@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +16,19 @@
  *    limitations under the License.
  */
 
-#include <lib/support/TimeUtils.h>
+#pragma once
+
+#include "push-av-stream-transport-delegate.h"
 
 namespace chip {
-namespace System {
-namespace Clock {
+namespace app {
+namespace Clusters {
+namespace PushAvStreamTransport {
 
-CHIP_ERROR InitClock_RealTime();
+/// Sets the given delegate on an endpoint configured via code-generation
+void SetDelegate(chip::EndpointId endpointId, PushAvStreamTransportDelegate * delegate);
 
-} // namespace Clock
-} // namespace System
+} // namespace PushAvStreamTransport
+} // namespace Clusters
+} // namespace app
 } // namespace chip

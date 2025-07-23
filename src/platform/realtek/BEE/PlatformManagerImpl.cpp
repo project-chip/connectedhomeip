@@ -41,6 +41,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = System::Clock::InitClock_RealTime();
     SuccessOrExit(err);
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // Initialize LwIP.
+    tcpip_init(NULL, NULL);
+#endif
+
     chip::Crypto::add_entropy_source(app_entropy_source, NULL, 1);
 
     // Call _InitChipStack() on the generic implementation base class

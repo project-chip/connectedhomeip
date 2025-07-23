@@ -39,6 +39,7 @@ void WebRTCProviderManager::SetCameraDevice(CameraDeviceInterface * aCameraDevic
 
 void WebRTCProviderManager::Init()
 {
+    ChipLogProgress(Camera, "Initializing WebRTC PeerConnection");
     mPeerConnection = CreateWebRTCPeerConnection();
 
     mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
@@ -68,6 +69,11 @@ void WebRTCProviderManager::SetMediaController(MediaController * mediaController
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                                      bool & outDeferredOffer)
 {
+    if (mPeerConnection == nullptr)
+    {
+        // Re-initialization of PeerConnection is needed
+        Init();
+    }
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
     outSession.id          = args.sessionId;
     outSession.peerNodeID  = args.peerNodeId;
@@ -165,6 +171,12 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
 {
     ChipLogProgress(Camera, "HandleProvideOffer called");
+
+    if (mPeerConnection == nullptr)
+    {
+        // Re-initialization of PeerConnection is needed
+        Init();
+    }
 
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
     outSession.id          = args.sessionId;
@@ -340,6 +352,7 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         mOriginatingEndpointId = 0;
         mPeerId                = ScopedNodeId();
         mLocalSdp.clear();
+        mLocalCandidates.clear();
     }
 
     return CHIP_NO_ERROR;

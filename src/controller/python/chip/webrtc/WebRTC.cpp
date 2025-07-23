@@ -131,7 +131,7 @@ const char * webrtc_get_local_description(WebRTCClientHandle handle)
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        return it->second->GetLocalDescription();
+        return it->second->GetLocalSessionDescriptionInternal();
     }
     return "";
 }
@@ -167,7 +167,7 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
     }
 }
 
-void webrtc_provider_client_init(WebRTCClientHandle handle, uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+void webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     auto it = g_clients.find(handle);

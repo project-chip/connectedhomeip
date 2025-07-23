@@ -70,9 +70,9 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
     }
 
     mPeerConnection->onLocalDescription([this](rtc::Description desc) {
-        mLocalDescription = std::string(desc);
+        std::string localDescription = std::string(desc);
         if (mLocalDescriptionCallback)
-            mLocalDescriptionCallback(mLocalDescription.c_str(), desc.typeString());
+            mLocalDescriptionCallback(localDescription.c_str(), desc.typeString());
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
@@ -97,11 +97,6 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
         {
             if (mGatheringCompleteCallback)
                 mGatheringCompleteCallback();
-
-            auto desc = mPeerConnection->localDescription();
-            // Update local description to include ice candidates since gathering is complete
-            if (desc.has_value())
-                mLocalDescription = desc.value();
         }
     });
 
@@ -210,8 +205,19 @@ void WebRTCClient::Disconnect()
     mLocalCandidates.clear();
 }
 
-const char * WebRTCClient::GetLocalDescription()
+const char * WebRTCClient::GetLocalSessionDescriptionInternal()
 {
+    if (mPeerConnection == nullptr)
+    {
+        return "";
+    }
+
+    auto desc = mPeerConnection->localDescription();
+    if (desc.has_value())
+    {
+        mLocalDescription = desc.value();
+    }
+
     return mLocalDescription.c_str();
 }
 
@@ -245,7 +251,7 @@ void WebRTCClient::OnStateChange(std::function<void(int)> callback)
     mStateChangeCallback = callback;
 }
 
-void WebRTCClient::WebRTCProviderClientInit(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+void WebRTCClient::WebRTCProviderClientInit(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
 {
     mTransportProviderClient->Init(nodeId, fabricIndex, endpoint);
 }

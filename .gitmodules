@@ -344,7 +344,7 @@
 [submodule "third_party/libdatachannel/repo"]
 	path = third_party/libdatachannel/repo
 	url = https://github.com/paullouisageneau/libdatachannel.git
-	platforms = linux
+	platforms = linux,darwin
 	recursive = true
 [submodule "third_party/openthread/ot-realtek"]
 	path = third_party/openthread/ot-realtek

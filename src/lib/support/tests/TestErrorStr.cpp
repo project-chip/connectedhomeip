@@ -128,13 +128,16 @@ TEST(TestErrorStr, CheckRegisterDeregisterErrorFormatter)
 
 TEST(TestErrorStr, CheckNoError)
 {
+#if CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR)), CHIP_NO_ERROR_STRING);
+#else  // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+    EXPECT_STREQ(ErrorStr(CHIP_NO_ERROR), CHIP_NO_ERROR_STRING);
+#endif // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 }
 
 TEST(TestErrorStr, CheckErrorWithProvidedStorage)
 {
     ErrorStrStorage storage;
-    EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR, true, storage)), CHIP_NO_ERROR_STRING);
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_ERROR_INTERNAL, true, storage)), "Error 0x000000AC");
 }
 
