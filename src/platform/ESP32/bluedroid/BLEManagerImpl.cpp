@@ -1771,7 +1771,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
         int rc = esp_ble_gattc_app_register(PROFILE_A_APP_ID);
         if (rc != 0)
         {
-            ChipLogError(DeviceLayer, "esp_ble_gattc_app_register() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_ble_gattc_app_register() failed: %d", rc);
             ExitNow();
         }
     }
