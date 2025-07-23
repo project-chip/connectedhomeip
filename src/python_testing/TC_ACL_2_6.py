@@ -3,7 +3,7 @@
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
+#    You may o+btain a copy of the License at
 #
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -13,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
@@ -63,27 +62,16 @@ class TC_ACL_2_6(MatterBaseTest):
             str(event.latestValue.fabricIndex)
         )
 
+    async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
+        if forceLegacyListEncoding:
+            return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
+        else:
+            return await controller.WriteAttribute(node_id, path)
+
     def desc_TC_ACL_2_6(self) -> str:
         return "[TC-ACL-2.6] AccessControlEntryChanged event"
 
-    def steps_TC_ACL_2_6(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "TH1 commissions DUT using admin node ID N1", "DUT is commissioned on TH1 fabric", is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
-                     "Result is SUCCESS, value is stored as F1"),
-            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS value is list of AccessControlEntryChangedEvent events containing 1 element"),
-            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements", "Result is SUCCESS"),
-            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged events containing 2 new elements"),
-            TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements. The first item is valid, the second item is invalid due to group ID 0 being used, which is illegal.", "Result is CONSTRAINT_ERROR"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "value MUST NOT contain an AccessControlEntryChanged entry corresponding to the second invalid entry in step 6."),
-        ]
-        return steps
-
-    @async_test_body
-    async def test_TC_ACL_2_6(self):
+    async def internal_test_TC_ACL_2_6(self, force_legacy_encoding: bool):
         self.step(1)
         # Initialize TH1 controller
         self.th1 = self.default_controller
@@ -98,17 +86,18 @@ class TC_ACL_2_6(MatterBaseTest):
         self.step(3)
         # Set up event subscription for future steps
         acec_event = Clusters.AccessControl.Events.AccessControlEntryChanged
-        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl)
-        await events_callback.start(self.default_controller, self.dut_node_id, 0)
+        self.events_callback = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl)
+        await self.events_callback.start(self.default_controller, self.dut_node_id, 0)
 
         # Read initial events
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
-            events=[(0, acec_event)],
+            events=[(0, acec_event, 1)],
             fabricFiltered=True
         )
-        logging.info(f"Events response: {events_response}")
+        # Getting the initial event from commissioning, validating it is the one we are expecting as it adds the admin entry for our controller for access control.
         events_response = [events_response[0]]
+        logging.info(f"Events response: {events_response}")
 
         # If we found events via read, verify them
         expected_event = Clusters.AccessControl.Events.AccessControlEntryChanged(
@@ -156,21 +145,24 @@ class TC_ACL_2_6(MatterBaseTest):
         ]
 
         acl_attr = Clusters.AccessControl.Attributes.Acl
-        result = await self.th1.WriteAttribute(
+        result = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, acl_attr(value=acl_entries))]
+            [(0, acl_attr(value=acl_entries))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         asserts.assert_equal(result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(5)
         # Wait for subscription events
         received_subscription_events = []
-        for _ in range(2):
-            event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+        expected_event_count = 3 if force_legacy_encoding else 2
+        for _ in range(expected_event_count):
+            event_data = self.events_callback.wait_for_event_report(acec_event, timeout_sec=15)
             logging.info(f"Received subscription event: {event_data}")
             received_subscription_events.append(event_data)
 
-        # Read events with retries
+        # Read events
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
@@ -179,55 +171,80 @@ class TC_ACL_2_6(MatterBaseTest):
         )
         logging.info(f"Read events response: {events_response}")
 
-        if events_response:
-            # Get the most recent events from the read response
-            read_events = sorted([e.Data for e in events_response],
-                                 key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x),
-                                 reverse=True)[:2]
-
-        # Verify we got the expected number of events
         asserts.assert_true(events_response, "Did not receive a response when calling ReadEvents")
-        asserts.assert_true(len(read_events) >= 2,
-                            f"Expected at least 2 events from read, but got {len(read_events)}")
+        read_events = sorted([e.Data for e in events_response],
+                             key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x))
 
-        # Verify both read and subscription events match our expectations
-        for event_source in [received_subscription_events, read_events]:
-            for event_data in event_source:
-                found = False
-                for acl_entry in acl_entries:
-                    if event_data.latestValue == acl_entry:
-                        found = True
-                        break
-                asserts.assert_true(found, "Event data doesn't match any expected ACL entry")
+        if force_legacy_encoding:
+            asserts.assert_true(len(read_events) == 3, f"Expected 3 events from read, but got {len(read_events)}")
+            e1, e2, e3 = read_events
 
-        # Log events for debugging
-        logging.info("Most recent subscription events:")
-        for event in received_subscription_events:
-            logging.info(f"  {event}")
+            # Event 1: Removed (admin)
+            asserts.assert_equal(e1.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved, "Expected Removed change type")
+            asserts.assert_equal(e1.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e1.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e1.latestValue, acl_entries[0], "LatestValue should match admin ACL entry")
+            asserts.assert_equal(e1.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(e1.fabricIndex, f1, "FabricIndex should be the current fabric index")
 
-        logging.info("Most recent read events:")
-        for event in read_events:
-            logging.info(f"  {event}")
+            # Event 2: Added (admin)
+            asserts.assert_equal(e2.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, "Expected Added change type")
+            asserts.assert_equal(e2.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e2.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e2.latestValue, acl_entries[0], "LatestValue should match admin ACL entry")
+            asserts.assert_equal(e2.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(e2.fabricIndex, f1, "FabricIndex should be the current fabric index")
 
+            # Event 3: Added (operate/group)
+            asserts.assert_equal(e3.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, "Expected Added change type")
+            asserts.assert_equal(e3.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e3.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e3.latestValue, acl_entries[1], "LatestValue should match operate/group ACL entry")
+            asserts.assert_equal(e3.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(e3.fabricIndex, f1, "FabricIndex should be the current fabric index")
+
+        else:
+            asserts.assert_true(len(read_events) == 2, f"Expected 2 events from read, but got {len(read_events)}")
+
+            e0, e1 = read_events
+            # First event: changed for admin
+            asserts.assert_equal(e0.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, "Expected Changed change type for first event")
+            asserts.assert_equal(e0.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e0.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e0.latestValue, acl_entries[0], "First event LatestValue should match admin ACL entry")
+            asserts.assert_equal(e0.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(e0.fabricIndex, f1, "FabricIndex should be the current fabric index")
+
+            # Second event: added for operate/group
+            asserts.assert_equal(e1.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, "Expected Added change type for second event")
+            asserts.assert_equal(e1.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
+            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e1.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e1.latestValue, acl_entries[1], "Second event LatestValue should match operate/group ACL entry")
+            asserts.assert_equal(e1.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
+            asserts.assert_equal(e1.fabricIndex, f1, "FabricIndex should be the current fabric index")
+
+        # Set comparison for debugging
         subscription_event_set = set(self.event_key(e) for e in received_subscription_events)
         read_event_set = set(self.event_key(e) for e in read_events)
-
-        # If sets don't match, log the differences
         if subscription_event_set != read_event_set:
-            logging.error("Events don't match. Differences:")
             sub_only = subscription_event_set - read_event_set
             read_only = read_event_set - subscription_event_set
             if sub_only:
-                logging.error("Events only in subscription:")
-                for event in sub_only:
-                    logging.error(f"  {event}")
+                logging.error(f"Events only in subscription: {sub_only}")
             if read_only:
-                logging.error("Events only in read:")
-                for event in read_only:
-                    logging.error(f"  {event}")
+                logging.error(f"Events only in read: {read_only}")
+        asserts.assert_equal(subscription_event_set, read_event_set, "Subscription and read events should match")
 
-        asserts.assert_equal(subscription_event_set, read_event_set,
-                             "Most recent subscription events should match most recent read events (comparing relevant fields)")
+        # Only fail if read events are missing expected entries
+        expected_event_keys = set(self.event_key(Clusters.AccessControl.Events.AccessControlEntryChanged(
+            adminNodeID=NullValue,
+            adminPasscodeID=0,
+            changeType=Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+            latestValue=acl_entry,
+            fabricIndex=f1
+        )) for acl_entry in acl_entries)
+        read_has_expected = expected_event_keys.issubset(read_event_set)
+        asserts.assert_equal(read_has_expected, True, f"Read events missing expected entries: {expected_event_keys - read_event_set}")
 
         self.step(6)
         # Write invalid ACL attribute
@@ -246,9 +263,11 @@ class TC_ACL_2_6(MatterBaseTest):
             )
         ]
 
-        result = await self.th1.WriteAttribute(
+        result = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, acl_attr(value=invalid_acl_entries))]
+            [(0, acl_attr(value=invalid_acl_entries))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         asserts.assert_equal(result[0].Status, Status.ConstraintError, "Write should have failed with CONSTRAINT_ERROR")
 
@@ -271,6 +290,36 @@ class TC_ACL_2_6(MatterBaseTest):
 
         logging.info("No events found for invalid entry, as expected")
 
+        self.step(8)
+        if force_legacy_encoding:
+            logging.info("Rerunning test with new list method")
+
+    def steps_TC_ACL_2_6(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, "TH1 commissions DUT using admin node ID N1", "DUT is commissioned on TH1 fabric", is_commissioning=True),
+            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
+                     "Result is SUCCESS, value is stored as F1"),
+            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                     "Result is SUCCESS value is list of AccessControlEntryChangedEvent events containing 1 element"),
+            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements", "Result is SUCCESS"),
+            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                     "Result is SUCCESS, value is list of AccessControlEntryChanged events containing 2 new elements if new write list method is used, else then the legacy list method is used there should be 3 new elements"),
+            TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements. The first item is valid, the second item is invalid due to group ID 0 being used, which is illegal.", "Result is CONSTRAINT_ERROR"),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                     "value MUST NOT contain an AccessControlEntryChanged entry corresponding to the second invalid entry in step 6."),
+            TestStep(8, "Rerunning test steps with new list method", "Rerunning test steps with new list method"),
+        ]
+        return steps
+
+    @async_test_body
+    async def test_TC_ACL_2_6(self):
+    # First run with new list encoding
+        await self.internal_test_TC_ACL_2_6(force_legacy_encoding=True)    
+
+        # Reset step counter and run second test with legacy list encoding
+        self.current_step_index = 0
+        logging.info("Starting second test run with new encoding")
+        await self.internal_test_TC_ACL_2_6(force_legacy_encoding=False)
 
 if __name__ == "__main__":
     default_matter_test_main()
