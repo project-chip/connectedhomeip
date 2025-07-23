@@ -310,8 +310,8 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     }
 
     VerifyOrReturn(aStatus.IsSuccess(),
-                   ChipLogError(Controller, "Receive bad status %" CHIP_ERROR_FORMAT, aStatus.ToChipError().Format()));
-    aPath.LogPath();
+                   ChipLogError(Controller, "Receive bad status %" CHIP_ERROR_FORMAT, aStatus.ToChipError().Format());
+                   aPath.LogPath());
     VerifyOrReturn(apData != nullptr, ChipLogError(Controller, "Receive empty apData"); aPath.LogPath());
 
     TLV::TLVReader readerForJavaTLV;
@@ -332,8 +332,8 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     }
 
     VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Fail to decode attribute with error %" CHIP_ERROR_FORMAT, err.Format()));
-    aPath.LogPath();
+                   ChipLogError(Controller, "Fail to decode attribute with error %" CHIP_ERROR_FORMAT, err.Format());
+                   aPath.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 #else
     value = DecodeGeneralTLVValue(env, readerForJavaObject, err);
@@ -491,8 +491,8 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
         err   = CHIP_NO_ERROR;
     }
     VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Fail to decode event with error %" CHIP_ERROR_FORMAT, err.Format()));
-    aEventHeader.LogPath();
+                   ChipLogError(Controller, "Fail to decode event with error %" CHIP_ERROR_FORMAT, err.Format());
+                   aEventHeader.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 #else
     value = DecodeGeneralTLVValue(env, readerForJavaObject, err);
