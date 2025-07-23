@@ -130,7 +130,8 @@ JNI_METHOD(void, initChipStack)(JNIEnv * env, jobject self)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error initializing CHIP stack: %s", ErrorStr(err)));
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "Error initializing CHIP stack: %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
 // for NFCCommissioningManager
@@ -446,7 +447,7 @@ JNI_METHOD(jboolean, updateCommissionableDataProviderData)
                                                                 spake2pIterationCount, setupPasscode, discriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to update commissionable data provider data: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to update commissionable data provider data: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
