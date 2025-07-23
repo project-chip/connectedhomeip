@@ -80,6 +80,10 @@ armeabi
 armino
 ARMmbed
 armv
+ARD
+SCL
+SDA
+VCC
 ASAN
 asdk
 ASR
