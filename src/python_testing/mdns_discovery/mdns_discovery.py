@@ -86,6 +86,7 @@ class MdnsDiscovery:
             - get_txt_record
             - get_quada_records
             - get_ptr_records
+            - get_commissionable_subtypes
         """
         # List of IPv6 addresses to use for mDNS discovery.
         self.interfaces = self._get_ipv6_addresses()
