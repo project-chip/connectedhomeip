@@ -66,10 +66,6 @@ enum CommissioningStage : uint8_t
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
     kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
-    kWaitForDeviceInstallation,  ///< Wait until the user has installed and powered on the device. Step used in case of
-                                 ///< NFC Commissioning without power.
-                                 ///< When the user has confirmed the installation of the device, the application should
-                                 ///< call ContinueCommissioningOverOperationalNetwork()
     kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
                                    ///< StayActive command
     kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
@@ -91,6 +87,10 @@ enum CommissioningStage : uint8_t
     kCleanup,                         ///< Call delegates with status, free memory, clear timers and state/
     kJFValidateNOC,                   ///< Verify Admin NOC contains an Administrator CAT
     kSendVIDVerificationRequest,      ///< Send SignVIDVerificationRequest command to the device
+    kWaitForDeviceInstallation,       ///< Wait until the user has installed and powered on the device. Step used in case of
+                                      ///< NFC Commissioning without power.
+                                      ///< When the user has confirmed the installation of the device, the application should
+                                      ///< call ContinueCommissioningOverOperationalNetwork()
 };
 
 enum class ICDRegistrationStrategy : uint8_t
