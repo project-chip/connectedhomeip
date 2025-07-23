@@ -17,10 +17,10 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 #include <app/static-cluster-config/TimeFormatLocalization.h>
-#include <platform/DeviceInfoProvider.h>
-#include <platform/PlatformManager.h>
 #include <app/util/attribute-metadata.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <platform/DeviceInfoProvider.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -35,10 +35,7 @@ LazyRegisteredServerCluster<TimeFormatLocalizationCluster> gServer;
 
 }
 
-void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
-{
-
-}
+void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint) {}
 
 void emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
@@ -79,18 +76,12 @@ void emberAfTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
 }
 
 Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
-    const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value) {
+    const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+{
 
     return Protocols::InteractionModel::Status::Success;
-
 }
 
-void MatterTimeFormatLocalizationPluginServerInitCallback()
-{
+void MatterTimeFormatLocalizationPluginServerInitCallback() {}
 
-}
-
-void MatterTimeFormatLocalizationPluginServerShutdownCallback()
-{
-
-}
+void MatterTimeFormatLocalizationPluginServerShutdownCallback() {}

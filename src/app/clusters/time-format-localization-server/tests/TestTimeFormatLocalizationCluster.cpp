@@ -14,15 +14,15 @@
  *    limitations under the License.
  */
 
- #include <pw_unit_test/framework.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/clusters/time-format-localization-server/time-format-localization-logic.h>
 
-#include <lib/support/ReadOnlyBuffer.h>
 #include <app/clusters/testing/AttributeTesting.h>
-#include <clusters/TimeFormatLocalization/Metadata.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/TimeFormatLocalization/Metadata.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 #include <clusters/TimeFormatLocalization/Attributes.h>
 #include <lib/core/TLV.h>
@@ -30,7 +30,6 @@
 #include <lib/core/TLVUtilities.h>
 
 #include "SampleDeviceProvider.h"
-
 
 using namespace chip;
 using namespace chip::app;
@@ -47,43 +46,48 @@ struct TestTimeFormatLocalizationCluster : public ::testing::Test
 TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
 {
     {
-        BitFlags<TimeFormatLocalization::Feature> features {0};
+        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
 
         TimeFormatLocalizationLogic onlyMandatory(features);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
 
         // No features enabled
-        ASSERT_EQ(onlyMandatory.GetFeatureMap(), BitFlags<TimeFormatLocalization::Feature>{0});
+        ASSERT_EQ(onlyMandatory.GetFeatureMap(), BitFlags<TimeFormatLocalization::Feature>{ 0 });
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(onlyMandatory.Attributes(attributesBuilder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
         ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry}), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedAttributes.AppendElements({ TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry }),
+                  CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
     }
 
     {
         // No attributes enabled
-         BitFlags<TimeFormatLocalization::Feature> features {0};
-         features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
+        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
 
         TimeFormatLocalizationLogic onlyMandatory(features);
 
         // CalendarFormat feature enabled.
-        ASSERT_EQ(onlyMandatory.GetFeatureMap(), BitFlags<TimeFormatLocalization::Feature>{TimeFormatLocalization::Feature::kCalendarFormat});
+        ASSERT_EQ(onlyMandatory.GetFeatureMap(),
+                  BitFlags<TimeFormatLocalization::Feature>{ TimeFormatLocalization::Feature::kCalendarFormat });
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(onlyMandatory.Attributes(attributesBuilder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
         ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry}), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry}), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry}), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedAttributes.AppendElements({ TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry }),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(expectedAttributes.AppendElements({ TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry }),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(expectedAttributes.AppendElements({ TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry }),
+                  CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
     }
@@ -101,11 +105,11 @@ TEST_F(TestTimeFormatLocalizationCluster, ListCalendarTest)
 
     ConcreteAttributePath path(0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id);
     ConcreteReadAttributePath readPath(path);
-    DataVersion version{0};
+    DataVersion version{ 0 };
     Access::SubjectDescriptor descriptor;
     AttributeValueEncoder encoder(builder, descriptor, path, version);
 
-    BitFlags<TimeFormatLocalization::Feature> features {0};
+    BitFlags<TimeFormatLocalization::Feature> features{ 0 };
     features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
 
     // Save old provider
@@ -168,10 +172,10 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
 {
     class TestAttributeProvider : public AttributePersistenceProvider
     {
-        public:
+    public:
         TestAttributeProvider()
         {
-            currentCalendar = TimeFormatLocalization::CalendarTypeEnum::kChinese;
+            currentCalendar   = TimeFormatLocalization::CalendarTypeEnum::kChinese;
             currentHourFormat = TimeFormatLocalization::HourFormatEnum::k24hr;
         }
 
@@ -179,16 +183,17 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
 
         CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
         {
-            ConcreteAttributePath hourPath = {0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id };
-            ConcreteAttributePath calendarPath = {0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id };
+            ConcreteAttributePath hourPath = { 0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id };
+            ConcreteAttributePath calendarPath = { 0, TimeFormatLocalization::Id,
+                                                   TimeFormatLocalization::Attributes::ActiveCalendarType::Id };
 
-            if(hourPath == aPath)
+            if (hourPath == aPath)
             {
                 EXPECT_EQ(aValue.size(), sizeof(currentHourFormat));
                 memcpy(&currentHourFormat, aValue.data(), sizeof(currentHourFormat));
             }
 
-            if(calendarPath == aPath)
+            if (calendarPath == aPath)
             {
                 EXPECT_EQ(aValue.size(), sizeof(currentCalendar));
                 memcpy(&currentCalendar, aValue.data(), sizeof(currentCalendar));
@@ -199,16 +204,17 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
 
         CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
         {
-            ConcreteAttributePath hourPath = {0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id };
-            ConcreteAttributePath calendarPath = {0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id };
+            ConcreteAttributePath hourPath = { 0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id };
+            ConcreteAttributePath calendarPath = { 0, TimeFormatLocalization::Id,
+                                                   TimeFormatLocalization::Attributes::ActiveCalendarType::Id };
 
-            if(hourPath == aPath)
+            if (hourPath == aPath)
             {
                 EXPECT_EQ(aValue.size(), sizeof(currentHourFormat));
                 memcpy(aValue.data(), &currentHourFormat, sizeof(currentHourFormat));
             }
 
-            if(calendarPath == aPath)
+            if (calendarPath == aPath)
             {
                 EXPECT_EQ(aValue.size(), sizeof(currentCalendar));
                 memcpy(aValue.data(), &currentCalendar, sizeof(currentCalendar));
@@ -217,12 +223,12 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
             return CHIP_NO_ERROR;
         }
 
-        private:
+    private:
         TimeFormatLocalization::CalendarTypeEnum currentCalendar;
         TimeFormatLocalization::HourFormatEnum currentHourFormat;
     };
 
-    BitFlags<TimeFormatLocalization::Feature> features {0};
+    BitFlags<TimeFormatLocalization::Feature> features{ 0 };
     features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
     // Save old provider
     DeviceLayer::DeviceInfoProvider * oldProvider = DeviceLayer::GetDeviceInfoProvider();
@@ -250,4 +256,4 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
 
     EXPECT_TRUE(true);
 }
-}
+} // namespace

@@ -47,7 +47,7 @@ protected:
         void Release() override { chip::Platform::Delete(this); }
 
     private:
-        size_t mTotal        = 0;
+        size_t mTotal = 0;
     };
 
     class SupportedLocalesIteratorImpl : public SupportedLocalesIterator

@@ -22,8 +22,11 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features) :
-DefaultServerCluster ({endpointId, TimeFormatLocalization::Id}), mLogic(features) { }
+TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId,
+                                                             BitFlags<TimeFormatLocalization::Feature> features) :
+    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
+    mLogic(features)
+{}
 
 CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
 {
@@ -34,61 +37,55 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
     return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                            AttributeValueDecoder & decoder)
 {
-    switch(request.path.mAttributeId)
+    switch (request.path.mAttributeId)
     {
-    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id:
-    {
+    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
         TimeFormatLocalization::CalendarTypeEnum tCalendar;
         ReturnErrorOnFailure(decoder.Decode(tCalendar));
         auto result = mLogic.setActiveCalendarType(tCalendar);
-        if(result == Protocols::InteractionModel::Status::Success)
+        if (result == Protocols::InteractionModel::Status::Success)
         {
             NotifyAttributeChanged(TimeFormatLocalization::Attributes::ActiveCalendarType::Id);
         }
         return result;
     }
-    case TimeFormatLocalization::Attributes::HourFormat::Id:
-    {
+    case TimeFormatLocalization::Attributes::HourFormat::Id: {
         TimeFormatLocalization::HourFormatEnum tHour;
         ReturnErrorOnFailure(decoder.Decode(tHour));
         auto result = mLogic.setHourFormat(tHour);
-        if(result == Protocols::InteractionModel::Status::Success)
+        if (result == Protocols::InteractionModel::Status::Success)
         {
             NotifyAttributeChanged(TimeFormatLocalization::Attributes::HourFormat::Id);
         }
         return result;
     }
-    default:
-    {
+    default: {
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
     }
 }
 
-DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                           AttributeValueEncoder & encoder)
 {
-    switch(request.path.mAttributeId)
+    switch (request.path.mAttributeId)
     {
-    case TimeFormatLocalization::Attributes::HourFormat::Id:
-    {
+    case TimeFormatLocalization::Attributes::HourFormat::Id: {
         return encoder.Encode(mLogic.GetHourFormat());
     }
-    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id:
-    {
+    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
         return encoder.Encode(mLogic.GetActiveCalendarType());
     }
-    case TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id:
-    {
+    case TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id: {
         return mLogic.GetSupportedCalendarTypes(encoder);
     }
-    case TimeFormatLocalization::Attributes::FeatureMap::Id:
-    {
+    case TimeFormatLocalization::Attributes::FeatureMap::Id: {
         return encoder.Encode(mLogic.GetFeatureMap().Raw());
     }
-    case TimeFormatLocalization::Attributes::ClusterRevision::Id:
-    {
+    case TimeFormatLocalization::Attributes::ClusterRevision::Id: {
         return encoder.Encode(TimeFormatLocalization::kRevision);
     }
     default:
@@ -96,7 +93,8 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
     }
 }
 
-CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath & path,
+                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     return mLogic.Attributes(builder);
 }

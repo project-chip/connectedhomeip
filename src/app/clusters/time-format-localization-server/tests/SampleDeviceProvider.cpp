@@ -84,10 +84,7 @@ DeviceInfoProvider::UserLabelIterator * SampleDeviceProvider::IterateUserLabel(E
     return chip::Platform::New<UserLabelIteratorImpl>(*this, endpoint);
 }
 
-SampleDeviceProvider::UserLabelIteratorImpl::UserLabelIteratorImpl(SampleDeviceProvider & provider, EndpointId endpoint)
-{
-
-}
+SampleDeviceProvider::UserLabelIteratorImpl::UserLabelIteratorImpl(SampleDeviceProvider & provider, EndpointId endpoint) {}
 
 bool SampleDeviceProvider::UserLabelIteratorImpl::Next(UserLabelType & output)
 {

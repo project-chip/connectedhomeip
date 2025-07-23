@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <clusters/TimeFormatLocalization/Enums.h>
 #include <lib/core/CHIPError.h>
@@ -32,9 +32,9 @@ namespace Clusters {
 class TimeFormatLocalizationLogic
 {
 public:
-    TimeFormatLocalizationLogic(BitFlags<TimeFormatLocalization::Feature> features): mFeatures(features)
+    TimeFormatLocalizationLogic(BitFlags<TimeFormatLocalization::Feature> features) : mFeatures(features)
     {
-        mHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
+        mHourFormat   = TimeFormatLocalization::HourFormatEnum::k12hr;
         mCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
         mAttrProvider = nullptr;
     };
@@ -53,16 +53,15 @@ public:
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
 private:
-
     // Method used to validate if the requested calendar is valid, optionally can return a valid calendar from the
     // supported calendars list.
-    bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
+    bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
+                                 TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
 
     BitFlags<TimeFormatLocalization::Feature> mFeatures;
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
     AttributePersistenceProvider * mAttrProvider;
-
 };
 
 } // namespace Clusters
