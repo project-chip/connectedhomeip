@@ -438,9 +438,9 @@ public:
         {
             for (const auto & [clusterId, clusterState] : endpointState)
             {
-                for (const auto & [attributeId, _] : clusterState.mAttributes)
+                for (const auto & attributeIter : clusterState.mAttributes)
                 {
-                    const ConcreteAttributePath path(endpointId, clusterId, attributeId);
+                    const ConcreteAttributePath path(endpointId, clusterId, attributeIter.first);
                     ReturnErrorOnFailure(func(path));
                 }
             }
