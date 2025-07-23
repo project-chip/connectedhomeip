@@ -105,21 +105,21 @@ bool TimeFormatLocalizationLogic::IsSupportedCalendarType(TimeFormatLocalization
     TimeFormatLocalization::CalendarTypeEnum type;
     bool found = false;
 
-    if (it.Next(type))
+    while(it.Next(type))
     {
-        // Set the first valid calendar type as the optional validCalendar, if needed.
+        // Update the optional validCalendar to a value from the SupportedList.
+        // This will return either the last element of the list or the requested
+        // value if exists.
         if (validCalendar != nullptr)
         {
             *validCalendar = type;
         }
         
-        do {
-            if (type == reqCalendar)
-            {
-                found = true;
-                break;
-            }
-        } while (it.Next(type));
+        if (type == reqCalendar)
+        {
+            found = true;
+            break;
+        }
     }
     
     return found;

@@ -171,8 +171,8 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
         public:
         TestAttributeProvider()
         {
-            //TimeFormatLocalization::CalendarTypeEnum currentCalendar;
-            //TimeFormatLocalization::HourFormatEnum currentHourFormat;
+            currentCalendar = TimeFormatLocalization::CalendarTypeEnum::kChinese;
+            currentHourFormat = TimeFormatLocalization::HourFormatEnum::k24hr;
         }
 
         ~TestAttributeProvider() = default;
@@ -184,7 +184,14 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
 
             if(hourPath == aPath)
             {
-                EXPECT_FALSE(false);
+                EXPECT_EQ(aValue.size(), sizeof(currentHourFormat));
+                memcpy(&currentHourFormat, aValue.data(), sizeof(currentHourFormat));
+            }
+
+            if(calendarPath == aPath)
+            {
+                EXPECT_EQ(aValue.size(), sizeof(currentCalendar));
+                memcpy(&currentCalendar, aValue.data(), sizeof(currentCalendar));
             }
 
             return CHIP_NO_ERROR;
@@ -192,8 +199,27 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
 
         CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
         {
+            ConcreteAttributePath hourPath = {0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id };
+            ConcreteAttributePath calendarPath = {0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id };
+
+            if(hourPath == aPath)
+            {
+                EXPECT_EQ(aValue.size(), sizeof(currentHourFormat));
+                memcpy(aValue.data(), &currentHourFormat, sizeof(currentHourFormat));
+            }
+
+            if(calendarPath == aPath)
+            {
+                EXPECT_EQ(aValue.size(), sizeof(currentCalendar));
+                memcpy(aValue.data(), &currentCalendar, sizeof(currentCalendar));
+            }
+
             return CHIP_NO_ERROR;
         }
+
+        private:
+        TimeFormatLocalization::CalendarTypeEnum currentCalendar;
+        TimeFormatLocalization::HourFormatEnum currentHourFormat;
     };
 
     BitFlags<TimeFormatLocalization::Feature> features {0};
@@ -210,7 +236,14 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
 
     clusterSim.Startup(&testAttrProvider);
 
+    EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k24hr);
+    EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kChinese);
+
     clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr);
+    EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k12hr);
+
+    clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian);
+    EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kGregorian);
 
     // Revert provider to old state
     DeviceLayer::SetDeviceInfoProvider(oldProvider);
