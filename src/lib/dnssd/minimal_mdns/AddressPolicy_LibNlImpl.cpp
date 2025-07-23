@@ -24,7 +24,6 @@
 
 namespace mdns {
 namespace Minimal {
-namespace LibNl {
 
 namespace {
 
@@ -415,25 +414,28 @@ CHIP_ERROR ValidIpAddressIterator::DecodeCurrentAddress(IPAddress & dest)
     return CHIP_NO_ERROR;
 }
 
-LibNl_AddressPolicy gAddressPolicy;
+class LibNl_AddressPolicy : public AddressPolicy
+{
+public:
+    chip::Platform::UniquePtr<ListenIterator> GetListenEndpoints() override
+    {
+        return UniquePtr<ListenIterator>(chip::Platform::New<AllListenIterator>());
+    }
+
+    chip::Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId,
+                                                                           chip::Inet::IPAddressType type) override
+    {
+        return UniquePtr<IpAddressIterator>(chip::Platform::New<ValidIpAddressIterator>(interfaceId, type));
+    }
+};
 
 } // namespace
 
-UniquePtr<ListenIterator> LibNl_AddressPolicy::GetListenEndpoints()
+AddressPolicy * GetDefaultAddressPolicy()
 {
-    return UniquePtr<ListenIterator>(chip::Platform::New<AllListenIterator>());
+    static LibNl_AddressPolicy gAddressPolicy;
+    return &gAddressPolicy;
 }
 
-UniquePtr<IpAddressIterator> LibNl_AddressPolicy::GetIpAddressesForEndpoint(InterfaceId interfaceId, IPAddressType type)
-{
-    return UniquePtr<IpAddressIterator>(chip::Platform::New<ValidIpAddressIterator>(interfaceId, type));
-}
-
-void SetAddressPolicy()
-{
-    SetAddressPolicy(&gAddressPolicy);
-}
-
-} // namespace LibNl
 } // namespace Minimal
 } // namespace mdns
