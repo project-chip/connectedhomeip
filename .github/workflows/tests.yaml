@@ -370,6 +370,7 @@ jobs:
             matrix:
                 build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
+                os: [macos-13, macos-14, macos-15]
                 include:
                     - os: macos-13
                       arch: x64     # observed, not configured
