@@ -374,7 +374,7 @@ jobs:
                     macos-13, # 13 - x64
                     macos-13-xlarge, # 13 - arm64
                     macos-14, # 14 - arm64
-                    macos-14-large, # 14 - x64
+                    # macos-14-large, # 14 - x64 - no large runners
                     macos-15, # 15 - arm64
                     macos-15-large # 15 - x64
                     ]
