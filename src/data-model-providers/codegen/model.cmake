@@ -30,6 +30,8 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/ServerClusterInterfaceRegistry.h"
 
   # "${chip_root}/src/app/server-cluster",
+  "${BASE_DIR}/../../app/server-cluster/AttributeListBuilder.cpp"
+  "${BASE_DIR}/../../app/server-cluster/AttributeListBuilder.h"
   "${BASE_DIR}/../../app/server-cluster/DefaultServerCluster.cpp"
   "${BASE_DIR}/../../app/server-cluster/DefaultServerCluster.h"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterContext.h"

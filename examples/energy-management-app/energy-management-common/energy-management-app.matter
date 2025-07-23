@@ -799,7 +799,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions

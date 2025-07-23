@@ -74,12 +74,6 @@ public:
     /// Was nothing written yet?
     bool Empty() const { return mWriter.Needed() == 0; }
 
-    /// Number of bytes actually needed
-    size_t Needed() const { return mWriter.Needed(); }
-
-    /// Size of the output buffer
-    size_t Size() const { return mWriter.Size(); }
-
     /// Write a formatted string to the stringbuilder
     StringBuilderBase & AddFormat(const char * format, ...) ENFORCE_FORMAT(2, 3);
 
@@ -96,6 +90,13 @@ public:
 
     /// access the underlying value
     const char * c_str() const { return reinterpret_cast<const char *>(mWriter.Buffer()); }
+
+protected:
+    /// Number of bytes actually needed
+    size_t Needed() const { return mWriter.Needed(); }
+
+    /// Size of the output buffer
+    size_t Size() const { return mWriter.Size(); }
 
 private:
     Encoding::BufferWriter mWriter;
