@@ -176,7 +176,7 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError
     return res
 
 
-def PrepareToReceiveBdxData(future: Future) -> Tuple[PyChipError, AsyncTransferObtainedTransaction]:
+def PrepareToReceiveBdxData(future: Future) -> PyChipError:
     ''' Prepares the BDX system for a BDX transfer where this device receives data. This must be called before the BDX
     transfer is initiated.
 
