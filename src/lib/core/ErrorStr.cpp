@@ -27,9 +27,9 @@
 namespace chip {
 
 /**
- * Static buffer to store the formatted error string.
+ * Thread-local buffer to store the formatted error string.
  */
-static ErrorStrStorage sErrorStr;
+static thread_local ErrorStrStorage sErrorStr;
 
 /**
  * Linked-list of error formatter functions.
@@ -54,7 +54,7 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation)
 }
 
 /**
- * This routine writess a human-readable NULL-terminated C string into the buf
+ * This routine writes a human-readable NULL-terminated C string into the buf
  * which describes the provided error.
  *
  * @param[in] err                      The error for format and describe.
