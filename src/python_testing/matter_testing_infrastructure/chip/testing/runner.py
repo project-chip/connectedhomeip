@@ -38,7 +38,6 @@ from unittest.mock import MagicMock
 import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
 # Add imports for argument parsing dependencies
-from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.pics import read_pics_from_file
 from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
@@ -309,6 +308,8 @@ def _find_test_class():
     Raises:
       SystemExit: Raised if the number of test classes is not exactly one.
     """
+    from chip.testing.matter_testing import MatterBaseTest
+
     def get_subclasses(cls: Any):
         subclasses = utils.find_subclasses_in_module([cls], sys.modules['__main__'])
         subclasses = [c for c in subclasses if c.__name__ != cls.__name__]
