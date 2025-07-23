@@ -95,7 +95,9 @@ class TC_ACL_2_6(MatterBaseTest):
             events=[(0, acec_event, 1)],
             fabricFiltered=True
         )
-        # Getting the initial event from commissioning, validating it is the one we are expecting as it adds the admin entry for our controller for access control.
+        # Getting the initial event from commissioning, validating it is the one
+        # we are expecting as it adds the admin entry for our controller for
+        # access control.
         events_response = [events_response[0]]
         logging.info(f"Events response: {events_response}")
 
@@ -180,7 +182,10 @@ class TC_ACL_2_6(MatterBaseTest):
             e1, e2, e3 = read_events
 
             # Event 1: Removed (admin)
-            asserts.assert_equal(e1.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved, "Expected Removed change type")
+            asserts.assert_equal(
+                e1.changeType,
+                Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                "Expected Removed change type")
             asserts.assert_equal(e1.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
             asserts.assert_in('chip.clusters.Types.Nullable', str(type(e1.adminPasscodeID)), "AdminPasscodeID should be Null")
             asserts.assert_equal(e1.latestValue, acl_entries[0], "LatestValue should match admin ACL entry")
@@ -208,7 +213,9 @@ class TC_ACL_2_6(MatterBaseTest):
 
             e0, e1 = read_events
             # First event: changed for admin
-            asserts.assert_equal(e0.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, "Expected Changed change type for first event")
+            asserts.assert_equal(e0.changeType,
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
+                                 "Expected Changed change type for first event")
             asserts.assert_equal(e0.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
             asserts.assert_in('chip.clusters.Types.Nullable', str(type(e0.adminPasscodeID)), "AdminPasscodeID should be Null")
             asserts.assert_equal(e0.latestValue, acl_entries[0], "First event LatestValue should match admin ACL entry")
@@ -216,7 +223,9 @@ class TC_ACL_2_6(MatterBaseTest):
             asserts.assert_equal(e0.fabricIndex, f1, "FabricIndex should be the current fabric index")
 
             # Second event: added for operate/group
-            asserts.assert_equal(e1.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, "Expected Added change type for second event")
+            asserts.assert_equal(e1.changeType,
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                                 "Expected Added change type for second event")
             asserts.assert_equal(e1.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
             asserts.assert_in('chip.clusters.Types.Nullable', str(type(e1.adminPasscodeID)), "AdminPasscodeID should be Null")
             asserts.assert_equal(e1.latestValue, acl_entries[1], "Second event LatestValue should match operate/group ACL entry")
@@ -244,7 +253,10 @@ class TC_ACL_2_6(MatterBaseTest):
             fabricIndex=f1
         )) for acl_entry in acl_entries)
         read_has_expected = expected_event_keys.issubset(read_event_set)
-        asserts.assert_equal(read_has_expected, True, f"Read events missing expected entries: {expected_event_keys - read_event_set}")
+        asserts.assert_equal(
+            read_has_expected,
+            True,
+            f"Read events missing expected entries: {expected_event_keys - read_event_set}")
 
         self.step(6)
         # Write invalid ACL attribute
@@ -296,30 +308,52 @@ class TC_ACL_2_6(MatterBaseTest):
 
     def steps_TC_ACL_2_6(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "TH1 commissions DUT using admin node ID N1", "DUT is commissioned on TH1 fabric", is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
-                     "Result is SUCCESS, value is stored as F1"),
-            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS value is list of AccessControlEntryChangedEvent events containing 1 element"),
-            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements", "Result is SUCCESS"),
-            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "Result is SUCCESS, value is list of AccessControlEntryChanged events containing 2 new elements if new write list method is used, else then the legacy list method is used there should be 3 new elements"),
-            TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements. The first item is valid, the second item is invalid due to group ID 0 being used, which is illegal.", "Result is CONSTRAINT_ERROR"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                     "value MUST NOT contain an AccessControlEntryChanged entry corresponding to the second invalid entry in step 6."),
-            TestStep(8, "Rerunning test steps with new list method", "Rerunning test steps with new list method"),
+            TestStep(
+                1,
+                "TH1 commissions DUT using admin node ID N1",
+                "DUT is commissioned on TH1 fabric",
+                is_commissioning=True),
+            TestStep(
+                2,
+                "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
+                "Result is SUCCESS, value is stored as F1"),
+            TestStep(
+                3,
+                "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                "Result is SUCCESS value is list of AccessControlEntryChangedEvent events containing 1 element"),
+            TestStep(
+                4,
+                "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements",
+                "Result is SUCCESS"),
+            TestStep(
+                5,
+                "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                "Result is SUCCESS, value is list of AccessControlEntryChanged events containing 2 new elements if new write list method is used, else then the legacy list method is used there should be 3 new elements"),
+            TestStep(
+                6,
+                "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements. The first item is valid, the second item is invalid due to group ID 0 being used, which is illegal.",
+                "Result is CONSTRAINT_ERROR"),
+            TestStep(
+                7,
+                "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
+                "value MUST NOT contain an AccessControlEntryChanged entry corresponding to the second invalid entry in step 6."),
+            TestStep(
+                8,
+                "Rerunning test steps with new list method",
+                "Rerunning test steps with new list method"),
         ]
         return steps
 
     @async_test_body
     async def test_TC_ACL_2_6(self):
-    # First run with new list encoding
-        await self.internal_test_TC_ACL_2_6(force_legacy_encoding=True)    
+        # First run with new list encoding
+        await self.internal_test_TC_ACL_2_6(force_legacy_encoding=True)
 
         # Reset step counter and run second test with legacy list encoding
         self.current_step_index = 0
         logging.info("Starting second test run with new encoding")
         await self.internal_test_TC_ACL_2_6(force_legacy_encoding=False)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
