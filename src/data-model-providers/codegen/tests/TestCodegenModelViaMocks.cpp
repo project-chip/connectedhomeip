@@ -642,7 +642,7 @@ private:
 
     std::vector<CommandId> mAccepted;
     std::vector<CommandId> mGenerated;
-}
+};
 
 struct UseMockNodeConfig
 {

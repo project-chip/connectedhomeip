@@ -105,7 +105,7 @@ commandHandler->AddResponse(path, kReplyCommandId, replyEncoder);
 
 CommandHandler Interface was coupled with Ember data in ways that caused bugs if
 not set up correctly, updates were made for decoupling, now this data is
-provided
+provided through the new interface.
 
 With this the interfaces
 [`CommandHandlerInterface::RetrieveGeneratedCommands`](#enumerateacceptedcommands-to-retrieveacceptedcommands),
@@ -156,7 +156,7 @@ Changes for implementation:
 
 -   Old
 
-```cpp
+```cpps
     for (auto && cmd : {
              Disable::Id,
              EnableCharging::Id,
