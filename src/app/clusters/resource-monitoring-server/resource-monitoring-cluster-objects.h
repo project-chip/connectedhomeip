@@ -259,8 +259,9 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 namespace Commands {
 namespace ResetCondition {
 // Getting these from a concrete implementation, Less error-prone if XML ever changes
-static constexpr CommandId Id                                   = ::chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition;
-static constexpr DataModel::AcceptedCommandEntry kMetadataEntry = ::chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::kMetadataEntry;
+static constexpr CommandId Id = ::chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition;
+static constexpr DataModel::AcceptedCommandEntry kMetadataEntry =
+    ::chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::kMetadataEntry;
 
 struct DecodableType
 {
