@@ -258,7 +258,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'SRV', service name '{service_name}'")
 
-        async with AsyncZeroconf() as azc:
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             mdns_service_info = None
 
             # Adds service listener
@@ -325,7 +325,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'TXT', service name '{service_name}'")
 
-        async with AsyncZeroconf() as azc:
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             mdns_service_info = None
 
             # Adds service listener
@@ -387,7 +387,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'AAAA',  hostname '{hostname}'")
 
-        async with AsyncZeroconf() as azc:
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             # Perform AAAA query
             addr_resolver = AddressResolverIPv6(server=hostname)
 
@@ -669,7 +669,7 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        async with AsyncZeroconf() as azc:
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             mdns_service_info = None
             discovery_timeout_sec = 3
 
