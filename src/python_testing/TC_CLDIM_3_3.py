@@ -80,8 +80,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "If Limitation feature is supportes, read LimitRange attribute"),
-            TestStep("2c", "If Positioning feature is supportes, read Resolution attribute"),
+            TestStep("2b", "If Limitation feature is supported, read LimitRange attribute"),
+            TestStep("2c", "If Positioning feature is supported, read Resolution attribute"),
             TestStep("2d", "Establish wilcard subscription to all attributes"),
             TestStep("2e", "Read CurrentState attribute"),
             TestStep("2f", "If Latching feature is not supported or state is unlatched, skip steps 2g to 2l"),
