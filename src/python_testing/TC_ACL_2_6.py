@@ -3,7 +3,7 @@
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
-#    You may o+btain a copy of the License at
+#    You may obtain a copy of the License at
 #
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -187,7 +187,7 @@ class TC_ACL_2_6(MatterBaseTest):
                 Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
                 "Expected Removed change type")
             asserts.assert_equal(e1.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e1.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
             asserts.assert_equal(e1.latestValue, acl_entries[0], "LatestValue should match admin ACL entry")
             asserts.assert_equal(e1.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(e1.fabricIndex, f1, "FabricIndex should be the current fabric index")
