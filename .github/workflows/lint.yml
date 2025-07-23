@@ -96,7 +96,6 @@ jobs:
                      --known-failure app/app-platform/ContentApp.h \
                      --known-failure app/app-platform/ContentAppPlatform.cpp \
                      --known-failure app/app-platform/ContentAppPlatform.h \
-                     --known-failure controller/jcm/TrustVerification.h \
                      --known-failure controller/ExamplePersistentStorage.cpp \
                      --known-failure controller/ExamplePersistentStorage.h \
                      --known-failure app/AttributeAccessToken.h \
