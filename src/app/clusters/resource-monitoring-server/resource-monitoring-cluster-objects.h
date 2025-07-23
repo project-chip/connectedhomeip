@@ -25,7 +25,7 @@
 #include <utility>
 
 // Including the Metadata from a concrete implementation
-#include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h> 
+#include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
 
 namespace chip {
 namespace app {

@@ -113,7 +113,7 @@ public:
      *
      * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of accepted
      * commands will come from the endpoint metadata for the cluster.
-     * 
+     *
      * Otherwise the list of accepted commands will be added to the builder
      */
     virtual CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
@@ -128,7 +128,7 @@ public:
      *
      * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of generated
      * commands will come from the endpoint metadata for the cluster.
-     * 
+     *
      * Otherwise the list of generated commands will be added to the builder
      */
     virtual CHIP_ERROR RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
