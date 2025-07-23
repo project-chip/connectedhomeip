@@ -593,6 +593,7 @@ formatters
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FRDM
 FS
 fsl
 fstab
