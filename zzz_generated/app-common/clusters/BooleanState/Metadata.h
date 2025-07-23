@@ -32,6 +32,13 @@ namespace Commands {
 inline constexpr uint32_t kMetadataCount = 0;
 
 } // namespace Commands
+
+namespace Events {
+namespace StateChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateChange
+
+} // namespace Events
 } // namespace BooleanState
 } // namespace Clusters
 } // namespace app

@@ -319,6 +319,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace StepColorTemperature
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ColorControl
 } // namespace Clusters
 } // namespace app

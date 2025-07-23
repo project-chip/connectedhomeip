@@ -46,7 +46,7 @@ TAGS
 
 # Python bytecodes
 __pycache__
-*.pyc
+*.py[cod]
 *.egg-info
 
 # Python generated modules

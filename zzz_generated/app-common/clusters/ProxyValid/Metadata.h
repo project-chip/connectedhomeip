@@ -27,6 +27,8 @@ namespace Commands {
 inline constexpr uint32_t kMetadataCount = 0;
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ProxyValid
 } // namespace Clusters
 } // namespace app

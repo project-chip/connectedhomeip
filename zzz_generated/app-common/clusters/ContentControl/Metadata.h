@@ -106,6 +106,13 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace SetScheduledContentRatingThreshold
 
 } // namespace Commands
+
+namespace Events {
+namespace RemainingScreenTimeExpired {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RemainingScreenTimeExpired
+
+} // namespace Events
 } // namespace ContentControl
 } // namespace Clusters
 } // namespace app

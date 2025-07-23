@@ -42,6 +42,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CommissionNode::
 } // namespace CommissionNode
 
 } // namespace Commands
+
+namespace Events {
+namespace CommissioningRequestResult {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kManage };
+} // namespace CommissioningRequestResult
+
+} // namespace Events
 } // namespace CommissionerControl
 } // namespace Clusters
 } // namespace app

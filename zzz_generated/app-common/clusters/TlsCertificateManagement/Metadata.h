@@ -101,6 +101,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveClientCertificate
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace TlsCertificateManagement
 } // namespace Clusters
 } // namespace app

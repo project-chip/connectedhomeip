@@ -65,6 +65,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SkipArea::Id, Bi
 } // namespace SkipArea
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ServiceArea
 } // namespace Clusters
 } // namespace app

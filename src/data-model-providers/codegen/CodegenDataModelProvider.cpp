@@ -40,7 +40,6 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>

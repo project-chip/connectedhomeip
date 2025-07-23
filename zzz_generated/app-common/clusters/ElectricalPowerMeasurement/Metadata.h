@@ -110,6 +110,13 @@ namespace Commands {
 inline constexpr uint32_t kMetadataCount = 0;
 
 } // namespace Commands
+
+namespace Events {
+namespace MeasurementPeriodRanges {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MeasurementPeriodRanges
+
+} // namespace Events
 } // namespace ElectricalPowerMeasurement
 } // namespace Clusters
 } // namespace app

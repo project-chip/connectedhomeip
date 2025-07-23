@@ -101,6 +101,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace SignVIDVerificationRequest
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace OperationalCredentials
 } // namespace Clusters
 } // namespace app

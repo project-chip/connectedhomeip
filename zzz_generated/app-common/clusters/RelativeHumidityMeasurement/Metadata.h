@@ -44,6 +44,8 @@ namespace Commands {
 inline constexpr uint32_t kMetadataCount = 0;
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace RelativeHumidityMeasurement
 } // namespace Clusters
 } // namespace app

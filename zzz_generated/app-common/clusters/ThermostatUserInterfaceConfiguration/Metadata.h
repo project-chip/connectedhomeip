@@ -41,6 +41,8 @@ namespace Commands {
 inline constexpr uint32_t kMetadataCount = 0;
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ThermostatUserInterfaceConfiguration
 } // namespace Clusters
 } // namespace app

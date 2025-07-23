@@ -32,6 +32,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RetrieveLogsRequ
 } // namespace RetrieveLogsRequest
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace DiagnosticLogs
 } // namespace Clusters
 } // namespace app

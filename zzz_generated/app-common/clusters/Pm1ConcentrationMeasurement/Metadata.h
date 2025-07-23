@@ -73,6 +73,8 @@ namespace Commands {
 inline constexpr uint32_t kMetadataCount = 0;
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Pm1ConcentrationMeasurement
 } // namespace Clusters
 } // namespace app

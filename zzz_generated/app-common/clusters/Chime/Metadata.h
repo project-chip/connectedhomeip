@@ -47,6 +47,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PlayChimeSound::
 } // namespace PlayChimeSound
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Chime
 } // namespace Clusters
 } // namespace app

@@ -54,6 +54,16 @@ namespace Commands {
 inline constexpr uint32_t kMetadataCount = 0;
 
 } // namespace Commands
+
+namespace Events {
+namespace CumulativeEnergyMeasured {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace CumulativeEnergyMeasured
+namespace PeriodicEnergyMeasured {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PeriodicEnergyMeasured
+
+} // namespace Events
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
 } // namespace app

@@ -104,6 +104,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(QueryIdentity::I
 } // namespace QueryIdentity
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace NetworkCommissioning
 } // namespace Clusters
 } // namespace app
