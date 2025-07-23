@@ -4,17 +4,9 @@ package chip.rpc;
 
 import 'pw_protobuf_protos/common.proto';
 
-message PairingInfo {
-  uint32 code = 1;
-  uint32 discriminator = 2;
-  string qr_code = 3;
-  string qr_code_url = 4;
-}
-
-message SpakeInfo {
-  optional bytes verifier = 1;
-  optional bytes salt = 2;
-  optional uint32 iteration_count = 3;
+enum IcdMode {
+  SIT_ICD = 0x00; // Short Idle Time ICD
+  LIT_ICD = 0x01; // Long Idle Time ICD
 }
 
 // type lengths defined in chip spec 8.2.3.1
@@ -27,40 +19,59 @@ message DeviceInfo {
   string software_version_string = 6;
 }
 
-message FabricInfo {
-  uint64 fabric_id = 1;
-  uint64 node_id = 2;
-}
-
 message DeviceState {
   uint64 time_since_boot_millis = 1;
   repeated FabricInfo fabric_info = 2;
 }
 
-message PairingState {
-  bool pairing_enabled = 1;
+message FabricInfo {
+  uint64 fabric_id = 1;
+  uint64 node_id = 2;
+}
+
+message IcdDeviceMode {
+  IcdMode icd_mode =1;
 }
 
 message MetadataForProvider {
   bytes tlv = 1;
 }
 
+message PairingInfo {
+  uint32 code = 1;
+  uint32 discriminator = 2;
+  string qr_code = 3;
+  string qr_code_url = 4;
+}
+
+message PairingState {
+  bool pairing_enabled = 1;
+}
+
 message RebootRequest {
   uint32 delay_ms = 1;
 }
 
+message SpakeInfo {
+  optional bytes verifier = 1;
+  optional bytes salt = 2;
+  optional uint32 iteration_count = 3;
+}
+
 service Device {
   rpc FactoryReset(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
-  rpc Reboot(RebootRequest) returns (pw.protobuf.Empty){}
-  rpc TriggerOta(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
-  rpc SetOtaMetadataForProvider(MetadataForProvider) returns (pw.protobuf.Empty){}
   rpc GetDeviceInfo(pw.protobuf.Empty) returns (DeviceInfo){}
   rpc GetDeviceState(pw.protobuf.Empty) returns (DeviceState){}
-  rpc SetPairingState(PairingState) returns (pw.protobuf.Empty){}
+  rpc GetIcdMode(pw.protobuf.Empty) returns (IcdDeviceMode){}
   rpc GetPairingState(pw.protobuf.Empty) returns (PairingState){}
-  rpc SetPairingInfo(PairingInfo) returns (pw.protobuf.Empty){}
   rpc GetSpakeInfo(pw.protobuf.Empty) returns (SpakeInfo){}
+  rpc Reboot(RebootRequest) returns (pw.protobuf.Empty){}
+  rpc SetIcdMode(IcdDeviceMode) returns (pw.protobuf.Empty){}
+  rpc SetPairingInfo(PairingInfo) returns (pw.protobuf.Empty){}
+  rpc SetPairingState(PairingState) returns (pw.protobuf.Empty){}
+  rpc SetOtaMetadataForProvider(MetadataForProvider) returns (pw.protobuf.Empty){}
   rpc SetSpakeInfo(SpakeInfo) returns (pw.protobuf.Empty){}
   rpc ShutdownAllSubscriptions(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc TriggerIcdCheckin(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
+  rpc TriggerOta(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
 }

@@ -19,6 +19,7 @@
 #pragma once
 
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
+#include "app/icd/server/ICDConfigurationData.h"
 #include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
 #include "app/server/Server.h"
@@ -480,6 +481,68 @@ public:
         }
         return pw::OkStatus();
     }
+
+    /**
+     * @brief RPC to get the current ICD mode (SIT or LIT).
+     *
+     * This function is only available when CONFIG_CHIP_ICD_DSLS_SUPPORT is enabled.
+     * It retrieves the current operating mode of the Intermittently Connected Device
+     * from ICDConfigurationData and populates the response.
+     *
+     * @param request The empty RPC request message.
+     * @param response The RPC response message to be populated with the current ICD mode.
+     * @return pw::OkStatus on success, pw::Status::Unimplemented if the feature is disabled.
+     */
+    virtual pw::Status GetIcdMode(const pw_protobuf_Empty & request, chip_rpc_IcdDeviceMode & response)
+    {
+#if CONFIG_CHIP_ICD_DSLS_SUPPORT
+        if (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT)
+            response.icd_mode = chip_rpc_IcdMode_LIT_ICD;
+        else
+            response.icd_mode = chip_rpc_IcdMode_SIT_ICD;
+
+        ChipLogDetail(AppServer, "SetIcdMode to %d", response.icd_mode);
+        return pw::OkStatus();
+#else  // CONFIG_CHIP_ICD_DSLS_SUPPORT
+        ChipLogError(AppServer, "SetIcdMode is not supported");
+        return pw::Status::Unimplemented();
+#endif // CONFIG_CHIP_ICD_DSLS_SUPPORT
+    }
+    
+    /**
+     * @brief RPC to set the ICD mode to SIT or LIT.
+     *
+     * This function is only available when CONFIG_CHIP_ICD_DSLS_SUPPORT is enabled.
+     * It schedules a work item to request a change in the ICD operating mode
+     * based on the current ICD mode. If current is LIT mode will force the device
+     * into SIT mode, while current being SIT mode will withdraw the SIT request,
+     * allowing the device to enter LIT mode if other conditions are met.
+     *
+     * @param request The RPC request message containing the desired ICD mode.
+     * @param response The empty RPC response message.
+     * @return pw::OkStatus on success, pw::Status::Unimplemented if the feature is disabled.
+     */
+    virtual pw::Status SetIcdMode(const chip_rpc_IcdDeviceMode & request, pw_protobuf_Empty & response)
+    {
+#if CONFIG_CHIP_ICD_DSLS_SUPPORT
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                if (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT) {
+                    ChipLogDetail(AppServer, "SetIcdMode from LIT to SIT");
+                    chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification();
+                } else {
+                    ChipLogDetail(AppServer, "SetIcdMode from SIT to LIT");
+                    chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal();
+                }
+            },
+            reinterpret_cast<intptr_t>(nullptr));
+        return pw::OkStatus();
+#else  // CONFIG_CHIP_ICD_DSLS_SUPPORT
+        ChipLogError(AppServer, "SetIcdMode is not supported");
+        return pw::Status::Unimplemented();
+#endif // CONFIG_CHIP_ICD_DSLS_SUPPORT
+    }
+
 
     virtual pw::Status ShutdownAllSubscriptions(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
