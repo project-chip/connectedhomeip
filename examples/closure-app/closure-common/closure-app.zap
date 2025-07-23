@@ -6139,7 +6139,7 @@
       "profileId": 259,
       "endpointId": 2,
       "networkId": 0,
-      "parentEndpointIdentifier": null
+      "parentEndpointIdentifier": 1
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
@@ -6147,7 +6147,7 @@
       "profileId": 259,
       "endpointId": 3,
       "networkId": 0,
-      "parentEndpointIdentifier": null
+      "parentEndpointIdentifier": 1
     }
   ]
 }
