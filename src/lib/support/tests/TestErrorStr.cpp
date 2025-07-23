@@ -139,7 +139,8 @@ TEST(TestErrorStr, CheckErrorWithProvidedStorage)
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_ERROR_INTERNAL, true, storage)), "Error 0x000000AC");
 }
 
-TEST(TestErrorStr, CheckErrorWithDefaultStorage)
+#if CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+TEST(TestErrorStr, CheckErrorWithDefaultThreadLocalStorage)
 {
     const char * localNoError = ErrorStr(CHIP_NO_ERROR, false);
     EXPECT_STREQ(localNoError, CHIP_NO_ERROR_STRING);
@@ -149,6 +150,7 @@ TEST(TestErrorStr, CheckErrorWithDefaultStorage)
 
     EXPECT_STREQ(localNoError, CHIP_NO_ERROR_STRING);
 }
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 
 TEST(TestErrorStr, CheckFormatErr)
 {

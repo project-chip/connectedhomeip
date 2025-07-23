@@ -27,9 +27,13 @@
 namespace chip {
 
 /**
- * Thread-local buffer to store the formatted error string.
+ * Buffer to store the formatted error string.
  */
+#if CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 static thread_local ErrorStrStorage sErrorStr;
+#else  // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+static ErrorStrStorage sErrorStr;
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 
 /**
  * Linked-list of error formatter functions.
@@ -38,7 +42,11 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
 
 /**
  * This routine returns a human-readable NULL-terminated C string
- * describing the provided error. It uses thread-local storage.
+ * describing the provided error.
+ *
+ * If CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE is enabled, this function uses
+ * thread-local storage to store the formatted error string. Otherwise, it uses
+ * a global static buffer.
  *
  * @param[in] err                      The error for format and describe.
  * @param[in] withSourceLocation       Whether or not to include the source
