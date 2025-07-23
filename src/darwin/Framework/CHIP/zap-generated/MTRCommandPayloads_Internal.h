@@ -814,6 +814,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRRefrigeratorAlarmClusterResetParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRDishwasherModeClusterChangeToModeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

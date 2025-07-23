@@ -43,7 +43,54 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace RefrigeratorAlarm {} // namespace RefrigeratorAlarm
+namespace RefrigeratorAlarm {
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Reset {
+struct Type;
+struct DecodableType;
+} // namespace Reset
+
+} // namespace Commands
+
+namespace Commands {
+namespace Reset {
+enum class Fields : uint8_t
+{
+    kAlarms = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+
+    chip::BitMask<AlarmBitmap> alarms = static_cast<chip::BitMask<AlarmBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<AlarmBitmap> alarms = static_cast<chip::BitMask<AlarmBitmap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Reset
+} // namespace Commands
+} // namespace RefrigeratorAlarm
 } // namespace Clusters
 } // namespace app
 } // namespace chip

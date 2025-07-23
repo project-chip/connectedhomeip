@@ -17322,6 +17322,7 @@ class RefrigeratorAlarm(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="mask", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="latch", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="state", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="supported", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -17332,6 +17333,7 @@ class RefrigeratorAlarm(Cluster):
             ])
 
     mask: uint = 0
+    latch: typing.Optional[uint] = None
     state: uint = 0
     supported: uint = 0
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -17343,6 +17345,23 @@ class RefrigeratorAlarm(Cluster):
     class Bitmaps:
         class AlarmBitmap(IntFlag):
             kDoorOpen = 0x1
+
+    class Commands:
+        @dataclass
+        class Reset(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000057
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarms", Tag=0, Type=uint),
+                    ])
+
+            alarms: uint = 0
 
     class Attributes:
         @dataclass
@@ -17360,6 +17379,22 @@ class RefrigeratorAlarm(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class Latch(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000057
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
 
         @dataclass
         class State(ClusterAttributeDescriptor):

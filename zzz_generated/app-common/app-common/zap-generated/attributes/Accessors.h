@@ -1682,6 +1682,15 @@ Protocols::InteractionModel::Status
 Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value, MarkAttributeDirty markDirty);
 } // namespace Mask
 
+namespace Latch {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value, MarkAttributeDirty markDirty);
+} // namespace Latch
+
 namespace State {
 Protocols::InteractionModel::Status Get(EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap

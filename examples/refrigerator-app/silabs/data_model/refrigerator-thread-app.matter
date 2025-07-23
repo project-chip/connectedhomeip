@@ -1809,7 +1809,7 @@ cluster TemperatureControl = 86 {
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
 cluster RefrigeratorAlarm = 87 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
@@ -1823,6 +1823,7 @@ cluster RefrigeratorAlarm = 87 {
   }
 
   readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
   readonly attribute AlarmBitmap state = 2;
   readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1830,6 +1831,13 @@ cluster RefrigeratorAlarm = 87 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ResetRequest {
+    AlarmBitmap alarms = 0;
+  }
+
+  /** This command resets active and latched alarms (if possible). */
+  command Reset(ResetRequest): DefaultSuccess = 0;
 }
 
 endpoint 0 {

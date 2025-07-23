@@ -1808,6 +1808,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::RefrigeratorAlarm::Attributes::Mask::Id:
             return "Mask";
+        case chip::app::Clusters::RefrigeratorAlarm::Attributes::Latch::Id:
+            return "Latch";
         case chip::app::Clusters::RefrigeratorAlarm::Attributes::State::Id:
             return "State";
         case chip::app::Clusters::RefrigeratorAlarm::Attributes::Supported::Id:
@@ -5445,6 +5447,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::TemperatureControl::Commands::SetTemperature::Id:
             return "SetTemperature";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::RefrigeratorAlarm::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::Id:
+            return "Reset";
         default:
             return "Unknown";
         }
