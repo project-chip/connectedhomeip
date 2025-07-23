@@ -322,6 +322,78 @@ private:
     std::vector<CommandId> mGenerated;
 };
 
+/// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
+/// testing of behaviors when command enumeration is done in the interace.
+class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTesting::Id>
+{
+public:
+    ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceShim(endpointId, clusterId)
+    {
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+    }
+    ~ShimCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+
+    void InvokeCommand(HandlerContext & handlerContext) override
+    {
+        if (mHandleCommand)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
+            handlerContext.SetCommandHandled();
+        }
+        else
+        {
+            handlerContext.SetCommandNotHandled();
+        }
+    }
+
+    //
+    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
+
+    //
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    {
+        VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
+
+        for (auto id : mAccepted)
+        {
+            if (callback(id, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    //
+    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+    {
+        VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
+
+        for (auto id : mGenerated)
+        {
+            if (callback(id, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void SetOverrideAccepted(bool overrideAccepted) { mOverrideAccepted = overrideAccepted; }
+    void SetOverrideGenerated(bool overrideGenerated) { mOverrideGenerated = overrideGenerated; }
+
+    std::vector<CommandId> & AcceptedVec() { return mAccepted; }
+    std::vector<CommandId> & GeneratedVec() { return mGenerated; }
+
+private:
+    bool mOverrideAccepted  = false;
+    bool mOverrideGenerated = false;
+    bool mHandleCommand     = false;
+
+    std::vector<CommandId> mAccepted;
+    std::vector<CommandId> mGenerated;
+};
+
 class ScopedMockAccessControl
 {
 public:
@@ -571,78 +643,6 @@ const MockNodeConfig gTestNodeConfig({
     ),
 });
 // clang-format on
-
-/// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
-/// testing of behaviors when command enumeration is done in the interace.
-class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTesting::Id>
-{
-public:
-    ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceShim(endpointId, clusterId)
-    {
-        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
-    }
-    ~ShimCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
-
-    void InvokeCommand(HandlerContext & handlerContext) override
-    {
-        if (mHandleCommand)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
-            handlerContext.SetCommandHandled();
-        }
-        else
-        {
-            handlerContext.SetCommandNotHandled();
-        }
-    }
-
-    //
-    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
-
-    //
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
-    {
-        VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mAccepted)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    //
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
-    {
-        VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
-
-        for (auto id : mGenerated)
-        {
-            if (callback(id, context) != Loop::Continue)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    void SetOverrideAccepted(bool overrideAccepted) { mOverrideAccepted = overrideAccepted; }
-    void SetOverrideGenerated(bool overrideGenerated) { mOverrideGenerated = overrideGenerated; }
-
-    std::vector<CommandId> & AcceptedVec() { return mAccepted; }
-    std::vector<CommandId> & GeneratedVec() { return mGenerated; }
-
-private:
-    bool mOverrideAccepted  = false;
-    bool mOverrideGenerated = false;
-    bool mHandleCommand     = false;
-
-    std::vector<CommandId> mAccepted;
-    std::vector<CommandId> mGenerated;
-};
 
 struct UseMockNodeConfig
 {
