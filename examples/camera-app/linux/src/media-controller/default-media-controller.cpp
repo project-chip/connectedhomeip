@@ -24,21 +24,13 @@ void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t v
 {
     ChipLogProgress(Camera, "Registering transport: videoStreamID=%u, audioStreamID=%u", videoStreamID, audioStreamID);
 
-    std::lock_guard<std::mutex> lock(mConnectionsMutex);
-    mConnections.push_back({ transport, videoStreamID, audioStreamID });
+    std::lock_guard<std::mutex> lock(connectionsMutex);
+    connections.push_back({ transport, videoStreamID, audioStreamID });
 
     auto * bufferSink                      = new BufferSink();
-    bufferSink->requestedPreBufferLengthMs = 0; // by default give only live stream
-    bufferSink->sendAudio                  = [transport](const char * data, size_t size, const std::string & streamId) {
-        uint16_t sid = static_cast<uint16_t>(std::stoi(streamId.substr(1))); // remove 'a'
-        if (transport->CanSendAudio())
-            transport->SendAudio(data, size, sid);
-    };
-    bufferSink->sendVideo = [transport](const char * data, size_t size, const std::string & streamId) {
-        uint16_t sid = static_cast<uint16_t>(std::stoi(streamId.substr(1))); // remove 'v'
-        if (transport->CanSendVideo())
-            transport->SendVideo(data, size, sid);
-    };
+    bufferSink->transport                  = transport;
+    bufferSink->requestedPreBufferLengthMs = 0;    // by default give only live stream
+    bufferSink->minKeyframeIntervalMs      = 1000; // TODO:get values from camera-device
 
     std::unordered_set<std::string> streamKeys;
     streamKeys.insert("a" + std::to_string(audioStreamID));
@@ -67,28 +59,13 @@ void DefaultMediaController::UnregisterTransport(Transport * transport)
 
 void DefaultMediaController::DistributeVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-    // std::lock_guard<std::mutex> lock(connectionsMutex);
-    // for (const Connection & connection : connections)
-    // {
-    //     if (connection.videoStreamID == videoStreamID && connection.transport && connection.transport->CanSendVideo())
-    //     {
-    //         connection.transport->SendVideo(data, size, videoStreamID);
-    //     }
-    // }
+
     std::string streamKey = "v" + std::to_string(videoStreamID);
     preRollBuffer.PushFrameToBuffer(streamKey, data, size);
 }
 
 void DefaultMediaController::DistributeAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
-    // std::lock_guard<std::mutex> lock(connectionsMutex);
-    // for (const Connection & connection : connections)
-    // {
-    //     if (connection.audioStreamID == audioStreamID && connection.transport && connection.transport->CanSendAudio())
-    //     {
-    //         connection.transport->SendAudio(data, size, audioStreamID);
-    //     }
-    // }
     std::string streamKey = "a" + std::to_string(audioStreamID);
     preRollBuffer.PushFrameToBuffer(streamKey, data, size);
 }
@@ -99,7 +76,7 @@ void DefaultMediaController::SetPreRollLength(Transport * transport, uint16_t pr
     auto it = sinkMap.find(transport);
     if (it != sinkMap.end() && it->second != nullptr)
     {
-        it->second->requestedPreBufferLengthMs = std::min<int64_t>(preRollBufferLength, preRollBuffer.GetMaxPreBufferLengthMs());
+        it->second->requestedPreBufferLengthMs = preRollBufferLength;
         ChipLogProgress(Camera, "Delay updated for transport to %u ms", preRollBufferLength);
     }
     else
