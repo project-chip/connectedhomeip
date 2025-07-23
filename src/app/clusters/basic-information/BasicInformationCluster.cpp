@@ -380,7 +380,7 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 #define OPTIONAL_ATTR(name) { mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name), name::kMetadataEntry }
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        {!mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose),
+        { !mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose),
           UniqueID::kMetadataEntry },
         OPTIONAL_ATTR(ManufacturingDate),
         OPTIONAL_ATTR(PartNumber),
