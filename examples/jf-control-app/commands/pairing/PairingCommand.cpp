@@ -710,7 +710,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.Span(), adminICACPKSpan);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Controller, "Joint Commissioning MethodError parsing adminICAC Public Key");
+                ChipLogError(Controller, "Joint Commissioning Method Error parsing adminICAC Public Key");
                 SetCommandExitStatus(err);
                 return;
             }
