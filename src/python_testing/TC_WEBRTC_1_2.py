@@ -125,7 +125,7 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
 
         self.step(2)
         webrtc_peer.create_offer()
-        offer = webrtc_peer.get_local_offer()
+        offer = await webrtc_peer.get_local_offer()
 
         provide_offer_response: WebRTCTransportProvider.Commands.ProvideOfferResponse = await webrtc_peer.send_command(
             cmd=WebRTCTransportProvider.Commands.ProvideOffer(
@@ -192,7 +192,7 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
 
 async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl):
     webrtc_peer.create_offer()
-    offer = webrtc_peer.get_local_offer()
+    offer = await webrtc_peer.get_local_offer()
     aVideoStreamId = await ctrl.allocate_video_stream(endpoint)
     provide_offer_response: WebRTCTransportProvider.Commands.ProvideOfferResponse = await webrtc_peer.send_command(
         cmd=WebRTCTransportProvider.Commands.ProvideOffer(
