@@ -1577,7 +1577,6 @@ TEST_F(TestCodegenModelViaMocks, ShimCommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
 }
 
-
 TEST_F(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
