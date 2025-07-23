@@ -47,7 +47,7 @@ inline constexpr uint32_t kMetadataCount = 1;
 
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceOTAProvider::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+                                                                Access::Privilege::kAdminister);
 } // namespace AnnounceOTAProvider
 
 } // namespace Commands
