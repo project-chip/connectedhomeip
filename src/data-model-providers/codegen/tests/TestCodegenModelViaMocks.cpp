@@ -595,7 +595,7 @@ public:
             handlerContext.SetCommandNotHandled();
         }
     }
- 
+
     //
     void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
