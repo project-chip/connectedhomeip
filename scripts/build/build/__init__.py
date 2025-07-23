@@ -12,6 +12,7 @@ from .targets import BUILD_TARGETS
 class BuildSteps(Enum):
     GENERATED = auto()
 
+
 class BuildTarget:
     """Represents a build target: a target name together with an output subdirectory"""
 
