@@ -218,6 +218,7 @@ public:
      * if the server wasn't able to determine a current suggestion, sets the ThermostatSuggestionNotFollowingReason accordingly.
      * This API should be responsible for keeping track of ExpirationTime for the current thermostat suggestion and re-evaluating
      * the next current suggestion when the current suggestion expires.
+     * The caller of this API must ensure that they remove all expired suggestions prior to calling this.
      *
      * @return CHIP_NO_ERROR if a current thermostat suggestion was evaluated successfully.
      * @return CHIP_ERROR if there was an error evaluating the current thermostat suggestion.

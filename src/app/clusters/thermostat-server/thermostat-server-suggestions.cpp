@@ -59,6 +59,7 @@ CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
         if (suggestion.GetExpirationTime() <= Seconds32(currentMatterEpochTimestampInSeconds))
         {
             err = delegate->RemoveFromThermostatSuggestionsList(static_cast<size_t>(i));
+            ReturnErrorOnFailure(err);
         }
     }
     return err;
