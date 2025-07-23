@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 from enum import Enum, auto
-from typing import Sequence
+from typing import Optional, Sequence
 
 from builders.builder import BuilderOptions
 
