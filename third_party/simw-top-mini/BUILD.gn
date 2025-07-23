@@ -162,7 +162,8 @@ static_library("se05x") {
 
   if (chip_device_platform == "nxp") {
     if (nxp_platform == "rt/rw61x") {
-      deps = [ "${chip_root}/third_party/nxp/nxp_matter_support/gn_build:nxp_sdk" ]
+      deps =
+          [ "${chip_root}/third_party/nxp/nxp_matter_support/gn_build:nxp_sdk" ]
     }
   }
 

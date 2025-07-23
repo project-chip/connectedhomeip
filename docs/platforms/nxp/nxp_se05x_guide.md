@@ -49,7 +49,6 @@ build environment.
     | 3V3     | J801_VCC    | J8_4            |
     | GND     | J801_GND    | J8_7            |
 
-
 #### Build the example as
 
 ```
@@ -63,7 +62,6 @@ control what crypto operations to be offloaded to SE05x.
 
 Refer [SE05x Type Configurations](#se05x_type_configurations) sections to select
 the correct variant of secure element connected.
-
 
 ### RW61x
 
@@ -80,7 +78,6 @@ control what crypto operations to be offloaded to SE05x.
 
 Refer [SE05x Type Configurations](#se05x_type_configurations) sections to select
 the correct variant of secure element connected.
-
 
 <a name="se05x_crypto_configurations"></a>
 
