@@ -2071,7 +2071,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
 }
 
-void DeviceCommissioner::ContinueCommissioningOverOperationalNetwork(void)
+void DeviceCommissioner::ContinueCommissioningOverOperationalNetwork()
 {
     ChipLogProgress(Controller, "DeviceCommissioner::ContinueCommissioningOverOperationalNetwork");
 
