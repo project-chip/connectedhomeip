@@ -444,7 +444,7 @@ class BuildTarget:
         return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
     def Create(self, name: str, runner, repository_path: str, output_prefix: str,
-               verbose: bool, ninja_jobs: int, builder_options: BuilderOptions):
+               output_dir: Optional[str], verbose: bool, ninja_jobs: int, builder_options: BuilderOptions):
 
         parts = self.StringIntoTargetParts(name)
 
@@ -460,7 +460,7 @@ class BuildTarget:
         builder = self.builder_class(repository_path, runner=runner, **kargs)
         builder.target = self
         builder.identifier = name
-        builder.output_dir = os.path.join(output_prefix, name)
+        builder.output_dir = os.path.join(output_prefix, output_dir if output_dir else name)
         builder.verbose = verbose
         builder.ninja_jobs = ninja_jobs
         builder.chip_dir = os.path.abspath(repository_path)

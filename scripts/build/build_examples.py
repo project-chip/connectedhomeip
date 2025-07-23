@@ -88,7 +88,7 @@ def ValidateTargetNames(context, parameter, values):
     default=[],
     multiple=True,
     callback=ValidateTargetNames,
-    help='Build target(s)')
+    help='Build target(s). Can use ":" as a separator for the output directoyr name (which otherwise defaults to the target name)')
 @click.option(
     '--enable-link-map-file',
     default=False,
@@ -174,7 +174,10 @@ before running this script.
         ninja_jobs=ninja_jobs, runner=runner
     )
 
-    requested_targets = set([t.lower() for t in target])
+
+    requested_targets = [build.BuildTarget.From(target) for target in set([t.lower() for t in target])]
+    
+    
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,

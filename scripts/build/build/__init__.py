@@ -12,6 +12,26 @@ from .targets import BUILD_TARGETS
 class BuildSteps(Enum):
     GENERATED = auto()
 
+class BuildTarget:
+    """Represents a build target: a target name together with an output subdirectory"""
+
+    def __init__(self, name: str, output_dir: Optional[str]):
+        if not output_dir:
+            output_dir = name
+        self.name = name
+        self.output_dir = output_dir
+
+    @staticmethod
+    def From(target: str):
+        """Allows a target to be either a stand-alone target OR a ":"-separated
+        tuple of target name and output directory.
+        """
+        if ':' in target:
+            name, output_dir = target.split(':')
+        else:
+            name, output_dir = target, None
+        return BuildTarget(name, output_dir)
+
 
 class Context:
     """Represents a grouped list of platform/board/app builders to use
@@ -28,7 +48,7 @@ class Context:
         self.ninja_jobs = ninja_jobs
         self.completed_steps = set()
 
-    def SetupBuilders(self, targets: Sequence[str], options: BuilderOptions):
+    def SetupBuilders(self, targets: Sequence[BuildTarget], options: BuilderOptions):
         """
         Configures internal builders for the given platform/board/app
         combination.
@@ -38,8 +58,8 @@ class Context:
         for target in targets:
             found = False
             for choice in BUILD_TARGETS:
-                builder = choice.Create(target, self.runner, self.repository_path,
-                                        self.output_prefix, self.verbose, self.ninja_jobs,
+                builder = choice.Create(target.name, self.runner, self.repository_path,
+                                        self.output_prefix, target.output_dir, self.verbose, self.ninja_jobs,
                                         options)
                 if builder:
                     self.builders.append(builder)
