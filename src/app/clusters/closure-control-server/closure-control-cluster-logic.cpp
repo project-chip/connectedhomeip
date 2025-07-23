@@ -269,7 +269,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
     
             if (mConformance.HasFeature(Feature::kPositioning))
             {
-                VerifyOrReturnError(!incomingOverallCurrentState.position.HasValue() || incomingOverallCurrentState.position.Value().IsNull(),
+                VerifyOrReturnError(incomingOverallCurrentState.position.HasValue() && !incomingOverallCurrentState.position.Value().IsNull(),
                                     CHIP_ERROR_INVALID_ARGUMENT);
                 VerifyOrReturnError(incomingOverallCurrentState.position.Value().Value() == CurrentPositionEnum::kFullyClosed,
                                     CHIP_ERROR_INVALID_ARGUMENT);
@@ -277,7 +277,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
 
             if (mConformance.HasFeature(Feature::kMotionLatching))
             {
-                VerifyOrReturnError(!incomingOverallCurrentState.latch.HasValue() || incomingOverallCurrentState.latch.Value().IsNull(),
+                VerifyOrReturnError(incomingOverallCurrentState.latch.HasValue() && !incomingOverallCurrentState.latch.Value().IsNull(),
                                     CHIP_ERROR_INVALID_ARGUMENT);
                 VerifyOrReturnError(incomingOverallCurrentState.latch.Value().Value() == true, CHIP_ERROR_INVALID_ARGUMENT);
             }
