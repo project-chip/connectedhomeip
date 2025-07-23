@@ -21,9 +21,7 @@
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
-PreRollBuffer::PreRollBuffer(int64_t maxPreBufferLengthMs, size_t maxTotalBytes) :
-    maxPreBufferLengthMs(maxPreBufferLengthMs), maxTotalBytes(maxTotalBytes)
-{}
+PreRollBuffer::PreRollBuffer(size_t maxTotalBytes) : maxTotalBytes(maxTotalBytes) {}
 
 void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const char * data, size_t size)
 {
@@ -33,32 +31,42 @@ void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const char 
     memcpy(frame->data.get(), data, size);
     frame->size  = size;
     frame->ptsMs = NowMs();
-
     auto & queue = buffers[streamKey]; // Get or create the queue for this stream key
     queue.push_back(frame);
-    bufferSizes[streamKey] += size; // Track total bytes in buffer for this stream key
-
-    TrimBuffer(queue);
+    contentBufferSize += size; // Track total bytes in buffer for all streams
+    TrimBuffer();
     PushBufferToTransport(); // Automatically flush after each frame push
 }
 
 void PreRollBuffer::PushBufferToTransport()
 {
-    int64_t currentTime  = NowMs();
-    int64_t pushMarginMs = 500;
+    int64_t currentTime = NowMs();
     std::vector<BufferSink *> sinksToRemove;
 
-    for (const auto & [sink, streamKeys] : sinkSubscriptions)
+    for (auto & [sink, streamKeys] : sinkSubscriptions)
     {
-        if (!sink->sendAudio && !sink->sendVideo)
+        if (!sink->transport)
         {
             sinksToRemove.push_back(sink);
             continue;
         }
 
-        // Calculated prerollbuffer that can be provided
-        int64_t effectiveDelay = std::min(sink->requestedPreBufferLengthMs, maxPreBufferLengthMs);
+        // if (sink->transport->GetTransportStatus() /*0:Active, 1:Inactive */)
+        // {
+        //     // Remove delivery records when transport is inactive
+        //     for (auto & [_, bufferQueue] : buffers)
+        //     {
+        //         for (auto & frame : bufferQueue)
+        //         {
+        //             frame->deliveredTo.erase(sink);
+        //         }
+        //     }
+        //     continue;
+        // }
 
+        int64_t minTimeToDeliver = (sink->requestedPreBufferLengthMs == 0 && sink->transport->CanSendVideo())
+            ? currentTime - sink->minKeyframeIntervalMs
+            : currentTime - sink->requestedPreBufferLengthMs;
         for (const std::string & streamKey : streamKeys)
         {
             auto it = buffers.find(streamKey);
@@ -68,20 +76,32 @@ void PreRollBuffer::PushBufferToTransport()
                 continue;
             }
 
-	    int64_t targetTime = currentTime - effectiveDelay;
             for (const auto & frame : it->second)
             {
-                if ((frame->ptsMs >= targetTime) && (frame->ptsMs < targetTime + pushMarginMs) &&
-                    (frame->deliveredTo.find(sink) == frame->deliveredTo.end()))
+                if (frame->ptsMs < minTimeToDeliver)
+                {
+                    continue;
+                }
+                if (frame->deliveredTo.find(sink) != frame->deliveredTo.end())
+                {
+                    continue;
+                }
+                else
                 {
                     // Frame is not older than the requested prebuffer length and hasn't been delivered to this sink yet
-                    if (streamKey[0] == 'a' && sink->sendAudio)
+                    if (streamKey[0] == 'a' && sink->transport->CanSendAudio())
                     {
-                        sink->sendAudio(frame->data.get(), frame->size, streamKey);
+                        sink->transport->SendAudio(frame->data.get(), frame->size,
+                                                   static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
                     }
-                    else if (streamKey[0] == 'v' && sink->sendVideo)
+                    else if (streamKey[0] == 'v' && sink->transport->CanSendVideo())
                     {
-                        sink->sendVideo(frame->data.get(), frame->size, streamKey);
+                        sink->transport->SendVideo(frame->data.get(), frame->size,
+                                                   static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
+                    }
+                    else
+                    {
+                        continue; // Cannot send
                     }
                     // Mark as delivered to this sink to avoid duplicate delivery
                     frame->deliveredTo.insert(sink);
@@ -107,27 +127,37 @@ void PreRollBuffer::DeregisterTransportFromBuffer(BufferSink * sink)
     sinkSubscriptions.erase(sink);
 }
 
-void PreRollBuffer::TrimBuffer(std::deque<std::shared_ptr<PreRollFrame>> & buffer)
+void PreRollBuffer::TrimBuffer()
 {
-    int64_t currentTime = NowMs();
-    if (buffer.empty())
+    while (contentBufferSize > maxTotalBytes)
     {
-        return;
-    }
+        std::shared_ptr<PreRollFrame> oldest = nullptr;
+        std::string oldestStreamKey;
 
-    size_t & size = bufferSizes[buffer.front()->streamKey];
-
-    while (!buffer.empty())
-    {
-        auto & front = buffer.front();
-        if ((currentTime - front->ptsMs > maxPreBufferLengthMs) || (size > maxTotalBytes))
+        // Find the oldest frame across all buffers
+        for (auto & [streamKey, buffer] : buffers)
         {
-            size -= front->size;
-            buffer.pop_front();
+            if (!buffer.empty())
+            {
+                auto & candidate = buffer.front();
+                if (!oldest || candidate->ptsMs < oldest->ptsMs)
+                {
+                    oldest          = candidate;
+                    oldestStreamKey = streamKey;
+                }
+            }
+        }
+
+        if (oldest)
+        {
+            // Remove it
+
+            buffers[oldestStreamKey].pop_front();
+            maxTotalBytes -= oldest->size;
         }
         else
         {
-            break;
+            break; // Nothing to remove
         }
     }
 }

@@ -43,8 +43,8 @@ public:
     void SetPreRollLength(Transport * transport, uint16_t PreRollBufferLength) override;
 
 private:
-
-    PreRollBuffer preRollBuffer{ 5000, 1024 * 1024 }; // 5 sec, 1MB buffer
+    // TODO: Look into ways to fetch from camera-device
+    PreRollBuffer preRollBuffer{ 4096 };
     std::vector<Connection> connections;
     std::mutex connectionsMutex;
     std::unordered_map<Transport *, BufferSink *> sinkMap; // map of transport to sink
