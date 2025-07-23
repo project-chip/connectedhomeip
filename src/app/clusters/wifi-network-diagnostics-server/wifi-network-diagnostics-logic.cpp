@@ -18,8 +18,6 @@
 #include <app/EventLogging.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
 #include <clusters/WiFiNetworkDiagnostics/Attributes.h>
-#include <clusters/WiFiNetworkDiagnostics/Ids.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
 #include <tracing/metric_event.h>
 

@@ -16,11 +16,8 @@
  */
 
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
-#include <clusters/WiFiNetworkDiagnostics/Attributes.h>
-#include <clusters/WiFiNetworkDiagnostics/Commands.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
-#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;

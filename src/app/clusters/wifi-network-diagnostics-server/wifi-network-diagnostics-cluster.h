@@ -21,9 +21,6 @@
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/WiFiNetworkDiagnostics/ClusterId.h>
-#include <clusters/WiFiNetworkDiagnostics/Enums.h>
-#include <clusters/WiFiNetworkDiagnostics/Metadata.h>
-#include <lib/core/DataModelTypes.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
