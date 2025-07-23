@@ -314,7 +314,7 @@ class TC_SC_4_1(MatterBaseTest):
         # and must be encoded as a variable-length decimal value with up to 4
         # digits omitting any leading zeros
         asserts.assert_true(self.verify_d_key(commissionable_service.txt_record), "D key is invalid or not present.")
-        
+
         # If VP TXT record key is present, verify it contain at least Vendor ID
         # and if Product ID is present, values must be separated by a + sign
         vp_key = commissionable_service.txt_record['VP']
@@ -326,7 +326,7 @@ class TC_SC_4_1(MatterBaseTest):
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
         sii_key = commissionable_service.txt_record['SII']
         if sii_key:
-            result, message = self.is_valid_key_decimal_value(sii_key, ONE_HOUR_IN_MS)        
+            result, message = self.is_valid_key_decimal_value(sii_key, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # If SAI TXT record key is present, SAI key must be an unsigned integer with
@@ -334,7 +334,7 @@ class TC_SC_4_1(MatterBaseTest):
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
         sai_key = commissionable_service.txt_record['SAI']
         if sai_key:
-            result, message = self.is_valid_key_decimal_value(sai_key, ONE_HOUR_IN_MS)        
+            result, message = self.is_valid_key_decimal_value(sai_key, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # - If the SAT TXT record key is present, verify that it is a decimal value with
@@ -349,7 +349,6 @@ class TC_SC_4_1(MatterBaseTest):
             if supports_icd:
                 logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
                 asserts.assert_equal(int(sat_key), active_mode_threshold_ms)
-
 
 
 if __name__ == "__main__":
