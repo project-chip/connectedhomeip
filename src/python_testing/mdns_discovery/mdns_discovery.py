@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import ipaddress
 import json
 import logging
 from asyncio import Event, TimeoutError, ensure_future, wait_for
@@ -23,11 +24,13 @@ from enum import Enum
 from functools import partial
 from typing import Dict, List, Optional
 
+import netifaces
 from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
 from mdns_discovery.data_clases.ptr_record import PtrRecord
 from mdns_discovery.data_clases.quada_record import QuadaRecord
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
+from zeroconf._utils.net import InterfaceChoice
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
 from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT
 
@@ -66,8 +69,6 @@ class MdnsDiscovery:
 
     DISCOVERY_TIMEOUT_SEC = 15
 
-    ip_version = IPVersion.V6Only
-
     def __init__(self, verbose_logging: bool = False):
         """
         Initializes the MdnsDiscovery instance.
@@ -83,9 +84,13 @@ class MdnsDiscovery:
             - get_txt_record
             - get_quada_records
             - get_ptr_records
+            - get_commissionable_subtypes
         """
+        # List of IPv6 addresses to use for mDNS discovery.
+        self.interfaces = self._get_ipv6_addresses()
+
         # An instance of Zeroconf to manage mDNS operations.
-        self._azc = AsyncZeroconf(ip_version=self.ip_version)
+        self._azc = AsyncZeroconf(interfaces=self.interfaces)
 
         # A dictionary to store discovered services.
         self._discovered_services = {}
@@ -197,7 +202,7 @@ class MdnsDiscovery:
 
     async def get_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,) -> List[str]:
         """
-        Asynchronously discovers all available mDNS services within the network and returns a list
+        Asynchronously discovers all available mDNS service types within the network and returns a list
         of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
         function to perform the network scan for mDNS services.
 
@@ -211,17 +216,18 @@ class MdnsDiscovery:
                     element in the list is a string representing a unique type of service found during
                     the discovery process.
         """
+        logger.info("Discovering all available mDNS service types...")
         try:
-            discovered_services = list(await wait_for(AsyncZeroconfServiceTypes.async_find(), timeout=discovery_timeout_sec))
+            service_types = list(set(await wait_for(AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces), timeout=discovery_timeout_sec)))
         except TimeoutError:
             logger.info(f"mDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
-            discovered_services = []
+            service_types = []
 
         if log_output:
             logger.info(
-                "\n\nmDNS discovered service types:\n%s\n", "\n".join(f"  - {s}" for s in discovered_services))
+                "\n\nDiscovered mDNS service types:\n%s\n", "\n".join(f"  - {s}" for s in service_types))
 
-        return discovered_services
+        return service_types
 
     async def get_srv_record(self, service_name: str,
                              service_type: str,
@@ -252,7 +258,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'SRV', service name '{service_name}'")
 
-        async with AsyncZeroconf(ip_version=self.ip_version) as azc:
+        async with AsyncZeroconf() as azc:
             mdns_service_info = None
 
             # Adds service listener
@@ -319,7 +325,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'TXT', service name '{service_name}'")
 
-        async with AsyncZeroconf(ip_version=self.ip_version) as azc:
+        async with AsyncZeroconf() as azc:
             mdns_service_info = None
 
             # Adds service listener
@@ -381,7 +387,7 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for mDNS record, type 'AAAA',  hostname '{hostname}'")
 
-        async with AsyncZeroconf(ip_version=self.ip_version) as azc:
+        async with AsyncZeroconf() as azc:
             # Perform AAAA query
             addr_resolver = AddressResolverIPv6(server=hostname)
 
@@ -394,7 +400,7 @@ class MdnsDiscovery:
                 return None
 
             # Get IPv6 addresses
-            ipv6_addresses = addr_resolver.ip_addresses_by_version(version=self.ip_version)
+            ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
             if ipv6_addresses:
                 quada_records: list[QuadaRecord] = [
                     QuadaRecord.build(ipv6)
@@ -413,8 +419,8 @@ class MdnsDiscovery:
             return quada_records
 
     async def get_ptr_records(self,
-                              discovery_timeout_sec: float,
                               service_types: list[str],
+                              discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                               log_output: bool = False,
                               ) -> list[PtrRecord]:
         """
@@ -462,6 +468,37 @@ class MdnsDiscovery:
 
         return ptr_records
 
+    async def get_commissionable_subtypes(self,
+                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                                          log_output: bool = False,) -> list[str]:
+        """
+        Asynchronously retrieves a list of commissionable mDNS service subtypes.
+
+        Args:
+            discovery_timeout_sec (float, optional): Timeout in seconds for the service type discovery. Defaults to DISCOVERY_TIMEOUT_SEC.
+            log_output (bool, optional): If True, logs the discovered commissionable subtypes. Defaults to False.
+
+        Returns:
+            list[str]: A list of strings representing the discovered commissionable mDNS service subtypes.
+        """
+        # Get service types
+        service_types = await self.get_service_types(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=False
+        )
+
+        # Filter for commissionable subtypes
+        sub_types = [
+            st for st in service_types
+            if st.startswith('_') and f'._sub.{MdnsServiceType.COMMISSIONABLE.value}' in st
+        ]
+
+        if log_output:
+            logger.info(
+                "\n\nDiscovered mDNS commissionable service subtypes:\n%s\n", "\n".join(f"  - {s}" for s in sub_types))
+
+        return sub_types
+
     # Private methods
     async def _get_service(self, service_type: MdnsServiceType,
                            log_output: bool,
@@ -508,6 +545,7 @@ class MdnsDiscovery:
     async def _discover(self,
                         discovery_timeout_sec: float,
                         log_output: bool,
+                        service_types: Optional[List[str]] = None,
                         all_services: bool = False,
                         unlock_service: bool = True,
                         ) -> None:
@@ -519,9 +557,13 @@ class MdnsDiscovery:
                                         announcements to be collected.
             log_output (bool): If True, logs the discovered services to the console in JSON format for debugging or informational
                             purposes. Defaults to False.
+            service_types (Optional[List[str]]): Specific service types to discover (e.g., ['_matterc._udp.local.']).
             unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
             all_services (bool): If True, discovers all available mDNS services. If False, discovers services based on the
                                 predefined `_service_types` list. Defaults to False.
+
+        Raises:
+            ValueError: If both `all_services` and `service_types` are provided.
 
         Returns:
             None: This method does not return any value.
@@ -530,10 +572,18 @@ class MdnsDiscovery:
             The discovery duration may need to be adjusted based on network conditions and expected response times for service
             announcements.
         """
+        if all_services and service_types:
+            raise ValueError("Specify either 'all_services' or 'service_types', not both.")
+
         self._event.clear()
 
         if all_services:
-            self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.ip_version)))
+            self._service_types = []
+            self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces)))
+
+        if service_types:
+            self._service_types = []
+            self._service_types = service_types
 
         logger.info(f"Browsing for mDNS service(s) of type: {self._service_types}")
 
@@ -619,7 +669,7 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        async with AsyncZeroconf(ip_version=self.ip_version) as azc:
+        async with AsyncZeroconf() as azc:
             mdns_service_info = None
             discovery_timeout_sec = 3
 
@@ -705,3 +755,45 @@ class MdnsDiscovery:
         converted_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
         json_str = json.dumps(converted_services, indent=4)
         logger.info("Discovery data:\n%s", json_str)
+
+    @staticmethod
+    def _get_ipv6_addresses():
+        results = []
+        for iface in netifaces.interfaces():
+            try:
+                # Get list of IPv6 addresses for the interface
+                addrs = netifaces.ifaddresses(iface).get(netifaces.AF_INET6, [])
+            except ValueError:
+                # Skip interfaces that don’t support IPv6
+                continue
+
+            for addr_info in addrs:
+                addr = addr_info.get('addr', '')
+                if not addr:
+                    continue
+
+                # Normalize by stripping any existing scope
+                base_addr = addr.split('%')[0]
+
+                try:
+                    ip = ipaddress.IPv6Address(base_addr)
+                except ValueError:
+                    # Skip invalid addresses
+                    continue
+
+                # Include link-local, ULA (fdxx::/8), and global (2000::/3), skip loopback (::1)
+                if ip.is_loopback:
+                    continue  # Skip ::1 (loopback); not usable for external discovery
+
+                if ip.is_link_local:
+                    results.append(f"{base_addr}%{iface}")  # Append scope for link-local
+                elif ip.is_private or ip.is_global:
+                    results.append(base_addr)  # ULA or global addresses
+
+        if not results:
+            # No usable IPv6, fallback to Zeroconf default
+            logger.info("\n\nDefaulting to InterfaceChoice.All\n")
+            return InterfaceChoice.All
+
+        logger.info(f"\n\nDiscovered IPv6 addresses: {results}\n")
+        return results
