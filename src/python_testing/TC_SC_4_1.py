@@ -34,10 +34,10 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-from asyncio import sleep
 import ipaddress
 import logging
 import re
+from asyncio import sleep
 from typing import Any
 
 import chip.clusters as Clusters

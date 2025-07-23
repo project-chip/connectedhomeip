@@ -15,25 +15,24 @@
 #    limitations under the License.
 #
 
+import ipaddress
 import json
 import logging
-import netifaces
-import ipaddress
-
 from asyncio import Event, TimeoutError, ensure_future, wait_for
 from dataclasses import asdict
 from enum import Enum
 from functools import partial
 from typing import Dict, List, Optional
 
+import netifaces
 from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
 from mdns_discovery.data_clases.ptr_record import PtrRecord
 from mdns_discovery.data_clases.quada_record import QuadaRecord
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
+from zeroconf._utils.net import InterfaceChoice
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
 from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT
-from zeroconf._utils.net import InterfaceChoice
 
 logger = logging.getLogger(__name__)
 
