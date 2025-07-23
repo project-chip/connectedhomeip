@@ -76,7 +76,6 @@ public:
     void OnShutDown() override;
 
 private:
-
     BitFlags<OptionalBasicInformationAttributes> mEnabledOptionalAttributes;
 
     char mNodeLabelBuffer[32 + 1];

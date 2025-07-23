@@ -256,7 +256,6 @@ void LogIfReadError(AttributeId attributeId, CHIP_ERROR err)
 
 BasicInformationCluster gInstance;
 
-
 } // namespace
 
 namespace chip::app::Clusters {
