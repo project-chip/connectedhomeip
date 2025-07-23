@@ -19,6 +19,8 @@ namespace AirQuality {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 6;
+
 namespace AirQuality {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(AirQuality::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -26,7 +28,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AirQuality::Id, BitFla
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace AirQuality
 } // namespace Clusters
 } // namespace app

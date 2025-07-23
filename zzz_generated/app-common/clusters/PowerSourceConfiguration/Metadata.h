@@ -19,6 +19,8 @@ namespace PowerSourceConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 6;
+
 namespace Sources {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Sources::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -27,7 +29,10 @@ inline constexpr DataModel::AttributeEntry
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace PowerSourceConfiguration
 } // namespace Clusters
 } // namespace app

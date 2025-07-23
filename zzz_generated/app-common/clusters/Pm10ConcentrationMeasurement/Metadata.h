@@ -19,6 +19,8 @@ namespace Pm10ConcentrationMeasurement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 16;
+
 namespace MeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -67,7 +69,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelValue::Id, BitFla
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace Pm10ConcentrationMeasurement
 } // namespace Clusters
 } // namespace app

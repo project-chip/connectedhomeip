@@ -19,6 +19,8 @@ namespace SoftwareDiagnostics {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 9;
+
 namespace ThreadMetrics {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ThreadMetrics::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -41,6 +43,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHeapHighWaterma
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace ResetWatermarks {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetWatermarks::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

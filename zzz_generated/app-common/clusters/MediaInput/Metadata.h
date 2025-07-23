@@ -19,6 +19,8 @@ namespace MediaInput {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace InputList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(InputList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -32,6 +34,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentInput::Id, BitF
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 4;
+
 namespace SelectInput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelectInput::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

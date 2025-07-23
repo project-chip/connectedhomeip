@@ -19,6 +19,8 @@ namespace ApplicationBasic {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 13;
+
 namespace VendorName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(VendorName::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -56,7 +58,10 @@ inline constexpr DataModel::AttributeEntry
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace ApplicationBasic
 } // namespace Clusters
 } // namespace app

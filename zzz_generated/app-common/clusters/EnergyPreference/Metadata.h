@@ -19,6 +19,8 @@ namespace EnergyPreference {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 10;
+
 namespace EnergyBalances {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(EnergyBalances::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -48,7 +50,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentLowPowerModeSen
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace EnergyPreference
 } // namespace Clusters
 } // namespace app

@@ -19,6 +19,8 @@ namespace ElectricalEnergyMeasurement {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 11;
+
 namespace Accuracy {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Accuracy::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -48,7 +50,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyReset:
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
 } // namespace app

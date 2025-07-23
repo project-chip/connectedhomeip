@@ -19,6 +19,8 @@ namespace Thermostat {
 inline constexpr uint32_t kRevision = 9;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 69;
+
 namespace LocalTemperature {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LocalTemperature::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -301,6 +303,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 9;
+
 namespace SetpointRaiseLower {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetpointRaiseLower::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

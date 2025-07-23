@@ -19,6 +19,8 @@ namespace CommissionerControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 6;
+
 namespace SupportedDeviceCategories {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategories::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kManage,
@@ -28,6 +30,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategor
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace RequestCommissioningApproval {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(RequestCommissioningApproval::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);

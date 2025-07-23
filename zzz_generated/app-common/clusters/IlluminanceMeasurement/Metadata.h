@@ -19,6 +19,8 @@ namespace IlluminanceMeasurement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 10;
+
 namespace MeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -42,7 +44,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LightSensorType::Id, B
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace IlluminanceMeasurement
 } // namespace Clusters
 } // namespace app

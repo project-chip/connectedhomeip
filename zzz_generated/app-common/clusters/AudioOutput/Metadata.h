@@ -19,6 +19,8 @@ namespace AudioOutput {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace OutputList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(OutputList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -32,6 +34,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentOutput::Id, Bit
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace SelectOutput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelectOutput::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

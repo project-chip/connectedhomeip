@@ -19,6 +19,8 @@ namespace OccupancySensing {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 19;
+
 namespace Occupancy {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Occupancy::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -88,7 +90,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalContactUnoccup
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace OccupancySensing
 } // namespace Clusters
 } // namespace app

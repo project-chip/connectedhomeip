@@ -307,8 +307,8 @@ public:
         return builder.AppendElements(Span<const CommandId>(mGenerated.data(), mGenerated.size()));
     }
 
-    void SetOverrideAccepted(bool overrideAccepted) { mOverrideAccepted = o; }
-    void SetOverrideGenerated(bool overrideGenerated) { mOverrideGenerated = o; }
+    void SetOverrideAccepted(bool overrideAccepted) { mOverrideAccepted = overrideAccepted; }
+    void SetOverrideGenerated(bool overrideGenerated) { mOverrideGenerated = overrideGenerated; }
 
     std::vector<DataModel::AcceptedCommandEntry> & AcceptedVec() { return mAccepted; }
     std::vector<CommandId> & GeneratedVec() { return mGenerated; }

@@ -108,23 +108,13 @@ public:
     typedef Loop (*CommandIdCallback)(CommandId id, void * context);
 
     /**
-     * Function that may be implemented to enumerate accepted (client-to-server)
+     * Function that may be implemented to retrieve accepted (client-to-server)
      * commands for the given cluster.
      *
      * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of accepted
      * commands will come from the endpoint metadata for the cluster.
-     *
-     * If this function returns any other error, that will be treated as an
-     * error condition by the caller, and handling will depend on the caller.
-     *
-     * Otherwise the list of accepted commands will be the list of values passed
-     * to the provided callback.
-     *
-     * The implementation _must_ pass the provided context to the callback.
-     *
-     * If the callback returns Loop::Break, there must be no more calls to it.
-     * This is used by callbacks that just look for a particular value in the
-     * list.
+     * 
+     * Otherwise the list of accepted commands will be added to the builder
      */
     virtual CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
@@ -136,20 +126,10 @@ public:
      * Function that may be implemented to enumerate generated (response)
      * commands for the given cluster.
      *
-     * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of
-     * generated commands will come from the endpoint metadata for the cluster.
-     *
-     * If this function returns any other error, that will be treated as an
-     * error condition by the caller, and handling will depend on the caller.
-     *
-     * Otherwise the list of generated commands will be the list of values
-     * passed to the provided callback.
-     *
-     * The implementation _must_ pass the provided context to the callback.
-     *
-     * If the callback returns Loop::Break, there must be no more calls to it.
-     * This is used by callbacks that just look for a particular value in the
-     * list.
+     * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of generated
+     * commands will come from the endpoint metadata for the cluster.
+     * 
+     * Otherwise the list of generated commands will be added to the builder
      */
     virtual CHIP_ERROR RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
     {

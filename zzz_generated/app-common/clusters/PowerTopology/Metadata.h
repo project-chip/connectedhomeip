@@ -19,6 +19,8 @@ namespace PowerTopology {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace AvailableEndpoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AvailableEndpoints::Id,
@@ -34,7 +36,10 @@ inline constexpr DataModel::AttributeEntry
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

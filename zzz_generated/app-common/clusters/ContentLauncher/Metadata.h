@@ -19,6 +19,8 @@ namespace ContentLauncher {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace AcceptHeader {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AcceptHeader::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -33,6 +35,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedStreamingProt
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace LaunchContent {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(LaunchContent::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

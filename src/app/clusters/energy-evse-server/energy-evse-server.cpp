@@ -187,7 +187,7 @@ CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluste
                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(7));
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kMetadataCount));
 
     ReturnErrorOnFailure(builder.AppendElements({ Disable::kMetadataEntry, EnableCharging::kMetadataEntry }));
 

@@ -19,6 +19,8 @@ namespace ElectricalPowerMeasurement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 24;
+
 namespace PowerMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -104,7 +106,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(NeutralCurrent::Id, Bi
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace ElectricalPowerMeasurement
 } // namespace Clusters
 } // namespace app

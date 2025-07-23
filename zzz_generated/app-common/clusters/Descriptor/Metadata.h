@@ -19,6 +19,8 @@ namespace Descriptor {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 11;
+
 namespace DeviceTypeList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(DeviceTypeList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -51,7 +53,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(EndpointUniqueID::Id, 
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace Descriptor
 } // namespace Clusters
 } // namespace app

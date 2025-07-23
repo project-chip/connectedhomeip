@@ -19,6 +19,8 @@ namespace ValveConfigurationAndControl {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 16;
+
 namespace OpenDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OpenDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -67,6 +69,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelStep::Id, BitFlag
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace Open {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Open::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

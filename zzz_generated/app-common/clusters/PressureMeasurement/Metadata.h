@@ -19,6 +19,8 @@ namespace PressureMeasurement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 14;
+
 namespace MeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -58,7 +60,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Scale::Id, BitFlags<Da
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace PressureMeasurement
 } // namespace Clusters
 } // namespace app

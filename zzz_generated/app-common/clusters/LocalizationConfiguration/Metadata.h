@@ -19,6 +19,8 @@ namespace LocalizationConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace ActiveLocale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ActiveLocale::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
@@ -32,7 +34,10 @@ inline constexpr DataModel::AttributeEntry
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace LocalizationConfiguration
 } // namespace Clusters
 } // namespace app

@@ -19,6 +19,8 @@ namespace DishwasherMode {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace SupportedModes {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -32,6 +34,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFl
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace ChangeToMode {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

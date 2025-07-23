@@ -19,6 +19,8 @@ namespace OperationalCredentials {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 11;
+
 namespace NOCs {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(NOCs::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -51,6 +53,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentFabricIndex::Id
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 10;
+
 namespace AttestationRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AttestationRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);

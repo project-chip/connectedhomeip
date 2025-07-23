@@ -19,6 +19,8 @@ namespace TlsClientManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace MaxProvisioned {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxProvisioned::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -33,6 +35,8 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 3;
+
 namespace ProvisionEndpoint {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ProvisionEndpoint::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),

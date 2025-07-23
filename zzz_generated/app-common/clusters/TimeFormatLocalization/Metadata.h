@@ -19,6 +19,8 @@ namespace TimeFormatLocalization {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 8;
+
 namespace HourFormat {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HourFormat::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
@@ -36,7 +38,10 @@ inline constexpr DataModel::AttributeEntry
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace TimeFormatLocalization
 } // namespace Clusters
 } // namespace app

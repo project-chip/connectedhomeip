@@ -19,6 +19,8 @@ namespace EcosystemInformation {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace DeviceDirectory {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(DeviceDirectory::Id,
@@ -34,7 +36,10 @@ inline constexpr DataModel::AttributeEntry
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace EcosystemInformation
 } // namespace Clusters
 } // namespace app

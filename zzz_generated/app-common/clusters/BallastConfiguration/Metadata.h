@@ -19,6 +19,8 @@ namespace BallastConfiguration {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 19;
+
 namespace PhysicalMinLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalMinLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -78,7 +80,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LampBurnHoursTripPoint
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace BallastConfiguration
 } // namespace Clusters
 } // namespace app

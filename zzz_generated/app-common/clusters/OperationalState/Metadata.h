@@ -19,6 +19,8 @@ namespace OperationalState {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 11;
+
 namespace PhaseList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(PhaseList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -50,6 +52,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OperationalError::Id, 
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 4;
+
 namespace Pause {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Pause::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

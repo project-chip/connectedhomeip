@@ -19,6 +19,8 @@ namespace Actions {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 8;
+
 namespace ActionList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ActionList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -37,6 +39,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SetupURL::Id, BitFlags
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 12;
+
 namespace InstantAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(InstantAction::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

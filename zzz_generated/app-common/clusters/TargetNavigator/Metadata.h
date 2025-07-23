@@ -19,6 +19,8 @@ namespace TargetNavigator {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace TargetList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(TargetList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -32,6 +34,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentTarget::Id, Bit
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace NavigateTarget {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(NavigateTarget::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

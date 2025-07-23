@@ -117,7 +117,7 @@ CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluste
                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(2));
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kMetadataCount));
     ReturnErrorOnFailure(builder.Append(GetDetailedPriceRequest::kMetadataEntry));
 
     if (HasFeature(Feature::kForecasting))

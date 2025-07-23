@@ -24,6 +24,9 @@
 #include <cstdint>
 #include <utility>
 
+// Including the Metadata from a concrete implementation
+#include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h> 
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -255,8 +258,9 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 
 namespace Commands {
 namespace ResetCondition {
-static constexpr CommandId Id                                   = 0x00000000;
-static constexpr DataModel::AcceptedCommandEntry kMetadataEntry = { ResetCondition::Id, {}, Access::Privilege::kOperate };
+// Getting these from a concrete implementation, Less error-prone if XML ever changes
+static constexpr CommandId Id                                   = ::chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition;
+static constexpr DataModel::AcceptedCommandEntry kMetadataEntry = ::chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::kMetadataEntry;
 
 struct DecodableType
 {

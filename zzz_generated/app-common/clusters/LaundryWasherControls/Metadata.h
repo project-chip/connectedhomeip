@@ -19,6 +19,8 @@ namespace LaundryWasherControls {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 9;
+
 namespace SpinSpeeds {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SpinSpeeds::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -41,7 +43,10 @@ inline constexpr DataModel::AttributeEntry
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace LaundryWasherControls
 } // namespace Clusters
 } // namespace app

@@ -19,6 +19,8 @@ namespace OtaSoftwareUpdateRequestor {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 9;
+
 namespace DefaultOTAProviders {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(DefaultOTAProviders::Id,
@@ -41,6 +43,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(UpdateStateProgress::I
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceOTAProvider::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

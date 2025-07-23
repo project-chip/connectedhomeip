@@ -19,6 +19,8 @@ namespace WebRTCTransportRequestor {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 6;
+
 namespace CurrentSessions {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(CurrentSessions::Id,
@@ -29,6 +31,8 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 4;
+
 namespace Offer {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Offer::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

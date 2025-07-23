@@ -19,6 +19,8 @@ namespace CommodityMetering {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 9;
+
 namespace MeteredQuantity {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(MeteredQuantity::Id,
@@ -42,7 +44,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantiti
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace CommodityMetering
 } // namespace Clusters
 } // namespace app

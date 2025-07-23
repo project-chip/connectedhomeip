@@ -19,6 +19,8 @@ namespace LaundryDryerControls {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace SupportedDrynessLevels {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedDrynessLevels::Id,
@@ -32,7 +34,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedDrynessLevel::
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace LaundryDryerControls
 } // namespace Clusters
 } // namespace app

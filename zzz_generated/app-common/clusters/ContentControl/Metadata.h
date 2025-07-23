@@ -19,6 +19,8 @@ namespace ContentControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 13;
+
 namespace Enabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Enabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -60,6 +62,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(BlockUnrated::Id, BitF
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 10;
+
 namespace UpdatePIN {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(UpdatePIN::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

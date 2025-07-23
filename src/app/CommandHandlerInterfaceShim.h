@@ -28,7 +28,7 @@ namespace chip {
 namespace app {
 
 /// class CommandHandlerInterfaceShim
-/// @brief Use this as a quick shim, but actual usage is NOT recommended
+/// @brief Use this as a quick shim, but actual usage is NOT recommended.
 ///        This class provides a convenience conversion for updating into the new CHI interface, its a drop-in replacement for the
 ///        old interface.
 //         However we DON'T expect people to use this very long term
@@ -44,7 +44,7 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
 private:
     std::optional<DataModel::AcceptedCommandEntry> GetEntry(const ConcreteClusterPath & cluster, CommandId command)
     {
-        return DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
+        return DataModel::detail::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
     }
 
 public:

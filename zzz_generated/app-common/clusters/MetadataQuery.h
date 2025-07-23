@@ -2,6 +2,10 @@
 //
 // This file provides a function to query into the MetadataProviders without
 // instantiating any unnecessary metadata.
+// It will instatiate all metadata for the selected cluster commands, even unused commands.
+//
+// If used without parameters it will instatiate metadata
+// for all clusters and might inccur a big overhead.
 //
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
@@ -292,6 +296,7 @@
 namespace chip {
 namespace app {
 namespace DataModel {
+namespace detail {
 
 // Implements a search for the AcceptedCommandEntry in multiple clusters
 // If no Clusters are provided it will search all clusters.
@@ -1013,6 +1018,7 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     return std::nullopt;
 }
 
+} // namespace detail
 } // namespace DataModel
 } // namespace app
 } // namespace chip

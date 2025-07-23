@@ -19,6 +19,8 @@ namespace PumpConfigurationAndControl {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 28;
+
 namespace MaxPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPressure::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -114,7 +116,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ControlMode::Id, BitFl
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace PumpConfigurationAndControl
 } // namespace Clusters
 } // namespace app

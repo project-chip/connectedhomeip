@@ -19,6 +19,8 @@ namespace Switch {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 8;
+
 namespace NumberOfPositions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfPositions::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -34,7 +36,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MultiPressMax::Id, Bit
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace Switch
 } // namespace Clusters
 } // namespace app

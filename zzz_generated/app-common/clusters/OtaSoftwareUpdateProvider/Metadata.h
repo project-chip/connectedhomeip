@@ -18,9 +18,14 @@ namespace OtaSoftwareUpdateProvider {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 5;
+
+} // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 3;
+
 namespace QueryImage {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(QueryImage::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

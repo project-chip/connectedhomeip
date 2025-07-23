@@ -19,6 +19,8 @@ namespace Channel {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 8;
+
 namespace ChannelList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ChannelList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -36,6 +38,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentChannel::Id, Bi
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 6;
+
 namespace ChangeChannel {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeChannel::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

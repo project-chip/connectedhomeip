@@ -19,6 +19,8 @@ namespace ThermostatUserInterfaceConfiguration {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 8;
+
 namespace TemperatureDisplayMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureDisplayMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -35,7 +37,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ScheduleProgrammingVis
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace ThermostatUserInterfaceConfiguration
 } // namespace Clusters
 } // namespace app

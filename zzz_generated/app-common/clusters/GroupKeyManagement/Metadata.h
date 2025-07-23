@@ -19,6 +19,8 @@ namespace GroupKeyManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 9;
+
 namespace GroupKeyMap {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(GroupKeyMap::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -41,6 +43,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxGroupKeysPerFabric:
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 4;
+
 namespace KeySetWrite {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(KeySetWrite::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),

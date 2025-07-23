@@ -19,6 +19,8 @@ namespace GeneralDiagnostics {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 14;
+
 namespace NetworkInterfaces {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(NetworkInterfaces::Id,
@@ -68,6 +70,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TestEventTriggersEnabl
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 3;
+
 namespace TestEventTrigger {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(TestEventTrigger::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

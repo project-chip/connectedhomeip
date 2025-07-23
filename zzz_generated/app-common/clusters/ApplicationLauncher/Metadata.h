@@ -19,6 +19,8 @@ namespace ApplicationLauncher {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace CatalogList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(CatalogList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -32,6 +34,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentApp::Id, BitFla
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 3;
+
 namespace LaunchApp {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(LaunchApp::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

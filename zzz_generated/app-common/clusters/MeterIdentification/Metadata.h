@@ -19,6 +19,8 @@ namespace MeterIdentification {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 10;
+
 namespace MeterType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeterType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -42,7 +44,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerThreshold::Id, Bi
 
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+inline constexpr uint32_t kMetadataCount = 0;
+
+} // namespace Commands
 } // namespace MeterIdentification
 } // namespace Clusters
 } // namespace app

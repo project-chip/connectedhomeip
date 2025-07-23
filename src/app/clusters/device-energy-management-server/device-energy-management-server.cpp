@@ -109,7 +109,7 @@ CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluste
                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(8));
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kMetadataCount));
 
     if (HasFeature(Feature::kPowerAdjustment))
     {

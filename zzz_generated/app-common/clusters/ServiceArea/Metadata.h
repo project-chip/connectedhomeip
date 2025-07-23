@@ -19,6 +19,8 @@ namespace ServiceArea {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 11;
+
 namespace SupportedAreas {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedAreas::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -51,6 +53,8 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace SelectAreas {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelectAreas::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
