@@ -259,7 +259,7 @@ Execute all the initialization steps for Ecosystem A and Ecosystem B above.
 
 On the Ecosystem B Joint Fabric Controller application
 
-TODO: Update the follow command to open the joint commissioning window
+TODO: Update the following command to open the joint commissioning window
 
 ```
 pairing open-commissioning-window 11 1 400 1000 1261
