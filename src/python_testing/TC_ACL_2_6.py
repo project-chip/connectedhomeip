@@ -260,7 +260,25 @@ class TC_ACL_2_6(MatterBaseTest):
         # Re-running test using the legacy list writing mechanism
         if not force_legacy_encoding:
             self.step(8)
-            logging.info("Re-running the test using the legacy list writing mechanism")
+            logging.info("Resetting ACL events to only admin/case, then re-running the test using the legacy list writing mechanism")
+
+            # Before rerunning with legacy encoding, reset ACL to only admin/case
+            single_admin_acl = [
+                Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                    subjects=[self.th1.nodeId],
+                    targets=NullValue,
+                    fabricIndex=f1
+                )
+            ]
+            await self.write_attribute_with_encoding_option(
+                self.th1,
+                self.dut_node_id,
+                [(0, acl_attr(value=single_admin_acl))],
+                forceLegacyListEncoding=False
+            )
+
         else:
             self.skip_step(8)
 
@@ -297,7 +315,7 @@ class TC_ACL_2_6(MatterBaseTest):
                 "value MUST NOT contain an AccessControlEntryChanged entry corresponding to the second invalid entry in step 6."),
             TestStep(
                 8,
-                "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
+                "Resetting ACL events to only admin/case, then re-running the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                 "Test succeeds with legacy list encoding mechanism"),
         ]
         return steps
