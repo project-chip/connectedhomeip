@@ -38,7 +38,7 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
 
 /**
  * This routine returns a human-readable NULL-terminated C string
- * describing the provided error. This uses the global static storage.
+ * describing the provided error. It uses thread-local storage.
  *
  * @param[in] err                      The error for format and describe.
  * @param[in] withSourceLocation       Whether or not to include the source

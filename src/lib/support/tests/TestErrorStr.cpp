@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <thread>
 
 #include <pw_unit_test/framework.h>
 
@@ -136,6 +137,17 @@ TEST(TestErrorStr, CheckErrorWithProvidedStorage)
     ErrorStrStorage storage;
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR, true, storage)), CHIP_NO_ERROR_STRING);
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_ERROR_INTERNAL, true, storage)), "Error 0x000000AC");
+}
+
+TEST(TestErrorStr, CheckErrorWithDefaultStorage)
+{
+    const char * localNoError = ErrorStr(CHIP_NO_ERROR, false);
+    EXPECT_STREQ(localNoError, CHIP_NO_ERROR_STRING);
+
+    std::thread t([]() { EXPECT_STRNE(ErrorStr(CHIP_ERROR_NO_MEMORY, false), CHIP_NO_ERROR_STRING); });
+    t.join();
+
+    EXPECT_STREQ(localNoError, CHIP_NO_ERROR_STRING);
 }
 
 TEST(TestErrorStr, CheckFormatErr)
