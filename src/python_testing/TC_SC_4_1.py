@@ -57,9 +57,11 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 
 PICS_MCORE_ROLE_COMMISSIONEE = "MCORE.ROLE.COMMISSIONEE"
 
+
 class DiscriminatorLength(Enum):
     LONG = 12
     SHORT = 4
+
 
 class TC_SC_4_1(MatterBaseTest):
 
@@ -67,9 +69,12 @@ class TC_SC_4_1(MatterBaseTest):
         return [TestStep(1, "DUT is commissioned.", is_commissioning=True),
                 TestStep(2, "TH reads ServerList attribute from the Descriptor cluster on EP0. ",
                          "If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false."),
-                TestStep(3, "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms."),
-                TestStep(4, "DUT is put in Commissioning Mode.", "DUT starts advertising Commissionable Node Discovery service using DNS-SD."),
-                TestStep(5, "DUT is put in Commissioning Mode.", "DUT starts advertising Commissionable Node Discovery service using DNS-SD."),
+                TestStep(
+                    3, "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms."),
+                TestStep(4, "DUT is put in Commissioning Mode.",
+                         "DUT starts advertising Commissionable Node Discovery service using DNS-SD."),
+                TestStep(5, "DUT is put in Commissioning Mode.",
+                         "DUT starts advertising Commissionable Node Discovery service using DNS-SD."),
                 ]
 
     async def read_attribute(self, attribute: Any) -> Any:
@@ -221,7 +226,7 @@ class TC_SC_4_1(MatterBaseTest):
         # (64-bit randomly selected ID expressed as a sixteen-char hex string with capital letters)
         asserts.assert_true(self.is_valid_dns_sd_instance_name(commissionable_service.instance_name),
                             f"Invalid DNS-SD instance name: {commissionable_service.instance_name}")
-        
+
         # Verify DUT's commissionable service service type is '_matterc._udp' and service domain '.local.'
         asserts.assert_equal(commissionable_service.service_type, MdnsServiceType.COMMISSIONABLE.value,
                              f"Invalid service type '{commissionable_service.service_type}', must be '{MdnsServiceType.COMMISSIONABLE.value}'")
@@ -229,7 +234,8 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify target hostname is derived from the 48bit or 64bit MAC address
         # expressed as a twelve or sixteen capital letter hex string. If the MAC
         # is randomized for privacy, the randomized version must be used each time.
-        asserts.assert_true(self.is_valid_hostname(commissionable_service.server), f"Invalid server hostname: {commissionable_service.server}")
+        asserts.assert_true(self.is_valid_hostname(commissionable_service.server),
+                            f"Invalid server hostname: {commissionable_service.server}")
 
         # Get commissionable subtypes
         sub_types = await mdns.get_commissionable_subtypes(
@@ -256,6 +262,7 @@ class TC_SC_4_1(MatterBaseTest):
             self.is_valid_vendor_subtype(sub_types),
             "Invalid vendor commissionable subtype or not present."
         )
+
 
 if __name__ == "__main__":
     default_matter_test_main()
