@@ -125,18 +125,16 @@ static_library("controller") {
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
-if (chip_device_config_enable_joint_fabric) {
-  source_set("jcm") {
-    sources = [
-      "jcm/AutoCommissioner.cpp",
-      "jcm/AutoCommissioner.h",
-      "jcm/DeviceCommissioner.cpp",
-      "jcm/DeviceCommissioner.h",
-      "jcm/VerificationDelegate.h",
-    ]
-    public_deps = [
-      "${chip_root}/src/app",
-      "${chip_root}/src/controller:controller",
-    ]
-  }
+source_set("jcm") {
+  sources = [
+    "jcm/AutoCommissioner.cpp",
+    "jcm/AutoCommissioner.h",
+    "jcm/DeviceCommissioner.cpp",
+    "jcm/DeviceCommissioner.h",
+    "jcm/TrustVerification.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller:controller",
+  ]
 }
