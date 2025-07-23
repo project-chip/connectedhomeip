@@ -527,6 +527,7 @@ jobs:
             - name: Build linux-x64-all-clusters
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
                   "
@@ -534,72 +535,84 @@ jobs:
             - name: Build linux-x64-bridge
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-lock
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-lit-icd
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-air-purifier
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-energy-gateway
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-energy-management
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-microwave-oven
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-rvc
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-network-manager
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-fabric-admin-rpc
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-fabric-bridge-rpc
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-fabric-sync
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang:build
                   build --copy-artifacts-to objdir-clone
 
@@ -607,18 +620,21 @@ jobs:
             - name: Build linux-x64-camera
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-camera:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-camera-controller
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-camera-controller
                   build --copy-artifacts-to objdir-clone:build
 
             - name: Build linux-x64-light-data-model-no-unique-id
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang:build
                   build --copy-artifacts-to objdir-clone
 
@@ -626,12 +642,14 @@ jobs:
             - name: Build linux-x64-terms-and-conditions
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-terms-and-conditions:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-python-bindings
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-python-bindings-webrtc:build
                   build --copy-artifacts-to objdir-clone
 
@@ -639,6 +657,7 @@ jobs:
             - name: Build linux-x64-jf-control-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-jf-control-app:build
                   build --copy-artifacts-to objdir-clone
 
@@ -646,17 +665,21 @@ jobs:
             - name: Build linux-x64-jf-admin-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-jf-admin-app:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Build linux-x64-closure-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --pw-command-launcher=ccache
                   --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test:build
                   build --copy-artifacts-to objdir-clone
 
             - name: Clean common build directory
               run: >-
+                  ccache --show-stats
+                  ccache --clear
                   rm -rf out/build
 
             - name: Copy push_av_server and install dependencies
