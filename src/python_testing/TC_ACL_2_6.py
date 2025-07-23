@@ -257,9 +257,12 @@ class TC_ACL_2_6(MatterBaseTest):
 
         logging.info("No events found for invalid entry, as expected")
 
-        self.step(8)
-        if force_legacy_encoding:
-            logging.info("Rerunning test with new list method")
+        # Re-running test using the legacy list writing mechanism
+        if not force_legacy_encoding:
+            self.step(8)
+            logging.info("Re-running the test using the legacy list writing mechanism")
+        else:
+            self.skip_step(8)
 
     def steps_TC_ACL_2_6(self) -> list[TestStep]:
         steps = [
@@ -294,20 +297,20 @@ class TC_ACL_2_6(MatterBaseTest):
                 "value MUST NOT contain an AccessControlEntryChanged entry corresponding to the second invalid entry in step 6."),
             TestStep(
                 8,
-                "Rerunning test steps with new list method",
-                "Rerunning test steps with new list method"),
+                "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
+                "Test succeeds with legacy list encoding mechanism"),
         ]
         return steps
 
     @async_test_body
     async def test_TC_ACL_2_6(self):
         # First run with new list encoding
-        await self.internal_test_TC_ACL_2_6(force_legacy_encoding=True)
-
-        # Reset step counter and run second test with legacy list encoding
-        self.current_step_index = 0
-        logging.info("Starting second test run with new encoding")
         await self.internal_test_TC_ACL_2_6(force_legacy_encoding=False)
+
+        # Reset step counter and re-run the test using the legacy list encoding mechanism
+        self.current_step_index = 0
+        logging.info("Starting second test run using legacy list encoding mechanism")
+        await self.internal_test_TC_ACL_2_6(force_legacy_encoding=True)
 
 
 if __name__ == "__main__":
