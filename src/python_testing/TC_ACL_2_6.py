@@ -195,7 +195,7 @@ class TC_ACL_2_6(MatterBaseTest):
             # Event 2: Added (admin)
             asserts.assert_equal(e2.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, "Expected Added change type")
             asserts.assert_equal(e2.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e2.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
             asserts.assert_equal(e2.latestValue, acl_entries[0], "LatestValue should match admin ACL entry")
             asserts.assert_equal(e2.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(e2.fabricIndex, f1, "FabricIndex should be the current fabric index")
@@ -203,7 +203,7 @@ class TC_ACL_2_6(MatterBaseTest):
             # Event 3: Added (operate/group)
             asserts.assert_equal(e3.changeType, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, "Expected Added change type")
             asserts.assert_equal(e3.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e3.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
             asserts.assert_equal(e3.latestValue, acl_entries[1], "LatestValue should match operate/group ACL entry")
             asserts.assert_equal(e3.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(e3.fabricIndex, f1, "FabricIndex should be the current fabric index")
@@ -217,7 +217,7 @@ class TC_ACL_2_6(MatterBaseTest):
                                  Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
                                  "Expected Changed change type for first event")
             asserts.assert_equal(e0.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e0.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
             asserts.assert_equal(e0.latestValue, acl_entries[0], "First event LatestValue should match admin ACL entry")
             asserts.assert_equal(e0.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(e0.fabricIndex, f1, "FabricIndex should be the current fabric index")
@@ -227,7 +227,7 @@ class TC_ACL_2_6(MatterBaseTest):
                                  Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
                                  "Expected Added change type for second event")
             asserts.assert_equal(e1.adminNodeID, self.default_controller.nodeId, "AdminNodeID should be the controller node ID")
-            asserts.assert_in('chip.clusters.Types.Nullable', str(type(e1.adminPasscodeID)), "AdminPasscodeID should be Null")
+            asserts.assert_equal(e1.adminPasscodeID, NullValue, "AdminPasscodeID should be Null")
             asserts.assert_equal(e1.latestValue, acl_entries[1], "Second event LatestValue should match operate/group ACL entry")
             asserts.assert_equal(e1.latestValue.fabricIndex, f1, "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(e1.fabricIndex, f1, "FabricIndex should be the current fabric index")
@@ -243,20 +243,6 @@ class TC_ACL_2_6(MatterBaseTest):
             if read_only:
                 logging.error(f"Events only in read: {read_only}")
         asserts.assert_equal(subscription_event_set, read_event_set, "Subscription and read events should match")
-
-        # Only fail if read events are missing expected entries
-        expected_event_keys = set(self.event_key(Clusters.AccessControl.Events.AccessControlEntryChanged(
-            adminNodeID=NullValue,
-            adminPasscodeID=0,
-            changeType=Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-            latestValue=acl_entry,
-            fabricIndex=f1
-        )) for acl_entry in acl_entries)
-        read_has_expected = expected_event_keys.issubset(read_event_set)
-        asserts.assert_equal(
-            read_has_expected,
-            True,
-            f"Read events missing expected entries: {expected_event_keys - read_event_set}")
 
         self.step(6)
         # Write invalid ACL attribute
@@ -328,7 +314,7 @@ class TC_ACL_2_6(MatterBaseTest):
             TestStep(
                 5,
                 "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                "Result is SUCCESS, value is list of AccessControlEntryChanged events containing 2 new elements if new write list method is used, else then the legacy list method is used there should be 3 new elements"),
+                "Result is SUCCESS, value is a list of AccessControlEntryChanged events containing 2 new elements, or 3 when using the legacy list write method"),
             TestStep(
                 6,
                 "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements. The first item is valid, the second item is invalid due to group ID 0 being used, which is illegal.",
