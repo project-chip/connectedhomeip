@@ -77,6 +77,65 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
                                         transportOptions.audioStreamID.Value().Value());
 
     // mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
+#ifdef TLS_CLUSTER_ENABLED
+    // TODO: get TLS endpointId from PAVST cluster
+    auto & tlsClientManager = mCameraDevice->GetTLSClientMgmtDelegate();
+    auto & tlsCertManager   = mCameraDevice->GetTLSCertMgmtDelegate();
+
+    if (!tlsClientManager || !tlsClientManager)
+    {
+        ChipLogError(Camera, "Failed to get TLS cluster handlers");
+        return;
+    }
+
+    // Get TLS endpoint information
+    TLSClientManagement::Commands::FindEndpointResponse::Type endpointResponse;
+    CHIP_ERROR err = tlsClientManager->FindEndpoint(mConnectionID, endpointResponse);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to find TLS endpoint for connection %u: %" CHIP_ERROR_FORMAT, mConnectionID, err.Format());
+        return;
+    }
+    auto endpoint = endpointResponse.endpoint;
+
+    // Get root certificate
+    TLSCertificateManagement::Commands::FindRootCertificateResponse::Type rootCertResponse;
+    rootCertResponse.CertificateDetails = DataModel::List<TLSCertificateManagement::Structs::TLSCertStruct::Type>();
+    err = tlsCertManager->FindRootCertificate(endpoint.CAID, rootCertResponse);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to find root certificate for CAID %u: %" CHIP_ERROR_FORMAT, endpoint.CAID, err.Format());
+        return;
+    }
+    auto rootCert = rootCertResponse.CertificateDetails[0].Certificate;
+
+    // Get client certificate details if configured
+    if (endpoint.CCDID != NullOptional)
+    {
+        chip::app::Clusters::TLSCertificateManagement::Commands::FindClientCertificateResponse::Type clientCertResponse;
+        err = tlsCertManager->FindClientCertificate(endpoint.CCDID.Value(), clientCertResponse);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Camera, "Failed to find client certificate for CCDID %u: %" CHIP_ERROR_FORMAT, endpoint.CCDID.Value(),
+                         err.Format());
+            return;
+        }
+        auto clientCert = clientCertResponse.CertificateDetails[0].ClientCertificate;
+
+        // Get private key from secure storage
+        auto mDevKey = GetPrivateKeyFromSecureStorage(endpoint.CCDID.Value());
+        if (mCertPath.mDevKey.empty())
+        {
+            ChipLogError(Camera, "Failed to get private key for CCDID %u", endpoint.CCDID.Value());
+            return;
+        }
+
+    }
+    mTransportMap[connectionID].get()->SetTLSCertPath(rootCert, clientCert, mDevKey);
+#else
+    mTransportMap[connectionID].get()->SetTLSCertPath("/tmp/pavstest/certs/server/root.pem", "/tmp/pavstest/certs/device/dev.pem",
+                                                      "/tmp/pavstest/certs/device/dev.key");
+#endif
     return Status::Success;
 }
 
@@ -134,7 +193,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
             ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
             continue;
         }
-        mTransportMap[connectionID]->setTransportStatus(transportStatus);
+        mTransportMap[connectionID]->SetTransportStatus(transportStatus);
     }
 
     return Status::Success;
