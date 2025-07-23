@@ -19,6 +19,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/PascalString.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/Enums.h>
@@ -376,25 +377,24 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
 CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-#define OPTIONAL_ATTR(name)                                                                                                        \
-    {                                                                                                                              \
-        mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name), name::kMetadataEntry                          \
-    }
+#define OPTIONAL_ATTR(name) { mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name), name::kMetadataEntry }
 
-    return AppendAttributes(
-        builder, Span<const DataModel::AttributeEntry>(kMandatoryAttributes),
-        {
-            { mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose),
-              UniqueID::kMetadataEntry },
-            OPTIONAL_ATTR(ManufacturingDate),
-            OPTIONAL_ATTR(PartNumber),
-            OPTIONAL_ATTR(ProductURL),
-            OPTIONAL_ATTR(ProductLabel),
-            OPTIONAL_ATTR(SerialNumber),
-            OPTIONAL_ATTR(LocalConfigDisabled),
-            OPTIONAL_ATTR(Reachable),
-            OPTIONAL_ATTR(ProductAppearance),
-        });
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        {!mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose),
+          UniqueID::kMetadataEntry },
+        OPTIONAL_ATTR(ManufacturingDate),
+        OPTIONAL_ATTR(PartNumber),
+        OPTIONAL_ATTR(ProductURL),
+        OPTIONAL_ATTR(ProductLabel),
+        OPTIONAL_ATTR(SerialNumber),
+        OPTIONAL_ATTR(LocalConfigDisabled),
+        OPTIONAL_ATTR(Reachable),
+        OPTIONAL_ATTR(ProductAppearance),
+    };
+
+    AttributeListBuilder listBuilder(builder);
+
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes));
 }
 
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
