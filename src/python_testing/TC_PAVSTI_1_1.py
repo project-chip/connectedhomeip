@@ -14,6 +14,26 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${CAMERA_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 import chip.clusters as Clusters
@@ -99,8 +119,8 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        await self.precondition_one_allocated_video_stream()
-        await self.precondition_one_allocated_audio_stream()
+        await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
+        await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
 
         self.step(1)
         currentConnections = await self.read_single_attribute_check_success(
@@ -170,7 +190,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase):
         allocatePushTransportResponse = await self.send_single_cmd(
             cmd=pushavCluster.Commands.AllocatePushTransport(
                 transportOptions={
-                    "streamUsage": Globals.Enums.StreamUsageEnum.kInternal,
+                    "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
                     "endpointID": 1,  # TODO: Revisit TLS arguments once TLSCM cluster is available.
