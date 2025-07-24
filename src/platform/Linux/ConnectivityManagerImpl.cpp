@@ -2302,7 +2302,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         WiFiScanResponse network;
         if (_GetBssInfo(bssPath, network))
         {
-            if (sInterestedSSIDLen == 0 || memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
+            if (sInterestedSSIDLen == 0 ||
+                (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0))
             {
                 networkScanned->push_back(network);
             }
