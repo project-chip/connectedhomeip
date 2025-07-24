@@ -1070,7 +1070,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1138,6 +1138,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2793,8 +2794,11 @@ provisional cluster JointFabricAdministrator = 1875 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kVIDNotVerified = 2;
-    kInvalidAdministratorFabricIndex = 3;
+    kBusy = 2;
+    kPAKEParameterError = 3;
+    kWindowNotOpen = 4;
+    kVIDNotVerified = 5;
+    kInvalidAdministratorFabricIndex = 6;
   }
 
   enum TransferAnchorResponseStatusEnum : enum8 {
@@ -2824,7 +2828,7 @@ provisional cluster JointFabricAdministrator = 1875 {
 
   request struct OpenJointCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;

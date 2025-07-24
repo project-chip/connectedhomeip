@@ -44,8 +44,31 @@ def check_dm_directory(dir):
             return 1
         return 0
 
-    ret = check_dir(dir)
-    sys.exit(ret)
+    def check_dm_scraper_script_updates(dir):
+        # Run the scraper script, but don't actually scrape from the spec right now
+        # because we don't have a spec checkout. This will ensure the script is
+        # working, and that any script-applied updates are applied correctly.
+        # TODO: If we can get this running against a checkout of the spec at the
+        # stated spec revision, that would be MUCH better and we could remove
+        # the check_dir check, which is not as robust.
+        scripts_dir = os.path.dirname(os.path.realpath(__file__))
+        generate_file = os.path.join(scripts_dir, 'spec_xml', 'generate_spec_xml.py')
+        # we're not using the scraper or spec, so it doesn't matter here
+        cmd_list = ['python3', generate_file, '--scraper', 'x', '--spec-root', 'x',
+                    '--output-dir', dir, '--include-in-progress', 'None', '--skip-scrape']
+        subprocess.run(cmd_list, check=True)
+        cmd_list = ['git', 'diff', 'HEAD', '--name-only', '--', dir]
+        output = subprocess.check_output(cmd_list).decode()
+        if output:
+            print(f"Data model directory {dir} files do not match DM generation script output")
+            print(output)
+            print("Note that the data_model directory files are automatically updated by a spec scraper and should not be manually updated.")
+            return 1
+        return 0
+
+    ret_check_dir = check_dir(dir)
+    ret_check_scraper = check_dm_scraper_script_updates(dir)
+    sys.exit(ret_check_dir+ret_check_scraper)
 
 
 if __name__ == '__main__':
