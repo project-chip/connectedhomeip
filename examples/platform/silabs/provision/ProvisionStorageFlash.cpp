@@ -512,7 +512,11 @@ CHIP_ERROR Storage::GetSoftwareVersionString(char * value, size_t max)
 
 CHIP_ERROR Storage::SetSetupDiscriminator(uint16_t value)
 {
-    return Flash::Set(Parameters::ID::kDiscriminator, value);
+    CHIP_ERROR err = Flash::Set(Parameters::ID::kDiscriminator, value);
+#if ENABLE_CHIP_SHELL
+    return err == CHIP_NO_ERROR ? Storage::Commit(): err;
+#endif // ENABLE_CHIP_SHELL
+    return err;
 }
 
 CHIP_ERROR Storage::GetSetupDiscriminator(uint16_t & value)
