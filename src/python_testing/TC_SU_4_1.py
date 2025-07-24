@@ -402,7 +402,7 @@ class TC_SU_4_1(MatterBaseTest):
         asserts.assert_equal(actual_provider, [], "DefaultOTAProviders on TH3 (Fabric 2) should be empty")
         logger.info("Step #6 - DefaultOTAProviders attribute matches expected values.")
 
-        # Leer fabric 1 con TH4 y verificar que sigue con el provider correcto (TH4).
+        # TODO: Read fabric 1 with TH4 and verify that the provider is still the corrcet that should be:
         # provider_th2_for_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
         #     providerNodeID=1,   # TH2 is the OTA Provider (NodeID=1)
         #     endpoint=0,
@@ -421,6 +421,7 @@ class TC_SU_4_1(MatterBaseTest):
 
         # self.step(7)
         # self.step(8)
-        # self.step(9)
+
+
 if __name__ == "__main__":
     default_matter_test_main()
