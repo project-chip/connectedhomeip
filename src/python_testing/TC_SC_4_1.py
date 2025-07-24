@@ -232,7 +232,6 @@ class TC_SC_4_1(MatterBaseTest):
         except (UnicodeEncodeError, AttributeError):
             return False
 
-
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
 
@@ -289,7 +288,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Get DUT's commissionable service
         commissionable_service = await mdns.get_commissionable_service(log_output=True)
-        
+
         # Verify presence of DUT's comissionable service
         asserts.assert_is_not_none(commissionable_service, "DUT's commissionable service not present")
 
@@ -397,7 +396,6 @@ class TC_SC_4_1(MatterBaseTest):
         #     asserts.assert_true(cm_key == "1", f"CM key must be equal to 1, got {cm_key}")
         # else:
         #     asserts.fail("CM key not present")
-            
 
         # If the DT key is present, it must contain the device type identifier from
         # Data Model Device Types and must be encoded as a variable length decimal
@@ -454,6 +452,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify at least 1 AAAA record is returned
         asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
