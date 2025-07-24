@@ -339,6 +339,12 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
 DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                       AttributeValueDecoder & decoder)
 {
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+}
+
+DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                                 AttributeValueDecoder & decoder)
+{
     using namespace BasicInformation::Attributes;
 
     switch (request.path.mAttributeId)
@@ -347,8 +353,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
         CharSpan location;
         ReturnErrorOnFailure(decoder.Decode(location));
         VerifyOrReturnError(location.size() == kFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
-        return NotifyAttributeChangedIfSuccess(Location::Id,
-                                               DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size()));
+        return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
     }
     case NodeLabel::Id: {
         CharSpan label;
@@ -357,18 +362,14 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
         Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
         VerifyOrReturnError(labelBuffer.SetValue(label), Protocols::InteractionModel::Status::ConstraintError);
 
-        return NotifyAttributeChangedIfSuccess(
-            NodeLabel::Id,
-            mContext->attributeStorage->WriteValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id },
-                                                   labelBuffer.ContentWithLenPrefix()));
+        return mContext->attributeStorage->WriteValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id },
+                                                      labelBuffer.ContentWithLenPrefix());
     }
     case LocalConfigDisabled::Id: {
         ReturnErrorOnFailure(decoder.Decode(mLocalConfigDisabled));
-        return NotifyAttributeChangedIfSuccess(
-            LocalConfigDisabled::Id,
-            mContext->attributeStorage->WriteValue(
-                { kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
-                { reinterpret_cast<const uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled) }));
+        return mContext->attributeStorage->WriteValue(
+            { kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+            { reinterpret_cast<const uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled) });
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
