@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,20 +14,14 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRCommissioneeInfo.h>
-#import <Matter/MTRCommissioningParameters.h>
-
-#import "MTRDefines_Internal.h"
-
-#include <controller/CommissioningDelegate.h>
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_DIRECT_MEMBERS
-@interface MTRCommissioneeInfo ()
-
-- (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info commissioningParameters:(MTRCommissioningParameters *)commissioningParameters;
-
-@end
+/**
+ * Helper method to round-trip an NSSecureCoding instance and return the
+ * (possibly nil) decoding result.
+ */
+id _Nullable RoundTripEncodable(id<NSSecureCoding> encodable, NSError * __autoreleasing * _Nullable decodeError);
 
 NS_ASSUME_NONNULL_END

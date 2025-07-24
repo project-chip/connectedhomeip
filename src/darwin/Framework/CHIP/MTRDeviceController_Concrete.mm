@@ -965,9 +965,22 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     auto block = ^BOOL {
         chip::Controller::CommissioningParameters params;
+
+        std::vector<chip::app::AttributePathParams> extraReadPaths;
         if (commissioningParams.readEndpointInformation) {
-            params.SetExtraReadPaths(MTREndpointInfo.requiredAttributePaths);
+            for (auto & path : MTREndpointInfo.requiredAttributePaths) {
+                extraReadPaths.emplace_back(path);
+            }
         }
+        if (commissioningParams.extraAttributesToRead != nil) {
+            for (MTRAttributeRequestPath * path in commissioningParams.extraAttributesToRead) {
+                [path convertToAttributePathParams:extraReadPaths.emplace_back()];
+            }
+        }
+        if (extraReadPaths.size() != 0) {
+            params.SetExtraReadPaths(chip::Span(extraReadPaths.data(), extraReadPaths.size()));
+        }
+
         if (commissioningParams.csrNonce) {
             params.SetCSRNonce(AsByteSpan(commissioningParams.csrNonce));
         }
@@ -1076,6 +1089,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(deviceId);
+        self->_deviceControllerDelegateBridge->SetCommissioningParameters([commissioningParams copy]);
+
         auto errorCode = self->_cppCommissioner->Commission(deviceId, params);
         MATTER_LOG_METRIC(kMetricCommissionNode, errorCode);
         return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
