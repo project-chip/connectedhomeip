@@ -130,6 +130,7 @@ limitations under the License.
         <attribute side="server" code="0x0003" define="UPDATE_STATE_PROGRESS" type="int8u" min="0" max="100" writable="false" isNullable="true" optional="false">UpdateStateProgress</attribute>
         <command source="client" code="0x00" name="AnnounceOTAProvider" optional="true" cli="chip ota announceotaprovider">
             <description>Announce the presence of an OTA Provider</description>
+            <access op="invoke" privilege="administer"/>
             <arg name="ProviderNodeID" type="node_id"/>
             <arg name="VendorID" type="vendor_id"/>
             <arg name="AnnouncementReason" type="AnnouncementReasonEnum"/>

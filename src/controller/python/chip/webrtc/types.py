@@ -14,47 +14,51 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint8, c_uint16, c_void_p
+from dataclasses import dataclass, field
+from enum import Enum, auto
 
-from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint32
+WebRTCClientHandle = c_void_p
+LocalDescriptionCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
+IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
+GatheringCompleteCallbackType = CFUNCTYPE(None)
+StateChangeCallback = CFUNCTYPE(None, c_int)
+
+# Callback types for WebRTCRequestor server
+OnOfferCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
+OnAnswerCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
+OnICECandidatesCallbackFunct = CFUNCTYPE(c_int, c_uint16, POINTER(c_char_p), c_int)
+OnEndCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_uint8)
 
 
-class ErrorType(c_int):
-    InvalidLocalOffer = 0
-    InvalidRemoteOffer = 1
+class PeerConnectionState(Enum):
+    NEW = 0
+    CONNECTING = 1
+    CONNECTED = 2
+    DISCONNECTED = 3
+    FAILED = 4
+    CLOSED = 5
+    INVALID = 6
+
+    @classmethod
+    def _missing_(cls, value):
+        return cls.INVALID
 
 
-# Define the callback types using ctypes
-SdpOfferCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_char_p, c_uint32  # sdp offer and peer id
-)
+class Events(Enum):
+    OFFER = auto()
+    ANSWER = auto()
+    ICE_CANDIDATE = auto()
+    PEER_CONNECTION_STATE = auto()
 
-SdpAnswerCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_char_p, c_uint32  # sdp answer and peer id
-)
 
-StatsCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_char_p, c_uint32  # stats and peer id
-)
+@dataclass
+class IceCandiate:
+    candidate: str
+    mid: str
 
-IceCallback_t = CFUNCTYPE(
-    None,  # void return
-    POINTER(c_char_p), c_uint32  # ice candidate and peer id
-)
 
-ErrorCallback_t = CFUNCTYPE(
-    None,  # void return
-    ErrorType, c_uint32  # error message and peer id
-)
-
-PeerConnectedCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_uint32  # peer id
-)
-
-PeerDisconnectedCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_uint32  # peer id
-)
+@dataclass
+class IceCandidateList:
+    candidates: list[IceCandiate] = field(default_factory=list)
+    gathering_complete: bool = False
