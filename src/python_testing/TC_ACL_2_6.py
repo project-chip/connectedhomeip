@@ -282,7 +282,6 @@ class TC_ACL_2_6(MatterBaseTest):
                 forceLegacyListEncoding=False
             )
 
-
     def steps_TC_ACL_2_6(self) -> list[TestStep]:
         steps = [
             TestStep(
