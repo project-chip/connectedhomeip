@@ -361,15 +361,12 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
 
         Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
         VerifyOrReturnError(labelBuffer.SetValue(label), Protocols::InteractionModel::Status::ConstraintError);
-
-        return mContext->attributeStorage->WriteValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id },
-                                                      labelBuffer.ContentWithLenPrefix());
+        return mContext->attributeStorage->WriteValue(request.path, labelBuffer.ContentWithLenPrefix());
     }
     case LocalConfigDisabled::Id: {
         ReturnErrorOnFailure(decoder.Decode(mLocalConfigDisabled));
         return mContext->attributeStorage->WriteValue(
-            { kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
-            { reinterpret_cast<const uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled) });
+            request.path, { reinterpret_cast<const uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled) });
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
