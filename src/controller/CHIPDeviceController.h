@@ -793,7 +793,7 @@ public:
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-    void ContinueCommissioningOverOperationalNetwork(void);
+    void ContinueCommissioningOverOperationalNetwork();
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
     DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
@@ -836,7 +836,7 @@ public:
                                          /* fireAndForget = */ true);
     }
 
-    bool IsNFCCommissioning(void) { return mNFCCommissioning; }
+    bool IsNFCCommissioning() { return mNFCCommissioning; }
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
