@@ -353,32 +353,36 @@ class TC_SC_4_1(MatterBaseTest):
 
         # If VP key is present, verify it contain at least Vendor ID
         # and if Product ID is present, values must be separated by a + sign
-        vp_key = commissionable_service.txt_record['VP']
-        if vp_key:
-            asserts.assert_true(self.is_valid_vp_key(vp_key), f"Invalid VP key: {vp_key}")
+        if 'VP' in commissionable_service.txt_record:
+            vp_key = commissionable_service.txt_record['VP']
+            if vp_key:
+                asserts.assert_true(self.is_valid_vp_key(vp_key), f"Invalid VP key: {vp_key}")
 
         # If SAI key is present, SII key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
-        sii_key = commissionable_service.txt_record['SII']
-        if sii_key:
-            result, message = self.is_valid_key_decimal_value(sii_key, ONE_HOUR_IN_MS)
-            asserts.assert_true(result, message)
+        if 'SII' in commissionable_service.txt_record:
+            sii_key = commissionable_service.txt_record['SII']
+            if sii_key:
+                result, message = self.is_valid_key_decimal_value(sii_key, ONE_HOUR_IN_MS)
+                asserts.assert_true(result, message)
 
         # If SAI key is present, SAI key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
-        sai_key = commissionable_service.txt_record['SAI']
-        if sai_key:
-            result, message = self.is_valid_key_decimal_value(sai_key, ONE_HOUR_IN_MS)
-            asserts.assert_true(result, message)
+        if 'SAI' in commissionable_service.txt_record:
+            sai_key = commissionable_service.txt_record['SAI']
+            if sai_key:
+                result, message = self.is_valid_key_decimal_value(sai_key, ONE_HOUR_IN_MS)
+                asserts.assert_true(result, message)
 
         # - If the SAT key is present, verify that it is a decimal value with
         #   no leading zeros and is less than or equal to 65535
-        sat_key = commissionable_service.txt_record['SAT']
-        if sat_key:
-            result, message = self.is_valid_key_decimal_value(sat_key, MAX_SAT_VALUE)
-            asserts.assert_true(result, message)
+        if 'SAT' in commissionable_service.txt_record:
+            sat_key = commissionable_service.txt_record['SAT']
+            if sat_key:
+                result, message = self.is_valid_key_decimal_value(sat_key, MAX_SAT_VALUE)
+                asserts.assert_true(result, message)
 
             # - If the SAT key is present and supports_icd is true, verify that
             #   the value is equal to active_mode_threshold
@@ -387,7 +391,11 @@ class TC_SC_4_1(MatterBaseTest):
                 asserts.assert_equal(int(sat_key), active_mode_threshold_ms)
 
         # Verify that the SAI key is present if the SAT key is present
-        asserts.assert_true(not sat_key or sai_key, "SAI key must be present if SAT key is present.")
+        asserts.assert_true(
+            not 'SAT' in commissionable_service.txt_record
+            or 'SAI' in commissionable_service.txt_record,
+            "SAI key must be present if SAT key is present."
+        )
 
         # TODO: how to make CM = 1, getting CM = 2 currently
         # Verify that the CM key is present and is equal to 1
