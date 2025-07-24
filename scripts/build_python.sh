@@ -214,7 +214,7 @@ if [[ -n $wifi_paf_config ]]; then
 fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
-echo "  chip_support_webrtc_bindings=\"$enable_webrtc\""
+echo "  chip_support_webrtc_python_bindings=\"$enable_webrtc\""
 echo "  enable_pw_rpc=\"$enable_pw_rpc\""
 
 if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
@@ -252,7 +252,7 @@ gn_args=(
     "chip_inet_config_enable_ipv4=$enable_ipv4"
     "chip_crypto=\"openssl\""
     "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
-    "chip_support_webrtc_bindings=$enable_webrtc"
+    "chip_support_webrtc_python_bindings=$enable_webrtc"
 )
 if [[ -n "$chip_mdns" ]]; then
     gn_args+=("chip_mdns=\"$chip_mdns\"")
