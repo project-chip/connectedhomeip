@@ -28,7 +28,7 @@ id _Nullable RoundTripEncodable(id<NSSecureCoding> encodable, NSError * __autore
     XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
     XCTAssertNotNil(encodedData);
 
-    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:decodeError];
+    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClass:obj.class fromData:encodedData error:decodeError];
     if (decodedValue != nil) {
         XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
     }

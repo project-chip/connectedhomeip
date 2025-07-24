@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Information that can be provided to commissionWithNodeID to commision devices.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRCommissioningParameters : NSObject <NSCopying>
+@interface MTRCommissioningParameters : NSObject
 
 /**
  * The nonce to use when requesting a CSR for the node's operational
@@ -119,7 +119,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * whatever attributes are already read to handle readEndpointInformation being
  * YES, or to handle other commissioning tasks).
  */
-@property (nonatomic, copy, nullable) NSArray<MTRAttributeRequestPath *> * extraAttributesToRead MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSArray<MTRAttributeRequestPath *> * extraAttributesToRead MTR_UNSTABLE_API;
 
 @end
 
