@@ -977,7 +977,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 [path convertToAttributePathParams:extraReadPaths.emplace_back()];
             }
         }
-        if (extraReadPaths.size() != 0) {
+        if (!extraReadPaths.empty()) {
             params.SetExtraReadPaths(chip::Span(extraReadPaths.data(), extraReadPaths.size()));
         }
 

@@ -36,7 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.readEndpointInformation = self.readEndpointInformation;
     other.acceptedTermsAndConditions = self.acceptedTermsAndConditions;
     other.acceptedTermsAndConditionsVersion = self.acceptedTermsAndConditionsVersion;
-    // TODO: Should we deep-copy the array entries in extraAttributesToRead?
     other.extraAttributesToRead = self.extraAttributesToRead;
     return other;
 }
