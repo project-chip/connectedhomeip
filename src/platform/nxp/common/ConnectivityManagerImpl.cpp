@@ -466,7 +466,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
          * a new call to RevertConfiguration must be made to remove the Wi-Fi credentials from the driver.
          * This step is necessary because the Wi-Fi driver's state machine requires a complete disconnection before
          * wlan_remove_network can be invoked.
-         * Additionnaly mWifiIsProvisioned needs to be re-initialized to false
+         * Additionally mWifiIsProvisioned needs to be re-initialized to false
          *
          */
         if (mWiFiStationState == kWiFiStationState_Connecting_Failed)
