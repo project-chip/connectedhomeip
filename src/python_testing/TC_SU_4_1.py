@@ -336,6 +336,15 @@ class TC_SU_4_1(MatterBaseTest):
         resp = await self.write_acl(th1, acl)
         logger.info(f'Step #5 - TH4 have the necessary permissions to perform operation: {resp}')
 
+        # --- Optional verification before write ---
+        # Verify DefaultOTAProviders attribute before write (TH4 on Fabric 1)
+        pre_write_val = await self.read_single_attribute_check_success(
+            dev_ctrl=th4,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+        logger.info(f'Step #5b - BEFORE Write - TH4 DefaultOTAProviders: {pre_write_val}')
+        # ------------------------------------------
+
         # Write updated DefaultOTAProviders attribute to TH4
         resp = await th4.WriteAttribute(
             attributes=[(0, attr)],
@@ -346,6 +355,19 @@ class TC_SU_4_1(MatterBaseTest):
         asserts.assert_equal(resp[0].Status, Status.ConstraintError,
                              "Expected write to fail with ConstraintError, got different status")
         logger.info("Step #5 - Write operation correctly failed with CONSTRAINT_ERROR")
+
+        # --- Optional verification after write ---
+        # Read again to confirm the value did NOT change
+        post_write_val = await self.read_single_attribute_check_success(
+            dev_ctrl=th4,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+        logger.info(f'Step #5b - AFTER Write - TH4 DefaultOTAProviders: {post_write_val}')
+
+        # Confirm attribute value did not change
+        asserts.assert_equal(pre_write_val, post_write_val,
+                             "Attribute value changed unexpectedly after failed write")
+        # -----------------------------------------
 
         self.step(6)
 
@@ -366,12 +388,12 @@ class TC_SU_4_1(MatterBaseTest):
         logger.info("Step #6 - Write operation correctly performed with empty list")
 
         # Verify DefaultOTAProviders attribute on the DUT after write (TH3 on Fabric 2)
-        actual_otap_info = await self.read_single_attribute_check_success(
+        th3_actual_otap_info = await self.read_single_attribute_check_success(
             dev_ctrl=th3,
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
 
-        actual_provider = actual_otap_info
+        actual_provider = th3_actual_otap_info
 
         # Verify that the provider list is empty
         asserts.assert_true(len(actual_provider) == 0, "DefaultOTAProviders list is not empty")
@@ -379,6 +401,23 @@ class TC_SU_4_1(MatterBaseTest):
         # Verify the actual provider matches the expected OTA Provider (TH3)
         asserts.assert_equal(actual_provider, [], "DefaultOTAProviders on TH3 (Fabric 2) should be empty")
         logger.info("Step #6 - DefaultOTAProviders attribute matches expected values.")
+
+        # Leer fabric 1 con TH4 y verificar que sigue con el provider correcto (TH4).
+        # provider_th2_for_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+        #     providerNodeID=1,   # TH2 is the OTA Provider (NodeID=1)
+        #     endpoint=0,
+        #     fabricIndex=1       # Fabric ID from TH1 (controller writing to DUT)
+        # )
+
+        # Verify DefaultOTAProviders attribute on the DUT after write (TH4 on Fabric 1)
+        th4_actual_otap_info = await self.read_single_attribute_check_success(
+            dev_ctrl=th4,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+
+        logger.info(f'Step #6b - Read DefaultOTAProviders attribute on DUT using TH4: {th4_actual_otap_info}')
+        actual_provider = th4_actual_otap_info[0]
+        logger.info(f'Step #6b - Read DefaultOTAProviders attribute on DUT using TH4: {th4_actual_otap_info}')
 
         # self.step(7)
         # self.step(8)
