@@ -492,7 +492,7 @@ jobs:
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
-            CCACHE_BASEDIR: /workspace/out/ccache
+            CCACHE_BASEDIR: /workspace
             CCACHE_NOHASHDIR: 1
 
         runs-on: ubuntu-latest
