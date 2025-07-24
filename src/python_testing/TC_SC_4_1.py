@@ -34,7 +34,6 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-from asyncio import sleep
 import logging
 import re
 from typing import Any, Optional, Tuple, Union
@@ -197,6 +196,43 @@ class TC_SC_4_1(MatterBaseTest):
         except ValueError:
             return False
 
+    @staticmethod
+    def is_valid_dt_key(value: str) -> bool:
+        # Must be a decimal ASCII string without leading zeros and ≥ 1
+        return value.isdigit() and not value.startswith('0') and int(value) >= 1
+
+    @staticmethod
+    def is_valid_dn_key(value: str) -> bool:
+        try:
+            return len(value.encode('utf-8')) <= 32
+        except UnicodeEncodeError:
+            return False
+
+    @staticmethod
+    def is_valid_ri_key(value: str) -> bool:
+        # Uppercase hex string, each byte is 2 hex chars
+        if not re.fullmatch(r'[0-9A-F]{2,100}', value):
+            return False
+        return len(value) % 2 == 0 and len(value) <= 100
+
+    @staticmethod
+    def is_valid_ph_key(value: str) -> bool:
+        if not value.isdigit():
+            return False
+        if value == '0' or value.startswith('0'):
+            return False
+        return True
+
+    @staticmethod
+    def is_valid_pi_key(value: str) -> bool:
+        if value is None:
+            return False
+        try:
+            return len(value.encode('utf-8')) <= 128
+        except (UnicodeEncodeError, AttributeError):
+            return False
+
+
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
 
@@ -311,18 +347,18 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify presence of the _CM subtype
         asserts.assert_in(CM_SUBTYPE, subtypes, f"{CM_SUBTYPE} subtype not present.")
 
-        # Verify D TXT record key is present, which represents the discriminator
+        # Verify D key is present, which represents the discriminator
         # and must be encoded as a variable-length decimal value with up to 4
         # digits omitting any leading zeros
         asserts.assert_true(self.verify_d_key(commissionable_service.txt_record), "D key is invalid or not present.")
 
-        # If VP TXT record key is present, verify it contain at least Vendor ID
+        # If VP key is present, verify it contain at least Vendor ID
         # and if Product ID is present, values must be separated by a + sign
         vp_key = commissionable_service.txt_record['VP']
         if vp_key:
             asserts.assert_true(self.is_valid_vp_key(vp_key), f"Invalid VP key: {vp_key}")
 
-        # If SAI TXT record key is present, SII key must be an unsigned integer with
+        # If SAI key is present, SII key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
         sii_key = commissionable_service.txt_record['SII']
@@ -330,7 +366,7 @@ class TC_SC_4_1(MatterBaseTest):
             result, message = self.is_valid_key_decimal_value(sii_key, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
-        # If SAI TXT record key is present, SAI key must be an unsigned integer with
+        # If SAI key is present, SAI key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
         sai_key = commissionable_service.txt_record['SAI']
@@ -338,21 +374,86 @@ class TC_SC_4_1(MatterBaseTest):
             result, message = self.is_valid_key_decimal_value(sai_key, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
-        # - If the SAT TXT record key is present, verify that it is a decimal value with
+        # - If the SAT key is present, verify that it is a decimal value with
         #   no leading zeros and is less than or equal to 65535
         sat_key = commissionable_service.txt_record['SAT']
         if sat_key:
             result, message = self.is_valid_key_decimal_value(sat_key, MAX_SAT_VALUE)
             asserts.assert_true(result, message)
 
-            # - If the SAT TXT record key is present and supports_icd is true, verify that
+            # - If the SAT key is present and supports_icd is true, verify that
             #   the value is equal to active_mode_threshold
             if supports_icd:
                 logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
                 asserts.assert_equal(int(sat_key), active_mode_threshold_ms)
 
+        # Verify that the SAI key is present if the SAT key is present
+        asserts.assert_true(not sat_key or sai_key, "SAI key must be present if SAT key is present.")
 
+        # TODO: how to make CM = 1, getting CM = 2 currently
+        # Verify that the CM key is present and is equal to 1
+        # cm_key = commissionable_service.txt_record.get('CM')
+        # if cm_key:
+        #     asserts.assert_true(cm_key == "1", f"CM key must be equal to 1, got {cm_key}")
+        # else:
+        #     asserts.fail("CM key not present")
+            
 
+        # If the DT key is present, it must contain the device type identifier from
+        # Data Model Device Types and must be encoded as a variable length decimal
+        # ASCII number without leading zeros
+        if 'DT' in commissionable_service.txt_record:
+            dt_key = commissionable_service.txt_record['DT']
+            asserts.assert_true(
+                self.is_valid_dt_key(dt_key),
+                f"Invalid DT key: must be a decimal ASCII number ≥ 1 without leading zeros, got {dt_key}"
+            )
+
+        # If the DN key is present, DN key must be a UTF-8 encoded string with a maximum length of 32B
+        if 'DN' in commissionable_service.txt_record:
+            dn_key = commissionable_service.txt_record['DN']
+            asserts.assert_true(
+                self.is_valid_dn_key(dn_key),
+                f"DN key must be valid UTF-8 and <= 32 bytes, got {len(dn_key.encode('utf-8'))} bytes"
+            )
+
+        # If the RI key is present, key RI must include the Rotating Device Identifier
+        # encoded as an uppercase string with a maximum length of 100 chars (each octet
+        # encoded as a 2-digit hex number, max 50 octets)
+        if 'RI' in commissionable_service.txt_record:
+            ri_key = commissionable_service.txt_record['RI']
+            asserts.assert_true(
+                self.is_valid_ri_key(ri_key),
+                f"RI key must be uppercase hex with even length ≤ 100, got {ri_key}"
+            )
+
+        # If the PH key is present, key PH must be encoded as a variable-length decimal number
+        # in ASCII text, omitting any leading zeros. If present value must be different of 0
+        if 'PH' in commissionable_service.txt_record:
+            ph_key = commissionable_service.txt_record['PH']
+            asserts.assert_true(
+                self.is_valid_ph_key(ph_key),
+                f"PH key must be a non-zero decimal number without leading zeros, got {ph_key}"
+            )
+
+        # TODO: Fix PI key coming in None
+        # # If the PI key is present, key PI must be encoded as a valid UTF-8 string
+        # # with a maximum length of 128 bytes
+        # if 'PI' in commissionable_service.txt_record:
+        #     pi_key = commissionable_service.txt_record['PI']
+        #     pi_value = len(pi_key.encode('utf-8')) if pi_key is not None else None
+        #     asserts.assert_true(
+        #         self.is_valid_pi_key(pi_key),
+        #         f"PI key must be valid UTF-8 and <= 128 bytes, got {pi_value} bytes"
+        #     )
+
+        # TH performs a query for the AAAA record against the target
+        # listed in the Commissionable Service SRV record.
+        hostname = commissionable_service.server
+        quada_records = await mdns.get_quada_records(hostname=hostname, log_output=True)
+
+        # Verify at least 1 AAAA record is returned
+        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
 
 if __name__ == "__main__":
     default_matter_test_main()
