@@ -367,6 +367,7 @@ jobs:
         name: Test Suites - Darwin
 
         strategy:
+            fail-fast: false
             matrix:
                 build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
                 chip_tool: [""]
@@ -381,6 +382,7 @@ jobs:
                     - os: macos-15
                       arch: arm64   # observed, not configured
                       dry-run: true
+        continue-on-error: ${{ matrix.dry-run }}
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
@@ -430,7 +432,6 @@ jobs:
                      "
 
             - name: Run Tests using the python parser sending commands to chip-tool
-              continue-on-error: ${{ matrix.dry-run }}
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -455,7 +456,6 @@ jobs:
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
-              continue-on-error: ${{ matrix.dry-run }}
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -499,7 +499,6 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
-            fail-fast: false
             matrix:
                 build_variant: [ipv6only-no-ble-no-wifi]
 
@@ -803,6 +802,7 @@ jobs:
                 - os: macos-15
                   arch: arm64   # observed, not configured
                   dry-run: true
+        continue-on-error: ${{ matrix.dry-run }}
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
@@ -829,7 +829,6 @@ jobs:
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Build Python REPL and example apps
-              continue-on-error: ${{ matrix.dry-run }}
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
