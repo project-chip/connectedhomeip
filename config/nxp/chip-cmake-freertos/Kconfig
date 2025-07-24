@@ -128,7 +128,7 @@ endchoice
 
 config CHIP_TASK_STACK_SIZE
 	int "CHIP task stack size"
-	default 13000 if CHIP_SE05X
+	default 13000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
 	default 10240
 	help
 		Set the stack size for the CHIP task.

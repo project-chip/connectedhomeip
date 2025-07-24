@@ -40,16 +40,6 @@ config("se05x_config") {
 
   # defines += ["FLOW_VERBOSE"]
 
-  if (chip_device_platform == "nxp") {
-    if (nxp_platform == "rt/rw61x") {
-      defines += [
-        "AX_EMBEDDED",
-        "FRDM_RW612",
-        "SDK_OS_FREE_RTOS=1",
-      ]
-    }
-  }
-
   include_dirs = [
     "repo/sss/inc",
     "repo/sss/port/default",
@@ -71,17 +61,6 @@ config("se05x_config") {
     include_dirs += [ "repo/scp03_ftr" ]
   } else {
     include_dirs += [ "repo" ]
-  }
-
-  if (chip_device_platform == "nxp") {
-    if (nxp_platform == "rt/rw61x") {
-      include_dirs += [
-        "${chip_root}/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/board",
-        "${chip_root}/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/board/frdmrw612",
-        "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/drivers/flexcomm/i2c",
-        "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/rtos/freertos/freertos-drivers/flexcomm/i2c",
-      ]
-    }
   }
 }
 
@@ -147,23 +126,6 @@ static_library("se05x") {
         "repo/hostlib/hostLib/platform/generic/sm_timer.c",
         "repo/hostlib/hostLib/platform/linux/i2c_a7.c",
       ]
-    }
-  }
-  if (chip_device_platform == "nxp") {
-    if (nxp_platform == "rt/rw61x") {
-      sources += [
-        "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/drivers/flexcomm/i2c/fsl_i2c.c",
-        "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/rtos/freertos/freertos-drivers/flexcomm/i2c/fsl_i2c_freertos.c",
-        "repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
-        "repo/hostlib/hostLib/platform/rt/rw61x/i2c_rw612.c",
-      ]
-    }
-  }
-
-  if (chip_device_platform == "nxp") {
-    if (nxp_platform == "rt/rw61x") {
-      deps =
-          [ "${chip_root}/third_party/nxp/nxp_matter_support/gn_build:nxp_sdk" ]
     }
   }
 

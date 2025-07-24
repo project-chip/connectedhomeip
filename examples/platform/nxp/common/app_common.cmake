@@ -116,7 +116,7 @@ if (CONFIG_CHIP_APP_FACTORY_DATA)
                 ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/rw61x_factory_data/AppFactoryDataDefaultImpl.cpp
             )
             target_include_directories(app PRIVATE
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../../..)
+                ${CHIP_ROOT}/examples)
         else ()
             target_sources(app PRIVATE
                 ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
