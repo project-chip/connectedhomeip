@@ -16,12 +16,14 @@
  */
 #pragma once
 
+#include <app/ConcreteEventPath.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <optional>
@@ -31,12 +33,14 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+class EventsGenerator;
+
 namespace internal {
 template <typename T>
 class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
 public:
-    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData){};
+    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData) {};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
@@ -46,60 +50,23 @@ private:
     const T & mEventData;
 };
 
+std::optional<EventNumber> GenerateEvent(const ConcreteEventPath & aPath, PriorityLevel aPriorityLevel, FabricIndex aFabricIndex,
+                                         EventsGenerator & generator, EventLoggingDelegate & delegate, bool isScopedEvent);
+
 template <typename G, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
 {
     internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-    ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    EventOptions eventOptions;
-    eventOptions.mPath        = path;
-    eventOptions.mPriority    = aEventData.GetPriorityLevel();
-    eventOptions.mFabricIndex = aEventData.GetFabricIndex();
-
-    // this skips generating the event if it is fabric-scoped but the provided event data is not
-    // associated with any fabric.
-    if (eventOptions.mFabricIndex == kUndefinedFabricIndex)
-    {
-        ChipLogError(EventLogging, "Event encode failure: no fabric index for fabric scoped event");
-        return std::nullopt;
-    }
-
-    //
-    // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,
-    // fabric-sensitive events don't require that since the actual omission of the event in its entirety
-    // happens within the event management framework itself at the time of access.
-    //
-    // The 'mFabricIndex' field in the event options above is encoded out-of-band alongside the event payload
-    // and used to match against the accessing fabric.
-    //
-    EventNumber eventNumber;
-    CHIP_ERROR err = generator.GenerateEvent(&eventPayloadWriter, eventOptions, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(EventLogging, "Failed to generate event: %" CHIP_ERROR_FORMAT, err.Format());
-        return std::nullopt;
-    }
-
-    return eventNumber;
+    return GenerateEvent(ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId()),
+                         aEventData.GetPriorityLevel(), aEventData.GetFabricIndex(), generator, eventPayloadWriter, true);
 }
 
 template <typename G, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId endpointId)
 {
     internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-    ConcreteEventPath path(endpointId, aEventData.GetClusterId(), aEventData.GetEventId());
-    EventOptions eventOptions;
-    eventOptions.mPath     = path;
-    eventOptions.mPriority = aEventData.GetPriorityLevel();
-    EventNumber eventNumber;
-    CHIP_ERROR err = generator.GenerateEvent(&eventPayloadWriter, eventOptions, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(EventLogging, "Failed to generate event: %" CHIP_ERROR_FORMAT, err.Format());
-        return std::nullopt;
-    }
-
-    return eventNumber;
+    return GenerateEvent(ConcreteEventPath(endpointId, aEventData.GetClusterId(), aEventData.GetEventId()),
+                         aEventData.GetPriorityLevel(), kUndefinedFabricIndex, generator, eventPayloadWriter, false);
 }
 
 } // namespace internal
