@@ -94,6 +94,75 @@ public:
      *      Point r is collinear with pq
      */
 
+    /**
+     * Proof of Correctness
+     * --------------------
+     *
+     * 1. Filtering vertex repetition(including consecutive and non-consecutive)
+     *    a. Consecutive repeated vertices(e.g., A, B, B, C.):
+     *       If V_i == V_i+1, then we have an edge(V_i, V_i+1) of zero length
+     *       and it is a degenerate polygon. Note, we are not collapsing all
+     *       consecutive identical vertices into a single one.
+     *    b. Non-consecutive repeated vertices(e.g., A, B, C, D, B, E):
+     *       If a vertex V appears at index i and again at index k(i < k and not
+     *       consecutive), the polygon's path revisits a point before
+     *       completing its cycle. In a cycle, the degree of each vertex is 2,
+     *       whereas with vertex repetition, there are vertices with higher degree.
+     *       This means the polygon's boundary self-intersects, and creates
+     *       these smaller loops that degenerates its form.
+     *
+     * 2. Correctness of SegmentsIntersect(p1q1, p2q2):
+     *    a. General case: where points p1 and q1 lie on opposite sides of
+     *       p2q2, AND points p2 and q2 lie on opposite sides of p1q1.
+     *       --This is the standard geometric test for proper intersection at a
+     *         point that is not one of the vertices of the segments.
+     *       --Orientation(p, q, r) is used here: To check if p1 and q1 are on
+     *         opposite sides of p2q2, Orientation(p2, q2, p1) and
+     *         Orientation(p2, q2, q1) must be different(one OnLeft and one
+     *         OnRight), thus p1q1 crossing over p2q2. Applying this
+     *         symmetrically to both p1q1 and p2q2 ensures they intersect each
+     *         other.
+     *    b. Collinearity and Overlap:
+     *       Orientation(p, q, r) returning 0 indicates collinearity of the 3
+     *       points.
+     *       --The check for a point 'q' lying on segment 'pr'[OnSegment(p, q, r)] involves
+     *         verifying that 'q' is collinear with 'pr', AND the coordinates of
+     *         'q' lies on 'pr'(fall within the bounding box defined by 'pr').
+     *         This correctly identifies overlapping segments when they are
+     *         collinear, or shared endpoints.
+     *    c. Thus, SegmentsIntersect correctly identifies if two given line
+     *       segments intersect in any way(proper crossing, collinear overlap,
+     *       or shared endpoint).
+     *
+     * 3. Correctness of Orientation(p, q, r):
+     *    a. Compute cross-product of vectors pq and pr.
+     *       --The sign determines the direction of thumb in the right hand
+     *         rule of turning from vector pq to pr.
+     *    b. If cross-product > 0, r lies to the left of vector
+     *       pq(Counter-clockwise turn from vector pq to pr)
+     *    c. If cross-product < 0, r lies to the right of vector
+     *       pq(Clockwise turn from vector pq to pr)
+     *    d. If cross-product is 0, p, q, r are collinear.
+     *
+     * 4. Correctness of overall iteration over non-adjacent edges to check for
+     *    self-intersection:
+     *    a. Adjacent edges share a common vertex by definition, and intersect
+     *       at that common vertex. This is an expected part of a simple polygon
+     *       (cycle graph) with each vertex having degree 2, and does not
+     *       constitute self-intersection.
+     *    b. If a polygon self-intersects, it must have at least one pair of
+     *       non-adjacent edges that intersect. Thus, by checking every unique
+     *       pair of non-adjacent edges, the algorithm guarantees that if a
+     *       self-intersection exists, it will be found.
+     *    c. Exception of 3 vertices:
+     *       A polygon of 3 vertices has all edges adjacent to each other. In
+     *       the normal case, it is a triangle and a cycle.
+     *       But in a degenerate case, one vertex can lie on the segment formed
+     *       by the other 2 vertices. So, the collinearity and overlapping
+     *       check must be performed to verify if that is true, and flag it as
+     *       self-intersecting.
+     */
+
     // Method to check for self-intersecting zones
     static bool IsZoneSelfIntersecting(const std::vector<TwoDCartesianVertexStruct> & vertices)
     {
