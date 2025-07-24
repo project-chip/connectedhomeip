@@ -602,48 +602,23 @@ CHIP_ERROR CertificateTableImpl::GetRootCertificateCount(FabricIndex fabric, uin
     return mRootCertificates.GetFabricEntryCount(fabric, outCount);
 }
 
-CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, TLSCCDID & id,
-                                                          MutableByteSpan & csr, MutableByteSpan & nonceSignature)
+CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer,
+                                                          TLSCCDID & id, MutableByteSpan & csr, MutableByteSpan & nonceSignature)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     // TODO(gmarcosb): Use PSAKeyAllocator instead
-    KeyStruct * nextAvailable = nullptr;
-    for (auto & pending : mPendingClientCerts)
-    {
-        if (!pending.certificateId.HasValue())
-        {
-            nextAvailable = &pending;
-        }
-    }
 
-    if (nextAvailable == nullptr)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    auto & keyPair = nextAvailable->key;
-
-    // Find a usable ID
-    GlobalCertificateData globalData(mEndpointId);
-    ReturnErrorOnFailure(globalData.Load(mStorage));
-
-    // Update the next ID
-    TLSCCDID localId;
-    ReturnErrorOnFailure(globalData.GetNextClientCertificateId(fabric, localId));
-    ReturnErrorOnFailure(globalData.Save(mStorage));
+    Crypto::P256Keypair keyPair;
 
     ReturnErrorOnFailure(keyPair.Initialize(Crypto::ECPKeyTarget::ECDSA));
-    nextAvailable->certificateId.SetValue(localId);
-    nextAvailable->endpoint = mEndpointId;
 
-    id            = localId;
     size_t csrLen = csr.size();
     ReturnErrorOnFailure(keyPair.NewCertificateSigningRequest(csr.data(), csrLen));
     csr.reduce_size(csrLen);
 
     // Build nocsr_elements_message per spec
-    std::array<uint8_t, 128> nocsrElementsMessage;
+    std::array<uint8_t, 256> nocsrElementsMessage;
     TLV::TLVWriter writer;
     writer.Init(MutableByteSpan(nocsrElementsMessage));
     TLV::TLVType container;
@@ -654,39 +629,35 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
 
     Crypto::P256ECDSASignature signatureBuffer;
     ReturnErrorOnFailure(keyPair.ECDSA_sign_msg(nocsrElementsMessage.data(), writer.GetLengthWritten(), signatureBuffer));
-    return CopySpanToMutableSpan(signatureBuffer.Span(), nonceSignature);
+    ReturnErrorOnFailure(CopySpanToMutableSpan(signatureBuffer.Span(), nonceSignature));
+
+    // Find a usable ID
+    GlobalCertificateData globalData(mEndpointId);
+    ReturnErrorOnFailure(globalData.Load(mStorage));
+
+    // Update the next ID
+    TLSCCDID localId;
+    ReturnErrorOnFailure(globalData.GetNextClientCertificateId(fabric, localId));
+    ReturnErrorOnFailure(globalData.Save(mStorage));
+    id = localId;
+
+    ClientCertWithKey certWithKey;
+    certWithKey.detail.ccdid = localId;
+    keyPair.Serialize(certWithKey.key);
+    CertificateId certId(localId);
+    return mClientCertificates.SetTableEntry(fabric, certId, certWithKey, buffer);
 }
 
 CHIP_ERROR CertificateTableImpl::UpdateClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, ClientBuffer & buffer,
                                                               const ClientCertStruct & entry)
 {
-    EntryIndex idx;
-    auto findResult = mRootCertificates.FindTableEntry(fabric_index, id, idx);
     ClientCertWithKey certWithKey;
+    CertificateId localId(id);
+    ReturnErrorOnFailure(mClientCertificates.GetTableEntry(fabric_index, localId, certWithKey, buffer));
     certWithKey.detail       = entry;
     certWithKey.detail.ccdid = id;
-    KeyStruct * pendingKey   = nullptr;
-    if (findResult == CHIP_ERROR_NOT_FOUND)
-    {
-        for (auto & current : mPendingClientCerts)
-        {
-            if (current.certificateId.HasValue() && current.certificateId == id && current.endpoint == mEndpointId)
-            {
-                pendingKey = &current;
-                break;
-            }
-        }
-        if (pendingKey == nullptr)
-        {
-            return CHIP_ERROR_NOT_FOUND;
-        }
-        pendingKey->key.Serialize(certWithKey.key);
-    }
 
-    CertificateId localId(id);
-    ReturnErrorOnFailure(mClientCertificates.SetTableEntry(fabric_index, localId, certWithKey, buffer));
-    pendingKey->certificateId.ClearValue();
-    return CHIP_NO_ERROR;
+    return mClientCertificates.SetTableEntry(fabric_index, localId, certWithKey, buffer);
 }
 
 CHIP_ERROR CertificateTableImpl::GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, BufferedClientCert & entry)

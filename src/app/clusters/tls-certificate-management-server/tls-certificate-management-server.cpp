@@ -213,7 +213,7 @@ void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerConte
                                                      foundId = certificate.caid;
                                                      return CHIP_NO_ERROR;
                                                  });
-    if (lookupResult != CHIP_ERROR_NOT_FOUND && foundId != req.caid)
+    if (lookupResult != CHIP_ERROR_NOT_FOUND)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
         return;
@@ -345,7 +345,7 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
                                                        foundId = certificate.ccdid;
                                                        return CHIP_NO_ERROR;
                                                    });
-    if (lookupResult != CHIP_ERROR_NOT_FOUND && foundId != req.ccdid)
+    if (lookupResult != CHIP_ERROR_NOT_FOUND)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
         return;

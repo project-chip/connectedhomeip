@@ -272,7 +272,10 @@ Status TlsCertificateManagementCommandDelegate::GenerateClientCsr(EndpointId mat
     MutableByteSpan nonceSignature(nonceData);
 
     ClientCsrResponseType csrResponse;
-    mCertificateTable.PrepareClientCertificate(fabric, request.nonce, csrResponse.ccdid, csr, nonceSignature);
+    UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
+    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, csrResponse.ccdid, csr,
+                                                             nonceSignature);
+    VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
     csrResponse.csr   = csr;
     csrResponse.nonce = nonceSignature;
     return loadedCallback(csrResponse);
@@ -361,14 +364,19 @@ TlsCertificateManagementCommandDelegate::LookupClientCertByFingerprint(EndpointI
     return mCertificateTable.IterateClientCertificates(fabric, *certBuffer, [&](auto & iterator) -> CHIP_ERROR {
         while (iterator.Next(certBuffer->mCertWithKey))
         {
+            const auto & cert = certBuffer->GetCert();
+            if (!cert.clientCertificate.HasValue())
+            {
+                continue;
+            }
             bool match;
-            ReturnErrorOnFailure(FingerprintMatch(fingerprint, certBuffer->GetCert().clientCertificate.Value(), match));
+            ReturnErrorOnFailure(FingerprintMatch(fingerprint, cert.clientCertificate.Value(), match));
             if (match)
             {
                 UniquePtr<InlineEncodableClientCert> callbackCert(New<InlineEncodableClientCert>());
                 VerifyOrReturnError(callbackCert, CHIP_ERROR_NO_MEMORY);
 
-                ReturnErrorOnFailure(callbackCert->FromPersistence(fabric, certBuffer->GetCert()));
+                ReturnErrorOnFailure(callbackCert->FromPersistence(fabric, cert));
                 return loadedCallback(callbackCert->inlineCertificate);
             }
         }

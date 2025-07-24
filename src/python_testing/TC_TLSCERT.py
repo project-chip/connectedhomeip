@@ -36,7 +36,7 @@
 import datetime
 import random
 import string
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -126,6 +126,50 @@ class TC_TLSCERT(MatterBaseTest):
     def assert_valid_ccdid(self, caid):
         asserts.assert_greater_equal(caid, 0, "Invalid CCDID returned")
         asserts.assert_less_equal(caid, 65534, "Invalid CCDID returned")
+
+    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.TLSClientCSRResponse, nonce: bytes):
+        # Verify der encoded and PKCS #10 (rfc2986 is PKCS #10) - next two requirements
+        try:
+            temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
+        except PyAsn1Error:
+            asserts.fail("Unable to decode CSR - improperly formatted DER")
+        layer1 = dict(temp)
+
+        # Verify public key is 256 bytes
+        csr = x509.load_der_x509_csr(response.csr)
+        csr_pubkey = csr.public_key()
+        asserts.assert_equal(csr_pubkey.key_size, 256, "Incorrect key size")
+
+        # Verify signature algorithm is ecdsa-with-SHA156
+        signature_algorithm = dict(layer1['signatureAlgorithm'])['algorithm']
+        asserts.assert_equal(signature_algorithm, rfc5480.ecdsa_with_SHA256, "CSR specifies incorrect signature key algorithm")
+
+        # Verify signature is valid
+        asserts.assert_true(csr.is_signature_valid, "Signature is invalid")
+
+        # Verify response.nonce is octet string of length 32
+        try:
+            # response.nonce is an octet string if it can be converted to an int
+            int(hex_from_bytes(response.nonce), 16)
+        except ValueError:
+            asserts.fail("Returned CSR nonce is not an octet string")
+
+        # Verify response.nonce is valid signature
+        nocsr_elements = dict(
+            [
+                (1, response.csr),
+                (2, nonce),
+            ]
+        )
+        writer = TLVWriter()
+        writer.put(None, nocsr_elements)
+
+        baselen = curve_by_name("NIST256p").baselen
+        signature_raw_r = int(hex_from_bytes(response.nonce[:baselen]), 16)
+        signature_raw_s = int(hex_from_bytes(response.nonce[baselen:]), 16)
+
+        nocsr_signature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
+        csr_pubkey.verify(signature=nocsr_signature, data=writer.encoding, signature_algorithm=ec.ECDSA(hashes.SHA256()))
 
     class TargetedFabric:
         def __init__(self, matter_test: MatterBaseTest, endpoint: Optional[int] = None,
@@ -444,57 +488,19 @@ class TC_TLSCERT(MatterBaseTest):
         self.assert_valid_ccdid(response.ccdid)
 
         self.step(7)
-        # Verify der encoded and PKCS #10 (rfc2986 is PKCS #10) - next two requirements
-        try:
-            temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
-        except PyAsn1Error:
-            asserts.fail("Unable to decode CSR - improperly formatted DER")
-        layer1 = dict(temp)
-
-        # Verify public key is 256 bytes
-        csr = x509.load_der_x509_csr(response.csr)
-        csr_pubkey = csr.public_key()
-        asserts.assert_equal(csr_pubkey.key_size, 256, "Incorrect key size")
-
-        # Verify signature algorithm is ecdsa-with-SHA156
-        signature_algorithm = dict(layer1['signatureAlgorithm'])['algorithm']
-        asserts.assert_equal(signature_algorithm, rfc5480.ecdsa_with_SHA256, "CSR specifies incorrect signature key algorithm")
-
-        # Verify signature is valid
-        asserts.assert_true(csr.is_signature_valid, "Signature is invalid")
-
-        # Verify response.nonce is octet string of length 32
-        try:
-            # response.nonce is an octet string if it can be converted to an int
-            int(hex_from_bytes(response.nonce), 16)
-        except ValueError:
-            asserts.fail("Returned CSR nonce is not an octet string")
-
-        # Verify response.nonce is valid signature
-        nocsr_elements = dict(
-            [
-                (1, response.csr),
-                (2, first_nonce),
-            ]
-        )
-        writer = TLVWriter()
-        writer.put(None, nocsr_elements)
-
-        baselen = curve_by_name("NIST256p").baselen
-        signature_raw_r = int(hex_from_bytes(response.nonce[:baselen]), 16)
-        signature_raw_s = int(hex_from_bytes(response.nonce[baselen:]), 16)
-
-        nocsr_signature = utils.encode_dss_signature(signature_raw_r, signature_raw_s)
-        csr_pubkey.verify(signature=nocsr_signature, data=writer.encoding, signature_algorithm=ec.ECDSA(hashes.SHA256()))
+        self.assert_valid_csr(response, first_nonce)
 
         self.step(8)
         await cr1_cmd.send_provision_client_command(ccdid=response.ccdid, certificate=first_cert)
 
         self.step(9)
         if not self.skip_cr2:
-            response2 = await cr2_cmd.send_provision_client_command(ccdid=response.ccdid, certificate=second_cert)
-            self.assert_valid_ccdid(response2.caid)
-            asserts.assert_not_equal(response.caid, response2.caid, "CCDID should be unique")
+            response2 = await cr2_cmd.send_csr_command(nonce=second_nonce)
+            self.assert_valid_ccdid(response2.ccdid)
+            self.assert_valid_csr(response2, second_nonce)
+            asserts.assert_not_equal(response.ccdid, response2.ccdid, "CCDID should be unique")
+
+            await cr2_cmd.send_provision_client_command(ccdid=response2.ccdid, certificate=second_cert)
 
         self.step(10)
         attribute_certs = await cr1_cmd.read_tls_cert_attribute(attributes.ProvisionedClientCertificates)

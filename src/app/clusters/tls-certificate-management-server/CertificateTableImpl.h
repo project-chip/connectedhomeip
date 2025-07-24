@@ -95,8 +95,8 @@ public:
     CHIP_ERROR RemoveRootCertificate(FabricIndex fabric, TLSCAID id) override;
     CHIP_ERROR GetRootCertificateCount(FabricIndex fabric, uint8_t & outCount) override;
 
-    CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, TLSCCDID & id, MutableByteSpan & csr,
-                                        MutableByteSpan & nonceSignature) override;
+    CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer, TLSCCDID & id,
+                                        MutableByteSpan & csr, MutableByteSpan & nonceSignature) override;
     CHIP_ERROR UpdateClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, ClientBuffer & buffer,
                                             const ClientCertStruct & entry) override;
     CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, BufferedClientCert & entry) override;
@@ -114,15 +114,6 @@ private:
     RootCertificateTable mRootCertificates;
     ClientCertificateTable mClientCertificates;
     PersistentStorageDelegate * mStorage = nullptr;
-
-    struct KeyStruct
-    {
-        EndpointId endpoint;
-        Crypto::P256Keypair key;
-        Optional<TLSCCDID> certificateId;
-    };
-
-    std::array<KeyStruct, 10> mPendingClientCerts;
 };
 
 } // namespace Tls
