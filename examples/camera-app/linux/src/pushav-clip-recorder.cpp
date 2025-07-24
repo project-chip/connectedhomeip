@@ -391,12 +391,11 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
             Stop();
             return -1;
         }
-        mAudioEncoderContext->sample_rate    = mAudioInfo.mSampleRate;
-        mAudioEncoderContext->channels       = mAudioInfo.mChannels;
-        mAudioEncoderContext->channel_layout = static_cast<uint64_t>(av_get_default_channel_layout(mAudioEncoderContext->channels));
-        mAudioEncoderContext->bit_rate       = mAudioInfo.mBitRate;
-        mAudioEncoderContext->sample_fmt     = audioCodec->sample_fmts[0];
-        mAudioEncoderContext->time_base      = (AVRational){ 1, mAudioInfo.mSampleRate };
+        mAudioEncoderContext->sample_rate = mAudioInfo.mSampleRate;
+        av_channel_layout_default(&mAudioEncoderContext->ch_layout, mAudioInfo.mChannels);
+        mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
+        mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
+        mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
         mAudioEncoderContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
         AVDictionary * opts                         = NULL;
         av_dict_set(&opts, "strict", "experimental", 0);
