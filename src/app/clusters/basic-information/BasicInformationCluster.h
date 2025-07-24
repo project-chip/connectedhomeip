@@ -77,14 +77,12 @@ public:
 
 private:
     // write without notification
-    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request,
-                                            AttributeValueDecoder & decoder);
+    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 
     BitFlags<OptionalBasicInformationAttributes> mEnabledOptionalAttributes;
 
     char mNodeLabelBuffer[32 + 1];
     bool mLocalConfigDisabled = false;
-
 };
 
 } // namespace Clusters
