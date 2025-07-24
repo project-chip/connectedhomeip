@@ -47,9 +47,11 @@ pw_python_package("chip-testing-module") {
     "chip/testing/global_stash.py",
     "chip/testing/matchers.py",
     "chip/testing/matter_asserts.py",
+    "chip/testing/matter_test_config.py",
     "chip/testing/matter_testing.py",
     "chip/testing/metadata.py",
     "chip/testing/pics.py",
+    "chip/testing/problem_notices.py",
     "chip/testing/runner.py",
     "chip/testing/spec_parsing.py",
     "chip/testing/taglist_and_topology_test.py",
@@ -61,6 +63,15 @@ pw_python_package("chip-testing-module") {
     "chip/testing/test_tasks.py",
     "chip/testing/test_matter_asserts.py",
   ]
+}
+
+pw_zip("data_model_zip_1_2") {
+  inputs = []
+  foreach(file, data_model_XMLS_1_2) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.2/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/data_model/zip_1_2.zip"
 }
 
 pw_zip("data_model_zip_1_3") {
@@ -110,6 +121,7 @@ pw_python_distribution("chip-testing") {
   }
 
   public_deps = [
+    ":data_model_zip_1_2",
     ":data_model_zip_1_3",
     ":data_model_zip_1_4",
     ":data_model_zip_1_4_1",
@@ -117,6 +129,7 @@ pw_python_distribution("chip-testing") {
   ]
 
   extra_files = [
+    "${root_out_dir}/data_model/zip_1_2.zip > chip/testing/data_model/1.2/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_3.zip > chip/testing/data_model/1.3/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4.zip > chip/testing/data_model/1.4/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4_1.zip > chip/testing/data_model/1.4.1/allfiles.zip",

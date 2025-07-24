@@ -1277,7 +1277,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1684,6 +1684,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6503,7 +6504,7 @@ provisional cluster ClosureControl = 260 {
     optional nullable CurrentPositionEnum position = 0;
     optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
-    optional nullable boolean secureState = 3;
+    nullable boolean secureState = 3;
   }
 
   struct OverallTargetStateStruct {
@@ -6548,9 +6549,9 @@ provisional cluster ClosureControl = 260 {
   /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
   /** On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed. */
-  command MoveTo(MoveToRequest): DefaultSuccess = 1;
+  timed command MoveTo(MoveToRequest): DefaultSuccess = 1;
   /** This command is used to trigger a calibration of the closure. */
-  command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
+  timed command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 
 /** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
@@ -6681,9 +6682,9 @@ provisional cluster ClosureDimension = 261 {
   }
 
   /** This command is used to move a dimension of the closure to a target position. */
-  command SetTarget(SetTargetRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL move a dimension of the closure to a target position by a number of steps. */
-  command Step(StepRequest): DefaultSuccess = 1;
+  timed command SetTarget(SetTargetRequest): DefaultSuccess = 0;
+  /** This command is used to move a dimension of the closure to a target position by a number of steps. */
+  timed command Step(StepRequest): DefaultSuccess = 1;
 }
 
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
@@ -6906,7 +6907,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 7;
+  revision 9;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -7024,6 +7025,7 @@ cluster Thermostat = 513 {
     kLocalTemperatureNotExposed = 0x40;
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
+    kEvents = 0x200;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -7147,6 +7149,47 @@ cluster Thermostat = 513 {
     int16u transitionTime = 0;
     nullable temperature heatSetpoint = 1;
     nullable temperature coolSetpoint = 2;
+  }
+
+  info event SystemModeChange = 0 {
+    optional SystemModeEnum previousSystemMode = 0;
+    SystemModeEnum currentSystemMode = 1;
+  }
+
+  info event LocalTemperatureChange = 1 {
+    nullable temperature currentLocalTemperature = 0;
+  }
+
+  info event OccupancyChange = 2 {
+    optional OccupancyBitmap previousOccupancy = 0;
+    OccupancyBitmap currentOccupancy = 1;
+  }
+
+  info event SetpointChange = 3 {
+    SystemModeEnum systemMode = 0;
+    optional OccupancyBitmap occupancy = 1;
+    optional temperature previousSetpoint = 2;
+    temperature currentSetpoint = 3;
+  }
+
+  info event RunningStateChange = 4 {
+    optional RelayStateBitmap previousRunningState = 0;
+    RelayStateBitmap currentRunningState = 1;
+  }
+
+  info event RunningModeChange = 5 {
+    optional ThermostatRunningModeEnum previousRunningMode = 0;
+    ThermostatRunningModeEnum currentRunningMode = 1;
+  }
+
+  info event ActiveScheduleChange = 6 {
+    optional nullable octet_string previousScheduleHandle = 0;
+    nullable octet_string currentScheduleHandle = 1;
+  }
+
+  info event ActivePresetChange = 7 {
+    optional nullable octet_string previousPresetHandle = 0;
+    nullable octet_string currentPresetHandle = 1;
   }
 
   readonly attribute nullable temperature localTemperature = 0;
@@ -8512,7 +8555,7 @@ cluster WiFiNetworkManagement = 1105 {
     octet_string<64> passphrase = 0;
   }
 
-  /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
+  /** This command is used to request the current WPA-Personal passphrase or PSK associated with the Wi-Fi network provided by this device. */
   command access(invoke: manage) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
@@ -11000,8 +11043,11 @@ provisional cluster JointFabricAdministrator = 1875 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kVIDNotVerified = 2;
-    kInvalidAdministratorFabricIndex = 3;
+    kBusy = 2;
+    kPAKEParameterError = 3;
+    kWindowNotOpen = 4;
+    kVIDNotVerified = 5;
+    kInvalidAdministratorFabricIndex = 6;
   }
 
   enum TransferAnchorResponseStatusEnum : enum8 {
@@ -11031,7 +11077,7 @@ provisional cluster JointFabricAdministrator = 1875 {
 
   request struct OpenJointCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;
@@ -11299,7 +11345,8 @@ provisional cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
+  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable int16u maximumMeteredQuantities = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11482,6 +11529,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute boolean clusterErrorBoolean = 50;
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
+  attribute access(read: administer, write: administer) optional boolean unsupportedAttributeRequiringAdminPrivilege = 254;
   attribute optional boolean unsupported = 255;
   attribute optional int8u readFailureCode = 12288;
   attribute optional int32u failureInt32U = 12289;

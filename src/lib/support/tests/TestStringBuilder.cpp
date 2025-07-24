@@ -108,6 +108,61 @@ TEST(TestStringBuilder, TestFormat)
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "Multi: 1234, then 0x00AB");
     }
+
+    {
+        const char str[]      = "1234567890";
+        const char expected[] = "1234567890";
+
+        StringBuilder<11> builder1(str, strlen(str));
+        EXPECT_TRUE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<11> builder2(CharSpan::fromCharString(str));
+        EXPECT_TRUE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const uint8_t str[]   = "12\x01"
+                                "34\x02"
+                                "56\x03"
+                                "7890";
+        const char expected[] = "12.34.56.7890";
+
+        StringBuilder<14> builder1(str, strlen(reinterpret_cast<const char *>(str)));
+        EXPECT_TRUE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))));
+        EXPECT_TRUE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0' };
+        const char expected[] = "12.34.56.7890";
+
+        StringBuilder<14> builder1(bytes, sizeof(bytes));
+        EXPECT_TRUE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(ByteSpan(bytes, sizeof(bytes)));
+        EXPECT_TRUE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const char str[]      = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0' };
+        const char expected[] = "12.34.56.7890";
+
+        StringBuilder<14> builder1(CharSpan(str, sizeof(str)));
+        EXPECT_TRUE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(str, sizeof(str));
+        EXPECT_TRUE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
 }
 
 TEST(TestStringBuilder, TestFormatOverflow)
@@ -153,6 +208,61 @@ TEST(TestStringBuilder, TestFormatOverflow)
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "1234abc...");
+    }
+
+    {
+        const char str[]      = "1234567890a";
+        const char expected[] = "1234567890";
+
+        StringBuilder<11> builder1(str, strlen(str), false);
+        EXPECT_FALSE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<11> builder2(CharSpan::fromCharString(str), false);
+        EXPECT_FALSE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const uint8_t str[]   = "12\x01"
+                                "34\x02"
+                                "56\x03"
+                                "7890a";
+        const char expected[] = "12.34.56.7890";
+
+        StringBuilder<14> builder1(str, strlen(reinterpret_cast<const char *>(str)), false);
+        EXPECT_FALSE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))), false);
+        EXPECT_FALSE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
+        const char expected[] = "12.34.56.7890";
+
+        StringBuilder<14> builder1(bytes, sizeof(bytes), false);
+        EXPECT_FALSE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(ByteSpan(bytes, sizeof(bytes)), false);
+        EXPECT_FALSE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const char str[]      = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
+        const char expected[] = "12.34.56.7890";
+
+        StringBuilder<14> builder1(CharSpan(str, sizeof(str)), false);
+        EXPECT_FALSE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(str, sizeof(str), false);
+        EXPECT_FALSE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
     }
 }
 
@@ -216,6 +326,61 @@ TEST(TestStringBuilder, TestOverflowMarker)
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "a...");
+    }
+
+    {
+        const char str[]      = "1234567890a";
+        const char expected[] = "1234567...";
+
+        StringBuilder<11> builder1(str, strlen(str));
+        EXPECT_FALSE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<11> builder2(CharSpan::fromCharString(str));
+        EXPECT_FALSE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const uint8_t str[]   = "12\x01"
+                                "34\x02"
+                                "56\x03"
+                                "7890a";
+        const char expected[] = "12.34.56.7...";
+
+        StringBuilder<14> builder1(str, strlen(reinterpret_cast<const char *>(str)));
+        EXPECT_FALSE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))));
+        EXPECT_FALSE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
+        const char expected[] = "12.34.56.7...";
+
+        StringBuilder<14> builder1(bytes, sizeof(bytes));
+        EXPECT_FALSE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(ByteSpan(bytes, sizeof(bytes)));
+        EXPECT_FALSE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
+    }
+
+    {
+        const char str[]      = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
+        const char expected[] = "12.34.56.7...";
+
+        StringBuilder<14> builder1(CharSpan(str, sizeof(str)));
+        EXPECT_FALSE(builder1.Fit());
+        EXPECT_STREQ(builder1.c_str(), expected);
+
+        StringBuilder<14> builder2(str, sizeof(str));
+        EXPECT_FALSE(builder2.Fit());
+        EXPECT_STREQ(builder2.c_str(), expected);
     }
 }
 
