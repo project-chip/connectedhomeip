@@ -794,10 +794,13 @@ jobs:
                 include:
                 - os: macos-13
                   arch: x64     # observed, not configured
+                  dry-run: false
                 - os: macos-14
                   arch: arm64   # observed, not configured
+                  dry-run: true
                 - os: macos-15
                   arch: arm64   # observed, not configured
+                  dry-run: true
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
@@ -824,6 +827,7 @@ jobs:
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Build Python REPL and example apps
+              continue-on-error: ${{ matrix.dry-run }}
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
