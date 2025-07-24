@@ -499,6 +499,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
+            fail-fast: false
             matrix:
                 build_variant: [ipv6only-no-ble-no-wifi]
 
@@ -788,6 +789,7 @@ jobs:
         name: REPL Tests - Darwin (Build Only)
 
         strategy:
+            fail-fast: false
             matrix:
                 build_variant: [no-ble-no-wifi-tsan-clang]
                 os: [macos-13, macos-14, macos-15]
