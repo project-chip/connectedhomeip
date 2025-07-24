@@ -103,7 +103,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
         outSession.audioStreamID.SetNull();
     }
 
-    // outDeferredOffer = LinuxDeviceOptions::GetInstance().cameraDeferredOffer;
+    outDeferredOffer = LinuxDeviceOptions::GetInstance().cameraDeferredOffer;
 
     WebrtcTransport * transport = GetTransport(args.sessionId);
     WebrtcTransport::RequestArgs requestArgs;
@@ -129,6 +129,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     transport->SetRequestArgs(requestArgs);
     transport->Start();
+    transport->AddTracks();
 
     // Acquire the Video and Audio Streams from the CameraAVStreamManagement
     // cluster and update the reference counts.
@@ -166,13 +167,7 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
 {
     ChipLogProgress(Camera, "HandleProvideOffer called");
-#if 0
-    if (mPeerConnection == nullptr)
-    {
-        // Re-initialization of PeerConnection is needed
-        Init();
-    }
-#endif
+
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
     outSession.id          = args.sessionId;
     outSession.peerNodeID  = args.peerNodeId;
