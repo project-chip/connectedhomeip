@@ -20,7 +20,7 @@ import builtins
 import ctypes
 from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_char_p, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
-from typing import Callable, Dict, Optional
+from typing import Callable, Optional
 
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 from . import BdxTransfer
