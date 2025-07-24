@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:150
+            image: ghcr.io/project-chip/chip-build-esp32:153
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -135,7 +135,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:150
+            image: ghcr.io/project-chip/chip-build-esp32:153
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
