@@ -20,7 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestBasicInformationCluster"
 
-  test_sources = [ "TestBasicInformationCommissioningCluster.cpp" ]
+  test_sources = [ "TestBasicInformationCluster.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
