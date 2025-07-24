@@ -19,6 +19,7 @@
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/ConcreteCommandPath.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -80,6 +81,12 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
                   CHIP_NO_ERROR);
         ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
 
+        DataModel::InvokeRequest request;
+        request.path = ConcreteCommandPath(kRootEndpointId, WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
+        TLV::TLVReader tlvReader;
+        ASSERT_EQ(cluster.InvokeCommand(request, tlvReader, nullptr),
+            Protocols::InteractionModel::Status::UnsupportedCommand);
+
         // Everything is unimplemented, so attributes are the mandatory and global ones.
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), attributesBuilder),
@@ -98,7 +105,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
     }
 
     {
-        class ResetCountsProvider : public DeviceLayer::DiagnosticDataProvider
+        class ErrorCountsProvider : public DeviceLayer::DiagnosticDataProvider
         {
         public:
             CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & v) override
@@ -117,9 +124,9 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
             .enableCurrentMaxRate = false,
         };
 
-        ResetCountsProvider resetCountsProvider;
+        ErrorCountsProvider errorCountsProvider;
         WiFiDiagnosticsServerCluster cluster(
-            kRootEndpointId, resetCountsProvider, enabledAttributes,
+            kRootEndpointId, errorCountsProvider, enabledAttributes,
             BitFlags<WiFiNetworkDiagnostics::Feature>(WiFiNetworkDiagnostics::Feature::kErrorCounts));
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
@@ -132,7 +139,12 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         ASSERT_EQ(commands[0].GetInvokePrivilege(),
                   WiFiNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry.GetInvokePrivilege());
 
-        // Test with ErrorCount enabled
+        DataModel::InvokeRequest request2;
+        request2.path = ConcreteCommandPath(kRootEndpointId, WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
+        TLV::TLVReader tlvReader2;
+        ASSERT_EQ(cluster.InvokeCommand(request2, tlvReader2, nullptr),
+                  Protocols::InteractionModel::Status::Success);
+
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), attributesBuilder),
                   CHIP_NO_ERROR);
