@@ -67,7 +67,7 @@ class MdnsServiceListener(ServiceListener):
 
 class MdnsDiscovery:
 
-    DISCOVERY_TIMEOUT_SEC = 15
+    DISCOVERY_TIMEOUT_SEC = 30
 
     def __init__(self, verbose_logging: bool = False):
         """
@@ -578,11 +578,9 @@ class MdnsDiscovery:
         self._event.clear()
 
         if all_services:
-            self._service_types = []
             self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces)))
 
         if service_types:
-            self._service_types = []
             self._service_types = service_types
 
         logger.info(f"Browsing for mDNS service(s) of type: {self._service_types}")
@@ -591,7 +589,6 @@ class MdnsDiscovery:
                                          type_=self._service_types,
                                          handlers=[partial(self._on_service_state_change, unlock_service=unlock_service)]
                                          )
-
         try:
             await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
         except TimeoutError:
@@ -671,7 +668,6 @@ class MdnsDiscovery:
         """
         async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             mdns_service_info = None
-            discovery_timeout_sec = 3
 
             # Adds service listener
             service_listener = MdnsServiceListener()
@@ -681,10 +677,11 @@ class MdnsDiscovery:
             # This is necessary whem requesting TXT records,
             # as the service may not be immediately available
             try:
-                await wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
+                logger.info(f"Service lookup for {service_name}")
+                await wait_for(service_listener.updated_event.wait(), self.DISCOVERY_TIMEOUT_SEC)
             except TimeoutError:
                 logger.info(
-                    f"Service lookup for {service_name} timeout ({discovery_timeout_sec} seconds) reached without an update.")
+                    f"Service lookup for {service_name} timeout ({self.DISCOVERY_TIMEOUT_SEC} seconds) reached without an update.")
             finally:
                 await azc.async_remove_service_listener(service_listener)
 
@@ -693,7 +690,7 @@ class MdnsDiscovery:
             service_info._query_record_types = {_TYPE_SRV, _TYPE_TXT, _TYPE_A, _TYPE_AAAA}
             is_discovered = await service_info.async_request(
                 azc.zeroconf,
-                discovery_timeout_sec * 1000)
+                self.DISCOVERY_TIMEOUT_SEC * 1000)
 
             if is_discovered:
                 if self._verbose_logging:
@@ -707,7 +704,7 @@ class MdnsDiscovery:
                 if mdns_service_info is not None:
                     self._discovered_services[service_type].append(mdns_service_info)
             elif self._verbose_logging:
-                logger.warning("Service information not found.")
+                logger.warning(f"Service information for '{service_name}' not found.")
 
             self._event.set()
 
