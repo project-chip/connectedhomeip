@@ -18,15 +18,9 @@
 
 namespace chip::app::DataModel::internal {
 
-std::optional<EventNumber> GenerateEvent(const ConcreteEventPath & aPath, PriorityLevel aPriorityLevel, FabricIndex aFabricIndex,
-                                         EventsGenerator & generator, EventLoggingDelegate & delegate, bool isScopedEvent)
+std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
+                                         EventLoggingDelegate & delegate, bool isScopedEvent)
 {
-
-    EventOptions eventOptions;
-    eventOptions.mPath        = aPath;
-    eventOptions.mPriority    = aPriorityLevel;
-    eventOptions.mFabricIndex = aFabricIndex;
-
     if (isScopedEvent)
     {
 

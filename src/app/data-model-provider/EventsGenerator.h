@@ -40,7 +40,7 @@ template <typename T>
 class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
 public:
-    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData){};
+    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData) {};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
@@ -50,23 +50,28 @@ private:
     const T & mEventData;
 };
 
-std::optional<EventNumber> GenerateEvent(const ConcreteEventPath & aPath, PriorityLevel aPriorityLevel, FabricIndex aFabricIndex,
-                                         EventsGenerator & generator, EventLoggingDelegate & delegate, bool isScopedEvent);
+std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
+                                         EventLoggingDelegate & delegate, bool isScopedEvent);
 
 template <typename G, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
 {
     internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-    return GenerateEvent(ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId()),
-                         aEventData.GetPriorityLevel(), aEventData.GetFabricIndex(), generator, eventPayloadWriter, true);
+    EventOptions eventOptions;
+    eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
+    eventOptions.mPriority    = aEventData.GetPriorityLevel();
+    eventOptions.mFabricIndex = aEventData.GetFabricIndex();
+    return GenerateEvent(eventOptions, generator, eventPayloadWriter, true /* isScopedEvent */);
 }
 
 template <typename G, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
-std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId endpointId)
+std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
 {
     internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-    return GenerateEvent(ConcreteEventPath(endpointId, aEventData.GetClusterId(), aEventData.GetEventId()),
-                         aEventData.GetPriorityLevel(), kUndefinedFabricIndex, generator, eventPayloadWriter, false);
+    EventOptions eventOptions;
+    eventOptions.mPath     = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
+    eventOptions.mPriority = aEventData.GetPriorityLevel();
+    return GenerateEvent(eventOptions, generator, eventPayloadWriter, false /* isScopedEvent */);
 }
 
 } // namespace internal
