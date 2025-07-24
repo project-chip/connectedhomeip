@@ -36,6 +36,7 @@ import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
+from chip.setup_payload.setup_payload import SetupPayload
 from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
