@@ -13,8 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/clusters/electrical-power-measurement-server/electrical-power-measurement-server.h"
-#include "lib/support/BitFlags.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/basic-information/BasicInformationCluster.h>
@@ -25,6 +23,7 @@
 #include <clusters/BasicInformation/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
