@@ -40,7 +40,9 @@ import random
 from typing import Optional
 
 import chip.clusters as Clusters
+
 from chip import ChipDeviceCtrl
+from chip.interaction_model import Status
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -56,6 +58,23 @@ class TC_SU_4_1(MatterBaseTest):
     """
     cluster_otap = Clusters.OtaSoftwareUpdateProvider
     cluster_otar = Clusters.OtaSoftwareUpdateRequestor
+
+    async def write_acl(self, controller, acl):
+        """
+        Writes the Access Control List (ACL) to the DUT device using the specified controller.
+
+        Args:
+            controller: The Matter controller (e.g., th1, th4) that will perform the write operation.
+            acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
+
+        Raises:
+            AssertionError: If writing the ACL attribute fails (status is not Status.Success).
+        """
+        result = await controller.WriteAttribute(
+            self.dut_node_id,
+            [(0, Clusters.AccessControl.Attributes.Acl(acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
 
     def desc_TC_SU_4_1(self) -> str:
         return "[TC-SU-4.1] Verifying Cluster Attributes on OTA-R(DUT)"
@@ -78,11 +97,14 @@ class TC_SU_4_1(MatterBaseTest):
                      "Verify that the write operation for the attribute works and DUT does not respond with any errors."),
             TestStep(4, "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT."
                      "Verify that the attribute value is set to TH2 as the default OTA provider for the first fabric and TH3 for the second fabric."),
-            TestStep(5, "TH..."),
+            TestStep(5, "TH sends a write request for the DefaultOTAProviders Attribute on the first fabric to the DUT. "
+                     "TH4 is the first Provider location and TH2 is the second Provider location in the same write request on the first fabric. "
+                     "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT.",
+                     "Verify that the write operation fails with CONSTRAINT_ERROR status code 0x87.\n"
+                     "Verify that the attribute value is set to TH3 as the default OTA provider for the second fabric and either of TH2 or TH4 for the first fabric."),
             # TestStep(6, "TH..."),
             # TestStep(7, "TH..."),
             # TestStep(8, "TH..."),
-            # TestStep(9, "TH..."),
         ]
         return steps
 
@@ -153,7 +175,7 @@ class TC_SU_4_1(MatterBaseTest):
         logger.info(f'Step #1 - Write DefaultOTAProviders response: {resp}')
 
         # Verify write succeeded (response code 0)
-        asserts.assert_equal(resp, 0, "Failed to write DefaultOTAProviders attribute")
+        asserts.assert_equal(resp, Status.Success, "Failed to write DefaultOTAProviders attribute")
 
         self.step(2)
         # Verify DefaultOTAProviders attribute on the DUT (TH1) after write (using TH1 on Fabric 1)
@@ -220,7 +242,7 @@ class TC_SU_4_1(MatterBaseTest):
         )
         logger.info(f'Step #3 - Write DefaultOTAProviders response: {resp}')
         # Status=<Status.Success: 0
-        asserts.assert_equal(resp[0].Status, 0, "Failed to write DefaultOTAProviders attribute")
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
 
         self.step(4)
 
@@ -297,15 +319,35 @@ class TC_SU_4_1(MatterBaseTest):
         # Update attribute with providers list  (TH2 and TH4 for fabric 1)
         attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list)
 
+        # Write the Access Control List (ACL) to the DUT device for TH4 controller,
+        # allowing TH4 to have the necessary permissions to perform operations.
+        admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],  # Optional [th4.nodeId]
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0, cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
+        )
+        view_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[]
+        )
+        acl = [admin_acl, view_acl]
+
+        # Write ACL using TH1 since it has permission; this grants TH4 the needed access.
+        resp = await self.write_acl(th1, acl)
+        logger.info(f'Step #5 - TH4 have the necessary permissions to perform operation: {resp}')
+
         # Write updated DefaultOTAProviders attribute to DUT (TH1)
-        # TODO: Investigate why TH4 not have permission to write
-        resp = await th1.WriteAttribute(
+        resp = await th4.WriteAttribute(
             attributes=[(0, attr)],
             nodeid=self.dut_node_id,
         )
         logger.info(f'Step #5- Write DefaultOTAProviders response: {resp}')
         #  Status=<Status.ConstraintError: 135
-        asserts.assert_equal(resp[0].Status, 135, "Failed to write DefaultOTAProviders attribute")
+        asserts.assert_equal(resp[0].Status, Status.ConstraintError, "Failed to write DefaultOTAProviders attribute")
         logger.info("Step #5 - Write operation correctly failed with CONSTRAINT_ERROR")
 
         # self.step(6)
