@@ -102,7 +102,7 @@ class TC_SU_4_1(MatterBaseTest):
                      "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT.",
                      "Verify that the write operation fails with CONSTRAINT_ERROR status code 0x87.\n"
                      "Verify that the attribute value is set to TH3 as the default OTA provider for the second fabric and either of TH2 or TH4 for the first fabric."),
-            # TestStep(6, "TH..."),
+            TestStep(6, "TH..."),
             # TestStep(7, "TH..."),
             # TestStep(8, "TH..."),
         ]
@@ -159,10 +159,6 @@ class TC_SU_4_1(MatterBaseTest):
             endpoint=0,
             fabricIndex=1       # Fabric ID from TH1 (controller writing to DUT)
         )
-
-        # Create Providers list and Add TH2 to Providers list
-        # providers_list = [provider_th2_for_fabric1]
-        # logger.info(f'Step #1 - Providers list updated with provider "TH2 for fabric 1": {providers_list}')
 
         # DefaultOTAProviders attribute with the provider list
         attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider_th2_for_fabric1])
@@ -340,17 +336,50 @@ class TC_SU_4_1(MatterBaseTest):
         resp = await self.write_acl(th1, acl)
         logger.info(f'Step #5 - TH4 have the necessary permissions to perform operation: {resp}')
 
-        # Write updated DefaultOTAProviders attribute to DUT (TH1)
+        # Write updated DefaultOTAProviders attribute to TH4
         resp = await th4.WriteAttribute(
             attributes=[(0, attr)],
             nodeid=self.dut_node_id,
         )
         logger.info(f'Step #5- Write DefaultOTAProviders response: {resp}')
         #  Status=<Status.ConstraintError: 135
-        asserts.assert_equal(resp[0].Status, Status.ConstraintError, "Failed to write DefaultOTAProviders attribute")
+        asserts.assert_equal(resp[0].Status, Status.ConstraintError,
+                             "Expected write to fail with ConstraintError, got different status")
         logger.info("Step #5 - Write operation correctly failed with CONSTRAINT_ERROR")
 
-        # self.step(6)
+        self.step(6)
+
+        # Create Empty Providers list
+        providers_list_empty = []
+        logger.info(f'Step #6 - Providers list updated with provider empty: {providers_list_empty}')
+
+        # Update attribute with empty providers list (TH3 for fabric 2)
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list_empty)
+
+        # Write updated DefaultOTAProviders attribute to TH3
+        resp = await th3.WriteAttribute(
+            attributes=[(0, attr)],
+            nodeid=self.dut_node_id,
+        )
+        logger.info(f'Step #6- Write DefaultOTAProviders response on TH3 Fabric 2: {resp}')
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
+        logger.info("Step #6 - Write operation correctly performed with empty list")
+
+        # Verify DefaultOTAProviders attribute on the DUT after write (TH3 on Fabric 2)
+        actual_otap_info = await self.read_single_attribute_check_success(
+            dev_ctrl=th3,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+
+        actual_provider = actual_otap_info
+
+        # Verify that the provider list is empty
+        asserts.assert_true(len(actual_provider) == 0, "DefaultOTAProviders list is not empty")
+
+        # Verify the actual provider matches the expected OTA Provider (TH3)
+        asserts.assert_equal(actual_provider, [], "DefaultOTAProviders on TH3 (Fabric 2) should be empty")
+        logger.info("Step #6 - DefaultOTAProviders attribute matches expected values.")
+
         # self.step(7)
         # self.step(8)
         # self.step(9)
