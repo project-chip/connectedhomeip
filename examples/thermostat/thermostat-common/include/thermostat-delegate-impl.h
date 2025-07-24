@@ -86,9 +86,9 @@ public:
 
     CHIP_ERROR AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion) override;
 
-    CHIP_ERROR RemoveFromThermostatSuggestionsList(uint8_t uniqueID) override;
+    CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t indexToRemove) override;
 
-    uint8_t GetUniqueID() override;
+    CHIP_ERROR GetUniqueID(uint8_t & uniqueID) override;
 
     CHIP_ERROR ReEvaluateCurrentSuggestion() override;
 
@@ -117,20 +117,20 @@ private:
      * invalid index.
      *
      */
-    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(uint32_t currentMatterEpochTimestampInSeconds);
+    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(System::Clock::Seconds32 currentMatterEpochTimestamp);
 
-    CHIP_ERROR StartExpirationTimer(uint32_t timeoutInSecs);
+    CHIP_ERROR StartExpirationTimer(System::Clock::Seconds32 timeout);
 
     static void TimerExpiredCallback(System::Layer * systemLayer, void * appState);
 
     void CancelExpirationTimer();
 
-    CHIP_ERROR RemoveExpiredSuggestions(uint32_t currentMatterEpochTimestampInSeconds);
-
     CHIP_ERROR SetThermostatSuggestionNotFollowingReason(
         const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason);
 
     void SetCurrentThermostatSuggestion(size_t index);
+
+    bool HaveSuggestionWithID(uint8_t uniqueIDToFind);
 
     uint8_t mNumberOfPresets;
 
@@ -153,7 +153,7 @@ private:
     size_t mIndexOfCurrentSuggestion;
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
 
-    bool IsExpirationTimerRunning = false;
+    bool mIsExpirationTimerRunning = false;
 };
 
 } // namespace Thermostat
