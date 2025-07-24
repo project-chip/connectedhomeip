@@ -29,8 +29,7 @@ import typing
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import IntFlag
-from itertools import chain
-from typing import Any, Callable, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, List, Optional, Type, Union
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
