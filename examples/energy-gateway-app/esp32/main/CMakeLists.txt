@@ -36,6 +36,7 @@ set(SRC_DIRS_LIST
   "${APP_COMMON_GEN_DIR}"
   "${CHIP_ROOT}/examples/providers"
   "${ENERGY_GATEWAY_DIR}/commodity-price/src"
+  "${ENERGY_GATEWAY_DIR}/commodity-metering/src"  
   "${ENERGY_GATEWAY_DIR}/common/src"
   "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/src"
   "${ENERGY_GATEWAY_DIR}/meter-identification/src"
