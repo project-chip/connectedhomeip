@@ -31,7 +31,6 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import logging
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -42,7 +41,7 @@ class TC_SU_2_8(MatterBaseTest):
     """
     This test case verifies that the DUT is able to successfully send a QueryImage command to the OTA-P in multi fabric scenario.
     """
-    
+
     def desc_TC_SU_2_8(self) -> str:
         return "[TC-SU-2.8] OTA functionality in Multi Fabric scenario"
 
@@ -60,7 +59,7 @@ class TC_SU_2_8(MatterBaseTest):
             TestStep(2, "DUT sends a QueryImage command to TH1/OTA-P. TH1/OTA-P does not respond with QueryImageResponse."),
         ]
         return steps
-    
+
     async def _get_provider_struct(self, th, endpoint=0):
         fabric_index = await self.get_fabric_index_for_node(th.node_id)
         provider_struct = Clusters.Objects.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
@@ -80,7 +79,7 @@ class TC_SU_2_8(MatterBaseTest):
 
         # Commissioning
         self.step(0)
-        
+
         # DUT sends a QueryImage command to TH1/OTA-P.
         self.step(1)
 
@@ -100,7 +99,7 @@ class TC_SU_2_8(MatterBaseTest):
             attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        asserts.assert_equal(state, 0 , "UpdateState should be Idle after setting TH1")
+        asserts.assert_equal(state, 0, "UpdateState should be Idle after setting TH1")
 
         # DUT sends a QueryImage command to TH1/OTA-P. TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
@@ -114,6 +113,7 @@ class TC_SU_2_8(MatterBaseTest):
         )
 
         asserts.assert_equal(resp.status, Clusters.Status.Success, "Failed to write DefaultOTAProviders for TH2")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
