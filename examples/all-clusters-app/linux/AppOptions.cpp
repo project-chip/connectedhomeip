@@ -18,7 +18,7 @@
 
 #include "AppOptions.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <system/SystemClock.h>
@@ -27,7 +27,7 @@
 
 using namespace chip::ArgParser;
 using namespace chip::System;
-using namespace chip::app::Clusters::TimeSynchronization::Attributes;
+using namespace chip::app::Clusters::TimeSynchronization;
 
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
@@ -143,7 +143,7 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
         {
             sMockClock.Emplace();
             // This ensures that the UTCTime attribute will be reported to have a value.
-            TimeSource::Set(chip::kRootEndpointId, chip::app::Clusters::TimeSynchronization::TimeSourceEnum::kUnknown);
+            TimeSynchronizationServer::Instance().SetTimeSource(TimeSourceEnum::kUnknown);
         }
         long longValue = atoi(value);
         if (longValue >= 0)
