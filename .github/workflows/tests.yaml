@@ -677,9 +677,9 @@ jobs:
 
             - name: Clean common build directory
               run: >-
-                  ccache --show-stats
-                  ccache --clear
                   rm -rf out/build
+                  && ccache --show-stats
+                  && ccache --clear
 
             - name: Copy push_av_server and install dependencies
               run: >-
