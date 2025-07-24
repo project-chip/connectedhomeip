@@ -258,7 +258,10 @@ class TC_ACL_2_6(MatterBaseTest):
         logging.info("No events found for invalid entry, as expected")
 
         # Re-running test using the legacy list writing mechanism
-        if not force_legacy_encoding:
+        if force_legacy_encoding:
+            self.skip_step(8)
+
+        else:
             self.step(8)
             logging.info("Resetting ACL events to only admin/case, then re-running the test using the legacy list writing mechanism")
 
@@ -279,8 +282,6 @@ class TC_ACL_2_6(MatterBaseTest):
                 forceLegacyListEncoding=False
             )
 
-        else:
-            self.skip_step(8)
 
     def steps_TC_ACL_2_6(self) -> list[TestStep]:
         steps = [
