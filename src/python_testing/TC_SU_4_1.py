@@ -67,30 +67,6 @@ class TC_SU_4_1(MatterBaseTest):
         ]
         return pics
 
-    async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
-        if expectedErrCode == 0x00:
-            params = await th.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
-
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenCommissioningWindow(
-                    nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
-            errcode = ctx.exception.chip_error
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
-
-    async def CommissionAttempt(self, setupPinCode: int, thnum: int, th):
-        await th.CommissionOnNetwork(
-            nodeId=self.dut_node_id,
-            setupPinCode=setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=self.discriminator)
-
     def steps_TC_SU_4_1(self) -> list[TestStep]:
         steps = [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
@@ -101,8 +77,8 @@ class TC_SU_4_1(MatterBaseTest):
             TestStep(3, "TH sends a write request for the DefaultOTAProviders Attribute on the second fabric to the DUT. TH3 is set as the default Provider for the fabric.",
                      "Verify that the write operation for the attribute works and DUT does not respond with any errors."),
             TestStep(4, "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT."
-                     "Verify that the attribute value is set to TH2 as the default OTA provider for the first fabric and TH3 for the second fabric.")
-            # TestStep(5, "TH..."),
+                     "Verify that the attribute value is set to TH2 as the default OTA provider for the first fabric and TH3 for the second fabric."),
+            TestStep(5, "TH..."),
             # TestStep(6, "TH..."),
             # TestStep(7, "TH..."),
             # TestStep(8, "TH..."),
@@ -163,11 +139,11 @@ class TC_SU_4_1(MatterBaseTest):
         )
 
         # Create Providers list and Add TH2 to Providers list
-        providers_list = [provider_th2_for_fabric1]
-        logger.info(f'Step #1 - Providers list updated with provider "TH2 for fabric 1": {providers_list}')
+        # providers_list = [provider_th2_for_fabric1]
+        # logger.info(f'Step #1 - Providers list updated with provider "TH2 for fabric 1": {providers_list}')
 
         # DefaultOTAProviders attribute with the provider list
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list)
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider_th2_for_fabric1])
 
         # Write the DefaultOTAProviders attribute to the DUT (TH1)
         resp = await self.write_single_attribute(
@@ -243,6 +219,7 @@ class TC_SU_4_1(MatterBaseTest):
             nodeid=self.dut_node_id,
         )
         logger.info(f'Step #3 - Write DefaultOTAProviders response: {resp}')
+        # Status=<Status.Success: 0
         asserts.assert_equal(resp[0].Status, 0, "Failed to write DefaultOTAProviders attribute")
 
         self.step(4)
@@ -280,7 +257,57 @@ class TC_SU_4_1(MatterBaseTest):
                              "Mismatch in fabricIndex (fabric 1)")
         logger.info("Step #4 - DefaultOTAProviders attribute matches expected values from TH1 view.")
 
-        # self.step(5)
+        self.step(5)
+
+        # Establishing TH4 controller - TH4, NodeID=4, Fabric=2
+        fabric_admin = self.default_controller.fabricAdmin
+        th4 = fabric_admin.NewController(nodeId=4)
+
+        th4_node_id = th4.nodeId
+        th4_fabric_id = th4.fabricId
+        logger.info(f'Step #5 - TH4 NodeID: {th4_node_id}')
+        logger.info(f'Step #5 - TH4 FabricID: {th4_fabric_id}')
+
+        params = await self.open_commissioning_window(th1, th1_node_id)
+        setup_pin_code = params.commissioningParameters.setupPinCode
+        long_discriminator = params.randomDiscriminator
+        setup_qr_code = params.commissioningParameters.setupQRCode
+        logger.info(f'Step #5: Commissioning window opened: {vars(params)}')
+
+        logger.info('Step #5 - Commissioning DUT with TH4...')
+        resp = await th4.CommissionOnNetwork(
+            nodeId=self.dut_node_id,
+            setupPinCode=setup_pin_code,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=long_discriminator)
+        logger.info(f'Step #5 - TH4 Commissioning response: {resp}')
+
+        # TH4 is the OTA Provider (NodeID=4) for fabric 1
+        provider_th4_for_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=th4.nodeId,   # TH4 is the OTA Provider (NodeID=4)
+            endpoint=0,
+            fabricIndex=th4.fabricId       # Fabric ID from TH4
+        )
+
+        # Create Providers list and Add TH4 and TH2 for fabric 1 to Providers list
+        providers_list = [provider_th4_for_fabric1]
+        providers_list.append(provider_th2_for_fabric1)
+        logger.info(f'Step #5 - Providers list updated with provider "TH4 and TH2 for fabric 1": {providers_list}')
+
+        # Update attribute with providers list  (TH2 and TH4 for fabric 1)
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list)
+
+        # Write updated DefaultOTAProviders attribute to DUT (TH1)
+        # TODO: Investigate why TH4 not have permission to write
+        resp = await th1.WriteAttribute(
+            attributes=[(0, attr)],
+            nodeid=self.dut_node_id,
+        )
+        logger.info(f'Step #5- Write DefaultOTAProviders response: {resp}')
+        #  Status=<Status.ConstraintError: 135
+        asserts.assert_equal(resp[0].Status, 135, "Failed to write DefaultOTAProviders attribute")
+        logger.info("Step #5 - Write operation correctly failed with CONSTRAINT_ERROR")
+
         # self.step(6)
         # self.step(7)
         # self.step(8)
