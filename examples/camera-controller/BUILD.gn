@@ -25,10 +25,7 @@ import("${chip_root}/src/lib/core/core.gni")
 assert(chip_build_tools)
 
 config("config") {
-  cflags = [
-    "-Wconversion",
-    "-Wno-shadow",
-  ]
+  cflags = [ "-Wno-shadow" ]
 
   if (is_clang) {
     # libdatachannel has a lot of these like:
