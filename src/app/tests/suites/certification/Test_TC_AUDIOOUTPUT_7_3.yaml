@@ -11,58 +11,82 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 19.9.3. [TC-AUDIOOUTPUT-7.3] Select Output Verification (DUT as Client)
+name: 19.9.2. [TC-AUDIOOUTPUT-7.3] Rename Output Verification
 
 PICS:
-    - AUDIOOUTPUT.C
+    - AUDIOOUTPUT.S
+    - AUDIOOUTPUT.S.C01.Rsp
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Audio Output"
+    endpoint: 1
+    Index:
+        type: int8u
+        defaultValue: 1
 
 tests:
-    - label: "Preconditions:"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the OutputList attribute from the DUT"
+      command: "readAttribute"
+      attribute: "OutputList"
+      response:
+          saveAs: audioOutputListValues
+          constraints:
+              type: list
+
+    - label:
+          "Step 2: TH sends a RenameOutput command to the DUT with an index from
+          the list in step 1 and the name 'CertTest'"
+      command: "RenameOutput"
+      arguments:
+          values:
+              - name: "Index"
+                value: Index
+              - name: "Name"
+                value: "CertTest"
+
+    #Disabled due to issue- #13029
+    - label:
+          "Step 3: TH reads the OutputList attribute from the DUT. Verify that
+          the output at the index provided in step 2 has the name CertTest"
       verification: |
-          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
-      disabled: true
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool audiooutput read output-list 1 1
+          ./chip-tv-casting-app audiooutput read output-list 1 1
 
-    - label: "Step 1: DUT sends SelectOutput command to TH"
-      PICS: AUDIOOUTPUT.C.C00.Tx
-      verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
-
-          ./chip-tool audiooutput select-output 1 1 1
-          ./chip-tv-casting-app audiooutput select-output 1 1 1
-
-
-          The log below shows the resulting log on the TH (tv-app or all-clusters-app):
-
-          [1658531323969] [21924:323905] CHIP: [DMG] InvokeRequestMessage =
-          [1658531323969] [21924:323905] CHIP: [DMG] {
-          [1658531323969] [21924:323905] CHIP: [DMG]         suppressResponse = false,
-          [1658531323969] [21924:323905] CHIP: [DMG]         timedRequest = false,
-          [1658531323969] [21924:323905] CHIP: [DMG]         InvokeRequests =
-          [1658531323969] [21924:323905] CHIP: [DMG]         [
-          [1658531323969] [21924:323905] CHIP: [DMG]                 CommandDataIB =
-          [1658531323969] [21924:323905] CHIP: [DMG]                 {
-          [1658531323969] [21924:323905] CHIP: [DMG]                         CommandPathIB =
-          [1658531323969] [21924:323905] CHIP: [DMG]                         {
-          [1658531323969] [21924:323905] CHIP: [DMG]                                 EndpointId = 0x1,
-          [1658531323969] [21924:323905] CHIP: [DMG]                                 ClusterId = 0x50b,
-          [1658531323969] [21924:323905] CHIP: [DMG]                                 CommandId = 0x0,
-          [1658531323969] [21924:323905] CHIP: [DMG]                         },
-          [1658531323969] [21924:323905] CHIP: [DMG]
-          [1658531323969] [21924:323905] CHIP: [DMG]                         CommandFields =
-          [1658531323969] [21924:323905] CHIP: [DMG]                         {
-          [1658531323969] [21924:323905] CHIP: [DMG]                                 0x0 = 1,
-          [1658531323969] [21924:323905] CHIP: [DMG]                         },
-          [1658531323969] [21924:323905] CHIP: [DMG]                 },
-          [1658531323969] [21924:323905] CHIP: [DMG]
-          [1658531323969] [21924:323905] CHIP: [DMG]         ],
-          [1658531323969] [21924:323905] CHIP: [DMG]
-          [1658531323969] [21924:323905] CHIP: [DMG]         InteractionModelRevision = 1
-          [1658531323969] [21924:323905] CHIP: [DMG] },
-      disabled: true
+          On TH(chip-tool),  Verify that the output at the index provided in step 2 has the name "CertTest".
+          [1651061821.366426][156898:156903] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_050B Attribute 0x0000_0000 DataVersion: 372822880
+          [1651061821.366510][156898:156903] CHIP:TOO:   OutputList: 3 entries
+          [1651061821.366575][156898:156903] CHIP:TOO:     [1]: {
+          [1651061821.366603][156898:156903] CHIP:TOO:       Index: 1
+          [1651061821.366619][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366635][156898:156903] CHIP:TOO:       Name: CertTest
+          [1651061821.366651][156898:156903] CHIP:TOO:      }
+          [1651061821.366675][156898:156903] CHIP:TOO:     [2]: {
+          [1651061821.366690][156898:156903] CHIP:TOO:       Index: 2
+          [1651061821.366705][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366719][156898:156903] CHIP:TOO:       Name: HDMI
+          [1651061821.366734][156898:156903] CHIP:TOO:      }
+          [1651061821.366755][156898:156903] CHIP:TOO:     [3]: {
+          [1651061821.366770][156898:156903] CHIP:TOO:       Index: 3
+          [1651061821.366785][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366799][156898:156903] CHIP:TOO:       Name: HDMI
+          [1651061821.366814][156898:156903] CHIP:TOO:      }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && AUDIOOUTPUT.S.A0001 && AUDIOOUTPUT.S.C01.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
