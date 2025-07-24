@@ -327,7 +327,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
 {
     AttributeListBuilder listBuilder(builder);
 
-    constexpr AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
         { mEnabledAttributes.enableTotalOperationalHours, GeneralDiagnostics::Attributes::TotalOperationalHours::kMetadataEntry },
         { mEnabledAttributes.enableBootReason, GeneralDiagnostics::Attributes::BootReason::kMetadataEntry },
         { mEnabledAttributes.enableActiveHardwareFaults, GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry },
