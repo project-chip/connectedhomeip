@@ -21,16 +21,13 @@ namespace chip::app::DataModel::internal {
 std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
                                          EventLoggingDelegate & delegate, bool isScopedEvent)
 {
-    if (isScopedEvent)
-    {
 
-        // this skips generating the event if it is fabric-scoped but the provided event data is not
-        // associated with any fabric.
-        if (eventOptions.mFabricIndex == kUndefinedFabricIndex)
-        {
-            ChipLogError(EventLogging, "Event encode failure: no fabric index for fabric scoped event");
-            return std::nullopt;
-        }
+    // this skips generating the event if it is fabric-scoped but the provided event data is not
+    // associated with any fabric.
+    if (isScopedEvent && (eventOptions.mFabricIndex == kUndefinedFabricIndex))
+    {
+        ChipLogError(EventLogging, "Event encode failure: no fabric index for fabric scoped event");
+        return std::nullopt;
     }
 
     //
