@@ -87,7 +87,7 @@ public:
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
-    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate & GetPushAVDelegate() override;
+    chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
