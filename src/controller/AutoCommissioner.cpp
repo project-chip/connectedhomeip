@@ -510,7 +510,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
 // No specific actions to take when an error happens since this command can fail and commissioning can still succeed.
 static void OnFailsafeFailureForCASE(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "ExtendFailsafe received failure response %s\n", chip::ErrorStr(error));
+    ChipLogProgress(Controller, "ExtendFailsafe received failure response: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
 // No specific actions to take upon success.
