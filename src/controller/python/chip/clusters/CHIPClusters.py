@@ -4673,24 +4673,11 @@ class ChipClusters:
         "clusterName": "RefrigeratorAlarm",
         "clusterId": 0x00000057,
         "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "Reset",
-                "args": {
-                    "alarms": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
                 "attributeName": "Mask",
                 "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "Latch",
-                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },

@@ -34,8 +34,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::Mask::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, mask);
-    case Attributes::Latch::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, latch);
     case Attributes::State::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, state);
     case Attributes::Supported::TypeInfo::GetAttributeId():

@@ -37,21 +37,8 @@ Git: 0.9-fall2025
     <server tick="false" init="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute side="server" code="0x0000" name="Mask" define="MASK" type="AlarmBitmap" max="0x00000001"/>
-    <attribute code="0x0001" side="server" name="Latch" define="LATCH" type="AlarmBitmap" max="0x00000001" optional="true">
-      <mandatoryConform>
-        <feature name="RESET"/>
-      </mandatoryConform>
-    </attribute>
     <attribute side="server" code="0x0002" name="State" define="STATE" type="AlarmBitmap" max="0x00000001"/>
     <attribute side="server" code="0x0003" name="Supported" define="SUPPORTED" type="AlarmBitmap" max="0x00000001"/>
-    <command code="0x00" source="client" name="Reset" optional="true">
-      <description>This command resets active and latched alarms (if possible).</description>
-      <arg id="0" name="Alarms" type="AlarmBitmap" max="0x00000001"/>
-      <mandatoryConform>
-        <feature name="RESET"/>
-      </mandatoryConform>
-    </command>
-
     <event side="server" code="0x00" priority="info" name="Notify">
       <description>This event SHALL be generated when one or more alarms change state.</description>
       <field id="0" name="Active" type="AlarmBitmap" max="0x00000001"/>

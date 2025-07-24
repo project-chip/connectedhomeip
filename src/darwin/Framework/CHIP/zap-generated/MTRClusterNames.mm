@@ -3245,10 +3245,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Mask";
             break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeLatchID:
-            result = @"Latch";
-            break;
-
         case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID:
             result = @"State";
             break;
@@ -10327,10 +10323,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
     case MTRClusterIDTypeRefrigeratorAlarmID:
 
         switch (commandID) {
-
-        case MTRCommandIDTypeClusterRefrigeratorAlarmCommandResetID:
-            result = @"Reset";
-            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];

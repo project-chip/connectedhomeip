@@ -972,13 +972,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::RefrigeratorAlarm::Id: {
-        switch (aCommand)
-        {
-        default:
-            return false;
-        }
-    }
     case Clusters::DishwasherMode::Id: {
         switch (aCommand)
         {

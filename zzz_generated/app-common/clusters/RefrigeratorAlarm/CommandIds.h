@@ -10,12 +10,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace RefrigeratorAlarm {
-namespace Commands {
-namespace Reset {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace Reset
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace RefrigeratorAlarm
 } // namespace Clusters
 } // namespace app

@@ -21204,7 +21204,6 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 87L;
 
     private static final long MASK_ATTRIBUTE_ID = 0L;
-    private static final long LATCH_ATTRIBUTE_ID = 1L;
     private static final long STATE_ATTRIBUTE_ID = 2L;
     private static final long SUPPORTED_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
@@ -21221,26 +21220,6 @@ public class ChipClusters {
     @Deprecated
     public long initWithDevice(long devicePtr, int endpointId) {
       return 0L;
-    }
-
-    public void reset(DefaultClusterCallback callback, Long alarms) {
-      reset(callback, alarms, 0);
-    }
-
-    public void reset(DefaultClusterCallback callback, Long alarms, int timedInvokeTimeoutMs) {
-      final long commandId = 0L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long alarmsFieldID = 0L;
-      BaseTLVType alarmstlvValue = new UIntType(alarms);
-      elements.add(new StructElement(alarmsFieldID, alarmstlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -21279,32 +21258,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, MASK_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readLatchAttribute(
-        LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LATCH_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, LATCH_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeLatchAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LATCH_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, LATCH_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readStateAttribute(

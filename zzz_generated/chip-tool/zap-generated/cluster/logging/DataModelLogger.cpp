@@ -15421,11 +15421,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mask", 1, value);
         }
-        case RefrigeratorAlarm::Attributes::Latch::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Latch", 1, value);
-        }
         case RefrigeratorAlarm::Attributes::State::Id: {
             chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

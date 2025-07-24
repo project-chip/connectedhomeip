@@ -16,10 +16,6 @@ namespace Mask {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Mask
 
-namespace Latch {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace Latch
-
 namespace State {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace State
