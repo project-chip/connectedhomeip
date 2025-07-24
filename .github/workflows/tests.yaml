@@ -522,9 +522,6 @@ jobs:
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
-            - name: Build python env
-              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
-
             - name: Build linux-x64-all-clusters
               run: >-
                   CCACHE_BASEDIR=/workspace/examples/all-clusters-app/linux/third_party/
@@ -686,6 +683,9 @@ jobs:
                   rm -rf out/build
                   && ccache --show-stats
                   && ccache --clear
+
+            - name: Build python env
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
 
             - name: Copy push_av_server and install dependencies
               run: >-
