@@ -419,9 +419,6 @@ class TC_SU_4_1(MatterBaseTest):
         actual_provider = th4_actual_otap_info[0]
         logger.info(f'Step #6b - Read DefaultOTAProviders attribute on DUT using TH4: {th4_actual_otap_info}')
 
-        # self.step(7)
-        # self.step(8)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
