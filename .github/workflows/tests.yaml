@@ -492,7 +492,6 @@ jobs:
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
-            CCACHE_BASEDIR: /workspace
             CCACHE_NOHASHDIR: 1
 
         runs-on: ubuntu-latest
@@ -528,6 +527,7 @@ jobs:
 
             - name: Build linux-x64-all-clusters
               run: >-
+                  CCACHE_BASEDIR=/workspace/examples/all-clusters-app/linux/third_party/
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --pw-command-launcher=ccache
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test:build
@@ -535,6 +535,7 @@ jobs:
             # TODO: determine why some apps are tsan and some are not (and does that add runtime overhead? )
             - name: Build linux-x64-bridge
               run: >-
+                  CCACHE_BASEDIR=/workspace/examples/bridge-app/linux/third_party/
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --pw-command-launcher=ccache
                   --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test:build
@@ -542,6 +543,7 @@ jobs:
 
             - name: Build linux-x64-lock
               run: >-
+                  CCACHE_BASEDIR=/workspace/examples/lock-app/linux/third_party/
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --pw-command-launcher=ccache
                   --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test:build
@@ -549,6 +551,7 @@ jobs:
 
             - name: Build linux-x64-lit-icd
               run: >-
+                  CCACHE_BASEDIR=/workspace/examples/lit-icd-app/linux/third_party/
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --pw-command-launcher=ccache
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test:build
@@ -556,6 +559,7 @@ jobs:
 
             - name: Build linux-x64-air-purifier
               run: >-
+                  CCACHE_BASEDIR=/workspace/examples/air-purifier-app/linux/third_party/
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --pw-command-launcher=ccache
                   --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test:build
