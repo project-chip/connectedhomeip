@@ -35,7 +35,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler

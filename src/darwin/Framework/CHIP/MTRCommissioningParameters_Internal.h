@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,20 +14,9 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRCommissioneeInfo.h>
-#import <Matter/MTRCommissioningParameters.h>
-
-#import "MTRDefines_Internal.h"
-
-#include <controller/CommissioningDelegate.h>
-
-NS_ASSUME_NONNULL_BEGIN
-
-MTR_DIRECT_MEMBERS
-@interface MTRCommissioneeInfo ()
-
-- (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info commissioningParameters:(MTRCommissioningParameters *)commissioningParameters;
-
+/**
+ * We want to be able to copy MTRCommissioningParameters, but not commit to that
+ * as public API yet.
+ */
+@interface MTRCommissioningParameters () <NSCopying>
 @end
-
-NS_ASSUME_NONNULL_END
