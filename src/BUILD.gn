@@ -59,8 +59,9 @@ if (chip_build_tests) {
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",
+      "${chip_root}/src/app/persistence/tests",
       "${chip_root}/src/crypto/tests",
-      "${chip_root}/src/data-model-providers/endpoint/tests",
+      "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/app/server-cluster/tests",
@@ -77,6 +78,8 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
       "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
+      "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      "${chip_root}/src/srp/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
@@ -111,7 +114,10 @@ if (chip_build_tests) {
       # Disabled from "one single binary" since the "mocks" contain duplicate sybmols
       # with ember
       # Disabled on EFR32 since "include <random>" fails with `::fabs` not defined
-      tests += [ "${chip_root}/src/data-model-providers/codegen/tests" ]
+      tests += [
+        "${chip_root}/src/data-model-providers/codegen/tests",
+        "${chip_root}/examples/common/server-cluster-shim/tests",
+      ]
     }
 
     if (chip_device_platform != "efr32") {

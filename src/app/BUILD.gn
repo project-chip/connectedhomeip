@@ -314,6 +314,7 @@ static_library("attribute-access") {
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider:core",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -352,6 +353,8 @@ source_set("required-privileges") {
     "${chip_root}/examples/*",
     "${chip_root}/src/app/util/*",
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/controller/java:jni",
+    "${chip_root}/src/controller/python:ChipDeviceCtrl",
     "${chip_root}/src/data-model-providers/codegen/*",
   ]
 

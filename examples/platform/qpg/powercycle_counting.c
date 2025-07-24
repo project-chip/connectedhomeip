@@ -44,9 +44,12 @@
 #define RESET_COUNTING_PERIOD_US 2000000 // 2s
 
 #define KVS_RESET_CYCLES_KEY "qrst"
+
 /*****************************************************************************
- *                    Static Function Prototypes
+ *                    Static Data Definitions
  *****************************************************************************/
+
+static gpAppFramework_ResetExpiredHandlerType sResetExpiredHandler = NULL;
 
 /*****************************************************************************
  *                    Static Function Definitions
@@ -85,6 +88,22 @@ static void gpAppFramework_HardwareResetTriggered(void)
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
+void gpAppFramework_Reset_Init(void)
+{
+    if ((gpReset_GetResetReason() == gpReset_ResetReason_HW_Por) ||
+        (gpReset_GetResetReason() == gpReset_ResetReason_UnSpecified)) // Use this reset reason for JLink resets
+    {
+        gpAppFramework_HardwareResetTriggered();
+    }
+
+    gpSched_ScheduleEvent(RESET_COUNTING_PERIOD_US, gpAppFramework_Reset_cbTriggerResetCountCompleted);
+}
+
+void gpAppFramework_SetResetExpiredHandler(gpAppFramework_ResetExpiredHandlerType handler)
+{
+    sResetExpiredHandler = handler;
+}
+
 UInt8 gpAppFramework_Reset_GetResetCount(void)
 {
     UInt8 resetCounts;
@@ -116,13 +135,12 @@ UInt8 gpAppFramework_Reset_GetResetCount(void)
     return resetCounts;
 }
 
-void gpAppFramework_Reset_Init(void)
+void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
 {
-    if ((gpReset_GetResetReason() == gpReset_ResetReason_HW_Por) ||
-        (gpReset_GetResetReason() == gpReset_ResetReason_UnSpecified)) // Use this reset reason for JLink resets
+    uint8_t resetCount = gpAppFramework_Reset_GetResetCount();
+    GP_LOG_SYSTEM_PRINTF("%d resets so far", 0, resetCount);
+    if (sResetExpiredHandler != NULL)
     {
-        gpAppFramework_HardwareResetTriggered();
+        sResetExpiredHandler(resetCount);
     }
-
-    gpSched_ScheduleEvent(RESET_COUNTING_PERIOD_US, gpAppFramework_Reset_cbTriggerResetCountCompleted);
 }

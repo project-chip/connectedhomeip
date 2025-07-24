@@ -15,36 +15,28 @@
 #    limitations under the License.
 #
 
-import argparse
 import asyncio
 import builtins
 import inspect
 import json
 import logging
 import os
-import pathlib
 import queue
 import random
-import re
 import shlex
-import sys
 import textwrap
-import threading
-import time
 import typing
-from binascii import unhexlify
-from dataclasses import asdict as dataclass_asdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from enum import Enum, IntFlag
-from itertools import chain
-from typing import Any, Callable, Iterable, List, Optional, Tuple
+from enum import IntFlag
+from typing import Any, Callable, List, Optional
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
+from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
 
@@ -61,17 +53,16 @@ import chip.native
 import chip.testing.global_stash as global_stash
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute, ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.pics import read_pics_from_file
+from chip.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
-from mobly import asserts, base_test, signals, utils
+from mobly import asserts, base_test, signals
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -81,174 +72,9 @@ logger.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
-_DEFAULT_ADMIN_VENDOR_ID = 0xFFF1
-_DEFAULT_STORAGE_PATH = "admin_storage.json"
-_DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
-_DEFAULT_CONTROLLER_NODE_ID = 112233
-_DEFAULT_DUT_NODE_ID = 0x12344321
-_DEFAULT_TRUST_ROOT_INDEX = 1
 
-
-def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
-    """Attempt to find a PAA trust store following SDK convention at `root_path`
-
-    This attempts to find {root_path}/credentials/development/paa-root-certs.
-
-    Returns the fully resolved path on success or None if not found.
-    """
-    start_path = root_path.resolve()
-    cred_path = start_path.joinpath("credentials")
-    dev_path = cred_path.joinpath("development")
-    paa_path = dev_path.joinpath("paa-root-certs")
-
-    return paa_path.resolve() if all([path.exists() for path in [cred_path, dev_path, paa_path]]) else None
-
-
-def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
-    """Attempt to find a PAA trust store starting at `root_path`.
-
-    This tries to find by various heuristics, and goes up one level at a time
-    until found. After a given number of levels, it will stop.
-
-    This returns `root_path` if not PAA store is not found.
-    """
-    # TODO: Add heuristics about TH default PAA location
-    cur_dir = pathlib.Path.cwd()
-    max_levels = 10
-
-    for level in range(max_levels):
-        paa_trust_store_path = default_paa_rootstore_from_root(cur_dir)
-        if paa_trust_store_path is not None:
-            return paa_trust_store_path
-
-        # Go back one level
-        cur_dir = cur_dir.joinpath("..")
-    else:
-        # On not having found a PAA dir, just return current dir to avoid blow-ups
-        return pathlib.Path.cwd()
-
-
-class SimpleEventCallback:
-    def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
-        self._name = name
-        self._expected_cluster_id = expected_cluster_id
-        self._expected_event_id = expected_event_id
-        self._output_queue = output_queue
-
-    def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
-        if (self._expected_cluster_id == event_result.Header.ClusterId and
-                self._expected_event_id == event_result.Header.EventId):
-            self._output_queue.put(event_result)
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-
-class EventChangeCallback:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
-        """This class creates a queue to store received event callbacks, that can be checked by the test script
-           expected_cluster: is the cluster from which the events are expected
-        """
-        self._q: queue.Queue = queue.Queue()
-        self._expected_cluster = expected_cluster
-
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
-        """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
-        urgent = True
-        self._subscription = await dev_ctrl.ReadEvent(node_id,
-                                                      events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(
-                                                          min_interval_sec, max_interval_sec),
-                                                      fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
-        self._subscription.SetEventUpdateCallback(self.__call__)
-        return self._subscription
-
-    def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an event is received.
-           It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
-        if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
-            logging.info(
-                f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
-            self._q.put(res)
-
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
-        """This function allows a test script to block waiting for the specific event to be the next event
-           to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
-        logging.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
-        try:
-            res = self._q.get(block=True, timeout=timeout_sec)
-        except queue.Empty:
-            asserts.fail("Failed to receive a report for the event {}".format(expected_event))
-
-        asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
-        asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
-        logging.info(f"Successfully waited for {expected_event}")
-        return res.Data
-
-    def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
-        """This function returns if an event does not arrive within the timeout specified in seconds.
-           If any event does arrive, an assert failure occurs."""
-        try:
-            res = self._q.get(block=True, timeout=timeout_sec)
-        except queue.Empty:
-            return
-
-        asserts.fail(f"Event reported when not expected {res}")
-
-    def get_last_event(self) -> Optional[Any]:
-        """Flush entire queue, returning last (newest) event only."""
-        last_event: Optional[Any] = None
-        while True:
-            try:
-                last_event = self._q.get(block=False)
-            except queue.Empty:
-                return last_event
-
-    def flush_events(self) -> None:
-        """Flush entire queue, returning nothing."""
-        _ = self.get_last_event()
-        return
-
-    def reset(self) -> None:
-        """Resets state as if no events had ever been received."""
-        self.flush_events()
-
-    @property
-    def event_queue(self) -> queue.Queue:
-        return self._q
-
-
-class AttributeChangeCallback:
-    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-        self._output = queue.Queue()
-        self._expected_attribute = expected_attribute
-
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an attribute is updated.
-           It checks the passed in attribute is the same as the subscribed to attribute and
-           then posts it into the queue for later processing."""
-
-        asserts.assert_equal(path.AttributeType, self._expected_attribute,
-                             f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
-        q = (path, transaction)
-        self._output.put(q)
-
-    def wait_for_report(self):
-        try:
-            path, transaction = self._output.get(block=True, timeout=10)
-        except queue.Empty:
-            asserts.fail(
-                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
-
-        asserts.assert_equal(path.AttributeType, self._expected_attribute,
-                             f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        try:
-            attribute_value = transaction.GetAttribute(path)
-            logging.info(
-                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
-        except KeyError:
-            asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
+class TestError(Exception):
+    pass
 
 
 def clear_queue(report_queue: queue.Queue):
@@ -302,492 +128,6 @@ class AttributeMatcher:
                 return self._matcher(report)
 
         return AttributeMatcherFromCallable(description, matcher)
-
-
-def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
-    """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
-
-    Args:
-      - report_queue: the queue that receives all the reports.
-      - endpoint_id: endpoint ID to match for reports to check.
-      - attribute: attribute to match for reports to check.
-      - sequence: list of attribute values in order that are expected.
-      - timeout_sec: number of seconds to wait for.
-
-    *** WARNING: The queue contains every report since the sub was established. Use
-        clear_queue to make it empty. ***
-
-    This will fail current Mobly test with assertion failure if the data is not as expected in order.
-
-    Returns nothing on success so the test can go on.
-    """
-    start_time = time.time()
-    elapsed = 0.0
-    time_remaining = timeout_sec
-
-    sequence_idx = 0
-    actual_values = []
-
-    while time_remaining > 0:
-        expected_value = sequence[sequence_idx]
-        logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
-        try:
-            item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
-
-            # Track arrival of all values for the given attribute.
-            if item.endpoint_id == endpoint_id and item.attribute == attribute:
-                actual_values.append(item.value)
-
-                if item.value == expected_value:
-                    logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
-                    sequence_idx += 1
-                else:
-                    asserts.assert_equal(item.value, expected_value,
-                                         msg=f"Did not get expected attribute value in correct sequence. Sequence so far: {actual_values}")
-
-                # We are done waiting when we have accumulated all results.
-                if sequence_idx == len(sequence):
-                    logging.info("Got all attribute changes, done waiting.")
-                    return
-        except queue.Empty:
-            # No error, we update timeouts and keep going
-            pass
-
-        elapsed = time.time() - start_time
-        time_remaining = timeout_sec - elapsed
-
-    asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
-
-
-class ClusterAttributeChangeAccumulator:
-    """
-    Subscribes to a cluster or single attribute and accumulates attribute reports in a queue.
-
-    If `expected_attribute` is provided, it subscribes only to that specific attribute.
-    Otherwise, it subscribes to all attributes from the cluster.
-
-    Args:
-        expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
-        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional):
-            If provided, subscribes to a single attribute. Defaults to None.
-    """
-
-    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
-        self._expected_cluster = expected_cluster
-        self._expected_attribute = expected_attribute
-        self._subscription = None
-        self._lock = threading.Lock()
-        self._q = queue.Queue()
-        self._endpoint_id = 0
-        self.reset()
-
-    def reset(self):
-        with self._lock:
-            self._attribute_report_counts = {}
-            attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
-                cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-            self._attribute_reports: dict[Any, AttributeValue] = {}
-            if self._expected_attribute is not None:
-                attrs = [self._expected_attribute]
-            for a in attrs:
-                self._attribute_report_counts[a] = 0
-                self._attribute_reports[a] = []
-
-        self.flush_reports()
-
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
-        """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
-        attributes = [(endpoint, self._expected_cluster)]
-        if self._expected_attribute is not None:
-            attributes = [(endpoint, self._expected_attribute)]
-        self._subscription = await dev_ctrl.ReadAttribute(
-            nodeid=node_id,
-            attributes=attributes,
-            reportInterval=(int(min_interval_sec), int(max_interval_sec)),
-            fabricFiltered=fabric_filtered,
-            keepSubscriptions=keepSubscriptions
-        )
-        self._endpoint_id = endpoint
-        self._subscription.SetAttributeUpdateCallback(self.__call__)
-        return self._subscription
-
-    async def cancel(self):
-        """This cancels a subscription."""
-        # Wait for the asyncio.CancelledError to be called before returning
-        try:
-            self._subscription.Shutdown()
-            await asyncio.sleep(5)
-        except asyncio.CancelledError:
-            pass
-
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an attribute report is received.
-           It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
-        valid_report = False
-        if path.ClusterType == self._expected_cluster:
-            if self._expected_attribute is not None:
-                valid_report = path.ClusterId == self._expected_attribute.cluster_id
-            else:
-                valid_report = True
-
-        if valid_report:
-            data = transaction.GetAttribute(path)
-            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
-                                   value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
-            self._q.put(value)
-            with self._lock:
-                self._attribute_report_counts[path.AttributeType] += 1
-                self._attribute_reports[path.AttributeType].append(value)
-
-    def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
-        """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
-
-        Waits for at least `timeout_sec` seconds.
-
-        This is a form of barrier for a set of attribute changes that should all happen together for an action.
-        """
-        start_time = time.time()
-        elapsed = 0.0
-        time_remaining = timeout_sec
-
-        last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_final_values)}
-
-        for element in expected_final_values:
-            logging.info(
-                f"--> Expecting report for value {element.value} for attribute {element.attribute} on endpoint {element.endpoint_id}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
-
-        while time_remaining > 0:
-            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
-            all_reports = self._attribute_reports
-
-            # Recompute all last-value matches
-            for expected_idx, expected_element in enumerate(expected_final_values):
-                last_value = None
-                for report in all_reports.get(expected_element.attribute, []):
-                    if report.endpoint_id == expected_element.endpoint_id:
-                        last_value = report.value
-
-                last_report_matches[expected_idx] = (last_value is not None and last_value == expected_element.value)
-
-            # Determine if all were met
-            if all(last_report_matches.values()):
-                logging.info("Found all expected reports were true.")
-                return
-
-            elapsed = time.time() - start_time
-            time_remaining = timeout_sec - elapsed
-            time.sleep(0.1)
-
-        # If we reach here, there was no early return and we failed to find all the values.
-        logging.error("Reached time-out without finding all expected report values.")
-        logging.info("Values found:")
-        for expected_idx, expected_element in enumerate(expected_final_values):
-            logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
-        asserts.fail("Did not find all expected last report values before time-out")
-
-    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
-        """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
-
-        Waits for at least `timeout_sec` seconds.
-
-        This is a form of barrier for a set of attribute changes that should all happen together for an action.
-
-        Note that this does not check against the "last" value of every attribute, only that each expected
-        report was seen at least once.
-        """
-        start_time = time.time()
-        elapsed = 0.0
-        time_remaining = timeout_sec
-
-        report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_matchers)}
-
-        for matcher in expected_matchers:
-            logging.info(
-                f"--> Matcher waiting: {matcher.description}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
-
-        while time_remaining > 0:
-            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
-            all_reports = self._attribute_reports
-
-            # Recompute all last-value matches
-            for expected_idx, matcher in enumerate(expected_matchers):
-                for attribute, reports in all_reports.items():
-                    for report in reports:
-                        if matcher.matches(report) and not report_matches[expected_idx]:
-                            logging.info(f"  --> Found a match for: {matcher.description}")
-                            report_matches[expected_idx] = True
-
-            # Determine if all were met
-            if all(report_matches.values()):
-                logging.info("Found all expected matchers did match.")
-                return
-
-            elapsed = time.time() - start_time
-            time_remaining = timeout_sec - elapsed
-            time.sleep(0.1)
-
-        # If we reach here, there was no early return and we failed to find all the values.
-        logging.error("Reached time-out without finding all expected report values.")
-        for expected_idx, expected_matcher in enumerate(expected_matchers):
-            logging.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
-        asserts.fail("Did not find all expected reports before time-out")
-
-    def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
-        """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
-
-        Args:
-          - attribute: attribute to match for reports to check.
-          - sequence: list of attribute values in order that are expected.
-          - timeout_sec: number of seconds to wait for.
-
-        *** WARNING: The queue contains every report since the sub was established. Use
-            self.reset() to make it empty. ***
-
-        This will fail current Mobly test with assertion failure if the data is not as expected in order.
-
-        Returns nothing on success so the test can go on.
-        """
-        await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
-                                  attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
-
-    @property
-    def attribute_queue(self) -> queue.Queue:
-        return self._q
-
-    @property
-    def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
-        with self._lock:
-            return self._attribute_report_counts
-
-    @property
-    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
-        with self._lock:
-            return self._attribute_reports.copy()
-
-    def get_last_report(self) -> Optional[Any]:
-        """Flush entire queue, returning last (newest) report only."""
-        last_report: Optional[Any] = None
-        while True:
-            try:
-                last_report = self._q.get(block=False)
-            except queue.Empty:
-                return last_report
-
-    def flush_reports(self) -> None:
-        """Flush entire queue, returning nothing."""
-        _ = self.get_last_report()
-        return
-
-
-@dataclass
-class MatterTestConfig:
-    storage_path: pathlib.Path = pathlib.Path(".")
-    logs_path: pathlib.Path = pathlib.Path(".")
-    paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_controller: Optional[int] = None
-    commission_only: bool = False
-
-    admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
-    case_admin_subject: Optional[int] = None
-    global_test_params: dict = field(default_factory=dict)
-    # List of explicit tests to run by name. If empty, all tests will run
-    tests: List[str] = field(default_factory=list)
-    timeout: typing.Union[int, None] = None
-    endpoint: typing.Union[int, None] = 0
-    app_pid: int = 0
-    pipe_name: typing.Union[str, None] = None
-    fail_on_skipped_tests: bool = False
-
-    commissioning_method: Optional[str] = None
-    in_test_commissioning_method: Optional[str] = None
-    discriminators: List[int] = field(default_factory=list)
-    setup_passcodes: List[int] = field(default_factory=list)
-    commissionee_ip_address_just_for_testing: Optional[str] = None
-    # By default, we start with maximized cert chains, as required for RR-1.1.
-    # This allows cert tests to be run without re-commissioning for RR-1.1.
-    maximize_cert_chains: bool = True
-
-    # By default, let's set validity to 10 years
-    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
-
-    qr_code_content: List[str] = field(default_factory=list)
-    manual_code: List[str] = field(default_factory=list)
-
-    wifi_ssid: Optional[str] = None
-    wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[str] = None
-
-    pics: dict[bool, str] = field(default_factory=dict)
-
-    # Node ID for basic DUT
-    dut_node_ids: List[int] = field(default_factory=list)
-    # Node ID to use for controller/commissioner
-    controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
-    # CAT Tags for default controller/commissioner
-    # By default, we commission with CAT tags specified for RR-1.1
-    # so the cert tests can be run without re-commissioning the device
-    # for this one test. This can be overwritten from the command line
-    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
-
-    # Fabric ID which to use
-    fabric_id: int = 1
-
-    # "Alpha" by default
-    root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
-
-    # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: Optional[pathlib.Path] = None
-
-    trace_to: List[str] = field(default_factory=list)
-
-    # Accepted Terms and Conditions if used
-    tc_version_to_simulate: int = None
-    tc_user_response_to_simulate: int = None
-    # path to device attestation revocation set json file
-    dac_revocation_set_path: Optional[pathlib.Path] = None
-
-    legacy: bool = False
-
-
-class ClusterMapper:
-    """Describe clusters/attributes using schema names."""
-
-    def __init__(self, legacy_cluster_mapping) -> None:
-        self._mapping = legacy_cluster_mapping
-
-    def get_cluster_string(self, cluster_id: int) -> str:
-        mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
-        if not mapping:
-            return f"Cluster Unknown ({cluster_id}, 0x{cluster_id:08X})"
-        else:
-            name = mapping["clusterName"]
-            return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
-
-    def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
-        global_attrs = [item.value for item in GlobalAttributeIds]
-        if attribute_id in global_attrs:
-            return f"Attribute {GlobalAttributeIds(attribute_id).to_name()} {attribute_id}, 0x{attribute_id:04X}"
-        mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
-        if not mapping:
-            return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
-        else:
-            attribute_mapping = mapping["attributes"].get(attribute_id, None)
-
-            if not attribute_mapping:
-                return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
-            else:
-                attribute_name = attribute_mapping["attributeName"]
-                return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
-
-
-@dataclass
-class ClusterPathLocation:
-    endpoint_id: int
-    cluster_id: int
-
-    def __str__(self):
-        return (f'\n       Endpoint: {self.endpoint_id},'
-                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
-
-
-@dataclass
-class AttributePathLocation(ClusterPathLocation):
-    cluster_id: Optional[int] = None
-    attribute_id: Optional[int] = None
-
-    def as_cluster_string(self, mapper: ClusterMapper):
-        desc = f"Endpoint {self.endpoint_id}"
-        if self.cluster_id is not None:
-            desc += f", {mapper.get_cluster_string(self.cluster_id)}"
-        return desc
-
-    def as_string(self, mapper: ClusterMapper):
-        desc = self.as_cluster_string(mapper)
-        if self.cluster_id is not None and self.attribute_id is not None:
-            desc += f", {mapper.get_attribute_string(self.cluster_id, self.attribute_id)}"
-
-        return desc
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n      Attribute:{id_str(self.attribute_id)}')
-
-
-@dataclass
-class EventPathLocation(ClusterPathLocation):
-    event_id: int
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Event:    {id_str(self.event_id)}')
-
-
-@dataclass
-class CommandPathLocation(ClusterPathLocation):
-    command_id: int
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Command:  {id_str(self.command_id)}')
-
-
-@dataclass
-class FeaturePathLocation(ClusterPathLocation):
-    feature_code: str
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Feature:  {self.feature_code}')
-
-
-@dataclass
-class DeviceTypePathLocation:
-    device_type_id: int
-    cluster_id: Optional[int] = None
-
-    def __str__(self):
-        msg = f'\n       DeviceType: {self.device_type_id}'
-        if self.cluster_id:
-            msg += f'\n       ClusterID: {self.cluster_id}'
-        return msg
-
-
-class UnknownProblemLocation:
-    def __str__(self):
-        return '\n      Unknown Locations - see message for more details'
-
-
-ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
-
-# ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
-# appeared in 3.11. To make it JSON serializable easily, multiple inheritance
-# from `str` is used. See https://stackoverflow.com/a/51976841.
-
-
-class ProblemSeverity(str, Enum):
-    NOTE = "NOTE"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-
-
-@dataclass
-class ProblemNotice:
-    test_name: str
-    location: ProblemLocation
-    severity: ProblemSeverity
-    problem: str
-    spec_location: str = ""
-
-    def __str__(self):
-        return (f'\nProblem: {str(self.severity)}'
-                f'\n    test_name: {self.test_name}'
-                f'\n    location: {str(self.location)}'
-                f'\n    problem: {self.problem}'
-                f'\n    spec_location: {self.spec_location}\n')
 
 
 @dataclass
@@ -1557,15 +897,49 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Returns nothing on success so the test can go on.
         """
+        self.mark_step_range_skipped(starting_step_number, None)
+
+    def mark_step_range_skipped(self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]) -> None:
+        """Mark a range of remaining test steps starting with provided starting step
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally.
+
+            If ending_step_number is provided, it gives the last step to be skipped, as defined in the TestStep.test_plan_number.
+            If ending_step_number is None, all steps until the end of the test will be skipped
+            ending_step_number is optional, and if not provided, all steps until the end of the test will be skipped.
+
+            By providing argument test is more deliberately identifying where test skips are starting from,
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+            ending_step_number (int,str,None): Number of name of the step to stop skipping the steps (inclusive).
+
+        Returns nothing on success so the test can go on.
+        """
         steps = self.get_test_steps(self.current_test_info.name)
+        starting_step_idx = None
         for idx, step in enumerate(steps):
             if step.test_plan_number == starting_step_number:
                 starting_step_idx = idx
                 break
+        asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
+
+        ending_step_idx = None
+        # If ending_step_number is None, we skip all steps until the end of the test
+        if ending_step_number is not None:
+            for idx, step in enumerate(steps):
+                if step.test_plan_number == ending_step_number:
+                    ending_step_idx = idx
+                    break
+
+            asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
+            asserts.assert_greater(ending_step_idx, starting_step_idx,
+                                   "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
+            skipping_steps = steps[starting_step_idx:ending_step_idx+1]
         else:
-            asserts.fail("mark_all_remaining_steps_skipped was provided with invalid starting_step_num")
-        remaining = steps[starting_step_idx:]
-        for step in remaining:
+            skipping_steps = steps[starting_step_idx:]
+
+        for step in skipping_steps:
             self.skip_step(step.test_plan_number)
 
     def step(self, step: typing.Union[int, str]):
@@ -1640,8 +1014,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def user_verify_snap_shot(self,
                               prompt_msg: str,
-                              image: bytes) -> Optional[str]:
+                              image: bytes) -> None:
         """Show Image Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
@@ -1649,459 +1024,58 @@ class MatterBaseTest(base_test.BaseTestClass):
             image (bytes): Image data as bytes.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        # Convert bytes to comma separated hex string
-        hex_string = ', '.join(f'{byte:02x}' for byte in image)
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating image validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_image_prompt'):
+            # Convert bytes to comma separated hex string
+            hex_string = ', '.join(f'{byte:02x}' for byte in image)
             self.runner_hook.show_image_prompt(
                 msg=prompt_msg,
                 img_hex_str=hex_string
             )
 
-        logging.info("========= USER PROMPT for Image Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Image Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Image validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
     def user_verify_video_stream(self,
-                                 prompt_msg: str) -> Optional[str]:
+                                 prompt_msg: str) -> None:
         """Show Video Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
             Indicates what is expected from the user.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating video validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
             self.runner_hook.show_video_prompt(msg=prompt_msg)
 
-        logging.info("========= USER PROMPT for Video Stream Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
-
-
-def _find_test_class():
-    """Finds the test class in a test script.
-    Walk through module members and find the subclass of MatterBaseTest. Only
-    one subclass is allowed in a test script.
-    Returns:
-      The test class in the test module.
-    Raises:
-      SystemExit: Raised if the number of test classes is not exactly one.
-    """
-    subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
-    subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
-    if len(subclasses) != 1:
-        print(
-            'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
-            str([subclass.__name__ for subclass in subclasses]))
-        sys.exit(1)
-
-    return subclasses[0]
-
-
-def int_decimal_or_hex(s: str) -> int:
-    val = int(s, 0)
-    if val < 0:
-        raise ValueError("Negative values not supported")
-    return val
-
-
-def byte_string_from_hex(s: str) -> bytes:
-    return unhexlify(s.replace(":", "").replace(" ", "").replace("0x", ""))
-
-
-def str_from_manual_code(s: str) -> str:
-    """Enforces legal format for manual codes and removes spaces/dashes."""
-    s = s.replace("-", "").replace(" ", "")
-    regex = r"^([0-9]{11}|[0-9]{21})$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid manual code format, does not match %s" % regex)
-
-    return s
-
-
-def int_named_arg(s: str) -> Tuple[str, int]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid int argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    if match.group("hex_value"):
-        value = int(match.group("hex_value"), 0)
-    else:
-        value = int(match.group("decimal_value"), 10)
-    return (name, value)
-
-
-def str_named_arg(s: str) -> Tuple[str, str]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid string argument format, does not match %s" % regex)
-
-    return (match.group("name"), match.group("value"))
-
-
-def float_named_arg(s: str) -> Tuple[str, float]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid float argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value = float(match.group("value"))
-
-    return (name, value)
-
-
-def json_named_arg(s: str) -> Tuple[str, object]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid JSON argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value = json.loads(match.group("value"))
-
-    return (name, value)
-
-
-def bool_named_arg(s: str) -> Tuple[str, bool]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s.lower())
-    if not match:
-        raise ValueError("Invalid bool argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    if match.group("truth_value"):
-        value = True if match.group("truth_value") == "true" else False
-    else:
-        value = int(match.group("decimal_value")) != 0
-
-    return (name, value)
-
-
-def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value_str = match.group("value")
-    value_str = value_str.replace(":", "")
-    if len(value_str) % 2 != 0:
-        raise ValueError("Byte string argument value needs to be event number of hex chars")
-    value = unhexlify(value_str)
-
-    return (name, value)
-
-
-def root_index(s: str) -> int:
-    CHIP_TOOL_COMPATIBILITY = {
-        "alpha": 1,
-        "beta": 2,
-        "gamma": 3
-    }
-
-    for name, id in CHIP_TOOL_COMPATIBILITY.items():
-        if s.lower() == name:
-            return id
-    else:
-        root_index = int(s)
-        if root_index == 0:
-            raise ValueError("Only support root index >= 1")
-        return root_index
-
-
-def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConfig) -> bool:
-    config.root_of_trust_index = args.root_index
-    # Follow root of trust index if ID not provided to have same behavior as legacy
-    # chip-tool that fabricID == commissioner_name == root of trust index
-    config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
-
-    if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
-        print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
-        return False
-    config.chip_tool_credentials_path = args.chip_tool_credentials_path
-
-    if args.dut_node_ids is None:
-        print("error: --dut-node-id is mandatory!")
-        return False
-    config.dut_node_ids = args.dut_node_ids
-
-    config.commissioning_method = args.commissioning_method
-    config.in_test_commissioning_method = args.in_test_commissioning_method
-    config.commission_only = args.commission_only
-
-    config.qr_code_content.extend(args.qr_code)
-    config.manual_code.extend(args.manual_code)
-    config.discriminators.extend(args.discriminators)
-    config.setup_passcodes.extend(args.passcodes)
-
-    if args.qr_code != [] and args.manual_code != []:
-        print("error: Cannot have both --qr-code and --manual-code present!")
-        return False
-
-    if len(config.discriminators) != len(config.setup_passcodes):
-        print("error: supplied number of discriminators does not match number of passcodes")
-        return False
-
-    device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
-
-    if not config.dut_node_ids:
-        config.dut_node_ids = [_DEFAULT_DUT_NODE_ID]
-
-    if args.commissioning_method is None:
-        return True
-
-    if len(config.dut_node_ids) > len(device_descriptors):
-        print("error: More node IDs provided than discriminators")
-        return False
-
-    if len(config.dut_node_ids) < len(device_descriptors):
-        # We generate new node IDs sequentially from the last one seen for all
-        # missing NodeIDs when commissioning many nodes at once.
-        missing = len(device_descriptors) - len(config.dut_node_ids)
-        for i in range(missing):
-            config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
-
-    if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
-        print("error: Duplicate values in node id list")
-        return False
-
-    if len(config.discriminators) != len(set(config.discriminators)):
-        print("error: Duplicate value in discriminator list")
-        return False
-
-    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
-        return False
-
-    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --passcode when no --qr-code/--manual-code present!")
-        return False
-
-    if config.commissioning_method == "ble-wifi":
-        if args.wifi_ssid is None:
-            print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
-            return False
-
-        if args.wifi_passphrase is None:
-            print("error: missing --wifi-passphrase <passphrasse> for --commissioning-method ble-wifi!")
-            return False
-
-        config.wifi_ssid = args.wifi_ssid
-        config.wifi_passphrase = args.wifi_passphrase
-    elif config.commissioning_method == "ble-thread":
-        if args.thread_dataset_hex is None:
-            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
-            return False
-        config.thread_operational_dataset = args.thread_dataset_hex
-    elif config.commissioning_method == "on-network-ip":
-        if args.ip_addr is None:
-            print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
-            return False
-        config.commissionee_ip_address_just_for_testing = args.ip_addr
-
-    if args.case_admin_subject is None:
-        # Use controller node ID as CASE admin subject during commissioning if nothing provided
-        config.case_admin_subject = config.controller_node_id
-    else:
-        # If a CASE admin subject is provided, then use that
-        config.case_admin_subject = args.case_admin_subject
-
-    return True
-
-
-def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
-    config = MatterTestConfig()
-
-    # Populate commissioning config if present, exiting on error
-    if not populate_commissioning_args(args, config):
-        sys.exit(1)
-
-    config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
-    config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
-    config.paa_trust_store_path = args.paa_trust_store_path
-    config.ble_controller = args.ble_controller
-    config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
-    config.tests = list(chain.from_iterable(args.tests or []))
-    config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
-    config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
-    config.app_pipe = args.app_pipe
-    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
-        # Named pipes are unique, so we MUST have consistent paths
-        # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
-        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
-
-    config.fail_on_skipped_tests = args.fail_on_skipped
-
-    config.legacy = args.use_legacy_test_event_triggers
-
-    config.controller_node_id = args.controller_node_id
-    config.trace_to = args.trace_to
-
-    config.tc_version_to_simulate = args.tc_version_to_simulate
-    config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
-    config.dac_revocation_set_path = args.dac_revocation_set_path
-
-    # Accumulate all command-line-passed named args
-    all_global_args = []
-    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
-                                 args.hex_arg, args.bool_arg) if item is not None]
-    for argset in chain.from_iterable(argsets):
-        all_global_args.extend(argset)
-
-    config.global_test_params = {}
-    for name, value in all_global_args:
-        config.global_test_params[name] = value
-
-    # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
-    config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
-
-    return config
-
-
-def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig:
-    parser = argparse.ArgumentParser(description='Matter standalone Python test')
-
-    basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
-
-    basic_group.add_argument('--tests', '--test-case', action='append', nargs='+', type=str, metavar='test_NAME',
-                             help='A list of tests in the test class to execute.')
-    basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
-                             help="Fail the test if any test cases are skipped")
-    basic_group.add_argument('--trace-to', nargs="*", default=[],
-                             help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
-    basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
-                             metavar="PATH", help="Location for persisted storage of instance")
-    basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
-    paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
-    basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
-                             help="PAA trust store path (default: %s)" % str(paa_path_default))
-    basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
-                             help="Path to JSON file containing the device attestation revocation set.")
-    basic_group.add_argument('--ble-controller', action="store", type=int,
-                             metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
-    basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
-                             metavar='NODE_ID',
-                             default=_DEFAULT_CONTROLLER_NODE_ID,
-                             help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
-    basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
-                             metavar='NODE_ID', dest='dut_node_ids', default=[],
-                             help='Node ID for primary DUT communication, '
-                             'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
-    basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
-    basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
-    basic_group.add_argument("--PICS", help="PICS file path", type=str)
-
-    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
-                             help="Send test event triggers with endpoint 0 for older devices")
-
-    commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
-
-    commission_group.add_argument('-m', '--commissioning-method', type=str,
-                                  metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
-                                  help='Name of commissioning method to use')
-    commission_group.add_argument('--in-test-commissioning-method', type=str,
-                                  metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
-                                  help='Name of commissioning method to use, for commissioning tests')
-    commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
-                                  metavar='LONG_DISCRIMINATOR',
-                                  dest='discriminators',
-                                  default=[],
-                                  help='Discriminator to use for commissioning', nargs="+")
-    commission_group.add_argument('-p', '--passcode', type=int_decimal_or_hex,
-                                  metavar='PASSCODE',
-                                  dest='passcodes',
-                                  default=[],
-                                  help='PAKE passcode to use', nargs="+")
-
-    commission_group.add_argument('--wifi-ssid', type=str,
-                                  metavar='SSID',
-                                  help='Wi-Fi SSID for ble-wifi commissioning')
-    commission_group.add_argument('--wifi-passphrase', type=str,
-                                  metavar='PASSPHRASE',
-                                  help='Wi-Fi passphrase for ble-wifi commissioning')
-
-    commission_group.add_argument('--thread-dataset-hex', type=byte_string_from_hex,
-                                  metavar='OPERATIONAL_DATASET_HEX',
-                                  help='Thread operational dataset as a hex string for ble-thread commissioning')
-
-    commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
-                                  metavar="VENDOR_ID",
-                                  help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
-    commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
-                                  metavar="CASE_ADMIN_SUBJECT",
-                                  help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
-
-    commission_group.add_argument('--commission-only', action="store_true", default=False,
-                                  help="If true, test exits after commissioning without running subsequent tests")
-
-    commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
-
-    commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
-
-    code_group = parser.add_mutually_exclusive_group(required=False)
-
-    code_group.add_argument('-q', '--qr-code', type=str,
-                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
-    code_group.add_argument('--manual-code', type=str_from_manual_code,
-                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
-
-    fabric_group = parser.add_argument_group(
-        title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
-    fabric_group.add_argument('-f', '--fabric-id', type=int_decimal_or_hex,
-                              metavar='FABRIC_ID',
-                              help='Fabric ID on which to operate under the root of trust')
-
-    fabric_group.add_argument('-r', '--root-index', type=root_index,
-                              metavar='ROOT_INDEX_OR_NAME', default=_DEFAULT_TRUST_ROOT_INDEX,
-                              help='Root of trust under which to operate/commission for single-fabric basic usage. '
-                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % _DEFAULT_TRUST_ROOT_INDEX)
-
-    fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
-                              metavar='PATH',
-                              help='Path to chip-tool credentials file root')
-
-    args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
-    args_group.add_argument('--int-arg', nargs='+', action='append', type=int_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
-    args_group.add_argument('--bool-arg', nargs='+', action='append', type=bool_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
-    args_group.add_argument('--float-arg', nargs='+', action='append', type=float_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
-    args_group.add_argument('--string-arg', nargs='+', action='append', type=str_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for a string value")
-    args_group.add_argument('--json-arg', nargs='+', action='append', type=json_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for JSON stored as a list or dict")
-    args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
-
-    if not argv:
-        argv = sys.argv[1:]
-
-    return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
+            logging.info("========= USER PROMPT for Video Stream Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Video stream validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
@@ -2176,3 +1150,7 @@ default_matter_test_main = runner.default_matter_test_main
 get_test_info = runner.get_test_info
 run_tests = runner.run_tests
 run_tests_no_exit = runner.run_tests_no_exit
+get_default_paa_trust_store = runner.get_default_paa_trust_store
+
+# Backward compatibility aliases for relocated functions
+parse_matter_test_args = runner.parse_matter_test_args
