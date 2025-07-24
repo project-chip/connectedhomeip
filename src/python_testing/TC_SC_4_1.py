@@ -34,6 +34,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
+from asyncio import sleep
 import logging
 import re
 from typing import Any, Optional, Tuple, Union
@@ -251,8 +252,8 @@ class TC_SC_4_1(MatterBaseTest):
         mdns = MdnsDiscovery()
 
         # Get DUT's commissionable service
-        commissionable_service = await mdns.get_commissionable_service(discovery_timeout_sec=3, log_output=True)
-
+        commissionable_service = await mdns.get_commissionable_service(log_output=True)
+        
         # Verify presence of DUT's comissionable service
         asserts.assert_is_not_none(commissionable_service, "DUT's commissionable service not present")
 
@@ -349,6 +350,8 @@ class TC_SC_4_1(MatterBaseTest):
             if supports_icd:
                 logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
                 asserts.assert_equal(int(sat_key), active_mode_threshold_ms)
+
+
 
 
 if __name__ == "__main__":
