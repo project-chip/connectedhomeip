@@ -215,12 +215,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace {
-    constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-        GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
-        GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
-        GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
-        GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
-    };
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
+    GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
+    GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
+    GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
+};
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)

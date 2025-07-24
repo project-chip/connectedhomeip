@@ -24,8 +24,8 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/reporting/reporting.h>
-#include <app/util/util.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/util/util.h>
 #include <clusters/PushAvStreamTransport/Commands.h>
 #include <clusters/PushAvStreamTransport/Ids.h>
 #include <clusters/PushAvStreamTransport/Metadata.h>
