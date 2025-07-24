@@ -80,21 +80,33 @@ public:
         switch (request.path.mAttributeId)
         {
         case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
+            VerifyOrReturnError(mLogic.GetEnabledAttributes().enableCurrentHeapFree,
+                                Protocols::InteractionModel::Status::UnsupportedAttribute);
+
             uint64_t value;
             CHIP_ERROR err = mLogic.GetCurrentHeapFree(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
+            VerifyOrReturnError(mLogic.GetEnabledAttributes().enableCurrentHeapUsed,
+                                Protocols::InteractionModel::Status::UnsupportedAttribute);
+
             uint64_t value;
             CHIP_ERROR err = mLogic.GetCurrentHeapUsed(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
+            VerifyOrReturnError(mLogic.GetEnabledAttributes().enableCurrentWatermarks,
+                                Protocols::InteractionModel::Status::UnsupportedAttribute);
+
             uint64_t value;
             CHIP_ERROR err = mLogic.GetCurrentHighWatermark(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
+            VerifyOrReturnError(mLogic.GetEnabledAttributes().enableThreadMetrics,
+                                Protocols::InteractionModel::Status::UnsupportedAttribute);
+
             return mLogic.ReadThreadMetrics(encoder);
         case Globals::Attributes::FeatureMap::Id:
             return encoder.Encode(mLogic.GetFeatureMap());

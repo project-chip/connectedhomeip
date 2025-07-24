@@ -15,11 +15,13 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/ServerClusterContext.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <clusters/SoftwareDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -223,6 +225,139 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
 
         EXPECT_EQ(diag.GetCurrentHighWatermark(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 456u);
+    }
+}
+
+TEST_F(TestSoftwareDiagnosticsCluster, ReadAttributeTest)
+{
+    // Test provider that supports all diagnostics
+    class TestProvider : public DeviceLayer::DiagnosticDataProvider
+    {
+    public:
+        bool SupportsWatermarks() override { return true; }
+
+        CHIP_ERROR GetCurrentHeapFree(uint64_t & v) override
+        {
+            v = 1000;
+            return CHIP_NO_ERROR;
+        }
+        CHIP_ERROR GetCurrentHeapUsed(uint64_t & v) override
+        {
+            v = 2000;
+            return CHIP_NO_ERROR;
+        }
+        CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & v) override
+        {
+            v = 3000;
+            return CHIP_NO_ERROR;
+        }
+    };
+
+    ScopedDiagnosticsProvider<TestProvider> testProvider;
+
+    // Helper function to test attribute reading
+    auto testAttributeRead = [](SoftwareDiagnosticsServerCluster & cluster, AttributeId attributeId,
+                                Protocols::InteractionModel::Status expectedStatus, const char * attributeName) {
+        uint8_t encoderBuffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(encoderBuffer);
+
+        AttributeReportIBs::Builder attributeReportIBsBuilder;
+        attributeReportIBsBuilder.Init(&writer);
+        Access::SubjectDescriptor subject;
+        const ConcreteAttributePath path(kRootEndpointId, SoftwareDiagnostics::Id, attributeId);
+        AttributeEncodeState state;
+
+        AttributeValueEncoder encoder(attributeReportIBsBuilder, subject, path, 0, false, state);
+
+        DataModel::ReadAttributeRequest request;
+        request.path = { kRootEndpointId, SoftwareDiagnostics::Id, attributeId };
+
+        DataModel::ActionReturnStatus status = cluster.ReadAttribute(request, encoder);
+        EXPECT_EQ(status, expectedStatus) << "Failed for attribute: " << attributeName;
+    };
+
+    // Test case 1: All attributes disabled - should return UnsupportedAttribute
+    {
+        const SoftwareDiagnosticsEnabledAttributes disabledAttributes{
+            .enableThreadMetrics     = false,
+            .enableCurrentHeapFree   = false,
+            .enableCurrentHeapUsed   = false,
+            .enableCurrentWatermarks = false,
+        };
+
+        SoftwareDiagnosticsServerCluster cluster(disabledAttributes);
+
+        // Table of attributes to test when disabled
+        struct AttributeTestCase
+        {
+            AttributeId attributeId;
+            const char * name;
+        };
+
+        const AttributeTestCase disabledTestCases[] = {
+            { SoftwareDiagnostics::Attributes::CurrentHeapFree::Id, "CurrentHeapFree" },
+            { SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, "CurrentHeapUsed" },
+            { SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id, "CurrentHeapHighWatermark" },
+            { SoftwareDiagnostics::Attributes::ThreadMetrics::Id, "ThreadMetrics" },
+        };
+
+        for (const auto & testCase : disabledTestCases)
+        {
+            testAttributeRead(cluster, testCase.attributeId, Protocols::InteractionModel::Status::UnsupportedAttribute,
+                              testCase.name);
+        }
+    }
+
+    // Test case 2: All attributes enabled - should return proper values
+    {
+        const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
+            .enableThreadMetrics     = true,
+            .enableCurrentHeapFree   = true,
+            .enableCurrentHeapUsed   = true,
+            .enableCurrentWatermarks = true,
+        };
+
+        SoftwareDiagnosticsServerCluster cluster(enabledAttributes);
+
+        // Table of attributes to test when enabled
+        struct AttributeTestCase
+        {
+            AttributeId attributeId;
+            const char * name;
+            Protocols::InteractionModel::Status expectedStatus;
+        };
+
+        const AttributeTestCase enabledTestCases[] = {
+            { SoftwareDiagnostics::Attributes::CurrentHeapFree::Id, "CurrentHeapFree",
+              Protocols::InteractionModel::Status::Success },
+            { SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, "CurrentHeapUsed",
+              Protocols::InteractionModel::Status::Success },
+            { SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id, "CurrentHeapHighWatermark",
+              Protocols::InteractionModel::Status::Success },
+            { SoftwareDiagnostics::Attributes::ThreadMetrics::Id, "ThreadMetrics", Protocols::InteractionModel::Status::Success },
+            { Globals::Attributes::FeatureMap::Id, "FeatureMap", Protocols::InteractionModel::Status::Success },
+            { Globals::Attributes::ClusterRevision::Id, "ClusterRevision", Protocols::InteractionModel::Status::Success },
+        };
+
+        for (const auto & testCase : enabledTestCases)
+        {
+            testAttributeRead(cluster, testCase.attributeId, testCase.expectedStatus, testCase.name);
+        }
+    }
+
+    // Test case 3: Unknown attribute - should return UnsupportedAttribute
+    {
+        const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
+            .enableThreadMetrics     = true,
+            .enableCurrentHeapFree   = true,
+            .enableCurrentHeapUsed   = true,
+            .enableCurrentWatermarks = true,
+        };
+
+        SoftwareDiagnosticsServerCluster cluster(enabledAttributes);
+
+        testAttributeRead(cluster, 0xFFFF, Protocols::InteractionModel::Status::UnsupportedAttribute, "InvalidAttribute");
     }
 }
 

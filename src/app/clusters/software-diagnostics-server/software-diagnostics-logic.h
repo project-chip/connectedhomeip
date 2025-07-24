@@ -71,6 +71,9 @@ public:
     /// Determines what commands are supported
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
+    /// Returns the enabled attributes for the SoftwareDiagnostics cluster.
+    SoftwareDiagnosticsEnabledAttributes GetEnabledAttributes() const { return mEnabledAttributes; }
+
 private:
     const SoftwareDiagnosticsEnabledAttributes mEnabledAttributes;
 };
