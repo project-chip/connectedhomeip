@@ -60,10 +60,10 @@ public:
      *         Return "True" for self-intersection.
      *         Note: We are also simplifying by rejecting consecutive repeated vertices.
      * 2. Go through the list of vertices:
-     *      a. Pick unique non-adjacent edges(p1q1 and p2q2) to check for self-intersection.
+     *      a. Pick unique non-adjacent edges (p1q1 and p2q2) to check for self-intersection.
      *         For a zone with only 3 vertices, where all edges are adjacent to
      *         each other, pick them for checking self-intersection.
-     *      b. If SegmentsIntersect(p1q1, p2q2):
+     *      b. If SegmentsIntersect(p1q1, p2q2) :
      *           i. Return "True" for self-intersection.
      * 3. Return "False" for self-intersection.
      *
@@ -72,24 +72,24 @@ public:
      * 1. If points p1 and q1 lie on the opposite sides of segment p2q2 AND
      *    points p2 and q2 lie on opposite sides of segment p1q1:
      *      a. Return True for segments p1q1 and p2q2 intersecting each other.
-     *         This is figured out by evaluating the Orientation(OnLeft,
+     *         This is figured out by evaluating the Orientation (OnLeft,
      *         OnRight, Collinear) of a point 'r' w.r.t a segment 'pq'.
-     * 2. If p2 lies on p1q1(collinear and p2 lies on segment p1q1)
+     * 2. If p2 lies on p1q1 (collinear and p2 lies on segment p1q1)
      *      a. Return True for segments p1q1 and p2q2 intersecting each other.
-     * 3. If q2 lies on p1q1(collinear and q2 lies on segment p1q1)
+     * 3. If q2 lies on p1q1 (collinear and q2 lies on segment p1q1)
      *      a. Return True for segments p1q1 and p2q2 intersecting each other.
-     * 4. If p1 lies on p2q2(collinear and p1 lies on segment p2q2)
+     * 4. If p1 lies on p2q2 (collinear and p1 lies on segment p2q2)
      *      a. Return True for segments p1q1 and p2q2 intersecting each other.
-     * 5. If q1 lies on p2q2(collinear and q1 lies on segment p2q2)
+     * 5. If q1 lies on p2q2 (collinear and q1 lies on segment p2q2)
      *      a. Return True for segments p1q1 and p2q2 intersecting each other.
      *
      * Algorithm for Orientation(p, q, r)
      * ----------------------------------
      * 1. Compute cross-product of vectors pq and pr.
      * 2. If cross-product > 0:
-     *      Point r lies to the left of vector pq(Counter-clockwise from pq to pr)
+     *      Point r lies to the left of vector pq (Counter-clockwise from pq to pr)
      *    Else if cross-product < 0:
-     *      Point r lies to the right of vector pq(Clockwise from pq to pr)
+     *      Point r lies to the right of vector pq (Clockwise from pq to pr)
      *    Else
      *      Point r is collinear with pq
      */
@@ -99,11 +99,11 @@ public:
      * --------------------
      *
      * 1. Filtering vertex repetition(including consecutive and non-consecutive)
-     *    a. Consecutive repeated vertices(e.g., A, B, B, C.):
-     *       If V_i == V_i+1, then we have an edge(V_i, V_i+1) of zero length
+     *    a. Consecutive repeated vertices (e.g., A, B, B, C.) :
+     *       If V_i == V_i+1, then we have an edge (V_i, V_i+1) of zero length
      *       and it is a degenerate polygon. Note, we are not collapsing all
      *       consecutive identical vertices into a single one.
-     *    b. Non-consecutive repeated vertices(e.g., A, B, C, D, B, E):
+     *    b. Non-consecutive repeated vertices (e.g., A, B, C, D, B, E) :
      *       If a vertex V appears at index i and again at index k(i < k and not
      *       consecutive), the polygon's path revisits a point before
      *       completing its cycle. In a cycle, the degree of each vertex is 2,
@@ -111,27 +111,27 @@ public:
      *       This means the polygon's boundary self-intersects, and creates
      *       these smaller loops that degenerates its form.
      *
-     * 2. Correctness of SegmentsIntersect(p1q1, p2q2):
+     * 2. Correctness of SegmentsIntersect(p1q1, p2q2) :
      *    a. General case: where points p1 and q1 lie on opposite sides of
      *       p2q2, AND points p2 and q2 lie on opposite sides of p1q1.
      *       --This is the standard geometric test for proper intersection at a
      *         point that is not one of the vertices of the segments.
      *       --Orientation(p, q, r) is used here: To check if p1 and q1 are on
      *         opposite sides of p2q2, Orientation(p2, q2, p1) and
-     *         Orientation(p2, q2, q1) must be different(one OnLeft and one
+     *         Orientation(p2, q2, q1) must be different (one OnLeft and one
      *         OnRight), thus p1q1 crossing over p2q2. Applying this
      *         symmetrically to both p1q1 and p2q2 ensures they intersect each
      *         other.
      *    b. Collinearity and Overlap:
      *       Orientation(p, q, r) returning 0 indicates collinearity of the 3
      *       points.
-     *       --The check for a point 'q' lying on segment 'pr'[OnSegment(p, q, r)] involves
+     *       --The check for a point 'q' lying on segment 'pr' [OnSegment(p, q, r)] involves
      *         verifying that 'q' is collinear with 'pr', AND the coordinates of
-     *         'q' lies on 'pr'(fall within the bounding box defined by 'pr').
+     *         'q' lies on 'pr' (fall within the bounding box defined by 'pr').
      *         This correctly identifies overlapping segments when they are
      *         collinear, or shared endpoints.
      *    c. Thus, SegmentsIntersect correctly identifies if two given line
-     *       segments intersect in any way(proper crossing, collinear overlap,
+     *       segments intersect in any way (proper crossing, collinear overlap,
      *       or shared endpoint).
      *
      * 3. Correctness of Orientation(p, q, r):
@@ -139,9 +139,9 @@ public:
      *       --The sign determines the direction of thumb in the right hand
      *         rule of turning from vector pq to pr.
      *    b. If cross-product > 0, r lies to the left of vector
-     *       pq(Counter-clockwise turn from vector pq to pr)
+     *       pq (Counter-clockwise turn from vector pq to pr)
      *    c. If cross-product < 0, r lies to the right of vector
-     *       pq(Clockwise turn from vector pq to pr)
+     *       pq (Clockwise turn from vector pq to pr)
      *    d. If cross-product is 0, p, q, r are collinear.
      *
      * 4. Correctness of overall iteration over non-adjacent edges to check for
