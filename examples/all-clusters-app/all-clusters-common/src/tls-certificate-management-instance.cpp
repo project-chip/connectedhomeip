@@ -226,7 +226,7 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCertByFingerprint(
     return mCertificateTable.IterateRootCertificates(fabric, *certBuffer, [&](auto & iterator) -> CHIP_ERROR {
         while (iterator.Next(certBuffer->GetCert()))
         {
-            bool match;
+            bool match = false;
             ReturnErrorOnFailure(FingerprintMatch(fingerprint, certBuffer->GetCert().certificate.Value(), match));
             if (match)
             {
@@ -369,7 +369,7 @@ TlsCertificateManagementCommandDelegate::LookupClientCertByFingerprint(EndpointI
             {
                 continue;
             }
-            bool match;
+            bool match = false;
             ReturnErrorOnFailure(FingerprintMatch(fingerprint, cert.clientCertificate.Value(), match));
             if (match)
             {

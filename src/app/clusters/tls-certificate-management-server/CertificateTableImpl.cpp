@@ -277,8 +277,10 @@ private:
             // Index is out of sync; keep it updated & return NOT_FOUND
             return CHIP_ERROR_NOT_FOUND;
         }
-        else if (removeResult != CHIP_NO_ERROR)
+
+        if (removeResult != CHIP_NO_ERROR)
         {
+            // Failed to remove, re-add
             foundEntry->fabric = fabric;
             foundEntry->id     = localId;
             ReturnErrorOnFailure(this->Save(&storage));
@@ -545,7 +547,7 @@ CHIP_ERROR CertificateTableImpl::UpsertRootCertificateEntry(FabricIndex fabric, 
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    TLSCAID localId;
+    TLSCAID localId = 0;
     if (id.HasValue())
     {
         localId = id.Value();
@@ -636,7 +638,7 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
     ReturnErrorOnFailure(globalData.Load(mStorage));
 
     // Update the next ID
-    TLSCCDID localId;
+    TLSCCDID localId = 0;
     ReturnErrorOnFailure(globalData.GetNextClientCertificateId(fabric, localId));
     ReturnErrorOnFailure(globalData.Save(mStorage));
     id = localId;
