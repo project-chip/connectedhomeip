@@ -361,6 +361,12 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                 cluster.Structs.TwoDCartesianVertexStruct(0, 0),
                 cluster.Structs.TwoDCartesianVertexStruct(0, 1)
             ]
+            # Degenerate zone with 3 vertices
+            selfIntersectingVertices7 = [
+                cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(2, 0),
+                cluster.Structs.TwoDCartesianVertexStruct(1, 0)
+            ]
             zoneToCreate1 = cluster.Structs.TwoDCartesianZoneStruct(
                 name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices1,
                 color="#00FFFF")
@@ -378,6 +384,9 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                 color="#00FFFF")
             zoneToCreate6 = cluster.Structs.TwoDCartesianZoneStruct(
                 name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices6,
+                color="#00FFFF")
+            zoneToCreate7 = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone1", use=enums.ZoneUseEnum.kMotion, vertices=selfIntersectingVertices7,
                 color="#00FFFF")
 
             # Create and send the command with selfIntersectingVertices1
@@ -416,7 +425,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                                      "Unexpected error returned when trying to create zone")
                 pass
 
-            # Create and send the command with selfIntersectingVertices3
+            # Create and send the command with selfIntersectingVertices4
             createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
                 zone=zoneToCreate4
             )
@@ -428,7 +437,7 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                                      "Unexpected error returned when trying to create zone")
                 pass
 
-            # Create and send the command with selfIntersectingVertices3
+            # Create and send the command with selfIntersectingVertices5
             createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
                 zone=zoneToCreate5
             )
@@ -440,9 +449,21 @@ class TC_ZONEMGMT_2_2(MatterBaseTest):
                                      "Unexpected error returned when trying to create zone")
                 pass
 
-            # Create and send the command with selfIntersectingVertices3
+            # Create and send the command with selfIntersectingVertices6
             createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
                 zone=zoneToCreate6
+            )
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
+                asserts.fail("Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to self intersecting vertices")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.DynamicConstraintError,
+                                     "Unexpected error returned when trying to create zone")
+                pass
+
+            # Create and send the command with selfIntersectingVertices7
+            createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
+                zone=zoneToCreate7
             )
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
