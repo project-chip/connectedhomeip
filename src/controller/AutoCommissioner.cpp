@@ -477,8 +477,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
-        if (mCommissioner->IsNFCCommissioning() &&
-            (mDeviceCommissioningInfo.general.isCommissioningWithoutPower))
+        if (mCommissioner->IsNFCCommissioning() && (mDeviceCommissioningInfo.general.isCommissioningWithoutPower))
         {
             return CommissioningStage::kWaitForDeviceInstallation;
         }
