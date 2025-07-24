@@ -60,7 +60,6 @@ class TestBdxTransfer(MatterBaseTest):
     def desc_bdx_transfer(self) -> str:
         return "Test a BDX transfer with the diagnostic logs cluster"
 
-
     def steps_bdx_transfer(self) -> list[TestStep]:
         steps = []
         base = 0
@@ -123,17 +122,17 @@ class TestBdxTransfer(MatterBaseTest):
             )
 
             self.step(base_step + 5)
-            if TestBdxTransfer._expect_bdx(filesize): # Sent via BDX
+            if TestBdxTransfer._expect_bdx(filesize):  # Sent via BDX
 
                 asserts.assert_true(bdx_future in done, "BDX transfer didn't start")
                 bdx_transfer: BdxTransfer.BdxTransfer = bdx_future.result()
                 asserts.assert_equal(bdx_transfer.init_message.TransferControlFlags,
-                                    BdxProtocol.SENDER_DRIVE, "Invalid transfer control flags")
+                                     BdxProtocol.SENDER_DRIVE, "Invalid transfer control flags")
                 asserts.assert_equal(bdx_transfer.init_message.MaxBlockSize, 1024, "Invalid max block size")
                 asserts.assert_equal(bdx_transfer.init_message.StartOffset, 0, "Invalid start offset")
                 asserts.assert_equal(bdx_transfer.init_message.FileDesignator,
-                                    bytes(file_designator, encoding='utf8'),
-                                    "Invalid file designator")
+                                     bytes(file_designator, encoding='utf8'),
+                                     "Invalid file designator")
 
                 self.step(base_step + 6)
                 data = await bdx_transfer.accept_and_receive_data()
@@ -147,12 +146,12 @@ class TestBdxTransfer(MatterBaseTest):
                 else:
                     command_response = await command_send_future
                 asserts.assert_equal(command_response.status,
-                                    Clusters.DiagnosticLogs.Enums.StatusEnum.kSuccess,
-                                    "Invalid command response")
+                                     Clusters.DiagnosticLogs.Enums.StatusEnum.kSuccess,
+                                     "Invalid command response")
 
                 await asyncio.sleep(0.1)  # Without sleep successive BDX transfers will fail.
 
-            else: # Sent inline
+            else:  # Sent inline
 
                 asserts.assert_true(bdx_future not in done, "BDX transfer was not expected")
 
