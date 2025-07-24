@@ -102,10 +102,29 @@ bool WebrtcTransport::CanSendAudio()
     return mAudioTrack != nullptr;
 }
 
+const char * WebrtcTransport::GetStateStr() const
+{
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::SendingOffer:
+        return "SendingOffer";
+
+    case State::SendingAnswer:
+        return "SendingAnswer";
+
+    case State::SendingICECandidates:
+        return "SendingICECandidates";
+    }
+    return "N/A";
+}
+
 void WebrtcTransport::MoveToState(const State targetState)
 {
     mState = targetState;
-    ChipLogProgress(Camera, "WebRTCProviderManager moving to [ %s ]", GetStateStr());
+    ChipLogProgress(Camera, "WebrtcTransport moving to [ %s ]", GetStateStr());
 }
 
 void WebrtcTransport::SetCommandType(const CommandType commandtype)
