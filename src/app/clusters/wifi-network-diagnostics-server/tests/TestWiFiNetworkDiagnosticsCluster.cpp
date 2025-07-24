@@ -15,11 +15,11 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/ConcreteCommandPath.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -82,10 +82,10 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
 
         DataModel::InvokeRequest request;
-        request.path = ConcreteCommandPath(kRootEndpointId, WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
+        request.path =
+            ConcreteCommandPath(kRootEndpointId, WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
         TLV::TLVReader tlvReader;
-        ASSERT_EQ(cluster.InvokeCommand(request, tlvReader, nullptr),
-            Protocols::InteractionModel::Status::UnsupportedCommand);
+        ASSERT_EQ(cluster.InvokeCommand(request, tlvReader, nullptr), Protocols::InteractionModel::Status::UnsupportedCommand);
 
         // Everything is unimplemented, so attributes are the mandatory and global ones.
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
@@ -140,10 +140,10 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
                   WiFiNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry.GetInvokePrivilege());
 
         DataModel::InvokeRequest request2;
-        request2.path = ConcreteCommandPath(kRootEndpointId, WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
+        request2.path =
+            ConcreteCommandPath(kRootEndpointId, WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
         TLV::TLVReader tlvReader2;
-        ASSERT_EQ(cluster.InvokeCommand(request2, tlvReader2, nullptr),
-                  Protocols::InteractionModel::Status::Success);
+        ASSERT_EQ(cluster.InvokeCommand(request2, tlvReader2, nullptr), Protocols::InteractionModel::Status::Success);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), attributesBuilder),
