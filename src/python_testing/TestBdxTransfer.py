@@ -149,7 +149,7 @@ class TestBdxTransfer(MatterBaseTest):
                                      Clusters.DiagnosticLogs.Enums.StatusEnum.kSuccess,
                                      "Invalid command response")
 
-                await asyncio.sleep(0.1)  # Without sleep successive BDX transfers will fail.
+                await asyncio.sleep(0.1)  # Without sleep the next BDX transfer will fail.
 
             else:  # Sent inline
 
@@ -178,7 +178,7 @@ class TestBdxTransfer(MatterBaseTest):
                 )
 
                 # Cancel the BDX receive transaction since no BDX transfer occurred (e.g., response was inline).
-                self.default_controller.TestOnlyCancelReceiveBdxData(bdx_future)
+                bdx_future.cancel()
 
 
 if __name__ == "__main__":
