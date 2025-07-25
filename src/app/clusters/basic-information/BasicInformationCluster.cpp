@@ -398,7 +398,7 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     (void) persistence.LoadPascalString<Storage::ShortPascalString>(
         { kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabelBuffer, ""_span);
     (void) persistence.LoadNativeEndianValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
-                                            mLocalConfigDisabled, false);
+                                             mLocalConfigDisabled, false);
 
     return CHIP_NO_ERROR;
 }

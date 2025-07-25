@@ -23,9 +23,7 @@ source_set("fakes") {
     "RamAttributePersistenceProvider.h",
   ]
 
-  public_deps = [
-    "${chip_root}/src/app/persistence",
-  ]
+  public_deps = [ "${chip_root}/src/app/persistence" ]
 }
 
 chip_test_suite("tests") {
