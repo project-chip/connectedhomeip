@@ -224,7 +224,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
         ChipLogDetail(AppServer, "Initiating unlatch action");
         // Unlatch action check is a prerequisite for the move to action.
         // In a real application, this would be replaced with actual unlatch logic.
-        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
+        instance.StartTimer(kMotionCountdownTimeMs); 
         break;
     case Action_t::SET_TARGET_ACTION:
         ChipLogDetail(AppServer, "Initiating set target action");
@@ -293,6 +293,9 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
         break;
     case Action_t::MOVE_TO_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureMotionAction(); });
+        break;
+    case Action_t::UNLATCH_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
         break;
     case Action_t::SET_TARGET_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
