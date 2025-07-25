@@ -1,0 +1,46 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.9.1. [TC-AUDIOOUTPUT-7.5] Read Audio Output cluster Attributes
+
+PICS:
+    - AUDIOOUTPUT.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Audio Output"
+    endpoint: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read attribute Audio Output list"
+      command: "readAttribute"
+      attribute: "OutputList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read attribute current audio output"
+      command: "readAttribute"
+      attribute: "CurrentOutput"
+      response:
+          constraints:
+              type: int8u
