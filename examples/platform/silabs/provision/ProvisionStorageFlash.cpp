@@ -779,7 +779,8 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         constexpr char enableKey[] = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
-        if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), TestEventTriggerDelegate::kEnableKeyLength) != TestEventTriggerDelegate::kEnableKeyLength)
+        if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), TestEventTriggerDelegate::kEnableKeyLength) !=
+            TestEventTriggerDelegate::kEnableKeyLength)
         {
             // enableKey Hex String doesn't have the correct length
             memset(keySpan.data(), 0, keySpan.size());
