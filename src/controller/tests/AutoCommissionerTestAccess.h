@@ -47,10 +47,7 @@ public:
     }
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
     void SetRequiresUTC(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
-    void SetRequiresTimeZone(bool requiresTimeZone)
-    {
-        mCommissioner->mDeviceCommissioningInfo.requiresTimeZone = requiresTimeZone;
-    }
+    void SetRequiresTimeZone(bool requiresTimeZone) { mCommissioner->mDeviceCommissioningInfo.requiresTimeZone = requiresTimeZone; }
 
     void AccessSetTrustedTimeSource(
         app::DataModel::Nullable<app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type>
