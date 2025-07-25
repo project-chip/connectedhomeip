@@ -514,7 +514,10 @@ CHIP_ERROR Storage::SetSetupDiscriminator(uint16_t value)
 {
     CHIP_ERROR err = Flash::Set(Parameters::ID::kDiscriminator, value);
 #if ENABLE_CHIP_SHELL
-    err = Storage::Commit();
+    if (err == CHIP_NO_ERROR)
+    {
+        err = Storage::Commit();
+    }
 #endif // ENABLE_CHIP_SHELL
     return err;
 }
