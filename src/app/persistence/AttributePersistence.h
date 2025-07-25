@@ -45,7 +45,7 @@ public:
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
     template <typename T, typename std::enable_if<std::is_fundamental_v<T>>::type * = nullptr>
-    bool LoadNativeEdianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
+    bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
     {
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
     }

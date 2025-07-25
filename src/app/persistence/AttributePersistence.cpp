@@ -64,11 +64,12 @@ DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttribut
 bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data,
                                                             const void * valueOnLoadFailure, size_t size)
 {
-    MutableByteSpan rawBytes(reinterpret_cast<uint8_t *>(&data), size);
+    MutableByteSpan rawBytes(reinterpret_cast<uint8_t *>(data), size);
     if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
     {
         /// in case of failure, set the default value
         memcpy(data, valueOnLoadFailure, size);
+        return false;
     }
     return true;
 }
