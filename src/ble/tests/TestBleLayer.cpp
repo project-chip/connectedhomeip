@@ -435,6 +435,29 @@ TEST_F(TestBleLayer, StartConnectFailsIfCalledTwice)
     EXPECT_EQ(ep->StartConnect(), CHIP_ERROR_INCORRECT_STATE); // second should fail
 
     ep->Abort();
+// This test checks that the BLE layer can handle a new connection
+// and that the connection complete callback is invoked.
+TEST_F(TestBleLayer, OnConnectionCompleteCallbackPath)
+{
+    auto connObj = GetConnectionObject();
+    EXPECT_EQ(NewBleConnectionByObject(connObj), CHIP_NO_ERROR);
+    EXPECT_EQ(mOnBleConnectionCompleteCalls, 1);
+    EXPECT_EQ(mOnBleConnectionErrorCalls, 0);
+}
+
+// This test checks that the BLE layer can handle a connection error
+// and that the error callback is invoked.
+TEST_F(TestBleLayer, OnConnectionErrorCallbackPath)
+{
+    // Simulate a connection error by passing an invalid connection object
+    for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
+    {
+        // Saturate BLE end-point pool
+        ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(GetConnectionObject()));
+    }
+
+    auto exhaustedConnObj = GetConnectionObject();
+    EXPECT_EQ(NewBleConnectionByObject(exhaustedConnObj), CHIP_NO_ERROR);
 }
 // This test creats new ble connection by discriminator and simulates error
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)

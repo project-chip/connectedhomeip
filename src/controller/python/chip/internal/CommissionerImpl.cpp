@@ -163,7 +163,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         err = gOperationalCredentialsIssuer.Initialize(gServerStorage);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Operational credentials issuer initialization failed: %s", chip::ErrorStr(err));
+            ChipLogError(Controller, "Operational credentials issuer initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
 
@@ -205,12 +205,12 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
                                                                         compressedFabricIdSpan));
         }
     exit:
-        ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));
+        ChipLogProgress(Controller, "Commissioner initialization status: %" CHIP_ERROR_FORMAT, err.Format());
     });
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Commissioner initialization failed: %s", chip::ErrorStr(err));
+        ChipLogError(Controller, "Commissioner initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
         return nullptr;
     }
 
