@@ -40,7 +40,7 @@ template <typename T>
 class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
 public:
-    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData) {};
+    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData){};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
@@ -60,7 +60,7 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
 
     constexpr bool isFabricScoped = DataModel::IsFabricScoped<T>::value;
 
-    FabricIndex fabricIndex       = kUndefinedFabricIndex;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
     if constexpr (isFabricScoped)
     {
         fabricIndex = aEventData.GetFabricIndex();
@@ -68,8 +68,8 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
 
     EventOptions eventOptions;
 
-    eventOptions.mPath = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    eventOptions.mPriority = aEventData.GetPriorityLevel();
+    eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
+    eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = fabricIndex;
 
     return GenerateEvent(eventOptions, generator, eventPayloadWriter, isFabricScoped);
