@@ -395,11 +395,8 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence persistence(*context.attributeStorage);
 
-    {
-        Storage::ShortPascalString label(mNodeLabelBuffer);
-        (void) persistence.Load({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, label, ""_span);
-    }
-
+    (void) persistence.LoadShortPascalString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabelBuffer,
+                                             ""_span);
     (void) persistence.LoadNativeEdianValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
                                             mLocalConfigDisabled, false);
 

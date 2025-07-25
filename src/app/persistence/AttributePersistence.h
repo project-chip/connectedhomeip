@@ -21,6 +21,7 @@
 #include <app/persistence/PascalString.h>
 
 #include <optional>
+#include <type_traits>
 
 namespace chip::app {
 
@@ -43,7 +44,7 @@ public:
     ///
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
-    template <typename T>
+    template <typename T, typename std::enable_if<std::is_fundamental_v<T>>::type * = nullptr>
     bool LoadNativeEdianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
     {
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
@@ -59,6 +60,14 @@ public:
     /// if valueOnLoadFailure cannot be set into value, value will be set to NULL (which never fails)
     bool Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value, std::optional<CharSpan> valueOnLoadFailure);
 
+    template <size_t N>
+    bool LoadShortPascalString(const ConcreteAttributePath & path, char (&buffer)[N], std::optional<CharSpan> valueOnLoadFailure)
+    {
+
+        Storage::ShortPascalString value(buffer);
+        return Load(path, value, valueOnLoadFailure);
+    }
+
     /// Performs all the steps of:
     ///   - decode the given char span
     ///   - store it in the given pascal string
@@ -66,10 +75,10 @@ public:
     DataModel::ActionReturnStatus Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                         Storage::ShortPascalString & value);
 
-
     /// helper to not create a separate ShortPascalString out of a buffer.
     template <size_t N>
-    DataModel::ActionReturnStatus StoreShortPascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, char (&buffer)[N])
+    DataModel::ActionReturnStatus StoreShortPascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                                         char (&buffer)[N])
     {
         Storage::ShortPascalString value(buffer);
         return Store(path, decoder, value);
@@ -78,8 +87,10 @@ public:
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - write to storage
-    template<typename T>
-    DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder &decoder, T &value) {
+    template <typename T, typename std::enable_if<std::is_fundamental_v<T>>::type * = nullptr>
+    DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                                         T & value)
+    {
         ReturnErrorOnFailure(decoder.Decode(value));
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
