@@ -17,6 +17,7 @@
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 
 #include <app/InteractionModelEngine.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/PascalString.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -245,15 +246,6 @@ inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoP
     return aEncoder.Encode(productAppearance);
 }
 
-void LogIfReadError(AttributeId attributeId, CHIP_ERROR err)
-{
-    VerifyOrReturn(err != CHIP_NO_ERROR);
-    VerifyOrReturn(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-
-    ChipLogError(Zcl, "BasicInformation: failed to load attribute " ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                 ChipLogValueMEI(attributeId), err.Format());
-}
-
 BasicInformationCluster gInstance;
 
 } // namespace
@@ -407,33 +399,17 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     {
         PlatformMgr().SetDelegate(this);
     }
-    {
-        Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
-        MutableByteSpan labelSpan = labelBuffer.RawFullBuffer();
 
-        LogIfReadError(
-            Attributes::NodeLabel::Id,
-            context.attributeStorage->ReadValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelSpan));
-
-        if (!Storage::ShortPascalString::IsValid({ mNodeLabelBuffer, labelSpan.size() }))
-        {
-            // invalid value
-            labelBuffer.SetValue(""_span);
-        }
-    }
+    AttributePersistence persistence(*context.attributeStorage);
 
     {
-        MutableByteSpan localConfigBytes(reinterpret_cast<uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled));
-        LogIfReadError(Attributes::LocalConfigDisabled::Id,
-                       context.attributeStorage->ReadValue(
-                           { kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id }, localConfigBytes));
-
-        if (localConfigBytes.size() == 0)
-        {
-            // invalid value
-            mLocalConfigDisabled = false;
-        }
+        Storage::ShortPascalString label(mNodeLabelBuffer);
+        (void) persistence.Load({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, label, ""_span);
     }
+
+    (void) persistence.LoadNativeEdianValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+                                            mLocalConfigDisabled, false);
+
     return CHIP_NO_ERROR;
 }
 
