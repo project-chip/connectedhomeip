@@ -271,7 +271,23 @@ template <typename U>
 struct IsList<DataModel::List<U>> : std::true_type
 {
 };
-// Type extraction utilities (as shown previously)
+
+/// @brief Type categorization traits
+template <typename U>
+struct IsNumeric : std::integral_constant<bool, std::is_integral<U>::value || std::is_floating_point<U>::value>
+{
+};
+template <typename U>
+struct IsEnum : std::is_enum<U>
+{
+};
+template <typename U>
+struct IsStruct
+    : std::integral_constant<bool, !IsList<U>::value && !IsNumeric<U>::value && !IsEnum<U>::value && !std::is_pointer<U>::value>
+{
+};
+
+/// @brief Type extraction utilities
 template <typename U>
 struct ExtractWrappedType
 {
@@ -301,24 +317,10 @@ struct ExtractPayloadType<DataModel::List<U>>
 };
 template <typename U>
 using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
-// Type categorization traits
-template <typename U>
-struct IsNumeric : std::integral_constant<bool, std::is_integral<U>::value || std::is_floating_point<U>::value>
-{
-};
-template <typename U>
-struct IsEnum : std::is_enum<U>
-{
-};
-template <typename U>
-struct IsStruct
-    : std::integral_constant<bool, !IsList<U>::value && !IsNumeric<U>::value && !IsEnum<U>::value && !std::is_pointer<U>::value>
-{
-};
 
 /**
  * @class CTC_BaseDataClass
- * @tparam T The attribute value type (nullable, list or primitive)
+ * @tparam T The attribute value type (nullable list , nullable struct or primitive)
  * @brief Base template class for thread-safe attribute data management with atomic update support
  *
  * Provides core functionality for:
