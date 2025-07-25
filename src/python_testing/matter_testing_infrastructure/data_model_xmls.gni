@@ -789,6 +789,7 @@ data_model_XMLS_1_4_2 = [
   "${chip_root}/data_model/1.4.2/device_types/WindowCovering.xml",
   "${chip_root}/data_model/1.4.2/device_types/WindowCoveringController.xml",
   "${chip_root}/data_model/1.4.2/namespaces/Namespace-Common-Area.xml",
+  "${chip_root}/data_model/1.4.2/namespaces/Namespace-Common-Closure.xml",
   "${chip_root}/data_model/1.4.2/namespaces/Namespace-Common-CompassDirection.xml",
   "${chip_root}/data_model/1.4.2/namespaces/Namespace-Common-CompassLocation.xml",
   "${chip_root}/data_model/1.4.2/namespaces/Namespace-Common-Direction.xml",
