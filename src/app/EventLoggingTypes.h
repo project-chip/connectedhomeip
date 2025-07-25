@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "ConcreteEventPath.h"
 #include <access/SubjectDescriptor.h>
 #include <app/EventPathParams.h>
 #include <app/util/basic-types.h>
