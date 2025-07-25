@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     reboot-dut: true
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
