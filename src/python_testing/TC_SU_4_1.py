@@ -40,7 +40,6 @@ import random
 from typing import Optional
 
 import chip.clusters as Clusters
-
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
