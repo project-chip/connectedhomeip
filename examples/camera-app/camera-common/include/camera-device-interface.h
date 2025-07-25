@@ -23,6 +23,7 @@
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
@@ -130,6 +131,9 @@ public:
 
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
+
+    // Getter for PushAVStreamTransport Delegate
+    virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface

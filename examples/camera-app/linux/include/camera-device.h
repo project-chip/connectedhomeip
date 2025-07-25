@@ -21,6 +21,7 @@
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
+#include "push-av-stream-transport-delegate-impl.h"
 #include "webrtc-provider-manager.h"
 
 #include "default-media-controller.h"
@@ -83,6 +84,7 @@ public:
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVDelegate() override;
 
     MediaController & GetMediaController() override;
 
@@ -294,6 +296,7 @@ private:
     chip::app::Clusters::ChimeManager mChimeManager;
     chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderManager mWebRTCProviderManager;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager mPushAVTransportManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
 
     DefaultMediaController mMediaController;
