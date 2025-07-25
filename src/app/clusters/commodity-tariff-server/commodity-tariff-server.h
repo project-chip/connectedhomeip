@@ -283,7 +283,7 @@ private:
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
-    static void TariffDataUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx)
+    static void TariffDataUpd_AttrChangeCb(AttributeId aAttrId, void * CbCtx)
     {
         TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
         ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);

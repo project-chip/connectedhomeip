@@ -453,7 +453,7 @@ public:
      * - List types: initialized as empty list
      * - Others: left uninitialized
      */
-    explicit CTC_BaseDataClass(uint32_t aAttrId) : mAttrId(aAttrId)
+    explicit CTC_BaseDataClass(AttributeId aAttrId) : mAttrId(aAttrId)
     {
         if constexpr (IsValueNullable())
         {
@@ -665,7 +665,7 @@ public:
      * @return CHIP_NO_ERROR if validation succeeds
      * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
      */
-    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(uint32_t, void *), bool valid_is_req)
+    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(AttributeId, void *), bool valid_is_req)
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
@@ -857,8 +857,8 @@ protected:
     T mValueStorage[2]; // Double-buffered storage
 
     void * mAuxData = nullptr;                  // Validation context
-    const uint32_t mAttrId;                     // Attribute identifier
-    void (*mAuxCb)(uint32_t, void *) = nullptr; // Update callback
+    const AttributeId mAttrId;                     // Attribute identifier
+    void (*mAuxCb)(AttributeId, void *) = nullptr; // Update callback
 
     StorageState mHoldState  = StorageState::kEmpty;
     UpdateState mUpdateState = UpdateState::kIdle;
