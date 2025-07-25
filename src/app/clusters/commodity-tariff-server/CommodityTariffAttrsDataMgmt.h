@@ -199,12 +199,11 @@ struct SpanCopier<char>
             return true;
         }
 
-        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size() + 1));
+        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
         if (!buffer)
             return false;
 
         std::copy(source.begin(), source.end(), buffer);
-        buffer[source.size()] = '\0';
         destination.SetNonNull(CharSpan(buffer, source.size()));
         return true;
     }
@@ -231,12 +230,11 @@ struct StrToSpan
             return CHIP_ERROR_INVALID_STRING_LENGTH;
         }
 
-        char * buffer = static_cast<char *>(Platform::MemoryAlloc(source.size() + 1));
+        char * buffer = static_cast<char *>(Platform::MemoryAlloc(source.size()));
         if (!buffer)
             return CHIP_ERROR_NO_MEMORY;
 
         memcpy(buffer, source.data(), source.size());
-        buffer[source.size()] = '\0';
         destination           = CharSpan(buffer, source.size());
         return CHIP_NO_ERROR;
     }
