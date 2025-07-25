@@ -103,7 +103,7 @@ class TC_SU_4_1(MatterBaseTest):
                      "Verify that the write operation fails with CONSTRAINT_ERROR status code 0x87.\n"
                      "Verify that the attribute value is set to TH3 as the default OTA provider for the second fabric and either of TH2 or TH4 for the first fabric."),
             TestStep(6, "TH..."),
-            # TestStep(7, "TH..."),
+            TestStep(7, "TH..."),
             # TestStep(8, "TH..."),
         ]
         return steps
@@ -422,6 +422,30 @@ class TC_SU_4_1(MatterBaseTest):
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
 
         logger.info(f'Step #6 - Read DefaultOTAProviders attribute on DUT using TH4: {th4_actual_otap_info}')
+
+        self.step(7)
+
+        # Verify DefaultOTAProviders attribute on the DUT after write (TH4 on Fabric 1)
+        update_possible_th4 = await self.read_single_attribute_check_success(
+            dev_ctrl=th4,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.UpdatePossible)
+
+        logger.info(f'Step #7 - Read UpdatePossible attribute on DUT using TH4 (fabric 1): {update_possible_th4}')
+
+        # Verify UpdatePossible is true
+        asserts.assert_equal(update_possible_th4, True, "Expected UpdatePossible to be True on fabric 1")
+
+        # Verify DefaultOTAProviders attribute on the DUT after write (TH3 on Fabric 2)
+        update_possible_th3 = await self.read_single_attribute_check_success(
+            dev_ctrl=th4,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.UpdatePossible)
+
+        logger.info(f'Step #7 - Read UpdatePossible attribute on DUT using TH3 (fabric 2): {update_possible_th3}')
+
+        # Verify UpdatePossible is true
+        asserts.assert_equal(update_possible_th3, True, "Expected UpdatePossible to be True on fabric 2")
 
 
 if __name__ == "__main__":
