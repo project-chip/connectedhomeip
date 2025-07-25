@@ -55,7 +55,7 @@ public:
     /// reason for the load failure).
     ///
     /// if valueOnLoadFailure cannot be set into value, value will be set to NULL (which never fails)
-    bool Load(const ConcreteAttributePath & path, Storage::ShortPascalString &value, std::optional<CharSpan> valueOnLoadFailure);
+    bool Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value, std::optional<CharSpan> valueOnLoadFailure);
 
 private:
     AttributePersistenceProvider & mProvider;
