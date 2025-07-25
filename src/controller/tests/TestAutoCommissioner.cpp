@@ -287,11 +287,7 @@ TEST_F(AutoCommissionerTest, NextStageStopCommissioning)
     EXPECT_EQ(stage, kCleanup);
 }
 
-<<<<<<< HEAD
 // if commissioning failed, then the next stage should be cleanup
-=======
-// if commissioning failed, than the next stage should be cleanup
->>>>>>> af8316a128 (Fix typos; Improve comments)
 TEST_F(AutoCommissionerTest, NextCommissioningStageAfterError)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
@@ -328,14 +324,14 @@ TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    privateConfigCommissioner.SetUTCRequirements(true);
+    privateConfigCommissioner.SetRequiresUTC(true);
 
     CommissioningStage nextStage =
         privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
 
     EXPECT_EQ(nextStage, kConfigureUTCTime);
 
-    privateConfigCommissioner.SetUTCRequirements(false);
+    privateConfigCommissioner.SetRequiresUTC(false);
 
     nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
 
@@ -349,7 +345,7 @@ TEST_F(AutoCommissionerTest, NextStageConfigureUTCTime_DoesNotRequireTimeZone_Ti
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    privateConfigCommissioner.SetTimeZoneRequirements(false);
+    privateConfigCommissioner.SetRequiresTimeZone(false);
 
     EXPECT_EQ(privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureUTCTime, err),
               privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err));
@@ -360,7 +356,7 @@ TEST_F(AutoCommissionerTest, NextStageConfigureUTCTime_RequiresTimeZone_TimeZone
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    privateConfigCommissioner.SetTimeZoneRequirements(true);
+    privateConfigCommissioner.SetRequiresTimeZone(true);
 
     EXPECT_EQ(privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureUTCTime, err),
               privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err));
@@ -371,7 +367,7 @@ TEST_F(AutoCommissionerTest, NextStageConfigureUTCTime_RequiresTimeZone_TimeZone
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    privateConfigCommissioner.SetTimeZoneRequirements(true);
+    privateConfigCommissioner.SetRequiresTimeZone(true);
 
     // setting up correct structs for condition evaluation
     app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type timeZoneStruct;
@@ -390,7 +386,7 @@ TEST_F(AutoCommissionerTest, NextStageConfigureUTCTime_DoesNotRequireTimeZone_Ti
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    privateConfigCommissioner.SetTimeZoneRequirements(false);
+    privateConfigCommissioner.SetRequiresTimeZone(false);
     // setting up correct structs for condition evaluation
     app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type timeZoneStruct;
 
