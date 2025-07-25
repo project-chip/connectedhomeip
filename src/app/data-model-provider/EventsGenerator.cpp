@@ -21,7 +21,6 @@ namespace chip::app::DataModel::internal {
 std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
                                          EventLoggingDelegate & delegate, bool isScopedEvent)
 {
-
     // this skips generating the event if it is fabric-scoped but the provided event data is not
     // associated with any fabric.
     if (isScopedEvent && (eventOptions.mFabricIndex == kUndefinedFabricIndex))

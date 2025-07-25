@@ -53,25 +53,26 @@ private:
 std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
                                          EventLoggingDelegate & delegate, bool isScopedEvent);
 
-template <typename G, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+template <typename G, typename T>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
 {
     internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
+
+    constexpr bool isFabricScoped = DataModel::IsFabricScoped<T>::value;
+
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    if constexpr (isFabricScoped)
+    {
+        fabricIndex = aEventData.GetFabricIndex();
+    }
+
     EventOptions eventOptions;
+
     eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
-    eventOptions.mFabricIndex = aEventData.GetFabricIndex();
-    return GenerateEvent(eventOptions, generator, eventPayloadWriter, true /* isScopedEvent */);
-}
+    eventOptions.mFabricIndex = fabricIndex;
 
-template <typename G, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
-std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
-{
-    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-    EventOptions eventOptions;
-    eventOptions.mPath     = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    eventOptions.mPriority = aEventData.GetPriorityLevel();
-    return GenerateEvent(eventOptions, generator, eventPayloadWriter, false /* isScopedEvent */);
+    return GenerateEvent(eventOptions, generator, eventPayloadWriter, isFabricScoped);
 }
 
 } // namespace internal

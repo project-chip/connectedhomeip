@@ -127,7 +127,8 @@ struct Timestamp
 class EventOptions
 {
 public:
-    EventOptions() : mPriority(PriorityLevel::Invalid) {}
+    EventOptions() = default;
+
     ConcreteEventPath mPath;
     PriorityLevel mPriority = PriorityLevel::Invalid;
     // kUndefinedFabricIndex 0 means not fabric associated at all
