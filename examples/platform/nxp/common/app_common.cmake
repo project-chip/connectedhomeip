@@ -224,9 +224,6 @@ if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreSE05X.cpp
         )
-        target_include_directories(app PRIVATE
-            ${CHIP_ROOT}
-        )
     endif()
 endif()
 
