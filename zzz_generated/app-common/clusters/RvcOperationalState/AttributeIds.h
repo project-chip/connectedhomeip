@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace RvcOperationalState {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 11;
+
 namespace PhaseList {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace PhaseList

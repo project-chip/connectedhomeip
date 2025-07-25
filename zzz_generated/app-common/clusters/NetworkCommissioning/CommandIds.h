@@ -11,6 +11,13 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 7;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 4;
+
 namespace ScanNetworks {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ScanNetworks
