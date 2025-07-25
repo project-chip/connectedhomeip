@@ -16,7 +16,7 @@
  *
  */
 
-#include "zone-util.h"
+#include "zone-geometry.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -498,7 +498,7 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    if (ZoneUtil::IsZoneSelfIntersecting(twoDCartVertices))
+    if (ZoneGeometry::IsZoneSelfIntersecting(twoDCartVertices))
     {
         ChipLogError(Zcl, "HandleCreateTwoDCartesianZone: Found self-intersecting polygon vertices for zone");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
@@ -592,7 +592,7 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    if (ZoneUtil::IsZoneSelfIntersecting(twoDCartVertices))
+    if (ZoneGeometry::IsZoneSelfIntersecting(twoDCartVertices))
     {
         ChipLogError(Zcl, "HandleUpdateTwoDCartesianZone: Found self-intersecting polygon vertices for zone");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
@@ -745,7 +745,7 @@ bool ZoneMgmtServer::DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vecto
     // Exact match check for vertices
     return std::equal(vertices.begin(), vertices.end(), zone.verticesVector.begin(),
                       [](const TwoDCartesianVertexStruct & v1, const TwoDCartesianVertexStruct & v2) {
-                          return ZoneUtil::AreTwoDCartVerticesEqual(v1, v2);
+                          return ZoneGeometry::AreTwoDCartVerticesEqual(v1, v2);
                       });
 }
 

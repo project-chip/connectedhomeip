@@ -40,7 +40,7 @@ enum class OrientationEnum : uint8_t
     kOnRight   = 0x02,
 };
 
-class ZoneUtil
+class ZoneGeometry
 {
 public:
     using TwoDCartesianVertexStruct = Structs::TwoDCartesianVertexStruct::Type;

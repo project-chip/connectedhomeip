@@ -12,11 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/zone-management-server.cpp"
-    "${CLUSTER_DIR}/zone-management-server.h"
-    "${CLUSTER_DIR}/zone-geometry.h"
-)
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "TestZoneManagement"
+
+  test_sources = [ "TestZonePolygon.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/clusters/zone-management-server",
+    "${chip_root}/src/lib/support",
+  ]
+}
