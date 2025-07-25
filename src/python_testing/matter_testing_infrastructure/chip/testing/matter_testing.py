@@ -57,7 +57,6 @@ from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningPa
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_stack_state import MatterStackState
-from chip.testing.pics import read_pics_from_file
 from chip.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
