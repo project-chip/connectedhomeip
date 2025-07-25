@@ -755,26 +755,48 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 
 CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
 {
-    // TODO: Implement this function if needed.
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+    constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
+
+    // Verify that the provided key has the correct length
+    VerifyOrReturnError(value.size() == kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Write the key to the configuration storage
+    return Flash::Set(Parameters::ID::kTestEventTriggerKey, value.data(), value.size());
+#else
     return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
 
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
-// TODO: Implement Flash Get for GetTestEventTriggerKey.
+    constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    size_t keyLength                  = 0;
+
+    VerifyOrReturnError(keySpan.size() >= kEnableKeyLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    err = Flash::Get(Parameters::ID::kTestEventTriggerKey, keySpan.data(), kEnableKeyLength, keyLength);
+
+#ifndef NDEBUG
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
-    constexpr size_t kEnableKeyLength = 16; // Length of the enable key in bytes
-    constexpr char enableKey[]        = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
-    if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), kEnableKeyLength) != kEnableKeyLength)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
-        // enableKey Hex String doesn't have the correct length
-        memset(keySpan.data(), 0, keySpan.size());
-        return CHIP_ERROR_INTERNAL;
+        constexpr char enableKey[]        = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
+        if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), kEnableKeyLength) != kEnableKeyLength)
+        {
+            // enableKey Hex String doesn't have the correct length
+            memset(keySpan.data(), 0, keySpan.size());
+            return CHIP_ERROR_INTERNAL;
+        }
     }
     return CHIP_NO_ERROR;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // NDEBUG
+
+    keySpan.reduce_size(kEnableKeyLength);
+    return err;
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
