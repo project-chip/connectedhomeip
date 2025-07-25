@@ -107,7 +107,7 @@ TEST(TestAttributePersistence, TestLoadAndStoreString)
     }
 }
 
-TEST(TestAttributePersistence, TestEncoderDecoder)
+TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
 {
     RamAttributePersistenceProvider ramProvider;
     AttributePersistence persistence(ramProvider);
@@ -133,7 +133,7 @@ TEST(TestAttributePersistence, TestEncoderDecoder)
     }
 }
 
-TEST(TestAttributePersistence, TestEncoderDecoderString)
+TEST(TestAttributePersistence, TestStringViaDecoder)
 {
     RamAttributePersistenceProvider ramProvider;
     AttributePersistence persistence(ramProvider);
