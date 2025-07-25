@@ -20,12 +20,12 @@
 #include <headers/ProvisionEncoder.h>
 #include <headers/ProvisionStorage.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <string.h>
-#include <lib/support/BytesToHex.h>
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
@@ -765,14 +765,14 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 // TODO: Implement Flash Get for GetTestEventTriggerKey.
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
     constexpr size_t kEnableKeyLength = 16; // Length of the enable key in bytes
-    constexpr char enableKey[] = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
-        if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), kEnableKeyLength) != kEnableKeyLength)
-        {
-            // enableKey Hex String doesn't have the correct length
-            memset(keySpan.data(), 0, keySpan.size());
-            return CHIP_ERROR_INTERNAL;
-        }
-        return CHIP_NO_ERROR;
+    constexpr char enableKey[]        = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
+    if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), kEnableKeyLength) != kEnableKeyLength)
+    {
+        // enableKey Hex String doesn't have the correct length
+        memset(keySpan.data(), 0, keySpan.size());
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #else

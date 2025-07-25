@@ -22,8 +22,8 @@
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 
-#include <app/server/Server.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
