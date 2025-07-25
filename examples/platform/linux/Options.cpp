@@ -116,7 +116,7 @@ enum
     kDeviceOption_TestEventTriggerEnableKey,
     kTraceTo,
     kOptionSimulateNoInternalTime,
-    kOptionPayloadVersion,
+    kOptionSdkVersion,
 #if defined(PW_RPC_ENABLED)
     kOptionRpcServerPort,
 #endif
@@ -254,7 +254,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
 #endif
-    { "payload-version", kNoArgument, kOptionPayloadVersion },
+    { "sdk-version", kNoArgument, kOptionSdkVersion },
     {}
 };
 
@@ -285,7 +285,7 @@ const char * sDeviceOptionHelp =
     "       Enable Thread management via ot-agent.\n"
 #endif // CHIP_ENABLE_OPENTHREAD
     "\n"
-    "  --payload-version\n"
+    "  --sdk-version\n"
     "       Print the Matter SDK version used to build this binary.\n"
     "\n"
     "  --version <version>\n"
@@ -929,7 +929,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
-    case kOptionPayloadVersion:
+    case kOptionSdkVersion:
         printf("matter-sdk version %s\n", CHIP_SDK_VERSION);
         exit(0);
         break;
