@@ -16,9 +16,9 @@
  */
 
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -102,13 +102,9 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
 {
     AttributeListBuilder attributeListBuilder(builder);
 
-
     const DataModel::AttributeEntry mandatoryAttributes[] = {
-        Bssid::kMetadataEntry,
-        SecurityType::kMetadataEntry,
-        WiFiVersion::kMetadataEntry,
-        ChannelNumber::kMetadataEntry,
-        Rssi::kMetadataEntry,
+        Bssid::kMetadataEntry,         SecurityType::kMetadataEntry, WiFiVersion::kMetadataEntry,
+        ChannelNumber::kMetadataEntry, Rssi::kMetadataEntry,
     };
 
     // Define optional attributes based on features
