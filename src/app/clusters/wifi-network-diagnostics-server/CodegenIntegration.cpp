@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- * @file CodegenIntegration.cpp
- *
- * This file contains the WiFi Network Diagnostics cluster integration code for
- * STATIC/FIXED endpoints only.
- */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
