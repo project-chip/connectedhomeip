@@ -52,12 +52,13 @@ struct LinuxDeviceOptions
     chip::Optional<std::vector<uint8_t>> spake2pVerifier;
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
     chip::Optional<std::string> dacProviderFile;
-    uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
-    uint32_t mBleDevice        = 0;
-    bool wifiSupports5g        = false;
-    bool mWiFi                 = false;
-    bool mThread               = false;
-    bool cameraDeferredOffer   = false;
+    uint32_t spake2pIterations  = 0; // When not provided (0), will default elsewhere
+    uint32_t mBleDevice         = 0;
+    bool wifiSupports5g         = false;
+    bool mWiFi                  = false;
+    bool mThread                = false;
+    bool cameraDeferredOffer    = false;
+    bool cameraInitiatedSession = false;
     chip::Optional<std::string> cameraVideoDevice;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;
