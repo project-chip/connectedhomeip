@@ -51,13 +51,13 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.AppendElements({
                       AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
                       AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
                       AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
                   }),
                   CHIP_NO_ERROR);
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
@@ -70,13 +70,13 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, AdministratorCommissioning::Id }, builder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.AppendElements({
                       AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
                       AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
                       AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
                   }),
                   CHIP_NO_ERROR);
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
