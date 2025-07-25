@@ -82,7 +82,7 @@ CHIP_ERROR WhmInit(EndpointId endpointId)
     err = gWhmInstance->Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "gWhmInstance->Init failed %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "gWhmInstance->Init failed: %" CHIP_ERROR_FORMAT, err.Format());
         gWhmInstance.reset();
         gWhmDelegate.reset();
         return err;

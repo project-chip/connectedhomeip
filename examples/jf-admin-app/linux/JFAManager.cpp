@@ -223,6 +223,7 @@ void JFAManager::OnSendICACSRRequestResponse(void * context,
         jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
     {
         ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");
+        jfaManagerCore->SendCommissioningComplete();
     }
 }
 

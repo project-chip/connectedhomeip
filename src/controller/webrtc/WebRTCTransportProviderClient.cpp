@@ -30,7 +30,7 @@ using namespace chip::app;
 using WebRTCSessionStruct                              = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
 static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
 
-void WebRTCTransportProviderClient::Init(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+void WebRTCTransportProviderClient::Init(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
 {
     mPeerId     = ScopedNodeId(nodeId, fabricIndex);
     mEndpointId = static_cast<EndpointId>(endpoint);
@@ -81,7 +81,7 @@ void WebRTCTransportProviderClient::OnResponse(chip::app::CommandSender * client
     CHIP_ERROR error = status.ToChipError();
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Camera, "Response Failure: %s", ErrorStr(error));
+        ChipLogError(Camera, "Response Failure: %" CHIP_ERROR_FORMAT, error.Format());
         this->OnError(client, error);
         return;
     }

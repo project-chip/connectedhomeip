@@ -1,10 +1,10 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *    You may obtain a copy of the License atMore actions
  *
  *        http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -15,14 +15,13 @@
  *    limitations under the License.
  */
 
-#include <lib/support/TimeUtils.h>
+#include "AppTask.h"
 
-namespace chip {
-namespace System {
-namespace Clock {
+using namespace ::chip;
 
-CHIP_ERROR InitClock_RealTime();
-
-} // namespace Clock
-} // namespace System
-} // namespace chip
+int main()
+{
+    chip::Zephyr::App::GetAppTask().Start();
+    // The Start function should never return
+    return EXIT_SUCCESS;
+}

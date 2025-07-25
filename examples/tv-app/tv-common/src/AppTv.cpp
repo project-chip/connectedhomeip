@@ -175,7 +175,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
             cluster.ReadAttribute<Binding::Attributes::Binding::TypeInfo>(this, OnReadSuccessResponse, OnReadFailureResponse);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed in reading binding. Error %s", ErrorStr(err));
+            ChipLogError(Controller, "Failed in reading binding: %" CHIP_ERROR_FORMAT, err.Format());
             clearContext();
         }
     }

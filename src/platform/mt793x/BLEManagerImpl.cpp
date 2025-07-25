@@ -318,7 +318,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "bt_gap_le_disconnect() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "bt_gap_le_disconnect() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -392,7 +392,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t handle, void * data, uint16_t si
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -439,7 +439,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(uint16_t handle, void * data, uint16_
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -775,7 +775,7 @@ void BLEManagerImpl::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
