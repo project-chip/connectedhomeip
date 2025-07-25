@@ -18,6 +18,7 @@
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -99,42 +100,30 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServerCluster::ReadAttribute(const 
 CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(13 + DefaultServerCluster::GlobalAttributes().size()));
+    AttributeListBuilder attributeListBuilder(builder);
 
-    // mandatory attributes
-    ReturnErrorOnFailure(builder.AppendElements({
+
+    const DataModel::AttributeEntry mandatoryAttributes[] = {
         Bssid::kMetadataEntry,
         SecurityType::kMetadataEntry,
         WiFiVersion::kMetadataEntry,
         ChannelNumber::kMetadataEntry,
         Rssi::kMetadataEntry,
-    }));
+    };
 
-    if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
-    {
-        ReturnErrorOnFailure(builder.AppendElements({
-            BeaconLostCount::kMetadataEntry,
-            OverrunCount::kMetadataEntry,
-        }));
-    }
-    if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts))
-    {
-        ReturnErrorOnFailure(builder.AppendElements({
-            BeaconRxCount::kMetadataEntry,
-            PacketMulticastRxCount::kMetadataEntry,
-            PacketMulticastTxCount::kMetadataEntry,
-            PacketUnicastRxCount::kMetadataEntry,
-            PacketUnicastTxCount::kMetadataEntry,
-        }));
-    }
-    if (mLogic.GetEnabledAttributes().enableCurrentMaxRate)
-    {
-        ReturnErrorOnFailure(builder.AppendElements({
-            CurrentMaxRate::kMetadataEntry,
-        }));
-    }
+    // Define optional attributes based on features
+    const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
+        { mLogic.GetFeatureFlags().Has(Feature::kErrorCounts), BeaconLostCount::kMetadataEntry },
+        { mLogic.GetFeatureFlags().Has(Feature::kErrorCounts), OverrunCount::kMetadataEntry },
+        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), BeaconRxCount::kMetadataEntry },
+        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), PacketMulticastRxCount::kMetadataEntry },
+        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), PacketMulticastTxCount::kMetadataEntry },
+        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), PacketUnicastRxCount::kMetadataEntry },
+        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), PacketUnicastTxCount::kMetadataEntry },
+        { mLogic.GetEnabledAttributes().enableCurrentMaxRate, CurrentMaxRate::kMetadataEntry },
+    };
 
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    return attributeListBuilder.Append(Span(mandatoryAttributes), Span(optionalEntries));
 }
 
 CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -157,12 +146,8 @@ std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::Invok
     switch (request.path.mCommandId)
     {
     case Commands::ResetCounts::Id: {
-        if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
-        {
-            mLogic.HandleResetCounts();
-            return Protocols::InteractionModel::Status::Success;
-        }
-        break;
+        mLogic.HandleResetCounts();
+        return Protocols::InteractionModel::Status::Success;
     }
     default:
         break;
