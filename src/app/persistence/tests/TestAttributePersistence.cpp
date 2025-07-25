@@ -15,14 +15,15 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/ConcreteAttributePath.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/Span.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
+#include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/tests/RamAttributePersistenceProvider.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/Span.h>
 
 namespace {
 
@@ -38,27 +39,28 @@ TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
     AttributePersistence persistence(ramProvider);
 
     ConcreteAttributePath path(1, 2, 3);
+    ConcreteAttributePath wrongPath(1, 2, 4);
     constexpr uint32_t kValueToStore = 42;
-    constexpr uint32_t kOtherValue = 42;
-    uint32_t valueRead;
+    constexpr uint32_t kOtherValue   = 99;
 
     // Store a fake value
     {
         const uint32_t value = kValueToStore;
-        EXPECT_EQ(ramProvider.WriteValue(path, {reinterpret_cast<const uint8_t*>(&value), sizeof(value)}), CHIP_NO_ERROR);
+        EXPECT_EQ(ramProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) }), CHIP_NO_ERROR);
     }
 
     // Test loading a value
     {
-        valueRead = 0;
+        uint32_t valueRead = 0;
+
         ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
         ASSERT_EQ(valueRead, kValueToStore);
     }
 
     // Test loading a non-existent value
     {
-        ConcreteAttributePath wrongPath(1, 2, 4);
-        valueRead = 0;
+        uint32_t valueRead = 0;
+
         ASSERT_FALSE(persistence.LoadNativeEndianValue(wrongPath, valueRead, kOtherValue));
         ASSERT_EQ(valueRead, kOtherValue);
     }
@@ -66,7 +68,8 @@ TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
     // Test loading a removed value
     {
         EXPECT_EQ(ramProvider.DeleteValue(path), CHIP_NO_ERROR);
-        valueRead = 0;
+
+        uint32_t valueRead = 0;
         ASSERT_FALSE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
         ASSERT_EQ(valueRead, kOtherValue);
     }
@@ -77,19 +80,18 @@ TEST(TestAttributePersistence, TestLoadAndStoreString)
     RamAttributePersistenceProvider ramProvider;
     AttributePersistence persistence(ramProvider);
     ConcreteAttributePath path(1, 2, 3);
-    char bufferToStore[16];
-    char bufferRead[16];
-    ShortPascalString stringToStore(bufferToStore);
-    ShortPascalString stringRead(bufferRead);
 
     // Store a fake value
     {
-        const char buffer[] = "\x05hello";
-        EXPECT_EQ(ramProvider.WriteValue(path, {reinterpret_cast<const uint8_t*>(&buffer), 6}), CHIP_NO_ERROR);
+        const char buffer[] = "hello";
+        EXPECT_EQ(ramProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&buffer), 6 }), CHIP_NO_ERROR);
     }
 
     // Test loading a value
     {
+        char bufferRead[16];
+        ShortPascalString stringRead(bufferRead);
+
         ASSERT_TRUE(persistence.Load(path, stringRead, std::nullopt));
         ASSERT_TRUE(stringRead.Content().data_equal(CharSpan::fromCharString("hello")));
     }
@@ -97,8 +99,37 @@ TEST(TestAttributePersistence, TestLoadAndStoreString)
     // Test loading a non-existent value
     {
         ConcreteAttributePath wrongPath(1, 2, 4);
+        char bufferRead[16];
+        ShortPascalString stringRead(bufferRead);
+
         ASSERT_FALSE(persistence.Load(wrongPath, stringRead, CharSpan::fromCharString("default")));
         ASSERT_TRUE(stringRead.Content().data_equal(CharSpan::fromCharString("default")));
+    }
+}
+
+TEST(TestAttributePersistence, TestEncoderDecoder)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+
+    ConcreteAttributePath path(1, 2, 3);
+    ConcreteAttributePath wrongPath(1, 2, 4);
+    constexpr uint32_t kValueToStore = 0x12345678;
+    constexpr uint32_t kOtherValue   = 0x99887766;
+    uint32_t valueRead               = 0;
+
+    // Store a value using an encoder
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(kValueToStore);
+        EXPECT_EQ(persistence.StoreNativeEndianValue(path, decoder, valueRead), CHIP_NO_ERROR);
+        EXPECT_EQ(valueRead, kValueToStore);
+    }
+
+    {
+        valueRead = 0;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
+        ASSERT_EQ(valueRead, kValueToStore);
     }
 }
 
