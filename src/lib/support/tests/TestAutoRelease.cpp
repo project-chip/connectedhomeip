@@ -69,6 +69,10 @@ TEST_F(TestAutoRelease, TestOperators)
     EXPECT_EQ(releasable.Counter(), 0);
     EXPECT_TRUE(releaser.IsNull());
     EXPECT_EQ(&*releaser, nullptr);
+
+    // Make sure addtional release is no-op
+    releaser.Release();
+    EXPECT_EQ(releasable.Counter(), 0);
 }
 
 } // namespace
