@@ -440,6 +440,8 @@ class SubscriptionTransaction:
             EventReadResult, SubscriptionTransaction], None] = DefaultEventChangeCallback
         self._onErrorCb: Callable[[
             int, SubscriptionTransaction], None] = DefaultErrorCallback
+        self._onSubscriptionStillActiveCb: Callable[[
+            SubscriptionTransaction], None] = DefaultSubscriptionStillActiveCallback
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
@@ -562,6 +564,11 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onErrorCb = callback
 
+    def SetSubscriptionStillActiveCallback(self, callback: Callable[[SubscriptionTransaction], None]):
+        '''Sets the callback function for the subscription still active notification.'''
+        if callback is not None:
+            self._onSubscriptionStillActiveCb = callback
+
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
@@ -577,6 +584,10 @@ class SubscriptionTransaction:
     @property
     def subscriptionId(self) -> int:
         return self._subscriptionId
+
+    @property
+    def OnSubscriptionStillActiveCb(self) -> Callable[[SubscriptionTransaction], None]:
+        return self._onSubscriptionStillActiveCb
 
     def Shutdown(self):
         if self._isDone:
@@ -620,6 +631,10 @@ def DefaultEventChangeCallback(data: EventReadResult, transaction: SubscriptionT
 
 def DefaultErrorCallback(chipError: int, transaction: SubscriptionTransaction):
     print(f"Error during Subscription: Matter Stack Error {chipError}")
+
+
+def DefaultSubscriptionStillActiveCallback(transaction: SubscriptionTransaction):
+    print(f"Subscription: 0x{transaction.subscriptionId:08x} still active.")
 
 
 def _BuildEventIndex():
@@ -829,6 +844,11 @@ class AsyncReadTransaction:
         # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
         self._handleReportEnd()
 
+    def handleSubscriptionStillActive(self):
+        if self._subscription_handler is not None:
+            self._subscription_handler.OnSubscriptionStillActiveCb(
+                self._subscription_handler)
+
 
 class AsyncWriteTransaction:
     def __init__(self, future: Future, eventLoop):
@@ -891,6 +911,8 @@ _OnReportBeginCallbackFunct = CFUNCTYPE(
     None, py_object)
 _OnReportEndCallbackFunct = CFUNCTYPE(
     None, py_object)
+_OnSubscriptionStillActiveCallbackFunct = CFUNCTYPE(
+    None, py_object)
 
 
 @_OnReadAttributeDataCallbackFunct
@@ -943,6 +965,11 @@ def _OnReportEndCallback(closure):
 @_OnReadDoneCallbackFunct
 def _OnReadDoneCallback(closure):
     closure.handleDone()
+
+
+@_OnSubscriptionStillActiveCallbackFunct
+def _OnSubscriptionStillActiveCallback(closure):
+    closure.handleSubscriptionStillActive()
 
 
 _OnWriteResponseCallbackFunct = CFUNCTYPE(
@@ -1206,14 +1233,14 @@ def Init():
                    _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct,
                    _OnSubscriptionEstablishedCallbackFunct, _OnResubscriptionAttemptedCallbackFunct,
                    _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct,
-                   _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct])
+                   _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct, _OnSubscriptionStillActiveCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
     handle.pychip_ReadClient_InitCallbacks(
         _OnReadAttributeDataCallback, _OnReadEventDataCallback,
         _OnSubscriptionEstablishedCallback, _OnResubscriptionAttemptedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
-        _OnReportBeginCallback, _OnReportEndCallback)
+        _OnReportBeginCallback, _OnReportEndCallback, _OnSubscriptionStillActiveCallback)
 
     _BuildAttributeIndex()
     _BuildClusterIndex()

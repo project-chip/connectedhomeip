@@ -81,6 +81,7 @@ using OnReadErrorCallback               = void (*)(PyObject * appContext, PyChip
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 using OnReportBeginCallback             = void (*)(PyObject * appContext);
 using OnReportEndCallback               = void (*)(PyObject * appContext);
+using OnSubscriptionStillActiveCallback = void (*)(PyObject * appContext);
 
 OnReadAttributeDataCallback gOnReadAttributeDataCallback             = nullptr;
 OnReadEventDataCallback gOnReadEventDataCallback                     = nullptr;
@@ -90,6 +91,7 @@ OnReadErrorCallback gOnReadErrorCallback                             = nullptr;
 OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
 OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
 OnReportBeginCallback gOnReportEndCallback                           = nullptr;
+OnSubscriptionStillActiveCallback gOnSubscriptionStillActiveCallback = nullptr;
 
 void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
 {
@@ -207,6 +209,7 @@ public:
 
     void OnError(CHIP_ERROR aError) override { gOnReadErrorCallback(mAppContext, ToPyChipError(aError)); }
 
+    void NotifySubscriptionStillActive(const ReadClient &) override { gOnSubscriptionStillActiveCallback(mAppContext); }
     void OnReportBegin() override { gOnReportBeginCallback(mAppContext); }
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
@@ -330,7 +333,8 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
                                      OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
                                      OnResubscriptionAttemptedCallback onResubscriptionAttemptedCallback,
                                      OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback,
-                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback)
+                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback,
+                                     OnSubscriptionStillActiveCallback onSubscriptionStillActiveCallback)
 {
     gOnReadAttributeDataCallback       = onReadAttributeDataCallback;
     gOnReadEventDataCallback           = onReadEventDataCallback;
@@ -340,6 +344,7 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
     gOnReadDoneCallback                = onReadDoneCallback;
     gOnReportBeginCallback             = onReportBeginCallback;
     gOnReportEndCallback               = onReportEndCallback;
+    gOnSubscriptionStillActiveCallback = onSubscriptionStillActiveCallback;
 }
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
