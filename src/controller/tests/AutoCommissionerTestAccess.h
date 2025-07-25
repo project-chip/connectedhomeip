@@ -46,12 +46,8 @@ public:
         return mCommissioner->GetNextCommissioningStageInternal(currentStage, lastErr);
     }
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
-    void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
-    void SetTimeSourceRequirements(bool requiresTrustedTimeSource)
-    {
-        mCommissioner->mDeviceCommissioningInfo.requiresTrustedTimeSource = requiresTrustedTimeSource;
-    }
-    void SetTimeZoneRequirements(bool requiresTimeZone)
+    void SetRequiresUTC(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
+    void SetRequiresTimeZone(bool requiresTimeZone)
     {
         mCommissioner->mDeviceCommissioningInfo.requiresTimeZone = requiresTimeZone;
     }
