@@ -25,6 +25,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <string.h>
+#include <lib/support/BytesToHex.h>
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
@@ -761,9 +762,18 @@ CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
-    // TODO: Implement Getter
-    // Adding the same return twice to have the function structure
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+// TODO: Implement Flash Get for GetTestEventTriggerKey.
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
+    constexpr size_t kEnableKeyLength = 16; // Length of the enable key in bytes
+    constexpr char enableKey[] = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
+        if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), kEnableKeyLength) != kEnableKeyLength)
+        {
+            // enableKey Hex String doesn't have the correct length
+            memset(keySpan.data(), 0, keySpan.size());
+            return CHIP_ERROR_INTERNAL;
+        }
+        return CHIP_NO_ERROR;
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
