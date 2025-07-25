@@ -480,14 +480,14 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipConfig);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Erase all values in the chip-counters NVS namespace.
     err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipCounters);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace(ChipCounters) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "ClearNamespace(ChipCounters) failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Restore WiFi persistent settings to default values.

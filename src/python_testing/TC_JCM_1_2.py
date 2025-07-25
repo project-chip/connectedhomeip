@@ -116,8 +116,7 @@ class TC_JCM_1_2(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with success",
-            timeout=10)
+            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success")
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -177,8 +176,7 @@ class TC_JCM_1_2(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with success",
-            timeout=10)
+            expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success")
 
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -222,7 +220,7 @@ class TC_JCM_1_2(MatterBaseTest):
             TestStep("1", "On Ecosystem B, use jfc-app for opening a commissioning window in jfa-app using Python Controller"
                      "Check this Commissioning Window opens successfully with correct parameters"),
             TestStep("2", "On Ecosystem A, use jfc-app for commissioning jfa-app at EcosystemB using Python Controller"
-                     "Verify Joint Commissioning completes successfully with --execute-jcm functionality"),
+                     "Verify Joint Commissioning completes successfully with --jcm functionality"),
             TestStep("3", "On jfc-app@EcoB used a non-filtered fabric read for reading the NOC from Fabric Index=2"
                      "Parse the NOC bytes and Checked that it contains the Administrator CAT")
         ]
@@ -251,56 +249,57 @@ class TC_JCM_1_2(MatterBaseTest):
             nodeId=201,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoBCATs, 16)])
-
-        self.step("1")
         try:
-            response = await devCtrlEcoB.OpenCommissioningWindow(
-                nodeid=11,
-                timeout=400,
-                iteration=random.randint(1000, 100000),
-                discriminator=random.randint(0, 4095),
-                option=ChipDeviceControllerBase.CommissioningWindowPasscode.kTokenWithRandomPin
-            )
-        except Exception as e:
-            asserts.assert_true(False, f'Exception {e} occured during OJCW')
+            self.step("1")
+            try:
+                response = await devCtrlEcoB.OpenCommissioningWindow(
+                    nodeid=11,
+                    timeout=400,
+                    iteration=random.randint(1000, 100000),
+                    discriminator=random.randint(0, 4095),
+                    option=ChipDeviceControllerBase.CommissioningWindowPasscode.kTokenWithRandomPin
+                )
+            except Exception as e:
+                asserts.assert_true(False, f'Exception {e} occured during OJCW')
 
-        self.step("2")
-        _nodeID = 15
-        self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --execute-jcm true",
-            expected_output=f"[CTL] Commissioning complete for node ID {'0x' + hex(_nodeID)[2:].upper().zfill(16)}: success",
-            timeout=10)
+            self.step("2")
+            _nodeID = 15
+            self.fabric_a_ctrl.send(
+                message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
+                expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
+                timeout=10)
 
-        self.step("3")
-        # Read JF-Admin NOC on Ecoystem B using jfc-app@EcoB
-        response = await devCtrlEcoB.ReadAttribute(
-            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
-            returnClusterObject=True)
+            self.step("3")
+            # Read JF-Admin NOC on Ecoystem B using jfc-app@EcoB
+            response = await devCtrlEcoB.ReadAttribute(
+                nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
+                returnClusterObject=True)
 
-        fabricIndex2_noc = None
-        for _nocs in response[0][Clusters.OperationalCredentials].NOCs:
-            if _nocs.fabricIndex == 2:
-                fabricIndex2_noc = _nocs.noc
-        asserts.assert_is_not_none(fabricIndex2_noc, "No NOC on fabric index 2 found!")
+            fabricIndex2_noc = None
+            for _nocs in response[0][Clusters.OperationalCredentials].NOCs:
+                if _nocs.fabricIndex == 2:
+                    fabricIndex2_noc = _nocs.noc
+            asserts.assert_is_not_none(fabricIndex2_noc, "No NOC on fabric index 2 found!")
 
-        # Search Administrator CAT (FFFF0001) in JF-Admin NOC on Ecoystem B
-        noc_tlv_data = chip.tlv.TLVReader(fabricIndex2_noc).get()
-        _admin_cat_found = False
-        for _tag, _value in noc_tlv_data['Any'][6]:
-            if _tag == 22 and _value == int(self.ecoBCATs, 16):
-                _admin_cat_found = True
-                break
-        asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
+            # Search Administrator CAT (FFFF0001) in JF-Admin NOC on Ecosystem B
+            noc_tlv_data = chip.tlv.TLVReader(fabricIndex2_noc).get()
+            _admin_cat_found = False
+            for _tag, _value in noc_tlv_data['Any'][6]:
+                if _tag == 22 and _value == int(self.ecoBCATs, 16):
+                    _admin_cat_found = True
+                    break
+            asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
 
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=15, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
-            returnClusterObject=True)
-        asserts.assert_not_equal(int('fffe0001', 16), response[0][Clusters.AccessControl].acl[0].subjects,
-                                 "Anchor CAT not found in Subject field of JF-Admin on Fabric A(Joint Fabric)")
+            response = await devCtrlEcoA.ReadAttribute(
+                nodeid=15, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+                returnClusterObject=True)
+            asserts.assert_not_equal(int('fffe0001', 16), response[0][Clusters.AccessControl].acl[0].subjects,
+                                     "Anchor CAT not found in Subject field of JF-Admin on Fabric A(Joint Fabric)")
 
-        # Shutdown the Python Controllers started at the beginning of this script
-        devCtrlEcoA.Shutdown()
-        devCtrlEcoB.Shutdown()
+        finally:
+            # Shutdown the Python Controllers started at the beginning of this script
+            devCtrlEcoA.Shutdown()
+            devCtrlEcoB.Shutdown()
 
 
 if __name__ == "__main__":

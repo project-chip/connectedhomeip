@@ -40,7 +40,7 @@ void AppTask::PostInitMatterStack()
     err = InitBindingHandlers();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "InitBindingHandlers failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "InitBindingHandlers failed: %" CHIP_ERROR_FORMAT, err.Format());
         goto exit;
     }
 #endif

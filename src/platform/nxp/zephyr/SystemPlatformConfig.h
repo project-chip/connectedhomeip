@@ -26,4 +26,5 @@
 
 #include <platform/Zephyr/SystemPlatformConfig.h>
 
+#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 0
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0

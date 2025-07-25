@@ -20,7 +20,6 @@
 #include <limits>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -154,7 +153,7 @@ exit:
 
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
 }

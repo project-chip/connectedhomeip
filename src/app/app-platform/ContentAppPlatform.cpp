@@ -615,8 +615,8 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
             CHIP_ERROR err = Access::GetAccessControl().ReadEntry(fabricIndex, --index, entry);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogDetail(DeviceLayer, "ContentAppPlatform::GetACLEntryIndex error reading entry %d err %s",
-                              static_cast<int>(index), ErrorStr(err));
+                ChipLogDetail(DeviceLayer, "ContentAppPlatform::GetACLEntryIndex error reading entry %d: %" CHIP_ERROR_FORMAT,
+                              static_cast<int>(index), err.Format());
             }
             else
             {
@@ -624,9 +624,10 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
                 err = entry.GetSubjectCount(count);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogDetail(DeviceLayer,
-                                  "ContentAppPlatform::GetACLEntryIndex error reading subject count for entry %d err %s",
-                                  static_cast<int>(index), ErrorStr(err));
+                    ChipLogDetail(
+                        DeviceLayer,
+                        "ContentAppPlatform::GetACLEntryIndex error reading subject count for entry %d: %" CHIP_ERROR_FORMAT,
+                        static_cast<int>(index), err.Format());
                     continue;
                 }
                 if (count)
@@ -638,9 +639,10 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
                         err = entry.GetSubject(i, subject);
                         if (err != CHIP_NO_ERROR)
                         {
-                            ChipLogDetail(DeviceLayer,
-                                          "ContentAppPlatform::GetACLEntryIndex error reading subject %i for entry %d err %s",
-                                          static_cast<int>(i), static_cast<int>(index), ErrorStr(err));
+                            ChipLogDetail(
+                                DeviceLayer,
+                                "ContentAppPlatform::GetACLEntryIndex error reading subject %i for entry %d: %" CHIP_ERROR_FORMAT,
+                                static_cast<int>(i), static_cast<int>(index), err.Format());
                             continue;
                         }
                         if (subject == subjectNodeId)
@@ -684,8 +686,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
             err = Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, index);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogDetail(DeviceLayer, "ContentAppPlatform::ManageClientAccess error entry %d err %s", static_cast<int>(index),
-                              ErrorStr(err));
+                ChipLogDetail(DeviceLayer, "ContentAppPlatform::ManageClientAccess error entry %d: %" CHIP_ERROR_FORMAT,
+                              static_cast<int>(index), err.Format());
             }
         }
     }

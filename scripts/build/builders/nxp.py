@@ -16,7 +16,6 @@ import importlib.util
 import logging
 import os
 from enum import Enum, auto
-from typing import Optional
 
 from .builder import BuilderOutput
 from .gn import GnBuilder

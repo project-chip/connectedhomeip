@@ -66,6 +66,8 @@ struct ChipDeviceEvent;
 
 // ========== Platform-specific Configuration Overrides =========
 
+// Disable Thread Local Storage (TLS) since nRF Connect SDK does not support it.
+#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 0
 // Disable Zephyr Socket extensions module, as the Zephyr RTOS now implements recvmsg()
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
 

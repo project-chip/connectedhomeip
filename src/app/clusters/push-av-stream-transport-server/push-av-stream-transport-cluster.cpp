@@ -24,6 +24,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
 #include <clusters/PushAvStreamTransport/Commands.h>
 #include <clusters/PushAvStreamTransport/Ids.h>
@@ -50,7 +51,7 @@ constexpr CommandId kGeneratedCommands[] = {
     FindTransportResponse::Id,
 };
 
-constexpr DataModel::AttributeEntry kAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     PushAvStreamTransport::Attributes::SupportedFormats::kMetadataEntry,
     PushAvStreamTransport::Attributes::CurrentConnections::kMetadataEntry,
 };
@@ -63,8 +64,8 @@ using namespace PushAvStreamTransport::Commands;
 CHIP_ERROR PushAvStreamTransportServer::Attributes(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.ReferenceExisting(kAttributes));
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryAttributes), {});
 }
 
 CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder)

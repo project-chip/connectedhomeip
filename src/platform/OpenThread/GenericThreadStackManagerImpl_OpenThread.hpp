@@ -1005,7 +1005,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif // CHIP_PROGRESS_LOGGING
     return err;
