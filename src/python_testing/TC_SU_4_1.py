@@ -477,6 +477,9 @@ class TC_SU_4_1(MatterBaseTest):
         asserts.assert_true(t4_update_state in valid_states,
                             f"Unexpected UpdateState value: {t4_update_state}")
 
+        # NOTE: Step 9 skipped per test plan refinement.
+        # Fabric separation and image download behavior will be validated in TC-SU-2.1 and TC-SU-2.2 tests.
+
 
 if __name__ == "__main__":
     default_matter_test_main()
