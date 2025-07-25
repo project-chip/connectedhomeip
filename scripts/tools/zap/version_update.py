@@ -38,7 +38,10 @@ __LOG_LEVELS__ = {
 #
 # At this time we hard-code nightly however we may need to figure out a more
 # generic version string once we stop using nightly builds
-ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
+# WARNING: As of July 2025, the tag of ZAP release pushed to CIPD was missing a "v" prefix in the Tag. Therefore, this script was adapted to not include that "v" prefix.
+# Example old TAG on CIPD: version:2@v2025.05.22.1
+# Example new TAG on CIPD: version:2@2025.07.24.1
+ZAP_VERSION_RE = re.compile(r'(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
 
 # A list of files where ZAP is maintained. You can get a similar list using:
 #

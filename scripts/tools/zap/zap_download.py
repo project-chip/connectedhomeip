@@ -178,6 +178,10 @@ def _GetZapVersionToUse(project_root):
                 suffix_index = zap_version.rfind(".")
                 if suffix_index != -1:
                     zap_version = zap_version[:suffix_index]
+                # NOTE: We need to add a "v" as of July 2025 since ZAP release pushed to CIPD had a tag without a "v" before the ZAP version.
+                # Where as in GitHub's ZAP releases page it had a "v" prefix.
+                # Example of the Tag: version:2@2025.07.24.1
+                zap_version = "v" + zap_version
                 return zap_version
 
     raise Exception(f"Failed to determine version from {zap_path}")
