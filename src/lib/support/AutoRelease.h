@@ -23,6 +23,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 

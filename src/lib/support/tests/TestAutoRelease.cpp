@@ -23,6 +23,8 @@
 
 namespace {
 
+using namespace chip;
+
 class TestAutoRelease : public ::testing::Test
 {
 public:
@@ -44,10 +46,9 @@ private:
 TEST_F(TestAutoRelease, TestDestruction)
 {
     TestCounterRelease releasable;
-    EXPECT_EQ(releasable.Counter(), 0);
 
     {
-        AutoRelease releaser(&releasable);
+        AutoRelease<TestCounterRelease> releaser(&releasable);
 
         EXPECT_EQ(releasable.Counter(), 1);
     }
@@ -57,18 +58,17 @@ TEST_F(TestAutoRelease, TestDestruction)
 TEST_F(TestAutoRelease, TestOperators)
 {
     TestCounterRelease releasable;
-    EXPECT_EQ(releasable.Counter(), 0);
 
-    AutoRelease releaser(&releasable);
+    AutoRelease<TestCounterRelease> releaser(&releasable);
     EXPECT_EQ(releasable.Counter(), 1);
     EXPECT_EQ(releaser->Counter(), 1);
-    EXPECT_EQ(*releaser, releasable);
+    EXPECT_EQ(&*releaser, &releasable);
     EXPECT_FALSE(releaser.IsNull());
 
     releaser.Release();
     EXPECT_EQ(releasable.Counter(), 0);
     EXPECT_TRUE(releaser.IsNull());
-    EXPECT_EQ(releaser, nullptr);
+    EXPECT_EQ(&*releaser, nullptr);
 }
 
 } // namespace

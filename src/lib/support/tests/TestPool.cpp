@@ -549,12 +549,13 @@ TEST_F(TestPool, TestPoolInterfaceDynamic)
 template <typename T, size_t N, ObjectPoolMem P>
 void TestPoolAutoRelease()
 {
-    ObjectPool<uint32_t, N, ObjectPoolMem::kInline> pool;
+    using PoolType = ObjectPool<uint32_t, N, P>;
+    PoolType pool;
 
     EXPECT_EQ(pool.Allocated(), 0u);
 
     {
-        PoolAutoRelease obj(pool, pool.CreateObject());
+        PoolAutoRelease<uint32_t, PoolType> obj(pool, pool.CreateObject());
         ASSERT_NE(obj, nullptr);
         ASSERT_FALSE(obj.IsNull());
         EXPECT_EQ(GetNumObjectsInUse(pool), 1u);
@@ -564,7 +565,7 @@ void TestPoolAutoRelease()
     EXPECT_EQ(GetNumObjectsInUse(pool), 0u);
     EXPECT_EQ(pool.Allocated(), 0u);
 
-    PoolAutoRelease obj(pool, pool.CreateObject());
+    PoolAutoRelease<uint32_t, PoolType> obj(pool, pool.CreateObject());
     ASSERT_NE(obj, nullptr);
     ASSERT_FALSE(obj.IsNull());
     obj.Release();
