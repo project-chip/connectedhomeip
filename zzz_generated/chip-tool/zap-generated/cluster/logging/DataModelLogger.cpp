@@ -6355,10 +6355,10 @@ CHIP_ERROR DataModelLogger::LogValue(
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("Interface", indent + 1, value.interface);
+        CHIP_ERROR err = LogValue("CMAFInterface", indent + 1, value.CMAFInterface);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Interface'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CMAFInterface'");
             return err;
         }
     }

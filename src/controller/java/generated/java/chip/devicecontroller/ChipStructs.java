@@ -15890,7 +15890,7 @@ public static class PushAvStreamTransportClusterTransportTriggerOptionsStruct {
   }
 }
 public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
-  public Integer interface;
+  public Integer CMAFInterface;
   public Integer segmentDuration;
   public Integer chunkDuration;
   public Integer sessionGroup;
@@ -15898,7 +15898,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public Optional<byte[]> CENCKey;
   public Optional<byte[]> CENCKeyID;
   public Optional<Boolean> metadataEnabled;
-  private static final long INTERFACE_ID = 0L;
+  private static final long CMAF_INTERFACE_ID = 0L;
   private static final long SEGMENT_DURATION_ID = 1L;
   private static final long CHUNK_DURATION_ID = 2L;
   private static final long SESSION_GROUP_ID = 3L;
@@ -15908,7 +15908,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   private static final long METADATA_ENABLED_ID = 7L;
 
   public PushAvStreamTransportClusterCMAFContainerOptionsStruct(
-    Integer interface,
+    Integer CMAFInterface,
     Integer segmentDuration,
     Integer chunkDuration,
     Integer sessionGroup,
@@ -15917,7 +15917,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     Optional<byte[]> CENCKeyID,
     Optional<Boolean> metadataEnabled
   ) {
-    this.interface = interface;
+    this.CMAFInterface = CMAFInterface;
     this.segmentDuration = segmentDuration;
     this.chunkDuration = chunkDuration;
     this.sessionGroup = sessionGroup;
@@ -15929,7 +15929,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(INTERFACE_ID, new UIntType(interface)));
+    values.add(new StructElement(CMAF_INTERFACE_ID, new UIntType(CMAFInterface)));
     values.add(new StructElement(SEGMENT_DURATION_ID, new UIntType(segmentDuration)));
     values.add(new StructElement(CHUNK_DURATION_ID, new UIntType(chunkDuration)));
     values.add(new StructElement(SESSION_GROUP_ID, new UIntType(sessionGroup)));
@@ -15945,7 +15945,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer interface = null;
+    Integer CMAFInterface = null;
     Integer segmentDuration = null;
     Integer chunkDuration = null;
     Integer sessionGroup = null;
@@ -15954,10 +15954,10 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     Optional<byte[]> CENCKeyID = Optional.empty();
     Optional<Boolean> metadataEnabled = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == INTERFACE_ID) {
+      if (element.contextTagNum() == CMAF_INTERFACE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          interface = castingValue.value(Integer.class);
+          CMAFInterface = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == SEGMENT_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15997,7 +15997,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       }
     }
     return new PushAvStreamTransportClusterCMAFContainerOptionsStruct(
-      interface,
+      CMAFInterface,
       segmentDuration,
       chunkDuration,
       sessionGroup,
@@ -16012,8 +16012,8 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n");
-    output.append("\tinterface: ");
-    output.append(interface);
+    output.append("\tCMAFInterface: ");
+    output.append(CMAFInterface);
     output.append("\n");
     output.append("\tsegmentDuration: ");
     output.append(segmentDuration);

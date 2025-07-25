@@ -7152,8 +7152,8 @@ ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.interface", "interface", value.isMember("interface")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.CMAFInterface", "CMAFInterface",
+                                                                  value.isMember("CMAFInterface")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.segmentDuration", "segmentDuration",
                                                                   value.isMember("segmentDuration")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.chunkDuration", "chunkDuration",
@@ -7164,9 +7164,9 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.trackName", "trackName", value.isMember("trackName")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "interface");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.interface, value["interface"]));
-    valueCopy.removeMember("interface");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "CMAFInterface");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.CMAFInterface, value["CMAFInterface"]));
+    valueCopy.removeMember("CMAFInterface");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "segmentDuration");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.segmentDuration, value["segmentDuration"]));
@@ -7211,7 +7211,7 @@ ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(
     chip::app::Clusters::PushAvStreamTransport::Structs::CMAFContainerOptionsStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.interface);
+    ComplexArgumentParser::Finalize(request.CMAFInterface);
     ComplexArgumentParser::Finalize(request.segmentDuration);
     ComplexArgumentParser::Finalize(request.chunkDuration);
     ComplexArgumentParser::Finalize(request.sessionGroup);

@@ -48909,7 +48909,7 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="interface", Tag=0, Type=PushAvStreamTransport.Enums.CMAFInterfaceEnum),
+                        ClusterObjectFieldDescriptor(Label="CMAFInterface", Tag=0, Type=PushAvStreamTransport.Enums.CMAFInterfaceEnum),
                         ClusterObjectFieldDescriptor(Label="segmentDuration", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="chunkDuration", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="sessionGroup", Tag=3, Type=uint),
@@ -48919,7 +48919,7 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=7, Type=typing.Optional[bool]),
                     ])
 
-            interface: 'PushAvStreamTransport.Enums.CMAFInterfaceEnum' = 0
+            CMAFInterface: 'PushAvStreamTransport.Enums.CMAFInterfaceEnum' = 0
             segmentDuration: 'uint' = 0
             chunkDuration: 'uint' = 0
             sessionGroup: 'uint' = 0

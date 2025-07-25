@@ -6723,7 +6723,7 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct CMAFContainerOptionsStruct {
-    CMAFInterfaceEnum interface = 0;
+    CMAFInterfaceEnum CMAFInterface = 0;
     int16u segmentDuration = 1;
     int16u chunkDuration = 2;
     int8u sessionGroup = 3;

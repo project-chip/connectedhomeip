@@ -129,7 +129,7 @@ public:
 namespace CMAFContainerOptionsStruct {
 enum class Fields : uint8_t
 {
-    kInterface       = 0,
+    kCMAFInterface   = 0,
     kSegmentDuration = 1,
     kChunkDuration   = 2,
     kSessionGroup    = 3,
@@ -142,10 +142,10 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    CMAFInterfaceEnum interface = static_cast<CMAFInterfaceEnum>(0);
-    uint16_t segmentDuration    = static_cast<uint16_t>(0);
-    uint16_t chunkDuration      = static_cast<uint16_t>(0);
-    uint8_t sessionGroup        = static_cast<uint8_t>(0);
+    CMAFInterfaceEnum CMAFInterface = static_cast<CMAFInterfaceEnum>(0);
+    uint16_t segmentDuration        = static_cast<uint16_t>(0);
+    uint16_t chunkDuration          = static_cast<uint16_t>(0);
+    uint8_t sessionGroup            = static_cast<uint8_t>(0);
     chip::CharSpan trackName;
     Optional<chip::ByteSpan> CENCKey;
     Optional<chip::ByteSpan> CENCKeyID;
