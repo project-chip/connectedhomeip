@@ -37,4 +37,10 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/../../app/server-cluster/ServerClusterContext.h"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.h"
+
+  # "${chip_root}/src/app/persistence",
+  "${BASE_DIR}/../../app/persistence/AttributePersistence.cpp"
+  "${BASE_DIR}/../../app/persistence/AttributePersistence.h"
+  "${BASE_DIR}/../../app/persistence/AttributePersistenceProvider.h"
+  "${BASE_DIR}/../../app/persistence/PascalString.h"
 )
