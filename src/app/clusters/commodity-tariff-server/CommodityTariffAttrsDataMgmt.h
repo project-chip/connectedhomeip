@@ -356,10 +356,9 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  * - Nullable state transitions
  *
  * @section update_flow Update Flow
- * @defgroup tariff_update_flow Tariff Data Update Flow
  * @brief State machine for managing atomic attribute updates
  *
- * The update process follows a strict state sequence:
+ * The complete update process requires explicit UpdateEnd() call:
  *
  * @dot
  * digraph update_flow {
@@ -367,67 +366,27 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  *   kInitialized -> kAssigned [label="MarkAsAssigned()"];
  *   kAssigned -> kValidated [label="UpdateBegin()"];
  *   kValidated -> kUpdated  [label="UpdateCommit()"];
- *   kUpdated -> kIdle  [label="UpdateEnd()"];
+ *   kUpdated -> kIdle  [label="UpdateEnd() (mandatory)"];
+ *
+ *   // Early termination paths
  *   kInitialized -> kIdle [label="UpdateEnd()" style="dashed"];
  *   kAssigned -> kIdle [label="UpdateEnd()" style="dashed"];
  *   kValidated -> kIdle [label="UpdateEnd()" style="dashed"];
  * }
  * @enddot
  *
- * ### Typical Update Sequence:
+ * ### Complete Successful Sequence:
+ * 1. CreateNewValue()   // kIdle → kInitialized
+ * 2. Modify value       // (via GetNewValueData())
+ * 3. MarkAsAssigned()   // kInitialized → kAssigned
+ * 4. UpdateBegin()      // kAssigned → kValidated
+ * 5. UpdateCommit()     // kValidated → kUpdated
+ * 6. UpdateEnd()        // kUpdated → kIdle (mandatory cleanup)
  *
- * 1. **Initialization Phase**:
- *    @code
- *    /// Create new value container
- *    err = dataObj.CreateNewValue(elementCount);
- *    @endcode
- *    - Allocates memory for list types
- *    - Initializes default values
- *    - State: kIdle → kInitialized
- *
- * 2. **Modification Phase**:
- *    @code
- *    /// Get and modify the value
- *    if (auto* newVal = dataObj.GetNewValueData()) {
- *        *newVal = configuredValue;
- *        err = dataObj.MarkAsAssigned();
- *    }
- *    @endcode
- *    - State: kInitialized → kAssigned
- *
- * 3. **Validation Phase**:
- *    @code
- *    /// Validate and prepare for commit
- *    err = dataObj.UpdateBegin(context, callback, valid_is_req);
- *    @endcode
- *    - Runs custom validation
- *    - State: kAssigned → kValidated
- *
- * 4. **Commit Phase**:
- *    @code
- *    /// Finalize the update
- *    if (CHIP_NO_ERROR == err) {
- *        dataObj.UpdateCommit(); // Or UpdateEnd() on failure
- *    }
- *    @endcode
- *    - Atomically swaps value buffers if validated
- *    - Invokes callback on success
- *    - State: kValidated → kUpdated → kIdle
- *
- * ### Error Recovery:
- * - At any point, UpdateEnd() can be called to:
- *   - Discard pending changes (dashed transitions in diagram)
- *   - Clean up allocated resources
- *   - Reset to kIdle state
- *
- * ### State Transition Rules:
- * | Current State    | Valid Operations                     |
- * |------------------|--------------------------------------|
- * | kIdle            | CreateNewValue()                     |
- * | kInitialized     | GetNewValueData(), MarkAsAssigned(), UpdateEnd() |
- * | kAssigned        | UpdateBegin(), UpdateEnd()           |
- * | kValidated       | UpdateCommit(), UpdateEnd()          |
- * | kUpdated         | UpdateEnd()                          |
+ * ### Critical Notes:
+ * - UpdateEnd() MUST be called after UpdateCommit()
+ * - Omitting UpdateEnd() will leak resources
+ * - UpdateEnd() can be called at any state for cleanup
  *
  * @see CreateNewValue()
  * @see GetNewValueData()
@@ -662,10 +621,11 @@ public:
      * @brief Validates and prepares the new value for commit
      * @param aUpdCtx Context pointer for callback
      * @param aUpdCb Callback to invoke on successful commit
+     * @param aValidationBypass Allows update the attribute value without validation
      * @return CHIP_NO_ERROR if validation succeeds
      * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
      */
-    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(AttributeId, void *), bool valid_is_req)
+    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(AttributeId, void *), bool aValidationBypass)
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
@@ -680,15 +640,15 @@ public:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        // Bypass validation if ctx not set
-        if (valid_is_req && aUpdCtx != nullptr)
+        if (aValidationBypass != true)
         {
-            mAuxData = aUpdCtx;
-            err      = ValidateNewValue();
+            err = ValidateNewValue();
         }
 
         if (err == CHIP_NO_ERROR)
         {
+            mAuxData = aUpdCtx;
+
             if (aUpdCb != nullptr)
             {
                 mAuxCb = aUpdCb;
