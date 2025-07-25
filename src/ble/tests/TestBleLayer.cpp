@@ -435,6 +435,8 @@ TEST_F(TestBleLayer, StartConnectFailsIfCalledTwice)
     EXPECT_EQ(ep->StartConnect(), CHIP_ERROR_INCORRECT_STATE); // second should fail
 
     ep->Abort();
+}
+
 // This test checks that the BLE layer can handle a new connection
 // and that the connection complete callback is invoked.
 TEST_F(TestBleLayer, OnConnectionCompleteCallbackPath)
