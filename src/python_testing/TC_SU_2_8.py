@@ -33,6 +33,7 @@
 
 
 import chip.clusters as Clusters
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -61,11 +62,10 @@ class TC_SU_2_8(MatterBaseTest):
         return steps
 
     async def _get_provider_struct(self, th, endpoint=0):
-        fabric_index = await self.get_fabric_index_for_node(th.node_id)
         provider_struct = Clusters.Objects.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=th.node_id,
+            providerNodeID=self.dut_node_id,
             endpoint=endpoint,
-            fabricIndex=fabric_index
+            fabricIndex=th.fabricId
         )
 
         return provider_struct
@@ -86,18 +86,19 @@ class TC_SU_2_8(MatterBaseTest):
 
         provider_th1 = await self._get_provider_struct(th1, endpoint=endpoint)
         resp = await self.write_single_attribute(
-            node_id=dut_node_id,
-            endpoint=endpoint,
-            attribute=attr,
-            value=[provider_th1]
+            attribute_value=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(
+                value=[provider_th1]
+            ),
+            endpoint_id=endpoint
         )
 
-        asserts.assert_equal(resp.status, Clusters.Status.Success, "Failed to write DefaultOTAProviders for TH1")
+        asserts.assert_equal(resp, Status.Success, "Failed to write DefaultOTAProviders for TH1")
 
         state = await self.read_single_attribute_check_success(
             node_id=dut_node_id,
             endpoint=endpoint,
-            attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+            attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+            cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
         )
 
         asserts.assert_equal(state, 0, "UpdateState should be Idle after setting TH1")
@@ -107,13 +108,13 @@ class TC_SU_2_8(MatterBaseTest):
 
         provider_th2 = await self._get_provider_struct(self.th2, endpoint=endpoint)
         resp = await self.write_single_attribute(
-            node_id=dut_node_id,
-            endpoint=endpoint,
-            attribute=attr,
-            value=[provider_th2]
+            attribute_value=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(
+                value=[provider_th2]
+            ),
+            endpoint_id=endpoint
         )
 
-        asserts.assert_equal(resp.status, Clusters.Status.Success, "Failed to write DefaultOTAProviders for TH2")
+        asserts.assert_equal(resp, Status.Success, "Failed to write DefaultOTAProviders for TH2")
 
 
 if __name__ == "__main__":
