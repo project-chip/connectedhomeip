@@ -571,6 +571,9 @@ void TestPoolAutoRelease()
     obj.Release();
     ASSERT_EQ(obj, nullptr);
     ASSERT_TRUE(obj.IsNull());
+
+    // Assert additional release is a no-op
+    obj.Release();
 }
 
 TEST_F(TestPool, TestPoolAutoReleaseStatic)
