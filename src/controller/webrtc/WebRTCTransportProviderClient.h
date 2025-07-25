@@ -21,7 +21,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
 #include <controller/python/chip/native/PyChipError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>

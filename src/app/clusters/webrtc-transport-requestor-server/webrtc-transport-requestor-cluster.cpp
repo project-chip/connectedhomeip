@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 #include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -28,12 +26,6 @@ using namespace chip::app::Clusters::WebRTCTransportRequestor;
 using namespace chip::app::Clusters::WebRTCTransportRequestor::Attributes;
 using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
-
-using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
-using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
-using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 namespace {
 
@@ -74,10 +66,10 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(cons
     switch (request.path.mAttributeId)
     {
     case Attributes::CurrentSessions::Id:
-        return encoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             for (auto & session : mCurrentSessions)
             {
-                ReturnErrorOnFailure(encoder.Encode(session));
+                ReturnErrorOnFailure(listEncoder.Encode(session));
             }
             return CHIP_NO_ERROR;
         });
