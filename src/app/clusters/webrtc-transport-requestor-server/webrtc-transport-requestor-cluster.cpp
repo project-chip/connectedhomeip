@@ -65,16 +65,34 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(cons
 {
     switch (request.path.mAttributeId)
     {
-    case Attributes::CurrentSessions::Id:
-        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
+    case Attributes::CurrentSessions::Id: {
+        CHIP_ERROR err = encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             for (auto & session : mCurrentSessions)
             {
                 ReturnErrorOnFailure(listEncoder.Encode(session));
             }
             return CHIP_NO_ERROR;
         });
-    case ClusterRevision::Id:
-        return encoder.Encode(WebRTCTransportRequestor::kRevision);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            return Protocols::InteractionModel::Status::Success;
+        }
+        else
+        {
+            return Protocols::InteractionModel::Status::Failure;
+        }
+    }
+    case ClusterRevision::Id: {
+        if (encoder.Encode(WebRTCTransportRequestor::kRevision) == CHIP_NO_ERROR)
+        {
+            return Protocols::InteractionModel::Status::Success;
+        }
+        else
+        {
+            return Protocols::InteractionModel::Status::Failure;
+        }
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
