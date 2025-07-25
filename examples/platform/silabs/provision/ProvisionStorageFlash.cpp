@@ -774,6 +774,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
         }
         return CHIP_NO_ERROR;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
