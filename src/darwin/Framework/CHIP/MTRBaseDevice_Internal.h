@@ -223,7 +223,7 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 @end
 
 @interface MTRAttributePath ()
-- (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path;
+- (instancetype)initWithPath:(const chip::app::ConcreteAttributePath &)path;
 @end
 
 @interface MTREventPath ()
