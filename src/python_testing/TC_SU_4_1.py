@@ -41,8 +41,8 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.exceptions import ChipStackError
+
+
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -214,7 +214,7 @@ class TC_SU_4_1(MatterBaseTest):
         params = await self.open_commissioning_window(th1, th1_node_id)
         setup_pin_code = params.commissioningParameters.setupPinCode
         long_discriminator = params.randomDiscriminator
-        setup_qr_code = params.commissioningParameters.setupQRCode
+        # setup_qr_code = params.commissioningParameters.setupQRCode
         logger.info(f'Step #3: Commissioning window opened: {vars(params)}')
 
         logger.info('Step #3 - Commissioning DUT with TH3...')
@@ -294,7 +294,7 @@ class TC_SU_4_1(MatterBaseTest):
         params = await self.open_commissioning_window(th1, th1_node_id)
         setup_pin_code = params.commissioningParameters.setupPinCode
         long_discriminator = params.randomDiscriminator
-        setup_qr_code = params.commissioningParameters.setupQRCode
+        # setup_qr_code = params.commissioningParameters.setupQRCode
         logger.info(f'Step #5: Commissioning window opened: {vars(params)}')
 
         logger.info('Step #5 - Commissioning DUT with TH4...')
