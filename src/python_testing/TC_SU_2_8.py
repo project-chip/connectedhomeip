@@ -75,7 +75,8 @@ class TC_SU_2_8(MatterBaseTest):
 
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
-        attr = Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOtaProviders
+        attr = Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
+        th1 = self.default_controller
 
         # Commissioning
         self.step(0)
@@ -83,7 +84,7 @@ class TC_SU_2_8(MatterBaseTest):
         # DUT sends a QueryImage command to TH1/OTA-P.
         self.step(1)
 
-        provider_th1 = await self._get_provider_struct(self.th1, endpoint=endpoint)
+        provider_th1 = await self._get_provider_struct(th1, endpoint=endpoint)
         resp = await self.write_single_attribute(
             node_id=dut_node_id,
             endpoint=endpoint,
