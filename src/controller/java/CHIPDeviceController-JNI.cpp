@@ -1366,7 +1366,7 @@ JNI_METHOD(jlong, getDeviceBeingCommissionedPointer)(JNIEnv * env, jobject self,
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to get commissionee device: %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed to get commissionee device: %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return 0;
     }
@@ -1418,7 +1418,7 @@ JNI_METHOD(jlong, getGroupDevicePointer)(JNIEnv * env, jobject self, jlong handl
     if (device == nullptr)
     {
         CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-        ChipLogError(Controller, "GroupDeviceProxy handle is nullptr: %s", ErrorStr(err));
+        ChipLogError(Controller, "GroupDeviceProxy handle is nullptr: %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return 0;
     }

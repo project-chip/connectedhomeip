@@ -870,7 +870,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -922,6 +922,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1808,7 +1809,7 @@ cluster TemperatureControl = 86 {
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
 cluster RefrigeratorAlarm = 87 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
