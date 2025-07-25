@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.9.2. [TC-AUDIOOUTPUT-7.3] Rename Output Verification
+name: 19.9.3. [TC-AUDIOOUTPUT-7.3] Rename Output Verification
 
 PICS:
     - AUDIOOUTPUT.S

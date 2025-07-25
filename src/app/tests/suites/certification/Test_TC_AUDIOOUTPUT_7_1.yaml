@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,19 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.9.2. [TC-AUDIOOUTPUT-7.2] Select Output Verification
+name: 19.9.1. [TC-AUDIOOUTPUT-7.1] Read Audio Output cluster Attributes
 
 PICS:
     - AUDIOOUTPUT.S
-    - AUDIOOUTPUT.S.C00.Rsp
 
 config:
     nodeId: 0x12344321
     cluster: "Audio Output"
     endpoint: 1
-    Index:
-        type: int8u
-        defaultValue: 1
 
 tests:
     - label: "Step 0: Wait for the commissioned device to be retrieved"
@@ -41,24 +37,17 @@ tests:
       response:
           constraints:
               type: list
+              item_constraints:
+                  - field: "index"
+                    type: int8u
+                  - field: "outputType"
+                    type: enum8
+                  - field: "name"
+                    type: string
 
-    - label: "Step 2: TH reads the CurrentOutput attribute from the DUT"
+    - label: "Step 2: TH reads the CurrentOutput attribute"
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:
-          value: Index
-
-    - label:
-          "Step 3: TH sends a SelectAudioOutput command to the DUT with an index
-          from the list in step 1"
-      command: "SelectOutput"
-      arguments:
-          values:
-              - name: "Index"
-                value: Index
-
-    - label: "Step 4: TH reads the CurrentOutput attribute from the DUT"
-      command: "readAttribute"
-      attribute: "CurrentOutput"
-      response:
-          value: Index
+          constraints:
+              type: int8u
