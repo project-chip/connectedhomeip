@@ -30,6 +30,8 @@
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
+#include <app/TestEventTriggerDelegate.h>
+
 #if !(SL_MATTER_GN_BUILD || defined(SL_PROVISION_GENERATOR))
 #include <sl_matter_provision_config.h>
 #endif
@@ -753,38 +755,31 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
 {
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
-    constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
-
     // Verify that the provided key has the correct length
-    VerifyOrReturnError(value.size() == kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value.size() == TestEventTriggerDelegate::kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Write the key to the configuration storage
     return Flash::Set(Parameters::ID::kTestEventTriggerKey, value.data(), value.size());
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
 
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
-    constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
-    size_t keyLength                  = 0;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    size_t keyLength = 0;
 
-    VerifyOrReturnError(keySpan.size() >= kEnableKeyLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(keySpan.size() >= TestEventTriggerDelegate::kEnableKeyLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    err = Flash::Get(Parameters::ID::kTestEventTriggerKey, keySpan.data(), kEnableKeyLength, keyLength);
+    err = Flash::Get(Parameters::ID::kTestEventTriggerKey, keySpan.data(), TestEventTriggerDelegate::kEnableKeyLength, keyLength);
 
 #ifndef NDEBUG
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         constexpr char enableKey[] = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
-        if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), kEnableKeyLength) != kEnableKeyLength)
+        if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), TestEventTriggerDelegate::kEnableKeyLength) != TestEventTriggerDelegate::kEnableKeyLength)
         {
             // enableKey Hex String doesn't have the correct length
             memset(keySpan.data(), 0, keySpan.size());
@@ -795,12 +790,22 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
 #endif // NDEBUG
 
-    keySpan.reduce_size(kEnableKeyLength);
+    keySpan.reduce_size(TestEventTriggerDelegate::kEnableKeyLength);
     return err;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
+
+#else // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 } // namespace Provision
 } // namespace Silabs
