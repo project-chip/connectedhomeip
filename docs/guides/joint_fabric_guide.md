@@ -259,10 +259,16 @@ Execute all the initialization steps for Ecosystem A and Ecosystem B above.
 
 On the Ecosystem B Joint Fabric Controller application
 
-TODO: Update the following command to open the joint commissioning window
+-   Open Joint Commissioning Window on JF Admin App of Ecosystem B
 
 ```
-pairing open-commissioning-window 11 1 400 1000 1261
+>>> jcm open-joint-commissioning-window 11 1 400 1000 1261
+```
+
+Check for the following logs on the jf-admin-app side:
+
+```
+>>> [DIS] Advertise commission parameter vendorID=65522 productID=32769 discriminator=1261/04 cm=3 cp=0 jf=14
 ```
 
 Note: Capture the [manual pairing code]

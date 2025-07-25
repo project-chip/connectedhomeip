@@ -253,6 +253,7 @@ gn_args=(
     "chip_crypto=\"openssl\""
     "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
     "chip_support_webrtc_python_bindings=$enable_webrtc"
+    "chip_device_config_enable_joint_fabric=true"
 )
 if [[ -n "$chip_mdns" ]]; then
     gn_args+=("chip_mdns=\"$chip_mdns\"")

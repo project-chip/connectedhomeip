@@ -1154,6 +1154,31 @@ class ChipDeviceControllerBase():
 
             return await asyncio.futures.wrap_future(ctx.future)
 
+    async def OpenJointCommissioningWindow(self, nodeid: int, endpointId: int, timeout: int, iteration: int,
+                                           discriminator: int) -> CommissioningParameters:
+        '''
+        Opens a joint commissioning window on the device with the given nodeid.
+
+        Args:
+            nodeid (int): Node id of the device.
+            timeout (int): Command timeout
+            iteration (int): The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+                PAKE passcode verifier to be used for this commissioning. Valid range: 1000 - 100000
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095
+
+            Returns:
+                CommissioningParameters
+        '''
+        self.CheckIsActive()
+
+        async with self._open_window_context as ctx:
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow(
+                    self.devCtrl, self.pairingDelegate, nodeid, endpointId, timeout, iteration, discriminator)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
     def GetCompressedFabricId(self):
         '''
         Get compressed fabric Id.
@@ -1743,7 +1768,8 @@ class ChipDeviceControllerBase():
         for v in attributes:
             if len(v) == 2:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    invalid_endpoint, v[0], v[1], 1, v[0].value))   # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
+                    # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
+                    invalid_endpoint, v[0], v[1], 1, v[0].value))
             else:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     invalid_endpoint, v[0], 0, 0, v[0].value))
@@ -2412,6 +2438,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
                 c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.argtypes = [
+                c_void_p, c_void_p, c_uint64, c_uint16, c_uint16, c_uint32, c_uint16]
+            self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.restype = PyChipError
 
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool

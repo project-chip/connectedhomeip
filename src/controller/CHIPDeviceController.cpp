@@ -474,7 +474,11 @@ DeviceCommissioner::DeviceCommissioner() :
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
-{}
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    (void) mPeerAdminJFAdminClusterEndpointId;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+}
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
