@@ -188,12 +188,7 @@ bool WebRTCTransportRequestorServer::IsPeerNodeSessionValid(uint16_t sessionId, 
 
     // Also check that the existing session belongs to the same PeerNodeID / Fabric
     // If it doesn't match, return false
-    if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->GetFabricIndex())
-    {
-        return false;
-    }
-
-    return true;
+    return (peerNodeId == existingSession->peerNodeID) && (peerFabricIndex == existingSession->GetFabricIndex());
 }
 
 DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const Commands::Offer::DecodableType & req,
