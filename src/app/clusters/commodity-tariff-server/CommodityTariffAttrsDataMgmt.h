@@ -548,8 +548,7 @@ public:
         }
         else if constexpr (IsValueNullable())
         {
-            WrappedType tmp = WrappedType();
-            GetNewValueRef().SetNonNull(tmp);
+            GetNewValueRef().SetNull();
         }
         else
         {
