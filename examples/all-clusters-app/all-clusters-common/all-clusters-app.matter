@@ -1337,7 +1337,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1744,6 +1744,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3479,7 +3480,7 @@ cluster TemperatureControl = 86 {
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
 cluster RefrigeratorAlarm = 87 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
@@ -4618,7 +4619,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 7;
+  revision 9;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -4736,6 +4737,7 @@ cluster Thermostat = 513 {
     kLocalTemperatureNotExposed = 0x40;
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
+    kEvents = 0x200;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4799,6 +4801,16 @@ cluster Thermostat = 513 {
     kSupportsOff = 0x8;
   }
 
+  bitmap ThermostatSuggestionNotFollowingReasonBitmap : bitmap16 {
+    kDemandResponseEvent = 0x1;
+    kOngoingHold = 0x2;
+    kSchedule = 0x4;
+    kOccupancy = 0x8;
+    kVacationMode = 0x10;
+    kTimeOfUseCostSavings = 0x20;
+    kPreCoolingOrPreHeating = 0x40;
+  }
+
   struct ScheduleTransitionStruct {
     ScheduleDayOfWeekBitmap dayOfWeek = 0;
     int16u transitionTime = 1;
@@ -4838,10 +4850,58 @@ cluster Thermostat = 513 {
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
+  struct ThermostatSuggestionStruct {
+    int8u uniqueID = 0;
+    octet_string<16> presetHandle = 1;
+    epoch_s effectiveTime = 2;
+    epoch_s expirationTime = 3;
+  }
+
   struct WeeklyScheduleTransitionStruct {
     int16u transitionTime = 0;
     nullable temperature heatSetpoint = 1;
     nullable temperature coolSetpoint = 2;
+  }
+
+  info event SystemModeChange = 0 {
+    optional SystemModeEnum previousSystemMode = 0;
+    SystemModeEnum currentSystemMode = 1;
+  }
+
+  info event LocalTemperatureChange = 1 {
+    nullable temperature currentLocalTemperature = 0;
+  }
+
+  info event OccupancyChange = 2 {
+    optional OccupancyBitmap previousOccupancy = 0;
+    OccupancyBitmap currentOccupancy = 1;
+  }
+
+  info event SetpointChange = 3 {
+    SystemModeEnum systemMode = 0;
+    optional OccupancyBitmap occupancy = 1;
+    optional temperature previousSetpoint = 2;
+    temperature currentSetpoint = 3;
+  }
+
+  info event RunningStateChange = 4 {
+    optional RelayStateBitmap previousRunningState = 0;
+    RelayStateBitmap currentRunningState = 1;
+  }
+
+  info event RunningModeChange = 5 {
+    optional ThermostatRunningModeEnum previousRunningMode = 0;
+    ThermostatRunningModeEnum currentRunningMode = 1;
+  }
+
+  info event ActiveScheduleChange = 6 {
+    optional nullable octet_string previousScheduleHandle = 0;
+    nullable octet_string currentScheduleHandle = 1;
+  }
+
+  info event ActivePresetChange = 7 {
+    optional nullable octet_string previousPresetHandle = 0;
+    nullable octet_string currentPresetHandle = 1;
   }
 
   readonly attribute nullable temperature localTemperature = 0;
@@ -4904,6 +4964,10 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
+  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
+  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4934,12 +4998,26 @@ cluster Thermostat = 513 {
     ScheduleModeBitmap modeToReturn = 1;
   }
 
+  response struct AddThermostatSuggestionResponse = 2 {
+    int8u uniqueID = 0;
+  }
+
   request struct SetActiveScheduleRequestRequest {
     octet_string<16> scheduleHandle = 0;
   }
 
   request struct SetActivePresetRequestRequest {
     nullable octet_string<16> presetHandle = 0;
+  }
+
+  request struct AddThermostatSuggestionRequest {
+    octet_string<16> presetHandle = 0;
+    nullable epoch_s effectiveTime = 1;
+    int16u expirationInMinutes = 2;
+  }
+
+  request struct RemoveThermostatSuggestionRequest {
+    int8u uniqueID = 0;
   }
 
   response struct AtomicResponse = 253 {
@@ -4966,6 +5044,8 @@ cluster Thermostat = 513 {
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
   /** ID */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
@@ -6570,6 +6650,176 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
 }
 
+/** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
+provisional cluster PushAvStreamTransport = 1365 {
+  revision 1;
+
+  enum ContainerFormatEnum : enum8 {
+    kCMAF = 0 [spec_name = "CMAF"];
+  }
+
+  enum IngestMethodsEnum : enum8 {
+    kCMAFIngest = 0;
+  }
+
+  enum StatusCodeEnum : enum8 {
+    kInvalidTLSEndpoint = 2;
+    kInvalidStream = 3;
+    kInvalidURL = 4;
+    kInvalidZone = 5;
+    kInvalidCombination = 6;
+    kInvalidTriggerType = 7;
+    kInvalidTransportStatus = 8;
+  }
+
+  enum TransportStatusEnum : enum8 {
+    kActive = 0;
+    kInactive = 1;
+  }
+
+  enum TransportTriggerTypeEnum : enum8 {
+    kCommand = 0;
+    kMotion = 1;
+    kContinuous = 2;
+  }
+
+  enum TriggerActivationReasonEnum : enum8 {
+    kUserInitiated = 0;
+    kAutomation = 1;
+    kEmergency = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPerZoneSensitivity = 0x1;
+    kMetadata = 0x2;
+  }
+
+  struct TransportMotionTriggerTimeControlStruct {
+    int16u initialDuration = 0;
+    int16u augmentationDuration = 1;
+    elapsed_s maxDuration = 2;
+    int16u blindDuration = 3;
+  }
+
+  struct TransportZoneOptionsStruct {
+    nullable int16u zone = 0;
+    optional int8u sensitivity = 1;
+  }
+
+  struct TransportTriggerOptionsStruct {
+    TransportTriggerTypeEnum triggerType = 0;
+    optional nullable TransportZoneOptionsStruct motionZones[] = 1;
+    optional nullable int8u motionSensitivity = 2;
+    optional TransportMotionTriggerTimeControlStruct motionTimeControl = 3;
+    optional int16u maxPreRollLen = 4;
+  }
+
+  struct CMAFContainerOptionsStruct {
+    int16u chunkDuration = 0;
+    optional octet_string<16> CENCKey = 1;
+    optional boolean metadataEnabled = 2;
+    optional octet_string<16> CENCKeyID = 3;
+  }
+
+  struct ContainerOptionsStruct {
+    ContainerFormatEnum containerType = 0;
+    optional CMAFContainerOptionsStruct CMAFContainerOptions = 1;
+  }
+
+  struct TransportOptionsStruct {
+    StreamUsageEnum streamUsage = 0;
+    optional nullable int16u videoStreamID = 1;
+    optional nullable int16u audioStreamID = 2;
+    int16u endpointID = 3;
+    long_char_string<2000> url = 4;
+    TransportTriggerOptionsStruct triggerOptions = 5;
+    IngestMethodsEnum ingestMethod = 6;
+    ContainerOptionsStruct containerOptions = 7;
+    optional epoch_s expiryTime = 8;
+  }
+
+  fabric_scoped struct TransportConfigurationStruct {
+    int16u connectionID = 0;
+    TransportStatusEnum transportStatus = 1;
+    optional TransportOptionsStruct transportOptions = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct SupportedFormatStruct {
+    ContainerFormatEnum containerFormat = 0;
+    IngestMethodsEnum ingestMethod = 1;
+  }
+
+  info event PushTransportBegin = 0 {
+    int16u connectionID = 0;
+    TransportTriggerTypeEnum triggerType = 1;
+    optional TriggerActivationReasonEnum activationReason = 2;
+  }
+
+  info event PushTransportEnd = 1 {
+    int16u connectionID = 0;
+    TransportTriggerTypeEnum triggerType = 1;
+    optional TriggerActivationReasonEnum activationReason = 2;
+  }
+
+  readonly attribute SupportedFormatStruct supportedFormats[] = 0;
+  readonly attribute TransportConfigurationStruct currentConnections[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AllocatePushTransportRequest {
+    TransportOptionsStruct transportOptions = 0;
+  }
+
+  response struct AllocatePushTransportResponse = 1 {
+    TransportConfigurationStruct transportConfiguration = 0;
+  }
+
+  request struct DeallocatePushTransportRequest {
+    int16u connectionID = 0;
+  }
+
+  request struct ModifyPushTransportRequest {
+    int16u connectionID = 0;
+    TransportOptionsStruct transportOptions = 1;
+  }
+
+  request struct SetTransportStatusRequest {
+    nullable int16u connectionID = 0;
+    TransportStatusEnum transportStatus = 1;
+  }
+
+  request struct ManuallyTriggerTransportRequest {
+    int16u connectionID = 0;
+    TriggerActivationReasonEnum activationReason = 1;
+    optional TransportMotionTriggerTimeControlStruct timeControl = 2;
+  }
+
+  request struct FindTransportRequest {
+    optional nullable int16u connectionID = 0;
+  }
+
+  response struct FindTransportResponse = 7 {
+    TransportConfigurationStruct transportConfigurations[] = 0;
+  }
+
+  /** This command SHALL allocate a transport and return a PushTransportConnectionID. */
+  fabric command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
+  /** This command SHALL be generated to request the Node deallocates the specified transport. */
+  fabric command access(invoke: manage) DeallocatePushTransport(DeallocatePushTransportRequest): DefaultSuccess = 2;
+  /** This command is used to request the Node modifies the configuration of the specified push transport. */
+  fabric command access(invoke: manage) ModifyPushTransport(ModifyPushTransportRequest): DefaultSuccess = 3;
+  /** This command SHALL be generated to request the Node modifies the Transport Status of a specified transport or all transports. */
+  fabric command access(invoke: manage) SetTransportStatus(SetTransportStatusRequest): DefaultSuccess = 4;
+  /** This command SHALL be generated to request the Node to manually start the specified push transport. */
+  fabric command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
+  /** This command SHALL return the Transport Configuration for the specified push transport or all allocated transports for the fabric if null. */
+  fabric command FindTransport(FindTransportRequest): FindTransportResponse = 6;
+}
+
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
 provisional cluster Chime = 1366 {
   revision 1;
@@ -6832,6 +7082,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute boolean clusterErrorBoolean = 50;
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
+  attribute access(read: administer, write: administer) optional boolean unsupportedAttributeRequiringAdminPrivilege = 254;
   attribute optional boolean unsupported = 255;
   attribute optional int8u readFailureCode = 12288;
   attribute optional int32u failureInt32U = 12289;
@@ -8841,6 +9092,27 @@ endpoint 1 {
     handle command MPTZRemovePreset;
     handle command DPTZSetViewport;
     handle command DPTZRelativeMove;
+  }
+
+  server cluster PushAvStreamTransport {
+    emits event PushTransportBegin;
+    emits event PushTransportEnd;
+    callback attribute supportedFormats;
+    callback attribute currentConnections;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AllocatePushTransport;
+    handle command AllocatePushTransportResponse;
+    handle command DeallocatePushTransport;
+    handle command ModifyPushTransport;
+    handle command SetTransportStatus;
+    handle command ManuallyTriggerTransport;
+    handle command FindTransport;
+    handle command FindTransportResponse;
   }
 
   server cluster Chime {

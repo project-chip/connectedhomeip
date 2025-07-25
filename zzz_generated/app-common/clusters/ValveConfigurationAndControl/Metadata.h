@@ -77,6 +77,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Close::Id, BitFl
 } // namespace Close
 
 } // namespace Commands
+
+namespace Events {
+namespace ValveStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ValveStateChanged
+namespace ValveFault {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ValveFault
+
+} // namespace Events
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters
 } // namespace app

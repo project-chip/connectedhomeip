@@ -153,6 +153,7 @@ def BuildHostTarget():
         TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
         TargetPart('jf-control-app', app=HostApp.JF_CONTROL),
         TargetPart('jf-admin-app', app=HostApp.JF_ADMIN),
+        TargetPart('closure', app=HostApp.CLOSURE),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -204,6 +205,7 @@ def BuildHostTarget():
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
+    target.AppendModifier('webrtc', enable_webrtc=True)
 
     return target
 
@@ -780,8 +782,11 @@ def BuildTelinkTarget():
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
         TargetPart('tl3218x', board=TelinkBoard.TL3218X),
+        TargetPart('tl3218x_ml3m', board=TelinkBoard.TL3218X_ML3M),
         TargetPart('tl3218x_retention', board=TelinkBoard.TL3218X_RETENTION),
         TargetPart('tl7218x', board=TelinkBoard.TL7218X),
+        TargetPart('tl7218x_ml7g', board=TelinkBoard.TL7218X_ML7G),
+        TargetPart('tl7218x_ml7m', board=TelinkBoard.TL7218X_ML7M),
         TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])
 

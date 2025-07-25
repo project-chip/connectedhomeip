@@ -7448,6 +7448,18 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
 /**
+ * @brief Thermostat Cluster AddThermostatSuggestion Command callback (from client)
+ */
+bool emberAfThermostatClusterAddThermostatSuggestionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster RemoveThermostatSuggestion Command callback (from client)
+ */
+bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+/**
  * @brief Thermostat Cluster AtomicRequest Command callback (from client)
  */
 bool emberAfThermostatClusterAtomicRequestCallback(
@@ -7891,54 +7903,6 @@ bool emberAfZoneManagementClusterRemoveTriggerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::DecodableType & commandData);
 /**
- * @brief Push AV Stream Transport Cluster AllocatePushTransport Command callback (from client)
- */
-bool emberAfPushAvStreamTransportClusterAllocatePushTransportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::PushAvStreamTransport::Commands::AllocatePushTransport::DecodableType & commandData);
-/**
- * @brief Push AV Stream Transport Cluster DeallocatePushTransport Command callback (from client)
- */
-bool emberAfPushAvStreamTransportClusterDeallocatePushTransportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::PushAvStreamTransport::Commands::DeallocatePushTransport::DecodableType & commandData);
-/**
- * @brief Push AV Stream Transport Cluster ModifyPushTransport Command callback (from client)
- */
-bool emberAfPushAvStreamTransportClusterModifyPushTransportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::PushAvStreamTransport::Commands::ModifyPushTransport::DecodableType & commandData);
-/**
- * @brief Push AV Stream Transport Cluster SetTransportStatus Command callback (from client)
- */
-bool emberAfPushAvStreamTransportClusterSetTransportStatusCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::PushAvStreamTransport::Commands::SetTransportStatus::DecodableType & commandData);
-/**
- * @brief Push AV Stream Transport Cluster ManuallyTriggerTransport Command callback (from client)
- */
-bool emberAfPushAvStreamTransportClusterManuallyTriggerTransportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::DecodableType & commandData);
-/**
- * @brief Push AV Stream Transport Cluster FindTransport Command callback (from client)
- */
-bool emberAfPushAvStreamTransportClusterFindTransportCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::DecodableType & commandData);
-/**
- * @brief Commodity Tariff Cluster GetTariffComponent Command callback (from client)
- */
-bool emberAfCommodityTariffClusterGetTariffComponentCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::DecodableType & commandData);
-/**
- * @brief Commodity Tariff Cluster GetDayEntry Command callback (from client)
- */
-bool emberAfCommodityTariffClusterGetDayEntryCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::DecodableType & commandData);
-/**
  * @brief Joint Fabric Datastore Cluster AddKeySet Command callback (from client)
  */
 bool emberAfJointFabricDatastoreClusterAddKeySetCallback(
@@ -8058,42 +8022,6 @@ bool emberAfJointFabricDatastoreClusterAddACLToNodeCallback(
 bool emberAfJointFabricDatastoreClusterRemoveACLFromNodeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricDatastore::Commands::RemoveACLFromNode::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster ICACCSRRequest Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster AddICAC Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterAddICACCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::AddICAC::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster OpenJointCommissioningWindow Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterOpenJointCommissioningWindowCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::OpenJointCommissioningWindow::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster TransferAnchorRequest Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterTransferAnchorRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorRequest::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster TransferAnchorComplete Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterTransferAnchorCompleteCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorComplete::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster AnnounceJointFabricAdministrator Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */
