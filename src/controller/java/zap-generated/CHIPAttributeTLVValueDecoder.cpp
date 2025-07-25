@@ -5005,6 +5005,22 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::IsCommissioningWithoutPower::Id: {
+            using TypeInfo = Attributes::IsCommissioningWithoutPower::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            jboolean jnivalue              = static_cast<jboolean>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           jnivalue, value);
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -25879,28 +25895,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     chip::JniReferences::GetInstance().CreateOptional(value_speedInsideOptional, value_speed);
                 }
                 jobject value_secureState;
-                if (!cppValue.Value().secureState.HasValue())
+                if (cppValue.Value().secureState.IsNull())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_secureState);
+                    value_secureState = nullptr;
                 }
                 else
                 {
-                    jobject value_secureStateInsideOptional;
-                    if (cppValue.Value().secureState.Value().IsNull())
-                    {
-                        value_secureStateInsideOptional = nullptr;
-                    }
-                    else
-                    {
-                        std::string value_secureStateInsideOptionalClassName     = "java/lang/Boolean";
-                        std::string value_secureStateInsideOptionalCtorSignature = "(Z)V";
-                        jboolean jnivalue_secureStateInsideOptional =
-                            static_cast<jboolean>(cppValue.Value().secureState.Value().Value());
-                        chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
-                            value_secureStateInsideOptionalClassName.c_str(), value_secureStateInsideOptionalCtorSignature.c_str(),
-                            jnivalue_secureStateInsideOptional, value_secureStateInsideOptional);
-                    }
-                    chip::JniReferences::GetInstance().CreateOptional(value_secureStateInsideOptional, value_secureState);
+                    std::string value_secureStateClassName     = "java/lang/Boolean";
+                    std::string value_secureStateCtorSignature = "(Z)V";
+                    jboolean jnivalue_secureState              = static_cast<jboolean>(cppValue.Value().secureState.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(value_secureStateClassName.c_str(),
+                                                                                   value_secureStateCtorSignature.c_str(),
+                                                                                   jnivalue_secureState, value_secureState);
                 }
 
                 {
@@ -25917,7 +25923,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID overallCurrentStateStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, overallCurrentStateStructStructClass_1, "<init>",
-                        "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Boolean;)V",
                         &overallCurrentStateStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || overallCurrentStateStructStructCtor_1 == nullptr)
                     {

@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:153
 
         steps:
             - name: Checkout
@@ -309,8 +309,9 @@ jobs:
                   git grep -I -n 'emberAfWriteAttribute' -- './*'                                            \
                       ':(exclude).github/workflows/lint.yml'                                                 \
                       ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
-                      ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'     \
-                      ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'       \
+                      ':(exclude)examples/common/server-cluster-shim/ServerClusterShim.cpp'                  \
+                      ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'        \
+                      ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'          \
                       ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                               \
                       ':(exclude)src/app/util/attribute-table.cpp'                                           \
                       ':(exclude)src/app/util/attribute-table.h'                                             \

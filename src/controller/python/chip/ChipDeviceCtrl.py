@@ -1656,6 +1656,21 @@ class ChipDeviceControllerBase():
         Raises:
             InteractionModelError on error.
         '''
+
+        return await self._WriteAttribute(nodeid=nodeid,
+                                          attributes=attributes,
+                                          timedRequestTimeoutMs=timedRequestTimeoutMs,
+                                          interactionTimeoutMs=interactionTimeoutMs,
+                                          busyWaitMs=busyWaitMs,
+                                          payloadCapability=payloadCapability,
+                                          forceLegacyListEncoding=False)
+
+    async def _WriteAttribute(self, nodeid: int,
+                              attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                              timedRequestTimeoutMs: typing.Optional[int] = None,
+                              interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
+
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
@@ -1674,8 +1689,35 @@ class ChipDeviceControllerBase():
 
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
         return await future
+
+    async def TestOnlyWriteAttributeWithLegacyList(self, nodeid: int,
+                                                   attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                                                   timedRequestTimeoutMs: typing.Optional[int] = None,
+                                                   interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                                   payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        '''
+        Please see WriteAttribute for description.
+        This is a test-only wrapper for _WriteAttribute that sets forceLegacyListEncoding to True.
+
+        The purpose of this method is to write attributes using the legacy encoding format for list data types, to ensure that end devices support legacy WriteClients.
+
+
+        Returns:
+            [AttributeStatus] (list - one for each path).
+
+        Raises:
+            InteractionModelError on error.
+        '''
+
+        return await self._WriteAttribute(nodeid=nodeid,
+                                          attributes=attributes,
+                                          timedRequestTimeoutMs=timedRequestTimeoutMs,
+                                          interactionTimeoutMs=interactionTimeoutMs,
+                                          busyWaitMs=busyWaitMs,
+                                          payloadCapability=payloadCapability,
+                                          forceLegacyListEncoding=True)
 
     def WriteGroupAttribute(
             self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Optional[int] = None):
@@ -2517,7 +2559,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._caIndex
 
     @property
-    def fabricAdmin(self) -> FabricAdmin.FabricAdmin:
+    def fabricAdmin(self) -> typing.Optional[FabricAdmin.FabricAdmin]:
         return self._fabricAdmin
 
     async def Commission(self, nodeid) -> int:

@@ -3047,6 +3047,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralCommissioningID) attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeNetworkRecoveryReasonID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeIsCommissioningWithoutPowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralCommissioningID) attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeIsCommissioningWithoutPowerID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralCommissioningID) attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID) params:params];
@@ -11805,6 +11810,9 @@ using chip::System::Clock::Timeout;
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
 
     using RequestType = ClosureControl::Commands::MoveTo::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
@@ -11836,6 +11844,9 @@ using chip::System::Clock::Timeout;
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
 
     using RequestType = ClosureControl::Commands::Calibrate::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
@@ -11926,6 +11937,9 @@ using chip::System::Clock::Timeout;
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
 
     using RequestType = ClosureDimension::Commands::SetTarget::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
@@ -11953,6 +11967,9 @@ using chip::System::Clock::Timeout;
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
 
     using RequestType = ClosureDimension::Commands::Step::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID

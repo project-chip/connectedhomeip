@@ -7548,6 +7548,7 @@ public class ChipClusters {
     private static final long TC_UPDATE_DEADLINE_ATTRIBUTE_ID = 9L;
     private static final long RECOVERY_IDENTIFIER_ATTRIBUTE_ID = 10L;
     private static final long NETWORK_RECOVERY_REASON_ATTRIBUTE_ID = 11L;
+    private static final long IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID = 12L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -8076,6 +8077,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, NETWORK_RECOVERY_REASON_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readIsCommissioningWithoutPowerAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeIsCommissioningWithoutPowerAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -35213,9 +35240,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void moveTo(DefaultClusterCallback callback, Optional<Integer> position, Optional<Boolean> latch, Optional<Integer> speed) {
-      moveTo(callback, position, latch, speed, 0);
-    }
 
     public void moveTo(DefaultClusterCallback callback, Optional<Integer> position, Optional<Boolean> latch, Optional<Integer> speed, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
@@ -35241,9 +35265,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void calibrate(DefaultClusterCallback callback) {
-      calibrate(callback, 0);
-    }
 
     public void calibrate(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
@@ -35603,9 +35624,6 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void setTarget(DefaultClusterCallback callback, Optional<Integer> position, Optional<Boolean> latch, Optional<Integer> speed) {
-      setTarget(callback, position, latch, speed, 0);
-    }
 
     public void setTarget(DefaultClusterCallback callback, Optional<Integer> position, Optional<Boolean> latch, Optional<Integer> speed, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
@@ -35631,9 +35649,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void step(DefaultClusterCallback callback, Integer direction, Integer numberOfSteps, Optional<Integer> speed) {
-      step(callback, direction, numberOfSteps, speed, 0);
-    }
 
     public void step(DefaultClusterCallback callback, Integer direction, Integer numberOfSteps, Optional<Integer> speed, int timedInvokeTimeoutMs) {
       final long commandId = 1L;

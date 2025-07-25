@@ -108,7 +108,8 @@ class TC_JFDS_2_1(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -187,6 +188,9 @@ class TC_JFDS_2_1(MatterBaseTest):
             nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
             returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
+
+        # Shutdown the Python Controllers started at the beginning of this script
+        devCtrlEcoA.Shutdown()
 
 
 if __name__ == "__main__":

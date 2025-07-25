@@ -50,10 +50,10 @@ class TC_BRBINFO_3_2(MatterBaseTest):
 
     def steps_TC_BRBINFO_3_2(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "TH reads ConfigurationVersion from the DUT and stores the value as initialConfigurationVersion",
+            TestStep(1, "TH reads ConfigurationVersion and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
-            TestStep(2, "Change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
-            TestStep(3, "TH reads ConfigurationVersion from the DUT",
+            TestStep(2, "On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
+            TestStep(3, "TH reads ConfigurationVersion from the DUT (same endpoint as in step 1)",
                      "Verify that the value is higher than the value of initialConfigurationVersion"),
         ]
         return steps
@@ -83,7 +83,7 @@ class TC_BRBINFO_3_2(MatterBaseTest):
             self.write_to_app_pipe(command_dict)
         else:
             self.wait_for_user_input(
-                prompt_msg="Change the configuration version in a way which results in functionality to be added or removed, then continue")
+                prompt_msg="On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode), then continue")
 
         self.step(3)
         newConfigurationVersion = await self.read_brbinfo_attribute_expect_success(endpoint=endpoint, attribute=attributes.ConfigurationVersion)

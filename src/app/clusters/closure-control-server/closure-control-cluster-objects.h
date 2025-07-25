@@ -34,7 +34,7 @@ struct GenericOverallCurrentState : public Structs::OverallCurrentStateStruct::T
     GenericOverallCurrentState(Optional<DataModel::Nullable<CurrentPositionEnum>> positionValue = NullOptional,
                                Optional<DataModel::Nullable<bool>> latchValue                   = NullOptional,
                                Optional<Globals::ThreeLevelAutoEnum> speedValue                 = NullOptional,
-                               Optional<DataModel::Nullable<bool>> secureStateValue             = NullOptional)
+                               DataModel::Nullable<bool> secureStateValue                       = NullOptional)
     {
         Set(positionValue, latchValue, speedValue, secureStateValue);
     }
@@ -50,7 +50,7 @@ struct GenericOverallCurrentState : public Structs::OverallCurrentStateStruct::T
     void Set(Optional<DataModel::Nullable<CurrentPositionEnum>> positionValue = NullOptional,
              Optional<DataModel::Nullable<bool>> latchValue                   = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue                 = NullOptional,
-             Optional<DataModel::Nullable<bool>> secureStateValue             = NullOptional)
+             DataModel::Nullable<bool> secureStateValue                       = NullOptional)
     {
         position    = positionValue;
         latch       = latchValue;
