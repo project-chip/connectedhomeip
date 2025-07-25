@@ -13,11 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/persistence/PascalString.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/tests/RamAttributePersistenceProvider.h>
@@ -118,7 +118,7 @@ TEST(TestAttributePersistence, TestEncoderDecoder)
     constexpr uint32_t kOtherValue   = 0x99887766;
     uint32_t valueRead               = 0;
 
-    // Store a value using an encoder
+    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
     {
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(kValueToStore);
@@ -130,6 +130,34 @@ TEST(TestAttributePersistence, TestEncoderDecoder)
         valueRead = 0;
         ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
         ASSERT_EQ(valueRead, kValueToStore);
+    }
+}
+
+TEST(TestAttributePersistence, TestEncoderDecoderString)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+
+    ConcreteAttributePath path(1, 2, 3);
+
+    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor("hello world"_span);
+
+        char buffer[32];
+        EXPECT_EQ(persistence.StorePascalString<Storage::ShortPascalString>(path, decoder, buffer), CHIP_NO_ERROR);
+
+        ShortPascalString stringStored(buffer);
+        EXPECT_TRUE(stringStored.Content().data_equal("hello world"_span));
+    }
+
+    {
+        char bufferRead[32];
+        ShortPascalString stringRead(bufferRead);
+
+        ASSERT_TRUE(persistence.Load(path, stringRead, std::nullopt));
+        ASSERT_TRUE(stringRead.Content().data_equal(CharSpan::fromCharString("hello world")));
     }
 }
 

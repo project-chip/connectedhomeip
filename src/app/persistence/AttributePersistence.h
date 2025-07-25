@@ -32,7 +32,6 @@ namespace chip::app {
 /// have known (strong) types and their load/decode logic is often
 /// similar and reusable. This class implements the logic of handling
 /// such attributes, so that it can be reused across cluster implementations.
-///
 class AttributePersistence
 {
 public:
