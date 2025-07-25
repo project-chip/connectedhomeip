@@ -563,7 +563,7 @@ class MockTestRunner():
     """
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
-                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
+                 pics: Optional[dict[bool, str]] = None, paa_trust_store_path=None):
 
         from chip.testing.matter_test_config import MatterTestConfig
         from chip.testing.matter_testing import MatterStackState
@@ -736,16 +736,20 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_controller = args.ble_controller
-    config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
+    if args.PICS is None:
+        config.pics = {}
+    else:
+        pics_file_dict = read_pics_from_file(args.PICS)
+        config.pics = {v: k for k, v in pics_file_dict.items()}
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
-    config.app_pipe = args.app_pipe
-    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
+    config.pipe_name = args.app_pipe
+    if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
-        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
+        logging.error("Named pipe %r does NOT exist" % config.pipe_name)
+        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.fail_on_skipped_tests = args.fail_on_skipped
 
