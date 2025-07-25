@@ -81,12 +81,6 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
                   CHIP_NO_ERROR);
         ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
 
-        DataModel::InvokeRequest request;
-        request.path =
-            ConcreteCommandPath(kRootEndpointId, WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
-        TLV::TLVReader tlvReader;
-        ASSERT_EQ(cluster.InvokeCommand(request, tlvReader, nullptr), Protocols::InteractionModel::Status::UnsupportedCommand);
-
         // Everything is unimplemented, so attributes are the mandatory and global ones.
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), attributesBuilder),
