@@ -75,6 +75,15 @@ public:
         return Store(path, decoder, value);
     }
 
+    /// Performs all the steps of:
+    ///   - decode the given raw data
+    ///   - write to storage
+    template<typename T>
+    DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder &decoder, T &value) {
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
+    }
+
 private:
     AttributePersistenceProvider & mProvider;
 

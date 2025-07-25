@@ -355,11 +355,8 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
     }
     case NodeLabel::Id:
         return persistence.StoreShortPascalString(request.path, decoder, mNodeLabelBuffer);
-    case LocalConfigDisabled::Id: {
-        ReturnErrorOnFailure(decoder.Decode(mLocalConfigDisabled));
-        return mContext->attributeStorage->WriteValue(
-            request.path, { reinterpret_cast<const uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled) });
-    }
+    case LocalConfigDisabled::Id:
+        return persistence.StoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
