@@ -388,6 +388,9 @@ private:
         // "not valid" because attestation verification always fails after entering revocation check step
         case chip::Controller::CommissioningStage::kAttestationVerification:
             return false;
+        case chip::Controller::CommissioningStage::kJCMTrustVerification:
+            // JCM Trust Verification is not supported in Python tests
+            return false;
         default:
             return true;
         }
