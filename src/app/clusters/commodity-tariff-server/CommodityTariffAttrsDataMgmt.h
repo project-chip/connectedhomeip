@@ -784,7 +784,7 @@ private:
 
     enum class StorageState : uint8_t
     {
-        kEmpty, // Value not initiated (default state)
+        kEmpty, // Value not initialized (default state)
         kHold,  // GetValueRef() holds valid data
     };
 
