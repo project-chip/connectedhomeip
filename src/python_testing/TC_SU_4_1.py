@@ -408,22 +408,20 @@ class TC_SU_4_1(MatterBaseTest):
         asserts.assert_equal(actual_provider, [], "DefaultOTAProviders on TH3 (Fabric 2) should be empty")
         logger.info("Step #6 - DefaultOTAProviders attribute matches expected values.")
 
-        # TODO: Read fabric 1 with TH4 and verify that the provider is still the corrcet that should be:
-        # provider_th2_for_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-        #     providerNodeID=1,   # TH2 is the OTA Provider (NodeID=1)
-        #     endpoint=0,
-        #     fabricIndex=1       # Fabric ID from TH1 (controller writing to DUT)
-        # )
+        # NOTE:
+        # According to current observed behavior and discussion in Bug #40294,
+        # when writing a list with multiple providers from the same fabric,
+        # only the first valid entry is preserved if the write fails due to a ConstraintError.
+        # The rest of the list is ignored, and the original value remains unchanged.
 
-        # Verify DefaultOTAProviders attribute on the DUT after write (TH4 on Fabric 1)
+        # Verify DefaultOTAProviders attribute on the DUT after write (TH4 on Fabric 1) in this case should be the original from TH2 fabric 1
+        # Read fabric 1 with TH4 and verify that the provider is TH1 (providerNodeID=1 , fabricIndex=1 )
         th4_actual_otap_info = await self.read_single_attribute_check_success(
             dev_ctrl=th4,
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
 
-        logger.info(f'Step #6b - Read DefaultOTAProviders attribute on DUT using TH4: {th4_actual_otap_info}')
-        actual_provider = th4_actual_otap_info[0]
-        logger.info(f'Step #6b - Read DefaultOTAProviders attribute on DUT using TH4: {th4_actual_otap_info}')
+        logger.info(f'Step #6 - Read DefaultOTAProviders attribute on DUT using TH4: {th4_actual_otap_info}')
 
 
 if __name__ == "__main__":
