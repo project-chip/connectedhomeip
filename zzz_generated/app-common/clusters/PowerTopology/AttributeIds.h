@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace PowerTopology {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace AvailableEndpoints {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace AvailableEndpoints
