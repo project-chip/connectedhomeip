@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.9.1. [TC-AUDIOOUTPUT-7.5] Read Audio Output cluster Attributes
+name: 19.9.5. [TC-AUDIOOUTPUT-7.5] Read Audio Output cluster Attributes
 
 PICS:
     - AUDIOOUTPUT.S
@@ -31,14 +31,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read attribute Audio Output list"
+    - label: "TH reads the OutputList attribute"
       command: "readAttribute"
       attribute: "OutputList"
       response:
           constraints:
               type: list
 
-    - label: "Read attribute current audio output"
+    - label: "TH reads the CurrentOutput attribute"
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:
