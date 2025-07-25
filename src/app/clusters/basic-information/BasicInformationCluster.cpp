@@ -281,6 +281,10 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
         return encoder.Encode<uint32_t>(0);
     case ClusterRevision::Id:
         return encoder.Encode<uint32_t>(BasicInformation::kRevision);
+    case NodeLabel::Id:
+        return encoder.Encode(Storage::ShortPascalString(mNodeLabelBuffer).Content());
+    case LocalConfigDisabled::Id:
+        return encoder.Encode(mLocalConfigDisabled);
     case DataModelRevision::Id:
         return encoder.Encode(Revision::kDataModelRevision);
     case Location::Id:
