@@ -354,7 +354,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
     }
     case NodeLabel::Id:
-        return persistence.StoreShortPascalString(request.path, decoder, mNodeLabelBuffer);
+        return persistence.StorePascalString<Storage::ShortPascalString>(request.path, decoder, mNodeLabelBuffer);
     case LocalConfigDisabled::Id:
         return persistence.StoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
     default:
@@ -395,8 +395,8 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence persistence(*context.attributeStorage);
 
-    (void) persistence.LoadShortPascalString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabelBuffer,
-                                             ""_span);
+    (void) persistence.LoadPascalString<Storage::ShortPascalString>(
+        { kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabelBuffer, ""_span);
     (void) persistence.LoadNativeEdianValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
                                             mLocalConfigDisabled, false);
 

@@ -60,11 +60,12 @@ public:
     /// if valueOnLoadFailure cannot be set into value, value will be set to NULL (which never fails)
     bool Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value, std::optional<CharSpan> valueOnLoadFailure);
 
-    template <size_t N>
-    bool LoadShortPascalString(const ConcreteAttributePath & path, char (&buffer)[N], std::optional<CharSpan> valueOnLoadFailure)
+    /// Interprets the `buffer` value as a `StringType` (generally ShortPascalString or similar) for the purposes of loading
+    template <typename StringType, size_t N>
+    bool LoadPascalString(const ConcreteAttributePath & path, char (&buffer)[N], std::optional<CharSpan> valueOnLoadFailure)
     {
 
-        Storage::ShortPascalString value(buffer);
+        StringType value(buffer);
         return Load(path, value, valueOnLoadFailure);
     }
 
@@ -76,11 +77,11 @@ public:
                                         Storage::ShortPascalString & value);
 
     /// helper to not create a separate ShortPascalString out of a buffer.
-    template <size_t N>
-    DataModel::ActionReturnStatus StoreShortPascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                                         char (&buffer)[N])
+    template <typename StringType, size_t N>
+    DataModel::ActionReturnStatus StorePascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                                    char (&buffer)[N])
     {
-        Storage::ShortPascalString value(buffer);
+        StringType value(buffer);
         return Store(path, decoder, value);
     }
 
