@@ -300,21 +300,6 @@ class TC_SU_4_1(MatterBaseTest):
             filter=long_discriminator)
         logger.info(f'Step #5 - TH4 Commissioning response: {resp}')
 
-        # TH4 is the OTA Provider (NodeID=4) for fabric 1
-        provider_th4_for_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=th4.nodeId,   # TH4 is the OTA Provider (NodeID=4)
-            endpoint=0,
-            fabricIndex=th4.fabricId       # Fabric ID from TH4
-        )
-
-        # Create Providers list and Add TH4 and TH2 for fabric 1 to Providers list
-        providers_list = [provider_th4_for_fabric1]
-        providers_list.append(provider_th2_for_fabric1)
-        logger.info(f'Step #5 - Providers list updated with provider "TH4 and TH2 for fabric 1": {providers_list}')
-
-        # Update attribute with providers list  (TH2 and TH4 for fabric 1)
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list)
-
         # Write the Access Control List (ACL) to the DUT device for TH4 controller,
         # allowing TH4 to have the necessary permissions to perform operations.
         admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -335,6 +320,27 @@ class TC_SU_4_1(MatterBaseTest):
         # Write ACL using TH1 since it has permission; this grants TH4 the needed access.
         resp = await self.write_acl(th1, acl)
         logger.info(f'Step #5 - TH4 have the necessary permissions to perform operation: {resp}')
+
+        # TH4 is the OTA Provider (NodeID=4) for fabric 1
+        provider_th4_for_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=th4.nodeId,   # TH4 is the OTA Provider (NodeID=4)
+            endpoint=0,
+            fabricIndex=th4.fabricId       # Fabric ID from TH4
+        )
+
+        # NOTE:
+        # According to current observed behavior and discussion in Bug #40294,
+        # when writing a list with multiple providers from the same fabric,
+        # only the first valid entry is preserved if the write fails due to a ConstraintError.
+        # The rest of the list is ignored, and the original value remains unchanged.
+
+        # Create Providers list and Add TH4 and TH2 for fabric 1 to Providers list
+        providers_list = [provider_th2_for_fabric1]
+        providers_list.append(provider_th4_for_fabric1)
+        logger.info(f'Step #5 - Providers list updated with provider "TH4 and TH2 for fabric 1": {providers_list}')
+
+        # Update attribute with providers list  (TH2 and TH4 for fabric 1)
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list)
 
         # --- Optional verification before write ---
         # Verify DefaultOTAProviders attribute before write (TH4 on Fabric 1)
