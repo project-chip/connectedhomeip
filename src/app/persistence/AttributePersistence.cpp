@@ -52,6 +52,15 @@ bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::Sho
     return true;
 }
 
+DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                                          Storage::ShortPascalString & value)
+{
+    CharSpan spanValue;
+    ReturnErrorOnFailure(decoder.Decode(spanValue));
+    VerifyOrReturnError(value.SetValue(spanValue), Protocols::InteractionModel::Status::ConstraintError);
+    return mProvider.WriteValue(path, value.ContentWithLenPrefix());
+}
+
 bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data,
                                                             const void * valueOnLoadFailure, size_t size)
 {

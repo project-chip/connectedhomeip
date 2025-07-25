@@ -23,7 +23,9 @@ source_set("persistence") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-access",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/support:span",
   ]
 }

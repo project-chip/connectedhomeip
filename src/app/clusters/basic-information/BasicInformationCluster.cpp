@@ -343,6 +343,8 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
 {
     using namespace BasicInformation::Attributes;
 
+    AttributePersistence persistence(*mContext->attributeStorage);
+
     switch (request.path.mAttributeId)
     {
     case Location::Id: {
@@ -351,14 +353,8 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         VerifyOrReturnError(location.size() == kFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
         return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
     }
-    case NodeLabel::Id: {
-        CharSpan label;
-        ReturnErrorOnFailure(decoder.Decode(label));
-
-        Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
-        VerifyOrReturnError(labelBuffer.SetValue(label), Protocols::InteractionModel::Status::ConstraintError);
-        return mContext->attributeStorage->WriteValue(request.path, labelBuffer.ContentWithLenPrefix());
-    }
+    case NodeLabel::Id:
+        return persistence.StoreShortPascalString(request.path, decoder, mNodeLabelBuffer);
     case LocalConfigDisabled::Id: {
         ReturnErrorOnFailure(decoder.Decode(mLocalConfigDisabled));
         return mContext->attributeStorage->WriteValue(

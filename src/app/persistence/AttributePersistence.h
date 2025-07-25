@@ -15,6 +15,8 @@
  */
 #pragma once
 
+#include <app/AttributeValueDecoder.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/PascalString.h>
 
@@ -56,6 +58,22 @@ public:
     ///
     /// if valueOnLoadFailure cannot be set into value, value will be set to NULL (which never fails)
     bool Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value, std::optional<CharSpan> valueOnLoadFailure);
+
+    /// Performs all the steps of:
+    ///   - decode the given char span
+    ///   - store it in the given pascal string
+    ///   - write the value to persistent storage as a "prefixed value"
+    DataModel::ActionReturnStatus Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                        Storage::ShortPascalString & value);
+
+
+    /// helper to not create a separate ShortPascalString out of a buffer.
+    template <size_t N>
+    DataModel::ActionReturnStatus StoreShortPascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, char (&buffer)[N])
+    {
+        Storage::ShortPascalString value(buffer);
+        return Store(path, decoder, value);
+    }
 
 private:
     AttributePersistenceProvider & mProvider;
