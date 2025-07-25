@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2024 Project CHIP Authors
+/**
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,15 +15,8 @@
  */
 
 /**
- *    @file
- *          Platform-specific configuration overrides for the CHIP System
- *          Layer on Zephyr platform.
- *
+ * We want to be able to copy MTRCommissioningParameters, but not commit to that
+ * as public API yet.
  */
-
-#pragma once
-
-#include <platform/Zephyr/SystemPlatformConfig.h>
-
-#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 0
-#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
+@interface MTRCommissioningParameters () <NSCopying>
+@end

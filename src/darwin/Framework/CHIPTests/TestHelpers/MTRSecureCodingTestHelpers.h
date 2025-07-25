@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2024 Project CHIP Authors
+/**
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +14,14 @@
  *    limitations under the License.
  */
 
+#import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
- *    @file
- *          Platform-specific configuration overrides for the CHIP System
- *          Layer on Zephyr platform.
- *
+ * Helper method to round-trip an NSSecureCoding instance and return the
+ * (possibly nil) decoding result.
  */
+id _Nullable RoundTripEncodable(id<NSSecureCoding> encodable, NSError * __autoreleasing * _Nullable decodeError);
 
-#pragma once
-
-#include <platform/Zephyr/SystemPlatformConfig.h>
-
-#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 0
-#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
+NS_ASSUME_NONNULL_END
