@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -134,7 +135,7 @@ public:
     Optional<chip::CharSpan> ICETransportPolicy;
     Optional<bool> metadataEnabled;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace SolicitOffer
 namespace SolicitOfferResponse {
@@ -234,7 +235,7 @@ public:
     Optional<chip::CharSpan> ICETransportPolicy;
     Optional<bool> metadataEnabled;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ProvideOffer
 namespace ProvideOfferResponse {
@@ -310,7 +311,7 @@ public:
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     chip::CharSpan sdp;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ProvideAnswer
 namespace ProvideICECandidates {
@@ -347,7 +348,7 @@ public:
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     DataModel::DecodableList<Globals::Structs::ICECandidateStruct::DecodableType> ICECandidates;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ProvideICECandidates
 namespace EndSession {
@@ -384,7 +385,7 @@ public:
     uint16_t webRTCSessionID            = static_cast<uint16_t>(0);
     Globals::WebRTCEndReasonEnum reason = static_cast<Globals::WebRTCEndReasonEnum>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace EndSession
 } // namespace Commands
