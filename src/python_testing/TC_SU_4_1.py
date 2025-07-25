@@ -102,9 +102,15 @@ class TC_SU_4_1(MatterBaseTest):
                      "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT.",
                      "Verify that the write operation fails with CONSTRAINT_ERROR status code 0x87.\n"
                      "Verify that the attribute value is set to TH3 as the default OTA provider for the second fabric and either of TH2 or TH4 for the first fabric."),
-            TestStep(6, "TH..."),
-            TestStep(7, "TH..."),
-            # TestStep(8, "TH..."),
+            TestStep(6, "TH sends a write request for the DefaultOTAProviders Attribute with an empty provider list on the second fabric to the DUT. "
+                     "TH sends a read request to read the DefaultOTAProviders Attribute on the first and second fabric to the DUT.",
+                     "Verify that the write operation for the attribute works and DUT does not respond with any errors."
+                     "Verify that the attribute value is set to TH4 as the default OTA provider for the first fabric and none for the second fabric."),
+            TestStep(7, "TH sends a read request to read the UpdatePossible attribute from the DUT.",
+                     "Verify that the attribute value is set to True when there is an update possible."),
+            TestStep(8, "TH sends a read request to read the UpdateState Attribute from the DUT.",
+                     "Verify that the attribute value is set to one of the following values.\n"
+                     "Idle, Querying, DelayedOnQuery, Downloading, Applying, DelayedOnApply, RollingBack, DelayedOnUserConsent."),
         ]
         return steps
 
@@ -446,6 +452,30 @@ class TC_SU_4_1(MatterBaseTest):
 
         # Verify UpdatePossible is true
         asserts.assert_equal(update_possible_th3, True, "Expected UpdatePossible to be True on fabric 2")
+
+        self.step(8)
+        # Step #8 - Read UpdateState from TH4 (fabric 1)
+        t4_update_state = await self.read_single_attribute_check_success(
+            dev_ctrl=th4,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.UpdateState
+        )
+        logger.info(f"Step #8 - TH4 UpdateState: {t4_update_state}")
+
+        valid_states = [
+            self.cluster_otar.Enums.UpdateStateEnum.kUnknown,
+            self.cluster_otar.Enums.UpdateStateEnum.kIdle,
+            self.cluster_otar.Enums.UpdateStateEnum.kQuerying,
+            self.cluster_otar.Enums.UpdateStateEnum.kDelayedOnQuery,
+            self.cluster_otar.Enums.UpdateStateEnum.kDownloading,
+            self.cluster_otar.Enums.UpdateStateEnum.kApplying,
+            self.cluster_otar.Enums.UpdateStateEnum.kDelayedOnApply,
+            self.cluster_otar.Enums.UpdateStateEnum.kRollingBack,
+            self.cluster_otar.Enums.UpdateStateEnum.kDelayedOnUserConsent
+        ]
+
+        asserts.assert_true(t4_update_state in valid_states,
+                            f"Unexpected UpdateState value: {t4_update_state}")
 
 
 if __name__ == "__main__":
