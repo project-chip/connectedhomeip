@@ -53,8 +53,6 @@ config("config") {
 
 static_library("camera-controller-utils") {
   sources = [
-    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.cpp",
-    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h",
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
     "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
@@ -97,7 +95,10 @@ static_library("camera-controller-utils") {
     "webrtc-manager/WebRTCRequestorDelegate.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server",
+  ]
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]
   deps += [

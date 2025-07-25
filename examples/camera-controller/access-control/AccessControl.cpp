@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Global.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::Access;
@@ -56,15 +57,16 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (requestPrivilege != Privilege::kOperate)
+        // Allow kOperate and below (kView, kProxyView, etc.)
+        // This covers reading attributes (kView) and invoking commands (kOperate)
+        if (requestPrivilege > Privilege::kOperate)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase &&
-            subjectDescriptor.authMode != AuthMode::kInternalDeviceAccess)
+        if (subjectDescriptor.authMode != AuthMode::kCase)
         {
-            // No idea who is asking; deny for now.
+            // Restrict to Case
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
@@ -76,7 +78,26 @@ struct ControllerAccessControl
 {
     DeviceTypeResolver mDeviceTypeResolver;
     AccessControlDelegate mDelegate;
-    ControllerAccessControl() { GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
+    bool mInitialized = false;
+
+    // Remove constructor initialization
+    ControllerAccessControl() = default;
+
+    // Add explicit Init method
+    CHIP_ERROR Init()
+    {
+        if (mInitialized)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR err = GetAccessControl().Init(&mDelegate, mDeviceTypeResolver);
+        if (err == CHIP_NO_ERROR)
+        {
+            mInitialized = true;
+        }
+        return err;
+    }
 };
 
 Global<ControllerAccessControl> gControllerAccessControl;
@@ -86,10 +107,20 @@ Global<ControllerAccessControl> gControllerAccessControl;
 namespace chip {
 namespace app {
 namespace AccessControl {
+
 void InitAccessControl()
 {
-    gControllerAccessControl.get(); // force initialization
+    CHIP_ERROR err = gControllerAccessControl.get().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to initialize access control: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Access control initialized successfully");
+    }
 }
+
 } // namespace AccessControl
 } // namespace app
 } // namespace chip
