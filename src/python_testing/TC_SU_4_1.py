@@ -36,8 +36,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import random
-from typing import Optional
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
