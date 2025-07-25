@@ -1114,6 +1114,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 logging.info("========= EOF on STDIN =========")
                 return None
 
+
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     """Runs an async function within the test's event loop with a timeout.
 
