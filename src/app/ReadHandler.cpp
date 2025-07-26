@@ -42,7 +42,8 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    return std::max(static_cast<uint16_t>(ICDConfigurationData::GetInstance().GetIdleModeDuration().count()),
+                    kSubscriptionMaxIntervalPublisherLimit);
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -50,8 +51,7 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType, Observer * observer) :
-    mExchangeCtx(*this),
-    mManagementCallback(apCallback)
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
