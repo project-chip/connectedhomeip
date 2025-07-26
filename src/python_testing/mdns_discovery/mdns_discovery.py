@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,61 +15,26 @@
 #    limitations under the License.
 #
 
-import asyncio
+import ipaddress
 import json
 import logging
-from dataclasses import asdict, dataclass
+from asyncio import Event, TimeoutError, ensure_future, wait_for
+from dataclasses import asdict
 from enum import Enum
-from time import sleep
-from typing import Dict, List, Optional, Union, cast
+from functools import partial
+from typing import Dict, List, Optional
 
-from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
+import netifaces
+from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
+from mdns_discovery.data_clases.ptr_record import PtrRecord
+from mdns_discovery.data_clases.quada_record import QuadaRecord
+from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
-from zeroconf._dns import DNSRecord
-from zeroconf._engine import AsyncListener
-from zeroconf._protocol.incoming import DNSIncoming
-from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
+from zeroconf._utils.net import InterfaceChoice
+from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
+from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class MdnsServiceInfo:
-    # The unique name of the mDNS service.
-    service_name: str
-
-    # The instance name of the service.
-    instance_name: str
-
-    # The domain name of the machine hosting the service.
-    server: str
-
-    # The network port on which the service is available.
-    port: int
-
-    # A list of IP addresses associated with the service.
-    addresses: list[str]
-
-    # A dictionary of key-value pairs representing the service's metadata.
-    txt_record: dict[str, str]
-
-    # The priority of the service, used in service selection when multiple instances are available.
-    priority: int
-
-    # The network interface index on which the service is advertised.
-    interface_index: int
-
-    # The relative weight for records with the same priority, used in load balancing.
-    weight: int
-
-    # The time-to-live value for the host name in the DNS record.
-    host_ttl: int
-
-    # The time-to-live value for other records associated with the service.
-    other_ttl: int
-
-    # The service type of the service, typically indicating the service protocol and domain.
-    service_type: Optional[str] = None
 
 
 class MdnsServiceType(Enum):
@@ -88,22 +53,21 @@ class MdnsServiceListener(ServiceListener):
     """
 
     def __init__(self):
-        self.updated_event = asyncio.Event()
+        self.updated_event = Event()
 
     def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        sleep(0.125)
+        self.updated_event.set()
+
+    def update_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
         self.updated_event.set()
 
     def remove_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
         pass
 
-    def update_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        self.updated_event.set()
-
 
 class MdnsDiscovery:
 
-    DISCOVERY_TIMEOUT_SEC = 15
+    DISCOVERY_TIMEOUT_SEC = 30
 
     def __init__(self, verbose_logging: bool = False):
         """
@@ -115,9 +79,18 @@ class MdnsDiscovery:
             - get_operational_service
             - get_border_router_service
             - get_all_services
+            - get_service_types
+            - get_srv_record
+            - get_txt_record
+            - get_quada_records
+            - get_ptr_records
+            - get_commissionable_subtypes
         """
+        # List of IPv6 addresses to use for mDNS discovery.
+        self.interfaces = self._get_ipv6_addresses()
+
         # An instance of Zeroconf to manage mDNS operations.
-        self._zc = Zeroconf(ip_version=IPVersion.V6Only)
+        self._azc = AsyncZeroconf(interfaces=self.interfaces)
 
         # A dictionary to store discovered services.
         self._discovered_services = {}
@@ -129,7 +102,7 @@ class MdnsDiscovery:
         self._name_filter = None
 
         # An asyncio Event to signal when a service has been discovered
-        self._event = asyncio.Event()
+        self._event = Event()
 
         # Verbose logging
         self._verbose_logging = verbose_logging
@@ -229,7 +202,7 @@ class MdnsDiscovery:
 
     async def get_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,) -> List[str]:
         """
-        Asynchronously discovers all available mDNS services within the network and returns a list
+        Asynchronously discovers all available mDNS service types within the network and returns a list
         of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
         function to perform the network scan for mDNS services.
 
@@ -243,103 +216,338 @@ class MdnsDiscovery:
                     element in the list is a string representing a unique type of service found during
                     the discovery process.
         """
+        logger.info("Discovering all available mDNS service types...")
         try:
-            discovered_services = list(await asyncio.wait_for(AsyncZeroconfServiceTypes.async_find(), timeout=discovery_timeout_sec))
-        except asyncio.TimeoutError:
-            logger.info(f"MDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
-            discovered_services = []
+            service_types = list(set(await wait_for(AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces), timeout=discovery_timeout_sec)))
+        except TimeoutError:
+            logger.info(f"mDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
+            service_types = []
 
         if log_output:
-            logger.info(f"MDNS discovered service types: {discovered_services}")
+            logger.info(
+                "\n\nDiscovered mDNS service types:\n%s\n", "\n".join(f"  - {s}" for s in service_types))
 
-        return discovered_services
+        return service_types
 
-    async def get_service_by_record_type(self, service_name: str,
-                                         record_type: DNSRecordType,
-                                         service_type: str = None,
-                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                                         log_output: bool = False
-                                         ) -> Union[Optional[MdnsServiceInfo], Optional[DNSRecord]]:
+    async def get_srv_record(self, service_name: str,
+                             service_type: str,
+                             discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                             log_output: bool = False
+                             ) -> Optional[MdnsServiceInfo]:
         """
-        Asynchronously discovers an mDNS service within the network by service name, service type,
-        and record type.
+        Asynchronously discovers the SRV record associated with an mDNS service.
 
-        Required args:
-            service_name (str): The unique name of the mDNS service.
-            Example:            
-                C82B83803DECA0B2-0000000012344321._matter._tcp.local.
+        This method performs an mDNS browse and then issues a targeted SRV query 
+        for the specified service instance. If a response is received within the timeout,
+        it returns an MdnsServiceInfo object populated with SRV record details 
+        (including target host and port).
 
-            record_type (DNSRecordType): The type of record to look for (SRV, TXT, AAAA, A).
-            Example:
-                _matterd._tcp.local. (from the MdnsServiceType enum)
-
-        Optional args:
-            service_type (str): The service type of the service. Defaults to None.
-            log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 15 seconds.
+        Args:
+            service_name (str): The full mDNS service instance name.
+                Example: '974B15BD2CC5278E-0000000012344321._matter._tcp.local.'
+            service_type (str): The mDNS service type.
+                Example: '_matter._tcp.local.'
+            discovery_timeout_sec (float, optional): Maximum time to wait for discovery.
+                Defaults to DISCOVERY_TIMEOUT_SEC.
+            log_output (bool, optional): If True, logs discovered service info. Defaults to False.
 
         Returns:
-            Union[Optional[MdnsServiceInfo], Optional[DNSRecord]]: An instance of MdnsServiceInfo,
-            a DNSRecord object, or None.
+            Optional[MdnsServiceInfo]:
+                - MdnsServiceInfo with parsed SRV data if discovered.
+                - None if no valid response is received within the timeout.
         """
-        mdns_service_info = None
+        logger.info(f"Looking for mDNS record, type 'SRV', service name '{service_name}'")
 
-        if service_type:
-            logger.info(
-                f"\nLooking for MDNS service type '{service_type}',  service name '{service_name}', record type '{record_type.name}'\n")
-        else:
-            logger.info(
-                f"\nLooking for MDNS service with service name '{service_name}', record type '{record_type.name}'\n")
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
+            mdns_service_info = None
 
-        # Adds service listener
-        service_listener = MdnsServiceListener()
-        self._zc.add_service_listener(MdnsServiceType.OPERATIONAL.value, service_listener)
+            # Adds service listener
+            service_listener = MdnsServiceListener()
+            await azc.async_add_service_listener(service_type, service_listener)
 
-        # Wait for the add/update service event or timeout
-        try:
-            await asyncio.wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
-        except asyncio.TimeoutError:
-            logger.info(f"Service lookup for {service_name} timeout ({discovery_timeout_sec}) reached without an update.")
-        finally:
-            self._zc.remove_service_listener(service_listener)
+            # Wait for the add/update service event or timeout
+            try:
+                await wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
+            except TimeoutError:
+                logger.info(
+                    f"Service lookup for {service_name} timeout ({discovery_timeout_sec} seconds) reached without an update.")
+            finally:
+                await azc.async_remove_service_listener(service_listener)
 
-        # Prepare and perform query
-        service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
-        is_discovered = await service_info.async_request(
-            self._zc,
-            3000,
-            record_type=record_type)
+            # Prepare and perform query
+            service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
+            service_info._query_record_types = {_TYPE_SRV}
+            is_discovered = await service_info.async_request(
+                azc.zeroconf,
+                discovery_timeout_sec * 1000)
 
-        if record_type in [DNSRecordType.A, DNSRecordType.AAAA]:
-            # Service type not supplied so we can
-            # query against the target/server
-            for protocols in self._zc.engine.protocols:
-                listener = cast(AsyncListener, protocols)
-                if listener.data:
-                    dns_incoming = DNSIncoming(listener.data)
-                    if dns_incoming.data:
-                        answers = dns_incoming.answers()
-                        logger.info(f"\nIncoming DNSRecord: {answers}\n")
-                        return answers.pop(0) if answers else None
-        else:
             # Adds service to discovered services
             if is_discovered:
                 mdns_service_info = self._to_mdns_service_info_class(service_info)
+                self._discovered_services = {}
+                self._discovered_services[service_type] = []
+                if mdns_service_info is not None:
+                    self._discovered_services[service_type].append(mdns_service_info)
+
+                if log_output:
+                    self._log_output()
+
+                return mdns_service_info
+            else:
+                logger.error(f"SRV Record for service '{service_name}' of type '{service_type}' not found.")
+                return None
+
+    async def get_txt_record(self, service_name: str,
+                             service_type: str,
+                             discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                             log_output: bool = False
+                             ) -> Optional[MdnsServiceInfo]:
+        """
+        Asynchronously discovers the TXT record associated with an mDNS service.
+
+        This method performs an mDNS browse and then issues a targeted TXT query 
+        for the specified service instance. If a response is received within the timeout,
+        it returns an MdnsServiceInfo object populated with TXT record key-value metadata.
+
+        Args:
+            service_name (str): The full mDNS service instance name.
+                Example: '974B15BD2CC5278E-0000000012344321._matter._tcp.local.'
+            service_type (str): The mDNS service type.
+                Example: '_matter._tcp.local.'
+            discovery_timeout_sec (float, optional): Maximum time to wait for discovery.
+                Defaults to DISCOVERY_TIMEOUT_SEC.
+            log_output (bool, optional): If True, logs discovered service info. Defaults to False.
+
+        Returns:
+            Optional[MdnsServiceInfo]:
+                - MdnsServiceInfo with parsed TXT data if discovered.
+                - None if no valid response is received within the timeout.
+        """
+        logger.info(f"Looking for mDNS record, type 'TXT', service name '{service_name}'")
+
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
+            mdns_service_info = None
+
+            # Adds service listener
+            service_listener = MdnsServiceListener()
+            await azc.async_add_service_listener(service_type, service_listener)
+
+            # Wait for the add/update service event or timeout
+            # This is necessary whem requesting TXT records,
+            # as the service may not be immediately available
+            try:
+                await wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
+            except TimeoutError:
+                logger.info(
+                    f"Service lookup for {service_name} timeout ({discovery_timeout_sec} seconds) reached without an update.")
+            finally:
+                await azc.async_remove_service_listener(service_listener)
+
+            # Prepare and perform query
+            service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
+            service_info._query_record_types = {_TYPE_TXT}
+            is_discovered = await service_info.async_request(
+                azc.zeroconf,
+                discovery_timeout_sec * 1000)
+
+            # Adds service to discovered services
+            if is_discovered:
+                mdns_service_info = self._to_mdns_service_info_class(service_info)
+                self._discovered_services = {}
+                self._discovered_services[service_type] = []
+                if mdns_service_info is not None:
+                    self._discovered_services[service_type].append(mdns_service_info)
+
+                if log_output:
+                    self._log_output()
+
+                return mdns_service_info
+            else:
+                logger.error(f"TXT Record for service '{service_name}' of type '{service_type}' not found.")
+                return None
+
+    async def get_quada_records(self, hostname: str,
+                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                                log_output: bool = False
+                                ) -> Optional[list[QuadaRecord]]:
+        """
+        Asynchronously retrieves the AAAA (IPv6) record of a device on the local network via mDNS.
+
+        Args:
+            hostname (str): The fully qualified hostname of the target device.
+                Example: '00155DF32EEB.local.'
+
+            discovery_timeout_sec (float, optional): Time in seconds to wait for discovery.
+                Defaults to 3.
+
+            log_output (bool, optional): Whether to log the discovered information. Defaults to False.
+
+        Returns:
+            Returns a QuadaRecord containing the resolved IPv6 addresses, or None if resolution fails.
+        """
+        logger.info(f"Looking for mDNS record, type 'AAAA',  hostname '{hostname}'")
+
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
+            # Perform AAAA query
+            addr_resolver = AddressResolverIPv6(server=hostname)
+
+            is_discovered = await addr_resolver.async_request(
+                azc.zeroconf,
+                timeout=discovery_timeout_sec * 1000)
+
+            if not is_discovered:
+                logger.warning(f"No AAAA record found for '{hostname}' within {discovery_timeout_sec}s")
+                return None
+
+            # Get IPv6 addresses
+            ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
+            if ipv6_addresses:
+                quada_records: list[QuadaRecord] = [
+                    QuadaRecord.build(ipv6)
+                    for ipv6 in ipv6_addresses
+                ]
+
+            # Adds service to discovered services
             self._discovered_services = {}
-            self._discovered_services[service_type] = []
-            if mdns_service_info is not None:
-                self._discovered_services[service_type].append(mdns_service_info)
+            self._discovered_services[hostname] = []
+            for ipv6 in quada_records:
+                self._discovered_services[hostname].append(ipv6)
 
             if log_output:
                 self._log_output()
 
-            return mdns_service_info
+            return quada_records
+
+    async def get_ptr_records(self,
+                              service_types: list[str],
+                              discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                              log_output: bool = False,
+                              ) -> list[PtrRecord]:
+        """
+        Asynchronously discovers mDNS PTR records for the given service types.
+
+        Args:
+            discovery_timeout_sec (float): Time in seconds to wait for responses after sending the browse request.
+            service_types (list[str]): A list of service types (e.g., "_matter._tcp.local.", "_Ixxxx._sub._matter._tcp.local.") to browse for.
+            log_output (bool): If True, logs the discovered PTR records grouped by service type as JSON.
+
+        Returns:
+            list[PtrRecord]: A flat list of all discovered PtrRecord objects across all requested service types.
+
+        Note:
+            This method performs a PTR browse using AsyncServiceBrowser for each specified service type.
+            It waits up to the specified timeout for responses and handles them via internal callbacks.
+            The resulting records include instance name extraction and optional subtype support.
+        """
+        self._event.clear()
+
+        logger.info(f"Browsing for mDNS service(s) of type: {service_types}")
+
+        self._discovered_services = {}
+        aiobrowser = AsyncServiceBrowser(zeroconf=self._azc.zeroconf,
+                                         type_=service_types,
+                                         handlers=[partial(self._on_service_state_change, unlock_service=False)]
+                                         )
+
+        try:
+            await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
+        except TimeoutError:
+            logger.info("mDNS browse finished after %d seconds.", discovery_timeout_sec)
+        finally:
+            self._event.set()
+            await aiobrowser.async_cancel()
+
+        if log_output:
+            self._log_output()
+
+        ptr_records = [
+            record
+            for records in self._discovered_services.values()
+            for record in records
+        ]
+
+        return ptr_records
+
+    async def get_commissionable_subtypes(self,
+                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                                          log_output: bool = False,) -> list[str]:
+        """
+        Asynchronously retrieves a list of commissionable mDNS service subtypes.
+
+        Args:
+            discovery_timeout_sec (float, optional): Timeout in seconds for the service type discovery. Defaults to DISCOVERY_TIMEOUT_SEC.
+            log_output (bool, optional): If True, logs the discovered commissionable subtypes. Defaults to False.
+
+        Returns:
+            list[str]: A list of strings representing the discovered commissionable mDNS service subtypes.
+        """
+        # Get service types
+        service_types = await self.get_service_types(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=False
+        )
+
+        # Filter for commissionable subtypes
+        sub_types = [
+            st for st in service_types
+            if st.startswith('_') and f'._sub.{MdnsServiceType.COMMISSIONABLE.value}' in st
+        ]
+
+        if log_output:
+            logger.info(
+                "\n\nDiscovered mDNS commissionable service subtypes:\n%s\n", "\n".join(f"  - {s}" for s in sub_types))
+
+        return sub_types
 
     # Private methods
+    async def _get_service(self, service_type: MdnsServiceType,
+                           log_output: bool,
+                           discovery_timeout_sec: float,
+                           service_name: str = None,
+                           unlock_service: bool = True
+                           ) -> Optional[MdnsServiceInfo]:
+        """
+        Asynchronously discovers a specific type of mDNS service within the network and returns its details.
+
+        Args:
+            service_type (MdnsServiceType): The enum representing the type of mDNS service to discover.
+            log_output (bool): Logs the discovered services to the console. Defaults to False.
+            discovery_timeout_sec (float): Defaults to 15 seconds.
+            service_name (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available.
+            unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
+
+        Returns:
+            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
+                                    any. Returns None if no service of the specified type is discovered within
+                                    the timeout period.
+        """
+        self._service_types = [service_type.value]
+
+        await self._discover(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=log_output,
+            unlock_service=unlock_service,
+        )
+
+        if self._verbose_logging:
+            logger.info("Getting service from discovered services: %s", self._discovered_services)
+
+        if service_type.value in self._discovered_services:
+            if service_name is not None:
+                for service in self._discovered_services[service_type.value]:
+                    if service.service_name == service_name.replace("._MATTER._TCP.LOCAL.", "._matter._tcp.local."):
+                        return service
+            else:
+                return self._discovered_services[service_type.value][0]
+        else:
+            return None
+
     async def _discover(self,
                         discovery_timeout_sec: float,
                         log_output: bool,
-                        all_services: bool = False
+                        service_types: Optional[List[str]] = None,
+                        all_services: bool = False,
+                        unlock_service: bool = True,
                         ) -> None:
         """
         Asynchronously discovers network services using multicast DNS (mDNS).
@@ -347,36 +555,49 @@ class MdnsDiscovery:
         Args:
             discovery_timeout_sec (float): The duration in seconds to wait for the discovery process, allowing for service
                                         announcements to be collected.
-            all_services (bool): If True, discovers all available mDNS services. If False, discovers services based on the
-                                predefined `_service_types` list. Defaults to False.
             log_output (bool): If True, logs the discovered services to the console in JSON format for debugging or informational
                             purposes. Defaults to False.
+            service_types (Optional[List[str]]): Specific service types to discover (e.g., ['_matterc._udp.local.']).
+            unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
+            all_services (bool): If True, discovers all available mDNS services. If False, discovers services based on the
+                                predefined `_service_types` list. Defaults to False.
+
+        Raises:
+            ValueError: If both `all_services` and `service_types` are provided.
 
         Returns:
             None: This method does not return any value.
 
         Note:
             The discovery duration may need to be adjusted based on network conditions and expected response times for service
-            announcements. The method leverages an asyncio event to manage asynchronous waiting and cancellation based on discovery
-            success or timeout.
+            announcements.
         """
+        if all_services and service_types:
+            raise ValueError("Specify either 'all_services' or 'service_types', not both.")
+
         self._event.clear()
 
         if all_services:
-            self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find()))
+            self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces)))
 
-        logger.info(f"Browsing for MDNS service(s) of type: {self._service_types}")
+        if service_types:
+            self._service_types = service_types
 
-        aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
+        logger.info(f"Browsing for mDNS service(s) of type: {self._service_types}")
+
+        aiobrowser = AsyncServiceBrowser(zeroconf=self._azc.zeroconf,
                                          type_=self._service_types,
-                                         handlers=[self._on_service_state_change]
+                                         handlers=[partial(self._on_service_state_change, unlock_service=unlock_service)]
                                          )
-
         try:
-            await asyncio.wait_for(self._event.wait(), timeout=discovery_timeout_sec)
-        except asyncio.TimeoutError:
-            logger.error("MDNS service discovery timed out after %d seconds.", discovery_timeout_sec)
+            await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
+        except TimeoutError:
+            if unlock_service:
+                logger.info("mDNS browse finished after %d seconds.", discovery_timeout_sec)
+            else:
+                logger.error("mDNS service discovery timed out after %d seconds.", discovery_timeout_sec)
         finally:
+            self._event.set()
             await aiobrowser.async_cancel()
 
         if log_output:
@@ -384,10 +605,11 @@ class MdnsDiscovery:
 
     def _on_service_state_change(
         self,
+        unlock_service: bool,
         zeroconf: Zeroconf,
         service_type: str,
         name: str,
-        state_change: ServiceStateChange
+        state_change: ServiceStateChange,
     ) -> None:
         """
         Callback method triggered on mDNS service state change.
@@ -396,6 +618,7 @@ class MdnsDiscovery:
         It handles the addition of new services by initiating a query for their detailed information.
 
         Args:
+            unlock_service (bool): If True, queries the service info for each of the discovered service names.
             zeroconf (Zeroconf): The Zeroconf instance managing the network operations.
             service_type (str): The service type of the mDNS service that changed state.
             name (str): The service name of the mDNS service.
@@ -407,30 +630,35 @@ class MdnsDiscovery:
         if self._verbose_logging:
             logger.info("Service state change: %s on %s/%s", state_change, name, service_type)
 
-        if state_change.value == ServiceStateChange.Removed.value:
+        if state_change in [ServiceStateChange.Removed, ServiceStateChange.Updated]:
             return
 
         if self._name_filter is not None and name.upper() != self._name_filter:
             if self._verbose_logging:
-                logger.info("   Name does NOT match %s", self._name_filter)
+                logger.info("   Name does NOT match \'%s\' vs \'%s\'", self._name_filter, name.upper())
             return
 
         if self._verbose_logging:
             logger.info("Received service data. Unlocking service information")
 
-        asyncio.ensure_future(self._query_service_info(
-            zeroconf,
-            service_type,
-            name)
-        )
+        if unlock_service:
+            # Get service information
+            ensure_future(self._query_service_info(
+                service_type,
+                name)
+            )
+        else:
+            # Only gather PTR record information
+            if service_type not in self._discovered_services:
+                self._discovered_services[service_type] = []
+            self._discovered_services[service_type].append(PtrRecord(service_type=service_type, service_name=name))
 
-    async def _query_service_info(self, zeroconf: Zeroconf, service_type: str, service_name: str) -> None:
+    async def _query_service_info(self, service_type: str, service_name: str) -> None:
         """
         This method queries for service details such as its address, port, and TXT records
         containing metadata.
 
         Args:
-            zeroconf (Zeroconf): The Zeroconf instance used for managing network operations and service discovery.
             service_type (str): The type of the mDNS service being queried.
             service_name (str): The specific service name of the mDNS service to query. This service name uniquely
             identifies the service instance within the local network.
@@ -438,26 +666,47 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        # Get service info
-        service_info = AsyncServiceInfo(service_type, service_name)
-        service_info.async_clear_cache()
-        is_service_discovered = await service_info.async_request(zeroconf, 3000)
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
+            mdns_service_info = None
 
-        if is_service_discovered:
-            if self._verbose_logging:
-                logger.warning("Service discovered for %s/%s.", service_name, service_type)
+            # Adds service listener
+            service_listener = MdnsServiceListener()
+            await azc.async_add_service_listener(service_type, service_listener)
 
-            mdns_service_info = self._to_mdns_service_info_class(service_info)
+            # Wait for the add/update service event or timeout
+            # This is necessary whem requesting TXT records,
+            # as the service may not be immediately available
+            try:
+                logger.info(f"Service lookup for {service_name}")
+                await wait_for(service_listener.updated_event.wait(), self.DISCOVERY_TIMEOUT_SEC)
+            except TimeoutError:
+                logger.info(
+                    f"Service lookup for {service_name} timeout ({self.DISCOVERY_TIMEOUT_SEC} seconds) reached without an update.")
+            finally:
+                await azc.async_remove_service_listener(service_listener)
 
-            if service_type not in self._discovered_services:
-                self._discovered_services[service_type] = []
+            # Prepare and perform query
+            service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
+            service_info._query_record_types = {_TYPE_SRV, _TYPE_TXT, _TYPE_A, _TYPE_AAAA}
+            is_discovered = await service_info.async_request(
+                azc.zeroconf,
+                self.DISCOVERY_TIMEOUT_SEC * 1000)
 
-            if mdns_service_info is not None:
-                self._discovered_services[service_type].append(mdns_service_info)
-        elif self._verbose_logging:
-            logger.warning("Service information not found.")
+            if is_discovered:
+                if self._verbose_logging:
+                    logger.warning("Service discovered for %s/%s.", service_name, service_type)
 
-        self._event.set()
+                mdns_service_info = self._to_mdns_service_info_class(service_info)
+
+                if service_type not in self._discovered_services:
+                    self._discovered_services[service_type] = []
+
+                if mdns_service_info is not None:
+                    self._discovered_services[service_type].append(mdns_service_info)
+            elif self._verbose_logging:
+                logger.warning(f"Service information for '{service_name}' not found.")
+
+            self._event.set()
 
     def _to_mdns_service_info_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
         """
@@ -486,46 +735,12 @@ class MdnsDiscovery:
 
         return mdns_service_info
 
-    def _get_instance_name(self, service_info: AsyncServiceInfo) -> str:
+    @staticmethod
+    def _get_instance_name(service_info: AsyncServiceInfo) -> str:
         if service_info.type:
             return service_info.name[: len(service_info.name) - len(service_info.type) - 1]
         else:
             return service_info.name
-
-    async def _get_service(self, service_type: MdnsServiceType,
-                           log_output: bool,
-                           discovery_timeout_sec: float,
-                           expected_value: str = None,
-                           ) -> Optional[MdnsServiceInfo]:
-        """
-        Asynchronously discovers a specific type of mDNS service within the network and returns its details.
-
-        Args:
-            service_type (MdnsServiceType): The enum representing the type of mDNS service to discover.
-            log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 15 seconds.
-            expected_value (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available
-
-        Returns:
-            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
-                                    any. Returns None if no service of the specified type is discovered within
-                                    the timeout period.
-        """
-        self._service_types = [service_type.value]
-        await self._discover(discovery_timeout_sec, log_output)
-
-        if self._verbose_logging:
-            logger.info("Getting service from discovered services: %s", self._discovered_services)
-
-        if service_type.value in self._discovered_services:
-            if expected_value is not None:
-                for service in self._discovered_services[service_type.value]:
-                    if service.service_name == expected_value.replace("._MATTER._TCP.LOCAL.", "._matter._tcp.local."):
-                        return service
-            else:
-                return self._discovered_services[service_type.value][0]
-        else:
-            return None
 
     def _log_output(self) -> str:
         """
@@ -537,3 +752,45 @@ class MdnsDiscovery:
         converted_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
         json_str = json.dumps(converted_services, indent=4)
         logger.info("Discovery data:\n%s", json_str)
+
+    @staticmethod
+    def _get_ipv6_addresses():
+        results = []
+        for iface in netifaces.interfaces():
+            try:
+                # Get list of IPv6 addresses for the interface
+                addrs = netifaces.ifaddresses(iface).get(netifaces.AF_INET6, [])
+            except ValueError:
+                # Skip interfaces that don’t support IPv6
+                continue
+
+            for addr_info in addrs:
+                addr = addr_info.get('addr', '')
+                if not addr:
+                    continue
+
+                # Normalize by stripping any existing scope
+                base_addr = addr.split('%')[0]
+
+                try:
+                    ip = ipaddress.IPv6Address(base_addr)
+                except ValueError:
+                    # Skip invalid addresses
+                    continue
+
+                # Include link-local, ULA (fdxx::/8), and global (2000::/3), skip loopback (::1)
+                if ip.is_loopback:
+                    continue  # Skip ::1 (loopback); not usable for external discovery
+
+                if ip.is_link_local:
+                    results.append(f"{base_addr}%{iface}")  # Append scope for link-local
+                elif ip.is_private or ip.is_global:
+                    results.append(base_addr)  # ULA or global addresses
+
+        if not results:
+            # No usable IPv6, fallback to Zeroconf default
+            logger.info("\n\nDefaulting to InterfaceChoice.All\n")
+            return InterfaceChoice.All
+
+        logger.info(f"\n\nDiscovered IPv6 addresses: {results}\n")
+        return results
