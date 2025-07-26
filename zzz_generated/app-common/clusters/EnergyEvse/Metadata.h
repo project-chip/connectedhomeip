@@ -19,6 +19,8 @@ namespace EnergyEvse {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 28;
+
 namespace State {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(State::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -118,6 +120,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SessionEnergyDischarge
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace Disable {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(Disable::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),

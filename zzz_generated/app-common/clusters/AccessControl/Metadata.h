@@ -19,6 +19,8 @@ namespace AccessControl {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 12;
+
 namespace Acl {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Acl::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -59,6 +61,8 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace ReviewFabricRestrictions {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ReviewFabricRestrictions::Id,

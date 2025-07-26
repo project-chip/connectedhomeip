@@ -19,6 +19,8 @@ namespace JointFabricDatastore {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 19;
+
 namespace AnchorRootCA {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(AnchorRootCA::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kAdminister, std::nullopt);
@@ -92,6 +94,8 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 20;
+
 namespace AddKeySet {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddKeySet::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);

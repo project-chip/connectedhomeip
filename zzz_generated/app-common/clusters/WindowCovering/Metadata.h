@@ -19,6 +19,8 @@ namespace WindowCovering {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 27;
+
 namespace Type {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Type::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -119,6 +121,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SafetyStatus::Id, BitF
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace UpOrOpen {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(UpOrOpen::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

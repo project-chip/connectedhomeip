@@ -19,6 +19,8 @@ namespace FanControl {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 17;
+
 namespace FanMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(FanMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -71,6 +73,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AirflowDirection::Id, 
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace Step {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Step::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

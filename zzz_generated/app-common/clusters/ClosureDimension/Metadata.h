@@ -19,6 +19,8 @@ namespace ClosureDimension {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 17;
+
 namespace CurrentState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -71,6 +73,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id,
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace SetTarget {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(SetTarget::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),

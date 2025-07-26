@@ -18,9 +18,14 @@ namespace KeypadInput {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 5;
+
+} // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace SendKey {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SendKey::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

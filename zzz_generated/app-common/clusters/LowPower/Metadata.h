@@ -18,9 +18,14 @@ namespace LowPower {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 5;
+
+} // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace Sleep {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Sleep::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

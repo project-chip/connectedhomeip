@@ -19,6 +19,8 @@ namespace SampleMei {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 6;
+
 namespace FlipFlop {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(FlipFlop::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -27,6 +29,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(FlipFlop::Id, BitFlags
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace Ping {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Ping::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

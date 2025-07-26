@@ -19,6 +19,8 @@ namespace CommodityTariff {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 24;
+
 namespace TariffInfo {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TariffInfo::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -113,6 +115,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultRandomizationTy
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace GetTariffComponent {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetTariffComponent::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

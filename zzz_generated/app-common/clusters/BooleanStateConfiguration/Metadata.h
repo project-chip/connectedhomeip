@@ -19,6 +19,8 @@ namespace BooleanStateConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 13;
+
 namespace CurrentSensitivityLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentSensitivityLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -56,6 +58,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SensorFault::Id, BitFl
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace SuppressAlarm {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SuppressAlarm::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
