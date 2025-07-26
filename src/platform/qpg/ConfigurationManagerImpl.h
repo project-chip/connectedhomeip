@@ -43,6 +43,7 @@ public:
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
+    void InitiateFactoryResetSkipReboot(void);
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -50,7 +51,7 @@ private:
     CHIP_ERROR Init(void) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     bool CanFactoryReset(void) override;
-    void InitiateFactoryReset(void) override;
+    void InitiateFactoryReset(bool reboot = true) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 

@@ -151,9 +151,9 @@ bool ConfigurationManagerImpl::CanFactoryReset()
     return true;
 }
 
-void ConfigurationManagerImpl::InitiateFactoryReset()
+void ConfigurationManagerImpl::InitiateFactoryReset(bool reboot)
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    PlatformMgr().ScheduleWork(DoFactoryReset, reboot);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
@@ -251,7 +251,7 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     QPGConfig::RunConfigUnitTest();
 }
 
-void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
+void ConfigurationManagerImpl::DoFactoryReset(intptr_t reboot)
 {
     CHIP_ERROR err;
     qvStatus_t qvErr;
@@ -277,9 +277,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    // Restart the system.
-    ChipLogProgress(DeviceLayer, "System restarting");
-    qvCHIP_ResetSystem();
+    if (reboot)
+    {
+        // Restart the system.
+        ChipLogProgress(DeviceLayer, "System restarting");
+        qvCHIP_ResetSystem();
+    }
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

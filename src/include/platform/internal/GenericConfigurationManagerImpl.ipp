@@ -438,6 +438,10 @@ template <class ConfigClass>
 void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset()
 {}
 
+template <class ConfigClass>
+void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset(bool reboot)
+{}
+
 template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 {

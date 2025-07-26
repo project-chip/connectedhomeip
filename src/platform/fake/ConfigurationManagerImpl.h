@@ -94,6 +94,7 @@ private:
     void LogDeviceConfig() override {}
     bool CanFactoryReset() override { return true; }
     void InitiateFactoryReset() override {}
+    void InitiateFactoryReset(bool reboot) override {}
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
