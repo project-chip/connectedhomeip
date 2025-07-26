@@ -33,7 +33,7 @@ template <typename T>
 class EventLogger : public EventLoggingDelegate
 {
 public:
-    EventLogger(const T & aEventData) : mEventData(aEventData) {};
+    EventLogger(const T & aEventData) : mEventData(aEventData){};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
@@ -54,7 +54,7 @@ namespace internal {
 CHIP_ERROR LogEvent(EventLoggingDelegate * delegate, const EventOptions & eventOptions, EventNumber & outEventNumber,
                     bool isFabricScoped);
 
-}
+} // namespace internal
 
 /**
  * @brief
@@ -85,16 +85,19 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     EventLogger<T> eventData(aEventData);
 
     EventOptions eventOptions;
-    eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    eventOptions.mPriority    = aEventData.GetPriorityLevel();
+    eventOptions.mPath     = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
+    eventOptions.mPriority = aEventData.GetPriorityLevel();
 
-    if constexpr (DataModel::IsFabricScoped<T>::value) {
+    if constexpr (DataModel::IsFabricScoped<T>::value)
+    {
         eventOptions.mFabricIndex = aEventData.GetFabricIndex();
-    } else {
+    }
+    else
+    {
         eventOptions.mFabricIndex = kUndefinedFabricIndex;
     }
 
-    return internal::LogEvent(&eventData, eventOptions, aEventNumber,  DataModel::IsFabricScoped<T>::value);
+    return internal::LogEvent(&eventData, eventOptions, aEventNumber, DataModel::IsFabricScoped<T>::value);
 }
 
 } // namespace app
