@@ -99,18 +99,15 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     # === Attribute Reading and Verification ===
 
-    async def read_attribute(self, attribute_path: list, timeout_ms: int = None) -> dict:
-        """Read attributes from the device with timeout handling."""
-        if timeout_ms is None:
-            timeout_ms = self.timeout_ms
-
+    async def read_attribute(self, attribute_path: list) -> dict:
+        """Read attributes from the device."""
         try:
             return await self.default_controller.Read(
                 self.dut_node_id,
                 attribute_path)
         except ChipStackError as e:  # chipstack-ok
             if "Timeout" in str(e):
-                logging.error(f"Read operation timed out after {timeout_ms}ms")
+                logging.error(f"Read operation timed out")
                 logging.error(f"Attribute path: {attribute_path}")
             raise
 
