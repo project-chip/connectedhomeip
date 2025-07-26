@@ -80,11 +80,35 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="StatusCodeEnum">
-      <item value="0x02" name="VIDNotVerified" summary="ICACCSRRequest command has been invoked by a peer against which Fabric Table VID Verification hasn&apos;t been executed">
-        <mandatoryConform/>
+      <item value="0x02" name="Busy" summary="Could not be completed because another commissioning is in progress">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </item>
-      <item value="0x03" name="InvalidAdministratorFabricIndex" summary="OpenJointCommissioningWindow command has been invoked but the AdministratorFabricIndex field has the value of null.">
-        <mandatoryConform/>
+      <item value="0x03" name="PAKEParameterError" summary="Provided PAKE parameters were incorrectly formatted or otherwise invalid">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="0x04" name="WindowNotOpen" summary="No commissioning window was currently open">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="0x05" name="VIDNotVerified" summary="ICACCSRRequest command has been invoked by a peer against which Fabric Table VID Verification hasn&apos;t been executed">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="0x06" name="InvalidAdministratorFabricIndex" summary="OpenJointCommissioningWindow command has been invoked but the AdministratorFabricIndex field has the value of null">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </item>
     </enum>
     <enum name="TransferAnchorResponseStatusEnum">

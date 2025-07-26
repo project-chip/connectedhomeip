@@ -287,13 +287,13 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="CostStruct">
-      <field id="0" name="CostType" type="CostTypeEnum" default="0">
+      <field id="0" name="CostType" type="CostTypeEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Value" type="int32" default="0">
+      <field id="1" name="Value" type="int32">
         <mandatoryConform/>
       </field>
-      <field id="2" name="DecimalPoints" type="uint8" default="0">
+      <field id="2" name="DecimalPoints" type="uint8">
         <mandatoryConform/>
       </field>
       <field id="3" name="Currency" type="uint16" default="0">
@@ -304,10 +304,10 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="ForecastStruct">
-      <field id="0" name="ForecastID" type="uint32" default="0">
+      <field id="0" name="ForecastID" type="uint32">
         <mandatoryConform/>
       </field>
-      <field id="1" name="ActiveSlotNumber" type="uint16" default="0">
+      <field id="1" name="ActiveSlotNumber" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -343,7 +343,7 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="PowerAdjustCapabilityStruct">
-      <field id="0" name="PowerAdjustCapability" type="list" default="null">
+      <field id="0" name="PowerAdjustCapability" type="list">
         <entry type="PowerAdjustStruct"/>
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -351,15 +351,15 @@ Davis, CA 95616, USA
           <maxCount value="8"/>
         </constraint>
       </field>
-      <field id="1" name="Cause" type="PowerAdjustReasonEnum" default="0">
+      <field id="1" name="Cause" type="PowerAdjustReasonEnum">
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="PowerAdjustStruct">
-      <field id="0" name="MinPower" type="power-mW" default="0">
+      <field id="0" name="MinPower" type="power-mW">
         <mandatoryConform/>
       </field>
-      <field id="1" name="MaxPower" type="power-mW" default="0">
+      <field id="1" name="MaxPower" type="power-mW">
         <mandatoryConform/>
         <constraint>
           <min>
@@ -367,7 +367,7 @@ Davis, CA 95616, USA
           </min>
         </constraint>
       </field>
-      <field id="2" name="MinDuration" type="elapsed-s" default="0">
+      <field id="2" name="MinDuration" type="elapsed-s">
         <mandatoryConform/>
       </field>
       <field id="3" name="MaxDuration" type="elapsed-s">
@@ -494,30 +494,27 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="ESAType" type="ESATypeEnum">
-      <default>
-        <enum default="Other"/>
-      </default>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="ESACanGenerate" type="bool" default="false">
+    <attribute id="0x0001" name="ESACanGenerate" type="bool">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="ESAState" type="ESAStateEnum" default="0">
+    <attribute id="0x0002" name="ESAState" type="ESAStateEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="AbsMinPower" type="power-mW" default="0">
+    <attribute id="0x0003" name="AbsMinPower" type="power-mW">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0004" name="AbsMaxPower" type="power-mW" default="0">
+    <attribute id="0x0004" name="AbsMaxPower" type="power-mW">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
@@ -526,14 +523,14 @@ Davis, CA 95616, USA
         </min>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct" default="null">
+    <attribute id="0x0005" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0006" name="Forecast" type="ForecastStruct" default="null">
+    <attribute id="0x0006" name="Forecast" type="ForecastStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -543,7 +540,7 @@ Davis, CA 95616, USA
         </orTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0007" name="OptOutState" type="OptOutStateEnum" default="0">
+    <attribute id="0x0007" name="OptOutState" type="OptOutStateEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <orTerm>
@@ -684,7 +681,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
-      <field id="0" name="Cause" type="CauseEnum" default="NormalCompletion">
+      <field id="0" name="Cause" type="CauseEnum">
         <mandatoryConform/>
       </field>
       <field id="1" name="Duration" type="elapsed-s">
@@ -705,7 +702,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PAU"/>
       </mandatoryConform>
-      <field id="0" name="Cause" type="CauseEnum" default="NormalCompletion">
+      <field id="0" name="Cause" type="CauseEnum">
         <mandatoryConform/>
       </field>
     </event>

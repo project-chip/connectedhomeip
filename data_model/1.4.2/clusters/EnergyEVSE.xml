@@ -243,7 +243,7 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="ChargingTargetStruct">
-      <field id="0" name="TargetTimeMinutesPastMidnight" type="uint16" default="0">
+      <field id="0" name="TargetTimeMinutesPastMidnight" type="uint16">
         <mandatoryConform/>
         <constraint>
           <max value="1439"/>
@@ -284,19 +284,19 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0003" name="ChargingEnabledUntil" type="epoch-s" default="0">
+    <attribute id="0x0003" name="ChargingEnabledUntil" type="epoch-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0004" name="DischargingEnabledUntil" type="epoch-s" default="0">
+    <attribute id="0x0004" name="DischargingEnabledUntil" type="epoch-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0005" name="CircuitCapacity" type="amperage-mA" default="0">
+    <attribute id="0x0005" name="CircuitCapacity" type="amperage-mA">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -304,7 +304,7 @@ Davis, CA 95616, USA
         <min value="0"/>
       </constraint>
     </attribute>
-    <attribute id="0x0006" name="MinimumChargeCurrent" type="amperage-mA" default="6000">
+    <attribute id="0x0006" name="MinimumChargeCurrent" type="amperage-mA">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -312,7 +312,7 @@ Davis, CA 95616, USA
         <min value="0"/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="MaximumChargeCurrent" type="amperage-mA" default="0">
+    <attribute id="0x0007" name="MaximumChargeCurrent" type="amperage-mA">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -320,7 +320,7 @@ Davis, CA 95616, USA
         <min value="0"/>
       </constraint>
     </attribute>
-    <attribute id="0x0008" name="MaximumDischargeCurrent" type="amperage-mA" default="0">
+    <attribute id="0x0008" name="MaximumDischargeCurrent" type="amperage-mA">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -346,21 +346,21 @@ Davis, CA 95616, USA
         <max value="86400"/>
       </constraint>
     </attribute>
-    <attribute id="0x0023" name="NextChargeStartTime" type="epoch-s" default="null">
+    <attribute id="0x0023" name="NextChargeStartTime" type="epoch-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0024" name="NextChargeTargetTime" type="epoch-s" default="null">
+    <attribute id="0x0024" name="NextChargeTargetTime" type="epoch-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0025" name="NextChargeRequiredEnergy" type="energy-mWh" default="null">
+    <attribute id="0x0025" name="NextChargeRequiredEnergy" type="energy-mWh">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -370,7 +370,7 @@ Davis, CA 95616, USA
         <min value="0"/>
       </constraint>
     </attribute>
-    <attribute id="0x0026" name="NextChargeTargetSoC" type="percent" default="null">
+    <attribute id="0x0026" name="NextChargeTargetSoC" type="percent">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -387,14 +387,14 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0030" name="StateOfCharge" type="percent" default="null">
+    <attribute id="0x0030" name="StateOfCharge" type="percent">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
         <feature name="SOC"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0031" name="BatteryCapacity" type="energy-mWh" default="null">
+    <attribute id="0x0031" name="BatteryCapacity" type="energy-mWh">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -404,7 +404,7 @@ Davis, CA 95616, USA
         <min value="0"/>
       </constraint>
     </attribute>
-    <attribute id="0x0032" name="VehicleID" type="string" default="null">
+    <attribute id="0x0032" name="VehicleID" type="string">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -414,17 +414,17 @@ Davis, CA 95616, USA
         <maxLength value="32"/>
       </constraint>
     </attribute>
-    <attribute id="0x0040" name="SessionID" type="uint32" default="null">
+    <attribute id="0x0040" name="SessionID" type="uint32">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0041" name="SessionDuration" type="elapsed-s" default="null">
+    <attribute id="0x0041" name="SessionDuration" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0042" name="SessionEnergyCharged" type="energy-mWh" default="null">
+    <attribute id="0x0042" name="SessionEnergyCharged" type="energy-mWh">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform/>
@@ -432,7 +432,7 @@ Davis, CA 95616, USA
         <min value="0"/>
       </constraint>
     </attribute>
-    <attribute id="0x0043" name="SessionEnergyDischarged" type="energy-mWh" default="null">
+    <attribute id="0x0043" name="SessionEnergyDischarged" type="energy-mWh">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
@@ -463,7 +463,7 @@ Davis, CA 95616, USA
     <command id="0x02" name="EnableCharging" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="ChargingEnabledUntil" type="epoch-s" default="null">
+      <field id="0" name="ChargingEnabledUntil" type="epoch-s">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -485,7 +485,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
-      <field id="0" name="DischargingEnabledUntil" type="epoch-s" default="null">
+      <field id="0" name="DischargingEnabledUntil" type="epoch-s">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
