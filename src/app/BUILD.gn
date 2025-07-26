@@ -514,6 +514,7 @@ static_library("app") {
     "ChunkedWriteCallback.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
+    "EventLogging.cpp",
     "EventLogging.h",
     "EventManagement.cpp",
     "EventManagement.h",
