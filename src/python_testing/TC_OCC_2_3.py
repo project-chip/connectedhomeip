@@ -39,7 +39,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -74,7 +75,7 @@ class TC_OCC_2_3(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OCC_2_3(self):
 
         cluster = Clusters.Objects.OccupancySensing
@@ -184,4 +185,4 @@ class TC_OCC_2_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

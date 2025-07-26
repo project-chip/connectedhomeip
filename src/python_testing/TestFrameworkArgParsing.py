@@ -1,3 +1,10 @@
+import json
+from typing import Any
+
+from chip.testing import conversions, runner
+from chip.testing.matter_testing import MatterBaseTest
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -52,13 +59,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import json
-from typing import Any
-
-from chip.testing.conversions import bytes_from_hex
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from mobly import asserts
-
 
 class TestFrameworkArgParsing(MatterBaseTest):
     def check_arg(self, expected_name: str, expected_val: Any) -> None:
@@ -74,7 +74,7 @@ class TestFrameworkArgParsing(MatterBaseTest):
                              expected_val, f"Unexpected value for {expected_name}")
 
     def test_FrameworkArgParsing(self):
-        hex_val = bytes_from_hex('01020A')
+        hex_val = conversions.bytes_from_hex('01020A')
         string_val = 'TestyTesty'
         int_val = 15
         float_val = 1.57
@@ -118,4 +118,4 @@ class TestFrameworkArgParsing(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -40,7 +40,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 
@@ -57,7 +58,7 @@ class TC_SEAR_1_4(MatterBaseTest):
     def TC_SEAR_1_4(self) -> list[str]:
         return ["SEAR.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SEAR_1_4(self):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
@@ -80,4 +81,4 @@ class TC_SEAR_1_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -36,7 +36,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -72,7 +73,7 @@ class TC_VALCC_2_1(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_VALCC_2_1(self):
 
         endpoint = self.get_endpoint(default=1)
@@ -191,4 +192,4 @@ class TC_VALCC_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

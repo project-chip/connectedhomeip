@@ -38,7 +38,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -143,7 +144,7 @@ class TC_ACL_2_8(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACL_2_8(self):
         self.step(1)
         self.th1 = self.default_controller
@@ -331,4 +332,4 @@ class TC_ACL_2_8(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

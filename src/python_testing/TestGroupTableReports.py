@@ -38,14 +38,15 @@ from typing import List
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 
 class TestGroupTableReports(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_group_table_reports(self):
         self.print_step(1, "Commissioning, already done")
 
@@ -129,4 +130,4 @@ class TestGroupTableReports(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

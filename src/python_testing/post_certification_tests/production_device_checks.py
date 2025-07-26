@@ -54,6 +54,7 @@ from pathlib import Path
 import chip.clusters as Clusters
 import cv2
 import requests
+from chip.testing import decorators, runner
 from mobly import asserts
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
@@ -62,13 +63,13 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 try:
     from chip.testing.basic_composition import BasicCompositionTests
     from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, async_test_body, run_tests_no_exit
+    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from chip.testing.basic_composition import BasicCompositionTests
     from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, async_test_body, run_tests_no_exit
+    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep
 
 try:
     import fetch_paa_certs_from_dcl
@@ -100,7 +101,6 @@ class Hooks():
 
     def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.current_test = name
-        pass
 
     def test_stop(self, exception: Exception, duration: int):
         # Exception is the test assertion that caused the failure
@@ -127,7 +127,7 @@ class Hooks():
 
 
 class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
-    @async_test_body
+    @decorators.async_test_body
     async def test_TestEventTriggersCheck(self):
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
         await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
@@ -137,7 +137,7 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
 
 
 class DclCheck(MatterBaseTest, BasicCompositionTests):
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
         await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
@@ -395,8 +395,8 @@ def run_test(test_class: MatterBaseTest, tests: typing.List[str], test_config: T
     stack = test_config.get_stack()
     controller = test_config.get_controller()
     matter_config = test_config.get_config(tests)
-    with asyncio.Runner() as runner:
-        if not run_tests_no_exit(test_class, matter_config, runner.get_loop(), hooks, controller, stack):
+    with asyncio.Runner() as runner_obj:
+        if not runner.run_tests_no_exit(test_class, matter_config, runner_obj.get_loop(), hooks, controller, stack):
             print(f"Test failure. Failed on step: {hooks.get_failures()}")
     return hooks.get_failures()
 

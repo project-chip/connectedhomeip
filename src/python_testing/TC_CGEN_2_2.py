@@ -45,7 +45,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackException
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -292,7 +293,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CGEN_2_2(self):
 
         self.step(0)
@@ -510,7 +511,6 @@ class TC_CGEN_2_2(MatterBaseTest):
         except ChipStackException as e:
             # Expected behavior and proceeding to next step.
             logger.info(f"Step #22 - ArmFailSafe command failed as expected: {str(e)}. Proceeding to next step.")
-            pass
         else:
             # If no exception is raised, log that the device response before closing the connection is acceptable.
             logger.info('Step #22 - ArmFailSafe did not fail, device response before closing is acceptable.')
@@ -811,4 +811,4 @@ class TC_CGEN_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

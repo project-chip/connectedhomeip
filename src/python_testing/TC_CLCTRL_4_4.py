@@ -38,9 +38,9 @@ import typing
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
+from chip.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep
 from chip.tlv import uint
 from mobly import asserts
 
@@ -85,7 +85,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
     def steps_TC_CLCTRL_4_4(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done", is_commissioning=True)
             TestStep("2a", "Read the AttributeList attribute to determine supported attributes",
                      "AttributeList of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "Check if CountdownTime attribute is supported",
@@ -135,7 +135,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CLCTRL_4_4(self):
         countdown_time_max: uint = 259200
 
@@ -340,4 +340,4 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

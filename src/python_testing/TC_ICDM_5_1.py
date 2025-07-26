@@ -40,7 +40,8 @@ from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
@@ -133,7 +134,7 @@ class TC_ICDM_5_1(MatterBaseTest):
     # ICDM 5.1 Test Body
     #
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ICDM_5_1(self):
 
         # Commissioning
@@ -202,4 +203,4 @@ class TC_ICDM_5_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

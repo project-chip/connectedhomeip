@@ -38,7 +38,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing import decorators, matchers, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -119,7 +120,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                 weekDayIndex=week_day_index, userIndex=user_index),
                 endpoint=self.app_cluster_endpoint,
                 timedRequestTimeoutMs=1000)
-            asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetWeekDayScheduleResponse),
+            asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetWeekDayScheduleResponse),
                                 "Unexpected return type for GetWeekDayScheduleResponse")
 
             if (expected_status == Status.Success):
@@ -179,7 +180,7 @@ class TC_DRLK_2_5(MatterBaseTest):
             logging.exception(e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DRLK_2_5(self):
 
         self.common_cluster_endpoint = 0
@@ -397,4 +398,4 @@ class TC_DRLK_2_5(MatterBaseTest):
 
 
 if __name__ == '__main__':
-    default_matter_test_main()
+    runner.default_matter_test_main()

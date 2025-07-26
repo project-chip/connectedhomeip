@@ -41,7 +41,8 @@ import os
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -111,7 +112,7 @@ class TC_ICDM_3_1(MatterBaseTest):
     # ICDM 3.1 Test Body
     #
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ICDM_3_1(self):
 
         cluster = Clusters.Objects.IcdManagement
@@ -131,7 +132,6 @@ class TC_ICDM_3_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
-                pass
 
         self.step("1b")
         clientsSupportedPerFabric = await self._read_icdm_attribute_expect_success(
@@ -146,7 +146,6 @@ class TC_ICDM_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, "Unexpected error returned")
-            pass
 
         # Validate response contains the ICDCounter
         asserts.assert_greater_equal(response.ICDCounter, icdCounter,
@@ -185,7 +184,6 @@ class TC_ICDM_3_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, "Unexpected error returned")
-                    pass
 
                 # Validate response contains the ICDCounter
                 asserts.assert_greater_equal(response.ICDCounter, icdCounter,
@@ -213,7 +211,6 @@ class TC_ICDM_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.ResourceExhausted, "Unexpected error returned")
-            pass
 
         self.step(7)
         try:
@@ -221,7 +218,6 @@ class TC_ICDM_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.NotFound, "Unexpected error returned")
-            pass
 
         self.step(8)
         try:
@@ -229,7 +225,6 @@ class TC_ICDM_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(9)
         registeredClients = await self._read_icdm_attribute_expect_success(
@@ -246,7 +241,6 @@ class TC_ICDM_3_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
-                pass
 
             registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
             for remainingClient in registeredClients:
@@ -266,8 +260,7 @@ class TC_ICDM_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.NotFound, "Unexpected error returned")
-            pass
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

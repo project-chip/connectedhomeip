@@ -39,7 +39,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -75,12 +76,11 @@ class TC_FAN_3_5(MatterBaseTest):
             await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(direction=direction, wrap=wrap, lowestOff=lowestOff), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-            pass
 
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_FAN_3_5(self):
         if not self.check_pics("FAN.S.F04"):
             logger.info("Test skipped because PICS FAN.S.F04 is not set")
@@ -225,4 +225,4 @@ class TC_FAN_3_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

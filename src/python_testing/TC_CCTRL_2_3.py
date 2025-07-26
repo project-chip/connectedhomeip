@@ -66,15 +66,15 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
 class TC_CCTRL_2_3(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -149,7 +149,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3*60
 
-    @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_3(self):
 
         self.step(1)
@@ -233,4 +233,4 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

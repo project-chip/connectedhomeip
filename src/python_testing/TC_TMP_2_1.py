@@ -33,7 +33,8 @@
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -60,7 +61,7 @@ class TC_TMP_2_1(MatterBaseTest):
                      "Verify that Tolerance is in the range of 0 to 2048"),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TMP_2_1(self):
         cluster = Clusters.TemperatureMeasurement
         attr = Clusters.TemperatureMeasurement.Attributes
@@ -112,4 +113,4 @@ class TC_TMP_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

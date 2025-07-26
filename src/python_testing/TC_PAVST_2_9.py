@@ -40,7 +40,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -73,7 +74,7 @@ class TC_PAVST_2_9(MatterBaseTest):
                      "Verify the number of PushAV Connections is 0."),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_PAVST_2_9(self):
         endpoint = self.get_endpoint(default=1)
         pvcluster = Clusters.PushAvStreamTransport
@@ -152,4 +153,4 @@ class TC_PAVST_2_9(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

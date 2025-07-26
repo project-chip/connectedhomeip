@@ -1,3 +1,11 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep, decorators
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -35,12 +43,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -97,8 +99,8 @@ class TC_AVSM_2_14(MatterBaseTest):
             ),
         ]
 
-    @run_if_endpoint_matches(
-        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio)
+    @decorators.run_if_endpoint_matches(
+        decorators.has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio)
     )
     async def test_TC_AVSM_2_14(self):
         endpoint = self.get_endpoint(default=1)
@@ -150,7 +152,6 @@ class TC_AVSM_2_14(MatterBaseTest):
             aAudioStreamID = audioStreamAllocateResponse.audioStreamID
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(6)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
@@ -178,7 +179,6 @@ class TC_AVSM_2_14(MatterBaseTest):
                                  aAudioStreamID, "The previous audio stream is not reused")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(8)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
@@ -189,4 +189,4 @@ class TC_AVSM_2_14(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

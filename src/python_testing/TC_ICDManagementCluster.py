@@ -42,7 +42,8 @@ import ctypes
 from enum import IntEnum
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 # Assumes `--enable-key 000102030405060708090a0b0c0d0e0f` on Linux app command line, or a DUT
@@ -62,7 +63,7 @@ class ICDTestEventTriggerOperations(IntEnum):
 
 
 class TestICDManagementCluster(MatterBaseTest):
-    @async_test_body
+    @decorators.async_test_body
     async def test_active_mode_test_event_trigger(self):
         dev_ctrl = self.default_controller
         is_test_event_triggers_enabled = await self.read_single_attribute(
@@ -137,4 +138,4 @@ class TestICDManagementCluster(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

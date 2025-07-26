@@ -37,7 +37,8 @@ import random
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import TestStep
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
 
@@ -78,7 +79,7 @@ class TC_CADMIN_1_22_24(CADMINBaseTest):
                      "DUT_CE windows status shows the window is closed"),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CADMIN_1_22(self):
         self.step(1)
         self.th1 = self.default_controller
@@ -148,4 +149,4 @@ class TC_CADMIN_1_22_24(CADMINBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

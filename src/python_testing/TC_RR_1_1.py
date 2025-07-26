@@ -47,7 +47,8 @@ from typing import Any, Dict, List, Set
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status as StatusEnum
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
@@ -86,7 +87,7 @@ class TC_RR_1_1(MatterBaseTest):
             subscription.Shutdown()
         super().teardown_class()
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RR_1_1(self):
         dev_ctrl = self.default_controller
 
@@ -962,4 +963,4 @@ class TC_RR_1_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

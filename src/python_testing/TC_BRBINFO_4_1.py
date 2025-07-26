@@ -52,9 +52,10 @@ import tempfile
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.apps import IcdAppServerSubprocess
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -128,7 +129,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         newly_added_endpoint = list(unique_endpoints_set)[0]
         return newly_added_endpoint
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -216,7 +217,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     # BRBINFO 4.1 Test Body
     #
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_BRBINFO_4_1(self):
         icdm_cluster = Clusters.Objects.IcdManagement
         icdm_attributes = icdm_cluster.Attributes
@@ -379,4 +380,4 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

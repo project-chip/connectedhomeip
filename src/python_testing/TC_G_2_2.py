@@ -41,7 +41,8 @@ from typing import List
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -84,7 +85,7 @@ class TC_G_2_2(MatterBaseTest):
                 TestStep("23", "TH sends AddGroup command to DUT as unicast with the following fields: GroupID as 0x0001, GroupName as Gp123456789123456 Note: GroupName length > 16"),
                 TestStep("24", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0")]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_G_2_2(self):
         if self.matter_test_config.endpoint is None:
             self.matter_test_config.endpoint = 0
@@ -313,4 +314,4 @@ class TC_G_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

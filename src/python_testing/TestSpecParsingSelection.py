@@ -1,3 +1,13 @@
+import chip.clusters as Clusters
+from chip.testing import runner
+from chip.testing.conformance import ConformanceDecision, ConformanceException
+from chip.testing.global_attribute_ids import is_standard_attribute_id
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
+from chip.tlv import uint
+from mobly import asserts, signals
+from TC_DeviceConformance import DeviceConformanceTests
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -14,14 +24,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import chip.clusters as Clusters
-from chip.testing.conformance import ConformanceDecision, ConformanceException
-from chip.testing.global_attribute_ids import is_standard_attribute_id
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
-from chip.tlv import uint
-from mobly import asserts, signals
-from TC_DeviceConformance import DeviceConformanceTests
 
 
 class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
@@ -184,4 +186,4 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

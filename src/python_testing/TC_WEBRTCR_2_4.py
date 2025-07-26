@@ -39,8 +39,9 @@ import os
 import tempfile
 
 import websockets
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 SERVER_URI = "ws://localhost:9002"
@@ -120,7 +121,7 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
             await websocket.recv()
             logging.info("Received command response")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_WebRTCRequestor_2_4(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
@@ -187,4 +188,4 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

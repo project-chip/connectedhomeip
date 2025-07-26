@@ -39,7 +39,8 @@ import random
 from datetime import timedelta
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 
@@ -101,7 +102,7 @@ class TC_OPCREDS_3_5(MatterBaseTest):
                 TestStep(20, "TH0 sends the RemoveFabric command with the fabric index set to fabric_idx")
                 ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OPCREDS_3_5(self):
         opcreds = Clusters.OperationalCredentials
 
@@ -244,4 +245,4 @@ class TC_OPCREDS_3_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

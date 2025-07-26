@@ -1,3 +1,9 @@
+import chip.clusters as Clusters
+from chip.interaction_model import Status
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -32,11 +38,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_attribute, run_if_endpoint_matches
-from mobly import asserts
-
 
 class Test_TC_FLABEL_2_1(MatterBaseTest):
     def pics_TC_FLABEL_2_1(self) -> list[str]:
@@ -53,7 +54,7 @@ class Test_TC_FLABEL_2_1(MatterBaseTest):
     def desc_TC_FLABEL_2_1(self) -> str:
         return "[TC-FLABEL-2.1] Fixed Label Cluster [DUT-server]"
 
-    @run_if_endpoint_matches(has_attribute(Clusters.FixedLabel.Attributes.LabelList))
+    @decorators.run_if_endpoint_matches(decorators.has_attribute(Clusters.FixedLabel.Attributes.LabelList))
     async def test_TC_FLABEL_2_1(self):
         # Step 1: Commission DUT (already done)
         self.step(1)
@@ -107,4 +108,4 @@ class Test_TC_FLABEL_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

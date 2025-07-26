@@ -1,3 +1,12 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.clusters import Globals
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -35,13 +44,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -166,8 +168,8 @@ class TC_AVSM_2_7(MatterBaseTest):
             ),
         ]
 
-    @run_if_endpoint_matches(
-        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
+    @decorators.run_if_endpoint_matches(
+        decorators.has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
     )
     async def test_TC_AVSM_2_7(self):
         endpoint = self.get_endpoint(default=1)
@@ -547,4 +549,4 @@ class TC_AVSM_2_7(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

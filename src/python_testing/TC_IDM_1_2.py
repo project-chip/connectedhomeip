@@ -44,7 +44,8 @@ import chip.discovery as Discovery
 from chip import ChipUtility
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing import decorators, matchers, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 
@@ -79,7 +80,7 @@ class FakeRevokeCommissioning(Clusters.AdministratorCommissioning.Commands.Revok
 
 class TC_IDM_1_2(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_IDM_1_2(self):
         self.print_step(0, "Commissioning - already done")
         wildcard_descriptor = await self.default_controller.ReadAttribute(self.dut_node_id, [(Clusters.Descriptor)])
@@ -245,7 +246,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # ArmFailSafe sends a data response
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
         ret = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-        asserts.assert_true(type_matches(ret, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected response type from ArmFailSafe")
 
         self.print_step(7, "Send a command with suppress Response")
@@ -306,4 +307,4 @@ class TC_IDM_1_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

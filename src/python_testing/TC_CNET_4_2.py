@@ -1,3 +1,11 @@
+import logging
+
+import chip.clusters as Clusters
+import test_plan_support
+from chip.testing import decorators, matter_asserts, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -13,14 +21,6 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-
-import logging
-
-import chip.clusters as Clusters
-import test_plan_support
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from mobly import asserts
 
 
 class TC_CNET_4_2(MatterBaseTest):
@@ -93,8 +93,8 @@ class TC_CNET_4_2(MatterBaseTest):
         """Return the PICS definitions associated with this test."""
         return ["CNET.S.F01"]
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
-                                         Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.NetworkCommissioning,
+                                                               Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_2(self):
         # Commissioning already done
         self.step(1)
@@ -195,4 +195,4 @@ class TC_CNET_4_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

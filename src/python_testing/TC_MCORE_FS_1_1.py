@@ -63,8 +63,9 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
@@ -72,7 +73,7 @@ _DEVICE_TYPE_AGGREGATOR = 0x000E
 
 class TC_MCORE_FS_1_1(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -141,7 +142,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3*60
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_MCORE_FS_1_1(self):
         dut_commissioning_control_endpoint = 0
 
@@ -237,4 +238,4 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

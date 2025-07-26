@@ -62,7 +62,8 @@
 import asyncio
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -124,13 +125,13 @@ class TC_TestAttrAvail(MatterBaseTest):
     def TC_TestAttrAvail(self) -> list[str]:
         return ["RVCOPSTATE.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper()
 
     # ======= START OF ACTUAL TESTS =======
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TestAttrAvail(self):
         self.step(1)
 
@@ -161,4 +162,4 @@ class TC_TestAttrAvail(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -40,7 +40,8 @@
 import enum
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing import decorators, matchers, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 
@@ -102,7 +103,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     def pics_TC_RVCCLEANM_2_2(self) -> list[str]:
         return ["RVCCLEANM.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
         self.directmodech_bit_mask = Clusters.RvcCleanMode.Bitmaps.Feature.kDirectModeChange
         self.endpoint = self.get_endpoint()
@@ -173,7 +174,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         self.print_step("7b", "Send ChangeToMode command")
         response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
-        asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
                             "The response should ChangeToModeResponse command")
         if directmode_enabled:
             asserts.assert_equal(response.status, RvcStatusEnum.Success,
@@ -186,4 +187,4 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

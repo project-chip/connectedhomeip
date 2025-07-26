@@ -42,8 +42,9 @@ from typing import Any
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -248,7 +249,7 @@ class TC_FAN_3_1(MatterBaseTest):
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_FAN_3_1(self):
         # Setup
         self.endpoint = self.get_endpoint(default=1)
@@ -280,4 +281,4 @@ class TC_FAN_3_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

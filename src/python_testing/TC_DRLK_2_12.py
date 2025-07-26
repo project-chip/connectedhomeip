@@ -35,7 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from drlk_2_x_common import DRLK_COMMON
 
 # Configurable parameters:
@@ -53,7 +54,7 @@ from drlk_2_x_common import DRLK_COMMON
 
 class TC_DRLK_2_12(MatterBaseTest, DRLK_COMMON):
 
-    @async_test_body
+    @decorators.async_test_body
     async def teardown_test(self):
         await self.teardown()
         return super().teardown_test()
@@ -64,10 +65,10 @@ class TC_DRLK_2_12(MatterBaseTest, DRLK_COMMON):
     def pics_TC_DRLK_2_12(self) -> list[str]:
         return ["DRLK.S.F0c"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DRLK_2_12(self):
         await self.run_drlk_test_2_12()
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

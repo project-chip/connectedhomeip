@@ -68,9 +68,9 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.testing import decorators, matchers, runner
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
+from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
@@ -89,7 +89,7 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
 
 
 class TC_MCORE_FS_1_2(MatterBaseTest):
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -169,7 +169,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3*60
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_MCORE_FS_1_2(self):
 
         # Commissioning - done
@@ -198,7 +198,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
+        asserts.assert_true(matchers.is_type(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
         if not self.is_pics_sdk_ci_only:
@@ -298,4 +298,4 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

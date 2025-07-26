@@ -45,8 +45,9 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -134,7 +135,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_EEVSE_2_6(self):
         self.step("1")
         # Commission DUT - already done
@@ -305,4 +306,4 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()
