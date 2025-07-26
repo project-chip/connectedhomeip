@@ -1332,6 +1332,30 @@ JNI_METHOD(void, unpairDeviceCallback)(JNIEnv * env, jobject self, jlong handle,
     }
 }
 
+// Method used in case of NFC-based Commissioning without power
+// At end of 1st commissioning phase, the user is asked to install and power ON the device.
+// Present function is used to confirm that this action has been done.
+JNI_METHOD(void, continueCommissioningOverOperationalNetwork)(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = nullptr;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+
+    VerifyOrExit(env != nullptr, err = CHIP_ERROR_BAD_REQUEST);
+
+    wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    wrapper->Controller()->ContinueCommissioningOverOperationalNetwork();
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to continue Commissioning Over OperationalNetwork. : %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
