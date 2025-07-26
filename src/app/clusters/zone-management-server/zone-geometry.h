@@ -151,9 +151,24 @@ public:
      *       (cycle graph) with each vertex having degree 2, and does not
      *       constitute self-intersection.
      *    b. If a polygon self-intersects, it must have at least one pair of
-     *       non-adjacent edges that intersect. Thus, by checking every unique
-     *       pair of non-adjacent edges, the algorithm guarantees that if a
-     *       self-intersection exists, it will be found.
+     *       non-adjacent edges that intersect.
+     *       Proof:
+     *       i)  Regular case where adjacent edges do not overlap:
+     *           Since adjacent edges only share their end-vertices, they only
+     *           intersect at their end vertices and that is not a self
+     *           intersection. Any other self intersection, if it exists,
+     *           must be between non-adjacent edges.
+     *       ii) Case where adjacent edges overlap:
+     *           When 2 adjacent edges overlap, let 'l' denote the longer edge
+     *           and 's' denote the shorter edge. The non-shared end vertex
+     *           of 's' lies on 'l'. Let this point be P. Since, a polygon with
+     *           no duplicate vertices is a cycle graph, each vertex has degree 2.
+     *           So, there must be another edge 't' that is incident on P. This
+     *           makes non-adjacent edges 't' and 'l' intersect by meeting at
+     *           point P.
+     *       Thus, by checking every unique pair of non-adjacent edges, the
+     *       algorithm guarantees that if a self-intersection exists, it will
+     *       be found.
      *    c. Exception of 3 vertices:
      *       A polygon of 3 vertices has all edges adjacent to each other. In
      *       the normal case, it is a triangle and a cycle.
