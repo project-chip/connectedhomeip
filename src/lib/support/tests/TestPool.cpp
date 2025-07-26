@@ -546,4 +546,47 @@ TEST_F(TestPool, TestPoolInterfaceDynamic)
 }
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
+template <typename T, size_t N, ObjectPoolMem P>
+void TestPoolAutoRelease()
+{
+    using PoolType = ObjectPool<uint32_t, N, P>;
+    PoolType pool;
+
+    EXPECT_EQ(pool.Allocated(), 0u);
+
+    {
+        PoolAutoRelease<uint32_t, PoolType> obj(pool, pool.CreateObject());
+        ASSERT_NE(obj, nullptr);
+        ASSERT_FALSE(obj.IsNull());
+        EXPECT_EQ(GetNumObjectsInUse(pool), 1u);
+        EXPECT_EQ(pool.Allocated(), 1u);
+    }
+
+    EXPECT_EQ(GetNumObjectsInUse(pool), 0u);
+    EXPECT_EQ(pool.Allocated(), 0u);
+
+    PoolAutoRelease<uint32_t, PoolType> obj(pool, pool.CreateObject());
+    ASSERT_NE(obj, nullptr);
+    ASSERT_FALSE(obj.IsNull());
+    obj.Release();
+    ASSERT_EQ(obj, nullptr);
+    ASSERT_TRUE(obj.IsNull());
+
+    // Assert additional release is a no-op
+    obj.Release();
+}
+
+TEST_F(TestPool, TestPoolAutoReleaseStatic)
+{
+    constexpr const size_t kSize = 100;
+    TestPoolAutoRelease<uint32_t, kSize, ObjectPoolMem::kInline>();
+}
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+TEST_F(TestPool, TestPoolAutoReleaseDynamic)
+{
+    TestPoolAutoRelease<uint32_t, 100, ObjectPoolMem::kHeap>();
+}
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
 } // namespace
