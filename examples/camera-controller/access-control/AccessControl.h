@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 
 #include <lib/core/DataModelTypes.h>
 
-constexpr chip::EndpointId kOtaProviderDynamicEndpointId = 0;
+constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
 
 namespace chip {
 namespace app {
-namespace dynamic_server {
+namespace AccessControl {
 
 /**
  * Initialize the access control module. Must be called on the Matter task
@@ -29,6 +29,6 @@ namespace dynamic_server {
  */
 void InitAccessControl();
 
-} // namespace dynamic_server
+} // namespace AccessControl
 } // namespace app
 } // namespace chip

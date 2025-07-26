@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 

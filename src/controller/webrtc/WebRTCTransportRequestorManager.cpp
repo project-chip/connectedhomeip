@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "WebRTCTransportRequestorManager.h"
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;

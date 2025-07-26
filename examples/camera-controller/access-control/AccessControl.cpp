@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Global.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::Access;
@@ -41,37 +42,33 @@ public:
     {}
 };
 
-// TODO: Make the policy more configurable by consumers.
 class AccessControlDelegate : public Access::AccessControl::Delegate
 {
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        // Check for OTA Software Update Provider endpoint
-        bool isOtaEndpoint =
-            (requestPath.endpoint == kOtaProviderDynamicEndpointId && requestPath.cluster == OtaSoftwareUpdateProvider::Id);
+        // Check for WebRTC Transport Requestor endpoint
+        bool isWebRtcEndpoint =
+            (requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
 
         // Only allow these specific endpoints
-        if (!isOtaEndpoint)
+        if (!isWebRtcEndpoint)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (requestPrivilege != Privilege::kOperate)
+        // Allow kOperate and below (kView, kProxyView, etc.)
+        // This covers reading attributes (kView) and invoking commands (kOperate)
+        if (requestPrivilege > Privilege::kOperate)
         {
-            // The commands on OtaSoftwareUpdateProvider all require
-            // Operate; we should not be asked for anything else.
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase &&
-            subjectDescriptor.authMode != AuthMode::kInternalDeviceAccess)
+        if (subjectDescriptor.authMode != AuthMode::kCase)
         {
-            // No idea who is asking; deny for now.
+            // Restrict to Case
             return CHIP_ERROR_ACCESS_DENIED;
         }
-
-        // TODO do we care about the fabric index here?  Probably not.
 
         return CHIP_NO_ERROR;
     }
@@ -81,7 +78,26 @@ struct ControllerAccessControl
 {
     DeviceTypeResolver mDeviceTypeResolver;
     AccessControlDelegate mDelegate;
-    ControllerAccessControl() { GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
+    bool mInitialized = false;
+
+    // Remove constructor initialization
+    ControllerAccessControl() = default;
+
+    // Add explicit Init method
+    CHIP_ERROR Init()
+    {
+        if (mInitialized)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR err = GetAccessControl().Init(&mDelegate, mDeviceTypeResolver);
+        if (err == CHIP_NO_ERROR)
+        {
+            mInitialized = true;
+        }
+        return err;
+    }
 };
 
 Global<ControllerAccessControl> gControllerAccessControl;
@@ -90,11 +106,21 @@ Global<ControllerAccessControl> gControllerAccessControl;
 
 namespace chip {
 namespace app {
-namespace dynamic_server {
+namespace AccessControl {
+
 void InitAccessControl()
 {
-    gControllerAccessControl.get(); // force initialization
+    CHIP_ERROR err = gControllerAccessControl.get().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to initialize access control: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Access control initialized successfully");
+    }
 }
-} // namespace dynamic_server
+
+} // namespace AccessControl
 } // namespace app
 } // namespace chip
