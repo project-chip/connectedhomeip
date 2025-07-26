@@ -46,12 +46,12 @@ from mobly.test_runner import TestRunner
 try:
     from matter_yamltests.hooks import TestRunnerHooks
 except ImportError:
-    class TestRunnerHooks:
+    class TestRunnerHooks:  # type: ignore[no-redef] # Conditional fallback, not a true redefinition
         pass
 try:
     from chip.tracing import TracingContext
 except ImportError:
-    class TracingContext:
+    class TracingContext:  # type: ignore[no-redef] # Conditional fallback, not a true redefinition
         def __enter__(self):
             return self
 
@@ -562,15 +562,16 @@ class MockTestRunner():
     mocking the controller's Read method and other interactions.
     """
 
-    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
-                 pics: dict[str, bool] = None, paa_trust_store_path=None):
+    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
+                 pics: Optional[dict[bool, str]] = None, paa_trust_store_path=None):
 
         from chip.testing.matter_test_config import MatterTestConfig
         from chip.testing.matter_testing import MatterStackState
 
         self.kvs_storage = 'kvs_admin.json'
+
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
-                                       pics=pics, storage_path=self.kvs_storage)
+                                       pics=pics or {}, storage_path=Path(self.kvs_storage))
         self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
@@ -595,14 +596,14 @@ class MockTestRunner():
 
         self.test_class = getattr(module, classname)
 
-    def set_test_config(self, test_config: 'MatterTestConfig' = None):
-        from chip.testing.matter_test_config import MatterTestConfig
+    def set_test_config(self, test_config: Optional['MatterTestConfig'] = None):
+        from chip.testing.matter_testing import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
 
         self.config = test_config
         self.config.tests = [self.test]
-        self.config.storage_path = self.kvs_storage
+        self.config.storage_path = Path(self.kvs_storage)
         if not self.config.dut_node_ids:
             self.config.dut_node_ids = [1]
 
@@ -735,16 +736,20 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_controller = args.ble_controller
-    config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
+    if args.PICS is None:
+        config.pics = {}
+    else:
+        pics_file_dict = read_pics_from_file(args.PICS)
+        config.pics = {v: k for k, v in pics_file_dict.items()}
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
-    config.app_pipe = args.app_pipe
-    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
+    config.pipe_name = args.app_pipe
+    if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
-        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
+        logging.error("Named pipe %r does NOT exist" % config.pipe_name)
+        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.fail_on_skipped_tests = args.fail_on_skipped
 
