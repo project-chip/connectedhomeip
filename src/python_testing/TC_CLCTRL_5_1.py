@@ -257,7 +257,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
 
                     logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
                     # Simulating manual latching by waiting for user input
-                    self.wait_for_user_input(promt_msg="Press Enter after latching the DUT...")
+                    self.wait_for_user_input(prompt_msg="Press Enter after latching the DUT...")
                     logging.info("Manual latching completed.")
                 else:
                     logging.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 3f")
@@ -325,7 +325,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
 
                 logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                 # Simulating manual unlatching by waiting for user input
-                self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
                 logging.info("Manual unlatching completed.")
             else:
                 logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to steps 4c to 4f")
