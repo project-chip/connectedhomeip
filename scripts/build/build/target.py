@@ -202,7 +202,7 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[
 class BuildTarget:
 
     def __init__(self, name, builder_class, **kwargs):
-        """ Sets up a new build tareget starting with the given builder class
+        """ Sets up a new build target starting with the given builder class
             and initial arguments
         """
         self.name = name.lower()

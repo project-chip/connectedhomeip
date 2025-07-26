@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabThreadType
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
@@ -24,7 +24,7 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
+from builders.mbed import MbedApp, MbedBoard, MbedBuilder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
@@ -39,8 +39,16 @@ from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from .target import BuildTarget, TargetPart
 
 
+class BuildTargetCommon(BuildTarget):
+    """Target builder with common modifiers."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.AppendModifier('no-debug', debug=False)
+
+
 def BuildHostTestRunnerTarget():
-    target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
+    target = BuildTargetCommon(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
     target.AppendFixedTargets([
         TargetPart(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE),
@@ -56,7 +64,7 @@ def BuildHostTestRunnerTarget():
 
 
 def BuildHostFakeTarget():
-    target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
+    target = BuildTargetCommon(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
     target.AppendFixedTargets([
         TargetPart('fake', board=HostBoard.FAKE),
@@ -91,7 +99,7 @@ def BuildHostTarget():
     cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (
         native_board_name != HostBoard.ARM64.BoardName())
 
-    target = BuildTarget(HostBoard.NATIVE.PlatformName(), HostBuilder)
+    target = BuildTargetCommon(HostBoard.NATIVE.PlatformName(), HostBuilder)
 
     board_parts = [
         TargetPart(native_board_name, board=HostBoard.NATIVE),
@@ -366,7 +374,7 @@ def BuildNuttXTarget():
 
 
 def BuildAndroidTarget():
-    target = BuildTarget('android', AndroidBuilder)
+    target = BuildTargetCommon('android', AndroidBuilder)
 
     # board
     target.AppendFixedTargets([
@@ -398,9 +406,6 @@ def BuildAndroidTarget():
                    app=AndroidApp.VIRTUAL_DEVICE_APP),
     ])
 
-    # Modifiers
-    target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
-
     return target
 
 
@@ -422,14 +427,6 @@ def BuildMbedTarget():
         TargetPart('ota-requestor', app=MbedApp.OTA_REQUESTOR),
         TargetPart('shell', app=MbedApp.SHELL),
     ])
-
-    # Modifiers
-    target.AppendModifier('release', profile=MbedProfile.RELEASE).ExceptIfRe(
-        '-(develop|debug)')
-    target.AppendModifier('develop', profile=MbedProfile.DEVELOP).ExceptIfRe(
-        '-(release|debug)')
-    target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe(
-        '-(release|develop)')
 
     return target
 
@@ -669,7 +666,7 @@ def BuildStm32Target():
 
 
 def BuildTizenTarget():
-    target = BuildTarget('tizen', TizenBuilder)
+    target = BuildTargetCommon('tizen', TizenBuilder)
 
     # board
     target.AppendFixedTargets([

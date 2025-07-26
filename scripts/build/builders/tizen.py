@@ -84,6 +84,7 @@ class TizenBuilder(GnBuilder):
                  runner,
                  app: TizenApp = TizenApp.LIGHT,
                  board: TizenBoard = TizenBoard.ARM,
+                 debug: bool = True,
                  enable_ble: bool = True,
                  enable_thread: bool = True,
                  enable_wifi: bool = True,
@@ -120,6 +121,8 @@ class TizenBuilder(GnBuilder):
             self.extra_gn_options.append('strip_symbols=true')
             self.build_command = 'check'
 
+        if not debug:
+            self.extra_gn_options.append('is_debug=false')
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
         if not enable_thread:
