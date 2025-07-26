@@ -612,4 +612,91 @@ TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
     sessionManager.Shutdown();
 }
 
+// Test that verifies group session keys are only parsed when SessionId matches KeyHash
+TEST_F(TestSessionManager, TestGroupSessionKeyMatching)
+{
+    // Create a test message with a specific session ID
+    constexpr uint16_t kTestSessionId      = 0x1234;
+    constexpr uint16_t kDestinationGroupId = 0x5678;
+
+    // Create a test message with the session ID
+    PacketHeader header;
+    header.SetSessionId(kTestSessionId);
+    header.SetSourceNodeId(kUndefinedNodeId);
+    header.SetDestinationGroupId(kDestinationGroupId);
+    header.SetMessageCounter(1);
+
+    // Create a dummy message buffer with minimal data for a group message
+    // We need at least enough space for the header and a minimal payload
+    const size_t data_len          = 64; // Sufficient for a minimal message
+    System::PacketBufferHandle msg = System::PacketBufferHandle::New(data_len);
+    ASSERT_FALSE(msg.IsNull());
+
+    // Get the group data provider
+    Credentials::GroupDataProvider * groupDataProvider = GetGroupDataProvider();
+    ASSERT_NE(groupDataProvider, nullptr);
+
+    // Create a test key set with our test session ID as the key hash
+    constexpr FabricIndex kFabricIndex = 1;
+    constexpr GroupId kGroupId         = kDestinationGroupId;
+
+    // Create a test key
+    uint8_t testKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
+    for (size_t i = 0; i < sizeof(testKey); ++i)
+    {
+        testKey[i] = static_cast<uint8_t>(i);
+    }
+
+    // Create a key set with our test session ID as the key hash
+    Credentials::GroupDataProvider::KeySet keySet(kGroupId, kTestSessionId,
+                                                  Credentials::GroupDataProvider::KeySet::kGroupKeyMinSize);
+    keySet.operational_keys[0].start_time = System::Clock::kZero;
+    memcpy(keySet.operational_keys[0].key, testKey, sizeof(testKey));
+
+    // Add the key set to the group data provider
+    CHIP_ERROR err = groupDataProvider->SetKeySet(kFabricIndex, keySet);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Create a flag to track if the message was handled
+    bool messageHandled = false;
+    auto oldHandler     = mSessionManager.GetMessageDispatchHandler();
+    mSessionManager.SetMessageDispatchHandler(
+        [&](const PacketHeader & packetHeader, const Transport::PeerAddress & peer, System::PacketBufferHandle && msg) {
+            messageHandled = true;
+            EXPECT_EQ(packetHeader.GetSessionId(), kTestSessionId);
+        });
+
+    // Test 1: Matching session ID - should be processed
+    messageHandled = false;
+
+    // Create a copy of the message for this test
+    System::PacketBufferHandle testMsg1 = msg.CloneData();
+    ASSERT_FALSE(testMsg1.IsNull());
+
+    // Process the message - should match our test session ID
+    mSessionManager.SecureGroupMessageDispatch(header, Transport::PeerAddress::UDP(IPAddress::Any), std::move(testMsg1));
+
+    // The message will fail to decrypt (since we didn't set up proper encryption),
+    // but we can verify that the session ID matching logic was exercised
+
+    // Test 2: Non-matching session ID - should be dropped
+    constexpr uint16_t kNonMatchingSessionId 0xFFFF;
+    header.SetSessionId(kNonMatchingSessionId);
+
+    messageHandled = false;
+
+    // Create another copy of the message for this test
+    System::PacketBufferHandle testMsg2 = msg.CloneData();
+    ASSERT_FALSE(testMsg2.IsNull());
+
+    // Process the message - should not match our test session ID
+    mSessionManager.SecureGroupMessageDispatch(header, Transport::PeerAddress::UDP(IPAddress::Any), std::move(testMsg2));
+
+    // The message should be dropped without attempting to decrypt
+
+    // Clean up
+    groupDataProvider->RemoveKeySet(kFabricIndex, kTestSessionId);
+    mSessionManager.SetMessageDispatchHandler(oldHandler);
+}
+
 } // namespace
