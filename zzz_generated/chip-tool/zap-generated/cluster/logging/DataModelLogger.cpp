@@ -6355,10 +6355,42 @@ CHIP_ERROR DataModelLogger::LogValue(
 {
     DataModelLogger::LogString(label, indent, "{");
     {
+        CHIP_ERROR err = LogValue("CMAFInterface", indent + 1, value.CMAFInterface);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CMAFInterface'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SegmentDuration", indent + 1, value.segmentDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SegmentDuration'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("ChunkDuration", indent + 1, value.chunkDuration);
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ChunkDuration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SessionGroup", indent + 1, value.sessionGroup);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SessionGroup'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TrackName", indent + 1, value.trackName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TrackName'");
             return err;
         }
     }
@@ -6371,18 +6403,18 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("MetadataEnabled", indent + 1, value.metadataEnabled);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MetadataEnabled'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("CENCKeyID", indent + 1, value.CENCKeyID);
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CENCKeyID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MetadataEnabled", indent + 1, value.metadataEnabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MetadataEnabled'");
             return err;
         }
     }
