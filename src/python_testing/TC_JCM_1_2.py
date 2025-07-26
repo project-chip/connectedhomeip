@@ -42,7 +42,6 @@ from configparser import ConfigParser
 import chip.clusters as Clusters
 import chip.tlv
 from chip import CertificateAuthority
-from chip.ChipDeviceCtrl import ChipDeviceControllerBase
 from chip.storage import PersistentStorage
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -217,7 +216,7 @@ class TC_JCM_1_2(MatterBaseTest):
 
     def steps_TC_JCM_1_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "On Ecosystem B, use jfc-app for opening a commissioning window in jfa-app using Python Controller"
+            TestStep("1", "On Ecosystem B, use jfc-app for opening a joint commissioning window in jfa-app using Python Controller"
                      "Check this Commissioning Window opens successfully with correct parameters"),
             TestStep("2", "On Ecosystem A, use jfc-app for commissioning jfa-app at EcosystemB using Python Controller"
                      "Verify Joint Commissioning completes successfully with --jcm functionality"),
@@ -252,12 +251,12 @@ class TC_JCM_1_2(MatterBaseTest):
         try:
             self.step("1")
             try:
-                response = await devCtrlEcoB.OpenCommissioningWindow(
+                response = await devCtrlEcoB.OpenJointCommissioningWindow(
                     nodeid=11,
+                    endpointId=1,
                     timeout=400,
                     iteration=random.randint(1000, 100000),
-                    discriminator=random.randint(0, 4095),
-                    option=ChipDeviceControllerBase.CommissioningWindowPasscode.kTokenWithRandomPin
+                    discriminator=random.randint(0, 4095)
                 )
             except Exception as e:
                 asserts.assert_true(False, f'Exception {e} occured during OJCW')
