@@ -143,6 +143,7 @@
 #if ENABLE_SE05X_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
+#include <third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h>
 
 extern CHIP_ERROR se05x_close_session(void);
 
@@ -451,6 +452,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
 #endif
+
+    if (se05x_host_gpio_init() != 0)
+    {
+        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_init function");
+        ChipLogError(NotSpecified, "SE05x - Crypto operations offloaded to secure element will fail");
+    }
+    else
+    {
+        ChipLogDetail(Crypto, "SE05x - Turn OFF secure Element");
+        if (se05x_host_gpio_set_value(0) != 0)
+        {
+            ChipLogError(NotSpecified, "SE05x - Failed to set the GPIO connected to SE05x to low");
+        }
+    }
 
     err = Platform::MemoryInit();
     SuccessOrExit(err);
@@ -851,6 +866,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     // Close SE05x session
     se05x_close_session();
+
+    ChipLogDetail(Crypto, "SE05x - De-initialize GPIO after Session Close");
+    if (se05x_host_gpio_deinit() != 0)
+    {
+        ChipLogError(NotSpecified, "SE05x - Failed to de-initialize GPIO connected to SE05x");
+    }
 
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
