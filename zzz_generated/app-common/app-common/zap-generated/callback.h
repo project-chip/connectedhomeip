@@ -7873,36 +7873,6 @@ bool emberAfContentAppObserverClusterContentAppMessageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::DecodableType & commandData);
 /**
- * @brief Zone Management Cluster CreateTwoDCartesianZone Command callback (from client)
- */
-bool emberAfZoneManagementClusterCreateTwoDCartesianZoneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZone::DecodableType & commandData);
-/**
- * @brief Zone Management Cluster UpdateTwoDCartesianZone Command callback (from client)
- */
-bool emberAfZoneManagementClusterUpdateTwoDCartesianZoneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::DecodableType & commandData);
-/**
- * @brief Zone Management Cluster RemoveZone Command callback (from client)
- */
-bool emberAfZoneManagementClusterRemoveZoneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ZoneManagement::Commands::RemoveZone::DecodableType & commandData);
-/**
- * @brief Zone Management Cluster CreateOrUpdateTrigger Command callback (from client)
- */
-bool emberAfZoneManagementClusterCreateOrUpdateTriggerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::DecodableType & commandData);
-/**
- * @brief Zone Management Cluster RemoveTrigger Command callback (from client)
- */
-bool emberAfZoneManagementClusterRemoveTriggerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::DecodableType & commandData);
-/**
  * @brief Joint Fabric Datastore Cluster AddKeySet Command callback (from client)
  */
 bool emberAfJointFabricDatastoreClusterAddKeySetCallback(

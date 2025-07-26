@@ -148,6 +148,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h': {'vector'},
+    'src/app/clusters/zone-management-server/zone-management-server.h': {'vector'},
+    'src/app/clusters/zone-management-server/zone-geometry.h': {'vector', 'set'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
     'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
