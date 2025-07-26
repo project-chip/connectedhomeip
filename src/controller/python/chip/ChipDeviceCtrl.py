@@ -1900,16 +1900,15 @@ class ChipDeviceControllerBase():
             # Wildcard
             return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
-            # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
-            # Fixing these typing errors is a high risk to affect existing functionality.
-            # These mismatches are intentional and safe within the current logic.
-            # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
+            # mypy refactor (PR https://github.com/project-chip/connectedhomeip/pull/39827):
+            # instantiate class types before passing to from_cluster/from_event
+            # because these expect instances, not classes.
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[arg-type]
-                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
-            elif issubclass(pathTuple, ClusterObjects.ClusterEvent):  # type: ignore[arg-type]
-                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)  # type: ignore[arg-type]
+            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.Cluster):
+                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
+            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.ClusterEvent):
+                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
             else:
                 raise ValueError("Unsupported Event Path")
         else:
@@ -1918,19 +1917,19 @@ class ChipDeviceControllerBase():
             else:
                 urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
                 # endpoint + (cluster) event / endpoint + cluster
-                # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
-                # Fixing these typing errors is a high risk to affect existing functionality.
-                # These mismatches are intentional and safe within the current logic.
-                # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
-                if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
+                # mypy refactor (PR https://github.com/project-chip/connectedhomeip/pull/39827):
+                # instantiate class types in pathTuple[1] before passing
+                # to from_cluster/from_event as these expect instances.
+                if isinstance(pathTuple[1], type) and issubclass(pathTuple[1], ClusterObjects.Cluster):
                     return ClusterAttribute.EventPath.from_cluster(
-                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                        Cluster=pathTuple[1], Urgent=urgent  # type: ignore[arg-type]
+                        EndpointId=pathTuple[0],
+                        Cluster=pathTuple[1](),
+                        Urgent=urgent
                     )
-                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):  # type: ignore[arg-type]
+                elif isinstance(pathTuple[1], type) and issubclass(pathTuple[1], ClusterObjects.ClusterEvent):
                     return ClusterAttribute.EventPath.from_event(
-                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                        Event=pathTuple[1],  # type: ignore[arg-type]
+                        EndpointId=pathTuple[0],
+                        Event=pathTuple[1](),
                         Urgent=urgent
                     )
                 else:
@@ -2536,13 +2535,20 @@ class ChipDeviceControllerBase():
 class ChipDeviceController(ChipDeviceControllerBase):
     ''' 
     The ChipDeviceCommissioner binding, named as ChipDeviceController
-
-    TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
     '''
+    # TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
-    ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
-        assert fabricAdmin is not None  # fabricAdmin must be provided
+    def __init__(self,
+                 opCredsContext: ctypes.c_void_p,
+                 fabricId: int,
+                 nodeId: int,
+                 adminVendorId: int,
+                 fabricAdmin: FabricAdmin.FabricAdmin,
+                 catTags: typing.List[int] = [],
+                 paaTrustStorePath: str = "",
+                 useTestCommissioner: bool = False,
+                 name: str = '',
+                 keypair: typing.Optional[p256keypair.P256Keypair] = None):
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -2866,7 +2872,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._fabricCheckNodeId
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
+                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,  # type: ignore
                                   discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
@@ -2936,7 +2942,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return None
         return rcac_bytes
 
-    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
+    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:  # type: ignore
         '''
         Commission with the given nodeid from the setupPayload.
         setupPayload may be a QR or manual code.
@@ -2958,7 +2964,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
+                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)  # type: ignore
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
@@ -3035,7 +3041,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDACRevocationSetPath(
-                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else ""))
+                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else ""))  # type: ignore[arg-type]
         ).raise_on_error()
 
 
