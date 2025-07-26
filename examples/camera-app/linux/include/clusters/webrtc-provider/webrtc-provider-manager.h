@@ -69,8 +69,8 @@ public:
                                 chip::app::DataModel::Nullable<uint16_t> audioStreamID) override;
 
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                   const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
-                                   const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
+                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
+                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 

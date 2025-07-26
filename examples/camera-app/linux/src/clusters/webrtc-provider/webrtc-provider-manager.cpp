@@ -359,9 +359,8 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
 }
 
 CHIP_ERROR
-WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                           Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
     if (mCameraDevice == nullptr)
     {
