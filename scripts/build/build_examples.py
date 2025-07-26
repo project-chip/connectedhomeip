@@ -207,7 +207,7 @@ def cmd_generate(context):
 
         json - a JSON representation of the available targets;
 
-        completion - a list of strings suitable for bash completion;
+        completion - a list of strings suitable for shell completion;
         """)
 @click.argument('COMPLETION-PREFIX', default='')
 @click.pass_context
