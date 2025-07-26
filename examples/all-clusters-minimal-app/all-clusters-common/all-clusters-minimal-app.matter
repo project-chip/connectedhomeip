@@ -6653,7 +6653,7 @@ endpoint 0 {
     callback attribute channelNumber;
     callback attribute rssi;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster EthernetNetworkDiagnostics {
