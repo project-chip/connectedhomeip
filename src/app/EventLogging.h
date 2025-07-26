@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "lib/core/DataModelTypes.h"
 #include <app/ConcreteEventPath.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventManagement.h>
@@ -32,7 +33,7 @@ template <typename T>
 class EventLogger : public EventLoggingDelegate
 {
 public:
-    EventLogger(const T & aEventData) : mEventData(aEventData){};
+    EventLogger(const T & aEventData) : mEventData(aEventData) {};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
@@ -41,6 +42,19 @@ public:
 private:
     const T & mEventData;
 };
+
+namespace internal {
+
+/// Internal event logging:
+///   - uses chip::app::EventManagement to log the event
+///   - validates that eventOptions.mFabricIndex is defined if `isFabricScoped`
+///
+/// This is NOT public API, it is here to save the amount of flash used by minimizing
+/// amount of code that is in template functions.
+CHIP_ERROR LogEvent(EventLoggingDelegate * delegate, const EventOptions & eventOptions, EventNumber & outEventNumber,
+                    bool isFabricScoped);
+
+}
 
 /**
  * @brief
@@ -58,7 +72,6 @@ private:
  * the Matter event queue when using LogEvent. This function is not safe to call
  * outside of the main Matter processing context.
  *
- * LogEvent has 2 variant, one for fabric-scoped events and one for non-fabric-scoped events.
  * @param[in] aEventData  The event cluster object
  * @param[in] aEndpoint    The current cluster's Endpoint Id
  * @param[out] aEventNumber The event Number if the event was written to the
@@ -66,40 +79,22 @@ private:
  *
  * @return CHIP_ERROR  CHIP Error Code
  */
-template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+template <typename T>
 CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aEventNumber)
 {
     EventLogger<T> eventData(aEventData);
-    ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+
     EventOptions eventOptions;
-    eventOptions.mPath        = path;
+    eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
-    eventOptions.mFabricIndex = aEventData.GetFabricIndex();
-    // this skips logging the event if it's fabric-scoped but no fabric association exists yet.
-    VerifyOrReturnError(eventOptions.mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    //
-    // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,
-    // fabric-sensitive events don't require that since the actual omission of the event in its entirety
-    // happens within the event management framework itself at the time of access.
-    //
-    // The 'mFabricIndex' field in the event options above is encoded out-of-band alongside the event payload
-    // and used to match against the accessing fabric.
-    //
-    return logMgmt.LogEvent(&eventData, eventOptions, aEventNumber);
-}
+    if constexpr (DataModel::IsFabricScoped<T>::value) {
+        eventOptions.mFabricIndex = aEventData.GetFabricIndex();
+    } else {
+        eventOptions.mFabricIndex = kUndefinedFabricIndex;
+    }
 
-template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
-CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aEventNumber)
-{
-    EventLogger<T> eventData(aEventData);
-    ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    EventOptions eventOptions;
-    eventOptions.mPath     = path;
-    eventOptions.mPriority = aEventData.GetPriorityLevel();
-    return logMgmt.LogEvent(&eventData, eventOptions, aEventNumber);
+    return internal::LogEvent(&eventData, eventOptions, aEventNumber,  DataModel::IsFabricScoped<T>::value);
 }
 
 } // namespace app

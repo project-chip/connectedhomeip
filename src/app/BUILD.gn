@@ -515,6 +515,7 @@ static_library("app") {
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
     "EventLogging.h",
+    "EventLogging.cpp",
     "EventManagement.cpp",
     "EventManagement.h",
     "FailSafeContext.cpp",
