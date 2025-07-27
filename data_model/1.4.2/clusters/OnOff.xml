@@ -139,30 +139,30 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="OnOff" type="bool" default="false">
+    <attribute id="0x0000" name="OnOff" type="bool">
       <access read="true" readPrivilege="view"/>
       <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x4000" name="GlobalSceneControl" type="bool" default="true">
+    <attribute id="0x4000" name="GlobalSceneControl" type="bool">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x4001" name="OnTime" type="uint16" default="0">
+    <attribute id="0x4001" name="OnTime" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x4002" name="OffWaitTime" type="uint16" default="0">
+    <attribute id="0x4002" name="OffWaitTime" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x4003" name="StartUpOnOff" type="StartUpOnOffEnum" default="MS">
+    <attribute id="0x4003" name="StartUpOnOff" type="StartUpOnOffEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -205,7 +205,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="EffectVariant" type="enum8" default="0">
+      <field id="1" name="EffectVariant" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>

@@ -93,6 +93,8 @@ static_library("jfc-utils") {
     "commands/common/CHIPCommand.cpp",
     "commands/example/ExampleOperationalCredentialsIssuer.cpp",
     "commands/example/ExampleOperationalCredentialsIssuer.h",
+    "commands/pairing/OpenJointCommissioningWindowCommand.cpp",
+    "commands/pairing/OpenJointCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/PairingCommand.h",
   ]
