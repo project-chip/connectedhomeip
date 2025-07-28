@@ -47,12 +47,12 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        // Check for WebRTC Transport Requestor endpoint
-        bool isWebRtcEndpoint =
+        // Check for WebRTC Transport Requestor endpoint and cluster
+        bool isWebRtcTransportRequestor =
             (requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
 
-        // Only allow these specific endpoints
-        if (!isWebRtcEndpoint)
+        // If the request is not from WebRTC Transport Requestor, deny access
+        if (!isWebRtcTransportRequestor)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -64,9 +64,11 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (subjectDescriptor.authMode != AuthMode::kCase)
+        // Allow CASE, PASE, and internal device access
+        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase &&
+            subjectDescriptor.authMode != AuthMode::kInternalDeviceAccess)
         {
-            // Restrict to Case
+            ChipLogError(AppServer, "Unsupported auth mode for WebRTC: %u", static_cast<uint8_t>(subjectDescriptor.authMode));
             return CHIP_ERROR_ACCESS_DENIED;
         }
 

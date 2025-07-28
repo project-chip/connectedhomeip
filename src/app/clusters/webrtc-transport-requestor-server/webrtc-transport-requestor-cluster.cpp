@@ -257,12 +257,14 @@ WebRTCTransportRequestorServer::HandleICECandidates(const Commands::ICECandidate
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
+    // Check ice candidates min 1 contraint.
     if (candidates.empty())
     {
         ChipLogError(Zcl, "HandleICECandidates: No ICE candidates provided.");
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
+    // Check if the session, NodeID are valid
     if (!IsPeerNodeSessionValid(sessionId, commandHandler))
     {
         return Protocols::InteractionModel::Status::NotFound;
@@ -280,7 +282,7 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const Co
     // Validate the reason field against the allowed enum values.
     if (reason == WebRTCEndReasonEnum::kUnknownEnumValue)
     {
-        ChipLogError(Zcl, "HandleEnd: Invalid reason value %u.", static_cast<uint8_t>(reason));
+        ChipLogError(Zcl, "HandleEnd: Invalid reason value %u.", to_underlying(reason));
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
