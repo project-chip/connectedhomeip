@@ -51,6 +51,9 @@ config("scm1612s_sdk_config") {
       "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/gap/include",
       "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/gatt/include",
       "${scm1612s_sdk_root}/lib/tinycrypt/lib/include",
+      "${scm1612s_sdk_root}/lib/scm_mcuboot/mcuboot/boot/wise/include",
+      "${scm1612s_sdk_root}/lib/scm_mcuboot/mcuboot/boot/bootutil/include",
+      "${scm1612s_sdk_root}/lib/scm_mcuboot/mcuboot/boot/wise/include/sysflash",
     ]
 
     cflags = [
@@ -158,6 +161,7 @@ config("scm1612s_sdk_config") {
       "${scm1612s_sdk_root}/hal/drivers/efuse/hal-drivers-efuse.a",
       "${scm1612s_sdk_root}/hal/drivers/systimer/hal-drivers-systimer.a",
       "${scm1612s_sdk_root}/hal/drivers/pta/hal-drivers-pta.a",
+      "${scm1612s_sdk_root}/lib/scm_mcuboot/lib-scm_mcuboot.a",
     ]
 }
 
