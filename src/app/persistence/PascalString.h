@@ -162,6 +162,10 @@ public:
         return len == kInvalidLength || (static_cast<size_t>(len + PREFIX_LEN) <= span.size());
     }
 
+    /// Is the buffer that the pascal string points into a valid
+    /// pascal string (null or valid length?)
+    bool IsValidContent() const { return IsValid({ mData, mMaxSize }); }
+
 private:
     T * mData;
     const LengthType mMaxSize;

@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/ConcreteAttributePath.h"
 #include "app/data-model/Nullable.h"
 #include "app/persistence/PascalString.h"
 #include <app/persistence/AttributePersistence.h>
@@ -33,6 +34,12 @@ bool VerifySuccessLogOnFailure(const ConcreteAttributePath & path, CHIP_ERROR er
     return false;
 }
 
+void LogInvalidPascalContent(const ConcreteAttributePath & path)
+{
+    ChipLogError(Zcl, "Invalid pascal content: %u/" ChipLogFormatMEI "/" ChipLogFormatMEI, path.mEndpointId,
+                 ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+}
+
 } // namespace
 
 bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value,
@@ -42,7 +49,11 @@ bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::Sho
 
     if (VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
     {
-        return true;
+        if (value.IsValidContent())
+        {
+            return true;
+        }
+        LogInvalidPascalContent(path);
     }
 
     // failed, need to store default
@@ -60,7 +71,12 @@ bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::Sho
 
     if (VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
     {
-        return true;
+        // value is read, however it has to be a valid pascal value
+        if (value.IsValidContent())
+        {
+            return true;
+        }
+        LogInvalidPascalContent(path);
     }
     // failed, return falue and set a default
     if (!valueOnLoadFailure.has_value() || !value.SetValue(*valueOnLoadFailure))
@@ -112,6 +128,14 @@ bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttrib
         memcpy(data, valueOnLoadFailure, size);
         return false;
     }
+
+    if (rawBytes.size() != size)
+    {
+        /// short read: the value is not valid
+        memcpy(data, valueOnLoadFailure, size);
+        return false;
+    }
+
     return true;
 }
 
