@@ -133,6 +133,8 @@ struct ServerInitParams
 
     // Application delegate to handle some commissioning lifecycle events
     AppDelegate * appDelegate = nullptr;
+    // device discovery timeout
+    System::Clock::Seconds32 discoveryTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS);
     // Port to use for Matter commissioning/operational traffic
     uint16_t operationalServicePort = CHIP_PORT;
     // Port to use for UDC if supported
