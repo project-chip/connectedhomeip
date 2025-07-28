@@ -83,8 +83,8 @@ TEST(TestAttributePersistence, TestLoadAndStoreString)
 
     // Store a fake value
     {
-        const char buffer[] = "hello";
-        EXPECT_EQ(ramProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&buffer), 6 }), CHIP_NO_ERROR);
+        const uint8_t buffer[] = { 5, 'h', 'e', 'l', 'l', 'o' };
+        EXPECT_EQ(ramProvider.WriteValue(path, { buffer, sizeof(buffer) }), CHIP_NO_ERROR);
     }
 
     // Test loading a value
@@ -355,3 +355,4 @@ TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
 }
 
 } // namespace
+
