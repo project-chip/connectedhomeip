@@ -32,9 +32,9 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 static constexpr size_t kWiFiNetworkDiagnosticsFixedClusterCount =
-     WiFiNetworkDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size();
- static constexpr size_t kWiFiNetworkDiagnosticsMaxClusterCount =
-     kWiFiNetworkDiagnosticsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    WiFiNetworkDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kWiFiNetworkDiagnosticsMaxClusterCount =
+    kWiFiNetworkDiagnosticsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<WiFiDiagnosticsServerCluster> gServers[kWiFiNetworkDiagnosticsMaxClusterCount];
 
@@ -42,8 +42,8 @@ LazyRegisteredServerCluster<WiFiDiagnosticsServerCluster> gServers[kWiFiNetworkD
 // Log an error if not found.
 bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, WiFiNetworkDiagnostics::Id,
-                                                               kWiFiNetworkDiagnosticsFixedClusterCount);
+    uint16_t arrayIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, WiFiNetworkDiagnostics::Id, kWiFiNetworkDiagnosticsFixedClusterCount);
 
     if (arrayIndex >= kWiFiNetworkDiagnosticsMaxClusterCount)
     {
@@ -84,7 +84,7 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     // and do not properly support secondary network interfaces or per-endpoint diagnostics.
     // See issue:#40317
     gServers[arrayIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), enabledAttributes,
-                   BitFlags<WiFiNetworkDiagnostics::Feature>(rawFeatureMap));
+                                BitFlags<WiFiNetworkDiagnostics::Feature>(rawFeatureMap));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
