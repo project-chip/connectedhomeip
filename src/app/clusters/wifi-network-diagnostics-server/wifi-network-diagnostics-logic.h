@@ -20,8 +20,8 @@
 
 #include <app/AttributeValueEncoder.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
-#include <platform/DiagnosticDataProvider.h>
 #include <lib/core/DataModelTypes.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
 namespace app {
@@ -39,15 +39,12 @@ public:
                                const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
         mEndpointId(endpointId),
-        mDiagnosticProvider(diagnosticProvider),
-        mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }
 
-    ~WiFiDiagnosticsServerLogic() {
-        mDiagnosticProvider.SetWiFiDiagnosticsDelegate(nullptr);
-    }
+    ~WiFiDiagnosticsServerLogic() { mDiagnosticProvider.SetWiFiDiagnosticsDelegate(nullptr); }
 
     template <typename T, typename Type>
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &), Type & data,
