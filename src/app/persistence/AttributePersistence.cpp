@@ -13,6 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model/Nullable.h"
+#include "app/persistence/PascalString.h"
 #include <app/persistence/AttributePersistence.h>
 
 namespace chip::app {
@@ -38,26 +40,65 @@ bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::Sho
 {
     MutableByteSpan rawBytes = value.RawFullBuffer();
 
-    if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
+    if (VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
     {
-        if (valueOnLoadFailure.has_value() && value.SetValue(*valueOnLoadFailure))
-        {
-            // have a default that could be set
-            return false;
-        }
-        // no default value or default set failed. Set null
-        value.SetNull();
-        return false;
+        return true;
     }
-    return true;
+
+    // failed, need to store default
+    if (!valueOnLoadFailure.has_value() || !value.SetValue(*valueOnLoadFailure))
+    {
+        value.SetNull();
+    }
+    return false;
+}
+
+bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalBytes & value,
+                                std::optional<ByteSpan> valueOnLoadFailure)
+{
+    MutableByteSpan rawBytes = value.RawFullBuffer();
+
+    if (VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
+    {
+        return true;
+    }
+    // failed, return falue and set a default
+    if (!valueOnLoadFailure.has_value() || !value.SetValue(*valueOnLoadFailure))
+    {
+        value.SetNull();
+    }
+    return false;
 }
 
 DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                                           Storage::ShortPascalString & value)
 {
-    CharSpan spanValue;
+    DataModel::Nullable<CharSpan> spanValue;
     ReturnErrorOnFailure(decoder.Decode(spanValue));
-    VerifyOrReturnError(value.SetValue(spanValue), Protocols::InteractionModel::Status::ConstraintError);
+    if (spanValue.IsNull())
+    {
+        value.SetNull();
+    }
+    else
+    {
+        VerifyOrReturnError(value.SetValue(spanValue.Value()), Protocols::InteractionModel::Status::ConstraintError);
+    }
+    return mProvider.WriteValue(path, value.ContentWithLenPrefix());
+}
+
+DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                                          Storage::ShortPascalBytes & value)
+{
+    DataModel::Nullable<ByteSpan> spanValue;
+    ReturnErrorOnFailure(decoder.Decode(spanValue));
+    if (spanValue.IsNull())
+    {
+        value.SetNull();
+    }
+    else
+    {
+        VerifyOrReturnError(value.SetValue(spanValue.Value()), Protocols::InteractionModel::Status::ConstraintError);
+    }
     return mProvider.WriteValue(path, value.ContentWithLenPrefix());
 }
 

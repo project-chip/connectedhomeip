@@ -146,7 +146,7 @@ TEST(TestAttributePersistence, TestStringViaDecoder)
         AttributeValueDecoder decoder = writeOp.DecoderFor("hello world"_span);
 
         char buffer[32];
-        EXPECT_EQ(persistence.StorePascalString<Storage::ShortPascalString>(path, decoder, buffer), CHIP_NO_ERROR);
+        EXPECT_EQ(persistence.StorePascalString(path, decoder, buffer), CHIP_NO_ERROR);
 
         ShortPascalString stringStored(buffer);
         EXPECT_TRUE(stringStored.Content().data_equal("hello world"_span));

@@ -58,13 +58,22 @@ public:
     ///
     /// if valueOnLoadFailure cannot be set into value, value will be set to NULL (which never fails)
     bool Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value, std::optional<CharSpan> valueOnLoadFailure);
+    bool Load(const ConcreteAttributePath & path, Storage::ShortPascalBytes & value, std::optional<ByteSpan> valueOnLoadFailure);
 
     /// Interprets the `buffer` value as a `StringType` (generally ShortPascalString or similar) for the purposes of loading
-    template <typename StringType, size_t N>
+    template <size_t N>
     bool LoadPascalString(const ConcreteAttributePath & path, char (&buffer)[N], std::optional<CharSpan> valueOnLoadFailure)
     {
 
-        StringType value(buffer);
+        Storage::ShortPascalString value(buffer);
+        return Load(path, value, valueOnLoadFailure);
+    }
+
+    template <size_t N>
+    bool LoadPascalString(const ConcreteAttributePath & path, uint8_t (&buffer)[N], std::optional<ByteSpan> valueOnLoadFailure)
+    {
+
+        Storage::ShortPascalBytes value(buffer);
         return Load(path, value, valueOnLoadFailure);
     }
 
@@ -72,15 +81,29 @@ public:
     ///   - decode the given char span
     ///   - store it in the given pascal string
     ///   - write the value to persistent storage as a "prefixed value"
+    ///
+    /// Will store/support NULL values.
+    ///
     DataModel::ActionReturnStatus Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                         Storage::ShortPascalString & value);
+    DataModel::ActionReturnStatus Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                        Storage::ShortPascalBytes & value);
 
     /// helper to not create a separate ShortPascalString out of a buffer.
-    template <typename StringType, size_t N>
+    template <size_t N>
     DataModel::ActionReturnStatus StorePascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                                     char (&buffer)[N])
     {
-        StringType value(buffer);
+        Storage::ShortPascalString value(buffer);
+        return Store(path, decoder, value);
+    }
+
+    /// helper to not create a separate ShortPascalBytes out of a buffer.
+    template <size_t N>
+    DataModel::ActionReturnStatus StorePascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                                    uint8_t (&buffer)[N])
+    {
+        Storage::ShortPascalBytes value(buffer);
         return Store(path, decoder, value);
     }
 
