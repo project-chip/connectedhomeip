@@ -1,3 +1,4 @@
+
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +21,7 @@ on:
             - master
             - 'v*-branch'
     pull_request:
+      paths-ignore: ['**/*.md', '*.md']
     merge_group:
 
 concurrency:
