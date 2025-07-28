@@ -20,6 +20,7 @@ on:
             - master
             - 'v*-branch'
     pull_request:
+        paths-ignore: ["**/*.md", "*.md"]
     merge_group:
     workflow_dispatch:
 
