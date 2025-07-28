@@ -55,7 +55,7 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
     return true;
 }
 // Runtime method to check if an attribute is enabled using Ember functions.
-constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
+bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
 {
     return emberAfContainsAttribute(endpointId, WiFiNetworkDiagnostics::Id, attributeId);
 }
