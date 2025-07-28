@@ -18,13 +18,13 @@
 
 #pragma once
 
-#include "lib/core/DataModelTypes.h"
 #include <app/ConcreteEventPath.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventManagement.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h> // So we can encode lists
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
@@ -33,7 +33,7 @@ template <typename T>
 class EventLogger : public EventLoggingDelegate
 {
 public:
-    EventLogger(const T & aEventData) : mEventData(aEventData){};
+    EventLogger(const T & aEventData) : mEventData(aEventData) {};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
