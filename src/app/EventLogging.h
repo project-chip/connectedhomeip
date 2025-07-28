@@ -43,19 +43,6 @@ private:
     const T & mEventData;
 };
 
-namespace internal {
-
-/// Internal event logging:
-///   - uses chip::app::EventManagement to log the event
-///   - validates that eventOptions.mFabricIndex is defined if `isFabricScoped`
-///
-/// This is NOT public API, it is here to save the amount of flash used by minimizing
-/// amount of code that is in template functions.
-CHIP_ERROR LogEvent(EventLoggingDelegate * delegate, const EventOptions & eventOptions, EventNumber & outEventNumber,
-                    bool isFabricScoped);
-
-} // namespace internal
-
 /**
  * @brief
  *   Log an event via a EventLoggingDelegate, with options.
