@@ -81,6 +81,9 @@ void Connectivity::LoadInitialState()
 void Connectivity::UpdateState()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    // TODO: Allow BLE connection state to be updated by ChipEventHandler. Unfortunately,
+    //       as for now, the BLE connection/disconnection logic is a bit messy and because
+    //       of that events are not posted for all connection state changes.
     mBLEConnected = chip::DeviceLayer::ConnectivityMgr().NumBLEConnections() != 0;
 #endif
 }
