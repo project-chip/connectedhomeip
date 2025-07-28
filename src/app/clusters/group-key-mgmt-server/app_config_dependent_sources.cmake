@@ -17,4 +17,6 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/group-key-mgmt-server.cpp"
+    "${CLUSTER_DIR}/group-key-mgmt-cluster.h"
+    "${CLUSTER_DIR}/group-key-mgmt-cluster.cpp"
 )
