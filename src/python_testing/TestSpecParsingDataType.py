@@ -944,6 +944,57 @@ class TestSpecParsingDataType(MatterBaseTest):
         else:
             self.print_step("XML Analysis", "No fields with constraints found in XML")
 
+    def test_exhaustive_all_fields_in_1_4_2(self):
+        """Comprehensive test: validate every field in every XML for version 1.4.2, accumulate all issues, and fail at the end if any are found."""
+        xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
+        issues = []
+        if problems:
+            issues.extend([f"Parsing problem: {p}" for p in problems])
+
+        for cluster_id, cluster in xml_clusters.items():
+            # Test structs
+            for struct_name, struct in cluster.structs.items():
+                if not struct.name:
+                    issues.append(f"Struct with empty name in cluster {cluster.name}")
+                for field_id, field in struct.components.items():
+                    if not field.name:
+                        issues.append(f"Struct field with empty name in {struct_name} of cluster {cluster.name}")
+                    if not field_id:
+                        issues.append(f"Struct field with empty id in {struct_name} of cluster {cluster.name}")
+                    # Skip type_info check for deprecated Key field
+                    if (struct_name.strip() == "MonitoringRegistrationStruct" and
+                        field.name.strip() == "Key" and
+                        "ICD Management" in cluster.name):
+                        continue
+                    if field.type_info is None:
+                        issues.append(f"Struct field {field.name} in {struct_name} of cluster {cluster.name} missing type_info")
+
+            # Test enums
+            for enum_name, enum in cluster.enums.items():
+                if not enum.name:
+                    issues.append(f"Enum with empty name in cluster {cluster.name}")
+                for item_id, item in enum.components.items():
+                    if not item.name:
+                        issues.append(f"Enum item with empty name in {enum_name} of cluster {cluster.name}")
+                    if not item_id:
+                        issues.append(f"Enum item with empty id in {enum_name} of cluster {cluster.name}")
+
+            # Test bitmaps
+            for bitmap_name, bitmap in cluster.bitmaps.items():
+                if not bitmap.name:
+                    issues.append(f"Bitmap with empty name in cluster {cluster.name}")
+                for bit_id, bitfield in bitmap.components.items():
+                    if not bitfield.name:
+                        issues.append(f"Bitmap bitfield with empty name in {bitmap_name} of cluster {cluster.name}")
+                    if not bit_id:
+                        issues.append(f"Bitmap bitfield with empty id in {bitmap_name} of cluster {cluster.name}")
+
+        if issues:
+            print("\n===== XML Validation Issues Found =====")
+            for issue in issues:
+                print(issue)
+            asserts.fail(f"{len(issues)} issues found in XML validation. See above for details.")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
