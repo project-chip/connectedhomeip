@@ -964,7 +964,7 @@ class TestSpecParsingDataType(MatterBaseTest):
                     # Skip type_info check for deprecated Key field
                     if (struct_name.strip() == "MonitoringRegistrationStruct" and
                         field.name.strip() == "Key" and
-                        "ICD Management" in cluster.name):
+                            "ICD Management" in cluster.name):
                         continue
                     if field.type_info is None:
                         issues.append(f"Struct field {field.name} in {struct_name} of cluster {cluster.name} missing type_info")
