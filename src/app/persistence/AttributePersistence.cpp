@@ -120,14 +120,14 @@ bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttrib
     MutableByteSpan rawBytes(reinterpret_cast<uint8_t *>(data), size);
     if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
     {
-        /// in case of failure, set the default value
+        // in case of failure, set the default value
         memcpy(data, valueOnLoadFailure, size);
         return false;
     }
 
     if (rawBytes.size() != size)
     {
-        /// short read: the value is not valid
+        // short read: the value is not valid
         memcpy(data, valueOnLoadFailure, size);
         return false;
     }
