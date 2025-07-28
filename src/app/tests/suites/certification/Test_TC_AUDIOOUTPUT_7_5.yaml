@@ -37,7 +37,7 @@ tests:
       response:
           constraints:
               type: list
-               # Optional: You may loop over list and validate each OutputInfoStruct has required fields.
+              # Optional: You may loop over list and validate each OutputInfoStruct has required fields.
               hasField:
                   - name: Index
                     type: int8u
