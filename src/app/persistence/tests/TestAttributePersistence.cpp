@@ -13,13 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/persistence/PascalString.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/persistence/PascalString.h>
 #include <app/persistence/tests/RamAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
