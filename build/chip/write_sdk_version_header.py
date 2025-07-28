@@ -15,9 +15,8 @@
 # limitations under the License.
 
 import argparse
-import argparse
-import subprocess
 import os
+import subprocess
 
 HEADER = """/*
  *
