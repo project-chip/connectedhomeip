@@ -86,7 +86,7 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
                      - Verify that the TariffComponentIDs field is a list with length less or equal 128;
                      - Verify that the Quantity field has int64 type;"""),
             TestStep("5", "TH reads MeteredQuantityTimestamp attribute", "DUT replies a null value or epoch-s type."),
-            TestStep("6", "TH reads TariffUnit attribute", "DUT replies a a null value or TariffUnitEnum type."),
+            TestStep("6", "TH reads TariffUnit attribute", "DUT replies a null value or TariffUnitEnum type."),
             TestStep("7", "TH sends TestEventTrigger command Fake Value Update Test Event", "Status code must be SUCCESS."),
             TestStep("8", "TH reads MeteredQuantityTimestamp attribute", "DUT replies an epoch-s value."),
             TestStep("9", "TH reads TariffUnit attribute", "DUT replies a TariffUnitEnum value."),
