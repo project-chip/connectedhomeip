@@ -16,6 +16,7 @@
 #include "AdministratorCommissioningCluster.h"
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AdministratorCommissioning/Commands.h>
 #include <lib/support/CodeUtils.h>
 
@@ -40,7 +41,7 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommandsWithBasicCommissionin
     AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::kMetadataEntry,
 };
 
-constexpr DataModel::AttributeEntry kAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
     AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
     AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
@@ -102,8 +103,9 @@ CHIP_ERROR AdministratorCommissioningCluster::AcceptedCommands(const ConcreteClu
 CHIP_ERROR AdministratorCommissioningCluster::Attributes(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.ReferenceExisting(kAttributes));
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryAttributes), {});
 }
 
 std::optional<DataModel::ActionReturnStatus> AdministratorCommissioningWithBasicCommissioningWindowCluster::InvokeCommand(

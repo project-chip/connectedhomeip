@@ -15,21 +15,31 @@
 #    limitations under the License.
 #
 
+# Add new imports for argument parsing functions
+import argparse
 import asyncio
 import importlib
+import json
 import logging
 import os
+import pathlib
+import re
 import sys
 import typing
+from binascii import unhexlify
+from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from itertools import chain
 from pathlib import Path
-from typing import Optional
+from typing import Any, List, Optional, Tuple
 from unittest.mock import MagicMock
 
 import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
-from mobly import signals
+# Add imports for argument parsing dependencies
+from chip.testing.pics import read_pics_from_file
+from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
@@ -57,6 +67,52 @@ if TYPE_CHECKING:
     from chip.testing.matter_test_config import MatterTestConfig
 
 _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
+
+# Default constants for argument parsing
+_DEFAULT_ADMIN_VENDOR_ID = 0xFFF1
+_DEFAULT_STORAGE_PATH = "admin_storage.json"
+_DEFAULT_CONTROLLER_NODE_ID = 112233
+_DEFAULT_DUT_NODE_ID = 0x12344321
+_DEFAULT_TRUST_ROOT_INDEX = 1
+
+
+def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
+    """Attempt to find a PAA trust store following SDK convention at `root_path`
+
+    This attempts to find {root_path}/credentials/development/paa-root-certs.
+
+    Returns the fully resolved path on success or None if not found.
+    """
+    start_path = root_path.resolve()
+    cred_path = start_path.joinpath("credentials")
+    dev_path = cred_path.joinpath("development")
+    paa_path = dev_path.joinpath("paa-root-certs")
+
+    return paa_path.resolve() if all([path.exists() for path in [cred_path, dev_path, paa_path]]) else None
+
+
+def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
+    """Attempt to find a PAA trust store starting at `root_path`.
+
+    This tries to find by various heuristics, and goes up one level at a time
+    until found. After a given number of levels, it will stop.
+
+    This returns `root_path` if not PAA store is not found.
+    """
+    # TODO: Add heuristics about TH default PAA location
+    cur_dir = pathlib.Path.cwd()
+    max_levels = 10
+
+    for level in range(max_levels):
+        paa_trust_store_path = default_paa_rootstore_from_root(cur_dir)
+        if paa_trust_store_path is not None:
+            return paa_trust_store_path
+
+        # Go back one level
+        cur_dir = cur_dir.joinpath("..")
+    else:
+        # On not having found a PAA dir, just return current dir to avoid blow-ups
+        return pathlib.Path.cwd()
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -243,19 +299,48 @@ def generate_mobly_test_config(matter_test_config):
     return test_run_config
 
 
+def _find_test_class():
+    """Finds the test class in a test script.
+    Walk through module members and find the subclass of MatterBaseTest. Only
+    one subclass is allowed in a test script.
+    Returns:
+      The test class in the test module.
+    Raises:
+      SystemExit: Raised if the number of test classes is not exactly one.
+    """
+    from chip.testing.matter_testing import MatterBaseTest
+
+    def get_subclasses(cls: Any):
+        subclasses = utils.find_subclasses_in_module([cls], sys.modules['__main__'])
+        subclasses = [c for c in subclasses if c.__name__ != cls.__name__]
+        return subclasses
+
+    def has_subclasses(cls: Any):
+        return get_subclasses(cls) != []
+
+    subclasses_matter_test_base = get_subclasses(MatterBaseTest)
+    leaf_subclasses = [s for s in subclasses_matter_test_base if not has_subclasses(s)]
+
+    if len(leaf_subclasses) != 1:
+        print(
+            'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
+            str([subclass.__name__ for subclass in leaf_subclasses]))
+        sys.exit(1)
+
+    return leaf_subclasses[0]
+
+
 def default_matter_test_main():
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.matter_testing import default_matter_test_main
+      from chip.testing.runner import default_matter_test_main
       ...
       if __name__ == '__main__':
         default_matter_test_main()
     """
-
-    from chip.testing.matter_testing import _find_test_class, parse_matter_test_args
 
     matter_test_config = parse_matter_test_args()
 
@@ -532,3 +617,400 @@ class MockTestRunner():
         with asyncio.Runner() as runner:
             return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
                                      hooks, self.default_controller, self.stack)
+
+
+# Argument parsing helper functions
+
+def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
+    config.root_of_trust_index = args.root_index
+    # Follow root of trust index if ID not provided to have same behavior as legacy
+    # chip-tool that fabricID == commissioner_name == root of trust index
+    config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
+
+    if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
+        print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
+        return False
+    config.chip_tool_credentials_path = args.chip_tool_credentials_path
+
+    if args.dut_node_ids is None:
+        print("error: --dut-node-id is mandatory!")
+        return False
+    config.dut_node_ids = args.dut_node_ids
+
+    config.commissioning_method = args.commissioning_method
+    config.in_test_commissioning_method = args.in_test_commissioning_method
+    config.commission_only = args.commission_only
+
+    config.qr_code_content.extend(args.qr_code)
+    config.manual_code.extend(args.manual_code)
+    config.discriminators.extend(args.discriminators)
+    config.setup_passcodes.extend(args.passcodes)
+
+    if args.qr_code != [] and args.manual_code != []:
+        print("error: Cannot have both --qr-code and --manual-code present!")
+        return False
+
+    if len(config.discriminators) != len(config.setup_passcodes):
+        print("error: supplied number of discriminators does not match number of passcodes")
+        return False
+
+    device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
+
+    if not config.dut_node_ids:
+        config.dut_node_ids = [_DEFAULT_DUT_NODE_ID]
+
+    if args.commissioning_method is None:
+        return True
+
+    if len(config.dut_node_ids) > len(device_descriptors):
+        print("error: More node IDs provided than discriminators")
+        return False
+
+    if len(config.dut_node_ids) < len(device_descriptors):
+        # We generate new node IDs sequentially from the last one seen for all
+        # missing NodeIDs when commissioning many nodes at once.
+        missing = len(device_descriptors) - len(config.dut_node_ids)
+        for i in range(missing):
+            config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
+
+    if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
+        print("error: Duplicate values in node id list")
+        return False
+
+    if len(config.discriminators) != len(set(config.discriminators)):
+        print("error: Duplicate value in discriminator list")
+        return False
+
+    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
+        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
+        return False
+
+    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
+        print("error: Missing --passcode when no --qr-code/--manual-code present!")
+        return False
+
+    if config.commissioning_method == "ble-wifi":
+        if args.wifi_ssid is None:
+            print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
+            return False
+
+        if args.wifi_passphrase is None:
+            print("error: missing --wifi-passphrase <passphrasse> for --commissioning-method ble-wifi!")
+            return False
+
+        config.wifi_ssid = args.wifi_ssid
+        config.wifi_passphrase = args.wifi_passphrase
+    elif config.commissioning_method == "ble-thread":
+        if args.thread_dataset_hex is None:
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
+            return False
+        config.thread_operational_dataset = args.thread_dataset_hex
+    elif config.commissioning_method == "on-network-ip":
+        if args.ip_addr is None:
+            print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
+            return False
+        config.commissionee_ip_address_just_for_testing = args.ip_addr
+
+    if args.case_admin_subject is None:
+        # Use controller node ID as CASE admin subject during commissioning if nothing provided
+        config.case_admin_subject = config.controller_node_id
+    else:
+        # If a CASE admin subject is provided, then use that
+        config.case_admin_subject = args.case_admin_subject
+
+    return True
+
+
+def convert_args_to_matter_config(args: argparse.Namespace):
+    # Lazy import to avoid circular dependency
+    from chip.testing.matter_testing import MatterTestConfig
+
+    config = MatterTestConfig()
+
+    # Populate commissioning config if present, exiting on error
+    if not populate_commissioning_args(args, config):
+        sys.exit(1)
+
+    config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
+    config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
+    config.paa_trust_store_path = args.paa_trust_store_path
+    config.ble_controller = args.ble_controller
+    config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
+    config.tests = list(chain.from_iterable(args.tests or []))
+    config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
+    config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
+    config.app_pipe = args.app_pipe
+    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
+        # Named pipes are unique, so we MUST have consistent paths
+        # Verify from start the named pipe exists.
+        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
+        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
+
+    config.fail_on_skipped_tests = args.fail_on_skipped
+
+    config.legacy = args.use_legacy_test_event_triggers
+
+    config.controller_node_id = args.controller_node_id
+    config.trace_to = args.trace_to
+
+    config.tc_version_to_simulate = args.tc_version_to_simulate
+    config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
+    config.dac_revocation_set_path = args.dac_revocation_set_path
+
+    # Accumulate all command-line-passed named args
+    all_global_args = []
+    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
+                                 args.hex_arg, args.bool_arg) if item is not None]
+    for argset in chain.from_iterable(argsets):
+        all_global_args.extend(argset)
+
+    config.global_test_params = {}
+    for name, value in all_global_args:
+        config.global_test_params[name] = value
+
+    # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
+    config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
+
+    return config
+
+
+def parse_matter_test_args(argv: Optional[List[str]] = None):
+    parser = argparse.ArgumentParser(description='Matter standalone Python test')
+
+    basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
+
+    basic_group.add_argument('--tests', '--test-case', action='append', nargs='+', type=str, metavar='test_NAME',
+                             help='A list of tests in the test class to execute.')
+    basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
+                             help="Fail the test if any test cases are skipped")
+    basic_group.add_argument('--trace-to', nargs="*", default=[],
+                             help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
+    basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
+                             metavar="PATH", help="Location for persisted storage of instance")
+    basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
+    paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
+    basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
+                             help="PAA trust store path (default: %s)" % str(paa_path_default))
+    basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
+                             help="Path to JSON file containing the device attestation revocation set.")
+    basic_group.add_argument('--ble-controller', action="store", type=int,
+                             metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
+    basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
+                             metavar='NODE_ID',
+                             default=_DEFAULT_CONTROLLER_NODE_ID,
+                             help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
+    basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
+                             metavar='NODE_ID', dest='dut_node_ids', default=[],
+                             help='Node ID for primary DUT communication, '
+                             'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
+    basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
+    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
+    basic_group.add_argument("--PICS", help="PICS file path", type=str)
+
+    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
+                             help="Send test event triggers with endpoint 0 for older devices")
+
+    commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
+
+    commission_group.add_argument('-m', '--commissioning-method', type=str,
+                                  metavar='METHOD_NAME',
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  help='Name of commissioning method to use')
+    commission_group.add_argument('--in-test-commissioning-method', type=str,
+                                  metavar='METHOD_NAME',
+                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  help='Name of commissioning method to use, for commissioning tests')
+    commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
+                                  metavar='LONG_DISCRIMINATOR',
+                                  dest='discriminators',
+                                  default=[],
+                                  help='Discriminator to use for commissioning', nargs="+")
+    commission_group.add_argument('-p', '--passcode', type=int_decimal_or_hex,
+                                  metavar='PASSCODE',
+                                  dest='passcodes',
+                                  default=[],
+                                  help='PAKE passcode to use', nargs="+")
+
+    commission_group.add_argument('--wifi-ssid', type=str,
+                                  metavar='SSID',
+                                  help='Wi-Fi SSID for ble-wifi commissioning')
+    commission_group.add_argument('--wifi-passphrase', type=str,
+                                  metavar='PASSPHRASE',
+                                  help='Wi-Fi passphrase for ble-wifi commissioning')
+
+    commission_group.add_argument('--thread-dataset-hex', type=byte_string_from_hex,
+                                  metavar='OPERATIONAL_DATASET_HEX',
+                                  help='Thread operational dataset as a hex string for ble-thread commissioning')
+
+    commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
+                                  metavar="VENDOR_ID",
+                                  help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
+    commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
+                                  metavar="CASE_ADMIN_SUBJECT",
+                                  help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
+
+    commission_group.add_argument('--commission-only', action="store_true", default=False,
+                                  help="If true, test exits after commissioning without running subsequent tests")
+
+    commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
+
+    commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
+
+    code_group = parser.add_mutually_exclusive_group(required=False)
+
+    code_group.add_argument('-q', '--qr-code', type=str,
+                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
+    code_group.add_argument('--manual-code', type=str_from_manual_code,
+                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
+
+    fabric_group = parser.add_argument_group(
+        title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
+    fabric_group.add_argument('-f', '--fabric-id', type=int_decimal_or_hex,
+                              metavar='FABRIC_ID',
+                              help='Fabric ID on which to operate under the root of trust')
+
+    fabric_group.add_argument('-r', '--root-index', type=root_index,
+                              metavar='ROOT_INDEX_OR_NAME', default=_DEFAULT_TRUST_ROOT_INDEX,
+                              help='Root of trust under which to operate/commission for single-fabric basic usage. '
+                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % _DEFAULT_TRUST_ROOT_INDEX)
+
+    fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
+                              metavar='PATH',
+                              help='Path to chip-tool credentials file root')
+
+    args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
+    args_group.add_argument('--int-arg', nargs='+', action='append', type=int_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
+    args_group.add_argument('--bool-arg', nargs='+', action='append', type=bool_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
+    args_group.add_argument('--float-arg', nargs='+', action='append', type=float_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
+    args_group.add_argument('--string-arg', nargs='+', action='append', type=str_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for a string value")
+    args_group.add_argument('--json-arg', nargs='+', action='append', type=json_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for JSON stored as a list or dict")
+    args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
+
+    if not argv:
+        argv = sys.argv[1:]
+
+    return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
+
+
+def int_decimal_or_hex(s: str) -> int:
+    val = int(s, 0)
+    if val < 0:
+        raise ValueError("Negative values not supported")
+    return val
+
+
+def byte_string_from_hex(s: str) -> bytes:
+    return unhexlify(s.replace(":", "").replace(" ", "").replace("0x", ""))
+
+
+def str_from_manual_code(s: str) -> str:
+    """Enforces legal format for manual codes and removes spaces/dashes."""
+    s = s.replace("-", "").replace(" ", "")
+    regex = r"^([0-9]{11}|[0-9]{21})$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid manual code format, does not match %s" % regex)
+
+    return s
+
+
+def int_named_arg(s: str) -> Tuple[str, int]:
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid int argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    if match.group("hex_value"):
+        value = int(match.group("hex_value"), 0)
+    else:
+        value = int(match.group("decimal_value"), 10)
+    return (name, value)
+
+
+def str_named_arg(s: str) -> Tuple[str, str]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid string argument format, does not match %s" % regex)
+
+    return (match.group("name"), match.group("value"))
+
+
+def float_named_arg(s: str) -> Tuple[str, float]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid float argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value = float(match.group("value"))
+
+    return (name, value)
+
+
+def json_named_arg(s: str) -> Tuple[str, object]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid JSON argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value = json.loads(match.group("value"))
+
+    return (name, value)
+
+
+def bool_named_arg(s: str) -> Tuple[str, bool]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
+    match = re.match(regex, s, re.IGNORECASE)
+    if not match:
+        raise ValueError("Invalid bool argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    if match.group("truth_value"):
+        value = True if match.group("truth_value").lower() == "true" else False
+    else:
+        value = int(match.group("decimal_value")) != 0
+
+    return (name, value)
+
+
+def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
+    match = re.match(regex, s)
+    if not match:
+        raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
+
+    name = match.group("name")
+    value_str = match.group("value")
+    value_str = value_str.replace(":", "")
+    if len(value_str) % 2 != 0:
+        raise ValueError("Byte string argument value needs to be event number of hex chars")
+    value = unhexlify(value_str)
+
+    return (name, value)
+
+
+def root_index(s: str) -> int:
+    CHIP_TOOL_COMPATIBILITY = {
+        "alpha": 1,
+        "beta": 2,
+        "gamma": 3
+    }
+
+    for name, id in CHIP_TOOL_COMPATIBILITY.items():
+        if s.lower() == name:
+            return id
+    else:
+        root_index = int(s)
+        if root_index == 0:
+            raise ValueError("Only support root index >= 1")
+        return root_index
