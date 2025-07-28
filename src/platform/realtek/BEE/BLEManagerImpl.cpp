@@ -189,7 +189,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(int conn_id, int indicationsEnabled)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return;
@@ -497,7 +497,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Close connection failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Close connection failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     mFlags.Set(Flags::kRestartAdvertising);
@@ -576,7 +576,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData()
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -624,7 +624,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData()
     }
     else
     {
-        ChipLogError(DeviceLayer, "ConfigureAdvertisingData error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "ConfigureAdvertisingData error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif
 
@@ -732,7 +732,7 @@ void BLEManagerImpl::DriveBLEState()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -913,7 +913,7 @@ CHIP_ERROR BLEManagerImpl::HandleGapMsg(T_IO_MSG * p_gap_msg)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         sInstance.mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 

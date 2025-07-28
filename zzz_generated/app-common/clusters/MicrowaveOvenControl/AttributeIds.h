@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 14;
+
 namespace CookTime {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace CookTime
