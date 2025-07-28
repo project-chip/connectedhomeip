@@ -317,6 +317,17 @@ TEST(TestAttributePersistence, TestLoadInvalidPascalString)
         ASSERT_FALSE(persistence.Load(path, stringRead, "def"_span));
         ASSERT_TRUE(stringRead.Content().data_equal("def"_span));
     }
+
+    // Test loading with too short of a buffer and too short of a default ...
+    {
+        char bufferRead[5]; // need 6 bytes here...
+        ShortPascalString stringRead(bufferRead);
+
+        ASSERT_FALSE(persistence.Load(path, stringRead, "default"_span));
+
+        // default could not be set (too long)
+        ASSERT_TRUE(stringRead.IsNull());
+    }
 }
 
 TEST(TestAttributePersistence, TestInvalidPascalLengthStored)

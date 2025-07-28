@@ -60,7 +60,7 @@ bool LoadPascalStringImpl(AttributePersistenceProvider & provider, const Concret
         LogInvalidPascalContent(path);
     }
 
-    // failed, return falue and set a default
+    // failed, try to set some default
     if (!valueOnLoadFailure.has_value() || !value.SetValue(*valueOnLoadFailure))
     {
         value.SetNull();
