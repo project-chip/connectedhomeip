@@ -43,7 +43,7 @@ void LogInvalidPascalContent(const ConcreteAttributePath & path)
 
 template <typename StringType>
 bool LoadPascalStringImpl(AttributePersistenceProvider & provider, const ConcreteAttributePath & path, StringType & value,
-                      std::optional<typename StringType::ValueType> valueOnLoadFailure)
+                          std::optional<typename StringType::ValueType> valueOnLoadFailure)
 {
     MutableByteSpan rawBytes = value.RawFullBuffer();
 
@@ -73,13 +73,13 @@ bool LoadPascalStringImpl(AttributePersistenceProvider & provider, const Concret
 bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value,
                                 std::optional<CharSpan> valueOnLoadFailure)
 {
-    return LoadPascalStringImpl( mProvider, path, value, valueOnLoadFailure);
+    return LoadPascalStringImpl(mProvider, path, value, valueOnLoadFailure);
 }
 
 bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalBytes & value,
                                 std::optional<ByteSpan> valueOnLoadFailure)
 {
-    return LoadPascalStringImpl( mProvider, path, value, valueOnLoadFailure);
+    return LoadPascalStringImpl(mProvider, path, value, valueOnLoadFailure);
 }
 
 DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,

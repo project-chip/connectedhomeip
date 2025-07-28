@@ -331,7 +331,7 @@ TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
         EXPECT_EQ(ramProvider.WriteValue(path, ByteSpan(buffer)), CHIP_NO_ERROR);
     }
 
-    // Load into a buffer that COULD contain the string, but 
+    // Load into a buffer that COULD contain the string, but
     // stored string is invalid
     {
         char bufferRead[16];
