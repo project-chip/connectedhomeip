@@ -15,6 +15,7 @@
  */
 #include "app/ConcreteAttributePath.h"
 #include "app/data-model/Nullable.h"
+#include "app/persistence/AttributePersistenceProvider.h"
 #include "app/persistence/PascalString.h"
 #include <app/persistence/AttributePersistence.h>
 
@@ -40,23 +41,26 @@ void LogInvalidPascalContent(const ConcreteAttributePath & path)
                  ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
 }
 
-} // namespace
-
-bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value,
-                                std::optional<CharSpan> valueOnLoadFailure)
+template <typename StringType>
+bool LoadPascalStringImpl(AttributePersistenceProvider & provider, const ConcreteAttributePath & path, StringType & value,
+                      std::optional<typename StringType::ValueType> valueOnLoadFailure)
 {
     MutableByteSpan rawBytes = value.RawFullBuffer();
 
-    if (VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
+    if (VerifySuccessLogOnFailure(path, provider.ReadValue(path, rawBytes)))
     {
-        if (value.IsValidContent())
+        // value is read, however it has to be a valid pascal value
+        // The value MUST be valid over the read range (i.e. rawBytes)
+        auto concrete = reinterpret_cast<const typename StringType::ValueType::pointer>(rawBytes.data());
+        if (value.IsValid({ concrete, rawBytes.size() }))
         {
             return true;
         }
+
         LogInvalidPascalContent(path);
     }
 
-    // failed, need to store default
+    // failed, return falue and set a default
     if (!valueOnLoadFailure.has_value() || !value.SetValue(*valueOnLoadFailure))
     {
         value.SetNull();
@@ -64,26 +68,18 @@ bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::Sho
     return false;
 }
 
+} // namespace
+
+bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value,
+                                std::optional<CharSpan> valueOnLoadFailure)
+{
+    return LoadPascalStringImpl( mProvider, path, value, valueOnLoadFailure);
+}
+
 bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalBytes & value,
                                 std::optional<ByteSpan> valueOnLoadFailure)
 {
-    MutableByteSpan rawBytes = value.RawFullBuffer();
-
-    if (VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
-    {
-        // value is read, however it has to be a valid pascal value
-        if (value.IsValidContent())
-        {
-            return true;
-        }
-        LogInvalidPascalContent(path);
-    }
-    // failed, return falue and set a default
-    if (!valueOnLoadFailure.has_value() || !value.SetValue(*valueOnLoadFailure))
-    {
-        value.SetNull();
-    }
-    return false;
+    return LoadPascalStringImpl( mProvider, path, value, valueOnLoadFailure);
 }
 
 DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,

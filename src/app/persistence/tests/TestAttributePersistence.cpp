@@ -298,4 +298,48 @@ TEST(TestAttributePersistence, TestStoreNullCharString)
     }
 }
 
+TEST(TestAttributePersistence, TestLoadInvalidPascalString)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+    ConcreteAttributePath path(1, 2, 3);
+
+    {
+        uint8_t buffer[] = { 5, 'h', 'e', 'l', 'l', 'o' }; // length 10, but only 5 chars
+        EXPECT_EQ(ramProvider.WriteValue(path, ByteSpan(buffer)), CHIP_NO_ERROR);
+    }
+
+    // Test loading with too short of a buffer
+    {
+        char bufferRead[5]; // need 6 bytes here...
+        ShortPascalString stringRead(bufferRead);
+
+        ASSERT_FALSE(persistence.Load(path, stringRead, "def"_span));
+        ASSERT_TRUE(stringRead.Content().data_equal("def"_span));
+    }
+}
+
+TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+    ConcreteAttributePath path(1, 2, 3);
+
+    // This string is invalid as stored
+    {
+        uint8_t buffer[] = { 10, 'h', 'e', 'l', 'l', 'o' }; // length 10, but only 5 chars
+        EXPECT_EQ(ramProvider.WriteValue(path, ByteSpan(buffer)), CHIP_NO_ERROR);
+    }
+
+    // Load into a buffer that COULD contain the string, but 
+    // stored string is invalid
+    {
+        char bufferRead[16];
+        ShortPascalString stringRead(bufferRead);
+
+        ASSERT_FALSE(persistence.Load(path, stringRead, "default"_span));
+        ASSERT_TRUE(stringRead.Content().data_equal("default"_span));
+    }
+}
+
 } // namespace
