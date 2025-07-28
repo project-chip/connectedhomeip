@@ -3360,7 +3360,7 @@ endpoint 1 {
   server cluster TimeSynchronization {
     callback attribute UTCTime;
     callback attribute granularity;
-    ram      attribute timeSource default = 0x00;
+    callback attribute timeSource;
     callback attribute trustedTimeSource;
     callback attribute defaultNTP;
     callback attribute timeZone;

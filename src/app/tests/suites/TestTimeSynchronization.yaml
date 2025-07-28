@@ -127,15 +127,13 @@ tests:
               - name: "TimeZone"
                 value: []
       response:
-          values:
-              - name: "DSTOffsetRequired"
-                value: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read Time Zone"
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [{ Offset: 0, ValidAt: 0 }]
+          value: [{ Offset: 100, ValidAt: 0 }]
 
     - label: "Read DSTOffset"
       command: "readAttribute"
@@ -198,11 +196,7 @@ tests:
       command: "readAttribute"
       attribute: "DSTOffset"
       response:
-          value:
-              [
-                  { Offset: 1, ValidStarting: 1, ValidUntil: 2 },
-                  { Offset: 0, ValidStarting: 3, ValidUntil: null },
-              ]
+          value: [{ Offset: 0, ValidStarting: 3, ValidUntil: null }]
 
     - label: "Set DSTOffset with same validStarting and validUntil"
       command: "SetDSTOffset"

@@ -973,7 +973,7 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 8, ZAP_TYPE(EPOCH_US),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) },                       /* UTCTime */               \
         { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* Granularity */           \
-        { ZAP_SIMPLE_DEFAULT(0x00), 0x00000002, 1, ZAP_TYPE(ENUM8), 0 },                               /* TimeSource */            \
+        { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* TimeSource */            \
         { ZAP_EMPTY_DEFAULT(), 0x00000003, 0, ZAP_TYPE(STRUCT),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* TrustedTimeSource */                           \
         { ZAP_EMPTY_DEFAULT(), 0x00000004, 129, ZAP_TYPE(CHAR_STRING),                                                             \
@@ -3200,7 +3200,7 @@
       .clusterId = 0x00000038, \
       .attributes = ZAP_ATTRIBUTE_INDEX(204), \
       .attributeCount = 14, \
-      .clusterSize = 9, \
+      .clusterSize = 8, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 52 ), \
@@ -4361,7 +4361,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 283 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 28, 282 },                                                                                         \
         { ZAP_CLUSTER_INDEX(28), 72, 3459 },                                                                                       \
         { ZAP_CLUSTER_INDEX(100), 7, 114 },                                                                                        \
         { ZAP_CLUSTER_INDEX(107), 2, 0 },                                                                                          \
@@ -4376,7 +4376,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3856)
+#define ATTRIBUTE_MAX_SIZE (3855)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
