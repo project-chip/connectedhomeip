@@ -246,7 +246,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ThreadStackMgrImpl().GetExtAddress(extAddr);
     memcpy(ifp->MacAddress, extAddr.m8, OT_EXT_ADDRESS_SIZE);
     ifp->hardwareAddress = ByteSpan(ifp->MacAddress, OT_EXT_ADDRESS_SIZE);
-    
+
     /* Thread only support IPv6 */
     uint8_t ipv6AddressesCount = 0;
     for (Inet::InterfaceAddressIterator iterator; iterator.Next() && ipv6AddressesCount < kMaxIPv6AddrCount;)
