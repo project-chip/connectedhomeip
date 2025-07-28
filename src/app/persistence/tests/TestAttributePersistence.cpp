@@ -305,7 +305,7 @@ TEST(TestAttributePersistence, TestLoadInvalidPascalString)
     ConcreteAttributePath path(1, 2, 3);
 
     {
-        uint8_t buffer[] = { 5, 'h', 'e', 'l', 'l', 'o' }; // length 10, but only 5 chars
+        uint8_t buffer[] = { 5, 'h', 'e', 'l', 'l', 'o' }; // valid string - size 6 with 5 chars in it
         EXPECT_EQ(ramProvider.WriteValue(path, ByteSpan(buffer)), CHIP_NO_ERROR);
     }
 
