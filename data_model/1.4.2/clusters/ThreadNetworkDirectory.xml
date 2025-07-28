@@ -91,7 +91,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="PreferredExtendedPanID" type="octstr" default="null">
+    <attribute id="0x0000" name="PreferredExtendedPanID" type="octstr">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -110,7 +110,7 @@ Davis, CA 95616, USA
         </maxCount>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="ThreadNetworkTableSize" type="uint8" default="10">
+    <attribute id="0x0002" name="ThreadNetworkTableSize" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
