@@ -286,13 +286,12 @@ The complete Border Router guide is located [here](./nxp_otbr_guide.md).
 
 ```
 -DCONFIG_CHIP_SE05X=y
--DCONFIG_CHIP_CRYPTO_PLATFORM=y
 ```
 
 Example :
 
 ```
-ubuntu@ubuntu-Latitude-5420:~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y -DCONFIG_CHIP_CRYPTO_PLATFORM=y
+ubuntu@ubuntu-Latitude-5420:~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y
 ```
 
 Refer [SE05x](nxp_se05x_guide.md) for more details on configurations of SE05x.

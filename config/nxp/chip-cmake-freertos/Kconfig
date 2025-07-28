@@ -77,6 +77,13 @@ config CHIP_NXP_PLATFORM_FAMILY
 	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	default "rt" if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
 
+config CHIP_NXP_CRYPTO_IMPL
+	string "NXP Crypto Implementation chosen"
+	default "se05x" if CHIP_SE05X
+	default ""
+	help
+		Defines crypto implementation to be used
+
 choice CHIP_NVM_COMPONENT
 	prompt "NVM component selection"
 	default CHIP_NVM_COMPONENT_NVS
@@ -104,8 +111,8 @@ endchoice
 
 choice CHIP_CRYPTO
 	prompt "CHIP Crypto selection"
+	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_SE05X
 	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
-	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 
 	config CHIP_CRYPTO_MBEDTLS
 		bool "CHIP MbedTLS crypto"
