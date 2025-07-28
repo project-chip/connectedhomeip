@@ -91,13 +91,10 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     if constexpr (DataModel::IsFabricScoped<T>::value)
     {
         eventOptions.mFabricIndex = aEventData.GetFabricIndex();
-    }
-    else
-    {
-        eventOptions.mFabricIndex = kUndefinedFabricIndex;
+        VerifyOrReturnError(eventOptions.mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     }
 
-    return internal::LogEvent(&eventData, eventOptions, aEventNumber, DataModel::IsFabricScoped<T>::value);
+    return chip::app::EventManagement::GetInstance().LogEvent(&eventData, eventOptions, aEventNumber);
 }
 
 } // namespace app
