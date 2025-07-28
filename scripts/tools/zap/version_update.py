@@ -38,12 +38,7 @@ __LOG_LEVELS__ = {
 #
 # At this time we hard-code nightly however we may need to figure out a more
 # generic version string once we stop using nightly builds
-# WARNING: As of July 2025, the tag of ZAP release pushed to CIPD was missing a "v" prefix in the Tag.
-# Therefore, this script was adapted to not include that "v" prefix for "zap.json"; For "zap.version" we still need the v prefix.
-# Example old TAG on CIPD: version:2@v2025.05.22.1
-# Example new TAG on CIPD: version:2@2025.07.24.1
-# TODO #40336: revert this (and other changes) once CIPD is fixed
-ZAP_VERSION_RE = re.compile(r'v?(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
+ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
 
 # A list of files where ZAP is maintained. You can get a similar list using:
 #
@@ -96,7 +91,7 @@ CHIP_ROOT_DIR = os.path.abspath(os.path.join(
 @click.option(
     '--new-version',
     default=None,
-    help='What version of ZAP to update to (like "2023.01.09-nightly" - v prefix will be added automatically for zap.version). If not set, versions will just be printed.')
+    help='What version of ZAP to update to (like "v2023.01.09-nightly". If not set, versions will just be printed.')
 def version_update(log_level, update, new_version):
     coloredlogs.install(level=__LOG_LEVELS__[
                         log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
@@ -104,9 +99,7 @@ def version_update(log_level, update, new_version):
     update = __UPDATE_CHOICES__[update]
 
     if new_version:
-        # Remove 'v' prefix if present in input
-        clean_version = new_version.lstrip('v')
-        parsed = ZAP_VERSION_RE.match(clean_version)
+        parsed = ZAP_VERSION_RE.match(new_version)
         if not parsed:
             logging.error(
                 f"Version '{new_version}' does not seem to parse as a ZAP VERSION")
@@ -115,7 +108,7 @@ def version_update(log_level, update, new_version):
         # get the numeric version for zap_execution
         #
         # This makes every group element (date section) to a base 10 integer,
-        # so for '2023.01.11-nightly' this gets (2023, 1, 11)
+        # so for 'v2023.01.11-nightly' this gets (2023, 1, 11)
         zap_min_version = tuple(map(lambda x: int(x, 10), parsed.groups()[:3]))
 
     files_to_update = []
@@ -140,30 +133,26 @@ def version_update(log_level, update, new_version):
 
         # If we update, perform the update
         if new_version:
-            # Determine if this file needs 'v' prefix
-            needs_v_prefix = name.endswith('zap.version')
-            version_to_use = f"v{clean_version}" if needs_v_prefix else clean_version
-
             search_pos = 0
             need_replace = False
             m = ZAP_VERSION_RE.search(file_data, search_pos)
             while m:
                 version = file_data[m.start():m.end()]
-                if version == version_to_use:
+                if version == new_version:
                     logging.warning(
                         "Nothing to replace. Version already %s", version)
                     break
                 file_data = file_data[:m.start()] + \
-                    version_to_use + file_data[m.end():]
+                    new_version + file_data[m.end():]
                 need_replace = True
                 # We search a bit past the match to not re-match the same thing again
                 # This is because our version lengths may vary.
-                search_pos = m.start() + len(version_to_use)
+                search_pos = m.start() + 1
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
 
             if need_replace:
                 logging.info('Replacing with version %s in %s',
-                             version_to_use, name)
+                             new_version, name)
 
                 with open(os.path.join(CHIP_ROOT_DIR, name), 'wt') as f:
                     f.write(file_data)
