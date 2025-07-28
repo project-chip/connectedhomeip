@@ -37,7 +37,7 @@ class AttributePersistence
 public:
     AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
 
-    /// Loads a native-entianess stored value into `T` from the persistence provider.
+    /// Loads a native-endianness stored value into `T` from the persistence provider.
     ///
     /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
     ///
