@@ -81,7 +81,7 @@ void WebRTCTransportProviderClient::OnResponse(chip::app::CommandSender * client
     CHIP_ERROR error = status.ToChipError();
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Camera, "Response Failure: %s", ErrorStr(error));
+        ChipLogError(Camera, "Response Failure: %" CHIP_ERROR_FORMAT, error.Format());
         this->OnError(client, error);
         return;
     }

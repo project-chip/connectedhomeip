@@ -175,6 +175,7 @@ ALLOW: Dict[str, Set[str]] = {
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
     'src/controller/ExamplePersistentStorage.h': {'string'},
+    'src/controller/jcm/TrustVerification.h': {'string'},
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
