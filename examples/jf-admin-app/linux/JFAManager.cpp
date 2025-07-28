@@ -32,6 +32,11 @@ using namespace chip::app::Clusters;
 using namespace chip::Controller;
 using namespace chip::Crypto;
 
+constexpr uint8_t kJFAvailableShift = 0;
+constexpr uint8_t kJFAdminShift     = 1;
+constexpr uint8_t kJFAnchorShift    = 2;
+constexpr uint8_t kJFDatastoreShift = 3;
+
 JFAManager JFAManager::sJFA;
 
 CHIP_ERROR JFAManager::Init(Server & server)
@@ -39,6 +44,15 @@ CHIP_ERROR JFAManager::Init(Server & server)
     mServer             = &server;
     mCASESessionManager = server.GetCASESessionManager();
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFAManager::GetJointFabricMode(uint8_t & jointFabricMode)
+{
+    jointFabricMode = ((IsDeviceCommissioned() ? 0 : 1) << kJFAvailableShift) |
+        (IsDeviceCommissioned() ? (IsDeviceJFAdmin() ? (1 << kJFAdminShift) : 0) : 0) |
+        (IsDeviceCommissioned() ? (IsDeviceJFAnchor() ? (1 << kJFAnchorShift) : 0) : 0) |
+        (IsDeviceCommissioned() ? (1 << kJFDatastoreShift) : 0);
     return CHIP_NO_ERROR;
 }
 
@@ -88,6 +102,46 @@ void JFAManager::HandleCommissioningCompleteEvent()
             }
         }
     }
+}
+
+bool JFAManager::IsDeviceJFAdmin()
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return false;
+    }
+
+    CATValues cats;
+
+    if (mServer->GetFabricTable().FetchCATs(jfFabricIndex, cats) == CHIP_NO_ERROR)
+    {
+        if (cats.ContainsIdentifier(kAdminCATIdentifier))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool JFAManager::IsDeviceJFAnchor()
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return false;
+    }
+
+    CATValues cats;
+
+    if (mServer->GetFabricTable().FetchCATs(jfFabricIndex, cats) == CHIP_NO_ERROR)
+    {
+        if (cats.ContainsIdentifier(kAnchorCATIdentifier))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void JFAManager::ReleaseSession()
