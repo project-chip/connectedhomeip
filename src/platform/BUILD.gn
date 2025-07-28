@@ -487,8 +487,8 @@ source_set("platform_config_header") {
 if (chip_device_platform != "none") {
   source_set("platform_base") {
     public_deps = [
-      ":platform_config_header",
       ":matter_sdk_version",
+      ":platform_config_header",
       "${chip_root}/src/app/icd/server:icd-server-config",
       "${chip_root}/src/ble",
       "${chip_root}/src/credentials:build_time_header",

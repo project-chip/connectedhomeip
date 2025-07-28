@@ -28,7 +28,6 @@ declare_args() {
   chip_version_extra = ""
 }
 
-
 template("gen_sdk_version") {
   action(target_name) {
     filename = invoker.filename
