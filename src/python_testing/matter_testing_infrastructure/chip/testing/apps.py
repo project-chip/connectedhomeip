@@ -15,10 +15,54 @@
 import os
 import signal
 import tempfile
-from typing import Optional
+from contextlib import contextmanager
+from dataclasses import dataclass
+from typing import Union, Optional
 
 import chip.clusters as Clusters
+from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.testing.tasks import Subprocess
+
+
+@contextmanager
+def create_kvs_file(storage_dir: str, prefix: str = "kvs-app-"):
+    """Context manager for creating and cleaning up KVS temporary files.
+
+    Creates a temporary file and yields its path, automatically cleaning up
+    the file descriptor and deleting the file when the context exits.
+    """
+    fd, path = tempfile.mkstemp(dir=storage_dir, prefix=prefix)
+    try:
+        yield path
+    finally:
+        os.close(fd)
+        try:
+            os.unlink(path)
+        except OSError:
+            # Ignore errors if file was already deleted or doesn't exist
+            pass
+
+
+@dataclass
+class OtaImagePath:
+    """Represents a path to a single OTA image file."""
+    path: str
+
+    @property
+    def ota_args(self) -> list[str]:
+        """Return the command line arguments for this OTA image path."""
+        return ["--filepath", self.path]
+
+
+@dataclass
+class ImageListPath:
+    """Represents a path to a file containing a list of OTA images."""
+    path: str
+
+    @property
+    def ota_args(self) -> list[str]:
+        """Return the command line arguments for this image list path."""
+        return ["--otaImageList", self.path]
 
 
 class AppServerSubprocess(Subprocess):
@@ -29,27 +73,23 @@ class AppServerSubprocess(Subprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = []):
-        self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
+        # Create KVS file using context manager for automatic cleanup
+        with create_kvs_file(storage_dir) as kvs_path:
+            # Build the command list
+            command = [app]
+            if extra_args:
+                command.extend(extra_args)
 
-        # Build the command list
-        command = [app]
-        if extra_args:
-            command.extend(extra_args)
+            command.extend([
+                "--KVS", kvs_path,
+                '--secured-device-port', str(port),
+                "--discriminator", str(discriminator),
+                "--passcode", str(passcode)
+            ])
 
-        command.extend([
-            "--KVS", kvs_path,
-            '--secured-device-port', str(port),
-            "--discriminator", str(discriminator),
-            "--passcode", str(passcode)
-        ])
-
-        # Start the server application
-        super().__init__(*command,  # Pass the constructed command list
-                         output_cb=lambda line, is_stderr: self.PREFIX + line)
-
-    def __del__(self):
-        # Do not leak KVS file descriptor.
-        os.close(self.kvs_fd)
+            # Start the server application
+            super().__init__(*command,  # Pass the constructed command list
+                             output_cb=lambda line, is_stderr: self.PREFIX + line)
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -115,8 +155,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
     PREFIX = b"[OTA-PROVIDER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, ota_image_path: Optional[str] = None,
-                 image_list_path: Optional[str] = None, extra_args: list[str] = []):
+                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
+                 port: int = 5540, extra_args: list[str] = []):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -125,34 +165,18 @@ class OTAProviderSubprocess(AppServerSubprocess):
             discriminator: Discriminator for commissioning
             passcode: Passcode for commissioning
             port: UDP port for secure connections
-            ota_image_path: Path to a file containing an OTA image (cannot be used with image_list_path)
-            image_list_path: Path to a file containing a list of OTA images (cannot be used with ota_image_path)
+            ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
             extra_args: Additional command line arguments
         """
 
-        if extra_args is None:
-            extra_args = []
-
-        if ota_image_path and image_list_path:
-            raise ValueError("Cannot specify both ota_image_path and image_list_path")
-
-        if not ota_image_path and not image_list_path:
-            raise ValueError("Must specify either ota_image_path or image_list_path")
-
-        # Build OTA-specific arguments
-        ota_args = []
-        if ota_image_path:
-            ota_args.extend(["--filepath", ota_image_path])
-        elif image_list_path:
-            ota_args.extend(["--otaImageList", image_list_path])
-
-        combined_extra_args = ota_args + extra_args
+        # Build OTA-specific arguments using the ota_source property
+        combined_extra_args = ota_source.ota_args + extra_args
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
                          passcode=passcode, port=port, extra_args=combined_extra_args)
 
-    def create_acl_entry(self, dev_ctrl, provider_node_id: int, requestor_node_id: Optional[int] = None):
+    def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
 
         Args:
@@ -185,11 +209,3 @@ class OTAProviderSubprocess(AppServerSubprocess):
             nodeid=provider_node_id,
             attributes=[(0, Clusters.AccessControl.id, Clusters.AccessControl.Attributes.Acl.attribute_id, acl_entries)]
         )
-
-    def __del__(self):
-        # Override to safely handle kvs_fd that might not exist if constructor failed
-        if hasattr(self, 'kvs_fd') and self.kvs_fd is not None:
-            try:
-                os.close(self.kvs_fd)
-            except (OSError, AttributeError):
-                pass  # Ignore errors during cleanup
