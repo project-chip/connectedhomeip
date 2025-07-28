@@ -38,16 +38,12 @@
 
 import asyncio
 import copy
-import inspect
 import logging
-from enum import IntFlag
-from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath
-from chip.clusters.enum import MatterIntEnum
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing import global_attribute_ids
@@ -107,7 +103,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 attribute_path)
         except ChipStackError as e:  # chipstack-ok
             if "Timeout" in str(e):
-                logging.error(f"Read operation timed out")
+                logging.error("Read operation timed out")
                 logging.error(f"Attribute path: {attribute_path}")
             raise
 
