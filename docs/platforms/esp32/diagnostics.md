@@ -12,7 +12,33 @@ Provider:
 CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE=y
 ```
 
-This option enables the diagnostic logs storage functionality.
+This option enables the diagnostic logs storage functionality. By default, this
+setting enables both traces and metrics.
+
+If you want to enable only metrics or only traces, configure the following
+options accordingly:
+
+To enable only metrics:
+
+```
+CONFIG_ENABLE_TRACES=n
+CONFIG_ENABLE_METRICS=y
+```
+
+To enable only traces:
+
+```
+CONFIG_ENABLE_TRACES=y
+CONFIG_ENABLE_METRICS=n
+```
+
+After modifying the configuration options, make sure to perform a clean build to
+ensure the changes are applied correctly:
+
+```
+idf.py fullclean
+idf.py build
+```
 
 ## Implementation Reference
 

@@ -92,7 +92,7 @@ CHIP_ERROR ESP32Diagnostics::RemoveFilter(const char * scope)
 {
     VerifyOrReturnError(scope != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(strlen(scope) > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end(), CHIP_ERROR_INVALID_ARGUMENT,
+    VerifyOrReturnError(mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end(), CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Filter does not exist"));
     mEnabledFilters.erase(MurmurHash(scope));
     return CHIP_NO_ERROR;
@@ -113,6 +113,7 @@ bool ESP32Diagnostics::IsEnabled(const char * scope)
     return mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end();
 }
 
+#ifdef CONFIG_ENABLE_METRICS
 void ESP32Diagnostics::LogMessageReceived(MessageReceivedInfo & info) {}
 
 void ESP32Diagnostics::LogMessageSend(MessageSendInfo & info) {}
@@ -125,9 +126,6 @@ void ESP32Diagnostics::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 
 void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 {
-#ifdef CONFIG_ENABLE_ONLY_TRACES
-    return;
-#endif // CONFIG_ENABLE_ONLY_TRACES
     VerifyOrReturn(mStorageInstance != nullptr, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
     DiagnosticEntry entry;
     switch (event.ValueType())
@@ -162,19 +160,15 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 
 void ESP32Diagnostics::TraceCounter(const char * label)
 {
-#ifdef CONFIG_ENABLE_ONLY_TRACES
-    return;
-#endif // CONFIG_ENABLE_ONLY_TRACES
     ESPDiagnosticCounter & counter = ESPDiagnosticCounter::GetInstance();
     counter.IncreaseCount(label);
     ReturnOnFailure(counter.ReportMetrics(label, mStorageInstance));
 }
+#endif // CONFIG_ENABLE_METRICS
 
+#ifdef CONFIG_ENABLE_TRACES
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
 {
-#ifdef CONFIG_ENABLE_ONLY_METRICS
-    return;
-#endif // CONFIG_ENABLE_ONLY_METRICS
     VerifyOrReturn(IsEnabled(group));
     ReturnOnFailure(StoreDiagnostics(label, group));
 }
@@ -183,12 +177,10 @@ void ESP32Diagnostics::TraceEnd(const char * label, const char * group) {}
 
 void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
 {
-#ifdef CONFIG_ENABLE_ONLY_METRICS
-    return;
-#endif // CONFIG_ENABLE_ONLY_METRICS
     VerifyOrReturn(IsEnabled(value));
     ReturnOnFailure(StoreDiagnostics(label, value));
 }
+#endif // CONFIG_ENABLE_TRACES
 
 CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
 {

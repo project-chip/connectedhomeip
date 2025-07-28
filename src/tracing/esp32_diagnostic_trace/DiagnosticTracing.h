@@ -38,13 +38,16 @@ public:
     ESP32Diagnostics(const ESP32Diagnostics &)             = delete;
     ESP32Diagnostics & operator=(const ESP32Diagnostics &) = delete;
 
+#ifdef CONFIG_ENABLE_TRACES
     void TraceBegin(const char * label, const char * group) override;
 
     void TraceEnd(const char * label, const char * group) override;
 
     /// Trace a zero-sized event
     void TraceInstant(const char * label, const char * group) override;
+#endif // CONFIG_ENABLE_TRACES
 
+#ifdef CONFIG_ENABLE_METRICS
     void TraceCounter(const char * label) override;
 
     void LogMessageSend(MessageSendInfo &) override;
@@ -54,9 +57,11 @@ public:
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
     void LogMetricEvent(const MetricEvent &) override;
+#endif // CONFIG_ENABLE_METRICS
 
     /*
-     * @brief Add a filter to the diagnostic backend
+     * @brief Add a filter to the diagnostic backend. Only traces and metrics with the given scope will be stored while other
+     * scopes will be ignored.
      * @param scope The scope to filter
      * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid
      * @return CHIP_NO_ERROR if the filter already exists or added successfully
