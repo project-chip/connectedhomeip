@@ -93,7 +93,7 @@ TEST(TestAttributePersistence, TestLoadAndStoreString)
         ShortPascalString stringRead(bufferRead);
 
         ASSERT_TRUE(persistence.Load(path, stringRead, std::nullopt));
-        ASSERT_TRUE(stringRead.Content().data_equal(CharSpan::fromCharString("hello")));
+        ASSERT_TRUE(stringRead.Content().data_equal("hello"_span));
     }
 
     // Test loading a non-existent value
@@ -102,8 +102,8 @@ TEST(TestAttributePersistence, TestLoadAndStoreString)
         char bufferRead[16];
         ShortPascalString stringRead(bufferRead);
 
-        ASSERT_FALSE(persistence.Load(wrongPath, stringRead, CharSpan::fromCharString("default")));
-        ASSERT_TRUE(stringRead.Content().data_equal(CharSpan::fromCharString("default")));
+        ASSERT_FALSE(persistence.Load(wrongPath, stringRead, "default"_span));
+        ASSERT_TRUE(stringRead.Content().data_equal("default"_span));
     }
 }
 
@@ -157,7 +157,7 @@ TEST(TestAttributePersistence, TestStringViaDecoder)
         ShortPascalString stringRead(bufferRead);
 
         ASSERT_TRUE(persistence.Load(path, stringRead, std::nullopt));
-        ASSERT_TRUE(stringRead.Content().data_equal(CharSpan::fromCharString("hello world")));
+        ASSERT_TRUE(stringRead.Content().data_equal("hello world"_span));
     }
 }
 
