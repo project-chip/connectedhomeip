@@ -16,6 +16,7 @@ name: Smoke test - Android
 
 on:
     pull_request:
+        paths-ignore: ['**/*.md', '*.md']
     merge_group:
     workflow_dispatch:
 
