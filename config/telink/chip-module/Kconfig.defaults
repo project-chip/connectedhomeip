@@ -346,10 +346,13 @@ config NET_IPV6_NBR_CACHE
     default n
 
 config NET_PKT_TXTIME
-	default y
+    default y
 
 config NET_PKT_TIMESTAMP
-	default y
+    default y
+
+config IEEE802154_2015
+    default y if ZEPHYR_VERSION_3_3
 
 config NET_MAX_CONN
     default 1 if !WIFI
