@@ -59,13 +59,14 @@ public:
      *         cases violating the definition of a simple polygon.
      *         Return "True" for self-intersection.
      *         Note: We are also simplifying by rejecting consecutive repeated vertices.
-     * 2. Go through the list of vertices:
+     * 2. For a polygon of 3 vertices, flag it as self-intersecting if all
+     *    vertices are collinear. Otherwise, it is a simple triangle and a valid
+     *    polygon.
+     * 3. For all polygons of > 3 vertices, go through the list of vertices:
      *      a. Pick unique non-adjacent edges (p1q1 and p2q2) to check for self-intersection.
-     *         For a zone with only 3 vertices, where all edges are adjacent to
-     *         each other, pick them for checking self-intersection.
      *      b. If SegmentsIntersect(p1q1, p2q2) :
      *           i. Return "True" for self-intersection.
-     * 3. Return "False" for self-intersection.
+     * 4. Return "False" for self-intersection.
      *
      * Algorithm for SegmentsIntersect(p1q1, p2q2)
      * -------------------------------------------
@@ -150,8 +151,8 @@ public:
      *       at that common vertex. This is an expected part of a simple polygon
      *       (cycle graph) with each vertex having degree 2, and does not
      *       constitute self-intersection.
-     *    b. If a polygon self-intersects, it must have at least one pair of
-     *       non-adjacent edges that intersect.
+     *    b. For a polygon(with > 3 vertices) that self-intersects, it must have
+     *       at least one pair of non-adjacent edges that intersect.
      *       Proof:
      *       i)  Regular case where adjacent edges do not overlap:
      *           Since adjacent edges only share their end-vertices, they only
@@ -169,13 +170,6 @@ public:
      *       Thus, by checking every unique pair of non-adjacent edges, the
      *       algorithm guarantees that if a self-intersection exists, it will
      *       be found.
-     *    c. Exception of 3 vertices:
-     *       A polygon of 3 vertices has all edges adjacent to each other. In
-     *       the normal case, it is a triangle and a cycle.
-     *       But in a degenerate case, one vertex can lie on the segment formed
-     *       by the other 2 vertices. So, the collinearity and overlapping
-     *       check must be performed to verify if that is true, and flag it as
-     *       self-intersecting.
      */
 
     // Method to check for self-intersecting zones
@@ -187,6 +181,13 @@ public:
         if (ZoneHasDuplicates(vertices))
         {
             ChipLogDetail(Zcl, "Zone has duplicate vertices");
+            return true;
+        }
+
+        // The degenerate case of 3 collinear vertices is self-intersecting
+        if (vertexCount == 3 && Orientation(vertices[0], vertices[1], vertices[2]) == OrientationEnum::kCollinear)
+        {
+            ChipLogDetail(Zcl, "Degenerate case of 3 collinear vertices");
             return true;
         }
 
@@ -203,9 +204,7 @@ public:
                 TwoDCartesianVertexStruct q2 = vertices[(j + 1) % vertexCount];
 
                 // Skip segments that share an endpoint (i.e., adjacent segments)
-                if (vertexCount > 3 &&
-                    (AreTwoDCartVerticesEqual(p1, p2) || AreTwoDCartVerticesEqual(p1, q2) || AreTwoDCartVerticesEqual(q1, p2) ||
-                     AreTwoDCartVerticesEqual(q1, q2)))
+                if ((j + 1) % vertexCount == i)
                 {
                     continue;
                 }
@@ -234,7 +233,9 @@ private:
     }
 
     // Helper function: Determine the orientation of the ordered triplet (p, q, r) of vertices.
-    // Employ the cross-product computation (determinant of the coordinate matrix) of
+    // The purpose of this function is to determine if 'r' is to the left, right
+    // of the vector 'pq', or is collinear with it.
+    // Employs the cross-product computation (determinant of the coordinate matrix) of
     // vectors pq and pr to find the direction of the Z axis. The rotation
     // considered is from vector pq to pr.
     // The sign of the determinant is used to infer the direction of the cross-product vector
@@ -246,8 +247,8 @@ private:
     // 0 --> p, q and r are collinear
     // 1 --> Counterclockwise
     // 2 --> Clockwise
-    static OrientationEnum CrossProduct(const TwoDCartesianVertexStruct & p, const TwoDCartesianVertexStruct & q,
-                                        const TwoDCartesianVertexStruct & r)
+    static OrientationEnum Orientation(const TwoDCartesianVertexStruct & p, const TwoDCartesianVertexStruct & q,
+                                       const TwoDCartesianVertexStruct & r)
     {
         long long val = static_cast<long long>((q.x - p.x) * (r.y - p.y)) - static_cast<long long>((q.y - p.y) * (r.x - p.x));
 
@@ -264,13 +265,13 @@ private:
                                     const TwoDCartesianVertexStruct & p2, const TwoDCartesianVertexStruct & q2)
     {
         // Segment 1 (p1q1) and first vertex of Segment 2 (p2)
-        OrientationEnum o1 = CrossProduct(p1, q1, p2);
+        OrientationEnum o1 = Orientation(p1, q1, p2);
         // Segment 1(p1q1) and second vertex of Segment 2(q2)
-        OrientationEnum o2 = CrossProduct(p1, q1, q2);
+        OrientationEnum o2 = Orientation(p1, q1, q2);
         // Segment 2(p2q2) and first vertex of Segment 1(p1)
-        OrientationEnum o3 = CrossProduct(p2, q2, p1);
+        OrientationEnum o3 = Orientation(p2, q2, p1);
         // Segment 2(p2q2) and second vertex of Segment 1(q1)
-        OrientationEnum o4 = CrossProduct(p2, q2, q1);
+        OrientationEnum o4 = Orientation(p2, q2, q1);
 
         // General case
         if (o1 != OrientationEnum::kCollinear && o2 != OrientationEnum::kCollinear && o3 != OrientationEnum::kCollinear &&
