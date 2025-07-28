@@ -89,6 +89,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalContactUnoccup
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace OccupancyChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OccupancyChanged
+
+} // namespace Events
 } // namespace OccupancySensing
 } // namespace Clusters
 } // namespace app

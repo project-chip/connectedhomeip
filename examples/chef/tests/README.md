@@ -22,7 +22,7 @@ shows all chef tests run in CI.
    container.
 
 ```
-docker run -it --rm ghcr.io/project-chip/chip-build:150 /bin/bash
+docker run -it --rm ghcr.io/project-chip/chip-build:153 /bin/bash
 ```
 
 Run the remaining commands inside the container.
@@ -64,3 +64,6 @@ scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py 
         MatterBaseTest base class for tests.
 -   [Python chip controller libraries](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/chip)
     -   [Chip Device Controller interface](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/ChipDeviceCtrl.py)
+-   PwRPC:
+    -   [Protos](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/protos)
+    -   [Device connection utils](https://github.com/google/pigweed/tree/1baea6bc0ee4afe955a834d17177d7be5418900a/pw_system/py/pw_system)

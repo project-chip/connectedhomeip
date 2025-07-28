@@ -144,7 +144,7 @@ bool AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+                ChipLogError(NotSpecified, "StartTimer failed: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
         else
@@ -160,7 +160,7 @@ bool AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+                ChipLogError(NotSpecified, "StartTimer failed: %" CHIP_ERROR_FORMAT, err.Format());
             }
 
             // if we have active multipress window we need to send extra event

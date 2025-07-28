@@ -48,7 +48,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:150
+            image: ghcr.io/project-chip/chip-build:153
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -496,7 +496,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:150
+            image: ghcr.io/project-chip/chip-build:153
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -772,7 +772,7 @@ jobs:
                   retention-days: 5
 
     repl_tests_darwin:
-        name: REPL Tests - Darwin
+        name: REPL Tests - Darwin (Build Only)
 
         strategy:
             matrix:
@@ -781,7 +781,7 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
 
-        if: github.actor != 'restyled-io[bot]' && false
+        if: github.actor != 'restyled-io[bot]'
         runs-on: macos-13
 
         steps:
@@ -812,6 +812,7 @@ jobs:
                       --copy-artifacts-to objdir-clone \
                    "
             - name: Run Tests
+              if: false # disable darwin test runs for now as they were very flaky in the past
               run: |
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files

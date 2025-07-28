@@ -18,8 +18,11 @@
 import logging
 
 import chip.clusters as Clusters
+from attributes_service import attributes_service_pb2
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from pw_hdlc import rpc
+from pw_system.device_connection import create_device_serial_or_socket_connection
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +35,9 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
     _MID_BRIGHTNESS_LEVEL = 127
     _MIN_BRIGHTNESS_LEVEL = 1
 
+    _PW_RPC_SOCKET_ADDR = "0.0.0.0:33000"
+    _PW_RPC_BAUD_RATE = 115200
+
     async def _read_on_off(self):
         return await self.read_single_attribute_check_success(
             endpoint=self._DIMMABLELIGHT_ENDPOINT, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
@@ -40,13 +46,59 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=self._DIMMABLELIGHT_ENDPOINT, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
 
+    def _read_on_off_pwrpc(self, device):
+        result = device.rpcs.chip.rpc.Attributes.Read(
+            endpoint=self._DIMMABLELIGHT_ENDPOINT,
+            cluster=Clusters.Objects.OnOff.id,
+            attribute_id=Clusters.Objects.OnOff.Attributes.OnOff.attribute_id,
+            type=attributes_service_pb2.AttributeType.ZCL_BOOLEAN_ATTRIBUTE_TYPE
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+        return result.response.data_bool
+
+    def _write_on_off_pwrpc(self, device, onOff: bool):
+        result = device.rpcs.chip.rpc.Attributes.Write(
+            data=attributes_service_pb2.AttributeData(data_bool=onOff),
+            metadata=attributes_service_pb2.AttributeMetadata(
+                endpoint=self._DIMMABLELIGHT_ENDPOINT,
+                cluster=Clusters.Objects.OnOff.id,
+                attribute_id=Clusters.Objects.OnOff.Attributes.OnOff.attribute_id,
+                type=attributes_service_pb2.AttributeType.ZCL_BOOLEAN_ATTRIBUTE_TYPE
+            )
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+
+    def _read_current_level_pwrpc(self, device):
+        result = device.rpcs.chip.rpc.Attributes.Read(
+            endpoint=self._DIMMABLELIGHT_ENDPOINT,
+            cluster=Clusters.Objects.LevelControl.id,
+            attribute_id=Clusters.Objects.LevelControl.Attributes.CurrentLevel.attribute_id,
+            type=attributes_service_pb2.AttributeType.ZCL_INT8U_ATTRIBUTE_TYPE
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+        return result.response.data_uint8
+
+    def _write_current_level_pwrpc(self, device, level: int):
+        result = device.rpcs.chip.rpc.Attributes.Write(
+            data=attributes_service_pb2.AttributeData(data_uint8=level),
+            metadata=attributes_service_pb2.AttributeMetadata(
+                endpoint=self._DIMMABLELIGHT_ENDPOINT,
+                cluster=Clusters.Objects.LevelControl.id,
+                attribute_id=Clusters.Objects.LevelControl.Attributes.CurrentLevel.attribute_id,
+                type=attributes_service_pb2.AttributeType.ZCL_INT8U_ATTRIBUTE_TYPE
+            )
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+
     def desc_TC_DIMMABLELIGHT(self) -> str:
         return "[TC_DIMMABLELIGHT] chef dimmablelight functionality test."
 
     def steps_TC_DIMMABLELIGHT(self):
         return [TestStep(1, "[TC_DIMMABLELIGHT] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[TC_DIMMABLELIGHT] Test level control."),
-                TestStep(3, "[TC_DIMMABLELIGHT] Test toggle.")]
+                TestStep(3, "[TC_DIMMABLELIGHT] Test toggle."),
+                TestStep(4, "[TC_DIMMABLELIGHT] Set up PwRPC connection."),
+                TestStep(5, "[TC_DIMMABLELIGHT] Test PwRPC on/off and level control.")]
 
     @async_test_body
     async def test_TC_DIMMABLELIGHT(self):
@@ -63,7 +115,7 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
             endpoint=self._DIMMABLELIGHT_ENDPOINT,
         )
         asserts.assert_equal(await self._read_on_off(), True)
-        for level in [self._MIN_BRIGHTNESS_LEVEL, self._MID_BRIGHTNESS_LEVEL, self._MAX_BRIGHTNESS_LEVEL]:
+        for level in [self._MID_BRIGHTNESS_LEVEL, self._MIN_BRIGHTNESS_LEVEL, self._MAX_BRIGHTNESS_LEVEL]:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.LevelControl.Commands.MoveToLevel(
                     level=level),
@@ -82,6 +134,33 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
             endpoint=self._DIMMABLELIGHT_ENDPOINT,
         )
         asserts.assert_equal(await self._read_on_off(), not before)
+
+        self.step(4)
+        device_connection = create_device_serial_or_socket_connection(
+            device="",
+            baudrate=self._PW_RPC_BAUD_RATE,
+            token_databases=[],
+            socket_addr=self._PW_RPC_SOCKET_ADDR,
+            compiled_protos=[attributes_service_pb2],
+            rpc_logging=True,
+            channel_id=rpc.DEFAULT_CHANNEL_ID,
+            hdlc_encoding=True,
+            device_tracing=False,
+        )
+
+        self.step(5)
+        with device_connection as device:
+            # Test onOff
+            self._write_on_off_pwrpc(device, True)
+            asserts.assert_equal(self._read_on_off_pwrpc(device), True)
+            self._write_on_off_pwrpc(device, False)
+            asserts.assert_equal(self._read_on_off_pwrpc(device), False)
+
+            # Test Level control
+            for level in [self._MID_BRIGHTNESS_LEVEL, self._MIN_BRIGHTNESS_LEVEL, self._MAX_BRIGHTNESS_LEVEL]:
+                self._write_current_level_pwrpc(device, level)
+                asserts.assert_equal(
+                    self._read_current_level_pwrpc(device), level)
 
 
 if __name__ == "__main__":
