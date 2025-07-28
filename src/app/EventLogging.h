@@ -78,6 +78,7 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     if constexpr (DataModel::IsFabricScoped<T>::value)
     {
         eventOptions.mFabricIndex = aEventData.GetFabricIndex();
+        // A fabric-sensitive event must be associated with a fabric to make sense.
         VerifyOrReturnError(eventOptions.mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     }
 
