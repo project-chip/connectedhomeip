@@ -21,7 +21,6 @@
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/WiFiNetworkDiagnostics/ClusterId.h>
-#include <platform/DiagnosticDataProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -31,11 +30,11 @@ namespace Clusters {
 class WiFiDiagnosticsServerCluster : public DefaultServerCluster
 {
 public:
-    WiFiDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
+    WiFiDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                  const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
                                  BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        DefaultServerCluster({ kRootEndpointId, WiFiNetworkDiagnostics::Id }),
-        mLogic(diagnosticProvider, enabledAttributes, featureFlags)
+        DefaultServerCluster({ endpointId, WiFiNetworkDiagnostics::Id }),
+        mLogic(endpointId, diagnosticProvider, enabledAttributes, featureFlags)
     {}
 
     // Server cluster implementation

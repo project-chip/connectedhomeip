@@ -53,7 +53,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, CompileTest)
     };
 
     NullProvider nullProvider;
-    WiFiDiagnosticsServerCluster cluster(nullProvider, enabledAttributes, BitFlags<WiFiNetworkDiagnostics::Feature>(0));
+    WiFiDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, enabledAttributes, BitFlags<WiFiNetworkDiagnostics::Feature>(0));
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, WiFiNetworkDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -71,7 +71,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         };
 
         NullProvider nullProvider;
-        WiFiDiagnosticsServerCluster cluster(nullProvider, enabledAttributes, BitFlags<WiFiNetworkDiagnostics::Feature>(0));
+        WiFiDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, enabledAttributes, BitFlags<WiFiNetworkDiagnostics::Feature>(0));
 
         // without any enabled attributes, no commands are accepted
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
@@ -118,7 +118,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
 
         ErrorCountsProvider errorCountsProvider;
         WiFiDiagnosticsServerCluster cluster(
-            errorCountsProvider, enabledAttributes,
+            kRootEndpointId, errorCountsProvider, enabledAttributes,
             BitFlags<WiFiNetworkDiagnostics::Feature>(WiFiNetworkDiagnostics::Feature::kErrorCounts));
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
@@ -229,7 +229,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         BitFlags<WiFiNetworkDiagnostics::Feature> features;
         features.Set(WiFiNetworkDiagnostics::Feature::kErrorCounts);
         features.Set(WiFiNetworkDiagnostics::Feature::kPacketCounts);
-        WiFiDiagnosticsServerCluster cluster(allProvider, enabledAttributes, features);
+        WiFiDiagnosticsServerCluster cluster(kRootEndpointId, allProvider, enabledAttributes, features);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), commandsBuilder),

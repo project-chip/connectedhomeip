@@ -71,7 +71,7 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         return;
     }
     const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-        .enableCurrentMaxRate = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentMaxRate::Id),
+        .enableCurrentMaxRate = IsAttributeEnabled(endpointId, Attributes::CurrentMaxRate::Id),
     };
 
     uint32_t rawFeatureMap;
@@ -83,7 +83,7 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
     // and do not properly support secondary network interfaces or per-endpoint diagnostics.
     // See issue:#40317
-    gServers[arrayIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), enabledAttributes,
+    gServers[arrayIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(), enabledAttributes,
                                 BitFlags<WiFiNetworkDiagnostics::Feature>(rawFeatureMap));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
@@ -92,7 +92,6 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         ChipLogError(AppServer, "Failed to register WiFiNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
                      err.Format());
     }
-    DeviceLayer::GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&gServers[arrayIndex].Cluster().GetLogic());
 }
 
 // This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.

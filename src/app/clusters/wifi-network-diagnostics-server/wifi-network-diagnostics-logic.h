@@ -21,6 +21,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
@@ -34,12 +35,19 @@ struct WiFiNetworkDiagnosticsEnabledAttributes
 class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
-    WiFiDiagnosticsServerLogic(DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
+    WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
+        mEndpointId(endpointId),
         mDiagnosticProvider(diagnosticProvider),
         mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
-    {}
+    {
+        mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
+    }
+
+    ~WiFiDiagnosticsServerLogic() {
+        mDiagnosticProvider.SetWiFiDiagnosticsDelegate(nullptr);
+    }
 
     template <typename T, typename Type>
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &), Type & data,
@@ -80,10 +88,12 @@ public:
     void OnConnectionStatusChanged(uint8_t connectionStatus) override;
 
     // Getter methods for private members
+    EndpointId GetEndpointId() const { return mEndpointId; }
     const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
     const WiFiNetworkDiagnosticsEnabledAttributes & GetEnabledAttributes() const { return mEnabledAttributes; }
 
 private:
+    EndpointId mEndpointId;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
     const WiFiNetworkDiagnosticsEnabledAttributes mEnabledAttributes;
     const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;

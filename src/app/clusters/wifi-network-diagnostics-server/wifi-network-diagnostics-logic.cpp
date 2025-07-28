@@ -60,7 +60,8 @@ void WiFiDiagnosticsServerLogic::OnDisconnectionDetected(uint16_t reasonCode)
     Events::Disconnection::Type event{ reasonCode };
     EventNumber eventNumber;
 
-    if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
+    EndpointId endpointId = GetEndpointId();
+    if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
     {
         ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record Disconnection event");
     }
@@ -71,10 +72,10 @@ void WiFiDiagnosticsServerLogic::OnAssociationFailureDetected(uint8_t associatio
     MATTER_TRACE_SCOPE("OnAssociationFailureDetected", "WiFiDiagnosticsDelegate");
 
     Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
-
     EventNumber eventNumber;
 
-    if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
+    EndpointId endpointId = GetEndpointId();
+    if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
     {
         ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record AssociationFailure event");
     }
@@ -85,10 +86,10 @@ void WiFiDiagnosticsServerLogic::OnConnectionStatusChanged(uint8_t connectionSta
     MATTER_TRACE_SCOPE("OnConnectionStatusChanged", "WiFiDiagnosticsDelegate");
 
     Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
-
     EventNumber eventNumber;
 
-    if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
+    EndpointId endpointId = GetEndpointId();
+    if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
     {
         ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record ConnectionStatus event");
     }
