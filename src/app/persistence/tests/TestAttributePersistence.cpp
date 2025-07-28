@@ -131,6 +131,23 @@ TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
         ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
         ASSERT_EQ(valueRead, kValueToStore);
     }
+
+    // Try to read non-compatible types (note that size-wise compatible types will work ... wrongly (like u32 and float))
+    // this extra check is best-effort
+    {
+        uint16_t smallValue = 0;
+        const uint16_t kOther = 123u;
+
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(path, smallValue, kOther));
+        ASSERT_EQ(smallValue, kOther);
+    }
+    {
+        uint64_t largeValue = 0;
+        const uint64_t kOther = 0x1122334455667788ull;
+
+        ASSERT_FALSE(persistence.LoadNativeEndianValue(path, largeValue, kOther));
+        ASSERT_EQ(largeValue, kOther);
+    }
 }
 
 TEST(TestAttributePersistence, TestStringViaDecoder)
