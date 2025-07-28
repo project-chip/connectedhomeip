@@ -124,7 +124,7 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
 CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))   
+    if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetCounts::kMetadataEntry };
         return builder.ReferenceExisting(kAcceptedCommands);
