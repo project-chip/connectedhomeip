@@ -35,7 +35,7 @@ chip_test_suite("tests") {
     test_sources += [
       "TestAccessControl.cpp",
       "TestAccessRestrictionProvider.cpp",
-      "TestProviderDevoceTypeResolver.cpp",
+      "TestProviderDeviceTypeResolver.cpp",
     ]
   }
 }
