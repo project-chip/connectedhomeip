@@ -345,6 +345,12 @@ config NET_RX_STACK_SIZE
 config NET_IPV6_NBR_CACHE
     default n
 
+config NET_PKT_TXTIME
+	default y
+
+config NET_PKT_TIMESTAMP
+	default y
+
 config NET_MAX_CONN
     default 1 if !WIFI
 
