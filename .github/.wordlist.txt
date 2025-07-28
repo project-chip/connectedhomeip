@@ -274,8 +274,8 @@ codelabs
 ColorControl
 Combinators
 Comcast
-Commandline
 CommandHandlerInterface
+Commandline
 CommandName
 Commissionable
 CommissionableDataProvider
@@ -303,8 +303,8 @@ connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 contrib
@@ -446,6 +446,7 @@ DL
 DM
 DMG
 DMM
+DMTT
 DNS
 Dnsmasq
 dnsmasqd
@@ -471,8 +472,8 @@ DS
 DSLS
 duplicative
 DUT
-DUTS
 DUT's
+DUTS
 DV
 DVK
 dynload
@@ -532,10 +533,10 @@ EthernetNetworkDiagnostics
 ethernets
 EthyleneConcentrationMeasurement
 EthyleneOxideConcentrationMeasurement
+EV
 EvalCode
 EvalCodeWithName
 EvalFrameDefault
-EV
 EVB
 EventLogging
 evk
@@ -570,9 +571,10 @@ feff
 ffaa
 ffeebaefa
 FFF
-FFFFFFFFFFFF0102
 fffe
 fffff
+FFFFFFFFFFFF0102
+FFmpeg
 Fi
 filepath
 fini
@@ -616,13 +618,13 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
-getter
-getters
 GetInDevelopmentTests
 GetIP
 getManualTests
 GetSafeAttributePersistenceProvider
 getstarted
+getter
+getters
 GH
 ghcr
 ghp
@@ -675,9 +677,10 @@ HomePod
 HomePods
 hostapd
 hostname
+hotfixes
 href
-HSM
 hsm
+HSM
 HTTPS
 Humidistat
 HW
@@ -758,14 +761,14 @@ itemName
 iterable
 itsfoss
 IW
-JDK
-jinja
 JCM
+JDK
+jf
+jinja
 JLink
 JLinkExe
 JLinkRTTClient
 JN
-jf
 jni
 jpg
 jre
@@ -836,6 +839,8 @@ LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+linter
+linters
 lladdr
 LocalConfigDisabled
 localedef
@@ -1138,6 +1143,7 @@ PowerProfile
 PowerSource
 PowerSourceConfiguration
 pre
+PrebuiltDataModelDirectory
 preprocessor
 Presetup
 PressureMeasurement
@@ -1232,8 +1238,8 @@ repo
 repos
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 RestrictedEvent
@@ -1268,8 +1274,8 @@ RTOS
 RTT
 RTX
 runArgs
-runIf
 RUNAS
+runIf
 RunMain
 runtime
 RVC
@@ -1291,8 +1297,8 @@ SDB
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1419,6 +1425,7 @@ sysv
 TargetNavigator
 TBD
 tbody
+TBR
 tcl
 TCP
 teardown
@@ -1495,8 +1502,8 @@ triaged
 triaging
 TriggerEffect
 TRNG
-trustm
 TrustedRootCertificates
+trustm
 tsan
 TSG
 tsv
@@ -1528,6 +1535,7 @@ Ultrafast
 UNBLUR
 uncommissioned
 Unencrypted
+unfixable
 unfocus
 Unicast
 UniFlash
@@ -1561,8 +1569,8 @@ util
 utils
 UUID
 ux
-validator
 valgrind
+validator
 vcom
 VCP
 Vectorcall
@@ -1675,4 +1683,3 @@ Zigbee
 zigbeealliance
 zigbeethread
 zsdk
-TBR

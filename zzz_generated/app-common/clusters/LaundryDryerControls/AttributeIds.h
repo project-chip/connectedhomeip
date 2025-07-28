@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace LaundryDryerControls {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 7;
+
 namespace SupportedDrynessLevels {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedDrynessLevels

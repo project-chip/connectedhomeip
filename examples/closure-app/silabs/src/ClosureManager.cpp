@@ -23,12 +23,14 @@
 #include "ClosureDimensionEndpoint.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::ClosureControl;
@@ -105,7 +107,82 @@ void ClosureManager::Init()
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList));
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint3TagList));
 
+    // Set Initial state for Closure endpoints
+    VerifyOrDie(SetClosureControlInitialState(mClosureEndpoint1) == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Initial state for Closure Control Endpoint set successfully");
+    VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint2) == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 2 set successfully");
+    VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3) == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 3 set successfully");
+
+    TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+
+    if (pTestEventDelegate != nullptr)
+    {
+        CHIP_ERROR err = pTestEventDelegate->AddHandler(&mClosureEndpoint1.GetDelegate());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to add handler for delegate: %s", chip::ErrorStr(err));
+        }
+    }
+    else
+    {
+        ChipLogError(AppServer, "TestEventTriggerDelegate is null, cannot add handler for delegate");
+    }
+
     DeviceLayer::PlatformMgr().UnlockChipStack();
+}
+
+CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint & closureControlEndpoint)
+{
+    ChipLogProgress(AppServer, "ClosureControlEndpoint SetInitialState");
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetCountdownTimeFromDelegate(NullNullable));
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetMainState(MainStateEnum::kStopped));
+
+    DataModel::Nullable<GenericOverallCurrentState> overallState(GenericOverallCurrentState(
+        MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallCurrentState(overallState));
+    DataModel::Nullable<GenericOverallTargetState> overallTarget(
+        GenericOverallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
+                                  MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallTargetState(overallTarget));
+    BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint & closurePanelEndpoint)
+{
+    ChipLogProgress(AppServer, "ClosurePanelEndpoint SetInitialState");
+    DataModel::Nullable<GenericDimensionStateStruct> currentState(
+        GenericDimensionStateStruct(MakeOptional(DataModel::MakeNullable<Percent100ths>(10000)),
+                                    MakeOptional(DataModel::MakeNullable(true)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetCurrentState(currentState));
+
+    DataModel::Nullable<GenericDimensionStateStruct> targetState(
+        GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
+                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetTargetState(targetState));
+
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetResolution(Percent100ths(100)));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(1000));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnit(ClosureUnitEnum::kMillimeter));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnitRange(
+        ClosureDimension::Structs::UnitRangeStruct::Type{ .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetOverflow(OverflowEnum::kTopInside));
+
+    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{ .min = static_cast<Percent100ths>(0),
+                                                                          .max = static_cast<Percent100ths>(10000) };
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLimitRange(limitRange));
+    BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
+
+    return CHIP_NO_ERROR;
 }
 
 void ClosureManager::StartTimer(uint32_t aTimeoutMs)
@@ -163,7 +240,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
         ChipLogDetail(AppServer, "Initiating unlatch action");
         // Unlatch action check is a prerequisite for the move to action.
         // In a real application, this would be replaced with actual unlatch logic.
-        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
+        instance.StartTimer(kMotionCountdownTimeMs);
         break;
     case Action_t::SET_TARGET_ACTION:
         ChipLogDetail(AppServer, "Initiating set target action");
@@ -232,6 +309,9 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
         break;
     case Action_t::MOVE_TO_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureMotionAction(); });
+        break;
+    case Action_t::UNLATCH_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
         break;
     case Action_t::SET_TARGET_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {

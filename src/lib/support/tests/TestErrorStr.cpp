@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <thread>
 
 #include <pw_unit_test/framework.h>
 
@@ -128,15 +129,31 @@ TEST(TestErrorStr, CheckRegisterDeregisterErrorFormatter)
 
 TEST(TestErrorStr, CheckNoError)
 {
+#if CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR)), CHIP_NO_ERROR_STRING);
+#else  // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+    EXPECT_STREQ(ErrorStr(CHIP_NO_ERROR), CHIP_NO_ERROR_STRING);
+#endif // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 }
 
 TEST(TestErrorStr, CheckErrorWithProvidedStorage)
 {
     ErrorStrStorage storage;
-    EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_NO_ERROR, true, storage)), CHIP_NO_ERROR_STRING);
     EXPECT_STREQ(CHECK_AND_SKIP_SOURCE(ErrorStr(CHIP_ERROR_INTERNAL, true, storage)), "Error 0x000000AC");
 }
+
+#if CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+TEST(TestErrorStr, CheckErrorWithDefaultThreadLocalStorage)
+{
+    const char * localNoError = ErrorStr(CHIP_NO_ERROR, false);
+    EXPECT_STREQ(localNoError, CHIP_NO_ERROR_STRING);
+
+    std::thread t([]() { EXPECT_STRNE(ErrorStr(CHIP_ERROR_NO_MEMORY, false), CHIP_NO_ERROR_STRING); });
+    t.join();
+
+    EXPECT_STREQ(localNoError, CHIP_NO_ERROR_STRING);
+}
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 
 TEST(TestErrorStr, CheckFormatErr)
 {

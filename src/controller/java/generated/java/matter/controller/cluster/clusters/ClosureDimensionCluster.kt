@@ -122,7 +122,7 @@ class ClosureDimensionCluster(
     position: UShort?,
     latch: Boolean?,
     speed: UByte?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 0u
 
@@ -154,7 +154,7 @@ class ClosureDimensionCluster(
     direction: UByte,
     numberOfSteps: UShort,
     speed: UByte?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 1u
 

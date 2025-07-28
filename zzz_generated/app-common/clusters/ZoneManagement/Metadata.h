@@ -75,6 +75,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveTrigger::I
 } // namespace RemoveTrigger
 
 } // namespace Commands
+
+namespace Events {
+namespace ZoneTriggered {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ZoneTriggered
+namespace ZoneStopped {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ZoneStopped
+
+} // namespace Events
 } // namespace ZoneManagement
 } // namespace Clusters
 } // namespace app

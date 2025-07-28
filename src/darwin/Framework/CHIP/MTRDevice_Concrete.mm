@@ -924,7 +924,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             MTR_LOG_ERROR("%@ _setUTCTime failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
         }
 #ifdef DEBUG
-        {
+        if (self) {
             std::lock_guard lock(self->_lock);
             [self _callDelegatesWithBlock:^(id testDelegate) {
                 if ([testDelegate respondsToSelector:@selector(unitTestSetUTCTimeInvokedForDevice:error:)]) {
@@ -4077,7 +4077,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             queue:queue
                        completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
                            mtr_strongify(self);
-                           {
+                           if (self) {
                                std::lock_guard lock(self->_lock);
                                self.diagnosticLogTransferInProgress = NO;
                                [self _notifyDelegateOfPrivateInternalPropertiesChanges];

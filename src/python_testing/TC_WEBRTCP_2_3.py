@@ -42,9 +42,10 @@ from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 
-class TC_WebRTCProvider_2_3(MatterBaseTest):
+class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
 
     def desc_TC_WebRTCProvider_2_3(self) -> str:
         """Returns a description of this test"""
@@ -56,13 +57,14 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
         """
         steps = [
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
-            TestStep(2, "Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(3, "Send ProvideOffer with null VideoStreamID => expect INVALID_IN_STATE"),
-            TestStep(4, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(5, "Send ProvideOffer with null AudioStreamID => expect INVALID_IN_STATE"),
-            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer => expect INVALID_IN_STATE"),
-            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer => expect ProvideOfferResponse"),
-            TestStep(8, "Read CurrentSessions attribute => expect 1"),
+            TestStep(2, "Send ProvideOffer with no audio or video id => expect INVALID_COMMAND"),
+            TestStep(3, "Send ProvideOffer with valid parameters, audio and video stream IDs are Null => expect INVALID_IN_STATE"),
+            TestStep(4, "Allocate Audio and Video Streams"),
+            TestStep(5, "Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
+            TestStep(6, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
+            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer => expect INVALID_IN_STATE"),
+            TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer => expect ProvideOfferResponse"),
+            TestStep(9, "Read CurrentSessions attribute => expect 1"),
         ]
         return steps
 
@@ -111,13 +113,40 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
         asserts.assert_equal(len(current_sessions), 0, "CurrentSessions must be empty!")
 
         self.step(2)
+        # Send ProvideOffer with no VideoStreamID and no AudioStreamID
+        cmd = cluster.Commands.ProvideOffer(
+            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=3, originatingEndpointID=endpoint)
+        try:
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.fail("Unexpected success on ProvideOffer with no VideoStreamID or AudioStreamID")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidCommand, "Expected INVALID_COMMAND")
+
+        self.step(3)
+        # Send ProvideOffer with null stream IDs
+        cmd = cluster.Commands.ProvideOffer(
+            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
+        try:
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.fail("Unexpected success on ProvideOffer with Null VideoStreamID and AudioStreamID")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
+
+        self.step(4)
+        audioStreamID = await self.allocate_one_audio_stream()
+        videoStreamID = await self.allocate_one_video_stream()
+
+        await self.validate_allocated_audio_stream(audioStreamID)
+        await self.validate_allocated_video_stream(videoStreamID)
+
+        self.step(5)
         # Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=test_sdp,
             streamUsage=3,
             originatingEndpointID=endpoint,
-            videoStreamID=9999  # Invalid VideoStreamID
+            videoStreamID=videoStreamID+1  # Invalid VideoStreamID
         )
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -125,29 +154,14 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
-        self.step(3)
-        # Send ProvideOffer with null VideoStreamID
-        cmd = cluster.Commands.ProvideOffer(
-            webRTCSessionID=NullValue,
-            sdp=test_sdp,
-            streamUsage=3,
-            originatingEndpointID=endpoint,
-            videoStreamID=NullValue  # Null VideoStreamID
-        )
-        try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Unexpected success on ProvideOffer with null VideoStreamID")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
-
-        self.step(4)
+        self.step(6)
         # Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=test_sdp,
             streamUsage=3,
             originatingEndpointID=endpoint,
-            audioStreamID=9999  # Invalid AudioStreamID
+            audioStreamID=audioStreamID+1  # Invalid AudioStreamID
         )
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -155,23 +169,8 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
-        self.step(5)
-        # Send ProvideOffer with null AudioStreamID
-        cmd = cluster.Commands.ProvideOffer(
-            webRTCSessionID=NullValue,
-            sdp=test_sdp,
-            streamUsage=3,
-            originatingEndpointID=endpoint,
-            audioStreamID=NullValue  # Null AudioStreamID
-        )
-        try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Unexpected success on ProvideOffer with null AudioStreamID")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
-
         if privacySupported:
-            self.step(6)
+            self.step(7)
             # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
             await self.write_single_attribute(
                 attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(True),
@@ -191,9 +190,9 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
         else:
             # Skip privacy mode test if not supported
-            self.skip_step(6)
+            self.skip_step(7)
 
-        self.step(7)
+        self.step(8)
         if privacySupported:
             # Write SoftLivestreamPrivacyModeEnabled=false and send valid ProvideOffer
             await self.write_single_attribute(
@@ -206,15 +205,16 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
             webRTCSessionID=NullValue,
             sdp=test_sdp,
             streamUsage=3,
-            originatingEndpointID=endpoint
-            # videoStreamID and audioStreamID not specified (empty)
+            originatingEndpointID=endpoint,
+            videoStreamID=videoStreamID,
+            audioStreamID=audioStreamID
         )
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
                              "Incorrect response type")
         asserts.assert_not_equal(resp.webRTCSessionID, 0, "webRTCSessionID in ProvideOfferResponse should not be 0.")
 
-        self.step(8)
+        self.step(9)
         # Verify CurrentSessions contains the new session
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,
