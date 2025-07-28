@@ -53,16 +53,12 @@ static_library("nxp_crypto_lib") {
     deps = [ "${chip_root}/${nxp_crypto_mw_root}:se05x" ]
   }
 
-  external_mbedtls = (current_os == "zephyr" || nxp_external_sdk)
+  external_mbedtls = current_os == "zephyr" || nxp_external_sdk
 
-  public_deps = [
-    "${chip_root}/src/crypto"
-  ]
+  public_deps = [ "${chip_root}/src/crypto" ]
 
   if (!external_mbedtls) {
-    public_deps += [
-      "${mbedtls_root}:mbedtls",
-    ]
+    public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
   include_dirs = [
