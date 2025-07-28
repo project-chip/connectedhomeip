@@ -21,7 +21,7 @@ on:
             - master
             - 'v*-branch'
     pull_request:
-        paths-ignore: ['**/*.md', '*.md']
+      paths-ignore: ['**/*.md', '*.md']
     merge_group:
 
 concurrency:
