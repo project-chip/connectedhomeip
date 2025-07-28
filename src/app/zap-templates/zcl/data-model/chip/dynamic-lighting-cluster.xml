@@ -1,133 +1,219 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2023 Project CHIP Authors
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
 
-    http://www.apache.org/licenses/LICENSE-2.0
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<configurator>
-  <!-- Dynamic Lighting Cluster Enums -->
-  <enum name="EffectMode" type="enum8">
-    <cluster code="0x0302"/>
-    <item name="LightBased" value="0x00"/>
-    <item name="SoundBased" value="0x01"/>
-  </enum>
-
-  <enum name="EffectColorMode" type="enum8">
-    <cluster code="0x0302"/>
-    <item name="XYAndLevel" value="0x00"/>
-    <item name="HSAndLevel" value="0x01"/>
-    <item name="Level" value="0x02"/>
-  </enum>
-
-  <!-- Dynamic Lighting Cluster Structs -->
-  <struct name="EffectStyleStruct">
-    <cluster code="0x0302"/>
-    <item name="ID" type="int16u"/>
-    <item name="Label" type="char_string" length="32"/>
-  </struct>
-
-  <struct name="ModeWithEffectStylesStruct">
-    <cluster code="0x0302"/>
-    <item name="Mode" type="EffectMode"/>
-    <item name="Styles" type="EffectStyleStruct" array="true"/>
-    <item name="MaxSpeed" type="int16u"/>
-    <item name="DefaultSpeed" type="int16u"/>
-  </struct>
-
-  <struct name="BuiltInEffectStruct">
-    <cluster code="0x0302"/>
-    <item name="ID" type="int16u"/>
-    <item name="Mode" type="EffectMode"/>
-    <item name="Label" type="char_string" length="32"/>
-    <item name="MaxSpeed" type="int16u"/>
-    <item name="DefaultSpeed" type="int16u"/>
-  </struct>
-
-  <struct name="EffectColorStruct">
-    <cluster code="0x0302"/>
-    <item name="Level" type="int8u" max="254"/>
-    <item name="X" type="int16u" max="65279" isNullable="true"/>
-    <item name="Y" type="int16u" max="65279" isNullable="true"/>
-    <item name="Hue" type="int16u" isNullable="true"/>
-    <item name="Saturation" type="int8u" isNullable="true"/>
-  </struct>
-
-  <!-- Dynamic Lighting Cluster -->
-  <cluster>
-    <name>Dynamic Lighting</name>
-    <domain>Lighting</domain>
-    <description>This cluster provides a means to activate dynamic lighting effects on a light. These effects MAY either be built in, or include a custom color palette using a pre-defined style.</description>
-    <code>0x0302</code>
-    <define>DYNAMIC_LIGHTING_CLUSTER</define>
-
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
-
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="DYNAMIC_LIGHTING_AVAILABLE_MODES_AND_STYLES" type="ModeWithEffectStylesStruct" array="true" writable="false">
-      <description>List of available effect modes and their associated styles</description>
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0305" name="Dynamic Lighting Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial release"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0305" name="Dynamic Lighting"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="DYNL" scope="Endpoint"/>
+  <dataTypes>
+    <enum name="EffectColorModeEnum">
+      <item value="0" name="Level" summary="Color values in Effect contain Level values.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="XY" summary="Color values in Effect contain XY values.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="XYAndLevel" summary="Color values in Effect contain XY values and Level.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="HS" summary="Color values in Effect contain Hue and Saturation values.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="HSAndLevel" summary="Color values in Effect contain Hue and Saturation values and Level.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="EHUE" summary="Color values in Effect contain Extended Hue and Saturation values.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="EHUEAndLevel" summary="Color values in Effect contain Extended Hue and Saturation values and Level.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="EffectSourceEnum">
+      <item value="0" name="Internal" summary="Effect is driven by pre-defined logic, and not any external input">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="SoundBased" summary="Effect is adapted based on audio input.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="EffectColorStruct">
+      <field id="0" name="Level" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="X" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="2" name="Y" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="3" name="Hue" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="ExtendedHue" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="Saturation" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="EffectStruct">
+      <field id="0" name="EffectID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Source" type="EffectSourceEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Label" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="3" name="MaxSpeed" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="DefaultSpeed" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max>
+            <field name="MaxSpeed"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="5" name="SupportsColorPalette" type="bool">
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="AvailableEffects" type="list">
+      <entry type="EffectStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="128"/>
+        </countBetween>
+      </constraint>
     </attribute>
-
-    <attribute side="server" code="0x0001" define="DYNAMIC_LIGHTING_BUILT_IN_EFFECTS" type="BuiltInEffectStruct" array="true" writable="false">
-      <description>List of built-in lighting effects supported by the device</description>
+    <attribute id="0x0001" name="CurrentEffectID" type="uint16" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
     </attribute>
-
-    <attribute side="server" code="0x0002" define="DYNAMIC_LIGHTING_CURRENT_SPEED" type="int16u" writable="true" isNullable="true" optional="true">
-      <description>Current speed setting for the active lighting effect</description>
-      <access op="read" role="view"/>
-      <access op="write" role="operate"/>
+    <attribute id="0x0002" name="CurrentSpeed" type="uint16" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
     </attribute>
-
-    <attribute side="server" code="0x0003" define="DYNAMIC_LIGHTING_CURRENT_BUILT_IN_EFFECT" type="int16u" writable="false" isNullable="true" optional="true">
-      <description>ID of the currently active built-in effect, null if none active</description>
-    </attribute>
-
-    <attribute side="server" code="0x0004" define="DYNAMIC_LIGHTING_CURRENT_EFFECT_STYLE" type="int16u" writable="false" isNullable="true" optional="true">
-      <description>ID of the currently active effect style, null if using default</description>
-    </attribute>
-
-    <!-- Commands -->
-    <command source="client" code="0x00" name="StartBuiltInEffect" optional="true" cli="zcl dynamic-lighting startbuiltineffect">
-      <description>
-        Start a built-in effect
-      </description>
-      <arg name="ID" type="int16u"/>
-      <arg name="Speed" type="int16u"/>
+  </attributes>
+  <commands>
+    <command id="0x00" name="StartEffect" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="EffectID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Speed" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="ColorMode" type="EffectColorModeEnum">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="ColorPalette" type="list">
+        <entry type="EffectColorStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="16"/>
+        </constraint>
+      </field>
     </command>
-
-    <command source="client" code="0x01" name="StopBuiltInEffect" optional="true" cli="zcl dynamic-lighting stopbuiltineffect">
-      <description>
-        Stop the currently running built-in effect
-      </description>
+    <command id="0x01" name="StopEffect" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
     </command>
-
-    <command source="client" code="0x02" name="StartEffect" optional="true" cli="zcl dynamic-lighting starteffect">
-      <description>
-        Start a style effect with custom colors
-      </description>
-      <arg name="Mode" type="EffectMode"/>
-      <arg name="StyleID" type="int16u"/>
-      <arg name="Speed" type="int16u"/>
-      <arg name="PointsMode" type="EffectColorMode"/>
-      <arg name="Points" type="EffectColorStruct" array="true" length="16"/>
-    </command>
-
-    <command source="client" code="0x03" name="StopEffect" optional="true" cli="zcl dynamic-lighting stopeffect">
-      <description>
-        Stop the currently running style effect
-      </description>
-    </command>
-  </cluster>
-</configurator>
+  </commands>
+</cluster>
