@@ -354,12 +354,31 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
     # Mobly Test Controller Methods (Framework Interface)
     #
+    # The test framework defines a set of named methods that can be used to set up or tear down tests.
+    # setup_class is called once after class initialization, once per class, before any test_ methods are run.
+    # setup_test is called once before each test_ function is run
+    # teardown_test is called once after each test_
+    # teardown_class is called after the last test_ function in the class is run
+    #
+    # Test authors may overwrite these methods to assist in performing setup and tear down.
+    # Test classes that overwrite these functions should ensure the base functions are called as appropriate. 
+    # setup_ methods  should call the super() method at the start
+    # teardown_ methods should call the super() method at the end
+    #
 
     def setup_class(self):
         """Set up the test class before running any tests.
 
         Initializes cluster mapping, step tracking, and global test state.
         Called once per test class by the Mobly framework.
+        
+        Test authors may overwrite this method in the derived class to perform setup that is common for all tests.
+        This function is called only once for the class. To perform setup before each test, use setup_test.
+        Test authors that implement steps in this function need to be careful of step handling if there is
+        more than one test in the class.
+        Test authors that implement this method should ensure super().setup_class() is called before any
+        custom setup.
+
         """
         super().setup_class()
 
@@ -375,7 +394,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.stored_global_wildcard = None
 
     def teardown_class(self):
-        """Final teardown after all tests: log all problems."""
+        """Final teardown after all tests: log all problems.
+            Test authors may overwrite this method in the derived class to perform teardown that is common for all tests
+             This function is called only once per class. To perform teardown after each test, use teardown_test.
+             Test authors that implement steps in this function need to be careful of step handling if there is
+             more than one test in the class.
+             Test authors that implement this method should ensure super().teardown_class() is called after any
+             custom teardown code.
+
+        """
         if len(self.problems) > 0:
             logging.info("###########################################################")
             logging.info("Problems found:")
@@ -390,6 +417,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Resets test state, starts timers, and notifies runner hooks.
         Called before each test method by the Mobly framework.
+        
+        Test authors may overwrite this method in the derived class to perform setup that is common for all tests.
+        This is called once before each test_ in the class.
+        
+        Test authors that implement this method should ensure super().setup_test() is called before any custom setup.
         """
         self.current_step_index = 0
         self.test_start_time = datetime.now(timezone.utc)
@@ -412,6 +444,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.
+        
+            This is called by the base framework.
+            Tests should not call this directly.
+            Tests should not overwrite this method.
 
         Args:
             record: TestResultRecord containing failure information.
@@ -504,6 +540,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def on_pass(self, record):
         """Handle test success callback from Mobly framework.
 
+            This is called by the base framework.
+            Tests should not call this directly. 
+            Tests should not overwrite this method.
+
         Args:
             record: TestResultRecord containing test results.
         """
@@ -531,6 +571,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def on_skip(self, record):
         """Handle test skip callback from Mobly framework.
+
+            This is called by the base framework.
+            Tests should not call this directly. 
+            Tests should not overwrite this method.
 
         Args:
             record: TestResultRecord containing skip information.
@@ -623,6 +667,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
     # Matter Test API - Test Definition Helpers (Steps, PICS, Description)
     #
+    #  These helper methods are used by the test harness and should not be called tests.
 
     def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
@@ -703,6 +748,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
     # Matter Test API - Step Management & Execution
     #
+    # These methods are used to mark test progress for the test harness and logs, to help with test
+    # debugging, issue creation and log analysis by the test labs. 
 
     def step(self, step: typing.Union[int, str]):
         """Execute a test step and manage step progression.
