@@ -70,7 +70,7 @@ using namespace app::Clusters::Descriptor::Structs;
 #if CONFIG_DAC_KEY_ENC
 #define APP_TASK_STACK_SIZE (8 * 1024)
 #else
-#define APP_TASK_STACK_SIZE (4 * 1024)
+#define APP_TASK_STACK_SIZE (3 * 1024)
 #endif
 
 #define APP_TASK_PRIORITY 2
@@ -140,8 +140,8 @@ TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
-uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+static const uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                                0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
