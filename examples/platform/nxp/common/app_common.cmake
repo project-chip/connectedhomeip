@@ -294,6 +294,6 @@ endif()
 mcux_convert_binary(
     BINARY ${APPLICATION_BINARY_DIR}/app.bin
     TARGET app
-    TOOLCHAINS armgcc
+    TOOLCHAINS ${CONFIG_TOOLCHAIN}
     EXTRA_ARGS "${CONFIG_REMOVE_SECTIONS_FROM_BIN}"
 )
