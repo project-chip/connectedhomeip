@@ -1891,7 +1891,6 @@ class ChipDeviceControllerBase():
             else:
                 urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
                 # endpoint + (cluster) event / endpoint + cluster
-                # mypy refactor (PR https://github.com/project-chip/connectedhomeip/pull/39827):
                 # instantiate class types in pathTuple[1] before passing
                 # to from_cluster/from_event as these expect instances.
                 if isinstance(pathTuple[1], type) and issubclass(pathTuple[1], ClusterObjects.Cluster):
