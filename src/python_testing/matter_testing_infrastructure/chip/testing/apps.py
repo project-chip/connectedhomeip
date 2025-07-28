@@ -17,7 +17,7 @@ import signal
 import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Union, Optional
+from typing import Optional, Union
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
