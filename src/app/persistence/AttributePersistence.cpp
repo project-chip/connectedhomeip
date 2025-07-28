@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/persistence/AttributePersistence.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/PascalString.h>
 

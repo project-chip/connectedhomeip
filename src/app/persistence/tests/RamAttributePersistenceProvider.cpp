@@ -63,7 +63,7 @@ CHIP_ERROR RamAttributePersistenceProvider::ReadValue(const app::ConcreteAttribu
 CHIP_ERROR RamAttributePersistenceProvider::DeleteValue(const app::ConcreteAttributePath & aPath)
 {
     const auto original_size = mEntries.size();
-    mEntries.remove_if([aPath](const Entry & entry) { return entry.path == aPath; });
+    mEntries.remove_if([&aPath](const Entry & entry) { return entry.path == aPath; });
 
     if (mEntries.size() < original_size)
     {
