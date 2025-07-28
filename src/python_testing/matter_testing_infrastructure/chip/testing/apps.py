@@ -21,6 +21,7 @@ from typing import Optional, Union
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.clusters.Types import NullValue
 from chip.testing.tasks import Subprocess
 
 
@@ -188,24 +189,39 @@ class OTAProviderSubprocess(AppServerSubprocess):
             Result of the ACL write operation
         """
         # Standard ACL entry for OTA Provider cluster
+        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
+        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
+
+        # Create ACL entries using proper struct constructors
         acl_entries = [
-            {
-                "fabricIndex": 1,
-                "privilege": Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                "authMode": Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                "subjects": [dev_ctrl.nodeId] if hasattr(dev_ctrl, 'nodeId') else [self.DEFAULT_ADMIN_NODE_ID],
-                "targets": None
-            },
-            {
-                "fabricIndex": 1,
-                "privilege": Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-                "authMode": Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                "subjects": [requestor_node_id] if requestor_node_id else None,
-                "targets": [{"cluster": Clusters.OtaSoftwareUpdateProvider.id, "endpoint": None, "deviceType": None}]
-            }
+            # Admin entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=[admin_node_id],  # type: ignore
+                targets=NullValue,
+                fabricIndex=1  # type: ignore
+            ),
+            # Operate entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=requestor_subjects,  # type: ignore
+                targets=[
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
+                        cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                        endpoint=NullValue,
+                        deviceType=NullValue
+                    )
+                ],
+                fabricIndex=1  # type: ignore
+            )
         ]
+
+        # Create the attribute descriptor for the ACL attribute
+        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
 
         return dev_ctrl.WriteAttribute(
             nodeid=provider_node_id,
-            attributes=[(0, Clusters.AccessControl.id, Clusters.AccessControl.Attributes.Acl.attribute_id, acl_entries)]
+            attributes=[(0, acl_attribute)]
         )
