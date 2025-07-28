@@ -21,6 +21,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRCommissioningParameters : NSObject
 
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCommissioningParameters alloc] init];
+    other.csrNonce = self.csrNonce;
+    other.attestationNonce = self.attestationNonce;
+    other.wifiSSID = self.wifiSSID;
+    other.wifiCredentials = self.wifiCredentials;
+    other.threadOperationalDataset = self.threadOperationalDataset;
+    other.deviceAttestationDelegate = self.deviceAttestationDelegate;
+    other.failSafeTimeout = self.failSafeTimeout;
+    other.skipCommissioningComplete = self.skipCommissioningComplete;
+    other.countryCode = self.countryCode;
+    other.readEndpointInformation = self.readEndpointInformation;
+    other.acceptedTermsAndConditions = self.acceptedTermsAndConditions;
+    other.acceptedTermsAndConditionsVersion = self.acceptedTermsAndConditionsVersion;
+    other.extraAttributesToRead = self.extraAttributesToRead;
+    return other;
+}
+
 @end
 
 @implementation MTRCommissioningParameters (Deprecated)

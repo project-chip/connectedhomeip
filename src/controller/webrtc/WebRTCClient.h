@@ -42,11 +42,16 @@ public:
     void OnGatheringComplete(std::function<void()> callback);
     void OnStateChange(std::function<void(int)> callback);
 
-    const char * GetLocalDescription();
+    /* Call to fetch the local session description string. This is used by the
+     * Python binding layer to get the local SDP string with ice candidates
+     * Should be called after setting local/remote SDP and GatheringComplete.
+     */
+    const char * GetLocalSessionDescriptionInternal();
+
     int GetPeerConnectionState();
     void Disconnect();
 
-    void WebRTCProviderClientInit(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
+    void WebRTCProviderClientInit(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
     PyChipError SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
                             size_t length);
     void WebRTCProviderClientInitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,

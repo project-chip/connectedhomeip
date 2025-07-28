@@ -17,6 +17,7 @@
 
 import asyncio
 import logging
+from typing import Optional
 
 from .command import WebRTCProviderCommand
 from .types import Events, IceCandiate, IceCandidateList, PeerConnectionState
@@ -111,11 +112,6 @@ class PeerConnection(WebRTCClient):
         self._ice_candidates.gathering_complete = True
         return self._ice_candidates.candidates
 
-    async def wait_for_gathering_complete(self) -> None:
-        """Waits indefinitely until the local ICE candidates are gathered."""
-        await self.get_local_ice_candidates()
-        return
-
     def set_remote_ice_candidates(self, remote_candidates: list[str]) -> None:
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
@@ -125,13 +121,35 @@ class PeerConnection(WebRTCClient):
         for candidate in remote_candidates:
             self.add_ice_candidate(candidate, "video")
 
-    def get_local_answer(self) -> str:
+    async def get_local_answer(self, timeout_sec: Optional[int] = None) -> str:
         """Fetches the local SDP answer for the WebRTC peer connection.
+
+        Args:
+            timeout_sec (Optional[int]): The maximum time in seconds to wait for a local answer sdp.
 
         Returns:
             str: The local SDP answer.
+
+        Raises:
+            asyncio.TimeoutError: If timeout period is elapsed waiting.
         """
-        return self.get_local_description()
+        return await self._local_events[Events.ANSWER].get(timeout_sec)
+
+    async def get_local_description_with_ice_candidates(self) -> str:
+        """Retrieves the local SDP including ICE candidates.
+        Waits for ICE Gathering Complete first. Then fetches the local description and returns it.
+
+        Returns:
+            str: The local SDP description including ICE candidates.
+
+        Raises:
+            RuntimeError: If no local sdp is available. This indicates invalid state.
+        """
+        await self.get_local_ice_candidates()
+        sdp = self.get_local_description()
+        if len(sdp) == 0:
+            raise RuntimeError("Invalid State: No local sdp available")
+        return sdp
 
     def set_remote_answer(self, answer_sdp: str) -> None:
         """Sets the remote SDP answer for the WebRTC peer connection.
@@ -141,13 +159,20 @@ class PeerConnection(WebRTCClient):
         """
         self.set_remote_description(answer_sdp, "answer")
 
-    def get_local_offer(self) -> str:
+    async def get_local_offer(self, timeout_sec: Optional[int] = None) -> str:
         """Fetches the local SDP offer for the WebRTC peer connection.
+
+        Args:
+            timeout_sec (Optional[int]): The maximum time in seconds to wait for a local offer sdp.
 
         Returns:
             str: The local SDP offer.
+
+        Raises:
+            asyncio.TimeoutError: If timeout period is elapsed waiting.
         """
-        return self.get_local_description()
+
+        return await self._local_events[Events.OFFER].get(timeout_sec)
 
     def set_remote_offer(self, offer_sdp: str) -> None:
         """Sets the remote SDP offer for the WebRTC peer connection.

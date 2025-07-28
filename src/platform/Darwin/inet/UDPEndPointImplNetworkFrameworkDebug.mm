@@ -169,7 +169,7 @@ namespace Inet {
 
             if (error) {
                 CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogDetail(Inet, "%s - Error: %s", str, chip::ErrorStr(err));
+                ChipLogDetail(Inet, "%s - Error: %" CHIP_ERROR_FORMAT, str, err.Format());
             } else {
                 ChipLogDetail(Inet, "%s", str);
             }
@@ -202,7 +202,7 @@ namespace Inet {
             const char * interfaceName = nw_interface_get_name(interface);
             if (error) {
                 CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogDetail(Inet, "%s (%s) - Error: %s", str, interfaceName, chip::ErrorStr(err));
+                ChipLogDetail(Inet, "%s (%s) - Error: %" CHIP_ERROR_FORMAT, str, interfaceName, err.Format());
             } else {
                 ChipLogDetail(Inet, "%s (%s)", str, interfaceName);
             }
@@ -237,7 +237,7 @@ namespace Inet {
 
             if (error) {
                 CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogDetail(Inet, "%s - Error: %s", str, chip::ErrorStr(err));
+                ChipLogDetail(Inet, "%s - Error: %" CHIP_ERROR_FORMAT, str, err.Format());
             } else {
                 ChipLogDetail(Inet, "%s", str);
             }

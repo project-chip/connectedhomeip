@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+/**
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +14,14 @@
  *    limitations under the License.
  */
 
-#include <lib/support/TimeUtils.h>
+#import <Foundation/Foundation.h>
 
-namespace chip {
-namespace System {
-namespace Clock {
+NS_ASSUME_NONNULL_BEGIN
 
-CHIP_ERROR InitClock_RealTime();
+/**
+ * Helper method to round-trip an NSSecureCoding instance and return the
+ * (possibly nil) decoding result.
+ */
+id _Nullable RoundTripEncodable(id<NSSecureCoding> encodable, NSError * __autoreleasing * _Nullable decodeError);
 
-} // namespace Clock
-} // namespace System
-} // namespace chip
+NS_ASSUME_NONNULL_END

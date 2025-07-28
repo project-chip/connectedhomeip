@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace Timer {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 8;
+
 namespace SetTime {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace SetTime
