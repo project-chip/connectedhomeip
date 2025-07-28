@@ -34,7 +34,7 @@ CHIP_ERROR RamAttributePersistenceProvider::WriteValue(const app::ConcreteAttrib
     else
     {
         // No existing entry, create a new one.
-        mEntries.push_back({ aPath, std::vector<uint8_t>(aValue.begin(), aValue.end()) });
+        mEntries.push_back({ aPath, { aValue.begin(), aValue.end() } });
     }
 
     return CHIP_NO_ERROR;
