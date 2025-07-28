@@ -35,6 +35,7 @@ import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
+from chip.setup_payload.setup_payload import SetupPayload
 from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
@@ -53,6 +54,7 @@ import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute, ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
+from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
@@ -128,7 +130,6 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
-@dataclass
 class SetupParameters:
     passcode: int
     vendor_id: int = 0xFFF1
