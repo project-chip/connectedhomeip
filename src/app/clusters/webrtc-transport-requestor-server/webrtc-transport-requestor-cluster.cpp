@@ -153,7 +153,7 @@ uint16_t WebRTCTransportRequestorServer::GenerateSessionId()
 
     // This should never happen in practice since we support 65534 sessions
     // and typical applications will have far fewer active sessions
-    ChipLogError(Zcl, "All session IDs are in use! Current sessions: %zu", mCurrentSessions.size());
+    ChipLogError(Zcl, "All session IDs are in use!");
     VerifyOrDie(false);
 }
 
