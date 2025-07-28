@@ -276,5 +276,3 @@ the PR")
 
 -   This requirement shall be dropped after a PR is 3 days old with stale or no
     feedback.
-
-### Unknown chapter
