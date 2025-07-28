@@ -18,12 +18,16 @@ on:
     push:
         branches:
             - master
-            - 'v*-branch'
+            - "v*-branch"
     pull_request:
+        paths-ignore: ["**/*.md", "*.md"]
     merge_group:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -47,13 +51,13 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
+                  platform: linux
             # Java formatting requires a newer java to run ktfmt
             # TODO: this should be eventually inside Docker files
             - name: Update java
               run: |
-                apt-get update
-                DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing openjdk-17-jre
+                  apt-get update
+                  DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing openjdk-17-jre
             # Clean out java generated files: since java codegen will generate one file per
             # structure/cluster, if clusters and structures are ever changed (for in progress work)
             # this may leave obsolete files. Ensure we always check for clean regen.
@@ -70,7 +74,9 @@ jobs:
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
             - name: Generate script-maintained items (ERROR_CODES.md)
-              run: ./scripts/run_in_build_env.sh "scripts/error_table.py > docs/ids_and_codes/ERROR_CODES.md"
+              run:
+                  ./scripts/run_in_build_env.sh "scripts/error_table.py >
+                  docs/ids_and_codes/ERROR_CODES.md"
             - name: Ensure git works in current working directory
               run: git config --global --add safe.directory `pwd`
             - name: Check for uncommited changes
