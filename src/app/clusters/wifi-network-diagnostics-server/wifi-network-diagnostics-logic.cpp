@@ -43,8 +43,6 @@ CHIP_ERROR WiFiDiagnosticsServerLogic::ReadWiFiBssId(AttributeValueEncoder & aEn
         if (!bssidSpan.empty())
         {
             bssid.SetNonNull(bssidSpan);
-            ChipLogProgress(Zcl, "Node is currently connected to Wi-Fi network with BSSID:");
-            ChipLogByteSpan(Zcl, bssidSpan);
         }
     }
     else
@@ -58,7 +56,6 @@ CHIP_ERROR WiFiDiagnosticsServerLogic::ReadWiFiBssId(AttributeValueEncoder & aEn
 void WiFiDiagnosticsServerLogic::OnDisconnectionDetected(uint16_t reasonCode)
 {
     MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
-    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
 
     Events::Disconnection::Type event{ reasonCode };
     EventNumber eventNumber;
@@ -72,7 +69,6 @@ void WiFiDiagnosticsServerLogic::OnDisconnectionDetected(uint16_t reasonCode)
 void WiFiDiagnosticsServerLogic::OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status)
 {
     MATTER_TRACE_SCOPE("OnAssociationFailureDetected", "WiFiDiagnosticsDelegate");
-    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected");
 
     Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
 
@@ -87,7 +83,6 @@ void WiFiDiagnosticsServerLogic::OnAssociationFailureDetected(uint8_t associatio
 void WiFiDiagnosticsServerLogic::OnConnectionStatusChanged(uint8_t connectionStatus)
 {
     MATTER_TRACE_SCOPE("OnConnectionStatusChanged", "WiFiDiagnosticsDelegate");
-    ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
 
     Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
 

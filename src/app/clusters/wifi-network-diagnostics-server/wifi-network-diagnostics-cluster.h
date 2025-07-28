@@ -31,10 +31,10 @@ namespace Clusters {
 class WiFiDiagnosticsServerCluster : public DefaultServerCluster
 {
 public:
-    WiFiDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
+    WiFiDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                  const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
                                  BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        DefaultServerCluster({ endpointId, WiFiNetworkDiagnostics::Id }),
+        DefaultServerCluster({ kRootEndpointId, WiFiNetworkDiagnostics::Id }),
         mLogic(diagnosticProvider, enabledAttributes, featureFlags)
     {}
 

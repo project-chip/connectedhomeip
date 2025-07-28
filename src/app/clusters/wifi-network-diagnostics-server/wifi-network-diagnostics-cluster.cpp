@@ -92,9 +92,8 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServerCluster::ReadAttribute(const 
         return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiOverrunCount, count, encoder);
     }
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-    return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
 CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
@@ -125,13 +124,12 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
 CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-    if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
+    if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))   
     {
-        ReturnErrorOnFailure(builder.AppendElements({
-            Commands::ResetCounts::kMetadataEntry,
-        }));
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetCounts::kMetadataEntry };
+        return builder.ReferenceExisting(kAcceptedCommands);
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -146,9 +144,8 @@ std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::Invok
         return Protocols::InteractionModel::Status::Success;
     }
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
-    return Protocols::InteractionModel::Status::UnsupportedCommand;
 }
 
 } // namespace Clusters

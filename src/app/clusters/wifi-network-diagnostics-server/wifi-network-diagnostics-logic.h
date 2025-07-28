@@ -60,8 +60,8 @@ public:
         return aEncoder.Encode(data);
     }
 
-    // WiFiBssId use custom implementations instead of ReadIfSupported because it
-    // provide more detailed logging messages.
+    // WiFiBssId uses custom implementations instead of ReadIfSupported because it
+    // is attribute of type octet string.
     CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR HandleResetCounts()
