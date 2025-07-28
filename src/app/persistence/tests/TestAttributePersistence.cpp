@@ -355,4 +355,3 @@ TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
 }
 
 } // namespace
-
