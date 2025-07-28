@@ -40,6 +40,7 @@ HEADER = """/*
 // This file is generated automatically by write_sdk_version_header.py
 """
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate header file with the SDK version.")
     parser.add_argument("--output", required=True, help="Name of the output header file")
@@ -61,5 +62,6 @@ def main() -> int:
         header.write(f'#define CHIP_SDK_VERSION "{git_ver}"\n')
 
     return 0
+
 
 main()
