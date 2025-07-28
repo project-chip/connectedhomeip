@@ -37,7 +37,7 @@ bool VerifySuccessLogOnFailure(const ConcreteAttributePath & path, CHIP_ERROR er
 
 void LogInvalidPascalContent(const ConcreteAttributePath & path)
 {
-    ChipLogError(Zcl, "Invalid pascal content: %u/" ChipLogFormatMEI "/" ChipLogFormatMEI, path.mEndpointId,
+    ChipLogError(Zcl, "Invalid length-prefixed string content for %u/" ChipLogFormatMEI "/" ChipLogFormatMEI, path.mEndpointId,
                  ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
 }
 
