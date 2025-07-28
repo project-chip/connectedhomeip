@@ -82,7 +82,7 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
         VerifyOrReturnError(eventOptions.mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     }
 
-    return chip::app::EventManagement::GetInstance().LogEvent(&eventData, eventOptions, aEventNumber);
+    return EventManagement::GetInstance().LogEvent(&eventData, eventOptions, aEventNumber);
 }
 
 } // namespace app
