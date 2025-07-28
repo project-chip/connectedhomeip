@@ -19,11 +19,13 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/PascalString.h>
-#include <app/persistence/tests/RamAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 
 namespace {
 
@@ -31,22 +33,27 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Testing;
 using namespace chip::app::Storage;
-using namespace chip::Testing;
 
 TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
-    ConcreteAttributePath path(1, 2, 3);
-    ConcreteAttributePath wrongPath(1, 2, 4);
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
     constexpr uint32_t kValueToStore = 42;
     constexpr uint32_t kOtherValue   = 99;
 
     // Store a fake value
     {
         const uint32_t value = kValueToStore;
-        EXPECT_EQ(ramProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) }), CHIP_NO_ERROR);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      &value, sizeof(value)),
+                  CHIP_NO_ERROR);
     }
 
     // Test loading a value
@@ -67,7 +74,9 @@ TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
 
     // Test loading a removed value
     {
-        EXPECT_EQ(ramProvider.DeleteValue(path), CHIP_NO_ERROR);
+        EXPECT_EQ(storageDelegate.SyncDeleteKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName()),
+                  CHIP_NO_ERROR);
 
         uint32_t valueRead = 0;
         ASSERT_FALSE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
@@ -77,14 +86,20 @@ TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
 
 TEST(TestAttributePersistence, TestLoadAndStoreString)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
-    ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path(1, 2, 3);
 
     // Store a fake value
     {
         const uint8_t buffer[] = { 5, 'h', 'e', 'l', 'l', 'o' };
-        EXPECT_EQ(ramProvider.WriteValue(path, { buffer, sizeof(buffer) }), CHIP_NO_ERROR);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      buffer, sizeof(buffer)),
+                  CHIP_NO_ERROR);
     }
 
     // Test loading a value
@@ -98,7 +113,7 @@ TEST(TestAttributePersistence, TestLoadAndStoreString)
 
     // Test loading a non-existent value
     {
-        ConcreteAttributePath wrongPath(1, 2, 4);
+        const ConcreteAttributePath wrongPath(1, 2, 4);
         char bufferRead[16];
         ShortPascalString stringRead(bufferRead);
 
@@ -109,11 +124,14 @@ TEST(TestAttributePersistence, TestLoadAndStoreString)
 
 TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
-    ConcreteAttributePath path(1, 2, 3);
-    ConcreteAttributePath wrongPath(1, 2, 4);
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
     constexpr uint32_t kValueToStore = 0x12345678;
     constexpr uint32_t kOtherValue   = 0x99887766;
     uint32_t valueRead               = 0;
@@ -152,10 +170,13 @@ TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
 
 TEST(TestAttributePersistence, TestStringViaDecoder)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
-    ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path(1, 2, 3);
 
     // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
     {
@@ -180,10 +201,13 @@ TEST(TestAttributePersistence, TestStringViaDecoder)
 
 TEST(TestAttributePersistence, TestByteStringViaDecoder)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
-    ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path(1, 2, 3);
     const uint8_t binary_data[] = { 1, 2, 3, 4, 0, 255, 128 };
 
     // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
@@ -209,10 +233,13 @@ TEST(TestAttributePersistence, TestByteStringViaDecoder)
 
 TEST(TestAttributePersistence, TestByteStringLoadWithDefaults)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
-    ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path(1, 2, 3);
     const uint8_t default_binary_data[] = { 10, 20, 30, 40 };
 
     uint8_t bufferRead[32];
@@ -224,10 +251,13 @@ TEST(TestAttributePersistence, TestByteStringLoadWithDefaults)
 
 TEST(TestAttributePersistence, TestCharStringLoadWithDefaults)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
-    ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path(1, 2, 3);
 
     char bufferRead[32];
     ShortPascalString stringRead(bufferRead);
@@ -238,7 +268,10 @@ TEST(TestAttributePersistence, TestCharStringLoadWithDefaults)
 
 TEST(TestAttributePersistence, TestStoreNullByteString)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
     const ConcreteAttributePath path(1, 2, 3);
@@ -270,7 +303,10 @@ TEST(TestAttributePersistence, TestStoreNullByteString)
 
 TEST(TestAttributePersistence, TestStoreNullCharString)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
     const ConcreteAttributePath path(1, 2, 3);
@@ -300,14 +336,20 @@ TEST(TestAttributePersistence, TestStoreNullCharString)
 
 TEST(TestAttributePersistence, TestLoadInvalidPascalString)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
-    ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path(1, 2, 3);
 
     {
         // valid pascal string for "hello" that requires 6 bytes to store (1 for length)
         uint8_t buffer[] = { 5, 'h', 'e', 'l', 'l', 'o' };
-        EXPECT_EQ(ramProvider.WriteValue(path, ByteSpan(buffer)), CHIP_NO_ERROR);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      buffer, sizeof(buffer)),
+                  CHIP_NO_ERROR);
     }
 
     // Test loading with too short of a buffer
@@ -336,14 +378,20 @@ TEST(TestAttributePersistence, TestLoadInvalidPascalString)
 
 TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
-    ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path(1, 2, 3);
 
     // This string is invalid as stored
     {
         uint8_t buffer[] = { 10, 'h', 'e', 'l', 'l', 'o' }; // length 10, but only 5 chars
-        EXPECT_EQ(ramProvider.WriteValue(path, ByteSpan(buffer)), CHIP_NO_ERROR);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      buffer, sizeof(buffer)),
+                  CHIP_NO_ERROR);
     }
 
     // Load into a buffer that COULD contain the string, but
