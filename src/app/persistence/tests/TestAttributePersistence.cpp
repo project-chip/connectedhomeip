@@ -319,7 +319,10 @@ TEST(TestAttributePersistence, TestLoadInvalidPascalString)
         ASSERT_TRUE(stringRead.Content().data_equal("def"_span));
     }
 
-    // Test loading with too short of a buffer and too short of a default ...
+    // Test loading with too short of a buffer and too long of a default:
+    //  - string load fails (insufficient buffer)
+    //  - default load fails because default does not fit either
+    //  - this moves the data to be null
     {
         char bufferRead[5]; // need 6 bytes here...
         ShortPascalString stringRead(bufferRead);
