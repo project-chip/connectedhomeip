@@ -53,7 +53,6 @@ def main() -> int:
     cmd = ["git", "describe", "--always", "--tags"]
     try:
         git_ver = subprocess.check_output(cmd).decode("utf-8").strip()
-        git_ver = subprocess.check_output(cmd).decode("utf-8").strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
         git_ver = ""
 
