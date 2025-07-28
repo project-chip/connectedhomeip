@@ -105,7 +105,7 @@ Global<ControllerAccessControl> gControllerAccessControl;
 } // anonymous namespace
 
 namespace chip {
-namespace app {
+namespace Controller {
 namespace AccessControl {
 
 void InitAccessControl()
@@ -122,5 +122,5 @@ void InitAccessControl()
 }
 
 } // namespace AccessControl
-} // namespace app
+} // namespace Controller
 } // namespace chip

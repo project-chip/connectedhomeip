@@ -20,6 +20,7 @@
 
 #include "WebRTCTransportRequestorManager.h"
 #include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <controller/access_control/AccessControl.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -42,10 +43,15 @@ using namespace chip::python;
 
 void WebRTCTransportRequestorManager::Init()
 {
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-    dynamic_server::InitAccessControl();
-#endif
-    mWebRTCRequestorServer.Init();
+    Controller::AccessControl::InitAccessControl();
+
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT,
+                     kWebRTCRequesterDynamicEndpointId, err.Format());
+    }
 }
 
 void WebRTCTransportRequestorManager::InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,
@@ -109,5 +115,5 @@ CHIP_ERROR WebRTCTransportRequestorManager::HandleEnd(uint16_t sessionId, WebRTC
 void WebRTCTransportRequestorManager::UpsertSession(
     const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & session)
 {
-    mWebRTCRequestorServer.UpsertSession(session);
+    mWebRTCRegisteredServerCluster.Cluster().UpsertSession(session);
 }

@@ -20,7 +20,7 @@
 constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
 
 namespace chip {
-namespace app {
+namespace Controller {
 namespace AccessControl {
 
 /**
@@ -30,5 +30,5 @@ namespace AccessControl {
 void InitAccessControl();
 
 } // namespace AccessControl
-} // namespace app
+} // namespace Controller
 } // namespace chip

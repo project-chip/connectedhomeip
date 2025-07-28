@@ -18,8 +18,8 @@
 
 #include "WebRTCManager.h"
 
-#include <access-control/AccessControl.h>
 #include <commands/interactive/InteractiveCommands.h>
+#include <controller/access_control/AccessControl.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
@@ -94,7 +94,7 @@ WebRTCManager::~WebRTCManager()
 
 void WebRTCManager::Init()
 {
-    AccessControl::InitAccessControl();
+    Controller::AccessControl::InitAccessControl();
 
     mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
