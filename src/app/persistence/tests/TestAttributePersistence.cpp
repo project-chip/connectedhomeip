@@ -161,4 +161,124 @@ TEST(TestAttributePersistence, TestStringViaDecoder)
     }
 }
 
+TEST(TestAttributePersistence, TestByteStringViaDecoder)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+
+    ConcreteAttributePath path(1, 2, 3);
+    const uint8_t binary_data[] = { 1, 2, 3, 4, 0, 255, 128 };
+
+    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(ByteSpan(binary_data));
+
+        uint8_t buffer[32];
+        EXPECT_EQ(persistence.StorePascalString(path, decoder, buffer), CHIP_NO_ERROR);
+
+        ShortPascalBytes bytesStored(buffer);
+        EXPECT_TRUE(bytesStored.Content().data_equal(ByteSpan(binary_data)));
+    }
+
+    {
+        uint8_t bufferRead[32];
+        ShortPascalBytes bytesRead(bufferRead);
+
+        ASSERT_TRUE(persistence.Load(path, bytesRead, std::nullopt));
+        ASSERT_TRUE(bytesRead.Content().data_equal(ByteSpan(binary_data)));
+    }
+}
+
+TEST(TestAttributePersistence, TestByteStringLoadWithDefaults)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+
+    ConcreteAttributePath path(1, 2, 3);
+    const uint8_t default_binary_data[] = { 10, 20, 30, 40 };
+
+    uint8_t bufferRead[32];
+    ShortPascalBytes bytesRead(bufferRead);
+
+    ASSERT_FALSE(persistence.Load(path, bytesRead, ByteSpan(default_binary_data)));
+    ASSERT_TRUE(bytesRead.Content().data_equal(ByteSpan(default_binary_data)));
+}
+
+TEST(TestAttributePersistence, TestCharStringLoadWithDefaults)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+
+    ConcreteAttributePath path(1, 2, 3);
+
+    char bufferRead[32];
+    ShortPascalString stringRead(bufferRead);
+
+    ASSERT_FALSE(persistence.Load(path, stringRead, "default value"_span));
+    ASSERT_TRUE(stringRead.Content().data_equal("default value"_span));
+}
+
+TEST(TestAttributePersistence, TestStoreNullByteString)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path2(1, 2, 4);
+
+    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<ByteSpan>());
+
+        uint8_t buffer[32];
+        EXPECT_EQ(persistence.StorePascalString(path, decoder, buffer), CHIP_NO_ERROR);
+
+        ShortPascalBytes bytesStored(buffer);
+        EXPECT_TRUE(bytesStored.IsNull());
+    }
+
+    // reading back on an invalid path will fail the load and a default value will be returned
+    {
+        uint8_t bufferRead[32];
+        ShortPascalBytes bytesRead(bufferRead);
+
+        const uint8_t default_binary_data[] = { 1, 2, 3 };
+
+        ASSERT_FALSE(persistence.Load(path2, bytesRead, ByteSpan(default_binary_data)));
+        ASSERT_TRUE(bytesRead.Content().data_equal(ByteSpan(default_binary_data)));
+    }
+}
+
+TEST(TestAttributePersistence, TestStoreNullCharString)
+{
+    RamAttributePersistenceProvider ramProvider;
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path2(1, 2, 4);
+
+    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
+    {
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<CharSpan>());
+
+        char buffer[32];
+        EXPECT_EQ(persistence.StorePascalString(path, decoder, buffer), CHIP_NO_ERROR);
+
+        ShortPascalString stringStored(buffer);
+        EXPECT_TRUE(stringStored.IsNull());
+    }
+
+    // reading back on an invalid path will fail the load and a default value will be returned
+    {
+        char bufferRead[32];
+        ShortPascalString stringRead(bufferRead);
+
+        ASSERT_FALSE(persistence.Load(path2, stringRead, "default value"_span));
+        ASSERT_TRUE(stringRead.Content().data_equal("default value"_span));
+    }
+}
+
 } // namespace
