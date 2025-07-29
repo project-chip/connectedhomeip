@@ -32,12 +32,12 @@ namespace Clusters {
 class TimeFormatLocalizationLogic
 {
 public:
-    TimeFormatLocalizationLogic(BitFlags<TimeFormatLocalization::Feature> features) : mFeatures(features)
-    {
-        mHourFormat   = TimeFormatLocalization::HourFormatEnum::k12hr;
-        mCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
-        mAttrProvider = nullptr;
-    };
+    TimeFormatLocalizationLogic(BitFlags<TimeFormatLocalization::Feature> features) : 
+        mFeatures(features),
+        mHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr),
+        mCalendarType(TimeFormatLocalization::CalendarTypeEnum::kBuddhist),
+        mAttrProvider(nullptr)
+    {};
     virtual ~TimeFormatLocalizationLogic() = default;
 
     void Startup(AttributePersistenceProvider * attrStorage);
