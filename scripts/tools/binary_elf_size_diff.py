@@ -20,6 +20,7 @@
 #     "click",
 #     "coloredlogs",
 #     "cxxfilt",
+#     "lark",
 #     "plotly",
 #     "tabulate",
 # ]
@@ -42,18 +43,21 @@
 import csv
 import logging
 import os
+import re
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 from pathlib import Path
-from typing import List
+from typing import Any, List, Optional
 
 import click
 import coloredlogs
 import cxxfilt
-import tabulate
 import plotly.graph_objects as go
+import tabulate
+from lark import Lark
+from lark.visitors import Transformer, v_args
 
 
 @dataclass
@@ -127,6 +131,82 @@ class SankeyLink:
     value: int
 
 
+@dataclass
+class DiagramInstance:
+    index: int  # index inside a sankey diagram
+    target_index: int  # where does this point to?
+    value: int
+
+
+@dataclass
+class SankeyGroupingRule:
+    expr: re.Pattern  # Regex to match
+    name: str  # What grouping to place this into
+    color: Optional[str]  # what color to use for this grouping
+
+    # internal state logic: we expect these to be part of sets
+    # dictionary key is the target_index
+    diagram_instances: dict[int, DiagramInstance] = field(default_factory=dict)
+
+    def add_towards(
+        self, target_index: int, sakey_data: "SankeyData", value: int
+    ) -> int:
+        if target_index in self.diagram_instances:
+            self.diagram_instances[target_index].value += value
+        else:
+            self.diagram_instances[target_index] = DiagramInstance(
+                index=sakey_data.add_node(self.name, color=self.color),
+                target_index=target_index,
+                value=value,
+            )
+
+        return self.diagram_instances[target_index].index
+
+    def add_links(self, sankey_data: "SankeyData"):
+        for instance in self.diagram_instances.values():
+            sankey_data.add_link(instance.index, instance.target_index, instance.value)
+
+
+class RuleTransformer(Transformer):
+    @v_args(inline=True)
+    def rule(self, expr, name, color=None) -> SankeyGroupingRule:
+        return SankeyGroupingRule(
+            expr=re.compile(expr),
+            name=name,
+            color=color.value if color else None,
+        )
+
+    def start(self, rules) -> List[SankeyGroupingRule]:
+        return rules
+
+    def ESCAPED_STRING(self, s):
+        # handle escapes, skip the start and end quotes
+        return s.value[1:-1].encode("utf-8").decode("unicode-escape")
+
+
+def ParseRules(rules: str) -> List[SankeyGroupingRule]:
+    grammar = Lark(
+        """
+       start: rule*
+       rule: "match" regex "to" name color?
+
+       ?regex: ESCAPED_STRING
+       ?name:  WORD | ESCAPED_STRING
+       ?color: "color" WORD
+
+       %import common.ESCAPED_STRING
+       %import common.WS
+       %import common.WORD
+       %import common.C_COMMENT
+       %import common.CPP_COMMENT
+       %ignore WS
+       %ignore C_COMMENT
+       %ignore CPP_COMMENT
+    """.strip()
+    )
+    return RuleTransformer().transform(grammar.parse(rules))
+
+
 class SankeyData:
     """Gathers sankey data: keeps track of labels and indices that correspond to them."""
 
@@ -134,10 +214,14 @@ class SankeyData:
         self.labels = []
         self.colors = []
         self.links = []
+        self.rules: List[SankeyGroupingRule] = []
 
-    def add_node(self, label: str, color: str = 'blue') -> int:
+    def add_grouping_rules(self, rules_definition: str):
+        self.rules.extend(ParseRules(rules_definition))
+
+    def add_node(self, label: str, color: Optional[str] = None) -> int:
         self.labels.append(label)
-        self.colors.append(color)
+        self.colors.append(color if color is not None else "blue")
         return len(self.labels) - 1
 
     def add_link(self, source: int, target: int, value: int):
@@ -168,14 +252,31 @@ class SankeyData:
                 color=self.colors,
             ),
             link=dict(
-                source = source,
-                target = target,
-                value = value,
+                source=source,
+                target=target,
+                value=value,
             ),
         )
 
 
-def sankey_diagram(input_list: List):
+# simplifly names as function names tend to be quite long
+def name_transform(name: str) -> str:
+    if name.endswith(")"):
+        # remove arguments from calls
+        idx = name.find("(")
+        # avoid "(anonymous namespace)" or templates like <char, (unsigned char)1> or other template logic
+        if (
+            idx == 0  # (anonymouns namespace) at the start
+            or name[idx + 1 :].startswith("anonymous ")  # (anonymous namespace)
+            or name[:idx].endswith(" ")  # <char, (unsigned char)1>
+            or name[:idx].endswith("<")  # <(unsigned char)1
+        ):
+            idx = name.find("(", idx + 1)
+        name = name[:idx]
+    return name
+
+
+def sankey_diagram(input_list: List, sankey_rules: Optional[Any]):
     """
     Generates a sanekey diagram based on the input list. The input list is expected
     to contain values of (change_type, delta, name, size_in_1, size_in_2)
@@ -183,21 +284,52 @@ def sankey_diagram(input_list: List):
 
     data = SankeyData()
 
+    if sankey_rules:
+        data.add_grouping_rules(sankey_rules.read())
+    else:
+        # these are example grouings that generally may make sense
+        data.add_grouping_rules(
+            """
+        match "::k(MetadataEntry|MandatoryAttributes)" to "Metadata"
+        match "chip::app::Clusters::" to Clusters color magenta
+        """
+        )
+
     inc_idx = data.add_node("INCREASE", color="red")
     dec_idx = data.add_node("DECREASE", color="green")
 
-    # TODO: intermediate layer
     for entry in input_list:
         delta = entry[1]
-        name = entry[2]
-        idx = data.add_node(name)
+
+        # Find the destination of the link
         if delta > 0:
-            data.add_link(idx, inc_idx, delta)
+            target_index = inc_idx
+            color = "salmon"
         else:
-            data.add_link(idx, dec_idx, -delta)
+            target_index = dec_idx
+            color = "darkseagreen"
+            delta = -delta
+
+        # find an alternate destination if applicable
+        name = entry[2]
+        for r in data.rules:
+            m = r.expr.search(name)
+            if not m:
+                continue
+            # have a match ...
+            target_index = r.add_towards(target_index, data, delta)
+            break
+
+        name = name_transform(name)
+        idx = data.add_node(name, color)
+        data.add_link(idx, target_index, delta)
+
+    # finally add all intermediate layers
+    for r in data.rules:
+        r.add_links(data)
 
     fig = go.Figure(data=[data.get_sankey()])
-    fig.update_layout(title_text="Basic Sankey Diagram", font_size=10)
+    fig.update_layout(title_text="ELF size increases", font_size=10)
     fig.show()
 
 
@@ -229,6 +361,12 @@ def sankey_diagram(input_list: List):
     help="Skip CXX demangling. Note that this will not deduplicate inline method instantiations.",
 )
 @click.option(
+    "--sankey-rules",
+    default=None,
+    help="rules to group sankey display",
+    type=click.File(),
+)
+@click.option(
     "--style",
     default="simple",
     show_default=True,
@@ -248,6 +386,7 @@ def main(
     output,
     skip_total,
     no_demangle,
+    sankey_rules,
     style: str,
     name_truncate: int,
     f1: Path,
@@ -299,7 +438,7 @@ def main(
         total += s1 - s2
 
     if output_type == OutputType.SANKEY:
-        sankey_diagram(delta)
+        sankey_diagram(delta, sankey_rules)
     else:
         delta.sort(key=lambda x: x[1])
         if not skip_total:
