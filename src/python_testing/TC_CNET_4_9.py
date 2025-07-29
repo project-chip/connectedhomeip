@@ -101,11 +101,20 @@ class TC_CNET_4_9(MatterBaseTest):
 
     def pics_TC_CNET_4_9(self):
         return ['CNET.S']
+    
+    def validate_empty_wifi_parameters(value, name):
+        if not isinstance(value, str):
+            raise AssertionError(f"{name} is not a string")
+        if not value.strip():
+            raise ValueError(f"The argument {name} is empty")
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
         ssid = self.get_wifi_ssid()
         credentials = self.get_credentials()
+
+        self.validate_empty_wifi_parameters(ssid, "--wifi-ssid")
+        self.validate_empty_wifi_parameters(credentials, "--wifi-passphrase")
 
         # Commissioning is already done
         self.step("Precondition")
