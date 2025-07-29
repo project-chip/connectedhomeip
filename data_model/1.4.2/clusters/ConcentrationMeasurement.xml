@@ -181,7 +181,7 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="MeasuredValue" type="single" default="null">
+    <attribute id="0x0000" name="MeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" reportable="true"/>
       <mandatoryConform>
@@ -198,14 +198,14 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="MinMeasuredValue" type="single" default="null">
+    <attribute id="0x0001" name="MinMeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="MaxMeasuredValue" type="single" default="null">
+    <attribute id="0x0002" name="MaxMeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -217,7 +217,7 @@ Davis, CA 95616, USA
         </min>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="PeakMeasuredValue" type="single" default="null">
+    <attribute id="0x0003" name="PeakMeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" reportable="true"/>
       <mandatoryConform>
@@ -234,7 +234,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="PeakMeasuredValueWindow" type="elapsed-s" default="1">
+    <attribute id="0x0004" name="PeakMeasuredValueWindow" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -244,7 +244,7 @@ Davis, CA 95616, USA
         <max value="604800"/>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="AverageMeasuredValue" type="single" default="null">
+    <attribute id="0x0005" name="AverageMeasuredValue" type="single">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" reportable="true"/>
       <mandatoryConform>
@@ -261,7 +261,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0006" name="AverageMeasuredValueWindow" type="elapsed-s" default="1">
+    <attribute id="0x0006" name="AverageMeasuredValueWindow" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -280,19 +280,19 @@ Davis, CA 95616, USA
         <allowed value="MS"/>
       </constraint>
     </attribute>
-    <attribute id="0x0008" name="MeasurementUnit" type="MeasurementUnitEnum" default="MS">
+    <attribute id="0x0008" name="MeasurementUnit" type="MeasurementUnitEnum">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0009" name="MeasurementMedium" type="MeasurementMediumEnum" default="MS">
+    <attribute id="0x0009" name="MeasurementMedium" type="MeasurementMediumEnum">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000A" name="LevelValue" type="LevelValueEnum" default="0">
+    <attribute id="0x000A" name="LevelValue" type="LevelValueEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="LEV"/>

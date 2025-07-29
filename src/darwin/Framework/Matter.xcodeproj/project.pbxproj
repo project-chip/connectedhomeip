@@ -149,6 +149,8 @@
 		5109E9C02CCAD64F0006884B /* MTRDeviceDataValidation.h in Headers */ = {isa = PBXBuildFile; fileRef = 5109E9BE2CCAD64F0006884B /* MTRDeviceDataValidation.h */; };
 		5109E9C12CCAD64F0006884B /* MTRDeviceDataValidation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5109E9BF2CCAD64F0006884B /* MTRDeviceDataValidation.mm */; };
 		510A07492A685D3900A9241C /* Matter.apinotes in Headers */ = {isa = PBXBuildFile; fileRef = 510A07482A685D3900A9241C /* Matter.apinotes */; settings = {ATTRIBUTES = (Public, ); }; };
+		510B18F22E315731000F9181 /* MTRSecureCodingTestHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 510B18F12E315731000F9181 /* MTRSecureCodingTestHelpers.m */; };
+		510B18F42E3275D6000F9181 /* MTRCommissioningParameters_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 510B18F32E3275D6000F9181 /* MTRCommissioningParameters_Internal.h */; };
 		510CECA8297F72970064E0B3 /* MTROperationalCertificateIssuerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 510CECA6297F72470064E0B3 /* MTROperationalCertificateIssuerTests.m */; };
 		5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5117DD3629A931AD00FFA1AA /* MTROperationalBrowser.mm */; };
 		5117DD3929A931AE00FFA1AA /* MTROperationalBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */; };
@@ -755,6 +757,9 @@
 		5109E9BE2CCAD64F0006884B /* MTRDeviceDataValidation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceDataValidation.h; sourceTree = "<group>"; };
 		5109E9BF2CCAD64F0006884B /* MTRDeviceDataValidation.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceDataValidation.mm; sourceTree = "<group>"; };
 		510A07482A685D3900A9241C /* Matter.apinotes */ = {isa = PBXFileReference; lastKnownFileType = text.apinotes; name = Matter.apinotes; path = CHIP/Matter.apinotes; sourceTree = "<group>"; };
+		510B18F02E315731000F9181 /* MTRSecureCodingTestHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRSecureCodingTestHelpers.h; sourceTree = "<group>"; };
+		510B18F12E315731000F9181 /* MTRSecureCodingTestHelpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRSecureCodingTestHelpers.m; sourceTree = "<group>"; };
+		510B18F32E3275D6000F9181 /* MTRCommissioningParameters_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommissioningParameters_Internal.h; sourceTree = "<group>"; };
 		510CECA6297F72470064E0B3 /* MTROperationalCertificateIssuerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTROperationalCertificateIssuerTests.m; sourceTree = "<group>"; };
 		5117DD3629A931AD00FFA1AA /* MTROperationalBrowser.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROperationalBrowser.mm; sourceTree = "<group>"; };
 		5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTROperationalBrowser.h; sourceTree = "<group>"; };
@@ -1554,6 +1559,8 @@
 				75139A6C2B7FE19100E3A919 /* MTRTestDeclarations.h */,
 				3DF5219C2D62C3E5008F8E52 /* MTRMockCB.h */,
 				3DF5219D2D62C3E5008F8E52 /* MTRMockCB.m */,
+				510B18F02E315731000F9181 /* MTRSecureCodingTestHelpers.h */,
+				510B18F12E315731000F9181 /* MTRSecureCodingTestHelpers.m */,
 			);
 			path = TestHelpers;
 			sourceTree = "<group>";
@@ -1617,7 +1624,6 @@
 				7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */,
 				7534D1772CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp */,
 			);
-			name = persistence;
 			path = persistence;
 			sourceTree = "<group>";
 		};
@@ -1747,6 +1753,7 @@
 				3D010DD12D4091C800CFFA02 /* MTRCommissioneeInfo_Internal.h */,
 				3D010DCE2D408FA300CFFA02 /* MTRCommissioneeInfo.mm */,
 				99D466E02798936D0089A18F /* MTRCommissioningParameters.h */,
+				510B18F32E3275D6000F9181 /* MTRCommissioningParameters_Internal.h */,
 				99AECC7F2798A57E00B6355B /* MTRCommissioningParameters.mm */,
 				3DFCB32B29678C9500332B35 /* MTRConversion.h */,
 				51565CAD2A79D42100469F18 /* MTRConversion.mm */,
@@ -2238,6 +2245,7 @@
 				998F286D26D55E10001846C6 /* MTRKeypair.h in Headers */,
 				1ED276E426C5832500547A89 /* MTRCluster.h in Headers */,
 				3D843711294977000070D20A /* NSStringSpanConversion.h in Headers */,
+				510B18F42E3275D6000F9181 /* MTRCommissioningParameters_Internal.h in Headers */,
 				757DA3102DB0369100E4AD75 /* ota-provider-cluster.h in Headers */,
 				757DA3112DB0369100E4AD75 /* ota-provider-delegate.h in Headers */,
 				B4FCD56A2B5EDBD300832859 /* MTRDiagnosticLogsType.h in Headers */,
@@ -2726,6 +2734,7 @@
 				1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */,
 				5A6FEC9D27B5E48900F25F42 /* MTRXPCProtocolTests.m in Sources */,
 				3DB9DAE52D67EE5A00704FAB /* MTRBleTests.m in Sources */,
+				510B18F22E315731000F9181 /* MTRSecureCodingTestHelpers.m in Sources */,
 				1EE0805E2A44875E008A03C2 /* MTRCommissionableBrowserTests.m in Sources */,
 				518D3F832AA132DC008E0007 /* MTRTestPerControllerStorage.m in Sources */,
 				51339B1F2A0DA64D00C798C1 /* MTRCertificateValidityTests.m in Sources */,

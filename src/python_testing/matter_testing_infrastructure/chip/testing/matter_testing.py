@@ -16,7 +16,6 @@
 #
 
 import asyncio
-import builtins
 import inspect
 import json
 import logging
@@ -36,7 +35,6 @@ import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
-from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
 
@@ -51,14 +49,14 @@ import chip.clusters as Clusters
 import chip.logging
 import chip.native
 import chip.testing.global_stash as global_stash
-from chip.ChipStack import ChipStack
 from chip.clusters import Attribute, ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
-from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_stack_state import MatterStackState
+from chip.testing.matter_test_config import MatterTestConfig
 from chip.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
@@ -130,7 +128,6 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
-@dataclass
 class SetupParameters:
     passcode: int
     vendor_id: int = 0xFFF1
@@ -149,78 +146,6 @@ class SetupParameters:
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
-
-
-class MatterStackState:
-    def __init__(self, config: MatterTestConfig):
-        self._logger = logger
-        self._config = config
-
-        if not hasattr(builtins, "chipStack"):
-            chip.native.Init(bluetoothAdapter=config.ble_controller)
-            if config.storage_path is None:
-                raise ValueError("Must have configured a MatterTestConfig.storage_path")
-            self._init_stack(already_initialized=False, persistentStoragePath=config.storage_path)
-            self._we_initialized_the_stack = True
-        else:
-            self._init_stack(already_initialized=True)
-            self._we_initialized_the_stack = False
-
-    def _init_stack(self, already_initialized: bool, **kwargs):
-        if already_initialized:
-            self._chip_stack = builtins.chipStack
-            self._logger.warn(
-                "Re-using existing ChipStack object found in current interpreter: "
-                "storage path %s will be ignored!" % (self._config.storage_path)
-            )
-            # TODO: Warn that storage will not follow what we set in config
-        else:
-            self._chip_stack = ChipStack(**kwargs)
-            builtins.chipStack = self._chip_stack
-
-        chip.logging.RedirectToPythonLogging()
-
-        self._storage = self._chip_stack.GetStorageManager()
-        self._certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self._chip_stack)
-        self._certificate_authority_manager.LoadAuthoritiesFromStorage()
-
-        if (len(self._certificate_authority_manager.activeCaList) == 0):
-            self._logger.warn(
-                "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
-            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
-            ca.maximizeCertChains = self._config.maximize_cert_chains
-            ca.certificateValidityPeriodSec = self._config.certificate_validity_period
-            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
-        elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
-            self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
-            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
-
-    # TODO: support getting access to chip-tool credentials issuer's data
-
-    def Shutdown(self):
-        if self._we_initialized_the_stack:
-            # Unfortunately, all the below are singleton and possibly
-            # managed elsewhere so we have to be careful not to touch unless
-            # we initialized ourselves.
-            self._certificate_authority_manager.Shutdown()
-            global_chip_stack = builtins.chipStack
-            global_chip_stack.Shutdown()
-
-    @property
-    def certificate_authorities(self):
-        return self._certificate_authority_manager.activeCaList
-
-    @property
-    def certificate_authority_manager(self):
-        return self._certificate_authority_manager
-
-    @property
-    def storage(self) -> PersistentStorage:
-        return self._storage
-
-    @property
-    def stack(self) -> ChipStack:
-        return builtins.chipStack
 
 
 class MatterBaseTest(base_test.BaseTestClass):
