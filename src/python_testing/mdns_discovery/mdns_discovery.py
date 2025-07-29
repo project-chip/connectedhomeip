@@ -19,7 +19,6 @@ import ipaddress
 import json
 import logging
 from asyncio import Event, TimeoutError, ensure_future, wait_for
-from dataclasses import asdict
 from enum import Enum
 from functools import partial
 from typing import Dict, List, Optional
@@ -283,7 +282,7 @@ class MdnsDiscovery:
 
             # Adds service to discovered services
             if is_discovered:
-                mdns_service_info = self._to_mdns_service_info_class(service_info)
+                mdns_service_info = MdnsServiceInfo(service_info)
                 self._discovered_services = {}
                 self._discovered_services[service_type] = []
                 if mdns_service_info is not None:
@@ -352,7 +351,7 @@ class MdnsDiscovery:
 
             # Adds service to discovered services
             if is_discovered:
-                mdns_service_info = self._to_mdns_service_info_class(service_info)
+                mdns_service_info = MdnsServiceInfo(service_info)
                 self._discovered_services = {}
                 self._discovered_services[service_type] = []
                 if mdns_service_info is not None:
@@ -403,7 +402,7 @@ class MdnsDiscovery:
             ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
             if ipv6_addresses:
                 quada_records: list[QuadaRecord] = [
-                    QuadaRecord.build(ipv6)
+                    QuadaRecord(ipv6)
                     for ipv6 in ipv6_addresses
                 ]
 
@@ -693,7 +692,7 @@ class MdnsDiscovery:
                 if self._verbose_logging:
                     logger.warning("Service discovered for %s/%s.", service_name, service_type)
 
-                mdns_service_info = self._to_mdns_service_info_class(service_info)
+                mdns_service_info = MdnsServiceInfo(service_info)
 
                 if service_type not in self._discovered_services:
                     self._discovered_services[service_type] = []
@@ -704,33 +703,6 @@ class MdnsDiscovery:
                 logger.warning(f"Service information for '{service_name}' not found.")
 
             self._event.set()
-
-    def _to_mdns_service_info_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
-        """
-        Converts an AsyncServiceInfo object into a MdnsServiceInfo data class.
-
-        Args:
-            service_info (AsyncServiceInfo): The service information to convert.
-
-        Returns:
-            MdnsServiceInfo: The converted service information as a data class.
-        """
-        mdns_service_info = MdnsServiceInfo(
-            service_name=service_info.name,
-            service_type=service_info.type,
-            instance_name=self._get_instance_name(service_info),
-            server=service_info.server,
-            port=service_info.port,
-            addresses=service_info.parsed_addresses(),
-            txt_record=service_info.decoded_properties,
-            priority=service_info.priority,
-            interface_index=service_info.interface_index,
-            weight=service_info.weight,
-            host_ttl=service_info.host_ttl,
-            other_ttl=service_info.other_ttl
-        )
-
-        return mdns_service_info
 
     @staticmethod
     def _get_instance_name(service_info: AsyncServiceInfo) -> str:
@@ -746,7 +718,10 @@ class MdnsDiscovery:
         The method is intended to be used for debugging or informational purposes, providing a clear and
         comprehensive view of all services discovered during the mDNS service discovery process.
         """
-        converted_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
+        converted_services = {
+            key: [item.json_dict() for item in value]
+            for key, value in self._discovered_services.items()
+        }
         json_str = json.dumps(converted_services, indent=4)
         logger.info("Discovery data:\n%s", json_str)
 

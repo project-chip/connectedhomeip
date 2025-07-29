@@ -16,12 +16,13 @@
 #
 
 from dataclasses import dataclass, field
+from .json_serializable import JsonSerializable
 
 
 @dataclass
-class PtrRecord:
-    service_type: str  # Can be a subtype like _Ixyz._sub._matter._tcp.local.
-    service_name: str  # Always ends with _matter._tcp.local.
+class PtrRecord(JsonSerializable):
+    service_type: str
+    service_name: str
     instance_name: str = field(init=False)
 
     def __post_init__(self):

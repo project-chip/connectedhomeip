@@ -19,8 +19,10 @@ import socket
 from dataclasses import dataclass
 from ipaddress import IPv6Address
 from typing import Optional, Union
+from dataclasses import dataclass, field
 
 from zeroconf._utils.ipaddress import ZeroconfIPv6Address
+from .json_serializable import JsonSerializable
 
 
 @dataclass
@@ -46,37 +48,39 @@ class AddressMeta:
 
 
 @dataclass
-class QuadaRecord:
-    address: str
-    version: int
-    interface: Union[str, int]
+class QuadaRecord(JsonSerializable):
+    ipv6: ZeroconfIPv6Address = field(repr=False, compare=False)
+    address: str = field(init=False)
+    version: int = field(init=False)
+    interface: Union[str, int] = field(init=False)
 
-    type_info: AddressTypeInfo
-    special_types: SpecialAddressTypes
-    meta: AddressMeta
+    type_info: AddressTypeInfo = field(init=False)
+    special_types: SpecialAddressTypes = field(init=False)
+    meta: AddressMeta = field(init=False)
 
-    @classmethod
-    def build(cls, ipv6: ZeroconfIPv6Address) -> "QuadaRecord":
-        return cls(
-            address=get_valid_compressed_ipv6(ipv6),
-            version=ipv6.version,
-            interface=get_interface(ipv6.scope_id),
-            type_info=AddressTypeInfo(
-                is_global=ipv6.is_global,
-                is_link_local=ipv6.is_link_local,
-                is_loopback=ipv6.is_loopback,
-                is_multicast=ipv6.is_multicast,
-            ),
-            special_types=SpecialAddressTypes(
-                teredo=str(ipv6.teredo) if ipv6.teredo else None,
-                sixtofour=str(ipv6.sixtofour) if ipv6.sixtofour else None,
-                is_reserved=ipv6.is_reserved,
-                ipv4_mapped=str(ipv6.ipv4_mapped) if ipv6.ipv4_mapped else None,
-            ),
-            meta=AddressMeta(
-                max_prefixlen=ipv6.max_prefixlen,
-                packed=ipv6.packed.hex(),
-            ),
+    def __post_init__(self):
+        ip = self.ipv6
+        self.address = get_valid_compressed_ipv6(ip)
+        self.version = ip.version
+        self.interface = get_interface(ip.scope_id)
+
+        self.type_info = AddressTypeInfo(
+            is_global=ip.is_global,
+            is_link_local=ip.is_link_local,
+            is_loopback=ip.is_loopback,
+            is_multicast=ip.is_multicast,
+        )
+
+        self.special_types = SpecialAddressTypes(
+            teredo=str(ip.teredo) if ip.teredo else None,
+            sixtofour=str(ip.sixtofour) if ip.sixtofour else None,
+            is_reserved=ip.is_reserved,
+            ipv4_mapped=str(ip.ipv4_mapped) if ip.ipv4_mapped else None,
+        )
+
+        self.meta = AddressMeta(
+            max_prefixlen=ip.max_prefixlen,
+            packed=ip.packed.hex(),
         )
 
 
