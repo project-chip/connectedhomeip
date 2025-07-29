@@ -222,8 +222,10 @@ TEST_F(TestThreadOperationalDataset, TestClear)
     }
 }
 
-TEST_F(TestThreadOperationalDataset, TestExampleDataset)
+template <typename T>
+static void TestExampleDatasetTemplate()
 {
+    T dataset;
     const uint8_t example[] = {
         0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, // Active Timestamp 1
         0x00, 0x03, 0x00, 0x00, 0x0f,                               // Channel 15
@@ -287,8 +289,20 @@ TEST_F(TestThreadOperationalDataset, TestExampleDataset)
     EXPECT_EQ(securityPolicy, 0x02a0f7f8u);
 }
 
-TEST_F(TestThreadOperationalDataset, TestInvalidExampleDataset)
+TEST_F(TestThreadOperationalDataset, TestExampleDataset)
 {
+    TestExampleDatasetTemplate<Thread::OperationalDataset>();
+}
+
+TEST_F(TestThreadOperationalDataset, TestExampleDatasetView)
+{
+    TestExampleDatasetTemplate<Thread::OperationalDatasetView>();
+}
+
+template <typename T>
+static void TestInvalidExampleDatasetTemplate()
+{
+    T dataset;
     const uint8_t invalid[] = {
         0x0e, 0x01, 0x01,                                                                                     // Active Timestamp
         0x00, 0x01, 0x0f,                                                                                     // Channel
@@ -334,6 +348,73 @@ TEST_F(TestThreadOperationalDataset, TestInvalidExampleDataset)
 
     uint32_t securityPolicy;
     EXPECT_EQ(dataset.GetSecurityPolicy(securityPolicy), CHIP_ERROR_INVALID_TLV_ELEMENT);
+}
+
+TEST_F(TestThreadOperationalDataset, TestInvalidExampleDataset)
+{
+    TestInvalidExampleDatasetTemplate<Thread::OperationalDataset>();
+}
+
+TEST_F(TestThreadOperationalDataset, TestInvalidExampleDatasetView)
+{
+    TestInvalidExampleDatasetTemplate<Thread::OperationalDatasetView>();
+}
+
+TEST_F(TestThreadOperationalDataset, TestMaxDatasetSize)
+{
+    uint8_t data[Thread::kSizeOperationalDataset - 2] = { 0 };        // minus 2 for Type and Length
+    EXPECT_EQ(dataset.SetChannelMask(ByteSpan(data)), CHIP_NO_ERROR); // channel mask takes an arbitrary size value
+    EXPECT_EQ(dataset.AsByteSpan().size(), Thread::kSizeOperationalDataset);
+    EXPECT_EQ(dataset.SetPanId(0x1234), CHIP_ERROR_NO_MEMORY);
+
+    EXPECT_EQ(dataset.SetChannelMask(ByteSpan(data, sizeof(data) - 3)), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.SetPanId(0x1234), CHIP_ERROR_NO_MEMORY); // still too small by one byte
+
+    EXPECT_EQ(dataset.SetChannelMask(ByteSpan(data, sizeof(data) - 4)), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.SetPanId(0x1234), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.AsByteSpan().size(), Thread::kSizeOperationalDataset);
+}
+
+TEST_F(TestThreadOperationalDataset, TestGrowAndShrinkValue)
+{
+    uint16_t panId;
+    char networkName[Thread::kSizeNetworkName + 1];
+    EXPECT_EQ(dataset.AsByteSpan().size(), 0u);
+    EXPECT_EQ(dataset.SetNetworkName("A"), CHIP_NO_ERROR); // 2 + 1 bytes
+    EXPECT_EQ(dataset.AsByteSpan().size(), 3u);
+    EXPECT_EQ(dataset.SetPanId(0x4321), CHIP_NO_ERROR); // 2 + 2 bytes
+    EXPECT_EQ(dataset.AsByteSpan().size(), 7u);
+    EXPECT_EQ(dataset.SetNetworkName("BB"), CHIP_NO_ERROR); // 1 byte longer
+    EXPECT_EQ(dataset.AsByteSpan().size(), 8u);
+    EXPECT_EQ(dataset.GetPanId(panId), CHIP_NO_ERROR);
+    EXPECT_EQ(panId, 0x4321u);
+    EXPECT_EQ(dataset.GetNetworkName(networkName), CHIP_NO_ERROR);
+    EXPECT_EQ(strncmp(networkName, "BB", sizeof(networkName)), 0);
+    EXPECT_EQ(dataset.SetNetworkName("C"), CHIP_NO_ERROR); // 1 byte shorter
+    EXPECT_EQ(dataset.AsByteSpan().size(), 7u);
+    EXPECT_EQ(dataset.GetPanId(panId), CHIP_NO_ERROR);
+    EXPECT_EQ(panId, 0x4321u);
+    EXPECT_EQ(dataset.GetNetworkName(networkName), CHIP_NO_ERROR);
+    EXPECT_EQ(strncmp(networkName, "C", sizeof(networkName)), 0);
+}
+
+TEST_F(TestThreadOperationalDataset, TestInitWithViewInitAndModify)
+{
+    uint64_t activeTimestamp;
+    uint8_t example[] = { 0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }; // Active Timestamp 1
+
+    EXPECT_EQ(dataset.Thread::OperationalDatasetView::Init(ByteSpan(example)), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.GetActiveTimestamp(activeTimestamp), CHIP_NO_ERROR);
+    EXPECT_EQ(activeTimestamp, 1u);
+    EXPECT_EQ(dataset.SetActiveTimestamp(42), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.GetActiveTimestamp(activeTimestamp), CHIP_NO_ERROR);
+    EXPECT_EQ(activeTimestamp, 42u);
+
+    // Ensure the original data was not modified
+    Thread::OperationalDatasetView view;
+    EXPECT_EQ(view.Init(ByteSpan(example)), CHIP_NO_ERROR);
+    EXPECT_EQ(view.GetActiveTimestamp(activeTimestamp), CHIP_NO_ERROR);
+    EXPECT_EQ(activeTimestamp, 1u);
 }
 
 } // namespace
