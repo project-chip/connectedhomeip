@@ -14,26 +14,29 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "click",
+#     "cxxfilt",
+#     "coloredlogs",
+#     "tabulate",
+# ]
+# ///
+#
 # Processes 2 ELF files via `nm` and outputs the
 # diferences in size. Example calls:
 #
-#  scripts/tools/bindiff.py    \
-#     ./out/updated_binary.elf \
+#  uv run --script scripts/tools/binary_elf_size_diff.py \
+#     ./out/updated_binary.elf                           \
 #     ./out/master_build.elf
 #
-#  scripts/tools/bindiff.py    \
-#     --output csv             \
-#     --no-demangle            \
-#     ./out/updated_binary.elf \
+#  uv run --script scripts/tools/binary_elf_size_diff.py \
+#     --output csv                                       \
+#     --no-demangle                                      \
+#     ./out/updated_binary.elf                           \
 #     ./out/master_build.elf
 #
-#
-# Requires:
-#   - click
-#   - coloredlogs
-#   - cxxfilt
-#   - tabulate
 
 import csv
 import logging
