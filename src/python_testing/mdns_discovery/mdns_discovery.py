@@ -15,53 +15,24 @@
 #    limitations under the License.
 #
 
-import ipaddress
 import json
 import logging
 from asyncio import Event, TimeoutError, ensure_future, wait_for
-from enum import Enum
 from functools import partial
 from typing import Dict, List, Optional
 
-import netifaces
 from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
 from mdns_discovery.data_clases.ptr_record import PtrRecord
 from mdns_discovery.data_clases.quada_record import QuadaRecord
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
-from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
-from zeroconf._utils.net import InterfaceChoice
-from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
+from mdns_discovery.service_listeners.mdns_service_listener import MdnsServiceListener
+from mdns_discovery.enums.mdns_service_type import MdnsServiceType
+from mdns_discovery.utils.net_utils import get_ipv6_addresses
+from zeroconf import IPVersion, ServiceStateChange, Zeroconf
+from zeroconf.asyncio import AsyncServiceBrowser, AsyncZeroconf, AsyncZeroconfServiceTypes
 from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT
 
 logger = logging.getLogger(__name__)
-
-
-class MdnsServiceType(Enum):
-    """
-    Enum for Matter mDNS service types used in network service discovery.
-    """
-    COMMISSIONER = "_matterd._udp.local."
-    COMMISSIONABLE = "_matterc._udp.local."
-    OPERATIONAL = "_matter._tcp.local."
-    BORDER_ROUTER = "_meshcop._udp.local."
-
-
-class MdnsServiceListener(ServiceListener):
-    """
-    A service listener required during mDNS service discovery
-    """
-
-    def __init__(self):
-        self.updated_event = Event()
-
-    def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        self.updated_event.set()
-
-    def update_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        self.updated_event.set()
-
-    def remove_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        pass
 
 
 class MdnsDiscovery:
@@ -86,7 +57,7 @@ class MdnsDiscovery:
             - get_commissionable_subtypes
         """
         # List of IPv6 addresses to use for mDNS discovery.
-        self.interfaces = self._get_ipv6_addresses()
+        self.interfaces = get_ipv6_addresses()
 
         # An instance of Zeroconf to manage mDNS operations.
         self._azc = AsyncZeroconf(interfaces=self.interfaces)
@@ -717,45 +688,3 @@ class MdnsDiscovery:
         }
         json_str = json.dumps(converted_services, indent=4)
         logger.info("Discovery data:\n%s", json_str)
-
-    @staticmethod
-    def _get_ipv6_addresses():
-        results = []
-        for iface in netifaces.interfaces():
-            try:
-                # Get list of IPv6 addresses for the interface
-                addrs = netifaces.ifaddresses(iface).get(netifaces.AF_INET6, [])
-            except ValueError:
-                # Skip interfaces that don’t support IPv6
-                continue
-
-            for addr_info in addrs:
-                addr = addr_info.get('addr', '')
-                if not addr:
-                    continue
-
-                # Normalize by stripping any existing scope
-                base_addr = addr.split('%')[0]
-
-                try:
-                    ip = ipaddress.IPv6Address(base_addr)
-                except ValueError:
-                    # Skip invalid addresses
-                    continue
-
-                # Include link-local, ULA (fdxx::/8), and global (2000::/3), skip loopback (::1)
-                if ip.is_loopback:
-                    continue  # Skip ::1 (loopback); not usable for external discovery
-
-                if ip.is_link_local:
-                    results.append(f"{base_addr}%{iface}")  # Append scope for link-local
-                elif ip.is_private or ip.is_global:
-                    results.append(base_addr)  # ULA or global addresses
-
-        if not results:
-            # No usable IPv6, fallback to Zeroconf default
-            logger.info("\n\nDefaulting to InterfaceChoice.All\n")
-            return InterfaceChoice.All
-
-        logger.info(f"\n\nDiscovered IPv6 addresses: {results}\n")
-        return results
