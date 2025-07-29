@@ -704,13 +704,6 @@ class MdnsDiscovery:
 
             self._event.set()
 
-    @staticmethod
-    def _get_instance_name(service_info: AsyncServiceInfo) -> str:
-        if service_info.type:
-            return service_info.name[: len(service_info.name) - len(service_info.type) - 1]
-        else:
-            return service_info.name
-
     def _log_output(self) -> str:
         """
         Converts the discovered services to a JSON string and logs it.
