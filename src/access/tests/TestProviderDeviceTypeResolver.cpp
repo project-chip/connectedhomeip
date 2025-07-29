@@ -33,7 +33,7 @@ using chip::app::DataModel::Provider;
 class FakeProvider : public Provider
 {
 public:
-    void SetDeviceTypes(EndpointId ep, chip::span<const DeviceTypeEntry> list) { mEntries[ep] = list; }
+    void SetDeviceTypes(EndpointId ep, chip::span<const DeviceTypeEngit try> list) { mEntries[ep] = list; }
 
     CHIP_ERROR DeviceTypes(EndpointId endpoint, ReadOnlyBufferBuilder<DeviceTypeEntry> & out) override
     {
