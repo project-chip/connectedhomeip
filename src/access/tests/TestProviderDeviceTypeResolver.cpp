@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "access/ProviderDeviceTypeResolver.h"
+#include <access/ProviderDeviceTypeResolver.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/data-model-provider/MetadataTypes.h>
@@ -30,13 +30,16 @@ using namespace chip::app::DataModel;
 
 namespace {
 
+constexpr EndpointId kTestEndpointRoot  = 1; // Example: could represent the main/root device
+constexpr EndpointId kTestEndpointLight = 2; // Example: could represent a lighting device
+
 class FakeProvider final : public Provider
 {
 public:
     // Devices are represented by endpoints, and each endpoint can have multiple device types.
     CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DeviceTypeEntry> & builder) override
     {
-        if (endpointId == 1)
+        if (endpointId == kTestEndpointRoot)
         {
             // Hardcoded device types for endpoint 1
             constexpr DeviceTypeEntry types[] = {
@@ -45,7 +48,7 @@ public:
             };
             return builder.AppendElements(chip::Span(types));
         }
-        if (endpointId == 2)
+        if (endpointId == kTestEndpointLight)
         {
             // Hardcoded device types for endpoint 2
             constexpr DeviceTypeEntry types[] = {
@@ -114,17 +117,17 @@ public:
 // is actually present on a given endpoint (for example, a particular room or appliance port).
 TEST_F(TestDeviceTypeResolver, PositiveMatches)
 {
-    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0001, 1));
-    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0002, 1));
-    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0003, 2));
+    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0001, kTestEndpointRoot));
+    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0002, kTestEndpointRoot));
+    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0003, kTestEndpointLight));
 }
 
 // Checks that the system does not mistakenly identify a device type as present on an endpoint where it
 // doesn’t actually exist (for example, asking if a light switch is in the kitchen when it isn't).
 TEST_F(TestDeviceTypeResolver, NegativeMatches)
 {
-    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(0x0000'0004, 1));  // wrong device type
-    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(0x0000'0001, 2));  // wrong endpoint
+    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(0x0000'0004, kTestEndpointRoot));  // wrong device type
+    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(0x0000'0001, kTestEndpointLight)); // wrong endpoint
     EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(0x0000'0001, 99)); // unknown endpoint
 }
 
