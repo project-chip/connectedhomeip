@@ -1,12 +1,24 @@
 /*
- *   ProviderDeviceTypeResolver tests
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 #include <access/ProviderDeviceTypeResolver.h>
-#include <pw_unit_test/framework.h>
-
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <pw_unit_test/framework.h>
 
 namespace chip {
 namespace Test {
@@ -21,21 +33,13 @@ using chip::app::DataModel::Provider;
 class FakeProvider : public Provider
 {
 public:
-    // Configure per‑endpoint lists from the test body.
-    void SetDeviceTypes(EndpointId ep, chip::span<const DeviceTypeEntry> list)
-    {
-        VerifyOrDie(ep < kMaxEndpoints);
-        mEntries[ep] = list;
-    }
+    void SetDeviceTypes(EndpointId ep, chip::span<const DeviceTypeEntry> list) { mEntries[ep] = list; }
 
-    // -------- Provider interface we actually care about ----------
     CHIP_ERROR DeviceTypes(EndpointId endpoint, ReadOnlyBufferBuilder<DeviceTypeEntry> & out) override
     {
-        VerifyOrDie(endpoint < kMaxEndpoints);
-        // Copy the span into the ReadOnlyBufferBuilder
         for (auto & e : mEntries[endpoint])
         {
-            ReturnErrorOnFailure(out.PushBack(e));
+            out.PushBack(e);
         }
         return CHIP_NO_ERROR;
     }
@@ -43,21 +47,15 @@ public:
     CHIP_ERROR ProcessNullableField(app::ConcreteAttributePath const &) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
 
 private:
-    static constexpr size_t kMaxEndpoints = 10;
-    // store spans owned by the test
-    chip::span<const DeviceTypeEntry> mEntries[kMaxEndpoints]{};
+    chip::span<const DeviceTypeEntry> mEntries[5]{};
 };
 
-/* Static getter that AccessControl will call */
 static FakeProvider gProvider;
 static Provider * GetProvider()
 {
     return &gProvider;
 }
 
-/* ---------------------------------------------------------------------------
- *  Helper to make DeviceTypeEntry in readable form
- * --------------------------------------------------------------------------*/
 static DeviceTypeEntry MakeEntry(DeviceTypeId id)
 {
     DeviceTypeEntry e;
@@ -66,23 +64,18 @@ static DeviceTypeEntry MakeEntry(DeviceTypeId id)
     return e;
 }
 
-/* ---------------------------------------------------------------------------
- *  The tests
- * --------------------------------------------------------------------------*/
-class TestProviderDeviceTypeResolver : public ::testing::Test
+class ProviderDeviceTypeResolverTest : public ::pw::unit_test::Test
 {
 protected:
-    TestProviderDeviceTypeResolver() : mResolver(&GetProvider) {}
+    ProviderDeviceTypeResolverTest() : mResolver(&GetProvider) {}
 
     void SetUp() override
     {
-        // Clean provider state every test
         for (auto & span : mStorage)
             span = {};
         memset(mBuf, 0, sizeof(mBuf));
     }
 
-    /* Provide a span backed by the fixed buffer so lifetime is OK */
     chip::span<const DeviceTypeEntry> MakeSpan(std::initializer_list<DeviceTypeId> ids, size_t ep)
     {
         DeviceTypeEntry * dst = &mBuf[ep][0];
@@ -96,41 +89,32 @@ protected:
     }
 
     ProviderDeviceTypeResolver mResolver;
-
-    // one small buffer per endpoint – avoids dynamic allocation
-    DeviceTypeEntry mBuf[5][4]; // 5 EPs × up to 4 types
+    DeviceTypeEntry mBuf[5][4];
     chip::Span<const DeviceTypeEntry> mStorage[5];
 };
 
-/* ---------- happy path: the type is present --------------------------------*/
-TEST_F(TestProviderDeviceTypeResolver, ReturnsTrueWhenTypeFound)
+TEST_F(ProviderDeviceTypeResolverTest, ReturnsTrueWhenTypeFound)
 {
     constexpr EndpointId kEp            = 1;
     constexpr DeviceTypeId kDim         = 0x0100; // Dimmer
     constexpr DeviceTypeId kOnOffSwitch = 0x0000;
 
     gProvider.SetDeviceTypes(kEp, MakeSpan({ kOnOffSwitch, kDim }, kEp));
-
     EXPECT_TRUE(mResolver.IsDeviceTypeOnEndpoint(kDim, kEp));
 }
 
-/* ---------- negative path: wrong endpoint ---------------------------------*/
-TEST_F(TestProviderDeviceTypeResolver, ReturnsFalseWhenTypeOnDifferentEndpoint)
+TEST_F(ProviderDeviceTypeResolverTest, ReturnsFalseWhenTypeOnDifferentEndpoint)
 {
     constexpr DeviceTypeId kSensor = 0x0302;
     gProvider.SetDeviceTypes(/*ep=*/2, MakeSpan({ kSensor }, 2));
-
     EXPECT_FALSE(mResolver.IsDeviceTypeOnEndpoint(kSensor, /*query ep=*/1));
 }
 
-/* ---------- negative path: type absent ------------------------------------*/
-TEST_F(TestProviderDeviceTypeResolver, ReturnsFalseWhenTypeNotPresent)
+TEST_F(ProviderDeviceTypeResolverTest, ReturnsFalseWhenTypeNotPresent)
 {
     constexpr EndpointId kEp     = 0;
     constexpr DeviceTypeId kLock = 0x000A;
-
     gProvider.SetDeviceTypes(kEp, MakeSpan({ /*empty list*/ }, kEp));
-
     EXPECT_FALSE(mResolver.IsDeviceTypeOnEndpoint(kLock, kEp));
 }
 
