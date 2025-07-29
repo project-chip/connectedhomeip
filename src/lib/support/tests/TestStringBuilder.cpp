@@ -44,7 +44,11 @@ public:
 
     TestStringBuilder(const ByteSpan & span, bool add_marker_if_overflow = true) : builder(span, add_marker_if_overflow) {}
 
-    void Check(std::function<void(StringBuilderBase &)> check) { check(builder); }
+    template <typename F>
+    void Check(F check)
+    {
+        check(builder);
+    }
 };
 
 TEST(TestStringBuilder, TestStringBuilder)
