@@ -2,11 +2,10 @@
 
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Callable, List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.testing.tasks import Subprocess
-
 
 @contextmanager
 def create_kvs_file(storage_dir: str, prefix: str = "kvs-app-") -> Any: ...
