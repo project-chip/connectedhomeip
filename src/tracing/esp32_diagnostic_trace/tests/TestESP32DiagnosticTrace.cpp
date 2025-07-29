@@ -352,7 +352,7 @@ TEST(ESP32DiagnosticsTest, RemoveFilter)
     EXPECT_TRUE(diagnostics.IsEnabled("AnyScope"));
 }
 
-TEST(ESP32DiagnosticsTest, RemoveFilterInvalidArguments)
+TEST(ESP32DiagnosticsTest, RemoveFilterNegativeTest)
 {
     uint8_t buffer[512];
     CircularDiagnosticBuffer storageBuffer(buffer, sizeof(buffer));
@@ -372,7 +372,7 @@ TEST(ESP32DiagnosticsTest, RemoveFilterInvalidArguments)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = diagnostics.RemoveFilter("NonExistentScope");
-    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 }
 
 TEST(ESP32DiagnosticsTest, ClearFilters)
@@ -427,6 +427,10 @@ TEST(ESP32DiagnosticsTest, FilteringInTraceOperations)
     diagnostics.ClearFilters();
     CHIP_ERROR err = diagnostics.AddFilter("EnabledScope");
     EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Check if filter was added correctly
+    EXPECT_TRUE(diagnostics.IsEnabled("EnabledScope"));
+    EXPECT_FALSE(diagnostics.IsEnabled("DisabledScope"));
 
     // Clear storage to ensure clean test
     storageBuffer.ClearBuffer();
