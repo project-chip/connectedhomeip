@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFl
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentMode
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     SupportedModes::kMetadataEntry,
     CurrentMode::kMetadataEntry,
 };

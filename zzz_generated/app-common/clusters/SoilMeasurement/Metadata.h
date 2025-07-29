@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SoilMoistureMeasuredVa
                                                           std::nullopt);
 } // namespace SoilMoistureMeasuredValue
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     SoilMoistureMeasurementLimits::kMetadataEntry,
     SoilMoistureMeasuredValue::kMetadataEntry,
 };

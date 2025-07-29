@@ -102,7 +102,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(NeutralCurrent::Id, Bi
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NeutralCurrent
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     PowerMode::kMetadataEntry,
     NumberOfMeasurementTypes::kMetadataEntry,
     Accuracy::kMetadataEntry,

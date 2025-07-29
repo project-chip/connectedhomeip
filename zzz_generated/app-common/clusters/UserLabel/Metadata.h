@@ -25,7 +25,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace LabelList
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     LabelList::kMetadataEntry,
 };
 

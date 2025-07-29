@@ -72,7 +72,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ExpiryDate::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ExpiryDate
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     ExpressedState::kMetadataEntry,     BatteryAlert::kMetadataEntry,      TestInProgress::kMetadataEntry,
     HardwareFaultAlert::kMetadataEntry, EndOfServiceAlert::kMetadataEntry,
 };

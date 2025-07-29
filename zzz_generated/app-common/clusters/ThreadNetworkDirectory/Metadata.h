@@ -33,7 +33,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadNetworkTableSize
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ThreadNetworkTableSize
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     PreferredExtendedPanID::kMetadataEntry,
     ThreadNetworks::kMetadataEntry,
     ThreadNetworkTableSize::kMetadataEntry,

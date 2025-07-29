@@ -32,7 +32,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MultiPressMax::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MultiPressMax
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     NumberOfPositions::kMetadataEntry,
     CurrentPosition::kMetadataEntry,
 };

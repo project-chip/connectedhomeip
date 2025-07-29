@@ -45,7 +45,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OnMode::Id, BitFlags<D
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace OnMode
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     Description::kMetadataEntry,
     StandardNamespace::kMetadataEntry,
     SupportedModes::kMetadataEntry,

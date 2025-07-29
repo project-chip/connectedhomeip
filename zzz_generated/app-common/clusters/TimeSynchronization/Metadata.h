@@ -74,7 +74,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportsDNSResolve::Id
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SupportsDNSResolve
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     UTCTime::kMetadataEntry,
     Granularity::kMetadataEntry,
 };

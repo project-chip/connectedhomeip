@@ -32,7 +32,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TimerState::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TimerState
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     SetTime::kMetadataEntry,
     TimeRemaining::kMetadataEntry,
     TimerState::kMetadataEntry,

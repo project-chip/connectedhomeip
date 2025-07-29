@@ -290,7 +290,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Rloc16::Id, BitFlags<D
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Rloc16
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     Channel::kMetadataEntry,
     RoutingRole::kMetadataEntry,
     NetworkName::kMetadataEntry,
