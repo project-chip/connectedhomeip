@@ -241,7 +241,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     # teardown_class is called after the last test_ function in the class is run
     #
     # Test authors may overwrite these methods to assist in performing setup and tear down.
-    # Test classes that overwrite these functions should ensure the base functions are called as appropriate. 
+    # Test classes that overwrite these functions should ensure the base functions are called as appropriate.
     # setup_ methods  should call the super() method at the start
     # teardown_ methods should call the super() method at the end
     #
@@ -251,7 +251,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Initializes cluster mapping, step tracking, and global test state.
         Called once per test class by the Mobly framework.
-        
+
         Test authors may overwrite this method in the derived class to perform setup that is common for all tests.
         This function is called only once for the class. To perform setup before each test, use setup_test.
         Test authors that implement steps in this function need to be careful of step handling if there is
@@ -297,10 +297,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Resets test state, starts timers, and notifies runner hooks.
         Called before each test method by the Mobly framework.
-        
+
         Test authors may overwrite this method in the derived class to perform setup that is common for all tests.
         This is called once before each test_ in the class.
-        
+
         Test authors that implement this method should ensure super().setup_test() is called before any custom setup.
         """
         self.current_step_index = 0
@@ -324,7 +324,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.
-        
+
             This is called by the base framework.
             Tests should not call this directly.
             Tests should not overwrite this method.
@@ -629,7 +629,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     # Matter Test API - Step Management & Execution
     #
     # These methods are used to mark test progress for the test harness and logs, to help with test
-    # debugging, issue creation and log analysis by the test labs. 
+    # debugging, issue creation and log analysis by the test labs.
 
     def step(self, step: typing.Union[int, str]):
         """Execute a test step and manage step progression.
