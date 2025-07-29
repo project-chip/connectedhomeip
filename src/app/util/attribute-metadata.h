@@ -118,7 +118,8 @@ union EmberAfDefaultOrMinMaxAttributeValue
 #define MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE (0x08)
 // Attribute deferred to external storage
 #define MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE (0x10)
-// UNUSED, used to be "SINGLETON": 0x20
+// Attribute that has this mask is NOT write-only
+#define MATTER_ATTRIBUTE_FLAG_READABLE (0x20)
 // Attribute is nullable
 #define MATTER_ATTRIBUTE_FLAG_NULLABLE (0x40)
 
@@ -177,9 +178,20 @@ struct EmberAfAttributeMetadata
     bool IsNullable() const { return mask & MATTER_ATTRIBUTE_FLAG_NULLABLE; }
 
     /**
-     * Check whether this attribute is readonly.
+     * Check whether this attribute is writable.
      */
-    bool IsReadOnly() const { return !(mask & MATTER_ATTRIBUTE_FLAG_WRITABLE); }
+    bool IsWritable() const { return mask & MATTER_ATTRIBUTE_FLAG_WRITABLE; }
+
+    /**
+     * Check whether this attribute is readable.
+     */
+    bool IsReadable() const { return mask & MATTER_ATTRIBUTE_FLAG_READABLE; }
+
+    /**
+     * Check whether this attribute is readonly.
+     * Note: IsReadOnly is deprecated: Keeping it for backward compatiblity
+     */
+    bool IsReadOnly() const { return IsReadable() && !IsWritable(); }
 
     /**
      * Check whether this attribute requires a timed write.
