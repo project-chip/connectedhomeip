@@ -31,6 +31,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LinkLocalAddress::Id, 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace WakeOnLan
 } // namespace Clusters
 } // namespace app

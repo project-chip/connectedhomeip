@@ -193,8 +193,8 @@ public:
     // Currently, defaulting to not supporting hard privacy switch.
     bool HasHardPrivacySwitch() override { return false; }
 
-    // Currently, defaulting to not supporting speaker.
-    bool HasSpeaker() override { return false; }
+    // Currently, defaulting to supporting speaker.
+    bool HasSpeaker() override { return true; }
 
     // Mute/Unmute speaker.
     CameraError SetSpeakerMuted(bool muteSpeaker) override;
@@ -234,7 +234,7 @@ public:
     bool GetImageFlipVertical() override { return mImageFlipVertical; }
 
     // Does camera have local storage
-    bool HasLocalStorage() override { return false; }
+    bool HasLocalStorage() override { return true; }
 
     // Set/Get LocalVideoRecordingEnabled
     CameraError SetLocalVideoRecordingEnabled(bool localVideoRecordingEnabled) override;

@@ -499,7 +499,7 @@ CHIP_ERROR FactoryDataProvider::GetSoftwareVersionString(char * buf, size_t bufS
     CHIP_ERROR err = ConfigurationMgr().GetSoftwareVersionString(buf, bufSize);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to get software version string from ConfigurationMgr: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to get software version string from ConfigurationMgr: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }

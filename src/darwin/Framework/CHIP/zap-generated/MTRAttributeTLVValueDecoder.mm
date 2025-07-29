@@ -2367,6 +2367,17 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
         }
         return value;
     }
+    case Attributes::IsCommissioningWithoutPower::Id: {
+        using TypeInfo = Attributes::IsCommissioningWithoutPower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
     default: {
         // Not a known GeneralCommissioning attribute.
         break;

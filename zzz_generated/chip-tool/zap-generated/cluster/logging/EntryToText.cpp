@@ -844,6 +844,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "RecoveryIdentifier";
         case chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::Id:
             return "NetworkRecoveryReason";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id:
+            return "IsCommissioningWithoutPower";
         case chip::app::Clusters::GeneralCommissioning::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::Id:

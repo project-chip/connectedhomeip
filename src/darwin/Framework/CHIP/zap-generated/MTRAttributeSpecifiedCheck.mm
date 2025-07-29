@@ -809,6 +809,9 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
     case Attributes::NetworkRecoveryReason::Id: {
         return YES;
     }
+    case Attributes::IsCommissioningWithoutPower::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

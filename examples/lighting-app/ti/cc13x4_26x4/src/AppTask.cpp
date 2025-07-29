@@ -16,9 +16,16 @@
  *    limitations under the License.
  */
 
-#include "AppTask.h"
-#include "AppConfig.h"
+extern "C" {
+#include "ti_drivers_config.h"
+#ifdef ti_log_Log_ENABLE
+#include "ti_log_config.h"
+#endif
+}
+
 #include "AppEvent.h"
+#include "AppTask.h"
+#include <AppConfig.h>
 
 #include "FreeRTOS.h"
 
@@ -28,6 +35,7 @@
 
 #include <DeviceInfoProviderImpl.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
@@ -40,6 +48,11 @@
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+
+#ifdef ENABLE_CHIP_SHELL
+#include <ChipShellCollection.h>
+#include <lib/shell/Engine.h>
+#endif
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -383,11 +396,34 @@ int AppTask::Init()
     return 0;
 }
 
+#ifdef ENABLE_CHIP_SHELL
+void matterShellTask(void * args)
+{
+    cmd_misc_init();
+    cmd_otcli_init();
+    chip::Shell::Engine::Root().RunMainLoop();
+}
+
+void startShellTask()
+{
+    if (chip::Shell::Engine::Root().Init() < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize shell engine!");
+        return;
+    }
+    xTaskCreate(matterShellTask, "matter_shell", 2048, NULL, tskIDLE_PRIORITY + 1, NULL);
+}
+#endif
+
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
 
     sAppTask.Init();
+
+#ifdef ENABLE_CHIP_SHELL
+    startShellTask();
+#endif
 
     while (1)
     {
@@ -429,6 +465,7 @@ void CancelTimer(void)
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
+    PLAT_LOG("Lighting ActionInitiated Callback");
     if (aAction == LightingManager::ON_ACTION)
     {
         uiTurnOn();
@@ -441,6 +478,7 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 {
+    PLAT_LOG("Lighting ActionCompleted Callback");
     if (aAction == LightingManager::ON_ACTION)
     {
         uiTurnedOn();
@@ -488,6 +526,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
     int32_t actor;
+    PLAT_LOG("DispatchEvent Entry");
 
     switch (aEvent->Type)
     {
@@ -504,6 +543,8 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 #else
             actor = AppEvent::kEventType_ButtonLeft;
+            PLAT_LOG("DispatchEvent Entry on action");
+
             LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
 #endif
         }
