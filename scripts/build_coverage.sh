@@ -45,6 +45,8 @@ _install_gcovr() {
     fi
 }
 
+_normpath() {
+    python3 -c "import os.path; print(os.path.normpath('$@'))"
 # Get absolute path from a relative and normalize (e.g "foo/bar/../baz" -> "/path/to/foo/baz")
 _abspath() {
     python3 -c "import os.path; print(os.path.abspath('$@'))"
@@ -303,7 +305,7 @@ if [ "$GENERATE_XML" == true ]; then
         --gcov-ignore-parse-errors \
         --xml="$COVERAGE_ROOT"/coverage.xml
 
-    XML_INDEX=$(_normpath "$COVERAGE_ROOT/coverage.xml")
+    XML_INDEX=$(_abspath "$COVERAGE_ROOT/coverage.xml")
     if [ -f "$XML_INDEX" ]; then
         echo
         echo "============================================================"
