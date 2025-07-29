@@ -1055,7 +1055,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
         if app_pipe is None:
-            app_pipe = self.matter_test_config.app_pipe
+            app_pipe = self.matter_test_config.pipe_name
 
         if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
