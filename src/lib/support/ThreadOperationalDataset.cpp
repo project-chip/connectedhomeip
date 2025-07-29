@@ -154,9 +154,9 @@ bool OperationalDatasetView::IsValid(ByteSpan aData)
     const ThreadTLV * end = reinterpret_cast<const ThreadTLV *>(aData.end());
     while (tlv != end)
     {
+        VerifyOrReturnValue(tlv + 1 <= end, false);                               // out of bounds
         VerifyOrReturnValue(tlv->GetLength() != ThreadTLV::kLengthEscape, false); // not allowed in a dataset TLV
         tlv = tlv->GetNext();
-        VerifyOrReturnValue(tlv <= end, false); // out of bounds
     }
     return true;
 }
