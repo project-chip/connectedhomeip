@@ -260,10 +260,17 @@ class TC_CNET_4_11(MatterBaseTest):
     def steps_TC_CNET_4_11(self):
         return [
             TestStep("precondition", "TH is commissioned", is_commissioning=True),
-            TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
+            TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
+                     "Verify that DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(2, "TH reads Networks attribute from the DUT and saves the number of entries as 'NumNetworks'."),
-            TestStep(3, "TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'Userwifi_netidx'"),
-            TestStep(4, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"),
+            TestStep(3, "TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'Userwifi_netidx'",
+                        "Verify that the Networks attribute list has an entry with the following fields:"
+                        " 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"
+                        " 2. Connected is of type bool and is TRUE"),
+            TestStep(4, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"
+                        "Verify that DUT sends NetworkConfigResponse to command with the following fields:"
+                        " 1. NetworkingStatus is Success"
+                        " 2. NetworkIndex matches previously saved 'Userwifi_netidx'"),
             TestStep(5, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1"),
             TestStep(6, "TH reads Networks attribute from the DUT"),
             TestStep(7, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2"),
