@@ -74,7 +74,6 @@ except ImportError:
     from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep
 
 
-
 try:
     import fetch_paa_certs_from_dcl
 except ImportError:

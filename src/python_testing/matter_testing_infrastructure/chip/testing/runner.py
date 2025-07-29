@@ -390,7 +390,6 @@ def run_tests_no_exit(
 
     # Lazy import to avoid circular dependency
 
-
     from chip.testing.matter_stack_state import MatterStackState
     if TYPE_CHECKING:
     else:
