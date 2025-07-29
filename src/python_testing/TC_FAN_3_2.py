@@ -44,11 +44,11 @@ from typing import Any
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_asserts import assert_valid_uint8
 from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators, runner
 
 
 class OrderEnum(Enum):

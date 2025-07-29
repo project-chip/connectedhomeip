@@ -70,8 +70,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing import decorators, matchers, runner
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.testing.commissioning import SetupParameters
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
