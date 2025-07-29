@@ -2841,7 +2841,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._fabricCheckNodeId
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,  # type: ignore
+                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
                                   discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
