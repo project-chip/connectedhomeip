@@ -32,9 +32,11 @@
 #include <messaging/tests/MessagingContext.h>
 #include <controller/tests/DispatchDataModel.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 
 using namespace chip;
 using namespace chip::Controller;
+using namespace chip::Credentials;
 using namespace chip::app;
 using namespace chip::Test;
 using namespace chip::TestDataModel;
@@ -85,7 +87,6 @@ public:
     void SetUp() override
     {
         AppContext::SetUp();
-
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&DispatchTestDataModel::Instance());
     }
     void TearDown() override
@@ -108,6 +109,13 @@ private:
 
 TEST_F(TestDeviceController, DeviceCommissioner_)
 {
+    DeviceController device;
+    SetupParams dParams;
+
+    chip::TestPersistentStorageDelegate cerStorage;
+
+    chip::Credentials::PersistentStorageOpCertStore opCertStore;
+    EXPECT_EQ(opCertStore.Init(&cerStorage), CHIP_NO_ERROR);
     chip::TestPersistentStorageDelegate mStorage;
     chip::TestPersistentStorageDelegate storage;
     chip::SimpleSessionResumptionStorage sessionStorage;
@@ -120,28 +128,64 @@ TEST_F(TestDeviceController, DeviceCommissioner_)
     // Initialize Group Data Provider
     sProvider.SetStorageDelegate(&sStorageDelegate);
     sProvider.SetSessionKeystore(&keystore);
-    // sProvider.SetListener(&chip::app::TestGroups::sListener);
     sProvider.Init();
     Credentials::SetGroupDataProvider(&sProvider);
 
     EXPECT_EQ(fHolder.Init(), CHIP_NO_ERROR);
-    // Initialize the ember side server logic
-        ChipLogProgress(NotSpecified, "otro init");
 
+    // Initialize the ember side server logic
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    //Set initials params
     factoryInitParams.listenPort = 88;
-    factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
-    factoryInitParams.fabricTable = &fHolder.GetFabricTable();
+    factoryInitParams.fabricTable = nullptr;
     factoryInitParams.sessionKeystore = &keystore;
     factoryInitParams.fabricIndependentStorage = &mStorage;
-    factoryInitParams.sessionResumptionStorage = &sessionStorage;
     factoryInitParams.groupDataProvider = &sProvider;
-        ChipLogProgress(NotSpecified, "otro init");
+    factoryInitParams.opCertStore = &opCertStore;
 
+    //Expect init fealure to test a print log error
     CHIP_ERROR err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+
+    //Init device controller factory
+    factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
+    err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    DeviceControllerFactory::GetInstance().Shutdown();
+
+    factoryInitParams.fabricTable = &fHolder.GetFabricTable();
+    factoryInitParams.sessionResumptionStorage = &sessionStorage;
+    factoryInitParams.enableServerInteractions = true;
+    err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    DeviceControllerFactory::GetInstance().SetupController(dParams, device);//;SetupCommissioner();
+    
+    //Test retain and release system state
+    DeviceControllerFactory::GetInstance().RetainSystemState();
+    DeviceControllerFactory::GetInstance().RetainSystemState();
+    EXPECT_FALSE(DeviceControllerFactory::GetInstance().GetSystemState()->IsShutDown());
+    EXPECT_FALSE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
+    EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
+    EXPECT_TRUE(DeviceControllerFactory::GetInstance().GetSystemState()->IsShutDown());
+    
+    //Reinit system state
+    EXPECT_EQ(DeviceControllerFactory::GetInstance().EnsureAndRetainSystemState(), CHIP_NO_ERROR);
+
+    //DeviceControllerFactory::GetInstance().SetupController(SetupParams params, DeviceController & controller);
+    //DeviceControllerFactory::GetInstance().SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner);
+
+    //Delete all environment before to end
+    EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
+    DeviceControllerFactory::GetInstance().Shutdown();
+    opCertStore.Finish();
+    ChipLogProgress(NotSpecified, "otro init release,2");
     engine->Shutdown();
+    device.Shutdown();
+    ChipLogProgress(NotSpecified, "termino");
 }
 
 // Add more test cases as needed to cover different scenarios
