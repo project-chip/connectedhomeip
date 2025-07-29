@@ -62,6 +62,31 @@ ADDED,224,"chip::app::WriteHandler::CheckWriteAllowed(chip::Access::SubjectDescr
 
 ```
 
+The diff can also export a sankey data for the differences. Example run:
+
+```
+# Running via `uv` from https://github.com/astral-sh/uv ensures packages are loaded and is generally fast
+# sankey-rules are optional and are of the form:
+#   match "<regex>" to <group_name> "color" colorstr
+# where the color part is optional
+#
+# Example used rules.txt:
+#
+#  match "::k(MetadataEntry|MandatoryAttributes)" to "Metadata"
+#  match "chip::app::Clusters::BasicInformationCluster" to "BasicInfoCluster" color magenta
+#  match "AttributePersistence" to Persistence
+#  match "Event" to Events color blue
+#  match "chip::app::Clusters::" to Clusters color yellow
+#
+uv run --script ./scripts/tools/binary_elf_size_diff.py                                                   \
+   out/branch-builds/migrate_basic_info_to_code/stm32-stm32wb5mm-dk-light/chip-stm32-lighting-example.elf \
+   out/branch-builds/better_scripts/stm32-stm32wb5mm-dk-light/chip-stm32-lighting-example.elf             \
+   --output sankey                                                                                        \
+   --sankey-rules out/rules.txt
+```
+
+![image](./elf_size_example.png)
+
 ## Looking at assembly code
 
 For general tests, the [Godbolt compiler explorer](https://godbolt.org) is a
@@ -75,14 +100,14 @@ the compiler explorer from
 [source](https://github.com/compiler-explorer/compiler-explorer) locally using
 the following instructions:
 
--   install node 20 or above (if you do not have it installed yet)
--   compile compiler-explorer from source
--   Set up a local C++ config in `etc/config/c++.local.properties`, often
+- install node 20 or above (if you do not have it installed yet)
+- compile compiler-explorer from source
+- Set up a local C++ config in `etc/config/c++.local.properties`, often
     `gcc-arm-none-eabi-g++` as a compiler
--   add the relevant compiler settings:
-    -   compile a sample application using the relevant variant. For example
+- add the relevant compiler settings:
+  - compile a sample application using the relevant variant. For example
         `./scripts/build/build_examples.py --target efr32-brd2703a-lock build`
-    -   This will create a compile_commands.json that contains compiler
+  - This will create a compile_commands.json that contains compiler
         arguments to compile files. We have a tool
         `compile_flags_from_compile_commands.py` to extract relevant compile
         flags.
@@ -131,8 +156,8 @@ scripts/tools/compile_flags_from_compile_commands.py \
 
 You may want to enable highlighting via `More->Settings` and have:
 
--   Site theme (as applicable)
--   Line highlighting color scheme as Rainbow (clearer code as opposed to just
+- Site theme (as applicable)
+- Line highlighting color scheme as Rainbow (clearer code as opposed to just
     gray scale)
 
 ![image](./godbolt_example.png)
