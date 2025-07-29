@@ -126,7 +126,8 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             expected_output="Server initialization complete",
             timeout=30)
 
-        # Add some server to the DUT_FSA's Aggregator/Bridge.
+        # Automatically commission some server to the DUT_FSA using the command line interface provided
+        # by either the unified fabric-sync app or the fabric-admin + fabric-bridge apps.
         if self.user_params.get("unified_fabric_sync_app"):
             self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
         else:
