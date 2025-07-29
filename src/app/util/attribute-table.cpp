@@ -365,7 +365,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
 
     // if the value the attribute is being set to is out of range
     // return Status::ConstraintError
-    if ((metadata->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
+    if ((metadata->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
         EmberAfDefaultAttributeValue maxv = metadata->defaultValue.ptrToMinMaxValue->maxValue;

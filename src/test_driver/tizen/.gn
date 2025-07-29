@@ -31,7 +31,6 @@ default_args = {
   pw_log_BACKEND = "$dir_pw_log_basic"
 
   pw_unit_test_BACKEND = "$dir_pw_unit_test:googletest"
-  pw_unit_test_MAIN = "$dir_pigweed/third_party/googletest:gmock_main"
   dir_pw_third_party_googletest = "$dir_googletest"
 
   # TODO: Make sure only unit tests link against this

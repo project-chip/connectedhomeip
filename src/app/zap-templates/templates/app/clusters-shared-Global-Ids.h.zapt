@@ -1,0 +1,25 @@
+{{> header}}
+#pragma once
+
+#include <lib/core/DataModelTypes.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+namespace Globals {
+namespace Attributes {
+
+{{#zcl_attributes_server}}
+{{#unless clusterRef}}
+namespace {{asUpperCamelCase label}} {
+static constexpr AttributeId Id = {{asMEI manufacturerCode code}};
+} // namespace {{asUpperCamelCase label}}
+{{/unless}}
+
+{{/zcl_attributes_server}}
+} // namespace Attributes
+} // namespace Globals
+} // namespace Clusters
+} // namespace app
+} // namespace chip

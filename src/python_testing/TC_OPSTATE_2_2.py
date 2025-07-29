@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/opstate_2_2_fifo
 #     script-args: >
 #       --endpoint 1
 #       --int-arg PIXIT.WAITTIME.COUNTDOWN:5
@@ -33,6 +33,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --app-pipe /tmp/opstate_2_2_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -62,7 +63,7 @@ class TC_OPSTATE_2_2(MatterBaseTest, TC_OPSTATE_BASE):
 
     @async_test_body
     async def test_TC_OPSTATE_2_2(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint(default=1)
 
         await self.TEST_TC_OPSTATE_BASE_2_2(endpoint=endpoint)
 

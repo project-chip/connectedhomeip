@@ -168,27 +168,20 @@ typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAUpdateState) {
  * SaturationMoveMode and SaturationStepMode.
  */
 typedef NS_ENUM(uint8_t, MTRColorControlSaturationMoveMode) {
-    MTRColorControlSaturationMoveModeStop MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeStop")
+    MTRColorControlSaturationMoveModeStop MTR_DEPRECATED("Please use MTRColorControlMoveModeStop", ios(16.1, 18.2), macos(13.0, 15.2), watchos(9.1, 11.2), tvos(16.1, 18.2))
     = 0x00,
-    MTRColorControlSaturationMoveModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeUp")
+    MTRColorControlSaturationMoveModeUp MTR_DEPRECATED("Please use MTRColorControlMoveModeUp", ios(16.1, 18.2), macos(13.0, 15.2), watchos(9.1, 11.2), tvos(16.1, 18.2))
     = 0x01,
-    MTRColorControlSaturationMoveModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveModeDown")
+    MTRColorControlSaturationMoveModeDown MTR_DEPRECATED("Please use MTRColorControlMoveModeDown", ios(16.1, 18.2), macos(13.0, 15.2), watchos(9.1, 11.2), tvos(16.1, 18.2))
     = 0x03,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRColorControlMoveMode");
+} MTR_DEPRECATED("Please use MTRColorControlMoveMode", ios(16.1, 18.2), macos(13.0, 15.2), watchos(9.1, 11.2), tvos(16.1, 18.2));
 
 typedef NS_ENUM(uint8_t, MTRColorControlSaturationStepMode) {
-    MTRColorControlSaturationStepModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepModeUp")
+    MTRColorControlSaturationStepModeUp MTR_DEPRECATED("Please use MTRColorControlStepModeUp", ios(16.1, 18.2), macos(13.0, 15.2), watchos(9.1, 11.2), tvos(16.1, 18.2))
     = 0x01,
-    MTRColorControlSaturationStepModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepModeDown")
+    MTRColorControlSaturationStepModeDown MTR_DEPRECATED("Please use MTRColorControlStepModeDown", ios(16.1, 18.2), macos(13.0, 15.2), watchos(9.1, 11.2), tvos(16.1, 18.2))
     = 0x03,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRColorControlStepMode");
+} MTR_DEPRECATED("Please use MTRColorControlStepMode", ios(16.1, 18.2), macos(13.0, 15.2), watchos(9.1, 11.2), tvos(16.1, 18.2));
 
 #pragma mark - Clusters that were removed wholesale: OnOffSwitchConfiguration
 

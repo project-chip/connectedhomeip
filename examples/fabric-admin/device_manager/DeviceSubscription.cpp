@@ -33,7 +33,12 @@ using namespace ::chip;
 using namespace ::chip::app;
 using chip::app::ReadClient;
 
+namespace admin {
+
 namespace {
+
+constexpr uint16_t kSubscribeMinInterval = 0;
+constexpr uint16_t kSubscribeMaxInterval = 10;
 
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
@@ -160,7 +165,9 @@ void DeviceSubscription::OnDeviceConnected(Messaging::ExchangeManager & exchange
 
     readParams.mpAttributePathParamsList    = readPaths;
     readParams.mAttributePathParamsListSize = 1;
-    readParams.mMaxIntervalCeilingSeconds   = 5 * 60;
+    readParams.mMinIntervalFloorSeconds     = kSubscribeMinInterval;
+    readParams.mMaxIntervalCeilingSeconds   = kSubscribeMaxInterval;
+    readParams.mKeepSubscriptions           = true;
 
     CHIP_ERROR err = mClient->SendRequest(readParams);
 
@@ -281,3 +288,5 @@ void DeviceSubscription::StopSubscription()
     MoveToState(State::AwaitingDestruction);
     mOnDoneCallback(mScopedNodeId);
 }
+
+} // namespace admin

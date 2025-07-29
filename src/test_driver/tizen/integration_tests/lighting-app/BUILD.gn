@@ -26,10 +26,13 @@ tizen_qemu_run("lighting-app") {
   # Share output directory.
   share = "${root_out_dir}"
 
+  # Runner script file name.
+  runner = "runner-${target_name}.sh"
+
   # Copy runner script to shared directory.
   copy("${target_name}:runner") {
     sources = [ "runner.sh" ]
-    outputs = [ share + "/runner.sh" ]
+    outputs = [ share + "/" + runner ]
   }
 
   # Build applications used in the test.

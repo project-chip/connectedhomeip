@@ -22,7 +22,6 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
-#import "MTRDeviceDataValueDictionary.h"
 #import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -147,10 +146,15 @@ MTR_DIRECT_MEMBERS
 // Returns YES if any non-null delegates were found
 - (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block;
 
+// For subclasses to call while holding lock
 - (BOOL)_delegateExists;
 
+// For device controller or other objects to call
+- (BOOL)delegateExists;
+
 // Must be called by subclasses or MTRDevice implementation only.
-- (void)_delegateAdded;
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate;
 
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
@@ -169,6 +173,20 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)one isEqualToDataValue:(MTRDeviceDataValueDictionary)theOther;
 - (BOOL)_attributeDataValue:(MTRDeviceDataValueDictionary)observed satisfiesValueExpectation:(MTRDeviceDataValueDictionary)expected;
 
+// Hook for subclasses to notify us that an attribute value has been reported.
+//
+// For the MTRDevice_Concrete case this will be an actual reported value from
+// the device. For the MTRDevice_XPC case, this might be an expected, not
+// actual, value that is getting reported to us, if something sets up an
+// expected value for the relevant attribute.
+- (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path;
+
+- (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
+
+@end
+
+@interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+- (void)_deviceMayBeReachable;
 @end
 
 #pragma mark - MTRDevice internal state monitoring
@@ -176,28 +194,23 @@ MTR_DIRECT_MEMBERS
 - (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
 @end
 
-// Returns whether a data-value dictionary is well-formed (in the sense that all
-// the types of the objects inside are as expected, so it's actually a valid
-// representation of some TLV).  Implemented in MTRBaseDevice.mm because that's
-// where the pieces needed to implement it are, but declared here so our tests
-// can see it.
-MTR_EXTERN MTR_TESTABLE BOOL MTRDataValueDictionaryIsWellFormed(MTRDeviceDataValueDictionary value);
-
 #pragma mark - Constants
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
 
-// Declared inside platform, but noting here for reference
-// static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
-
 // Concrete to XPC internal state property dictionary keys
 static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
 static NSString * const kMTRDeviceInternalPropertyKeyProductID = @"MTRDeviceInternalStateKeyProductID";
 static NSString * const kMTRDeviceInternalPropertyNetworkFeatures = @"MTRDeviceInternalPropertyNetworkFeatures";
-static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyDeviceInternalState = @"MTRDeviceInternalPropertyDeviceInternalState";
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionAttemptWait = @"kMTRDeviceInternalPropertyLastSubscriptionAttemptWait";
 static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDeviceInternalPropertyMostRecentReportTime";
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
+static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
+static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDeviceInternalPropertyDeviceCachePrimed";
+static NSString * const kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress = @"MTRDeviceInternalPropertyDiagnosticLogTransferInProgress";
+static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
+static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
 
 NS_ASSUME_NONNULL_END

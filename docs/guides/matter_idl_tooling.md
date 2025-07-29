@@ -7,7 +7,7 @@ Since it is designed to be easy for both machine and humans to read, it is the
 basis of some tools to make validating zap-based cluster definitions easier.
 
 More details on the format in
-[matter_idl/README.md](../../scripts/py_matter_idl/matter_idl/README.md).
+[matter/idl/README.md](../../scripts/py_matter_idl/matter/idl/README.md).
 
 ## Parsing CSA XML Data definitions
 
@@ -20,12 +20,12 @@ information available in [data_model/README.md](../../data_model/README.md).
 NOTE: scraper is a work in progress, XML data may be incomplete or have errors
 still.
 
-The script `./scripts/py_matter_idl/matter_idl/data_model_xml_parser.py` has the
-ability to parse one or more CSA data model XML files and output their content
-in `.matter` format. For example:
+The script `matter-data-model-xml-parser` has the ability to parse one or more
+CSA data model XML files and output their content in `.matter` format. For
+example:
 
 ```sh
-./scripts/py_matter_idl/matter_idl/data_model_xml_parser.py data_model/clusters/BooleanState.xml
+matter-data-model-xml-parser data_model/clusters/BooleanState.xml
 ```
 
 The tool supports several options that are useful for development:
@@ -54,7 +54,7 @@ specification:
 As such one can run compares such as:
 
 ```sh
-./scripts/py_matter_idl/matter_idl/data_model_xml_parser.py         \
+matter-data-model-xml-parser \
      -o out/spec.matter                                             \
      --compare-output out/sdk.matter                                \
      --compare src/controller/data_model/controller-clusters.matter \
@@ -68,9 +68,9 @@ spec).
 
 ## Linting `.matter` files for devices
 
-For device validation, `./scripts/idl_lint.py` provides the ability to validate
-a matter file for some basic conformance logic. These rules are expressed in
-`scripts/rules.matterlint`.
+For device validation, `matter-idl-lint` provides the ability to validate a
+matter file for some basic conformance logic. These rules are expressed in
+`.matterlint`.
 
 The rules generally are:
 
@@ -82,5 +82,5 @@ The rules generally are:
 Usage:
 
 ```sh
-./scripts/idl_lint.py ./examples/window-app/common/window-app.matter
+matter-idl-lint examples/window-app/common/window-app.matter
 ```

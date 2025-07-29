@@ -28,6 +28,8 @@
 
 using namespace chip;
 
+namespace admin {
+
 namespace {
 
 // Constants
@@ -57,7 +59,7 @@ CHIP_ERROR WaitForResponse(CallType & call)
     }
     else
     {
-        fprintf(stderr, "RPC Response timed out!");
+        fprintf(stderr, "RPC Response timed out!\n");
         return CHIP_ERROR_TIMEOUT;
     }
 }
@@ -227,3 +229,5 @@ CHIP_ERROR DeviceReachableChanged(const chip_rpc_ReachabilityChanged & data)
 
     return WaitForResponse(call);
 }
+
+} // namespace admin

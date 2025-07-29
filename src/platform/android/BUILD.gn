@@ -64,8 +64,6 @@ static_library("android") {
     "BleConnectCallback-JNI.cpp",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
-    "CHIPP256KeypairBridge.cpp",
-    "CHIPP256KeypairBridge.h",
     "CommissionableDataProviderImpl.cpp",
     "CommissionableDataProviderImpl.h",
     "ConfigurationManagerImpl.cpp",
@@ -80,12 +78,16 @@ static_library("android") {
     "DnssdImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
+    "NFCCommissioningManagerImpl.cpp",
+    "NFCCommissioningManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
   ]
 
   deps = [
     ":tracing",
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
   ]
@@ -117,6 +119,7 @@ android_library("java") {
     "java/chip/platform/AndroidChipLogging.java",
     "java/chip/platform/AndroidChipPlatform.java",
     "java/chip/platform/AndroidChipPlatformException.java",
+    "java/chip/platform/AndroidNfcCommissioningManager.java",
     "java/chip/platform/BleCallback.java",
     "java/chip/platform/BleConnectCallback.java",
     "java/chip/platform/BleManager.java",
@@ -127,6 +130,8 @@ android_library("java") {
     "java/chip/platform/DiagnosticDataProviderImpl.java",
     "java/chip/platform/KeyValueStoreManager.java",
     "java/chip/platform/NetworkInterface.java",
+    "java/chip/platform/NfcCallback.java",
+    "java/chip/platform/NfcCommissioningManager.java",
     "java/chip/platform/NsdManagerServiceBrowser.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
     "java/chip/platform/NsdServiceFinderAndResolver.java",
@@ -143,5 +148,5 @@ android_library("java") {
 }
 
 java_prebuilt("android_sdk") {
-  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-30/android.jar"
 }

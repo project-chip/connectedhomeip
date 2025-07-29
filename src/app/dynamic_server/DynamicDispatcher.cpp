@@ -15,7 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/util/ember-compatibility-functions.h>
+
+#include "AccessControl.h"
 
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/callback.h>
@@ -30,9 +31,12 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
+#include <app/clusters/ota-provider/ota-provider-cluster.h>
 #include <app/data-model/Decode.h>
-#include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
+#include <cstddef>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
@@ -41,9 +45,8 @@
 
 /**
  * This file defines the APIs needed to handle interaction model dispatch.
- * These are the APIs normally defined in
- * src/app/util/ember-compatibility-functions.cpp and the generated
- * IMClusterCommandHandler.cpp but we want a different implementation of these
+ * These are the APIs normally defined generated ember code,
+ * however we want a different implementation of these
  * to enable more dynamic behavior, since not all framework consumers will be
  * implementing the same server clusters.
  */
@@ -53,206 +56,68 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-// TODO: Maybe consider making this configurable?  See also
-// AccessControl.cpp.
-constexpr EndpointId kSupportedEndpoint = 0;
+DataVersion gMockDataVersion = 0;
+
+OtaProviderServer gOtaProviderServer(kOtaProviderDynamicEndpointId);
 
 } // anonymous namespace
 
 namespace chip {
 namespace app {
+namespace Clusters {
+namespace OTAProvider {
+
+void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate)
+{
+    if (endpointId != kOtaProviderDynamicEndpointId)
+    {
+        ChipLogError(AppServer, "Trying to set OTA delegate on invalid endpoint %d (only %d supported)", endpointId,
+                     kOtaProviderDynamicEndpointId);
+        return;
+    }
+    gOtaProviderServer.SetDelegate(delegate);
+}
+
+} // namespace OTAProvider
+} // namespace Clusters
 
 using Access::SubjectDescriptor;
 using Protocols::InteractionModel::Status;
 
-namespace {
-
-bool IsSupportedGlobalAttribute(AttributeId aAttribute)
-{
-    // We don't have any non-global attributes.
-    using namespace Globals::Attributes;
-
-    for (auto & attr : GlobalAttributesNotInMetadata)
-    {
-        if (attr == aAttribute)
-        {
-            return true;
-        }
-    }
-
-    switch (aAttribute)
-    {
-    case FeatureMap::Id:
-        FALLTHROUGH;
-    case ClusterRevision::Id:
-        return true;
-    }
-
-    return false;
-}
-
-Status DetermineAttributeStatus(const ConcreteAttributePath & aPath, bool aIsWrite)
-{
-    // TODO: Consider making this configurable for applications that are not
-    // trying to be an OTA provider, though in practice it just affects which
-    // error is returned.
-    if (aPath.mEndpointId != kSupportedEndpoint)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    // TODO: Consider making this configurable for applications that are not
-    // trying to be an OTA provider, though in practice it just affects which
-    // error is returned.
-    if (aPath.mClusterId != OtaSoftwareUpdateProvider::Id)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    if (!IsSupportedGlobalAttribute(aPath.mAttributeId))
-    {
-        return Status::UnsupportedAttribute;
-    }
-
-    // No permissions for this for read, and none of these are writable for
-    // write.  The writable-or-not check happens before the ACL check.
-    return aIsWrite ? Status::UnsupportedWrite : Status::UnsupportedAccess;
-}
-
-} // anonymous namespace
-
-CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * aEncoderState)
-{
-    Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ false);
-    return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(status));
-}
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return DetermineAttributeStatus(aPath, /* aIsWrite = */ false) == Status::UnsupportedAccess;
-}
-
-Status ServerClusterCommandExists(const ConcreteCommandPath & aPath)
-{
-    // TODO: Consider making this configurable for applications that are not
-    // trying to be an OTA provider.
-    using namespace OtaSoftwareUpdateProvider::Commands;
-
-    if (aPath.mEndpointId != kSupportedEndpoint)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-
-    if (aPath.mClusterId != OtaSoftwareUpdateProvider::Id)
-    {
-        return Status::UnsupportedCluster;
-    }
-
-    switch (aPath.mCommandId)
-    {
-    case QueryImage::Id:
-        FALLTHROUGH;
-    case ApplyUpdateRequest::Id:
-        FALLTHROUGH;
-    case NotifyUpdateApplied::Id:
-        return Status::Success;
-    }
-
-    return Status::UnsupportedCommand;
-}
-
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    // Will never be called anyway; we have no attributes.
-    return false;
-}
-
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
-{
-    // Note: This test does not make use of the real attribute metadata.
-    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
-    return &stub;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
-}
-
-CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
-{
-    Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ true);
-    return aWriteHandler->AddStatus(aPath, status);
-}
-
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
 {
-    // This command passed ServerClusterCommandExists so we know it's one of our
-    // supported commands.
-    using namespace OtaSoftwareUpdateProvider::Commands;
+    SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
 
-    bool wasHandled = false;
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    DataModel::InvokeRequest invokeRequest;
+    invokeRequest.path              = aPath;
+    invokeRequest.subjectDescriptor = &subjectDescriptor;
 
-    switch (aPath.mCommandId)
+    std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(invokeRequest, aReader, aCommandObj);
+
+    if (result.has_value())
     {
-    case QueryImage::Id: {
-        QueryImage::DecodableType commandData;
-        err = DataModel::Decode(aReader, commandData);
-        if (err == CHIP_NO_ERROR)
-        {
-            wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(aCommandObj, aPath, commandData);
-        }
-        break;
+        // The cluster indicates that handler status or data was already set (or will be set asynchronously) by
+        // returning std::nullopt. If any other value is returned, it is requesting that a status is set. This
+        // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
+        aCommandObj->AddStatus(aPath, result->GetStatusCode());
     }
-    case ApplyUpdateRequest::Id: {
-        ApplyUpdateRequest::DecodableType commandData;
-        err = DataModel::Decode(aReader, commandData);
-        if (err == CHIP_NO_ERROR)
-        {
-            wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(aCommandObj, aPath, commandData);
-        }
-        break;
-    }
-    case NotifyUpdateApplied::Id: {
-        NotifyUpdateApplied::DecodableType commandData;
-        err = DataModel::Decode(aReader, commandData);
-        if (err == CHIP_NO_ERROR)
-        {
-            wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(aCommandObj, aPath, commandData);
-        }
-        break;
-    }
-    default:
-        break;
-    }
-
-    if (CHIP_NO_ERROR != err || !wasHandled)
-    {
-        aCommandObj->AddStatus(aPath, Status::InvalidCommand);
-    }
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    return Protocols::InteractionModel::Status::UnsupportedEvent;
 }
 
 } // namespace app
 } // namespace chip
 
 /**
- * Called by the OTA provider cluster server to determine an index
- * into its array.
+ * Returns the index of the given endpoint in the list of all endpoints that might support the given cluster server.
  */
 uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
-    if (endpoint == kSupportedEndpoint && cluster == OtaSoftwareUpdateProvider::Id)
+    if (endpoint == kOtaProviderDynamicEndpointId && cluster == OtaSoftwareUpdateProvider::Id)
     {
         return 0;
+    }
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId && cluster == WebRTCTransportRequestor::Id)
+    {
+        return 1;
     }
 
     return UINT16_MAX;
@@ -272,14 +137,18 @@ uint16_t emberAfGetServerAttributeCount(EndpointId endpoint, ClusterId cluster)
 
 uint16_t emberAfEndpointCount(void)
 {
-    return 1;
+    return 2;
 }
 
 uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 {
-    if (endpoint == kSupportedEndpoint)
+    if (endpoint == kOtaProviderDynamicEndpointId)
     {
         return 0;
+    }
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId)
+    {
+        return 1;
     }
 
     return UINT16_MAX;
@@ -287,15 +156,27 @@ uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 
 EndpointId emberAfEndpointFromIndex(uint16_t index)
 {
-    // Index must be valid here, so 0.
-    return kSupportedEndpoint;
+    if (index == 0)
+    {
+        return kOtaProviderDynamicEndpointId;
+    }
+    else if (index == 1)
+    {
+        return kWebRTCRequesterDynamicEndpointId;
+    }
+
+    return UINT16_MAX;
 }
 
 Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool server)
 {
-    if (endpoint == kSupportedEndpoint && n == 0 && server)
+    if (endpoint == kOtaProviderDynamicEndpointId && n == 0 && server)
     {
         return MakeOptional(OtaSoftwareUpdateProvider::Id);
+    }
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId && n == 0 && server)
+    {
+        return MakeOptional(WebRTCTransportRequestor::Id);
     }
 
     return NullOptional;
@@ -313,12 +194,25 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
 
 uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 {
-    if (endpoint == kSupportedEndpoint && server)
+    if (endpoint == kOtaProviderDynamicEndpointId && server)
+    {
+        return 1;
+    }
+
+    if (endpoint == kWebRTCRequesterDynamicEndpointId && server)
     {
         return 1;
     }
 
     return 0;
+}
+
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
+{
+    const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_FLAG_SERVER : MATTER_CLUSTER_FLAG_CLIENT;
+
+    return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
+                                              [=](const EmberAfCluster & cluster) { return (cluster.mask & cluster_mask) != 0; }));
 }
 
 Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, ClusterId cluster, uint16_t attributeIndex)
@@ -328,7 +222,14 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
 
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
-    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id && (mask & CLUSTER_MASK_SERVER))
+    if (endpoint == kOtaProviderDynamicEndpointId && clusterId == OtaSoftwareUpdateProvider::Id &&
+        (mask & MATTER_CLUSTER_FLAG_SERVER))
+    {
+        return 0;
+    }
+
+    if (endpoint == kWebRTCRequesterDynamicEndpointId && clusterId == WebRTCTransportRequestor::Id &&
+        (mask & MATTER_CLUSTER_FLAG_SERVER))
     {
         return 0;
     }
@@ -342,31 +243,64 @@ bool emberAfEndpointIndexIsEnabled(uint16_t index)
 }
 
 namespace {
-const CommandId acceptedCommands[]  = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
-                                        Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
-                                        Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id, kInvalidCommandId };
-const CommandId generatedCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
-                                        Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id, kInvalidCommandId };
+
+const CommandId acceptedOtaProviderCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
+                                                  Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
+                                                  Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id,
+                                                  kInvalidCommandId };
+
+const CommandId generatedOtaProviderCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
+                                                   Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id,
+                                                   kInvalidCommandId };
+
 const EmberAfCluster otaProviderCluster{
     .clusterId            = Clusters::OtaSoftwareUpdateProvider::Id,
     .attributes           = nullptr,
     .attributeCount       = 0,
     .clusterSize          = 0,
-    .mask                 = CLUSTER_MASK_SERVER,
+    .mask                 = MATTER_CLUSTER_FLAG_SERVER,
     .functions            = nullptr,
-    .acceptedCommandList  = acceptedCommands,
-    .generatedCommandList = generatedCommands,
+    .acceptedCommandList  = acceptedOtaProviderCommands,
+    .generatedCommandList = generatedOtaProviderCommands,
     .eventList            = nullptr,
     .eventCount           = 0,
 };
+
 const EmberAfEndpointType otaProviderEndpoint{ .cluster = &otaProviderCluster, .clusterCount = 1, .endpointSize = 0 };
+
+const CommandId acceptedWebRTCRequestorCommands[] = { Clusters::WebRTCTransportRequestor::Commands::Offer::Id,
+                                                      Clusters::WebRTCTransportRequestor::Commands::Answer::Id,
+                                                      Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id,
+                                                      Clusters::WebRTCTransportRequestor::Commands::End::Id, kInvalidCommandId };
+
+const CommandId generatedWebRTCRequestorCommands[] = { kInvalidCommandId };
+
+const EmberAfCluster webRTCReqeustorCluster{
+    .clusterId            = Clusters::WebRTCTransportRequestor::Id,
+    .attributes           = nullptr,
+    .attributeCount       = 0,
+    .clusterSize          = 0,
+    .mask                 = MATTER_CLUSTER_FLAG_SERVER,
+    .functions            = nullptr,
+    .acceptedCommandList  = acceptedWebRTCRequestorCommands,
+    .generatedCommandList = generatedWebRTCRequestorCommands,
+    .eventList            = nullptr,
+    .eventCount           = 0,
+};
+
+const EmberAfEndpointType webRTCRequestorEndpoint{ .cluster = &webRTCReqeustorCluster, .clusterCount = 1, .endpointSize = 0 };
+
 } // namespace
 
 const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
 {
-    if (endpoint == kSupportedEndpoint)
+    if (endpoint == kOtaProviderDynamicEndpointId)
     {
         return &otaProviderEndpoint;
+    }
+    else if (endpoint == kWebRTCRequesterDynamicEndpointId)
+    {
+        return &webRTCRequestorEndpoint;
     }
 
     return nullptr;
@@ -374,10 +308,107 @@ const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
 
 const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId cluster)
 {
-    if (endpoint == kSupportedEndpoint && cluster == Clusters::OtaSoftwareUpdateProvider::Id)
+    if (endpoint == kOtaProviderDynamicEndpointId && cluster == Clusters::OtaSoftwareUpdateProvider::Id)
     {
         return &otaProviderCluster;
     }
 
+    if (endpoint == kWebRTCRequesterDynamicEndpointId && cluster == Clusters::WebRTCTransportRequestor::Id)
+    {
+        return &webRTCReqeustorCluster;
+    }
+
+    return nullptr;
+}
+
+unsigned emberAfMetadataStructureGeneration()
+{
+    // DynamicDispatcher at this point hardcodes a single OTA provider cluster.
+    // The structure does not change over time, so the current version stays at 0.
+    return 0;
+}
+
+Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
+                                                             const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
+                                                             uint16_t readLength, bool write)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+namespace chip {
+namespace app {
+
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
+{
+    return EndpointComposition::kFullFamily;
+}
+
+} // namespace app
+} // namespace chip
+
+EndpointId emberAfParentEndpointFromIndex(uint16_t index)
+{
+    return kInvalidEndpointId;
+}
+
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
+                                            Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
+{
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                             AttributesChangedListener * listener)
+{
+    gMockDataVersion++;
+    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+}
+
+void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+{
+    listener->MarkDirty(AttributePathParams(endpoint));
+}
+
+DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClusterPath)
+{
+    return &gMockDataVersion;
+}
+
+Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
+                                                               const EmberAfWriteDataInput & input)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsigned endpointIndex, CHIP_ERROR & err)
+{
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
+    return Span<const EmberAfDeviceType>();
+}
+
+const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
+                                                EmberAfClusterMask mask, uint8_t * index)
+{
+    if ((endpointType == &otaProviderEndpoint) && (clusterId == Clusters::OtaSoftwareUpdateProvider::Id))
+    {
+        return &otaProviderCluster;
+    }
+
+    if ((endpointType == &webRTCRequestorEndpoint) && (clusterId == Clusters::WebRTCTransportRequestor::Id))
+    {
+        return &webRTCReqeustorCluster;
+    }
+
+    return nullptr;
+}
+
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+{
+    // no known attributes even for OTA
     return nullptr;
 }

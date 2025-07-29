@@ -27,8 +27,8 @@
 #import <Matter/MTRServerCluster.h>
 
 #include <app/AttributeAccessInterface.h>
-#include <app/clusters/descriptor/descriptor.h>
 #include <app/data-model/PreEncodedValue.h>
+#include <clusters/Descriptor/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -126,7 +126,7 @@ MTR_DIRECT_MEMBERS
 
 + (MTRServerCluster *)newDescriptorCluster
 {
-    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kClusterRevision) accessGrants:[NSSet set] attributes:@[]];
+    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kRevision) accessGrants:[NSSet set] attributes:@[]];
 }
 
 - (instancetype)initInternalWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision accessGrants:(NSSet *)accessGrants attributes:(NSArray *)attributes
@@ -287,7 +287,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     }
 
     if (needsDescriptorAttributes) {
-        attributeCount += ArraySize(sDescriptorAttributesMetadata);
+        attributeCount += MATTER_ARRAY_SIZE(sDescriptorAttributesMetadata);
     }
 
     // And add one for ClusterRevision
@@ -312,7 +312,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
             // Size in bytes does not matter, since we plan to
             // handle this entirely via AttributeAccessInterface.
             0,
-            // ATTRIBUTE_MASK_NULLABLE is not relevant because we
+            // MATTER_ATTRIBUTE_FLAG_NULLABLE is not relevant because we
             // are handling this all via AttributeAccessInterface.
             0)));
     }

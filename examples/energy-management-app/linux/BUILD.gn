@@ -34,6 +34,7 @@ config("includes") {
 
 executable("chip-energy-management-app") {
   sources = [
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyManagementAppCommonMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
@@ -51,7 +52,6 @@ executable("chip-energy-management-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WaterHeaterMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
@@ -64,6 +64,7 @@ executable("chip-energy-management-app") {
   deps = [
     "${chip_root}/examples/energy-management-app/energy-management-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/lib",
   ]
 

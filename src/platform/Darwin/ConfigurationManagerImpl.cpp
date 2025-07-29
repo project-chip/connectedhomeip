@@ -26,6 +26,7 @@
 #include <platform/Darwin/ConfigurationManagerImpl.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/Global.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
@@ -138,10 +139,13 @@ exit:
 }
 #endif // TARGET_OS_OSX
 
+namespace {
+AtomicGlobal<ConfigurationManagerImpl> gInstance;
+}
+
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
-    static ConfigurationManagerImpl sInstance;
-    return sInstance;
+    return gInstance.get();
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
@@ -194,6 +198,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     {
         uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
         ReturnErrorOnFailure(WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ConfigurationVersion))
+    {
+        ReturnErrorOnFailure(StoreConfigurationVersion(1));
     }
 
     return CHIP_NO_ERROR;
@@ -336,6 +345,24 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     }
 
     return err;
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetConfigurationVersion(uint32_t & configurationVersion)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return ReadConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreConfigurationVersion(uint32_t configurationVersion)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return WriteConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
 

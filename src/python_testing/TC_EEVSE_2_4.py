@@ -45,7 +45,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
@@ -124,10 +125,10 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
         # Commission DUT - already done
 
         # Subscribe to Events and when they are sent push them to a queue for checking later
-        events_callback = EventChangeCallback(Clusters.EnergyEvse)
+        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.EnergyEvse)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.matter_test_config.endpoint)
+                                    self.get_endpoint())
 
         self.step("2")
         await self.check_test_event_triggers_enabled()

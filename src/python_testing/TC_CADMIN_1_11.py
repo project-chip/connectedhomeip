@@ -28,7 +28,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
-#     quiet: false
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 
@@ -42,12 +42,12 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+from chip.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
 
 
-class TC_CADMIN_1_11(MatterBaseTest):
+class TC_CADMIN_1_11(CADMINBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode is None:
             params = await th.OpenCommissioningWindow(
@@ -81,12 +81,6 @@ class TC_CADMIN_1_11(MatterBaseTest):
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                 'Unexpected error code returned from CommissioningComplete')
-
-    async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
-        cluster = Clusters.OperationalCredentials
-        attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
 
     def steps_TC_CADMIN_1_11(self) -> list[TestStep]:
         return [

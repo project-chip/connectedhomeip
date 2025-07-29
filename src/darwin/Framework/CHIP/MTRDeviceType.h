@@ -23,8 +23,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_NEWLY_AVAILABLE
-@interface MTRDeviceType : NSObject
+/**
+ * Meta-data about a device type defined in the Matter specification.
+ */
+MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
+@interface MTRDeviceType : NSObject /* <NSCopying> (see below) */
 
 /**
  * Returns an MTRDeviceType for the given ID, if the ID is known.  Returns nil
@@ -50,6 +53,10 @@ MTR_NEWLY_AVAILABLE
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
+@end
+
+MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
+@interface MTRDeviceType () <NSCopying>
 @end
 
 NS_ASSUME_NONNULL_END

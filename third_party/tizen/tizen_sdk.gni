@@ -175,6 +175,7 @@ template("tizen_qemu_run") {
   testonly = true
 
   assert(defined(invoker.share), "It is required to specify path to share.")
+  assert(defined(invoker.runner), "It is required to specify runner script.")
 
   # Store QEMU output in a dedicated log file.
   output_log_file = "${root_out_dir}/tizen-qemu-" + target_name + ".log"
@@ -186,6 +187,7 @@ template("tizen_qemu_run") {
 
     args = [
       "--share=" + invoker.share,
+      "--runner=" + invoker.runner,
       "--output=" + rebase_path(output_log_file),
     ]
     if (defined(invoker.virtio_net) && invoker.virtio_net) {

@@ -70,12 +70,6 @@ if(CONFIG_CHIP)
         zephyr_set_openthread_config(${CHIP_OPENTHREAD_CONFIG})
     endif()
 
-    if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
-        set(DATA_MODEL_INTERFACE "enabled")
-    else()
-        set(DATA_MODEL_INTERFACE "disabled")
-    endif()
-
     # ==============================================================================
     # Generate configuration for CHIP GN build system
     # ==============================================================================
@@ -84,7 +78,6 @@ if(CONFIG_CHIP)
         LIB_SHELL CONFIG_CHIP_LIB_SHELL
         LIB_TESTS CONFIG_CHIP_BUILD_TESTS
         PROJECT_CONFIG ${CONFIG_CHIP_PROJECT_CONFIG}
-        DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
     )
 
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
@@ -108,9 +101,9 @@ if(CONFIG_CHIP)
     matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" FALSE)
     matter_add_gn_arg_bool("chip_enable_read_client" CONFIG_CHIP_ENABLE_READ_CLIENT)
 
-    if(BOARD STREQUAL "native_posix")
+    if(BOARD STREQUAL "native_sim")
         matter_add_gn_arg_string("target_cpu" "x86")
-    elseif(BOARD STREQUAL "native_posix_64")
+    elseif(BOARD STREQUAL "native_sim/native/64")
         matter_add_gn_arg_string("target_cpu" "x64")
     endif()
 

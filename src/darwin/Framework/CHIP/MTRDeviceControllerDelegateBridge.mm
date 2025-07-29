@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,12 +15,17 @@
  */
 
 #import "MTRDeviceControllerDelegateBridge.h"
+
+#import "MTRCommissioneeInfo_Internal.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTREndpointInfo_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+#import "MTRProductIdentity.h"
+#import "MTRUtilities.h"
 
 using namespace chip::Tracing::DarwinFramework;
 
@@ -124,21 +128,25 @@ void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
 {
     MTRDeviceController * strongController = mController;
-
-    chip::VendorId vendorId = info.basic.vendorId;
-    uint16_t productId = info.basic.productId;
-
-    MTR_LOG("%@ DeviceControllerDelegate Read Commissioning Info. VendorId %u ProductId %u", strongController, vendorId, productId);
-
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue && strongController) {
-        if ([strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
-            dispatch_async(mQueue, ^{
-                auto * info = [[MTRProductIdentity alloc] initWithVendorID:@(vendorId) productID:@(productId)];
-                [strongDelegate controller:strongController readCommissioningInfo:info];
-            });
-        }
+    VerifyOrReturn(strongDelegate && mQueue && strongController);
+
+    // TODO: These checks are pointless since currently mController == mDelegate
+    BOOL wantCommissioneeInfo = [strongDelegate respondsToSelector:@selector(controller:readCommissioneeInfo:)];
+    BOOL wantProductIdentity = [strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)];
+    if (wantCommissioneeInfo || wantProductIdentity) {
+        auto * commissioneeInfo = [[MTRCommissioneeInfo alloc] initWithCommissioningInfo:info commissioningParameters:mCommissioningParameters];
+        dispatch_async(mQueue, ^{
+            if (wantCommissioneeInfo) { // prefer the newer delegate method over the deprecated one
+                [strongDelegate controller:strongController readCommissioneeInfo:commissioneeInfo];
+            } else if (wantProductIdentity) {
+                [strongDelegate controller:strongController readCommissioningInfo:commissioneeInfo.productIdentity];
+            }
+        });
     }
+
+    // Don't hold on to the commissioning parameters now that we don't need them anymore.
+    mCommissioningParameters = nil;
 }
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
@@ -183,20 +191,34 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     }
 }
 
+void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR error)
+{
+    using namespace chip::Controller;
+
+    MTRDeviceController * strongController = mController;
+
+    MTR_LOG("%@ DeviceControllerDelegate stage %s completed for nodeID 0x%016llx with status %s", strongController, StageToString(stageCompleted), peerId.GetNodeId(), error.AsString());
+
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+
+    if (strongDelegate && mQueue && strongController && error == CHIP_NO_ERROR && (stageCompleted == CommissioningStage::kFailsafeBeforeWiFiEnable || stageCompleted == CommissioningStage::kFailsafeBeforeThreadEnable)) {
+        // We're about to send the ConnectNetwork command.  Let our delegate
+        // know that the other side now has network credentials.
+        NSNumber * nodeID = @(peerId.GetNodeId());
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioneeHasReceivedNetworkCredentials:)]) {
+            dispatch_async(mQueue, ^{
+                [strongDelegate controller:strongController commissioneeHasReceivedNetworkCredentials:nodeID];
+            });
+        }
+    }
+}
+
 void MTRDeviceControllerDelegateBridge::SetDeviceNodeID(chip::NodeId deviceNodeId)
 {
     mDeviceNodeId = deviceNodeId;
 }
 
-@implementation MTRProductIdentity
-
-- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID
+void MTRDeviceControllerDelegateBridge::SetCommissioningParameters(MTRCommissioningParameters * commissioningParameters)
 {
-    if (self = [super init]) {
-        _vendorID = vendorID;
-        _productID = productID;
-    }
-    return self;
+    mCommissioningParameters = commissioningParameters;
 }
-
-@end

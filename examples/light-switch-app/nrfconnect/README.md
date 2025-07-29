@@ -650,7 +650,7 @@ To perform the unicast binding process, complete the following steps:
 
     -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
         is an ACL for the communication with the CHIP Tool.
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
+    -   `{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
         is an ACL for binding (cluster no. 6 is the On/Off cluster and the
         cluster no. 8 is the Level Control cluster).
 

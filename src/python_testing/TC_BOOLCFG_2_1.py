@@ -72,7 +72,7 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_BOOLCFG_2_1(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
         all_alarm_mode_bitmap_bits = functools.reduce(
             ior, [b.value for b in Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap])
         all_sensor_fault_bitmap_bits = functools.reduce(

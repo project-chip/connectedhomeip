@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2021-2023, 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,16 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/BufferReader.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <src/app/clusters/ota-requestor/OTADownloader.h>
-#include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
+
+#include "OtaSupport.h"
 
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
@@ -260,7 +262,7 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %s", ErrorStr(status));
+        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %" CHIP_ERROR_FORMAT, status.Format());
         GetRequestorInstance()->CancelImageUpdate();
     }
 }
@@ -352,6 +354,13 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     imageProcessor->ReleaseBlock();
 }
 
+void OTAImageProcessorImpl::Cleanup()
+{
+    AbortAllProcessors();
+    Clear();
+    GetRequestorInstance()->Reset();
+}
+
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     CHIP_ERROR error      = CHIP_NO_ERROR;
@@ -369,15 +378,18 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Apply action for tag %d processor failed.", (uint8_t) pair.first);
-                // Revert all previously applied actions if current apply action fails.
-                // Reset image processor and requestor states.
-                imageProcessor->AbortAllProcessors();
-                imageProcessor->Clear();
-                GetRequestorInstance()->Reset();
-
+                imageProcessor->Cleanup();
                 return;
             }
         }
+    }
+
+    // Execute OTA_CommitImage once all ApplyAction will be done to avoid app image update when an other OTA processor failed
+    if (OTA_CommitImage(NULL) != gOtaSuccess_c)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
+        imageProcessor->Cleanup();
+        return;
     }
 
     for (auto const & pair : imageProcessor->mProcessorMap)
@@ -390,12 +402,13 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
     PlatformMgr().HandleServerShuttingDown();
-
-    // Set the necessary information to inform the SSBL that a new image is available
-    // and trigger the actual device reboot after some time, to take into account
-    // queued actions, e.g. sending events to a subscription
+    /*
+     * Set the necessary information to inform the SSBL/bootloader that a new image
+     * is available and trigger the actual device reboot after some time, to take
+     * into account queued actions, e.g. sending events to a subscription.
+     */
     SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
+        chip::System::Clock::Milliseconds32(imageProcessor->mDelayBeforeRebootSec * 1000 + CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
         [](chip::System::Layer *, void *) { OtaHookReset(); }, nullptr);
 }
 

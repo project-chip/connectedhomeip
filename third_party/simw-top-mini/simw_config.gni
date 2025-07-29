@@ -12,4 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Configuration file
+import("//build_overrides/build.gni")
+
+# chip_se05x_smcom:
+# To configure the physical connection to secure element.
+# Possible values: t=1oi2c (For T=1 Protocol over I2C), vcom (For COM port on windows).
+
+# chip_se05x_auth:
+# To configure the session type to SE05x.
+# Possible values: none (For plain session), scp03 (Platform SCP03 authenticated session).
+
+declare_args() {
+  chip_se05x_smcom = "t=1oi2c"
+  chip_se05x_auth = "none"
+}

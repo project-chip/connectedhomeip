@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +24,7 @@
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
+#import "MTRCommissioningParameters_Internal.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
@@ -34,6 +34,7 @@
 #import "MTRDeviceController_Concrete.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
+#import "MTREndpointInfo_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
@@ -106,8 +107,6 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic, readonly, nullable) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (nonatomic, readonly, nullable) NSMutableArray<MTRServerEndpoint *> * serverEndpoints;
 
-@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
-
 @property (nonatomic, readonly) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
 
 // Whether we should be advertising our operational identity when we are not suspended.
@@ -175,10 +174,9 @@ using namespace chip::Tracing::DarwinFramework;
             storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
                           startSuspended:(BOOL)startSuspended
 {
-    if (self = [super initForSubclasses:startSuspended]) {
+    if (self = [super initForSubclasses:startSuspended uniqueIdentifier:uniqueIdentifier]) {
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
-        self.uniqueIdentifier = uniqueIdentifier;
 
         // Setup assertion variables
         _keepRunningAssertionCounter = 0;
@@ -270,6 +268,7 @@ using namespace chip::Tracing::DarwinFramework;
         if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kDeviceControllerErrorPartialDacVerifierInit]) {
             return nil;
         }
+        _partialDACVerifier->EnableVerboseLogs(true);
 
         _operationalCredentialsDelegate = new MTROperationalCredentialsDelegate(self);
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kDeviceControllerErrorOperationalCredentialsInit]) {
@@ -451,6 +450,14 @@ using namespace chip::Tracing::DarwinFramework;
     for (MTRDevice * device in devices) {
         [device invalidate];
     }
+
+    // Since MTRDevice invalidate may issue asynchronous writes to storage, perform a
+    // block synchronously on the storage delegate queue so the async write operations
+    // get to run, in case the API client tears down the storage backend afterwards.
+    [self.controllerDataStore synchronouslyPerformBlock:^{
+        MTR_LOG("%@ Finished flushing data write operations", self);
+    }];
+
     [self stopBrowseForCommissionables];
 
     [_factory controllerShuttingDown:self];
@@ -686,7 +693,9 @@ using namespace chip::Tracing::DarwinFramework;
             trustStore = chip::Credentials::GetTestAttestationTrustStore();
         }
 
+        // TODO: Pass a revocation delegate to DefaultDACVerifier!
         _defaultDACVerifier = new chip::Credentials::DefaultDACVerifier(trustStore);
+        _defaultDACVerifier->EnableVerboseLogs(true);
 
         if (startupParams.certificationDeclarationCertificates) {
             auto cdTrustStore = _defaultDACVerifier->GetCertificationDeclarationTrustStore();
@@ -944,6 +953,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error
 {
+    MTR_LOG("%@ trying to commission node with ID 0x%016llX parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
+
     if (self.suspended) {
         MTR_LOG_ERROR("%@ suspended: can't commission device ID 0x%016llX with parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
         // TODO: Can we do a better error here?
@@ -955,6 +966,22 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     auto block = ^BOOL {
         chip::Controller::CommissioningParameters params;
+
+        std::vector<chip::app::AttributePathParams> extraReadPaths;
+        if (commissioningParams.readEndpointInformation) {
+            for (auto & path : MTREndpointInfo.requiredAttributePaths) {
+                extraReadPaths.emplace_back(path);
+            }
+        }
+        if (commissioningParams.extraAttributesToRead != nil) {
+            for (MTRAttributeRequestPath * path in commissioningParams.extraAttributesToRead) {
+                [path convertToAttributePathParams:extraReadPaths.emplace_back()];
+            }
+        }
+        if (!extraReadPaths.empty()) {
+            params.SetExtraReadPaths(chip::Span(extraReadPaths.data(), extraReadPaths.size()));
+        }
+
         if (commissioningParams.csrNonce) {
             params.SetCSRNonce(AsByteSpan(commissioningParams.csrNonce));
         }
@@ -963,6 +990,25 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
         if (commissioningParams.threadOperationalDataset) {
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
+        }
+        if (commissioningParams.acceptedTermsAndConditions && commissioningParams.acceptedTermsAndConditionsVersion) {
+            if (!chip::CanCastTo<uint16_t>([commissioningParams.acceptedTermsAndConditions unsignedIntValue])) {
+                MTR_LOG_ERROR("%@ Error: acceptedTermsAndConditions value should be between 0 and 65535", self);
+                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+                return NO;
+            }
+
+            if (!chip::CanCastTo<uint16_t>([commissioningParams.acceptedTermsAndConditionsVersion unsignedIntValue])) {
+                MTR_LOG_ERROR("%@ Error: acceptedTermsAndConditionsVersion value should be between 0 and 65535", self);
+                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+                return NO;
+            }
+
+            chip::Controller::TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = {
+                .acceptedTermsAndConditions = static_cast<uint16_t>([commissioningParams.acceptedTermsAndConditions unsignedIntValue]),
+                .acceptedTermsAndConditionsVersion = static_cast<uint16_t>([commissioningParams.acceptedTermsAndConditionsVersion unsignedIntValue])
+            };
+            params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
         }
         params.SetSkipCommissioningComplete(commissioningParams.skipCommissioningComplete);
         if (commissioningParams.wifiSSID) {
@@ -1044,6 +1090,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(deviceId);
+        self->_deviceControllerDelegateBridge->SetCommissioningParameters([commissioningParams copy]);
+
         auto errorCode = self->_cppCommissioner->Commission(deviceId, params);
         MATTER_LOG_METRIC(kMetricCommissionNode, errorCode);
         return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
@@ -1182,6 +1230,21 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     [deviceToReturn setStorageBehaviorConfiguration:_storageBehaviorConfiguration];
 
     return deviceToReturn;
+}
+
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID
+{
+    MTR_LOG("%@: Forgetting device with node ID: %@", self, nodeID);
+
+    // Tear down any existing MTRDevice for this nodeID first, so we don't run
+    // into issues with it storing data after we have deleted it.
+    [super forgetDeviceWithNodeID:nodeID];
+
+    if (_controllerDataStore) {
+        [_controllerDataStore clearResumptionInfoForNodeID:nodeID];
+        [_controllerDataStore clearDeviceDataForNodeID:nodeID];
+        [_controllerDataStore clearStoredClusterDataForNodeID:nodeID];
+    }
 }
 
 #ifdef DEBUG
@@ -1384,6 +1447,28 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return NO;
 }
 
+- (BOOL)definitelyUsesThreadForDevice:(chip::NodeId)nodeID
+{
+    if (!chip::IsOperationalNodeId(nodeID)) {
+        return NO;
+    }
+
+    // Get the corresponding MTRDevice object for the node id
+    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
+
+    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
+    // really nice if we had compile-time checking for this somehow...
+    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
+        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID, nodeID);
+        return NO;
+    }
+
+    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
+
+    BOOL usesThread = [concreteDevice deviceUsesThread];
+    return usesThread;
+}
+
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
     // TODO: Figure out whether the synchronization here makes sense.  What
@@ -1395,22 +1480,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return;
     }
 
-    // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
-    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
-
-    // TODO: Can we not just assume this isKindOfClass test is true?  Would be
-    // really nice if we had compile-time checking for this somehow...
-    if (![device isKindOfClass:MTRDevice_Concrete.class]) {
-        MTR_LOG_ERROR("%@ somehow has %@ instead of MTRDevice_Concrete for node ID 0x%016llX (%llu)", self, device, nodeID, nodeID);
-        completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    auto * concreteDevice = static_cast<MTRDevice_Concrete *>(device);
-
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
-    if ([concreteDevice deviceUsesThread]) {
+    if ([self definitelyUsesThreadForDevice:nodeID]) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -1621,12 +1693,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)operationalInstanceAdded:(NSNumber *)nodeID
 {
-    // Don't use deviceForNodeID here, because we don't want to create the
-    // device if it does not already exist.
-    os_unfair_lock_lock(self.deviceMapLock);
-    MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
-    os_unfair_lock_unlock(self.deviceMapLock);
+    MTR_LOG("%@ at fabric index %u notified about new operational node 0x%016llx (%llu)", self, self.fabricIndex,
+        nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
 
+    // If we don't have an existing MTRDevice for this node ID, that's fine;
+    // nothing to do.
+    MTRDevice * device = [self _deviceForNodeID:nodeID createIfNeeded:NO];
     if (device == nil) {
         return;
     }
@@ -1697,6 +1769,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     return nil;
+}
+
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    if (!self.controllerDataStore) {
+        // We have nothing stored, if we have no way to store.
+        return @[];
+    }
+
+    return self.controllerDataStore.nodesWithStoredData;
 }
 
 @end

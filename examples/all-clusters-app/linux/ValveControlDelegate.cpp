@@ -38,7 +38,6 @@ DataModel::Nullable<chip::Percent> ValveControlDelegate::HandleOpenValve(DataMod
     // In this demo application, the transition is considered instant,
     // so current level is set to the requested level and current state is set to kOpen.
     currentLevel = sLevel;
-    Attributes::CurrentState::Set(kValveEndpoint, ValveConfigurationAndControl::ValveStateEnum::kOpen);
 
     return DataModel::Nullable<chip::Percent>(currentLevel);
 }
@@ -48,8 +47,6 @@ CHIP_ERROR ValveControlDelegate::HandleCloseValve()
     sLastOpenDuration = 0;
     sLevel            = 0;
     ReturnErrorOnFailure(ValveConfigurationAndControl::UpdateCurrentLevel(kValveEndpoint, sLevel));
-    ReturnErrorOnFailure(
-        ValveConfigurationAndControl::UpdateCurrentState(kValveEndpoint, ValveConfigurationAndControl::ValveStateEnum::kClosed));
     ChipLogProgress(NotSpecified, "Valve closed");
     return CHIP_NO_ERROR;
 }

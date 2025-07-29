@@ -25,7 +25,7 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/NetworkCommissioning.h>
-#include <platform/NuttX/dbus/openthread/introspect.h>
+#include <platform/NuttX/dbus/openthread/DBusOpenthread.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 

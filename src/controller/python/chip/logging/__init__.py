@@ -16,8 +16,8 @@
 
 import logging
 
-from chip.logging.library_handle import _GetLoggingLibraryHandle
-from chip.logging.types import LogRedirectCallback_t
+from .library_handle import _GetLoggingLibraryHandle
+from .types import LogRedirectCallback_t
 
 # Defines match src/lib/support/logging/Constants.h (LogCategory enum)
 LOG_CATEGORY_NONE = 0

@@ -22,12 +22,13 @@
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
+#if SL_WIFI
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
+#endif // SL_WIFI
+
 extern "C" {
 #include "btl_interface.h"
 #include "sl_core.h"
-#if SL_WIFI
-#include "spi_multiplex.h"
-#endif // SL_WIFI
 }
 
 /// No error, operation OK
@@ -45,7 +46,7 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
 {
     VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
 #endif
 
@@ -57,7 +58,7 @@ CHIP_ERROR OTAFirmwareProcessor::Clear()
     OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
     mDescriptorProcessed = false;
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
 #endif
 
@@ -70,12 +71,12 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
         /* 16 bytes to used to store undecrypted data because of unalignment */
         mAccumulator.Init(requestedOtaMaxBlockSize + 16);
 #endif
     }
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
     memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
     memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());

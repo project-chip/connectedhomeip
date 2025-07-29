@@ -17,7 +17,6 @@
  */
 
 #include <EnergyEvseDelegateImpl.h>
-#include <EnergyTimeUtils.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
@@ -32,16 +31,6 @@ using namespace chip::app::Clusters::EnergyEvse::Attributes;
 
 using chip::app::LogEvent;
 using chip::Protocols::InteractionModel::Status;
-
-EnergyEvseDelegate::~EnergyEvseDelegate()
-{
-    // TODO Fix this as part of issue #30993 refactoring
-    if (!mVehicleID.IsNull())
-    {
-        ChipLogDetail(AppServer, "Freeing VehicleID");
-        delete[] mVehicleID.Value().data();
-    }
-}
 
 /**
  * @brief   Called when EVSE cluster receives Disable command
@@ -62,7 +51,8 @@ Status EnergyEvseDelegate::Disable()
     ComputeMaxChargeCurrentLimit();
 
     /* update MaximumDischargeCurrent to 0 */
-    SetMaximumDischargeCurrent(0);
+    mMaximumDischargingCurrentLimitFromCommand = 0;
+    ComputeMaxDischargeCurrentLimit();
 
     return HandleStateMachineEvent(EVSEStateMachineEvent::DisabledEvent);
 }
@@ -79,15 +69,15 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
 
-    if (maximumChargeCurrent < kMinimumChargeCurrent)
+    if (maximumChargeCurrent < kMinimumChargeCurrentLimit)
     {
         ChipLogError(AppServer, "Maximum Current outside limits");
         return Status::ConstraintError;
     }
 
-    if (minimumChargeCurrent < kMinimumChargeCurrent)
+    if (minimumChargeCurrent < kMinimumChargeCurrentLimit)
     {
-        ChipLogError(AppServer, "Maximum Current outside limits");
+        ChipLogError(AppServer, "Minimum Current outside limits");
         return Status::ConstraintError;
     }
 
@@ -100,13 +90,13 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
     if (chargingEnabledUntil.IsNull())
     {
         /* Charging enabled indefinitely */
-        ChipLogError(AppServer, "Charging enabled indefinitely");
+        ChipLogProgress(AppServer, "Charging enabled indefinitely");
         SetChargingEnabledUntil(chargingEnabledUntil);
     }
     else
     {
         /* check chargingEnabledUntil is in the future */
-        ChipLogError(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
+        ChipLogProgress(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
         SetChargingEnabledUntil(chargingEnabledUntil);
     }
 
@@ -131,10 +121,124 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableDischarging() called.");
 
-    // TODO save the maxDischarging Current
-    // TODO Do something with timestamp
+    if (maximumDischargeCurrent < kMinimumChargeCurrentLimit)
+    {
+        ChipLogError(AppServer, "Maximum Discharging Current outside limits - cannot be negative");
+        return Status::ConstraintError;
+    }
+
+    if (dischargingEnabledUntil.IsNull())
+    {
+        /* Discharging enabled indefinitely */
+        ChipLogProgress(AppServer, "Discharging enabled indefinitely");
+        SetDischargingEnabledUntil(dischargingEnabledUntil);
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Discharging enabled until: %lu",
+                        static_cast<long unsigned int>(dischargingEnabledUntil.Value()));
+        SetDischargingEnabledUntil(dischargingEnabledUntil);
+    }
+
+    /* If it looks ok, store the max discharging current */
+    mMaximumDischargingCurrentLimitFromCommand = maximumDischargeCurrent;
+    ComputeMaxDischargeCurrentLimit();
+
+    // TODO persist these to KVS
 
     return HandleStateMachineEvent(EVSEStateMachineEvent::DischargingEnabledEvent);
+}
+
+/**
+ * @brief    Helper function to get the earliest time from two Nullable<uint32_t> values
+ *
+ * If either time is null, it returns the other time. If both are non-null, it returns the earlier one.
+ */
+static DataModel::Nullable<uint32_t> GetEarliestTime(const DataModel::Nullable<uint32_t> & time1,
+                                                     const DataModel::Nullable<uint32_t> & time2)
+{
+    if (time1.IsNull())
+        return time2;
+    if (time2.IsNull())
+        return time1;
+    return (time1.Value() < time2.Value()) ? time1 : time2;
+}
+
+/**
+ * @brief    Helper function to check if a time value has expired
+ *
+ * @param timeValue The Nullable<uint32_t> time value to check
+ * @param currentTime The current time in seconds since epoch
+ * @return true if the time has expired, false otherwise
+ */
+static bool IsTimeExpired(const DataModel::Nullable<uint32_t> & timeValue, uint32_t currentTime)
+{
+    return !timeValue.IsNull() && (timeValue.Value() <= currentTime);
+}
+/**
+ * @brief    Helper function to handle timer expiration when in enabled state
+ *
+ * @param matterEpochSeconds Current time in Matter epoch seconds
+ * This function is called when the EVSE is in an enabled state
+ * (either charging or discharging) and the timer expires.
+ * It checks if the charging or discharging enabled times have expired
+ * and updates the EVSE state accordingly.
+ * If both charging and discharging have expired or are Zero, it disables the EVSE.
+ * If only one has expired, it updates the state to the other enabled state.
+ * If both are still valid, it does nothing.
+ */
+void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeconds)
+{
+
+    DataModel::Nullable<uint32_t> chargingEnabledUntil    = GetChargingEnabledUntil();
+    DataModel::Nullable<uint32_t> dischargingEnabledUntil = GetDischargingEnabledUntil();
+
+    bool chargingExpired    = IsTimeExpired(chargingEnabledUntil, matterEpochSeconds);
+    bool dischargingExpired = IsTimeExpired(dischargingEnabledUntil, matterEpochSeconds);
+
+    if (chargingExpired)
+    {
+        // set to zero to indicate disabled
+        SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(0));
+
+        // update MinimumChargeCurrent & MaximumChargeCurrent to 0
+        SetMinimumChargeCurrent(0);
+
+        mMaximumChargingCurrentLimitFromCommand = 0;
+        ComputeMaxChargeCurrentLimit();
+
+        // Change to discharging-only if discharging is still enabled
+        if (!dischargingExpired)
+        {
+            SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+        }
+        else
+        {
+            // If both charging and discharging have expired, disable the EVSE
+            Disable();
+        }
+    }
+
+    if (dischargingExpired)
+    {
+        // set to zero to indicate disabled
+        SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(0));
+
+        // update MaximumDischargeCurrent to 0
+        mMaximumDischargingCurrentLimitFromCommand = 0;
+        ComputeMaxDischargeCurrentLimit();
+
+        // Change to charging-only if charging is still enabled
+        if (!chargingExpired)
+        {
+            SetSupplyState(SupplyStateEnum::kChargingEnabled);
+        }
+        else
+        {
+            // If both charging and discharging have expired, disable the EVSE
+            Disable();
+        }
+    }
 }
 
 /**
@@ -149,55 +253,77 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
  */
 Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
 {
-
-    uint32_t chipEpoch = 0;
+    // Determine the relevant timeout based on current supply state
     DataModel::Nullable<uint32_t> enabledUntilTime;
-
-    if (mSupplyState == SupplyStateEnum::kChargingEnabled)
+    switch (mSupplyState)
     {
+    case SupplyStateEnum::kChargingEnabled:
         enabledUntilTime = GetChargingEnabledUntil();
-    }
-    else if (mSupplyState == SupplyStateEnum::kDischargingEnabled)
-    {
+        break;
+    case SupplyStateEnum::kDischargingEnabled:
         enabledUntilTime = GetDischargingEnabledUntil();
-    }
-    else
-    {
-        // In all other states the EVSE is disabled
+        break;
+    case SupplyStateEnum::kEnabled:
+        // For enabled state, use the earliest of charging or discharging timeout
+        enabledUntilTime = GetEarliestTime(GetChargingEnabledUntil(), GetDischargingEnabledUntil());
+        break;
+    default:
+        // In all other states the EVSE is disabled, no timer needed
         return Status::Success;
     }
 
     if (enabledUntilTime.IsNull())
     {
-        /* This is enabled indefinitely so don't schedule a callback */
+        ChipLogDetail(AppServer, "EVSE is enabled indefinitely, no timer needed");
         return Status::Success;
     }
 
-    CHIP_ERROR err = DeviceEnergyManagement::GetEpochTS(chipEpoch);
-    if (err == CHIP_NO_ERROR)
+    uint32_t matterEpochSeconds = 0;
+    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
+    if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
-        /* time is sync'd */
-        int32_t delta = static_cast<int32_t>(enabledUntilTime.Value() - chipEpoch);
-        if (delta > 0)
-        {
-            /* The timer hasn't expired yet - set a timer to check in the future */
-            ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %ld seconds", static_cast<long int>(delta));
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
-        }
-        else
-        {
-            /* we have gone past the enabledUntilTime - so we need to disable */
-            ChipLogDetail(AppServer, "EVSE enable time expired, disabling charging");
-            Disable();
-        }
-    }
-    else if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
-    {
-        /* Real time isn't sync'd -lets check again in 30 seconds - otherwise keep the charger enabled */
+        // Real time isn't sync'd - check again in 30 seconds
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec),
                                               EvseCheckTimerExpiry, this);
+        return Status::Success;
     }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        return Status::Failure; // Can't get time, skip scheduling
+    }
+
+    if (enabledUntilTime.Value() > matterEpochSeconds)
+    {
+        // Timer hasn't expired yet - schedule future check
+        uint32_t delta = enabledUntilTime.Value() - matterEpochSeconds;
+        ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %lu seconds", static_cast<unsigned long>(delta));
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
+        return Status::Success;
+    }
+
+    // Time has expired - handle expiration based on current state
+    ChipLogDetail(AppServer, "EVSE enable time expired, processing expiration");
+
+    if (mSupplyState == SupplyStateEnum::kChargingEnabled || mSupplyState == SupplyStateEnum::kDischargingEnabled)
+    {
+        Disable();
+    }
+    else if (mSupplyState == SupplyStateEnum::kEnabled)
+    {
+        HandleEnabledStateExpiration(matterEpochSeconds);
+        // Call ourselves again now that one of our 2 timers has expired
+        // The other timer expiry may need to be scheduled now
+        ScheduleCheckOnEnabledTimeout();
+    }
+
     return Status::Success;
+}
+
+void EnergyEvseDelegate::CancelActiveTimers()
+{
+    // Cancel the EVSE check timer if it is active
+    DeviceLayer::SystemLayer().CancelTimer(EvseCheckTimerExpiry, this);
 }
 
 void EnergyEvseDelegate::EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate)
@@ -334,23 +460,65 @@ Status EnergyEvseDelegate::HwRegisterEvseCallbackHandler(EVSECallbackFunc handle
 
 /**
  * @brief    Called by EVSE Hardware to notify the delegate of the maximum
- *           current limit supported by the hardware.
+ *           current limit supported by the hardware (for charging).
  *
  *           This is normally called at start-up.
  *
  * @param    currentmA - Maximum current limit supported by the hardware
  */
-Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
+Status EnergyEvseDelegate::HwSetMaxHardwareChargeCurrentLimit(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
 
     /* there is no attribute to store this so store in private variable */
-    mMaxHardwareCurrentLimit = currentmA;
+    mMaxHardwareChargeCurrentLimit = currentmA;
 
     return ComputeMaxChargeCurrentLimit();
+}
+
+/**
+ * @brief    Called by EVSE Hardware to notify the delegate of the maximum
+ *           current limit supported by the hardware (for discharging).
+ *
+ *           This is normally called at start-up.
+ *
+ * @param    currentmA - Maximum current limit supported by the hardware for discharging
+ */
+Status EnergyEvseDelegate::HwSetMaxHardwareDischargeCurrentLimit(int64_t currentmA)
+{
+    if (currentmA < kMinimumChargeCurrentLimit)
+    {
+        return Status::ConstraintError;
+    }
+
+    /* there is no attribute to store this so store in private variable */
+    mMaxHardwareDischargeCurrentLimit = currentmA;
+
+    return ComputeMaxDischargeCurrentLimit();
+}
+
+/**
+ * @brief    Called by EVSE Hardware to notify the delegate of the nominal
+ *           mains voltage (in mV)
+ *
+ *           This is normally called at start-up.
+ *
+ * @param   voltage_mV - nominal mains voltage
+ */
+Status EnergyEvseDelegate::HwSetNominalMainsVoltage(int64_t voltage_mV)
+{
+    if (voltage_mV < kMinimumMainsVoltage_mV)
+    {
+        ChipLogError(AppServer, "Mains voltage looks too low - check value is in mV");
+        return Status::ConstraintError;
+    }
+
+    mNominalMainsVoltage = voltage_mV;
+
+    return Status::Success;
 }
 
 /**
@@ -364,7 +532,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
@@ -389,7 +557,7 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
@@ -561,35 +729,57 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
  */
 Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
-    // TODO this code to be refactored - See Issue #30993
-    if (!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value()))
+
+    if ((!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value())) || (mVehicleID.IsNull() && newValue.empty()))
     {
+        // No change in VehicleID, nothing to do
         return Status::Success;
     }
 
-    /* create a copy of the string so the callee doesn't have to keep it */
-    char * destinationBuffer = new char[kMaxVehicleIDBufSize];
-
-    MutableCharSpan destinationString(destinationBuffer, kMaxVehicleIDBufSize);
-    CHIP_ERROR err = CopyCharSpanToMutableCharSpan(newValue, destinationString);
-    if (err != CHIP_NO_ERROR)
+    if (newValue.size() > kMaxVehicleIDBufSize)
     {
-        ChipLogError(AppServer, "HwSetVehicleID - could not copy vehicleID");
-        delete[] destinationBuffer;
+        ChipLogError(AppServer, "HwSetVehicleID - input too long. Max size = %d", kMaxVehicleIDBufSize);
         return Status::Failure;
     }
 
-    if (!mVehicleID.IsNull())
+    // If the input is empty, treat it as a request to clear the vehicle ID
+    if (newValue.empty())
     {
-        delete[] mVehicleID.Value().data();
+        mVehicleID.SetNull();
+        ChipLogDetail(AppServer, "VehicleID cleared");
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
+        return Status::Success;
     }
 
-    mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
+    memcpy(mVehicleIDBuf, newValue.data(), newValue.size());
+    mVehicleID = MakeNullable(CharSpan(mVehicleIDBuf, newValue.size()));
 
-    ChipLogDetail(AppServer, "VehicleID updated %.*s", static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data());
+    ChipLogDetail(AppServer, "VehicleID updated %s", NullTerminated(mVehicleID.Value()).c_str());
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
 
     return Status::Success;
+}
+
+/**
+ * @brief Allows the caller to get a copy of the VehicleID into its own
+ *        MutableCharSpan avoiding potential use-after-free if vehicleID
+ *        was to change in the background
+ */
+CHIP_ERROR EnergyEvseDelegate::HwGetVehicleID(DataModel::Nullable<MutableCharSpan> & outValue)
+{
+    if (mVehicleID.IsNull())
+    {
+        outValue.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
+    if (outValue.IsNull())
+    {
+        // Defensive: outValue must be non-null to copy into it
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CopyCharSpanToMutableCharSpan(mVehicleID.Value(), outValue.Value());
 }
 
 /**
@@ -726,8 +916,20 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
         SendEnergyTransferStartedEvent();
         break;
     case SupplyStateEnum::kDischargingEnabled:
-        // TODO ComputeMaxDischargeCurrentLimit() - Needs to be implemented
+        ComputeMaxDischargeCurrentLimit();
         SetState(StateEnum::kPluggedInDischarging);
+        SendEnergyTransferStartedEvent();
+        break;
+    case SupplyStateEnum::kEnabled:
+        /* We are enabled for both charging and discharging
+        since the vehicle is asking for demand, we should start charging
+        NOTE: for discharging the PowerAdjustment feature of DEM is used.
+        This assumes we are not in TimeOfUse mode and charging should begin
+        as soon as the vehicle asks for demand.
+        */
+        ComputeMaxChargeCurrentLimit();
+        ComputeMaxDischargeCurrentLimit();
+        SetState(StateEnum::kPluggedInCharging);
         SendEnergyTransferStartedEvent();
         break;
     case SupplyStateEnum::kDisabled:
@@ -737,6 +939,9 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
          * but we can't charge or discharge now - leave it as kPluggedInDemand */
         SetState(StateEnum::kPluggedInDemand);
         break;
+    case SupplyStateEnum::kUnknownEnumValue:
+        ChipLogError(AppServer, "EVSE: HandleEVDemandEvent called in unexpected SupplyState");
+        return Status::Failure;
     default:
         break;
     }
@@ -768,8 +973,29 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         return status;
     }
 
-    /* update SupplyState to say that charging is now enabled */
-    SetSupplyState(SupplyStateEnum::kChargingEnabled);
+    switch (mSupplyState)
+    {
+    case SupplyStateEnum::kDisabled:
+        // it was kDisabled, then the state becomes kChargingEnabled
+        SetSupplyState(SupplyStateEnum::kChargingEnabled);
+        break;
+    case SupplyStateEnum::kChargingEnabled:
+        // No change
+        break;
+    case SupplyStateEnum::kDischargingEnabled:
+        // If the SupplyState was already kDischargingEnabled the state becomes kEnabled
+        SetSupplyState(SupplyStateEnum::kEnabled);
+        break;
+    case SupplyStateEnum::kDisabledError:
+    case SupplyStateEnum::kDisabledDiagnostics:
+        break;
+    case SupplyStateEnum::kEnabled:
+        // No change
+        break;
+    case SupplyStateEnum::kUnknownEnumValue:
+        ChipLogError(AppServer, "EVSE: ChargingEnabledEvent called in unexpected SupplyState");
+        return Status::Failure;
+    }
 
     switch (mState)
     {
@@ -782,14 +1008,11 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         SendEnergyTransferStartedEvent();
         break;
     case StateEnum::kPluggedInCharging:
-        break;
     case StateEnum::kPluggedInDischarging:
-        /* Switched from discharging to charging */
-        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
-
-        ComputeMaxChargeCurrentLimit();
-        SetState(StateEnum::kPluggedInCharging);
-        SendEnergyTransferStartedEvent();
+        /* Switching from Discharging to Charging is controlled via PowerAdjust
+           command from DEM - we don't do anything specific here
+           and we do not send EnergyTransferStopped and StartedEvents when switching
+           from Discharging to Charging and vice-versa. */
         break;
     default:
         break;
@@ -807,8 +1030,30 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
     {
         return status;
     }
-    /* update SupplyState to say that charging is now enabled */
-    SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+
+    switch (mSupplyState)
+    {
+    case SupplyStateEnum::kDisabled:
+        // it was kDisabled, then the state becomes kDischargingEnabled
+        SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+        break;
+    case SupplyStateEnum::kChargingEnabled:
+        // If the SupplyState was already kChargingEnabled the state becomes kEnabled
+        SetSupplyState(SupplyStateEnum::kEnabled);
+        break;
+    case SupplyStateEnum::kDischargingEnabled:
+        // No change
+        break;
+    case SupplyStateEnum::kDisabledError:
+    case SupplyStateEnum::kDisabledDiagnostics:
+        break;
+    case SupplyStateEnum::kEnabled:
+        // No change
+        break;
+    case SupplyStateEnum::kUnknownEnumValue:
+        ChipLogError(AppServer, "EVSE: DischargingEnabledEvent called in unexpected SupplyState");
+        return Status::Failure;
+    }
 
     switch (mState)
     {
@@ -816,17 +1061,10 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
     case StateEnum::kPluggedInNoDemand:
         break;
     case StateEnum::kPluggedInDemand:
-        // TODO call ComputeMaxDischargeCurrentLimit()
-        SetState(StateEnum::kPluggedInDischarging);
-        SendEnergyTransferStartedEvent();
-        break;
     case StateEnum::kPluggedInCharging:
-        /* Switched from charging to discharging */
-        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
-
-        // TODO call ComputeMaxDischargeCurrentLimit()
-        SetState(StateEnum::kPluggedInDischarging);
-        SendEnergyTransferStartedEvent();
+        /* Discharging is controlled from DEM PowerAdjust command - we don't change state here or send events here */
+        ComputeMaxDischargeCurrentLimit();
+        ComputeMaxDischargeCurrentLimit();
         break;
     case StateEnum::kPluggedInDischarging:
     default:
@@ -846,7 +1084,7 @@ Status EnergyEvseDelegate::HandleDisabledEvent()
         return status;
     }
 
-    /* update SupplyState to say that charging is now enabled */
+    /* update SupplyState to disabled */
     SetSupplyState(SupplyStateEnum::kDisabled);
 
     switch (mState)
@@ -921,7 +1159,7 @@ Status EnergyEvseDelegate::HandleFaultCleared()
  *  @brief   Called to compute the safe charging current limit
  *
  * mActualChargingCurrentLimit is the minimum of:
- *   - MaxHardwareCurrentLimit (of the hardware)
+ *   - MaxHardwareChargeCurrentLimit (of the hardware)
  *   - CircuitCapacity (set by the electrician - less than the hardware)
  *   - CableAssemblyLimit (detected when the cable is inserted)
  *   - MaximumChargeCurrent (from charging command)
@@ -933,7 +1171,7 @@ Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
     int64_t oldValue;
 
     oldValue                    = mActualChargingCurrentLimit;
-    mActualChargingCurrentLimit = mMaxHardwareCurrentLimit;
+    mActualChargingCurrentLimit = mMaxHardwareChargeCurrentLimit;
     mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mCircuitCapacity);
     mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mCableAssemblyCurrentLimit);
     mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mMaximumChargingCurrentLimitFromCommand);
@@ -948,17 +1186,65 @@ Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id);
 
         /* Call the EV Charger hardware current limit callback */
-        NotifyApplicationCurrentLimitChange(mMaximumChargeCurrent);
+        NotifyApplicationChargeCurrentLimitChange(mMaximumChargeCurrent);
     }
     return Status::Success;
 }
 
-Status EnergyEvseDelegate::NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent)
+/**
+ *  @brief   Called to compute the safe discharging current limit
+ *
+ * mActualDischargingCurrentLimit is the minimum of:
+ *   - MaxHardwareDischargeCurrentLimit (of the hardware)
+ *   - CircuitCapacity (set by the electrician - less than the hardware)
+ *   - CableAssemblyLimit (detected when the cable is inserted)
+ *   - MaximumDischargeCurrent (from Enable Discharging command)
+ */
+Status EnergyEvseDelegate::ComputeMaxDischargeCurrentLimit()
+{
+    int64_t oldValue;
+
+    oldValue                       = mActualDischargingCurrentLimit;
+    mActualDischargingCurrentLimit = mMaxHardwareDischargeCurrentLimit;
+    mActualDischargingCurrentLimit = std::min(mActualDischargingCurrentLimit, mCircuitCapacity);
+    mActualDischargingCurrentLimit = std::min(mActualDischargingCurrentLimit, mCableAssemblyCurrentLimit);
+    mActualDischargingCurrentLimit = std::min(mActualDischargingCurrentLimit, mMaximumDischargingCurrentLimitFromCommand);
+
+    /* Set the actual max discharging current attribute */
+    mMaximumDischargeCurrent = mActualDischargingCurrentLimit;
+
+    if (oldValue != mMaximumDischargeCurrent)
+    {
+        ChipLogDetail(AppServer, "MaximumDischargeCurrent updated to %ld", static_cast<long>(mMaximumDischargeCurrent));
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id);
+
+        /* Call the EV Charger hardware current limit callback */
+        NotifyApplicationDischargeCurrentLimitChange(mMaximumDischargeCurrent);
+    }
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::NotifyApplicationChargeCurrentLimitChange(int64_t maximumChargeCurrent)
 {
     EVSECbInfo cbInfo;
 
     cbInfo.type                                 = EVSECallbackType::ChargeCurrentChanged;
     cbInfo.ChargingCurrent.maximumChargeCurrent = maximumChargeCurrent;
+
+    if (mCallbacks.handler != nullptr)
+    {
+        mCallbacks.handler(&cbInfo, mCallbacks.arg);
+    }
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::NotifyApplicationDischargeCurrentLimitChange(int64_t maximumDischargeCurrent)
+{
+    EVSECbInfo cbInfo;
+
+    cbInfo.type                                       = EVSECallbackType::DischargeCurrentChanged;
+    cbInfo.DischargingCurrent.maximumDischargeCurrent = maximumDischargeCurrent;
 
     if (mCallbacks.handler != nullptr)
     {
@@ -1076,26 +1362,24 @@ Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
 
     event.sessionID = mSession.mSessionID.Value();
     event.state     = mState;
-    /**
-     * A positive value indicates the EV has been enabled for charging and the value is
-     * taken directly from the MaximumChargeCurrent attribute.
-     * A negative value indicates that the EV has been enabled for discharging and the value can be taken
-     * from the MaximumDischargeCurrent attribute with its sign inverted.
-     */
 
-    if (mState == StateEnum::kPluggedInCharging)
-    {
-        /* Sample the energy meter for charging */
-        GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, mMeterValueAtEnergyTransferStart);
-        event.maximumCurrent = mMaximumChargeCurrent;
-    }
-    else if (mState == StateEnum::kPluggedInDischarging)
+    /* Sample the energy meter for charging */
+    GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, mImportedMeterValueAtEnergyTransferStart);
+    event.maximumCurrent = mMaximumChargeCurrent;
+
+    /* For V2X we may switch between charging and discharging, but we don't
+     * keep sending EnergyTransferStarted events */
+    if (GetInstance()->HasFeature(Feature::kV2x))
     {
         /* Sample the energy meter for discharging */
-        GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, mMeterValueAtEnergyTransferStart);
+        GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, mExportedMeterValueAtEnergyTransferStart);
 
-        /* discharging should have a negative current  */
-        event.maximumCurrent = -mMaximumDischargeCurrent;
+        event.maximumDischargeCurrent.SetValue(mMaximumDischargeCurrent);
+    }
+    else
+    {
+        mExportedMeterValueAtEnergyTransferStart = 0;
+        event.maximumDischargeCurrent.ClearValue();
     }
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
@@ -1123,17 +1407,17 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
     event.reason          = reason;
     int64_t meterValueNow = 0;
 
-    if (mState == StateEnum::kPluggedInCharging)
-    {
-        GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, meterValueNow);
-        event.energyTransferred = meterValueNow - mMeterValueAtEnergyTransferStart;
-    }
-    else if (mState == StateEnum::kPluggedInDischarging)
+    GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, meterValueNow);
+    event.energyTransferred = meterValueNow - mImportedMeterValueAtEnergyTransferStart;
+
+    if (GetInstance()->HasFeature(Feature::kV2x))
     {
         GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, meterValueNow);
-
-        /* discharging should have a negative value */
-        event.energyTransferred = mMeterValueAtEnergyTransferStart - meterValueNow;
+        event.energyDischarged.SetValue(mExportedMeterValueAtEnergyTransferStart - meterValueNow);
+    }
+    else
+    {
+        event.energyDischarged.ClearValue();
     }
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
@@ -1585,9 +1869,52 @@ DataModel::Nullable<Percent> EnergyEvseDelegate::GetStateOfCharge()
 {
     return mStateOfCharge;
 }
+CHIP_ERROR EnergyEvseDelegate::SetStateOfCharge(DataModel::Nullable<Percent> newValue)
+{
+    DataModel::Nullable<Percent> oldValue = mStateOfCharge;
+
+    mStateOfCharge = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "StateOfCharge updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "StateOfCharge updated to %d", mStateOfCharge.Value());
+        }
+
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, StateOfCharge::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<int64_t> EnergyEvseDelegate::GetBatteryCapacity()
 {
     return mBatteryCapacity;
+}
+CHIP_ERROR EnergyEvseDelegate::SetBatteryCapacity(DataModel::Nullable<int64_t> newValue)
+{
+    DataModel::Nullable<int64_t> oldValue = mBatteryCapacity;
+
+    mBatteryCapacity = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "BatteryCapacity updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "BatteryCapacity updated to %ld", static_cast<long>(mBatteryCapacity.Value()));
+        }
+
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, BatteryCapacity::Id);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 /* PNC attributes*/
@@ -1634,8 +1961,8 @@ bool EnergyEvseDelegate::IsEvsePluggedIn()
 void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
     /* Get Timestamp */
-    uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = DeviceEnergyManagement::GetEpochTS(chipEpoch);
+    uint32_t matterEpochSeconds = 0;
+    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1643,7 +1970,7 @@ void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue
         ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
-    mStartTime = chipEpoch;
+    mStartTime = matterEpochSeconds;
 
     mSessionEnergyChargedAtStart    = chargingMeterValue;
     mSessionEnergyDischargedAtStart = dischargingMeterValue;
@@ -1701,8 +2028,8 @@ void EvseSession::StopSession(EndpointId endpointId, int64_t chargingMeterValue,
 void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
 {
     /* Get Timestamp */
-    uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = DeviceEnergyManagement::GetEpochTS(chipEpoch);
+    uint32_t matterEpochSeconds = 0;
+    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1712,7 +2039,7 @@ void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
         return;
     }
 
-    uint32_t duration = chipEpoch - mStartTime;
+    uint32_t duration = matterEpochSeconds - mStartTime;
     mSessionDuration  = MakeNullable(duration);
     MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
 }

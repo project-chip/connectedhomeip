@@ -26,6 +26,7 @@
 #include "AndroidCurrentFabricRemover.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include "AndroidInteractionClient.h"
+#include "AndroidLogDownloadFromNode.h"
 #include <controller/java/ControllerConfig.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -124,6 +125,11 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     jclass controllerExceptionCls;
     err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
                                                         controllerExceptionCls);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Fail to create local ref for ChipDeviceControllerException");
+        return JNI_ERR;
+    }
     SuccessOrExit(err = sChipDeviceControllerExceptionCls.Init(controllerExceptionCls));
 
     ChipLogProgress(Controller, "Java class references loaded.");
@@ -1360,7 +1366,7 @@ JNI_METHOD(jlong, getDeviceBeingCommissionedPointer)(JNIEnv * env, jobject self,
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to get commissionee device: %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed to get commissionee device: %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return 0;
     }
@@ -1412,7 +1418,7 @@ JNI_METHOD(jlong, getGroupDevicePointer)(JNIEnv * env, jobject self, jlong handl
     if (device == nullptr)
     {
         CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-        ChipLogError(Controller, "GroupDeviceProxy handle is nullptr: %s", ErrorStr(err));
+        ChipLogError(Controller, "GroupDeviceProxy handle is nullptr: %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return 0;
     }
@@ -2057,6 +2063,28 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
     }
 
     return true;
+}
+
+JNI_METHOD(void, downloadLogFromNode)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint typeEnum, jlong timeout, jobject downloadLogCallback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrReturn(wrapper != nullptr,
+                   ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in downloadLogFromNode fails!"));
+
+    ChipLogProgress(Controller, "downloadLogFromNode() called with device ID and callback object");
+
+    err = AndroidLogDownloadFromNode::LogDownloadFromNode(wrapper->Controller(), static_cast<NodeId>(deviceId),
+                                                          static_cast<chip::app::Clusters::DiagnosticLogs::IntentEnum>(typeEnum),
+                                                          static_cast<uint16_t>(timeout), downloadLogCallback);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to download Log the device.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
 }
 
 JNI_METHOD(void, shutdownCommissioning)

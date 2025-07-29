@@ -30,12 +30,13 @@ using namespace ::chip::DeviceLayer::Internal;
 
 static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
+#if SL_WIFI
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
+#endif // SL_WIFI
+
 extern "C" {
 #include "btl_interface.h"
 #include "sl_core.h"
-#if SL_WIFI
-#include "spi_multiplex.h"
-#endif // SL_WIFI
 }
 
 namespace chip {
@@ -261,7 +262,7 @@ void OTAMultiImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %s", ErrorStr(status));
+        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %" CHIP_ERROR_FORMAT, status.Format());
         GetRequestorInstance()->CancelImageUpdate();
     }
 }

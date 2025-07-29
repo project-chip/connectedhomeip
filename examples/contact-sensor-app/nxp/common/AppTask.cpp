@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,12 +17,10 @@
  */
 
 #include "AppTask.h"
-
-#if CONFIG_LOW_POWER
-#include "PWR_Interface.h"
-#endif
+#include "ICDUtil.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/InteractionModelEngine.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #ifndef APP_DEVICE_TYPE_ENDPOINT
@@ -36,17 +34,10 @@ void ContactSensorApp::AppTask::PreInitMatterStack()
     ChipLogProgress(DeviceLayer, "Welcome to NXP Contact Sensor Demo App");
 }
 
-#if CONFIG_LOW_POWER
-void ContactSensorApp::AppTask::AppMatter_DisallowDeviceToSleep()
+void ContactSensorApp::AppTask::PostInitMatterStack()
 {
-    PWR_DisallowDeviceToSleep();
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
 }
-
-void ContactSensorApp::AppTask::AppMatter_AllowDeviceToSleep()
-{
-    PWR_AllowDeviceToSleep();
-}
-#endif
 
 ContactSensorApp::AppTask & ContactSensorApp::AppTask::GetDefaultInstance()
 {

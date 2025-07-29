@@ -223,7 +223,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 await TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
                                                  nodeid=self.dut_node_id+1, port=device.port)
                 break
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Some device IPs may fail, it tries all addresses until one works
                 continue
 
         try:
@@ -258,7 +258,7 @@ class TC_IDM_1_2(MatterBaseTest):
         try:
             await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
             # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
-        except ChipStackError:
+        except ChipStackError:  # chipstack-ok: Using try/except to validate DUT behavior without failing the test on expected errors, assert_raises would fail the test
             logging.info("DUT correctly supressed the response")
 
         # Verify that the command had the correct side effect even if a response was sent

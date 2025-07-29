@@ -35,7 +35,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -197,9 +197,8 @@ uint16_t BLEManagerImpl::_NumConnections()
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
-    mAdapterId   = aAdapterId;
-    mIsCentral   = aIsCentral;
-    mpBLEAdvUUID = "0xFFF6";
+    mAdapterId = aAdapterId;
+    mIsCentral = aIsCentral;
     return CHIP_NO_ERROR;
 }
 
@@ -322,7 +321,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         sInstance.mFlags.Clear(Flags::kControlOpInProgress);
@@ -478,7 +477,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
 
 exit:
     if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
@@ -503,7 +502,7 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -587,7 +586,7 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mpBLEAdvUUID, mDeviceName));
+                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR, mDeviceName));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
@@ -628,7 +627,7 @@ void BLEManagerImpl::DriveBLEState()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
@@ -731,7 +730,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        ChipLogError(Ble, "Failed to start a BLE can: %s", chip::ErrorStr(err));
+        ChipLogError(Ble, "Failed to start a BLE can: %" CHIP_ERROR_FORMAT, err.Format());
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
         return;
     }

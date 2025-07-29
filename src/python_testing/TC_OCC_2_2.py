@@ -65,7 +65,7 @@ class TC_OCC_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_2(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
 

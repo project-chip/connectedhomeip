@@ -58,6 +58,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
@@ -398,6 +399,7 @@ MTR_DIRECT_MEMBERS
             params.opCertStore = _opCertStore;
             params.certificateValidityPolicy = &_certificateValidityPolicy;
             params.sessionResumptionStorage = _sessionResumptionStorage;
+            params.dataModelProvider = app::CodegenDataModelProviderInstance(_persistentStorageDelegate);
             SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
@@ -819,7 +821,7 @@ MTR_DIRECT_MEMBERS
     } else {
         // No root certificate means the nocSigner is using the root keys, because
         // consumers must provide a root certificate whenever an ICA is used.
-        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
+        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromMTRKeypair(params.nocSigner, &pubKey);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;
@@ -1131,8 +1133,6 @@ MTR_DIRECT_MEMBERS
     for (MTRDeviceController_Concrete * controller in controllersCopy) {
         auto * compressedFabricId = controller.compressedFabricID;
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
-            ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
-                controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
             [controller operationalInstanceAdded:@(operationalID.GetNodeId())];
         }
 
@@ -1200,6 +1200,10 @@ MTR_DIRECT_MEMBERS
                           additionalRetransmitDelayMs:(nullable NSNumber *)additionalRetransmitDelayMs
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+
+    MTR_LOG("%@ setting MRP params: idle %@ active %@ threshold %@ additional retransmit delay %@",
+        self, idleRetransmitMs, activeRetransmitMs, activeThresholdMs, additionalRetransmitDelayMs);
+
     dispatch_async(_chipWorkQueue, ^{
         bool resetAdvertising;
         if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {

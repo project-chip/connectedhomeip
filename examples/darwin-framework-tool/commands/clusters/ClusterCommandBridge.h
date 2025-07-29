@@ -45,6 +45,8 @@ public:
 
     ~ClusterCommand() {}
 
+    using ModelCommand::SendCommand;
+
     CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         id commandFields;

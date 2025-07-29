@@ -46,7 +46,7 @@ from mobly import asserts
 class TC_OCC_2_3(MatterBaseTest):
     async def read_occ_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.OccupancySensing
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         return await self.read_single_attribute_check_success(endpoint=endpoint_id, cluster=cluster, attribute=attribute)
 
     def desc_TC_OCC_2_3(self) -> str:
@@ -97,7 +97,8 @@ class TC_OCC_2_3(MatterBaseTest):
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         if attributes.HoldTime.attribute_id not in attribute_list:
             logging.info("No HoldTime attribute supports. Terminate this test case")
-            self.skip_all_remaining_steps(4)
+            self.mark_all_remaining_steps_skipped(4)
+            return
         holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
 
         self.step(4)
@@ -132,7 +133,7 @@ class TC_OCC_2_3(MatterBaseTest):
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
             asserts.assert_equal(occupancy_pir_otou_delay_dut, holdtime_dut,
                                  "PIROccupiedToUnoccupiedDelay has a different value from HoldTime in reverse testing.")
-            # self.skip_all_remaining_steps("7a")
+            # self.mark_all_remaining_steps_skipped("7a")
         else:
             self.skip_step("6a")
             self.skip_step("6b")

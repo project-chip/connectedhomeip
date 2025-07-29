@@ -805,7 +805,7 @@ constexpr EntryData entryData1[] = {
     },
 };
 
-constexpr size_t entryData1Count = ArraySize(entryData1);
+constexpr size_t entryData1Count = MATTER_ARRAY_SIZE(entryData1);
 static_assert(entryData1Count == (kNumFabric1EntriesInEntryData1 + kNumFabric2EntriesInEntryData1),
               "Must maintain both fabric counts for some tests");
 
@@ -1772,22 +1772,22 @@ TEST_F(TestAccessControl, TestCreateReadEntry)
 TEST_F(TestAccessControl, TestDeleteEntry)
 {
     EntryData data[entryData1Count];
-    for (size_t pos = 0; pos < ArraySize(data); ++pos)
+    for (size_t pos = 0; pos < MATTER_ARRAY_SIZE(data); ++pos)
     {
-        for (size_t count = ArraySize(data) - pos; count > 0; --count)
+        for (size_t count = MATTER_ARRAY_SIZE(data) - pos; count > 0; --count)
         {
             memcpy(data, entryData1, sizeof(data));
             EXPECT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
-            EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
+            EXPECT_EQ(LoadAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data)), CHIP_NO_ERROR);
 
-            memmove(&data[pos], &data[pos + count], (ArraySize(data) - count - pos) * sizeof(data[0]));
+            memmove(&data[pos], &data[pos + count], (MATTER_ARRAY_SIZE(data) - count - pos) * sizeof(data[0]));
 
             for (size_t i = 0; i < count; ++i)
             {
                 EXPECT_EQ(accessControl.DeleteEntry(pos), CHIP_NO_ERROR);
             }
 
-            EXPECT_EQ(CompareAccessControl(accessControl, data, ArraySize(data) - count), CHIP_NO_ERROR);
+            EXPECT_EQ(CompareAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data) - count), CHIP_NO_ERROR);
         }
     }
 
@@ -1795,7 +1795,7 @@ TEST_F(TestAccessControl, TestDeleteEntry)
     {
         memcpy(data, entryData1, sizeof(data));
         EXPECT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
-        EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
+        EXPECT_EQ(LoadAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data)), CHIP_NO_ERROR);
 
         // After deleting Fabric index 1, we should have the number of entries of Fabric index 2
         EXPECT_EQ(accessControl.DeleteAllEntriesForFabric(1), CHIP_NO_ERROR);
@@ -1854,8 +1854,8 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
         constexpr size_t indexes[] = { 0, 1, 2, 3, 4, 5 };
         for (auto & index : indexes)
         {
-            constexpr size_t illegalIndex                          = entryData1Count;
-            constexpr size_t expectedIndexes[][ArraySize(indexes)] = {
+            constexpr size_t illegalIndex                                  = entryData1Count;
+            constexpr size_t expectedIndexes[][MATTER_ARRAY_SIZE(indexes)] = {
                 { 0, 1, 3, 6, illegalIndex, illegalIndex },
                 { 2, 4, 5, 7, 8, illegalIndex },
                 { illegalIndex, illegalIndex, illegalIndex, illegalIndex, illegalIndex, illegalIndex },
@@ -1909,7 +1909,7 @@ TEST_F(TestAccessControl, TestIterator)
         EXPECT_EQ(CompareEntry(entry, entryData1[fabric1[count]]), CHIP_NO_ERROR);
         count++;
     }
-    EXPECT_EQ(count, ArraySize(fabric1));
+    EXPECT_EQ(count, MATTER_ARRAY_SIZE(fabric1));
 
     fabricIndex = 2;
     EXPECT_EQ(accessControl.Entries(iterator, &fabricIndex), CHIP_NO_ERROR);
@@ -1920,7 +1920,7 @@ TEST_F(TestAccessControl, TestIterator)
         EXPECT_EQ(CompareEntry(entry, entryData1[fabric2[count]]), CHIP_NO_ERROR);
         count++;
     }
-    EXPECT_EQ(count, ArraySize(fabric2));
+    EXPECT_EQ(count, MATTER_ARRAY_SIZE(fabric2));
 }
 
 TEST_F(TestAccessControl, TestPrepareEntry)
@@ -1984,17 +1984,17 @@ TEST_F(TestAccessControl, TestPrepareEntry)
                 EXPECT_EQ(entry.GetSubjectCount(subjectCount), CHIP_NO_ERROR);
                 EXPECT_EQ(entry.GetTargetCount(targetCount), CHIP_NO_ERROR);
 
-                EXPECT_EQ(subjectCount, ArraySize(subjects[0]));
-                EXPECT_EQ(targetCount, ArraySize(targets));
+                EXPECT_EQ(subjectCount, MATTER_ARRAY_SIZE(subjects[0]));
+                EXPECT_EQ(targetCount, MATTER_ARRAY_SIZE(targets));
 
-                for (size_t i = 0; i < ArraySize(subjects[subjectIndex]); ++i)
+                for (size_t i = 0; i < MATTER_ARRAY_SIZE(subjects[subjectIndex]); ++i)
                 {
                     NodeId n;
                     EXPECT_EQ(entry.GetSubject(i, n), CHIP_NO_ERROR);
                     EXPECT_EQ(n, subjects[subjectIndex][i]);
                 }
 
-                for (size_t i = 0; i < ArraySize(targets); ++i)
+                for (size_t i = 0; i < MATTER_ARRAY_SIZE(targets); ++i)
                 {
                     Target t;
                     EXPECT_EQ(entry.GetTarget(i, t), CHIP_NO_ERROR);
@@ -2170,17 +2170,17 @@ TEST_F(TestAccessControl, TestUpdateEntry)
 {
     EntryData data[entryData1Count];
     memcpy(data, entryData1, sizeof(data));
-    EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
+    EXPECT_EQ(LoadAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data)), CHIP_NO_ERROR);
 
-    for (size_t i = 0; i < ArraySize(data); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(data); ++i)
     {
         EntryData updateData;
-        updateData.authMode    = authModes[i % ArraySize(authModes)];
-        updateData.fabricIndex = fabricIndexes[i % ArraySize(fabricIndexes)];
-        updateData.privilege   = privileges[i % (ArraySize(privileges) - 1)];
+        updateData.authMode    = authModes[i % MATTER_ARRAY_SIZE(authModes)];
+        updateData.fabricIndex = fabricIndexes[i % MATTER_ARRAY_SIZE(fabricIndexes)];
+        updateData.privilege   = privileges[i % (MATTER_ARRAY_SIZE(privileges) - 1)];
 
-        updateData.AddSubject(nullptr, subjects[i % ArraySize(authModes)][i % ArraySize(subjects[0])]);
-        updateData.AddTarget(nullptr, targets[i % ArraySize(targets)]);
+        updateData.AddSubject(nullptr, subjects[i % MATTER_ARRAY_SIZE(authModes)][i % MATTER_ARRAY_SIZE(subjects[0])]);
+        updateData.AddTarget(nullptr, targets[i % MATTER_ARRAY_SIZE(targets)]);
 
         data[i] = updateData;
 
@@ -2191,7 +2191,7 @@ TEST_F(TestAccessControl, TestUpdateEntry)
             EXPECT_EQ(accessControl.UpdateEntry(i, entry), CHIP_NO_ERROR);
         }
 
-        EXPECT_EQ(CompareAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
+        EXPECT_EQ(CompareAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data)), CHIP_NO_ERROR);
     }
 }
 

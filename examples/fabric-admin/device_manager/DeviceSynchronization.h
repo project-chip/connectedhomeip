@@ -22,13 +22,14 @@
 #include <app/ReadClient.h>
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/DataModelTypes.h>
-
 #include <memory>
 
 #if defined(PW_RPC_ENABLED)
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 #endif
+
+namespace admin {
 
 /// Ensures that device data is synchronized to the remote fabric bridge.
 ///
@@ -100,3 +101,5 @@ private:
 #endif
     UniqueIdGetter mUniqueIdGetter;
 };
+
+} // namespace admin

@@ -26,6 +26,7 @@ limitations under the License.
     <description>This cluster provides an interface for managing low power mode on a device.</description>
     <command source="client" code="0x00" name="Sleep" optional="false">
       <description>This command shall put the device into low power mode.</description>
+      <mandatoryConform/>
     </command>
   </cluster>
 </configurator>

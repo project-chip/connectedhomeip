@@ -15,7 +15,6 @@
 import os
 import shlex
 from enum import Enum, auto
-from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -103,7 +102,6 @@ class MbedBuilder(Builder):
                  app: MbedApp = MbedApp.LOCK,
                  board: MbedBoard = MbedBoard.CY8CPROTO_062_4343W,
                  profile: MbedProfile = MbedProfile.RELEASE,
-                 data_model_interface: Optional[str] = None,
                  ):
         super(MbedBuilder, self).__init__(root, runner)
         self.app = app
@@ -114,7 +112,6 @@ class MbedBuilder(Builder):
             self.root, 'third_party', 'mbed-os', 'repo')
         self.mbed_os_posix_socket_path = os.path.join(
             self.root, 'third_party', 'mbed-os-posix-socket', 'repo')
-        self.data_model_interface = data_model_interface
 
     @property
     def ExamplePath(self):
@@ -134,9 +131,6 @@ class MbedBuilder(Builder):
             flags.append(f"-DMBED_OS_PATH={shlex.quote(self.mbed_os_path)}")
             flags.append(f"-DMBED_OS_PATH={shlex.quote(self.mbed_os_path)}")
             flags.append(f"-DMBED_OS_POSIX_SOCKET_PATH={shlex.quote(self.mbed_os_posix_socket_path)}")
-
-            if self.data_model_interface is not None:
-                flags.append(f"-DCHIP_DATA_MODEL_INTERFACE={self.data_model_interface}")
 
             if self.options.pregen_dir:
                 flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

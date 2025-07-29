@@ -207,7 +207,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_DGTHREAD_2_2",  # Thread Network Diagnostics is not implemented under darwin.
         "Test_TC_DGTHREAD_2_3",  # Thread Network Diagnostics is not implemented under darwin.
         "Test_TC_DGTHREAD_2_4",  # Thread Network Diagnostics is not implemented under darwin.
-        "Test_TC_FLABEL_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_GRPKEY_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_LCFG_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_OPCREDS_3_7",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
@@ -219,7 +218,9 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_SC_4_1",  # darwin-framework-tool does not support dns-sd commands.
         "Test_TC_SC_5_2",  # darwin-framework-tool does not support group commands.
         "Test_TC_S_2_3",  # darwin-framework-tool does not support group commands.
-        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests
+        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
+        "Test_TC_TBRM_2_2",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
+        "Test_TC_TBRM_2_3",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
     }
 
 
@@ -293,6 +294,13 @@ def target_for_name(name: str):
         return TestTarget.RVC
     if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
         return TestTarget.NETWORK_MANAGER
+    if name.startswith("Test_TC_MTRID_"):
+        return TestTarget.ENERGY_GATEWAY
+    if (name.startswith("Test_TC_DEM_") or name.startswith("Test_TC_DEMM_") or
+            name.startswith("Test_TC_EEVSE_") or name.startswith("Test_TC_EEVSEM_")):
+        return TestTarget.ENERGY_MANAGEMENT
+    if name.startswith("Test_TC_CLCTRL_") or name.startswith("Test_TC_CLDIM_"):
+        return TestTarget.CLOSURE
     return TestTarget.ALL_CLUSTERS
 
 

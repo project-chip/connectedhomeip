@@ -91,13 +91,6 @@ endif()
 
 get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
-if (CONFIG_USE_CHIP_DATA_MODEL_INTERFACE)
-    set(DATA_MODEL_INTERFACE "enabled")
-else()
-    set(DATA_MODEL_INTERFACE "disabled")
-endif()
-
-
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
@@ -108,7 +101,6 @@ matter_common_gn_args(
     LIB_TESTS       CONFIG_CHIP_BUILD_TESTS
     PROJECT_CONFIG  ${CONFIG_CHIP_PROJECT_CONFIG}
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-    DATA_MODEL_INTERFACE ${DATA_MODEL_INTERFACE}
 )
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
@@ -130,9 +122,9 @@ else()
 endif()
 
 
-# if (BOARD STREQUAL "native_posix")
+# if (BOARD STREQUAL "native_sim")
 #     matter_add_gn_arg_string("target_cpu" "x86")
-# elseif (BOARD STREQUAL "native_posix_64")
+# elseif (BOARD STREQUAL "native_sim/native/64")
 #     matter_add_gn_arg_string("target_cpu" "x64")
 # endif()
 

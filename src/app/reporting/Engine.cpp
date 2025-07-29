@@ -16,21 +16,28 @@
  *    limitations under the License.
  */
 
+#include <access/AccessRestrictionProvider.h>
+#include <access/Privilege.h>
 #include <app/AppConfig.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/ConcreteEventPath.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
-#include <app/RequiredPrivilege.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataLookup.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
-#include <app/reporting/Read-Checked.h>
-#include <app/reporting/Read.h>
 #include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
-#include <app/util/ember-compatibility-functions.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <optional>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -43,31 +50,265 @@ namespace app {
 namespace reporting {
 namespace {
 
+using DataModel::ReadFlags;
 using Protocols::InteractionModel::Status;
 
-Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
+/// Returns the status of ACL validation.
+///   If the return value has a status set, that means the ACL check failed,
+///   the read must not be performed, and the returned status (which may
+///   be success, when dealing with non-concrete paths) should be used
+///   as the status for the read.
+///
+///   If the returned value is std::nullopt, that means the ACL check passed and the
+///   read should proceed.
+std::optional<CHIP_ERROR> ValidateReadAttributeACL(const SubjectDescriptor & subjectDescriptor,
+                                                   const ConcreteReadAttributePath & path, Privilege requiredPrivilege)
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
-    if (!model->GetClusterInfo(eventPath).has_value())
+    RequestPath requestPath{ .cluster     = path.mClusterId,
+                             .endpoint    = path.mEndpointId,
+                             .requestType = RequestType::kAttributeReadRequest,
+                             .entityId    = path.mAttributeId };
+
+    CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, requiredPrivilege);
+    if (err == CHIP_NO_ERROR)
     {
-        return model->EndpointExists(eventPath.mEndpointId) ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
+        return std::nullopt;
+    }
+    VerifyOrReturnError((err == CHIP_ERROR_ACCESS_DENIED) || (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL), err);
+
+    // Implementation of 8.4.3.2 of the spec for path expansion
+    if (path.mExpanded)
+    {
+        return CHIP_NO_ERROR;
     }
 
-    return Status::Success;
-#else
-    return CheckEventSupportStatus(eventPath);
+    // access denied and access restricted have specific codes for IM
+    return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess) : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
+}
+
+/// Checks that the given attribute path corresponds to a readable attribute. If not, it
+/// will return the corresponding failure status.
+std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataModel, const ConcreteReadAttributePath & path,
+                                                  const std::optional<DataModel::AttributeEntry> & entry)
+{
+    if (!entry.has_value())
+    {
+        return DataModel::ValidateClusterPath(dataModel, path, Status::UnsupportedAttribute);
+    }
+
+    if (!entry->GetReadPrivilege().has_value())
+    {
+        return Status::UnsupportedRead;
+    }
+
+    return std::nullopt;
+}
+
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
+                                                  BitFlags<ReadFlags> flags, AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+{
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
+                  path.mAttributeId);
+    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                          DataModelCallbacks::OperationOrder::Pre, path);
+
+    DataModel::ReadAttributeRequest readRequest;
+
+    readRequest.readFlags         = flags;
+    readRequest.subjectDescriptor = &subjectDescriptor;
+    readRequest.path              = path;
+
+    DataModel::ServerClusterFinder serverClusterFinder(dataModel);
+
+    DataVersion version = 0;
+    if (auto clusterInfo = serverClusterFinder.Find(path); clusterInfo.has_value())
+    {
+        version = clusterInfo->dataVersion;
+    }
+    else
+    {
+        ChipLogError(DataManagement, "Read request on unknown cluster - no data version available");
+    }
+
+    TLV::TLVWriter checkpoint;
+    reportBuilder.Checkpoint(checkpoint);
+
+    DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
+    bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered);
+    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
+
+    // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
+    //       explicitly ignores that case).
+    //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
+    //
+    //       See https://github.com/project-chip/connectedhomeip/issues/37410
+
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
+
+    DataModel::AttributeFinder finder(dataModel);
+    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+
+    if (auto access_status = ValidateReadAttributeACL(subjectDescriptor, path, Privilege::kView); access_status.has_value())
+    {
+        status = *access_status;
+    }
+    else if (auto readable_status = ValidateAttributeIsReadable(dataModel, path, entry); readable_status.has_value())
+    {
+        status = *readable_status;
+    }
+    // Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege.
+    // entry->GetReadPrivilege() is guaranteed to have a value, since that condition is checked in the previous condition (inside
+    // ValidateAttributeIsReadable()).
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    else if (auto required_privilege_status = ValidateReadAttributeACL(subjectDescriptor, path, entry->GetReadPrivilege().value());
+             required_privilege_status.has_value())
+    {
+        status = *required_privilege_status;
+    }
+    else if (IsSupportedGlobalAttributeNotInMetadata(readRequest.path.mAttributeId))
+    {
+        // Global attributes are NOT directly handled by data model providers, instead
+        // they are routed through metadata.
+        status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
+    }
+    else
+    {
+        status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+    }
+
+    if (status.IsSuccess())
+    {
+        // TODO: this callback being only executed on success is awkward. The Write callback is always done
+        //       for both read and write.
+        //
+        //       For now this preserves existing/previous code logic, however we should consider to ALWAYS
+        //       call this.
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                              DataModelCallbacks::OperationOrder::Post, path);
+        return status;
+    }
+
+    // Encoder state is relevant for errors in case they are retryable.
+    //
+    // Generally only out of space encoding errors would be retryable, however we save the state
+    // for all errors in case this is information that is useful (retry or error position).
+    if (encoderState != nullptr)
+    {
+        *encoderState = attributeValueEncoder.GetState();
+    }
+
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+    // Out of space errors may be chunked data, reporting those cases would be very confusing
+    // as they are not fully errors. Report only others (which presumably are not recoverable
+    // and will be sent to the client as well).
+    if (!status.IsOutOfSpaceEncodingResponse())
+    {
+        DataModel::ActionReturnStatus::StringStorage storage;
+        ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str(storage));
+    }
 #endif
+    return status;
+}
+
+bool IsClusterDataVersionEqualTo(DataModel::Provider * dataModel, const ConcreteClusterPath & path, DataVersion dataVersion)
+{
+    DataModel::ServerClusterFinder serverClusterFinder(dataModel);
+    auto info = serverClusterFinder.Find(path);
+
+    return info.has_value() && (info->dataVersion == dataVersion);
+}
+
+/// Check if the given `err` is a known ACL error that can be translated into
+/// a StatusIB (UnsupportedAccess/AccessRestricted)
+///
+/// Returns true if the error could be translated and places the result into `outStatus`.
+/// `path` is used for logging.
+bool IsTranslatableAclError(const ConcreteEventPath & path, const CHIP_ERROR & err, StatusIB & outStatus)
+{
+    if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
+    {
+        return false;
+    }
+
+    ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by %s",
+                  path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mEventId),
+                  err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
+
+    outStatus = err == CHIP_ERROR_ACCESS_DENIED ? StatusIB(Status::UnsupportedAccess) : StatusIB(Status::AccessRestricted);
+    return true;
+}
+
+CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescriptor & subjectDescriptor,
+                              DataModel::Provider * provider, StatusIB & outStatus)
+{
+    // We validate ACL before Path, however this means we do not want the real ACL check
+    // to be blocked by a `Invalid endpoint id` error when checking event info.
+    // As a result, we check for VIEW privilege on the cluster first (most permissive)
+    // and will do a 2nd check for the actual required privilege as a followup.
+    RequestPath requestPath{
+        .cluster     = path.mClusterId,
+        .endpoint    = path.mEndpointId,
+        .requestType = RequestType::kEventReadRequest,
+    };
+    CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, Access::Privilege::kView);
+    if (IsTranslatableAclError(path, err, outStatus))
+    {
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    DataModel::EventEntry eventInfo;
+    err = provider->EventInfo(path, eventInfo);
+    if (err != CHIP_NO_ERROR)
+    {
+        // cannot get event data to validate. Event is not supported.
+        // we still fall through into "ValidateClusterPath" to try to return a `better code`
+        // (i.e. say invalid endpoint or cluser), however if path seems ok we will
+        // return unsupported event as we failed to get event metadata.
+        outStatus = StatusIB(Status::UnsupportedEvent);
+    }
+    else
+    {
+        // set up the status as "OK" as long as validation below works
+        outStatus = StatusIB(Status::Success);
+
+        requestPath.entityId = path.mEventId;
+
+        err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
+        if (IsTranslatableAclError(path, err, outStatus))
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+    }
+
+    Status status = DataModel::ValidateClusterPath(provider, path, Status::Success);
+    if (status != Status::Success)
+    {
+        // a valid status available: failure
+        outStatus = StatusIB(status);
+        return CHIP_NO_ERROR;
+    }
+
+    // Status set above: could be success, but also UnsupportedEvent
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 
-CHIP_ERROR Engine::Init()
+CHIP_ERROR Engine::Init(EventManagement * apEventManagement)
 {
+    VerifyOrReturnError(apEventManagement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
+    mpEventManagement   = apEventManagement;
+
     return CHIP_NO_ERROR;
 }
 
@@ -92,9 +333,9 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         {
             existPathMatch = true;
 
-            if (!Impl::IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
-                                                   ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
-                                                   filter->mValue.mDataVersion.Value()))
+            if (!IsClusterDataVersionEqualTo(mpImEngine->GetDataModelProvider(),
+                                             ConcreteClusterPath(filter->mValue.mEndpointId, filter->mValue.mClusterId),
+                                             filter->mValue.mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }
@@ -155,8 +396,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
 #endif
 
         // For each path included in the interested path of the read handler...
-        for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
-             apReadHandler->GetAttributePathExpandIterator()->Next())
+        for (RollbackAttributePathExpandIterator iterator(mpImEngine->GetDataModelProvider(),
+                                                          apReadHandler->AttributeIterationPosition());
+             iterator.Next(readPath); iterator.MarkCompleted())
         {
             if (!apReadHandler->IsPriming())
             {
@@ -205,9 +447,12 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
+            BitFlags<ReadFlags> flags;
+            flags.Set(ReadFlags::kFabricFiltered, apReadHandler->IsFabricFiltered());
+            flags.Set(ReadFlags::kAllowsLargePayload, apReadHandler->AllowsLargePayload());
             DataModel::ActionReturnStatus status =
-                Impl::RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
-                                          apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
+                RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(), flags,
+                                    attributeReportIBs, pathForRetrieval, &encodeState);
             if (status.IsError())
             {
                 // Operation error set, since this will affect early return or override on status encoding
@@ -268,6 +513,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             // Successfully encoded the attribute, clear the internal state.
             apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
+
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.
         hasMoreChunks = false;
@@ -348,12 +594,16 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
 
-        if (status != Status::Success)
+        StatusIB statusIB;
+
+        ReturnErrorOnFailure(
+            CheckEventValidity(path, apReadHandler->GetSubjectDescriptor(), mpImEngine->GetDataModelProvider(), statusIB));
+
+        if (statusIB.IsFailure())
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(status));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, statusIB);
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
@@ -362,34 +612,6 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             aHasEncodedData = true;
         }
 
-        Access::RequestPath requestPath{ .cluster     = current->mValue.mClusterId,
-                                         .endpoint    = current->mValue.mEndpointId,
-                                         .requestType = RequestType::kEventReadRequest,
-                                         .entityId    = current->mValue.mEventId };
-        Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
-
-        err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
-        if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
-        {
-            ReturnErrorOnFailure(err);
-        }
-        else
-        {
-            TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
-                                                        err == CHIP_ERROR_ACCESS_DENIED ? StatusIB(Status::UnsupportedAccess)
-                                                                                                              : StatusIB(Status::AccessRestricted));
-
-            if (err != CHIP_NO_ERROR)
-            {
-                aWriter = checkpoint;
-                break;
-            }
-            aHasEncodedData = true;
-            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by %s",
-                          current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
-                          ChipLogValueMEI(current->mValue.mEventId), err == CHIP_ERROR_ACCESS_DENIED ? "ACL" : "ARL");
-        }
         current = current->mpNext;
     }
 
@@ -403,20 +625,20 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     size_t eventCount     = 0;
     bool hasEncodedStatus = false;
     TLV::TLVWriter backup;
-    bool eventClean                = true;
-    auto & eventMin                = apReadHandler->GetEventMin();
-    EventManagement & eventManager = EventManagement::GetInstance();
-    bool hasMoreChunks             = false;
+    bool eventClean    = true;
+    auto & eventMin    = apReadHandler->GetEventMin();
+    bool hasMoreChunks = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
     VerifyOrExit(apReadHandler->GetEventPathList() != nullptr, );
 
-    // If the eventManager is not valid or has not been initialized,
+    // If the mpEventManagement is not valid or has not been initialized,
     // skip the rest of processing
-    VerifyOrExit(eventManager.IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
+    VerifyOrExit(mpEventManagement != nullptr && mpEventManagement->IsValid(),
+                 ChipLogError(DataManagement, "EventManagement has not yet initialized"));
 
-    eventClean = apReadHandler->CheckEventClean(eventManager);
+    eventClean = apReadHandler->CheckEventClean(*mpEventManagement);
 
     // proceed only if there are new events.
     if (eventClean)
@@ -436,8 +658,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         err = CheckAccessDeniedEventPaths(*(eventReportIBs.GetWriter()), hasEncodedStatus, apReadHandler);
         SuccessOrExit(err);
 
-        err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin, eventCount,
-                                            apReadHandler->GetSubjectDescriptor());
+        err = mpEventManagement->FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin,
+                                                  eventCount, apReadHandler->GetSubjectDescriptor());
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
         {
@@ -507,13 +729,13 @@ exit:
 CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::System::PacketBufferTLVWriter reportDataWriter;
+    System::PacketBufferTLVWriter reportDataWriter;
     ReportDataMessage::Builder reportDataBuilder;
-    chip::System::PacketBufferHandle bufHandle = nullptr;
-    uint16_t reservedSize                      = 0;
-    bool hasMoreChunks                         = false;
-    bool needCloseReadHandler                  = false;
-    size_t reportBufferMaxSize                 = 0;
+    System::PacketBufferHandle bufHandle = nullptr;
+    uint16_t reservedSize                = 0;
+    bool hasMoreChunks                   = false;
+    bool needCloseReadHandler            = false;
+    size_t reportBufferMaxSize           = 0;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -550,7 +772,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     // Always limit the size of the generated packet to fit within the max size returned by the ReadHandler regardless
     // of the available buffer capacity.
     // Also, we need to reserve some extra space for the MIC field.
-    reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+    reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Create a report data.
     err = reportDataBuilder.Init(&reportDataWriter);
@@ -882,8 +1104,9 @@ CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
-    bool intersectsInterestPath = false;
-    mpImEngine->mReadHandlers.ForEachActiveObject([&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+    bool intersectsInterestPath     = false;
+    DataModel::Provider * dataModel = mpImEngine->GetDataModelProvider();
+    mpImEngine->mReadHandlers.ForEachActiveObject([&dataModel, &aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
         // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
         // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
         // waiting for a response to the last message chunk for read interactions.
@@ -893,7 +1116,7 @@ CHIP_ERROR Engine::SetDirty(const AttributePathParams & aAttributePath)
             {
                 if (object->mValue.Intersects(aAttributePath))
                 {
-                    handler->AttributePathIsDirty(aAttributePath);
+                    handler->AttributePathIsDirty(dataModel, aAttributePath);
                     intersectsInterestPath = true;
                     break;
                 }
@@ -971,7 +1194,7 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten)
+CHIP_ERROR Engine::NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed)
 {
     // If we literally have no read handlers right now that care about any events,
     // we don't need to call schedule run for event.
@@ -1009,7 +1232,7 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
         return CHIP_NO_ERROR;
     }
 
-    return ScheduleBufferPressureEventDelivery(aBytesWritten);
+    return ScheduleBufferPressureEventDelivery(aBytesConsumed);
 }
 
 void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
@@ -1045,10 +1268,3 @@ void Engine::MarkDirty(const AttributePathParams & path)
 } // namespace reporting
 } // namespace app
 } // namespace chip
-
-// TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
-// instead of being in ember-compatibility-functions.  It does not depend on any
-// app-specific generated bits.
-void __attribute__((weak))
-MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
-{}

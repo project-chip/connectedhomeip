@@ -23,6 +23,8 @@
 
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 
+namespace admin {
+
 /**
  * @brief Sets the RPC server port to which the RPC client will connect.
  *
@@ -99,3 +101,5 @@ CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommis
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR DeviceReachableChanged(const chip_rpc_ReachabilityChanged & data);
+
+} // namespace admin

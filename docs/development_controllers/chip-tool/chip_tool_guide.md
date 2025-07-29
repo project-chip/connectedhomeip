@@ -9,6 +9,26 @@ the setup payload or performing discovery actions.
 
 <hr>
 
+## Table of Contents
+
+-   [Installation](#installation)
+-   [Building from source](#building-from-source)
+-   [Running the CHIP Tool](#running-the-chip-tool)
+-   [CHIP Tool modes](#chip-tool-modes)
+    -   [Single-command mode (default)](#single-command-mode-default)
+    -   [Interactive mode](#interactive-mode)
+-   [Using CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
+-   [Supported commands and options](#supported-commands-and-options)
+    -   [List all supported clusters](#printing-all-supported-clusters)
+    -   [List all supported command for a cluster](#getting-the-list-of-commands-supported-for-a-specific-cluster)
+    -   [List all supported attributes for a cluster](#getting-the-list-of-attributes-supported-for-a-specific-cluster)
+    -   [Command options](#getting-the-list-of-command-options)
+-   [Testing and Interaction](#running-a-test-suite-against-a-paired-peer-device)
+-   [Multi-admin scenario](#multi-admin-scenario)
+-   [Subscribing to events or attributes](#subscribing-to-events-or-attributes)
+-   [Using wildcards](#using-wildcards)
+-   [Saving users and credentials for door lock device](#saving-users-and-credentials-on-door-lock-devices)
+
 ## Installation
 
 On Linux distributions
@@ -629,7 +649,7 @@ $ ./chip-tool onoff on
 ```bash
 [1647417976.556313][404456:404456] CHIP:TOO: InitArgs: Wrong arguments number: 0 instead of 2
 Usage:
-  ./chip-tool onoff on node-id/group-id endpoint-id-ignored-for-group-commands [--paa-trust-store-path] [--commissioner-name] [--trace_file] [--trace_log] [--ble-adapter] [--timedInteractionTimeoutMs] [--suppressResponse]
+  ./chip-tool onoff on node-id/group-id endpoint-id-ignored-for-group-commands [--paa-trust-store-path] [--commissioner-name] [--trace_file] [--trace_log] [--ble-controller] [--timedInteractionTimeoutMs] [--suppressResponse]
 [1647417976.556362][404456:404456] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/Commands.cpp:135: Error 0x0000002F
 
 ```
@@ -641,21 +661,15 @@ command.
 
 ##### Choosing the Bluetooth adapter
 
-To choose the Bluetooth adapter used by the CHIP Tool, use the following command
-pattern:
-
-```
---ble-adapter <id>
-```
-
-In this command:
-
--   _<id\>_ is the ID of HCI device.
+To choose the Bluetooth adapter used by the CHIP Tool, use the
+`--ble-controller <selector>` switch where selector syntax is platform-specific.
+For Linux it's documented in
+[Linux BLE Settings](/platforms/linux/ble_settings.md).
 
 **Example of usage:**
 
 ```
-$ ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 20202021 3840 --ble-adapter 0
+$ ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 20202021 3840 --ble-controller 2
 ```
 
 ##### Using message tracing

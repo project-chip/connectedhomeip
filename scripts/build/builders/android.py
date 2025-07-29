@@ -98,6 +98,7 @@ class AndroidApp(Enum):
         elif self == AndroidApp.VIRTUAL_DEVICE_APP:
             gn_args["chip_config_network_layer_ble"] = True
         elif self == AndroidApp.CHIP_TOOL:
+            gn_args["chip_enable_nfc_based_commissioning"] = True
             gn_args["chip_build_controller_dynamic_server"] = True
         return gn_args
 
@@ -164,9 +165,9 @@ class AndroidBuilder(Builder):
             os.environ["ANDROID_HOME"], "tools", "bin", "sdkmanager"
         )
 
-        # New SDK manager at cmdline-tools/latest/bin/
+        # New SDK manager at cmdline-tools/10.0/bin/
         new_sdk_manager = os.path.join(
-            os.environ["ANDROID_HOME"], "cmdline-tools", "latest", "bin", "sdkmanager"
+            os.environ["ANDROID_HOME"], "cmdline-tools", "10.0", "bin", "sdkmanager"
         )
         if not (
             os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)
@@ -413,7 +414,7 @@ class AndroidBuilder(Builder):
             new_sdk_manager = os.path.join(
                 os.environ["ANDROID_HOME"],
                 "cmdline-tools",
-                "latest",
+                "10.0",
                 "bin",
                 "sdkmanager",
             )

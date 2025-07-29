@@ -54,6 +54,25 @@ namespace ScenesManagement {
 
 namespace {
 
+Protocols::InteractionModel::Status ResponseStatus(CHIP_ERROR err)
+{
+    // TODO : Properly fix mapping between error types (issue https://github.com/project-chip/connectedhomeip/issues/26885)
+    if (CHIP_ERROR_NOT_FOUND == err)
+    {
+        return Protocols::InteractionModel::Status::NotFound;
+    }
+    if (CHIP_ERROR_NO_MEMORY == err)
+    {
+        return Protocols::InteractionModel::Status::ResourceExhausted;
+    }
+    if (CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) == err)
+    {
+        // TODO: Confirm if we need to add UnsupportedAttribute status as a return for Scene Commands
+        return Protocols::InteractionModel::Status::InvalidCommand;
+    }
+    return StatusIB(err).mStatus;
+}
+
 /// @brief Generate and add a response to a command handler context if err parameter is not CHIP_NO_ERROR
 /// @tparam ResponseType Type of response, depends on the command
 /// @param ctx Command Handler context where to add reponse
@@ -65,24 +84,7 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 {
     if (CHIP_NO_ERROR != err)
     {
-        // TODO : Properly fix mapping between error types (issue https://github.com/project-chip/connectedhomeip/issues/26885)
-        if (CHIP_ERROR_NOT_FOUND == err)
-        {
-            resp.status = to_underlying(Protocols::InteractionModel::Status::NotFound);
-        }
-        else if (CHIP_ERROR_NO_MEMORY == err)
-        {
-            resp.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
-        }
-        else if (CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) == err)
-        {
-            // TODO: Confirm if we need to add UnsupportedAttribute status as a return for Scene Commands
-            resp.status = to_underlying(Protocols::InteractionModel::Status::InvalidCommand);
-        }
-        else
-        {
-            resp.status = to_underlying(StatusIB(err).mStatus);
-        }
+        resp.status = to_underlying(ResponseStatus(err));
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
     }
     return err;
@@ -97,27 +99,9 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 template <typename ResponseType>
 CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, Status status)
 {
+    // TODO: this seems odd: we convert `status` to a CHIP_ERROR and then back to status. This seems
+    //       potentially lossy and not ideal.
     return AddResponseOnError(ctx, resp, StatusIB(status).ToChipError());
-}
-
-template <typename ResponseType>
-CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
-{
-    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
-    Status status                        = Status::Success;
-
-    if (AuthMode::kCase == descriptor.authMode)
-    {
-        status = Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
-    }
-    else
-    {
-        status = Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
-    }
-
-    // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
-    VerifyOrReturnValue(!(Status::Success == status || Status::UnsupportedAttribute == status), CHIP_NO_ERROR);
-    return AddResponseOnError(ctx, resp, status);
 }
 
 /// @brief Helper function to update the FabricSceneInfo attribute for a given Endpoint and fabric
@@ -227,7 +211,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::SetSceneInfoStruct(EndpointId endpoint
     uint8_t sceneInfoStructIndex = 0;
     if (CHIP_ERROR_NOT_FOUND == FindSceneInfoStructIndex(fabric, endpointIndex, sceneInfoStructIndex))
     {
-        VerifyOrReturnError(mSceneInfoStructsCount[endpointIndex] < ArraySize(mSceneInfoStructs[endpointIndex]),
+        VerifyOrReturnError(mSceneInfoStructsCount[endpointIndex] < MATTER_ARRAY_SIZE(mSceneInfoStructs[endpointIndex]),
                             CHIP_ERROR_NO_MEMORY);
         sceneInfoStructIndex = mSceneInfoStructsCount[endpointIndex];
 
@@ -250,7 +234,7 @@ void ScenesServer::FabricSceneInfo::ClearSceneInfoStruct(EndpointId endpoint, Fa
     ReturnOnFailure(FindSceneInfoStructIndex(fabric, endpointIndex, sceneInfoStructIndex));
 
     uint8_t nextIndex = static_cast<uint8_t>(sceneInfoStructIndex + 1);
-    uint8_t moveNum   = static_cast<uint8_t>(ArraySize(mSceneInfoStructs[endpointIndex]) - nextIndex);
+    uint8_t moveNum   = static_cast<uint8_t>(MATTER_ARRAY_SIZE(mSceneInfoStructs[endpointIndex]) - nextIndex);
     // Compress the endpoint's SceneInfoStruct array
     if (moveNum)
     {
@@ -283,7 +267,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
     uint16_t index =
         emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (index < ArraySize(mSceneInfoStructs))
+    if (index < MATTER_ARRAY_SIZE(mSceneInfoStructs))
     {
         endpointIndex = index;
         return CHIP_NO_ERROR;
@@ -301,7 +285,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpointIndex are provided
 CHIP_ERROR ScenesServer::FabricSceneInfo::FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index)
 {
-    VerifyOrReturnError(endpointIndex < ArraySize(mSceneInfoStructs), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endpointIndex < MATTER_ARRAY_SIZE(mSceneInfoStructs), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kUndefinedFabricIndex != fabric, CHIP_ERROR_INVALID_ARGUMENT);
 
     index = 0;
@@ -344,13 +328,13 @@ CHIP_ERROR ScenesServer::Init()
     // Prevents re-initializing
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     mGroupProvider = Credentials::GetGroupDataProvider();
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
-    ReturnErrorOnFailure(sceneTable->Init(&chip::Server::GetInstance().GetPersistentStorage()));
-    ReturnErrorOnFailure(chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate));
+    ReturnErrorOnFailure(sceneTable->Init(Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate));
 
     mIsInitialized = true;
     return CHIP_NO_ERROR;
@@ -358,7 +342,9 @@ CHIP_ERROR ScenesServer::Init()
 
 void ScenesServer::Shutdown()
 {
-    chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
     mGroupProvider = nullptr;
     mIsInitialized = false;
@@ -408,7 +394,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         storageData.SetName(req.sceneName);
     }
 
-    auto fieldSetIter = req.extensionFieldSets.begin();
+    auto fieldSetIter = req.extensionFieldSetStructs.begin();
     uint8_t EFSCount  = 0;
     // Goes through all EFS in command
     while (fieldSetIter.Next() && EFSCount < scenes::kMaxClustersPerScene)
@@ -465,8 +451,6 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
                            UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
                                                  Optional<GroupId>(), Optional<SceneId>(), Optional<bool>())));
 
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -515,7 +499,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
                                                                       SceneStorageId(req.sceneID, req.groupID), scene)));
 
     // Response Extension Field Sets buffer
-    Structs::ExtensionFieldSet::Type responseEFSBuffer[scenes::kMaxClustersPerScene];
+    Structs::ExtensionFieldSetStruct::Type responseEFSBuffer[scenes::kMaxClustersPerScene];
     uint8_t deserializedEFSCount = 0;
 
     // Adds extension field sets to the scene
@@ -544,8 +528,8 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
     response.transitionTime.SetValue(scene.mStorageData.mSceneTransitionTimeMs);
 
     response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
-    Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
-    response.extensionFieldSets.SetValue(responseEFSSpan);
+    Span<Structs::ExtensionFieldSetStruct::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
+    response.extensionFieldSetStructs.SetValue(responseEFSSpan);
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -882,7 +866,6 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
         sceneValid.Emplace(false);
     }
 
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
     ReturnOnFailure(
         AddResponseOnError(ctx, response,
                            UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
@@ -936,8 +919,6 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
                            UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
                                                  Optional<GroupId>(), Optional<SceneId>(), sceneValid)));
 
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -964,8 +945,6 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
                                      req.sceneID, mGroupProvider);
 
     ReturnOnFailure(AddResponseOnError(ctx, response, err));
-
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -1129,8 +1108,6 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                                       Optional<GroupId>(), Optional<SceneId>(), Optional<bool>() /* = sceneValid*/)));
         }
 
-        ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-
         response.status = to_underlying(Protocols::InteractionModel::Status::Success);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
@@ -1151,8 +1128,6 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                            UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
                                                  Optional<GroupId>(), Optional<SceneId>(), Optional<bool>())));
 
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -1168,12 +1143,6 @@ using namespace chip::app::Clusters::ScenesManagement;
 
 void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
-    Status status = Attributes::LastConfiguredBy::SetNull(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, to_underlying(status));
-    }
-
     // Initialize the FabricSceneInfo by getting the number of scenes and the remaining capacity for storing fabric scene data
     for (auto & info : chip::Server::GetInstance().GetFabricTable())
     {
@@ -1199,4 +1168,9 @@ void MatterScenesManagementPluginServerInitCallback()
     {
         ChipLogError(Zcl, "ScenesServer::Instance().Init() error: %" CHIP_ERROR_FORMAT, err.Format());
     }
+}
+
+void MatterScenesManagementPluginServerShutdownCallback()
+{
+    ScenesServer::Instance().Shutdown();
 }

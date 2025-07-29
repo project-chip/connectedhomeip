@@ -27,13 +27,7 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 #include "wfx_sl_ble_init.h"
-#ifdef __cplusplus
-}
-#endif // __cplusplus
 #else
 #include "gatt_db.h"
 #include "sl_bgapi.h"
@@ -68,6 +62,7 @@ public:
     int32_t SendBLEAdvertisementCommand(void);
 #else
     void HandleConnectEvent(volatile sl_bt_msg_t * evt);
+    void HandleConnectParams(volatile sl_bt_msg_t * evt);
     void HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt);
     void HandleWriteEvent(volatile sl_bt_msg_t * evt);
     void UpdateMtu(volatile sl_bt_msg_t * evt);
@@ -80,7 +75,7 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    static void HandleC3ReadRequest(SilabsBleWrapper::sl_wfx_msg_t * rsi_ble_read_req);
+    static void HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & rsi_ble_read_req);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
@@ -142,13 +137,13 @@ private:
     // ===== Private members reserved for use by this class only.
     enum class Flags : uint16_t
     {
-        kAdvertisingEnabled     = 0x0001,
-        kFastAdvertisingEnabled = 0x0002,
-        kAdvertising            = 0x0004,
-        kRestartAdvertising     = 0x0008,
-        kEFRBLEStackInitialized = 0x0010,
-        kDeviceNameSet          = 0x0020,
-        kExtAdvertisingEnabled  = 0x0040,
+        kAdvertisingEnabled       = 0x0001,
+        kFastAdvertisingEnabled   = 0x0002,
+        kAdvertising              = 0x0004,
+        kRestartAdvertising       = 0x0008,
+        kSiLabsBLEStackInitialize = 0x0010,
+        kDeviceNameSet            = 0x0020,
+        kExtAdvertisingEnabled    = 0x0040,
     };
 
     enum
@@ -164,9 +159,6 @@ private:
 
     struct CHIPoBLEConState
     {
-#if !(SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-        bd_addr address;
-#endif
         uint16_t mtu : 10;
         uint16_t allocated : 1;
         uint16_t subscribed : 1;

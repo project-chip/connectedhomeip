@@ -32,7 +32,7 @@ using namespace chip;
 
 void ApplicationInit()
 {
-    DeviceMgr().Init();
+    admin::DeviceManager::Instance().Init();
 }
 
 // ================================================================================

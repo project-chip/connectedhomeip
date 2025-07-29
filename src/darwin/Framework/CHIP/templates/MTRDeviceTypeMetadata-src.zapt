@@ -6,10 +6,12 @@ using namespace chip;
 
 namespace {
 
-constexpr MTRDeviceTypeData knownDeviceTypes[] = {
+// Not constexpr in the strict sense because NSString * is not a literal
+// type, but the array is in fact constant initialized by the compiler.
+static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
   {{#zcl_device_types}}
   {{#if class}}
-  { {{asHex code 8}}, MTRDeviceTypeClass::{{class}}, "{{caption}}" },
+  { {{asHex code 8}}, MTRDeviceTypeClass::{{class}}, @"{{caption}}" },
   {{/if}}
   {{/zcl_device_types}}
 };

@@ -19,18 +19,22 @@
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/TextOnlyLogging.h>
@@ -43,6 +47,8 @@ namespace chip {
 namespace app {
 
 namespace {
+
+using Protocols::InteractionModel::Status;
 
 /// Wraps a EndpointIterator and ensures that `::Release()` is called
 /// for the iterator (assuming it is non-null)
@@ -74,10 +80,8 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(apWriteHandlerDelegate, CHIP_ERROR_INVALID_ARGUMENT);
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     VerifyOrReturnError(apProvider, CHIP_ERROR_INVALID_ARGUMENT);
     mDataModelProvider = apProvider;
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
@@ -99,34 +103,29 @@ void WriteHandler::Close()
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
     mStateFlags.Clear(StateBits::kSuppressResponse);
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mDataModelProvider = nullptr;
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     MoveToState(State::Uninitialized);
 }
 
 std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
 {
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    VerifyOrReturnValue(mDataModelProvider != nullptr, std::nullopt,
-                        ChipLogError(DataManagement, "Null data model while checking attribute properties."));
+    if (mDataModelProvider == nullptr)
+    {
+#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
+        ChipLogError(DataManagement, "Null data model while checking attribute properties.");
+#endif
+        return std::nullopt;
+    }
 
-    auto info = mDataModelProvider->GetAttributeInfo(path);
+    DataModel::AttributeFinder finder(mDataModelProvider);
+    std::optional<DataModel::AttributeEntry> info = finder.Find(path);
+
     if (!info.has_value())
     {
         return std::nullopt;
     }
 
-    return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
-#else
-    constexpr uint8_t kListAttributeType = 0x48;
-    const auto attributeMetadata         = GetAttributeMetadata(path);
-    if (attributeMetadata == nullptr)
-    {
-        return std::nullopt;
-    }
-    return (attributeMetadata->attributeType == kListAttributeType);
-#endif
+    return info->HasFlags(DataModel::AttributeQualityFlags::kListAttribute);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -259,17 +258,19 @@ exit:
 
 void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
-    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
+    if (mDataModelProvider != nullptr)
     {
-        attrOverride->OnListWriteBegin(aPath);
+        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin);
     }
 }
 
 void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful)
 {
-    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
+    if (mDataModelProvider != nullptr)
     {
-        attrOverride->OnListWriteEnd(aPath, writeWasSuccessful);
+        mDataModelProvider->ListAttributeWriteNotification(aPath,
+                                                           writeWasSuccessful ? DataModel::ListWriteOperation::kListWriteSuccess
+                                                                              : DataModel::ListWriteOperation::kListWriteFailure);
     }
 }
 
@@ -608,9 +609,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     // our callees hand out Status as well.
     Status status = Status::InvalidAction;
 
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mLastSuccessfullyWrittenPath = std::nullopt;
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
     reader.Init(std::move(aPayload));
 
@@ -763,31 +762,146 @@ void WriteHandler::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
 }
 
+DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
+                                                              const ConcreteDataAttributePath & aPath)
+{
+
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
+    // SPEC-DIVERGENCE: For non-concrete paths, the spec mandates only one ACL check (the one after the existence check), unlike the
+    // concrete path case, when there is one ACL check before existence check and a second one after. However, because this code is
+    // also used in the group path case, we end up performing an ADDITIONAL ACL check before the existence check. In practice, this
+    // divergence is not observable.
+    Status writeAccessStatus = CheckWriteAccess(aSubject, aPath, Access::Privilege::kView);
+    VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
+
+    DataModel::AttributeFinder finder(mDataModelProvider);
+
+    std::optional<DataModel::AttributeEntry> attributeEntry = finder.Find(aPath);
+
+    // if path is not valid, return a spec-compliant return code.
+    if (!attributeEntry.has_value())
+    {
+        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, Status::UnsupportedAttribute);
+    }
+
+    // Allow writes on writable attributes only
+    VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
+
+    // Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
+    writeAccessStatus = CheckWriteAccess(aSubject, aPath, *attributeEntry->GetWritePrivilege());
+    VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
+
+    // SPEC:
+    //   If the path indicates specific attribute data that requires a Timed Write
+    //   transaction to write and this action is not part of a Timed Write transaction,
+    //   an AttributeStatusIB SHALL be generated with the NEEDS_TIMED_INTERACTION Status Code.
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
+                        Status::NeedsTimedInteraction);
+
+    // SPEC:
+    //   Else if the attribute in the path indicates a fabric-scoped list and there is no accessing
+    //   fabric, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code,
+    //   with the Path field indicating only the path to the attribute.
+    if (attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kListAttribute) &&
+        attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kFabricScoped))
+    {
+        VerifyOrReturnError(aSubject.fabricIndex != kUndefinedFabricIndex, Status::UnsupportedAccess);
+    }
+
+    // SPEC:
+    //   Else if the DataVersion field of the AttributeDataIB is present and does not match the
+    //   data version of the indicated cluster instance, an AttributeStatusIB SHALL be generated
+    //   with the DATA_VERSION_MISMATCH Status Code.
+    if (aPath.mDataVersion.HasValue())
+    {
+        DataModel::ServerClusterFinder clusterFinder(mDataModelProvider);
+        std::optional<DataModel::ServerClusterEntry> cluster_entry = clusterFinder.Find(aPath);
+
+        // path is valid based on above checks (we have an attribute entry)
+        VerifyOrDie(cluster_entry.has_value());
+        VerifyOrReturnValue(cluster_entry->dataVersion == aPath.mDataVersion.Value(), Status::DataVersionMismatch);
+    }
+
+    return Status::Success;
+}
+
+Status WriteHandler::CheckWriteAccess(const Access::SubjectDescriptor & aSubject, const ConcreteAttributePath & aPath,
+                                      const Access::Privilege aRequiredPrivilege)
+{
+
+    bool checkAcl = true;
+    if (mLastSuccessfullyWrittenPath.has_value())
+    {
+        // only validate ACL if path has changed
+        //
+        // Note that this is NOT operator==: we could do `checkAcl == (aPath != *mLastSuccessfullyWrittenPath)`
+        // however that seems to use more flash.
+        if ((aPath.mEndpointId == mLastSuccessfullyWrittenPath->mEndpointId) &&
+            (aPath.mClusterId == mLastSuccessfullyWrittenPath->mClusterId) &&
+            (aPath.mAttributeId == mLastSuccessfullyWrittenPath->mAttributeId))
+        {
+            checkAcl = false;
+        }
+    }
+
+    if (checkAcl)
+    {
+        Access::RequestPath requestPath{ .cluster     = aPath.mClusterId,
+                                         .endpoint    = aPath.mEndpointId,
+                                         .requestType = Access::RequestType::kAttributeWriteRequest,
+                                         .entityId    = aPath.mAttributeId };
+
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, aRequiredPrivilege);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            return Status::Success;
+        }
+
+        if (err == CHIP_ERROR_ACCESS_DENIED)
+        {
+            return Status::UnsupportedAccess;
+        }
+
+        if (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL)
+        {
+            return Status::AccessRestricted;
+        }
+
+        return Status::Failure;
+    }
+
+    return Status::Success;
+}
+
 CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,
                                           TLV::TLVReader & aData)
 {
     // Writes do not have a checked-path. If data model interface is enabled (both checked and only version)
     // the write is done via the DataModel interface
-#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    DataModel::WriteAttributeRequest request;
+    ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
+                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
 
-    request.path                = aPath;
-    request.subjectDescriptor   = aSubject;
-    request.previousSuccessPath = mLastSuccessfullyWrittenPath;
-    request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
+    DataModel::ActionReturnStatus status = CheckWriteAllowed(aSubject, aPath);
+    if (status.IsSuccess())
+    {
+        DataModel::WriteAttributeRequest request;
 
-    AttributeValueDecoder decoder(aData, aSubject);
+        request.path              = aPath;
+        request.subjectDescriptor = &aSubject;
+        request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
-    DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
+        AttributeValueDecoder decoder(aData, aSubject);
+        status = mDataModelProvider->WriteAttribute(request, decoder);
+    }
 
     mLastSuccessfullyWrittenPath = status.IsSuccess() ? std::make_optional(aPath) : std::nullopt;
 
     return AddStatusInternal(aPath, StatusIB(status.GetStatusCode()));
-#else
-    return WriteSingleClusterData(aSubject, aPath, aData, this);
-#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
 } // namespace app

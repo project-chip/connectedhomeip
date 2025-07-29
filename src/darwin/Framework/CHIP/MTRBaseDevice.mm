@@ -23,6 +23,7 @@
 #import "MTRCluster.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCluster_Internal.h"
+#import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
@@ -230,11 +231,6 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
     PurgeCompletedReadClientContainers(_deviceID);
 }
 
-@end
-
-@interface MTRBaseDevice ()
-// Will return nil if our controller is not in fact a concrete controller.
-@property (nullable, nonatomic, strong, readonly) MTRDeviceController_Concrete * concreteController;
 @end
 
 @implementation MTRBaseDevice
@@ -1449,7 +1445,10 @@ exit:
     }
 
     if (logCall) {
-        MTR_LOG("%@ invoke %@ 0x%llx 0x%llx: %@", self, endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue, commandFields);
+        MTR_LOG("%@ invoke %@ 0x%llx (%@) 0x%llx (%@): %@", self, endpointID,
+            clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
+            commandID.unsignedLongLongValue, MTRRequestCommandNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRCommandIDType>(commandID.unsignedLongLongValue)),
+            commandFields);
     }
 
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
@@ -1527,7 +1526,7 @@ exit:
                 // Clamp to a number of seconds that will not overflow 32-bit
                 // int when converted to ms.
                 auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
-                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds));
+                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
             }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 
@@ -2763,7 +2762,7 @@ static NSString * const sClusterKey = @"clusterKey";
 @end
 
 @implementation MTRAttributePath
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path
+- (instancetype)initWithPath:(const ConcreteAttributePath &)path
 {
     if (self = [super initWithPath:path]) {
         _attribute = @(path.mAttributeId);
@@ -2773,7 +2772,7 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu, %@) 0x%llx (%llu, %@)>",
+    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu, %@) attribute 0x%llx (%llu, %@)>",
                      self.endpoint.unsignedShortValue,
                      self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(self.cluster.unsignedLongLongValue)),
                      _attribute.unsignedLongLongValue, _attribute.unsignedLongLongValue,

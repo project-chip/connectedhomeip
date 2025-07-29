@@ -40,7 +40,7 @@
 #include "stdio.h"
 #include "timers.h"
 
-#if defined(CPU_JN518X) && defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(CPU_JN518X) && defined(nxp_use_low_power) && (nxp_use_low_power == 1)
 #include "PWR_Configuration.h"
 #endif
 
@@ -49,12 +49,17 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+// Temporarily keep backwards compatibility. To be removed
+#ifndef CONFIG_CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+#define CONFIG_CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+#endif
+
 /*******************************************************************************
  * Local data types
  *******************************************************************************/
 extern "C" bool_t Ble_ConfigureHostStackConfig(void);
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
 extern "C" void PWR_DisallowDeviceToSleep(void);
 extern "C" void PWR_AllowDeviceToSleep(void);
 #endif
@@ -127,7 +132,7 @@ TimerHandle_t connectionTimeout;
 
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
 static bool bleAppStopInProgress;
 #endif
 
@@ -192,7 +197,7 @@ CHIP_ERROR BLEManagerCommon::_Init()
     VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, err = CHIP_ERROR_INCORRECT_STATE);
 #endif
 
-#if defined(CPU_JN518X) && defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(CPU_JN518X) && defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
 #endif
 
@@ -516,7 +521,7 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_start_advertising(gapAdverti
         return BLE_E_START_ADV;
     }
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     PWR_DisallowDeviceToSleep();
 #endif
 
@@ -524,13 +529,13 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_start_advertising(gapAdverti
                                     CHIP_BLE_KW_EVNT_TIMEOUT);
     if (!(eventBits & CHIP_BLE_KW_EVNT_ADV_CHANGED))
     {
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
         PWR_AllowDeviceToSleep();
 #endif
         return BLE_E_START_ADV_FAILED;
     }
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     PWR_AllowDeviceToSleep();
 #endif
 
@@ -738,7 +743,7 @@ CHIP_ERROR BLEManagerCommon::StartAdvertising(void)
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT);
+        StartBleAdvTimeoutTimer(CONFIG_CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT);
     }
 
     err = ConfigureAdvertisingData();
@@ -771,7 +776,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
             CancelBleAdvTimeoutTimer();
         }
 
-#if CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         /* schedule NFC emulation stop */
         ChipDeviceEvent advChange;
         advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
@@ -813,7 +818,7 @@ void BLEManagerCommon::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = kCHIPoBLE_Disabled;
     }
 }
@@ -927,10 +932,6 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
     uint8_t deviceId = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", deviceId);
 
-#if gClkUseFro32K && defined(chip_with_low_power) && (chip_with_low_power == 1)
-    PWR_DisallowDeviceToSleep();
-#endif
-
     mDeviceIds.insert(deviceId);
 
     if (mServiceMode == kCHIPoBLE_Enabled)
@@ -949,10 +950,6 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
 {
     uint8_t deviceId = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is disconnected with device: %d.\n", deviceId);
-
-#if gClkUseFro32K && defined(chip_with_low_power) && (chip_with_low_power == 1)
-    PWR_AllowDeviceToSleep();
-#endif
 
     mDeviceIds.erase(deviceId);
 
@@ -1036,7 +1033,7 @@ void BLEManagerCommon::HandleTXCharCCCDWrite(blekw_msg_t * msg)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1071,7 +1068,7 @@ void BLEManagerCommon::HandleRXCharWrite(blekw_msg_t * msg)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1088,7 +1085,7 @@ void BLEManagerCommon::HandleForceDisconnect()
         }
     }
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     PWR_AllowDeviceToSleep();
 #endif
 }
@@ -1190,16 +1187,16 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
 
     if (pConnectionEvent->eventType == gConnEvtConnected_c)
     {
-#if CHIP_DEVICE_K32W1
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
-        /* Disallow must be called here for K32W1, otherwise an assert will be reached.
+#if NXP_DEVICE_MCXW7X
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
+        /* Disallow must be called here for MCXW7X, otherwise an assert will be reached.
          * Disclaimer: this is a workaround until a better cross platform solution is found. */
         PWR_DisallowDeviceToSleep();
 #endif
 #endif
 
 #if CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
-        ChipLogProgress(DeviceLayer, "BLE K32W: Trying to set the PHY to 2M");
+        ChipLogProgress(DeviceLayer, "BLE MCXW7X: Trying to set the PHY to 2M");
 
         (void) Gap_LeSetPhy(FALSE, deviceId, 0, gConnPhyUpdateReqTxPhySettings_c, gConnPhyUpdateReqRxPhySettings_c,
                             (uint16_t) gConnPhyUpdateReqPhyOptions_c);
@@ -1207,7 +1204,7 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
 
         /* Notify App Task that the BLE is connected now */
         (void) blekw_msg_add_u8(BLE_KW_MSG_CONNECTED, (uint8_t) deviceId);
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
         PWR_AllowDeviceToSleep();
 #endif
     }
@@ -1218,7 +1215,7 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
         /* Notify App Task that the BLE is disconnected now */
         (void) blekw_msg_add_u8(BLE_KW_MSG_DISCONNECTED, (uint8_t) deviceId);
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
         if (bleAppStopInProgress == TRUE)
         {
             bleAppStopInProgress = FALSE;
@@ -1454,7 +1451,7 @@ CHIP_ERROR BLEManagerCommon::blekw_stop_connection_internal(BLE_CONNECTION_OBJEC
         ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
         return CHIP_ERROR_INTERNAL;
     }
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     else
     {
         bleAppStopInProgress = TRUE;

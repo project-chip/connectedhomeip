@@ -23,7 +23,6 @@
 #include <EnergyEvseManager.h>
 #include <EnergyTimeUtils.h>
 
-#include <EnergyTimeUtils.h>
 #include <FakeReadings.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
@@ -47,7 +46,9 @@ using namespace chip::app::Clusters::PowerSource::Attributes;
 
 using Protocols::InteractionModel::Status;
 
-CHIP_ERROR EVSEManufacturer::Init()
+constexpr int64_t kMaxRequiredEnergy_mWh = 1000000000000; // 1000 MWh
+
+CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
 {
     /* Manufacturers should modify this to do any custom initialisation */
 
@@ -63,7 +64,7 @@ CHIP_ERROR EVSEManufacturer::Init()
 
     ReturnErrorOnFailure(InitializePowerMeasurementCluster());
 
-    ReturnErrorOnFailure(InitializePowerSourceCluster());
+    ReturnErrorOnFailure(InitializePowerSourceCluster(powerSourceEndpointId));
 
     DeviceEnergyManagementDelegate * dem = GetEvseManufacturer()->GetDEMDelegate();
     VerifyOrReturnLogError(dem != nullptr, CHIP_ERROR_UNINITIALIZED);
@@ -78,6 +79,9 @@ CHIP_ERROR EVSEManufacturer::Init()
 
     /*
      * This is an example implementation for manufacturers to consider
+     *
+     * For Manufacturer to specify the hardware mains voltage in mV:
+     *  dg->HwSetNominalMainsVoltage(230000);       // 230V
      *
      * For Manufacturer to specify the hardware capability in mA:
      *  dg->HwSetMaxHardwareCurrentLimit(32000);    // 32A
@@ -124,7 +128,7 @@ CHIP_ERROR EVSEManufacturer::Shutdown()
 
 CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOfWeekMap, uint16_t minutesPastMidnightNow_m,
                           uint16_t & targetTimeMinutesPastMidnight_m, DataModel::Nullable<Percent> & targetSoC,
-                          DataModel::Nullable<int64_t> & addedEnergy_mWh, bool bAllowTargetsInPast)
+                          DataModel::Nullable<int64_t> & targetAddedEnergy_mWh, bool bAllowTargetsInPast)
 {
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
@@ -171,11 +175,11 @@ CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOf
 
                     if (chargingTarget.addedEnergy.HasValue())
                     {
-                        addedEnergy_mWh.SetNonNull(chargingTarget.addedEnergy.Value());
+                        targetAddedEnergy_mWh.SetNonNull(chargingTarget.addedEnergy.Value());
                     }
                     else
                     {
-                        addedEnergy_mWh.SetNull();
+                        targetAddedEnergy_mWh.SetNull();
                     }
                 }
             }
@@ -189,6 +193,141 @@ CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOf
     }
 
     return bFound ? CHIP_NO_ERROR : CHIP_ERROR_NOT_FOUND;
+}
+
+/**
+ * @brief   DetermineRequiredEnergy based on if we know vehicle SoC, BatteryCapacity
+ *          and TargetSoC or fallback to addedEnergy target.
+ *
+ *  Output: requiredEnergy_mWh - how much energy is needed to charge
+ *          Note this could be 0 if the vehicleSoC > targetSoC
+ */
+CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, int64_t & requiredEnergy_mWh,
+                                                     DataModel::Nullable<Percent> & targetSoC,
+                                                     DataModel::Nullable<int64_t> & targetAddedEnergy_mWh)
+{
+    DataModel::Nullable<Percent> vehicleSoC;
+    DataModel::Nullable<int64_t> batteryCapacity_mWh;
+
+    if (!targetSoC.IsNull())
+    {
+        if (GetEvseInstance()->HasFeature(Feature::kSoCReporting))
+        {
+            // We support SoCReporting, but it doesn't mean the Vehicle supports it
+            vehicleSoC          = dg->GetStateOfCharge();
+            batteryCapacity_mWh = dg->GetBatteryCapacity();
+            if (!vehicleSoC.IsNull() && !batteryCapacity_mWh.IsNull())
+            {
+                // If the current SoC is already >= targetSoC - we don't need to charge, set to 0.
+                requiredEnergy_mWh = std::max<int64_t>(
+                    0, static_cast<int64_t>((targetSoC.Value() - vehicleSoC.Value()) * batteryCapacity_mWh.Value() / 100));
+                ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d    ----- target SoC: %d", vehicleSoC.Value(),
+                                targetSoC.Value());
+                // Since we are charging using SoC then always null out the NextAddedEnergy target
+                // to indicate that the SoC target is being followed (per spec)
+                // NextChargeAddedEnergy is set by the caller based on targetAddedEnergy_mWh
+                targetAddedEnergy_mWh.SetNull();
+
+                return CHIP_NO_ERROR;
+            }
+            // ELSE we don't have VehicleSoC and Battery Capacity so we have to
+            // fallback to AddedEnergy charging below
+        }
+        else
+        {
+            // Cluster does not support SoC Reporting so target SoC is only allowed to be 100%
+            if (targetSoC.Value() != 100)
+            {
+                ChipLogError(AppServer, "EVSE WARNING: TargetSoC is not 100%% and we don't know the EV SoC!");
+            }
+
+            // We don't know the Vehicle SoC so we must charge now
+            // Let's assume an unreasonably large battery size which
+            // ComputeStartTime uses to recognise it needs to start now
+            requiredEnergy_mWh = kMaxRequiredEnergy_mWh;
+
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    // Unable to charge using TargetSoC - Fallback to using AddedEnergy method
+    // Check we have a AddedEnergy target
+    if (targetAddedEnergy_mWh.IsNull())
+    {
+        ChipLogError(AppServer,
+                     "EVSE ERROR: Cannot use TargetSoC (maybe missing VehicleSoC/BatteryCapacity?) or AddedEnergy has not been "
+                     "provided - assume large battery!");
+
+        requiredEnergy_mWh = kMaxRequiredEnergy_mWh;
+        return CHIP_NO_ERROR;
+    }
+
+    // Otherwise just use targetAddedEnergy_mWh
+    requiredEnergy_mWh = targetAddedEnergy_mWh.Value();
+
+    // According to spec if we can't use SoC for charging (falling back to AddedEnergy)
+    // then NextTargetSoC should be Null is set by the caller based on targetSoC
+    targetSoC.SetNull();
+
+    return CHIP_NO_ERROR;
+}
+/**
+ * @brief   Compute the start time based on required energy
+ *
+ *  Simple optimizer - assume a flat tariff throughout the day
+ */
+CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel::Nullable<uint32_t> & startTime_epoch_s,
+                                              uint32_t targetTime_epoch_s, uint32_t now_epoch_s, int64_t requiredEnergy_mWh)
+{
+
+    uint32_t chargingDuration_s;
+    uint32_t tempStartTime_epoch_s;
+
+    if (requiredEnergy_mWh == 0)
+    {
+        // If we don't need to charge, then ensure we do not set a NextStartTime
+        // (spec says this should be NULL if we don't plan to schedule a charge)
+        startTime_epoch_s.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
+    // Compute power from nominal voltage and maxChargingRate
+    // GetMaximumChargeCurrent returns mA, but to help avoid overflow
+    // We use V (not mV) and compute power to the nearest Watt
+    uint32_t power_W = static_cast<uint32_t>((dg->HwGetNominalMainsVoltage() * dg->GetMaximumChargeCurrent()) / 1000000);
+    if (power_W == 0)
+    {
+        ChipLogError(AppServer, "EVSE Error: MaxCurrent = 0Amp - Can't schedule charging");
+        startTime_epoch_s.SetNull();
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
+    // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
+    chargingDuration_s =
+        static_cast<uint32_t>((static_cast<uint64_t>(requiredEnergy_mWh) * 36) / (static_cast<uint64_t>(power_W) * 10));
+
+    // Add in 15 minutes leeway to account for slow starting vehicles
+    // that need to condition the battery or if it is cold etc
+    chargingDuration_s += (15 * 60);
+
+    // A price optimizer can look for cheapest time of day
+    // However for now we'll start charging as late as possible
+    tempStartTime_epoch_s = targetTime_epoch_s - chargingDuration_s;
+
+    if (tempStartTime_epoch_s < now_epoch_s)
+    {
+        // we need to turn on the EVSE now - it won't have enough time to reach the target
+        startTime_epoch_s.SetNonNull(now_epoch_s);
+        // TODO call function to turn on the EV
+    }
+    else
+    {
+        // we turn off the EVSE for now
+        startTime_epoch_s.SetNonNull(tempStartTime_epoch_s);
+        // TODO have a periodic timer which checks if we should turn on the charger now
+    }
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -211,23 +350,21 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     ReturnErrorOnFailure(GetMinutesPastMidnight(minutesPastMidnightNow_m));
 
     uint32_t now_epoch_s = 0;
-    ReturnErrorOnFailure(GetEpochTS(now_epoch_s));
+    ReturnErrorOnFailure(System::Clock::GetClock_MatterEpochS(now_epoch_s));
 
     DataModel::Nullable<uint32_t> startTime_epoch_s;
     DataModel::Nullable<uint32_t> targetTime_epoch_s;
     DataModel::Nullable<Percent> targetSoC;
-    DataModel::Nullable<int64_t> addedEnergy_mWh;
+    DataModel::Nullable<int64_t> targetAddedEnergy_mWh;
 
-    uint32_t power_W;
-    uint32_t chargingDuration_s;
     uint32_t tempTargetTime_epoch_s;
-    uint32_t tempStartTime_epoch_s;
+    int64_t requiredEnergy_mWh;
     uint16_t targetTimeMinutesPastMidnight_m;
 
     // Initialise the values to Null - if the FindNextTarget finds one, then it will update the value
     targetTime_epoch_s.SetNull();
     targetSoC.SetNull();
-    addedEnergy_mWh.SetNull();
+    targetAddedEnergy_mWh.SetNull();
     startTime_epoch_s.SetNull(); // If we FindNextTarget this will be computed below and set to a non null value
 
     /* We can only compute charging schedules if the EV is plugged in and the charging is enabled
@@ -240,7 +377,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
         while (searchDay < 2)
         {
             err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTimeMinutesPastMidnight_m, targetSoC,
-                                 addedEnergy_mWh, (searchDay != 0));
+                                 targetAddedEnergy_mWh, (searchDay != 0));
             if (err == CHIP_ERROR_NOT_FOUND)
             {
                 // We didn't find one for today, try tomorrow
@@ -266,60 +403,10 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
                 ((now_epoch_s / 60) + targetTimeMinutesPastMidnight_m + (searchDay * 1440) - minutesPastMidnightNow_m) * 60;
             targetTime_epoch_s.SetNonNull(tempTargetTime_epoch_s);
 
-            if (!targetSoC.IsNull())
+            /* Determine requiredEnergy based on if we support SoC Reporting or fallback to AddedEnergy target */
+            if (DetermineRequiredEnergy(dg, requiredEnergy_mWh, targetSoC, targetAddedEnergy_mWh) == CHIP_NO_ERROR)
             {
-                if (targetSoC.Value() != 100)
-                {
-                    ChipLogError(AppServer, "EVSE WARNING: TargetSoC is not 100%% and we don't know the EV SoC!");
-                }
-                // We don't know the Vehicle SoC so we must charge now
-                // TODO make this use the SoC featureMap to determine if this is an error
-                startTime_epoch_s.SetNonNull(now_epoch_s);
-            }
-            else
-            {
-                // We expect to use AddedEnergy to determine the charging start time
-                if (addedEnergy_mWh.IsNull())
-                {
-                    ChipLogError(AppServer, "EVSE ERROR: Neither TargetSoC or AddedEnergy has been provided");
-                    return CHIP_ERROR_INTERNAL;
-                }
-                // Simple optimizer - assume a flat tariff throughout the day
-                // Compute power from nominal voltage and maxChargingRate
-                // GetMaximumChargeCurrent returns mA, but to help avoid overflow
-                // We use V (not mV) and compute power to the nearest Watt
-                power_W = static_cast<uint32_t>((230 * dg->GetMaximumChargeCurrent()) /
-                                                1000); // TODO don't use 230V - not all markets will use that
-                if (power_W == 0)
-                {
-                    ChipLogError(AppServer, "EVSE Error: MaxCurrent = 0Amp - Can't schedule charging");
-                    return CHIP_ERROR_INTERNAL;
-                }
-
-                // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
-                // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
-                chargingDuration_s = static_cast<uint32_t>(((addedEnergy_mWh.Value() / power_W) * 36) / 10);
-
-                // Add in 15 minutes leeway to account for slow starting vehicles
-                // that need to condition the battery or if it is cold etc
-                chargingDuration_s += (15 * 60);
-
-                // A price optimizer can look for cheapest time of day
-                // However for now we'll start charging as late as possible
-                tempStartTime_epoch_s = tempTargetTime_epoch_s - chargingDuration_s;
-
-                if (tempStartTime_epoch_s < now_epoch_s)
-                {
-                    // we need to turn on the EVSE now - it won't have enough time to reach the target
-                    startTime_epoch_s.SetNonNull(now_epoch_s);
-                    // TODO call function to turn on the EV
-                }
-                else
-                {
-                    // we turn off the EVSE for now
-                    startTime_epoch_s.SetNonNull(tempStartTime_epoch_s);
-                    // TODO have a periodic timer which checks if we should turn on the charger now
-                }
+                ComputeStartTime(dg, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s, requiredEnergy_mWh);
             }
         }
     }
@@ -327,7 +414,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     // Update the attributes to allow a UI to inform the user
     dg->SetNextChargeStartTime(startTime_epoch_s);
     dg->SetNextChargeTargetTime(targetTime_epoch_s);
-    dg->SetNextChargeRequiredEnergy(addedEnergy_mWh);
+    dg->SetNextChargeRequiredEnergy(targetAddedEnergy_mWh);
     dg->SetNextChargeTargetSoC(targetSoC);
 
     return err;
@@ -352,31 +439,30 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
 /**
  * @brief   Allows a client application to initialise the PowerSource cluster
  */
-CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster()
+CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpointId)
 {
     Protocols::InteractionModel::Status status;
 
-    status = PowerSource::Attributes::Status::Set(EndpointId(0) /*RootNode*/, PowerSourceStatusEnum::kActive);
+    status = PowerSource::Attributes::Status::Set(endpointId, PowerSourceStatusEnum::kActive);
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status =
-        PowerSource::Attributes::FeatureMap::Set(EndpointId(0 /*RootNode*/), static_cast<uint32_t>(PowerSource::Feature::kWired));
+    status = PowerSource::Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(PowerSource::Feature::kWired));
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::WiredNominalVoltage::Set(EndpointId(0 /*RootNode*/), 230'000); // 230V in mv
+    status = PowerSource::Attributes::WiredNominalVoltage::Set(endpointId, 230'000); // 230V in mv
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::WiredMaximumCurrent::Set(EndpointId(0 /*RootNode*/), 32'000); // 32A in mA
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-
-    status = PowerSource::Attributes::WiredCurrentType::Set(EndpointId(0 /*RootNode*/), PowerSource::WiredCurrentTypeEnum::kAc);
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::Description::Set(EndpointId(0 /*RootNode*/), CharSpan::fromCharString("Primary Mains Power"));
+    status = PowerSource::Attributes::WiredMaximumCurrent::Set(endpointId, 32'000); // 32A in mA
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
 
-    chip::EndpointId endpointArray[] = { 1 /* EVSE Endpoint */ };
+    status = PowerSource::Attributes::WiredCurrentType::Set(endpointId, PowerSource::WiredCurrentTypeEnum::kAc);
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    status = PowerSource::Attributes::Description::Set(endpointId, CharSpan::fromCharString("Primary Mains Power"));
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+
+    chip::EndpointId endpointArray[] = { endpointId };
     Span<EndpointId> endpointList    = Span<EndpointId>(endpointArray);
 
     // Note per API - we do not need to maintain the span after the SetEndpointList has been called
     // since it takes a copy (see power-source-server.cpp)
-    PowerSourceServer::Instance().SetEndpointList(0 /* Root Node */, endpointList);
+    PowerSourceServer::Instance().SetEndpointList(endpointId, endpointList);
 
     return CHIP_NO_ERROR;
 }
@@ -450,7 +536,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
 
     // Get current timestamp
     uint32_t currentTimestamp;
-    CHIP_ERROR err = GetEpochTS(currentTimestamp);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
     if (err == CHIP_NO_ERROR)
     {
         // use EpochTS
@@ -459,7 +545,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
     }
     else
     {
-        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "GetClock_MatterEpochS returned error getting timestamp %" CHIP_ERROR_FORMAT, err.Format());
 
         // use systemTime as a fallback
         System::Clock::Milliseconds64 system_time_ms =
@@ -523,7 +609,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
 
     // Get current timestamp
     uint32_t currentTimestamp;
-    CHIP_ERROR err = GetEpochTS(currentTimestamp);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
     if (err == CHIP_NO_ERROR)
     {
         // use EpochTS
@@ -532,7 +618,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
     }
     else
     {
-        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");
+        ChipLogError(AppServer, "GetClock_MatterEpochS returned error getting timestamp");
 
         // use systemTime as a fallback
         System::Clock::Milliseconds64 system_time_ms =
@@ -583,6 +669,10 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
                         static_cast<long>(cb->ChargingCurrent.maximumChargeCurrent));
         pClass->ComputeChargingSchedule();
         pClass->UpdateEVFakeReadings(cb->ChargingCurrent.maximumChargeCurrent);
+        break;
+    case EVSECallbackType::DischargeCurrentChanged:
+        ChipLogProgress(AppServer, "EVSE callback - maxDischargeCurrent changed to %ld",
+                        static_cast<long>(cb->DischargingCurrent.maximumDischargeCurrent));
         break;
     case EVSECallbackType::EnergyMeterReadingRequested:
         ChipLogProgress(AppServer, "EVSE callback - EnergyMeterReadingRequested");

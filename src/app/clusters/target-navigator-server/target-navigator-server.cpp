@@ -36,7 +36,8 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/app-platform/ContentAppPlatform.h>
+#include <app/app-platform/ContentAppPlatform.h> // nogncheck
+
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
@@ -262,4 +263,9 @@ void MatterTargetNavigatorClusterServerAttributeChangedCallback(const chip::app:
 void MatterTargetNavigatorPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gTargetNavigatorAttrAccess);
+}
+
+void MatterTargetNavigatorPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gTargetNavigatorAttrAccess);
 }

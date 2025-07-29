@@ -31,9 +31,19 @@ public:
         SLEEP
     };
 
-    virtual ~ExternalFlashManager() {}
+    // Not copyable or movable
+    ExternalFlashManager(ExternalFlashManager &&)                  = delete;
+    ExternalFlashManager & operator=(const ExternalFlashManager &) = delete;
+    ExternalFlashManager(const ExternalFlashManager &)             = delete;
+    ExternalFlashManager & operator=(ExternalFlashManager &&)      = delete;
 
-    virtual void DoAction(Action aAction)
+    static ExternalFlashManager & GetInstance()
+    {
+        static ExternalFlashManager sExternalFlashManager;
+        return sExternalFlashManager;
+    }
+
+    void DoAction(Action aAction)
     {
 #if defined(CONFIG_PM_DEVICE) && defined(CONFIG_NORDIC_QSPI_NOR)
         // utilize the QSPI driver sleep power mode
@@ -45,6 +55,10 @@ public:
         }
 #endif
     }
+
+private:
+    // Singleton Object
+    ExternalFlashManager() = default;
 };
 
 } // namespace DeviceLayer

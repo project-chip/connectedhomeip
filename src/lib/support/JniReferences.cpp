@@ -310,8 +310,8 @@ CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & option
 {
     JNIEnv * env = GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-    jclass optionalCls = nullptr;
-    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/Optional", optionalCls));
+    VerifyOrReturnError(optionalObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    jclass optionalCls        = env->GetObjectClass(optionalObj);
     jmethodID isPresentMethod = env->GetMethodID(optionalCls, "isPresent", "()Z");
     VerifyOrReturnError(isPresentMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
     jboolean isPresent = optionalObj && env->CallBooleanMethod(optionalObj, isPresentMethod);

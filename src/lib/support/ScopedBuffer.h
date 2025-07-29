@@ -26,6 +26,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 #include <type_traits>
 #include <utility>
@@ -218,10 +219,11 @@ public:
         return *this;
     }
 
-    ~ScopedMemoryBufferWithSize() { mCount = 0; }
-
     // return the size as count of elements
     inline size_t AllocatedSize() const { return mCount; }
+
+    chip::Span<T> Span() { return chip::Span<T>(this->Get(), AllocatedSize()); }
+    chip::Span<const T> Span() const { return chip::Span<T>(this->Get(), AllocatedSize()); }
 
     void Free()
     {
@@ -258,6 +260,29 @@ public:
         {
             mCount = elementCount;
         }
+        return *this;
+    }
+
+    // Allow creating ScopedMemoryBufferWithSize from Span, so we
+    // don't have to reinvent it in various places.
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible_v<U *, T *>>>
+    ScopedMemoryBufferWithSize & CopyFromSpan(const chip::Span<const U> & span)
+    {
+        static_assert(std::is_trivially_copyable_v<U>, "Span<const U> must be trivially copyable");
+
+        if (span.size() == 0)
+        {
+            Free();
+            return *this;
+        }
+
+        ScopedMemoryBufferWithSize<T>::Alloc(span.size());
+
+        if (AllocatedSize() > 0)
+        {
+            memcpy(ScopedMemoryBuffer<T>::Get(), span.data(), AllocatedSize());
+        }
+
         return *this;
     }
 

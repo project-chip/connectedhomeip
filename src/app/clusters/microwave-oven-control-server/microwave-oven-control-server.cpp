@@ -19,12 +19,14 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-compatibility-functions.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -135,7 +137,7 @@ void Instance::SetCookTimeSec(uint32_t cookTimeSec)
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "Microwave Oven Control: Reading");
+    ChipLogDetail(Zcl, "Microwave Oven Control: Reading");
     switch (aPath.mAttributeId)
     {
     case MicrowaveOvenControl::Attributes::CookTime::Id:
@@ -248,11 +250,20 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
+
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
+            ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);
+        auto acceptedCommands = acceptedCommandsList.TakeBuffer();
+
+        bool commandExists =
+            std::find_if(acceptedCommands.begin(), acceptedCommands.end(), [](const DataModel::AcceptedCommandEntry & entry) {
+                return entry.commandId == OperationalState::Commands::Start::Id;
+            }) != acceptedCommands.end();
+
         VerifyOrExit(
-            ServerClusterCommandExists(
-                ConcreteCommandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id)) == Status::Success,
-            status = Status::InvalidCommand;
-            ChipLogError(
+            commandExists, status = Status::InvalidCommand; ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set cooking parameters, Start command of operational state is not supported"));
     }
@@ -374,3 +385,4 @@ bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNu
  *
  */
 void MatterMicrowaveOvenControlPluginServerInitCallback() {}
+void MatterMicrowaveOvenControlPluginServerShutdownCallback() {}

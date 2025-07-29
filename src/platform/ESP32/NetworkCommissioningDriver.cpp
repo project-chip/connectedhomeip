@@ -238,7 +238,7 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
         CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
             return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
         }
     }
@@ -300,7 +300,7 @@ void ESPWiFiDriver::OnConnectWiFiNetworkFailed(chip::System::Layer * aLayer, voi
     CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
     ESPWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed();
 }
@@ -315,8 +315,7 @@ void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(BackupConfiguration() == CHIP_NO_ERROR, networkingStatus = Status::kUnknownError);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
-                    networkId.data());
+    ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %s", NullTerminated(networkId).c_str());
     if (CHIP_NO_ERROR == GetConfiguredNetwork(configuredNetwork))
     {
         if (NetworkMatch(mStagingNetwork, ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)))
@@ -342,7 +341,7 @@ exit:
     }
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
@@ -387,6 +386,29 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         return;
     }
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
+    if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_number]() {
+            ESPScanResponseIterator iter(ap_number);
+            if (GetInstance().mpScanCallback)
+            {
+                GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+                GetInstance().mpScanCallback = nullptr;
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "can't find the ScanCallback function");
+            }
+            iter.Release();
+        }))
+    {
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "can't schedule the scan result processing");
+        mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        mpScanCallback = nullptr;
+    }
+#else
     // Since this is the dynamic memory allocation, restrict it to a configured limit
     ap_number = std::min(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_MAX_SCAN_NETWORKS_RESULTS), ap_number);
 
@@ -430,6 +452,7 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         mpScanCallback = nullptr;
     }
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
 }
 
 void ESPWiFiDriver::OnNetworkStatusChange()

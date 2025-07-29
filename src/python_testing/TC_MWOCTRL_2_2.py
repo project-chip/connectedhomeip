@@ -106,7 +106,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_MWOCTRL_2_2(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes
@@ -117,7 +117,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
 
         if not is_pwrnum_feature_supported:
             logging.info("PWRNUM is not supported so skipping remaining test steps")
-            self.skip_all_remaining_steps(2)
+            self.mark_all_remaining_steps_skipped(2)
             return
 
         logging.info("The PWRNUM feature is supported so continuing with remaining test steps")

@@ -39,6 +39,7 @@ shared_library("jni") {
     "${chip_root}/src/platform/android:java",
     "${chip_root}/src/platform/android:logging",
     "${chip_root}/src/platform/tests:tests",
+    "${chip_root}/src/pw_backends/assert:assert.impl",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/nlfaultinjection:nlfaultinjection",
   ]
@@ -71,7 +72,7 @@ android_library("java") {
 }
 
 java_prebuilt("android") {
-  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-30/android.jar"
 }
 
 group("default") {

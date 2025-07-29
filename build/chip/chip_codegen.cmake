@@ -17,21 +17,31 @@
 #   INPUT     - the name of the ".matter" file to use for generation
 #   GENERATOR - generator to use for codegen.py
 #   OUTPUTS   - EXPECTED output names. MUST match actual outputs
-# 
+#
 #   OUTPUT_PATH  - [OUT] output variable will contain the directory where the
 #                  files will be generated
 #   OUTPUT_FILES - [OUT] output variable will contain the path of generated files.
 #                  suitable to be added within a build target
 #
 function(chip_codegen TARGET_NAME)
-    cmake_parse_arguments(ARG 
-         "" 
-         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES" 
-         "OUTPUTS" 
+    cmake_parse_arguments(ARG
+         ""
+         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES"
+         "OUTPUTS"
          ${ARGN}
     )
 
     set(CHIP_CODEGEN_PREGEN_DIR "" CACHE PATH "Pre-generated directory to use instead of compile-time code generation.")
+
+    # Output paths can contain placeholders such as
+    # {{defined_cluster_name}} or {{server_cluster_name}}
+    #
+    # This translates them to the actually fully expanded path.
+    execute_process(
+            COMMAND "${CHIP_ROOT}/scripts/codegen_paths.py" "--idl" "${ARG_INPUT}" ${ARG_OUTPUTS}
+            OUTPUT_VARIABLE GENERATED_PATHS_OUT
+    )
+    string(REPLACE "\n" ";" GENERATED_PATHS "${GENERATED_PATHS_OUT}")
 
     if ("${CHIP_CODEGEN_PREGEN_DIR}" STREQUAL "")
         set(GEN_FOLDER "${CMAKE_BINARY_DIR}/gen/${TARGET_NAME}/${ARG_GENERATOR}")
@@ -46,16 +56,16 @@ function(chip_codegen TARGET_NAME)
 
 
         set(OUT_NAMES)
-        foreach(NAME IN LISTS ARG_OUTPUTS)
+        foreach(NAME IN LISTS GENERATED_PATHS)
             list(APPEND OUT_NAMES "${GEN_FOLDER}/${NAME}")
         endforeach()
 
         # Python is expected to be in the path
-        #
-        # find_package(Python3 REQUIRED)
+        # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
+        find_package(Python3 REQUIRED)
         add_custom_command(
             OUTPUT ${OUT_NAMES}
-            COMMAND "${CHIP_ROOT}/scripts/codegen.py"
+            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/codegen.py"
             ARGS "--generator" "${ARG_GENERATOR}"
                  "--output-dir" "${GEN_FOLDER}"
                  "--expected-outputs" "${GEN_FOLDER}/expected.outputs"
@@ -87,7 +97,7 @@ function(chip_codegen TARGET_NAME)
 
         # Here we have ${CHIP_CODEGEN_PREGEN_DIR}
         set(OUT_NAMES)
-        foreach(NAME IN LISTS ARG_OUTPUTS)
+        foreach(NAME IN LISTS GENERATED_PATHS)
             list(APPEND OUT_NAMES "${GEN_FOLDER}/${NAME}")
         endforeach()
 
@@ -103,7 +113,7 @@ endfunction()
 # Run chip code generation using zap
 #
 # Example usage:
-#   chip_codegen("app"
+#   chip_zapgen("app"
 #      INPUT     "some_file.zap"
 #      GENERATOR "app-templates"
 #      OUTPUTS
@@ -171,8 +181,8 @@ function(chip_zapgen TARGET_NAME)
         endif()
 
         # Python is expected to be in the path
-        #
-        # find_package(Python3 REQUIRED)
+        # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
+        find_package(Python3 REQUIRED)
         #
         # TODO: lockfile support should be removed as this serializes zap
         # (slower), however this is currently done because on Darwin zap startup
@@ -180,7 +190,7 @@ function(chip_zapgen TARGET_NAME)
         #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
         add_custom_command(
             OUTPUT ${OUT_NAMES}
-            COMMAND "${CHIP_ROOT}/scripts/tools/zap/generate.py"
+            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/tools/zap/generate.py"
             ARGS
                 "--no-prettify-output"
                 "--templates" "${TEMPLATE_PATH}"

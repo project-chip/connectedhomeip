@@ -1138,13 +1138,13 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len)
 {
     secEcp256Status_t result;
     ecp256Point_t gen_point;
     uint32_t W1[SEC_ECP256_COORDINATE_WLEN];
 
-    result = ECP256_ModularReductionN(W1, w1in, w1in_len);
+    result = ECP256_ModularReductionN(W1, w1sin, w1sin_len);
     VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
     result = ECP256_GeneratePublicKey((uint8_t *) &gen_point, (uint8_t *) &W1, NULL);

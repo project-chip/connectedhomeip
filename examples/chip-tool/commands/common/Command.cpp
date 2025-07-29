@@ -41,6 +41,7 @@
 
 constexpr char kOptionalArgumentPrefix[]       = "--";
 constexpr size_t kOptionalArgumentPrefixLength = 2;
+char kOptionalArgumentNullableDefault[]        = "null";
 
 bool Command::InitArguments(int argc, char ** argv)
 {
@@ -54,6 +55,10 @@ bool Command::InitArguments(int argc, char ** argv)
         if (arg.isOptional())
         {
             optionalArgsCount++;
+        }
+        else if (argvExtraArgsCount == 0)
+        {
+            mandatoryArgsCount++;
         }
         else
         {
@@ -77,10 +82,33 @@ bool Command::InitArguments(int argc, char ** argv)
     }
 
     // Initialize optional arguments
-    // Optional arguments expect a name and a value, so i is increased by 2 on every step.
-    for (size_t i = mandatoryArgsCount; i < (size_t) argc; i += 2)
+    //
+    // The optional arguments have a specific format and can also be "nullable":
+    // - Each optional argument is prefixed by `kOptionalArgumentPrefix` (e.g., "--").
+    // - Every optional argument name should be immediately followed by its corresponding value, unless it is nullable.
+    // - For nullable optional arguments, it is valid to have no subsequent value. In that case, the argument is set to a
+    //   default null value. This allows such arguments to act as flags:
+    //   - If the next token in `argv` starts with the optional prefix, or if this argument is the last one,
+    //     we treat the optional argument as null (no specified value).
+    //
+    // The loop processes arguments starting at `mandatoryArgsCount` because all mandatory arguments are already processed.
+    // We iterate through `argv` and attempt to match each potential optional argument. The logic is as follows:
+    // 1. Check if the current argument (`argv[i]`) is indeed an optional argument by verifying it has the prefix
+    // `kOptionalArgumentPrefix`.
+    // 2. If it matches a known optional argument name, handle its value:
+    //    - If the optional argument is nullable and the following conditions hold:
+    //      a) There are no more arguments (`i + 1 >= argc`), or
+    //      b) The next argument (`argv[i + 1]`) is also an optional argument (prefix check)
+    //      then set the current optional argument to a null default.
+    //    - Otherwise, expect the next argument (`argv[i + 1]`) to be the value. If no value is provided, log an error and exit.
+    // 3. Once processed, move the index `i` forward by 2 if a value was consumed (name + value), or by 1 if the argument was
+    // nullable and no value was consumed.
+    //
+    // If at any point an argument cannot be matched or initialized properly, an error is logged and we exit.
+    for (size_t i = mandatoryArgsCount; i < (size_t) argc;)
     {
-        bool found = false;
+        bool found      = false;
+        bool foundValue = false;
         for (size_t j = mandatoryArgsCount; j < mandatoryArgsCount + optionalArgsCount; j++)
         {
             // optional arguments starts with kOptionalArgumentPrefix
@@ -94,14 +122,40 @@ bool Command::InitArguments(int argc, char ** argv)
             {
                 found = true;
 
+                if (mArgs[j].isNullable())
+                {
+                    if ((size_t) argc <= (i + 1))
+                    {
+                        // This is the last argument, so set it to null.
+                        VerifyOrDo(InitArgument(j, kOptionalArgumentNullableDefault), ExitNow());
+                        continue;
+                    }
+
+                    if (strncmp(argv[i + 1], kOptionalArgumentPrefix, kOptionalArgumentPrefixLength) == 0)
+                    {
+                        // The argument is followed by an other optional argument, so set it to null.
+                        VerifyOrDo(InitArgument(j, kOptionalArgumentNullableDefault), ExitNow());
+                        continue;
+                    }
+                }
+
                 VerifyOrExit((size_t) argc > (i + 1),
                              ChipLogError(chipTool, "InitArgs: Optional argument %s missing value.", argv[i]));
-                if (!InitArgument(j, argv[i + 1]))
-                {
-                    ExitNow();
-                }
+
+                foundValue = true;
+                VerifyOrDo(InitArgument(j, argv[i + 1]), ExitNow());
             }
         }
+
+        if (foundValue)
+        {
+            i += 2;
+        }
+        else
+        {
+            i += 1;
+        }
+
         VerifyOrExit(found, ChipLogError(chipTool, "InitArgs: Optional argument %s does not exist.", argv[i]));
     }
 

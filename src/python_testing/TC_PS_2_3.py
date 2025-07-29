@@ -38,8 +38,8 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -61,8 +61,8 @@ class TC_PS_2_3(MatterBaseTest):
 
         self.step(2)
         ps = Clusters.PowerSource
-        sub_handler = ClusterAttributeChangeAccumulator(ps)
-        await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=ps)
+        await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(3)
         logging.info("This test will now wait for 30 seconds.")

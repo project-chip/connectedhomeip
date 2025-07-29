@@ -10,11 +10,9 @@ The following docs are a brief introduction to SDK development.
 first_example
 changing_examples
 SDKBasics
-zap
 
 ```
 
 -   [Running your first example](./first_example.md)
 -   [Changing examples](./changing_examples.md)
 -   [SDK Architecture Overview](./SDKBasics.md)
--   [ZAP Introduction](./zap.md)

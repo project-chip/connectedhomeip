@@ -16,11 +16,10 @@
  *    limitations under the License.
  */
 
-#include <DEMDelegate.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
+#include <EnergyManagementAppCommonMain.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
-
-#include <EnergyTimeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include "FakeReadings.h"
 
@@ -28,24 +27,26 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+namespace {
 
-static constexpr uint16_t MAX_SLOTS             = 10;
-static constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
+constexpr uint16_t MAX_SLOTS             = 10;
+constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
 
-static chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
-static chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type sForecastStruct;
-static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> sForecast;
+chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
+chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type sForecastStruct;
 
-static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type sPowerAdjustments[MAX_POWER_ADJUSTMENTS];
-static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;
-static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>
+chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type sPowerAdjustments[MAX_POWER_ADJUSTMENTS];
+chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;
+chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>
     sPowerAdjustmentCapability;
+
+} // namespace
 
 CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 {
-    uint32_t chipEpoch = 0;
+    uint32_t matterEpoch = 0;
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "ConfigureForecast could not get time");
@@ -54,17 +55,17 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     // planned start time, in UTC, for the entire Forecast. Allow to be a little
     // time in the future as forecastStruct.startTime is used in some tests.
-    sForecastStruct.startTime = chipEpoch + 60;
+    sForecastStruct.startTime = matterEpoch + 60;
 
     // earliest start time, in UTC, that the entire Forecast can be shifted to. null value indicates that it can be started
     // immediately.
-    sForecastStruct.earliestStartTime = MakeOptional(DataModel::MakeNullable(chipEpoch));
+    sForecastStruct.earliestStartTime = MakeOptional(DataModel::MakeNullable(matterEpoch));
 
     // planned end time, in UTC, for the entire Forecast.
-    sForecastStruct.endTime = chipEpoch * 3;
+    sForecastStruct.endTime = matterEpoch * 3;
 
     // latest end time, in UTC, for the entire Forecast
-    sForecastStruct.latestEndTime = MakeOptional(chipEpoch * 3);
+    sForecastStruct.latestEndTime = MakeOptional(matterEpoch * 3);
 
     sForecastStruct.isPausable = true;
 
@@ -145,7 +146,7 @@ void SetTestEventTrigger_PowerAdjustment()
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(sPowerAdjustmentCapability);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed %s", chip::ErrorStr(err));
+        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -167,7 +168,7 @@ void SetTestEventTrigger_ClearForecast()
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(powerAdjustmentCapabilityStruct);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed %s", chip::ErrorStr(err));
+        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -178,25 +179,26 @@ void SetTestEventTrigger_StartTimeAdjustment()
     // Get the current forecast ad update the earliestStartTime and latestEndTime
     sForecastStruct = GetDEMDelegate()->GetForecast().Value();
 
-    uint32_t chipEpoch = 0;
+    uint32_t matterEpoch = 0;
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "ConfigureForecast_EarliestStartLatestEndTimes could not get time");
     }
 
     // planned start time, in UTC, for the entire Forecast.
-    sForecastStruct.startTime = chipEpoch;
+    sForecastStruct.startTime = matterEpoch;
 
     // Set the earliest start time, in UTC, to that before the startTime
-    sForecastStruct.earliestStartTime = Optional<DataModel::Nullable<uint32_t>>{ DataModel::Nullable<uint32_t>{ chipEpoch - 60 } };
+    sForecastStruct.earliestStartTime =
+        Optional<DataModel::Nullable<uint32_t>>{ DataModel::Nullable<uint32_t>{ matterEpoch - 60 } };
 
     // Planned end time, in UTC, for the entire Forecast.
-    sForecastStruct.endTime = chipEpoch * 3;
+    sForecastStruct.endTime = matterEpoch * 3;
 
     // Latest end time, in UTC, for the entire Forecast which is > sForecastStruct.endTime
-    sForecastStruct.latestEndTime = Optional<uint32_t>(chipEpoch * 3 + 60);
+    sForecastStruct.latestEndTime = Optional<uint32_t>(matterEpoch * 3 + 60);
 
     GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }

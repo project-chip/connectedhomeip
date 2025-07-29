@@ -62,7 +62,7 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
  *
  * The abstract class hierarchy is:
  * - Layer: Core timer methods.
- *   - LayerFreeRTOS: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP and CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT.
+ *   - LayerFreeRTOS: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP and CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT.
  *   - LayerSockets: Adds I/O event methods specific to CHIP_SYSTEM_CONFIG_USING_SOCKETS.
  *     - LayerSocketsLoop: Adds methods for event-loop-based implementations.
  *
@@ -227,7 +227,7 @@ private:
     Layer & operator=(const Layer &) = delete;
 };
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 class LayerFreeRTOS : public Layer
 {
@@ -236,7 +236,6 @@ class LayerFreeRTOS : public Layer
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 class LayerSockets : public Layer
 {
 public:
@@ -338,18 +337,13 @@ public:
     virtual void HandleEvents()    = 0;
     virtual void EventLoopEnds()   = 0;
 
-#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
     virtual void AddLoopHandler(EventLoopHandler & handler)    = 0;
     virtual void RemoveLoopHandler(EventLoopHandler & handler) = 0;
-#endif // !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;
-    virtual dispatch_queue_t GetDispatchQueue()                   = 0;
-#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
     virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) = 0;
     virtual struct ev_loop * GetLibEvLoop()                 = 0;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
 protected:
     // Expose EventLoopHandler.mState as a non-const reference to sub-classes
@@ -357,6 +351,31 @@ protected:
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+class LayerDispatch :
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    public LayerSockets
+#else
+    public Layer
+#endif
+{
+public:
+    virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue)  = 0;
+    virtual dispatch_queue_t GetDispatchQueue()                    = 0;
+    virtual void HandleDispatchQueueEvents(Clock::Timeout timeout) = 0;
+
+    /**
+     * Schedule a block to run asynchronously.
+     *
+     * @param block The block to be executed.
+     *
+     * @note This method is thread-safe and can be called from any dispatch queue.
+     */
+    virtual CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block)                     = 0;
+    virtual CHIP_ERROR StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) = 0;
+};
+#endif
 
 } // namespace System
 } // namespace chip

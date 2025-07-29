@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class CameraAvStreamManagementClusterAudioStreamStruct(
   val audioStreamID: UInt,
-  val streamType: UInt,
+  val streamUsage: UInt,
   val audioCodec: UInt,
   val channelCount: UInt,
   val sampleRate: ULong,
@@ -35,7 +35,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterAudioStreamStruct {\n")
     append("\taudioStreamID : $audioStreamID\n")
-    append("\tstreamType : $streamType\n")
+    append("\tstreamUsage : $streamUsage\n")
     append("\taudioCodec : $audioCodec\n")
     append("\tchannelCount : $channelCount\n")
     append("\tsampleRate : $sampleRate\n")
@@ -49,7 +49,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
-      put(ContextSpecificTag(TAG_STREAM_TYPE), streamType)
+      put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       put(ContextSpecificTag(TAG_AUDIO_CODEC), audioCodec)
       put(ContextSpecificTag(TAG_CHANNEL_COUNT), channelCount)
       put(ContextSpecificTag(TAG_SAMPLE_RATE), sampleRate)
@@ -62,7 +62,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
 
   companion object {
     private const val TAG_AUDIO_STREAM_ID = 0
-    private const val TAG_STREAM_TYPE = 1
+    private const val TAG_STREAM_USAGE = 1
     private const val TAG_AUDIO_CODEC = 2
     private const val TAG_CHANNEL_COUNT = 3
     private const val TAG_SAMPLE_RATE = 4
@@ -76,7 +76,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
     ): CameraAvStreamManagementClusterAudioStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val audioStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-      val streamType = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_TYPE))
+      val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
       val audioCodec = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_CODEC))
       val channelCount = tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL_COUNT))
       val sampleRate = tlvReader.getULong(ContextSpecificTag(TAG_SAMPLE_RATE))
@@ -88,7 +88,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
 
       return CameraAvStreamManagementClusterAudioStreamStruct(
         audioStreamID,
-        streamType,
+        streamUsage,
         audioCodec,
         channelCount,
         sampleRate,

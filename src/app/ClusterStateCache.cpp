@@ -36,7 +36,7 @@ uint32_t SizeOfStatusIB(const StatusIB & aStatus)
     // 1 byte: end of container.
     uint32_t size = 5;
 
-    if (aStatus.mClusterStatus.HasValue())
+    if (aStatus.mClusterStatus.has_value())
     {
         // 1 byte: control byte for uint8 value.
         // 1 byte: context-specific tag for uint8 value.

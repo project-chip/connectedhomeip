@@ -54,6 +54,12 @@ class CameraAvStreamManagementCluster(
 
   class SnapshotStreamAllocateResponse(val snapshotStreamID: UShort)
 
+  class CaptureSnapshotResponse(
+    val data: ByteArray,
+    val imageCodec: UByte,
+    val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+  )
+
   class VideoSensorParamsAttribute(
     val value: CameraAvStreamManagementClusterVideoSensorParamsStruct?
   )
@@ -119,51 +125,28 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : SpeakerCapabilitiesAttributeSubscriptionState()
   }
 
-  class SupportedSnapshotParamsAttribute(
-    val value: List<CameraAvStreamManagementClusterSnapshotParamsStruct>?
+  class SnapshotCapabilitiesAttribute(
+    val value: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>?
   )
 
-  sealed class SupportedSnapshotParamsAttributeSubscriptionState {
-    data class Success(val value: List<CameraAvStreamManagementClusterSnapshotParamsStruct>?) :
-      SupportedSnapshotParamsAttributeSubscriptionState()
+  sealed class SnapshotCapabilitiesAttributeSubscriptionState {
+    data class Success(
+      val value: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>?
+    ) : SnapshotCapabilitiesAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) :
-      SupportedSnapshotParamsAttributeSubscriptionState()
+    data class Error(val exception: Exception) : SnapshotCapabilitiesAttributeSubscriptionState()
 
-    object SubscriptionEstablished : SupportedSnapshotParamsAttributeSubscriptionState()
+    object SubscriptionEstablished : SnapshotCapabilitiesAttributeSubscriptionState()
   }
 
-  class CurrentVideoCodecsAttribute(val value: List<UByte>?)
+  class SupportedStreamUsagesAttribute(val value: List<UByte>)
 
-  sealed class CurrentVideoCodecsAttributeSubscriptionState {
-    data class Success(val value: List<UByte>?) : CurrentVideoCodecsAttributeSubscriptionState()
+  sealed class SupportedStreamUsagesAttributeSubscriptionState {
+    data class Success(val value: List<UByte>) : SupportedStreamUsagesAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : CurrentVideoCodecsAttributeSubscriptionState()
+    data class Error(val exception: Exception) : SupportedStreamUsagesAttributeSubscriptionState()
 
-    object SubscriptionEstablished : CurrentVideoCodecsAttributeSubscriptionState()
-  }
-
-  class CurrentSnapshotConfigAttribute(
-    val value: CameraAvStreamManagementClusterSnapshotParamsStruct?
-  )
-
-  sealed class CurrentSnapshotConfigAttributeSubscriptionState {
-    data class Success(val value: CameraAvStreamManagementClusterSnapshotParamsStruct?) :
-      CurrentSnapshotConfigAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : CurrentSnapshotConfigAttributeSubscriptionState()
-
-    object SubscriptionEstablished : CurrentSnapshotConfigAttributeSubscriptionState()
-  }
-
-  class FabricsUsingCameraAttribute(val value: List<UByte>)
-
-  sealed class FabricsUsingCameraAttributeSubscriptionState {
-    data class Success(val value: List<UByte>) : FabricsUsingCameraAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : FabricsUsingCameraAttributeSubscriptionState()
-
-    object SubscriptionEstablished : FabricsUsingCameraAttributeSubscriptionState()
+    object SubscriptionEstablished : SupportedStreamUsagesAttributeSubscriptionState()
   }
 
   class AllocatedVideoStreamsAttribute(
@@ -206,16 +189,14 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : AllocatedSnapshotStreamsAttributeSubscriptionState()
   }
 
-  class RankedVideoStreamPrioritiesListAttribute(val value: List<UByte>?)
+  class StreamUsagePrioritiesAttribute(val value: List<UByte>)
 
-  sealed class RankedVideoStreamPrioritiesListAttributeSubscriptionState {
-    data class Success(val value: List<UByte>?) :
-      RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+  sealed class StreamUsagePrioritiesAttributeSubscriptionState {
+    data class Success(val value: List<UByte>) : StreamUsagePrioritiesAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) :
-      RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+    data class Error(val exception: Exception) : StreamUsagePrioritiesAttributeSubscriptionState()
 
-    object SubscriptionEstablished : RankedVideoStreamPrioritiesListAttributeSubscriptionState()
+    object SubscriptionEstablished : StreamUsagePrioritiesAttributeSubscriptionState()
   }
 
   class ViewportAttribute(val value: CameraAvStreamManagementClusterViewportStruct?)
@@ -249,16 +230,6 @@ class CameraAvStreamManagementCluster(
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
 
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
-  }
-
   class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
@@ -270,7 +241,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun audioStreamAllocate(
-    streamType: UByte,
+    streamUsage: UByte,
     audioCodec: UByte,
     channelCount: UByte,
     sampleRate: UInt,
@@ -283,8 +254,8 @@ class CameraAvStreamManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_STREAM_TYPE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_STREAM_TYPE_REQ), streamType)
+    val TAG_STREAM_USAGE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
 
     val TAG_AUDIO_CODEC_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_AUDIO_CODEC_REQ), audioCodec)
@@ -358,7 +329,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun videoStreamAllocate(
-    streamType: UByte,
+    streamUsage: UByte,
     videoCodec: UByte,
     minFrameRate: UShort,
     maxFrameRate: UShort,
@@ -366,8 +337,8 @@ class CameraAvStreamManagementCluster(
     maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     minBitRate: UInt,
     maxBitRate: UInt,
-    minFragmentLen: UShort,
-    maxFragmentLen: UShort,
+    minKeyFrameInterval: UShort,
+    maxKeyFrameInterval: UShort,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
@@ -377,8 +348,8 @@ class CameraAvStreamManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_STREAM_TYPE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_STREAM_TYPE_REQ), streamType)
+    val TAG_STREAM_USAGE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
 
     val TAG_VIDEO_CODEC_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_VIDEO_CODEC_REQ), videoCodec)
@@ -401,11 +372,11 @@ class CameraAvStreamManagementCluster(
     val TAG_MAX_BIT_RATE_REQ: Int = 7
     tlvWriter.put(ContextSpecificTag(TAG_MAX_BIT_RATE_REQ), maxBitRate)
 
-    val TAG_MIN_FRAGMENT_LEN_REQ: Int = 8
-    tlvWriter.put(ContextSpecificTag(TAG_MIN_FRAGMENT_LEN_REQ), minFragmentLen)
+    val TAG_MIN_KEY_FRAME_INTERVAL_REQ: Int = 8
+    tlvWriter.put(ContextSpecificTag(TAG_MIN_KEY_FRAME_INTERVAL_REQ), minKeyFrameInterval)
 
-    val TAG_MAX_FRAGMENT_LEN_REQ: Int = 9
-    tlvWriter.put(ContextSpecificTag(TAG_MAX_FRAGMENT_LEN_REQ), maxFragmentLen)
+    val TAG_MAX_KEY_FRAME_INTERVAL_REQ: Int = 9
+    tlvWriter.put(ContextSpecificTag(TAG_MAX_KEY_FRAME_INTERVAL_REQ), maxKeyFrameInterval)
 
     val TAG_WATERMARK_ENABLED_REQ: Int = 10
     watermarkEnabled?.let {
@@ -452,7 +423,6 @@ class CameraAvStreamManagementCluster(
 
   suspend fun videoStreamModify(
     videoStreamID: UShort,
-    resolution: CameraAvStreamManagementClusterVideoResolutionStruct?,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
@@ -465,15 +435,12 @@ class CameraAvStreamManagementCluster(
     val TAG_VIDEO_STREAM_ID_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_VIDEO_STREAM_ID_REQ), videoStreamID)
 
-    val TAG_RESOLUTION_REQ: Int = 1
-    resolution?.let { resolution.toTlv(ContextSpecificTag(TAG_RESOLUTION_REQ), tlvWriter) }
-
-    val TAG_WATERMARK_ENABLED_REQ: Int = 2
+    val TAG_WATERMARK_ENABLED_REQ: Int = 1
     watermarkEnabled?.let {
       tlvWriter.put(ContextSpecificTag(TAG_WATERMARK_ENABLED_REQ), watermarkEnabled)
     }
 
-    val TAG_OSD_ENABLED_REQ: Int = 3
+    val TAG_OSD_ENABLED_REQ: Int = 2
     OSDEnabled?.let { tlvWriter.put(ContextSpecificTag(TAG_OSD_ENABLED_REQ), OSDEnabled) }
     tlvWriter.endStructure()
 
@@ -511,11 +478,12 @@ class CameraAvStreamManagementCluster(
 
   suspend fun snapshotStreamAllocate(
     imageCodec: UByte,
-    frameRate: UShort,
-    bitRate: UInt,
+    maxFrameRate: UShort,
     minResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     quality: UByte,
+    watermarkEnabled: Boolean?,
+    OSDEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
   ): SnapshotStreamAllocateResponse {
     val commandId: UInt = 7u
@@ -526,20 +494,25 @@ class CameraAvStreamManagementCluster(
     val TAG_IMAGE_CODEC_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_IMAGE_CODEC_REQ), imageCodec)
 
-    val TAG_FRAME_RATE_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_FRAME_RATE_REQ), frameRate)
+    val TAG_MAX_FRAME_RATE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_MAX_FRAME_RATE_REQ), maxFrameRate)
 
-    val TAG_BIT_RATE_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_BIT_RATE_REQ), bitRate)
-
-    val TAG_MIN_RESOLUTION_REQ: Int = 3
+    val TAG_MIN_RESOLUTION_REQ: Int = 2
     minResolution.toTlv(ContextSpecificTag(TAG_MIN_RESOLUTION_REQ), tlvWriter)
 
-    val TAG_MAX_RESOLUTION_REQ: Int = 4
+    val TAG_MAX_RESOLUTION_REQ: Int = 3
     maxResolution.toTlv(ContextSpecificTag(TAG_MAX_RESOLUTION_REQ), tlvWriter)
 
-    val TAG_QUALITY_REQ: Int = 5
+    val TAG_QUALITY_REQ: Int = 4
     tlvWriter.put(ContextSpecificTag(TAG_QUALITY_REQ), quality)
+
+    val TAG_WATERMARK_ENABLED_REQ: Int = 5
+    watermarkEnabled?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_WATERMARK_ENABLED_REQ), watermarkEnabled)
+    }
+
+    val TAG_OSD_ENABLED_REQ: Int = 6
+    OSDEnabled?.let { tlvWriter.put(ContextSpecificTag(TAG_OSD_ENABLED_REQ), OSDEnabled) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -576,11 +549,45 @@ class CameraAvStreamManagementCluster(
     return SnapshotStreamAllocateResponse(snapshotStreamID_decoded)
   }
 
+  suspend fun snapshotStreamModify(
+    snapshotStreamID: UShort,
+    watermarkEnabled: Boolean?,
+    OSDEnabled: Boolean?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 9u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SNAPSHOT_STREAM_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_SNAPSHOT_STREAM_ID_REQ), snapshotStreamID)
+
+    val TAG_WATERMARK_ENABLED_REQ: Int = 1
+    watermarkEnabled?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_WATERMARK_ENABLED_REQ), watermarkEnabled)
+    }
+
+    val TAG_OSD_ENABLED_REQ: Int = 2
+    OSDEnabled?.let { tlvWriter.put(ContextSpecificTag(TAG_OSD_ENABLED_REQ), OSDEnabled) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
   suspend fun snapshotStreamDeallocate(
     snapshotStreamID: UShort,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 9u
+    val commandId: UInt = 10u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -604,7 +611,7 @@ class CameraAvStreamManagementCluster(
     streamPriorities: List<UByte>,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 10u
+    val commandId: UInt = 11u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -629,17 +636,19 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun captureSnapshot(
-    snapshotStreamID: UShort,
+    snapshotStreamID: UShort?,
     requestedResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     timedInvokeTimeout: Duration? = null,
-  ) {
-    val commandId: UInt = 11u
+  ): CaptureSnapshotResponse {
+    val commandId: UInt = 12u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_SNAPSHOT_STREAM_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_SNAPSHOT_STREAM_ID_REQ), snapshotStreamID)
+    snapshotStreamID?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_SNAPSHOT_STREAM_ID_REQ), snapshotStreamID)
+    }
 
     val TAG_REQUESTED_RESOLUTION_REQ: Int = 1
     requestedResolution.toTlv(ContextSpecificTag(TAG_REQUESTED_RESOLUTION_REQ), tlvWriter)
@@ -654,96 +663,55 @@ class CameraAvStreamManagementCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_DATA: Int = 0
+    var data_decoded: ByteArray? = null
+
+    val TAG_IMAGE_CODEC: Int = 1
+    var imageCodec_decoded: UByte? = null
+
+    val TAG_RESOLUTION: Int = 2
+    var resolution_decoded: CameraAvStreamManagementClusterVideoResolutionStruct? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
+        data_decoded = tlvReader.getByteArray(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_IMAGE_CODEC)) {
+        imageCodec_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_RESOLUTION)) {
+        resolution_decoded =
+          CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(tag, tlvReader)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (data_decoded == null) {
+      throw IllegalStateException("data not found in TLV")
+    }
+
+    if (imageCodec_decoded == null) {
+      throw IllegalStateException("imageCodec not found in TLV")
+    }
+
+    if (resolution_decoded == null) {
+      throw IllegalStateException("resolution not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return CaptureSnapshotResponse(data_decoded, imageCodec_decoded, resolution_decoded)
   }
 
-  suspend fun setViewport(
-    viewport: CameraAvStreamManagementClusterViewportStruct,
-    timedInvokeTimeout: Duration? = null,
-  ) {
-    val commandId: UInt = 13u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_VIEWPORT_REQ: Int = 0
-    viewport.toTlv(ContextSpecificTag(TAG_VIEWPORT_REQ), tlvWriter)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun setImageRotation(angle: UShort, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 14u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_ANGLE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_ANGLE_REQ), angle)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun setImageFlipHorizontal(enabled: Boolean, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 15u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_ENABLED_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_ENABLED_REQ), enabled)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun setImageFlipVertical(enabled: Boolean, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 16u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_ENABLED_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_ENABLED_REQ), enabled)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun readMaxConcurrentVideoEncodersAttribute(): UByte? {
+  suspend fun readMaxConcurrentEncodersAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -765,7 +733,7 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Maxconcurrentvideoencoders attribute not found in response" }
+    requireNotNull(attributeData) { "Maxconcurrentencoders attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -779,7 +747,7 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun subscribeMaxConcurrentVideoEncodersAttribute(
+  suspend fun subscribeMaxConcurrentEncodersAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
@@ -815,7 +783,7 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Maxconcurrentvideoencoders attribute not found in Node State update"
+            "Maxconcurrentencoders attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -1025,7 +993,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readNightVisionCapableAttribute(): Boolean? {
+  suspend fun readNightVisionUsesInfraredAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -1047,7 +1015,7 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Nightvisioncapable attribute not found in response" }
+    requireNotNull(attributeData) { "Nightvisionusesinfrared attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1061,7 +1029,7 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun subscribeNightVisionCapableAttribute(
+  suspend fun subscribeNightVisionUsesInfraredAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
@@ -1097,7 +1065,7 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Nightvisioncapable attribute not found in Node State update"
+            "Nightvisionusesinfrared attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -1327,7 +1295,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readMaxContentBufferSizeAttribute(): UInt? {
+  suspend fun readMaxContentBufferSizeAttribute(): UInt {
     val ATTRIBUTE_ID: UInt = 6u
 
     val attributePath =
@@ -1353,12 +1321,7 @@ class CameraAvStreamManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUInt(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
 
     return decodedValue
   }
@@ -1404,14 +1367,9 @@ class CameraAvStreamManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UInt? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUInt(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
 
-          decodedValue?.let { emit(UIntSubscriptionState.Success(it)) }
+          emit(UIntSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UIntSubscriptionState.SubscriptionEstablished)
@@ -1705,7 +1663,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readSupportedSnapshotParamsAttribute(): SupportedSnapshotParamsAttribute {
+  suspend fun readSnapshotCapabilitiesAttribute(): SnapshotCapabilitiesAttribute {
     val ATTRIBUTE_ID: UInt = 10u
 
     val attributePath =
@@ -1727,17 +1685,20 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Supportedsnapshotparams attribute not found in response" }
+    requireNotNull(attributeData) { "Snapshotcapabilities attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<CameraAvStreamManagementClusterSnapshotParamsStruct>? =
+    val decodedValue: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>? =
       if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<CameraAvStreamManagementClusterSnapshotParamsStruct> {
+        buildList<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> {
           tlvReader.enterArray(AnonymousTag)
           while (!tlvReader.isEndOfContainer()) {
             add(
-              CameraAvStreamManagementClusterSnapshotParamsStruct.fromTlv(AnonymousTag, tlvReader)
+              CameraAvStreamManagementClusterSnapshotCapabilitiesStruct.fromTlv(
+                AnonymousTag,
+                tlvReader,
+              )
             )
           }
           tlvReader.exitContainer()
@@ -1746,13 +1707,13 @@ class CameraAvStreamManagementCluster(
         null
       }
 
-    return SupportedSnapshotParamsAttribute(decodedValue)
+    return SnapshotCapabilitiesAttribute(decodedValue)
   }
 
-  suspend fun subscribeSupportedSnapshotParamsAttribute(
+  suspend fun subscribeSnapshotCapabilitiesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<SupportedSnapshotParamsAttributeSubscriptionState> {
+  ): Flow<SnapshotCapabilitiesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
       listOf(
@@ -1771,7 +1732,7 @@ class CameraAvStreamManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            SupportedSnapshotParamsAttributeSubscriptionState.Error(
+            SnapshotCapabilitiesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -1785,18 +1746,18 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Supportedsnapshotparams attribute not found in Node State update"
+            "Snapshotcapabilities attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<CameraAvStreamManagementClusterSnapshotParamsStruct>? =
+          val decodedValue: List<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct>? =
             if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<CameraAvStreamManagementClusterSnapshotParamsStruct> {
+              buildList<CameraAvStreamManagementClusterSnapshotCapabilitiesStruct> {
                 tlvReader.enterArray(AnonymousTag)
                 while (!tlvReader.isEndOfContainer()) {
                   add(
-                    CameraAvStreamManagementClusterSnapshotParamsStruct.fromTlv(
+                    CameraAvStreamManagementClusterSnapshotCapabilitiesStruct.fromTlv(
                       AnonymousTag,
                       tlvReader,
                     )
@@ -1808,10 +1769,10 @@ class CameraAvStreamManagementCluster(
               null
             }
 
-          decodedValue?.let { emit(SupportedSnapshotParamsAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(SnapshotCapabilitiesAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(SupportedSnapshotParamsAttributeSubscriptionState.SubscriptionEstablished)
+          emit(SnapshotCapabilitiesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -2126,7 +2087,7 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readCurrentVideoCodecsAttribute(): CurrentVideoCodecsAttribute {
+  suspend fun readSupportedStreamUsagesAttribute(): SupportedStreamUsagesAttribute {
     val ATTRIBUTE_ID: UInt = 14u
 
     val attributePath =
@@ -2148,205 +2109,7 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Currentvideocodecs attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<UByte> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
-      }
-
-    return CurrentVideoCodecsAttribute(decodedValue)
-  }
-
-  suspend fun subscribeCurrentVideoCodecsAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<CurrentVideoCodecsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 14u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            CurrentVideoCodecsAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Currentvideocodecs attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UByte>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<UByte> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUByte(AnonymousTag))
-                }
-                tlvReader.exitContainer()
-              }
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(CurrentVideoCodecsAttributeSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(CurrentVideoCodecsAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readCurrentSnapshotConfigAttribute(): CurrentSnapshotConfigAttribute {
-    val ATTRIBUTE_ID: UInt = 15u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Currentsnapshotconfig attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: CameraAvStreamManagementClusterSnapshotParamsStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        CameraAvStreamManagementClusterSnapshotParamsStruct.fromTlv(AnonymousTag, tlvReader)
-      } else {
-        null
-      }
-
-    return CurrentSnapshotConfigAttribute(decodedValue)
-  }
-
-  suspend fun subscribeCurrentSnapshotConfigAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<CurrentSnapshotConfigAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 15u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            CurrentSnapshotConfigAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Currentsnapshotconfig attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: CameraAvStreamManagementClusterSnapshotParamsStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              CameraAvStreamManagementClusterSnapshotParamsStruct.fromTlv(AnonymousTag, tlvReader)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(CurrentSnapshotConfigAttributeSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(CurrentSnapshotConfigAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readFabricsUsingCameraAttribute(): FabricsUsingCameraAttribute {
-    val ATTRIBUTE_ID: UInt = 16u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Fabricsusingcamera attribute not found in response" }
+    requireNotNull(attributeData) { "Supportedstreamusages attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -2359,14 +2122,14 @@ class CameraAvStreamManagementCluster(
         tlvReader.exitContainer()
       }
 
-    return FabricsUsingCameraAttribute(decodedValue)
+    return SupportedStreamUsagesAttribute(decodedValue)
   }
 
-  suspend fun subscribeFabricsUsingCameraAttribute(
+  suspend fun subscribeSupportedStreamUsagesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<FabricsUsingCameraAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 16u
+  ): Flow<SupportedStreamUsagesAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 14u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2384,7 +2147,7 @@ class CameraAvStreamManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            FabricsUsingCameraAttributeSubscriptionState.Error(
+            SupportedStreamUsagesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -2398,7 +2161,7 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Fabricsusingcamera attribute not found in Node State update"
+            "Supportedstreamusages attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -2412,17 +2175,17 @@ class CameraAvStreamManagementCluster(
               tlvReader.exitContainer()
             }
 
-          emit(FabricsUsingCameraAttributeSubscriptionState.Success(decodedValue))
+          emit(SupportedStreamUsagesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(FabricsUsingCameraAttributeSubscriptionState.SubscriptionEstablished)
+          emit(SupportedStreamUsagesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
   suspend fun readAllocatedVideoStreamsAttribute(): AllocatedVideoStreamsAttribute {
-    val ATTRIBUTE_ID: UInt = 17u
+    val ATTRIBUTE_ID: UInt = 15u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2467,7 +2230,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<AllocatedVideoStreamsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 17u
+    val ATTRIBUTE_ID: UInt = 15u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2532,7 +2295,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readAllocatedAudioStreamsAttribute(): AllocatedAudioStreamsAttribute {
-    val ATTRIBUTE_ID: UInt = 18u
+    val ATTRIBUTE_ID: UInt = 16u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2577,7 +2340,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<AllocatedAudioStreamsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 18u
+    val ATTRIBUTE_ID: UInt = 16u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2642,7 +2405,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readAllocatedSnapshotStreamsAttribute(): AllocatedSnapshotStreamsAttribute {
-    val ATTRIBUTE_ID: UInt = 19u
+    val ATTRIBUTE_ID: UInt = 17u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2689,7 +2452,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<AllocatedSnapshotStreamsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 19u
+    val ATTRIBUTE_ID: UInt = 17u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2753,9 +2516,8 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readRankedVideoStreamPrioritiesListAttribute():
-    RankedVideoStreamPrioritiesListAttribute {
-    val ATTRIBUTE_ID: UInt = 20u
+  suspend fun readStreamUsagePrioritiesAttribute(): StreamUsagePrioritiesAttribute {
+    val ATTRIBUTE_ID: UInt = 18u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2776,80 +2538,27 @@ class CameraAvStreamManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Rankedvideostreamprioritieslist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Streamusagepriorities attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte>? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<UByte> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<UByte> =
+      buildList<UByte> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUByte(AnonymousTag))
         }
-      } else {
-        null
+        tlvReader.exitContainer()
       }
 
-    return RankedVideoStreamPrioritiesListAttribute(decodedValue)
+    return StreamUsagePrioritiesAttribute(decodedValue)
   }
 
-  suspend fun writeRankedVideoStreamPrioritiesListAttribute(
-    value: List<UByte>,
-    timedWriteTimeout: Duration? = null,
-  ) {
-    val ATTRIBUTE_ID: UInt = 20u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startArray(AnonymousTag)
-    for (item in value.iterator()) {
-      tlvWriter.put(AnonymousTag, item)
-    }
-    tlvWriter.endArray()
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeRankedVideoStreamPrioritiesListAttribute(
+  suspend fun subscribeStreamUsagePrioritiesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<RankedVideoStreamPrioritiesListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 20u
+  ): Flow<StreamUsagePrioritiesAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2867,7 +2576,7 @@ class CameraAvStreamManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            RankedVideoStreamPrioritiesListAttributeSubscriptionState.Error(
+            StreamUsagePrioritiesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -2881,37 +2590,31 @@ class CameraAvStreamManagementCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Rankedvideostreamprioritieslist attribute not found in Node State update"
+            "Streamusagepriorities attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UByte>? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<UByte> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUByte(AnonymousTag))
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<UByte> =
+            buildList<UByte> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUByte(AnonymousTag))
               }
-            } else {
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let {
-            emit(RankedVideoStreamPrioritiesListAttributeSubscriptionState.Success(it))
-          }
+          emit(StreamUsagePrioritiesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(RankedVideoStreamPrioritiesListAttributeSubscriptionState.SubscriptionEstablished)
+          emit(StreamUsagePrioritiesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
   suspend fun readSoftRecordingPrivacyModeEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 21u
+    val ATTRIBUTE_ID: UInt = 19u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -2952,7 +2655,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 21u
+    val ATTRIBUTE_ID: UInt = 19u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2995,7 +2698,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 21u
+    val ATTRIBUTE_ID: UInt = 19u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3049,7 +2752,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSoftLivestreamPrivacyModeEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 22u
+    val ATTRIBUTE_ID: UInt = 20u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3090,7 +2793,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 22u
+    val ATTRIBUTE_ID: UInt = 20u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3133,7 +2836,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 22u
+    val ATTRIBUTE_ID: UInt = 20u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3187,7 +2890,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readHardPrivacyModeOnAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 23u
+    val ATTRIBUTE_ID: UInt = 21u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3226,7 +2929,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 23u
+    val ATTRIBUTE_ID: UInt = 21u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3280,7 +2983,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readNightVisionAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 24u
+    val ATTRIBUTE_ID: UInt = 22u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3316,7 +3019,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeNightVisionAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 24u
+    val ATTRIBUTE_ID: UInt = 22u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3359,7 +3062,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 24u
+    val ATTRIBUTE_ID: UInt = 22u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3411,7 +3114,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readNightVisionIllumAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 25u
+    val ATTRIBUTE_ID: UInt = 23u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3447,7 +3150,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeNightVisionIllumAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 25u
+    val ATTRIBUTE_ID: UInt = 23u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3490,7 +3193,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 25u
+    val ATTRIBUTE_ID: UInt = 23u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3543,408 +3246,8 @@ class CameraAvStreamManagementCluster(
     }
   }
 
-  suspend fun readAWBEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 26u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Awbenabled attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeAWBEnabledAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 26u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeAWBEnabledAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 26u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            BooleanSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Awbenabled attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(BooleanSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readAutoShutterSpeedEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 27u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Autoshutterspeedenabled attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeAutoShutterSpeedEnabledAttribute(
-    value: Boolean,
-    timedWriteTimeout: Duration? = null,
-  ) {
-    val ATTRIBUTE_ID: UInt = 27u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeAutoShutterSpeedEnabledAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 27u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            BooleanSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Autoshutterspeedenabled attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(BooleanSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readAutoISOEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 28u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Autoisoenabled attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeAutoISOEnabledAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 28u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeAutoISOEnabledAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 28u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            BooleanSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Autoisoenabled attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(BooleanSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
   suspend fun readViewportAttribute(): ViewportAttribute {
-    val ATTRIBUTE_ID: UInt = 29u
+    val ATTRIBUTE_ID: UInt = 24u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -3979,11 +3282,54 @@ class CameraAvStreamManagementCluster(
     return ViewportAttribute(decodedValue)
   }
 
+  suspend fun writeViewportAttribute(
+    value: CameraAvStreamManagementClusterViewportStruct,
+    timedWriteTimeout: Duration? = null,
+  ) {
+    val ATTRIBUTE_ID: UInt = 24u
+
+    val tlvWriter = TlvWriter()
+    value.toTlv(AnonymousTag, tlvWriter)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeViewportAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<ViewportAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 29u
+    val ATTRIBUTE_ID: UInt = 24u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4035,7 +3381,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSpeakerMutedAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 30u
+    val ATTRIBUTE_ID: UInt = 25u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4071,7 +3417,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeSpeakerMutedAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 30u
+    val ATTRIBUTE_ID: UInt = 25u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4114,7 +3460,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 30u
+    val ATTRIBUTE_ID: UInt = 25u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4166,7 +3512,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSpeakerVolumeLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 31u
+    val ATTRIBUTE_ID: UInt = 26u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4202,7 +3548,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeSpeakerVolumeLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 31u
+    val ATTRIBUTE_ID: UInt = 26u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4245,7 +3591,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 31u
+    val ATTRIBUTE_ID: UInt = 26u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4299,7 +3645,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSpeakerMaxLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 32u
+    val ATTRIBUTE_ID: UInt = 27u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4334,51 +3680,11 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun writeSpeakerMaxLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 32u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
   suspend fun subscribeSpeakerMaxLevelAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 32u
+    val ATTRIBUTE_ID: UInt = 27u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4432,7 +3738,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readSpeakerMinLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 33u
+    val ATTRIBUTE_ID: UInt = 28u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4467,51 +3773,11 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun writeSpeakerMinLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 33u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
   suspend fun subscribeSpeakerMinLevelAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 33u
+    val ATTRIBUTE_ID: UInt = 28u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4565,7 +3831,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneMutedAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 34u
+    val ATTRIBUTE_ID: UInt = 29u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4601,7 +3867,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun writeMicrophoneMutedAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 34u
+    val ATTRIBUTE_ID: UInt = 29u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4644,7 +3910,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 34u
+    val ATTRIBUTE_ID: UInt = 29u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4698,7 +3964,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneVolumeLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 35u
+    val ATTRIBUTE_ID: UInt = 30u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4737,7 +4003,7 @@ class CameraAvStreamManagementCluster(
     value: UByte,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 35u
+    val ATTRIBUTE_ID: UInt = 30u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4780,7 +4046,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 35u
+    val ATTRIBUTE_ID: UInt = 30u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4834,7 +4100,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneMaxLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 36u
+    val ATTRIBUTE_ID: UInt = 31u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4869,51 +4135,11 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun writeMicrophoneMaxLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 36u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
   suspend fun subscribeMicrophoneMaxLevelAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 36u
+    val ATTRIBUTE_ID: UInt = 31u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -4967,7 +4193,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneMinLevelAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 37u
+    val ATTRIBUTE_ID: UInt = 32u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5002,51 +4228,11 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
-  suspend fun writeMicrophoneMinLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 37u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
   suspend fun subscribeMicrophoneMinLevelAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 37u
+    val ATTRIBUTE_ID: UInt = 32u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5100,7 +4286,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readMicrophoneAGCEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 38u
+    val ATTRIBUTE_ID: UInt = 33u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5139,7 +4325,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 38u
+    val ATTRIBUTE_ID: UInt = 33u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5182,7 +4368,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 38u
+    val ATTRIBUTE_ID: UInt = 33u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5236,7 +4422,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readImageRotationAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 39u
+    val ATTRIBUTE_ID: UInt = 34u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5271,11 +4457,51 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
+  suspend fun writeImageRotationAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 34u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeImageRotationAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 39u
+    val ATTRIBUTE_ID: UInt = 34u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5327,7 +4553,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readImageFlipHorizontalAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 40u
+    val ATTRIBUTE_ID: UInt = 35u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5362,11 +4588,54 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
+  suspend fun writeImageFlipHorizontalAttribute(
+    value: Boolean,
+    timedWriteTimeout: Duration? = null,
+  ) {
+    val ATTRIBUTE_ID: UInt = 35u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeImageFlipHorizontalAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 40u
+    val ATTRIBUTE_ID: UInt = 35u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5420,7 +4689,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readImageFlipVerticalAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 41u
+    val ATTRIBUTE_ID: UInt = 36u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5455,11 +4724,51 @@ class CameraAvStreamManagementCluster(
     return decodedValue
   }
 
+  suspend fun writeImageFlipVerticalAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 36u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeImageFlipVerticalAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 41u
+    val ATTRIBUTE_ID: UInt = 36u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5513,7 +4822,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readLocalVideoRecordingEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 42u
+    val ATTRIBUTE_ID: UInt = 37u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5552,7 +4861,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 42u
+    val ATTRIBUTE_ID: UInt = 37u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5595,7 +4904,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 42u
+    val ATTRIBUTE_ID: UInt = 37u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5649,7 +4958,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readLocalSnapshotRecordingEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 43u
+    val ATTRIBUTE_ID: UInt = 38u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5690,7 +4999,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 43u
+    val ATTRIBUTE_ID: UInt = 38u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5733,7 +5042,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 43u
+    val ATTRIBUTE_ID: UInt = 38u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5787,7 +5096,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readStatusLightEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 44u
+    val ATTRIBUTE_ID: UInt = 39u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5826,7 +5135,7 @@ class CameraAvStreamManagementCluster(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 44u
+    val ATTRIBUTE_ID: UInt = 39u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5869,7 +5178,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 44u
+    val ATTRIBUTE_ID: UInt = 39u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5923,7 +5232,7 @@ class CameraAvStreamManagementCluster(
   }
 
   suspend fun readStatusLightBrightnessAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 45u
+    val ATTRIBUTE_ID: UInt = 40u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -5962,7 +5271,7 @@ class CameraAvStreamManagementCluster(
     value: UByte,
     timedWriteTimeout: Duration? = null,
   ) {
-    val ATTRIBUTE_ID: UInt = 45u
+    val ATTRIBUTE_ID: UInt = 40u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6005,7 +5314,7 @@ class CameraAvStreamManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 45u
+    val ATTRIBUTE_ID: UInt = 40u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -6038,139 +5347,6 @@ class CameraAvStreamManagementCluster(
 
           requireNotNull(attributeData) {
             "Statuslightbrightness attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readDepthSensorStatusAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 46u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Depthsensorstatus attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeDepthSensorStatusAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 46u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeDepthSensorStatusAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 46u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Depthsensorstatus attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -6380,101 +5556,6 @@ class CameraAvStreamManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

@@ -127,135 +127,359 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="int8u" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentHue</attribute>
+    <attribute side="server" code="0x0000" name="CurrentHue" define="COLOR_CONTROL_CURRENT_HUE" type="int8u" max="0xFE" reportable="true" default="0x00" optional="true">
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+    </attribute>
     <!-- CURRENT_HUE -->
-    <attribute side="server" code="0x0001" define="COLOR_CONTROL_CURRENT_SATURATION" type="int8u" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentSaturation</attribute>
+    <attribute side="server" code="0x0001" name="CurrentSaturation" define="COLOR_CONTROL_CURRENT_SATURATION" type="int8u" max="0xFE" reportable="true" default="0x00" optional="true">
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+    </attribute>
     <!-- CURRENT_SATURATION -->
-    <attribute side="server" code="0x0002" define="COLOR_CONTROL_REMAINING_TIME" type="int16u" min="0x0000" max="0xFFFE" writable="false" default="0x0000" optional="true">RemainingTime</attribute>
+    <attribute side="server" code="0x0002" name="RemainingTime" define="COLOR_CONTROL_REMAINING_TIME" type="int16u" max="0xFFFE" default="0x0000" optional="true">
+      <optionalConform/>
+    </attribute>
     <!-- REMAINING_TIME -->
-    <attribute side="server" code="0x0003" define="COLOR_CONTROL_CURRENT_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x616B" optional="true">CurrentX</attribute>
+    <attribute side="server" code="0x0003" name="CurrentX" define="COLOR_CONTROL_CURRENT_X" type="int16u" max="0xFEFF" default="0x616B" reportable="true" optional="true">
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
+    </attribute>
     <!-- CURRENT_X -->
-    <attribute side="server" code="0x0004" define="COLOR_CONTROL_CURRENT_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x607D" optional="true">CurrentY</attribute>
+    <attribute side="server" code="0x0004" name="CurrentY" define="COLOR_CONTROL_CURRENT_Y" type="int16u" max="0xFEFF" default="0x607D" reportable="true" optional="true">
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
+    </attribute>
     <!-- CURRENT_Y -->
-    <attribute side="server" code="0x0005" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="DriftCompensationEnum" writable="false" optional="true">DriftCompensation</attribute>
+    <attribute side="server" code="0x0005" name="DriftCompensation" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="DriftCompensationEnum" optional="true">
+      <optionalConform/>
+    </attribute>
     <!-- DRIFT_COMPENSATION -->
-    <attribute side="server" code="0x0006" define="COLOR_CONTROL_COMPENSATION_TEXT" type="char_string" length="254" writable="false" optional="true">CompensationText</attribute>
+    <attribute side="server" code="0x0006" name="CompensationText" define="COLOR_CONTROL_COMPENSATION_TEXT" type="char_string" length="254" optional="true">
+      <optionalConform/>
+    </attribute>
     <!-- COMPENSATION_TEXT -->
-    <attribute side="server" code="0x0007" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="int16u" min="0x0001" max="0xFEFF" writable="false" reportable="true" default="0x00FA" optional="true">ColorTemperatureMireds</attribute>
+    <attribute side="server" code="0x0007" name="ColorTemperatureMireds" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="int16u" min="0x0001" max="0xFEFF" reportable="true" default="0x00FA" optional="true">
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+    </attribute>
     <!-- COLOR_TEMPERATURE -->
-    <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="ColorModeEnum" writable="false" default="0x01">ColorMode</attribute>
+    <attribute side="server" code="0x0008" name="ColorMode" define="COLOR_CONTROL_COLOR_MODE" type="ColorModeEnum" default="0x01">
+      <mandatoryConform/>
+    </attribute>
     <!-- COLOR_MODE -->
-    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="OptionsBitmap" writable="true" default="0x00">Options</attribute>
+    <attribute side="server" code="0x000F" name="Options" define="COLOR_CONTROL_OPTIONS" type="OptionsBitmap" writable="true" default="0x00">
+      <mandatoryConform/>
+    </attribute>
     <!-- COLOR_CONTROL_OPTIONS -->
-    <attribute side="server" code="0x0010" define="COLOR_CONTROL_NUMBER_OF_PRIMARIES" type="int8u" min="0x00" max="0x06" isNullable="true" writable="false">NumberOfPrimaries</attribute>
+    <attribute side="server" code="0x0010" name="NumberOfPrimaries" define="COLOR_CONTROL_NUMBER_OF_PRIMARIES" type="int8u" max="0x06" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
     <!-- NUMBER_OF_PRIMARIES -->
-    <attribute side="server" code="0x0011" define="COLOR_CONTROL_PRIMARY_1_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary1X</attribute>
+    <attribute side="server" code="0x0011" name="Primary1X" define="COLOR_CONTROL_PRIMARY_1_X" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="0"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_1_X -->
-    <attribute side="server" code="0x0012" define="COLOR_CONTROL_PRIMARY_1_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary1Y</attribute>
+    <attribute side="server" code="0x0012" name="Primary1Y" define="COLOR_CONTROL_PRIMARY_1_Y" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="0"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_1_Y -->
-    <attribute side="server" code="0x0013" define="COLOR_CONTROL_PRIMARY_1_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary1Intensity</attribute>
+    <attribute side="server" code="0x0013" name="Primary1Intensity" define="COLOR_CONTROL_PRIMARY_1_INTENSITY" type="int8u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="0"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_1_INTENSITY -->
-    <attribute side="server" code="0x0015" define="COLOR_CONTROL_PRIMARY_2_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary2X</attribute>
+    <attribute side="server" code="0x0015" name="Primary2X" define="COLOR_CONTROL_PRIMARY_2_X" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="1"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_2_X -->
-    <attribute side="server" code="0x0016" define="COLOR_CONTROL_PRIMARY_2_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary2Y</attribute>
+    <attribute side="server" code="0x0016" name="Primary2Y" define="COLOR_CONTROL_PRIMARY_2_Y" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="1"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_2_Y -->
-    <attribute side="server" code="0x0017" define="COLOR_CONTROL_PRIMARY_2_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary2Intensity</attribute>
+    <attribute side="server" code="0x0017" name="Primary2Intensity" define="COLOR_CONTROL_PRIMARY_2_INTENSITY" type="int8u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="1"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_2_INTENSITY -->
-    <attribute side="server" code="0x0019" define="COLOR_CONTROL_PRIMARY_3_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary3X</attribute>
+    <attribute side="server" code="0x0019" name="Primary3X" define="COLOR_CONTROL_PRIMARY_3_X" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="2"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_3_X -->
-    <attribute side="server" code="0x001A" define="COLOR_CONTROL_PRIMARY_3_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary3Y</attribute>
+    <attribute side="server" code="0x001A" name="Primary3Y" define="COLOR_CONTROL_PRIMARY_3_Y" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="2"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_3_Y -->
-    <attribute side="server" code="0x001B" define="COLOR_CONTROL_PRIMARY_3_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary3Intensity</attribute>
+    <attribute side="server" code="0x001B" name="Primary3Intensity" define="COLOR_CONTROL_PRIMARY_3_INTENSITY" type="int8u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="2"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_3_INTENSITY -->
-    <attribute side="server" code="0x0020" define="COLOR_CONTROL_PRIMARY_4_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary4X</attribute>
+    <attribute side="server" code="0x0020" name="Primary4X" define="COLOR_CONTROL_PRIMARY_4_X" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="3"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_4_X -->
-    <attribute side="server" code="0x0021" define="COLOR_CONTROL_PRIMARY_4_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary4Y</attribute>
+    <attribute side="server" code="0x0021" name="Primary4Y" define="COLOR_CONTROL_PRIMARY_4_Y" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="3"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_4_Y -->
-    <attribute side="server" code="0x0022" define="COLOR_CONTROL_PRIMARY_4_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary4Intensity</attribute>
+    <attribute side="server" code="0x0022" name="Primary4Intensity" define="COLOR_CONTROL_PRIMARY_4_INTENSITY" type="int8u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="3"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_4_INTENSITY -->
-    <attribute side="server" code="0x0024" define="COLOR_CONTROL_PRIMARY_5_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary5X</attribute>
+    <attribute side="server" code="0x0024" name="Primary5X" define="COLOR_CONTROL_PRIMARY_5_X" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="4"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_5_X -->
-    <attribute side="server" code="0x0025" define="COLOR_CONTROL_PRIMARY_5_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary5Y</attribute>
+    <attribute side="server" code="0x0025" name="Primary5Y" define="COLOR_CONTROL_PRIMARY_5_Y" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="4"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_5_Y -->
-    <attribute side="server" code="0x0026" define="COLOR_CONTROL_PRIMARY_5_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary5Intensity</attribute>
+    <attribute side="server" code="0x0026" name="Primary5Intensity" define="COLOR_CONTROL_PRIMARY_5_INTENSITY" type="int8u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="4"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_5_INTENSITY -->
-    <attribute side="server" code="0x0028" define="COLOR_CONTROL_PRIMARY_6_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary6X</attribute>
+    <attribute side="server" code="0x0028" name="Primary6X" define="COLOR_CONTROL_PRIMARY_6_X" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="5"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_6_X -->
-    <attribute side="server" code="0x0029" define="COLOR_CONTROL_PRIMARY_6_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary6Y</attribute>
+    <attribute side="server" code="0x0029" name="Primary6Y" define="COLOR_CONTROL_PRIMARY_6_Y" type="int16u" max="0xFEFF" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="5"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_6_Y -->
-    <attribute side="server" code="0x002A" define="COLOR_CONTROL_PRIMARY_6_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary6Intensity</attribute>
+    <attribute side="server" code="0x002A" name="Primary6Intensity" define="COLOR_CONTROL_PRIMARY_6_INTENSITY" type="int8u" isNullable="true" optional="true">
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="5"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
     <!-- PRIMARY_6_INTENSITY -->
-    <attribute side="server" code="0x0030" define="COLOR_CONTROL_WHITE_POINT_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
-      <description>WhitePointX</description>
+    <attribute side="server" code="0x0030" name="WhitePointX" define="COLOR_CONTROL_WHITE_POINT_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- WHITE_POINT_X -->
-    <attribute side="server" code="0x0031" define="COLOR_CONTROL_WHITE_POINT_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
-      <description>WhitePointY</description>
+    <attribute side="server" code="0x0031" name="WhitePointY" define="COLOR_CONTROL_WHITE_POINT_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- WHITE_POINT_Y -->
-    <attribute side="server" code="0x0032" define="COLOR_CONTROL_COLOR_POINT_R_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
-      <description>ColorPointRX</description>
+    <attribute side="server" code="0x0032" name="ColorPointRX" define="COLOR_CONTROL_COLOR_POINT_R_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_R_X -->
-    <attribute side="server" code="0x0033" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
-      <description>ColorPointRY</description>
+    <attribute side="server" code="0x0033" name="ColorPointRY" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_R_Y -->
-    <attribute side="server" code="0x0034" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
-      <description>ColorPointRIntensity</description>
+    <attribute side="server" code="0x0034" name="ColorPointRIntensity" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_R_INTENSITY -->
-    <attribute side="server" code="0x0036" define="COLOR_CONTROL_COLOR_POINT_G_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
-      <description>ColorPointGX</description>
+    <attribute side="server" code="0x0036" name="ColorPointGX" define="COLOR_CONTROL_COLOR_POINT_G_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_G_X -->
-    <attribute side="server" code="0x0037" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
-      <description>ColorPointGY</description>
+    <attribute side="server" code="0x0037" name="ColorPointGY" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_G_Y -->
-    <attribute side="server" code="0x0038" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
-      <description>ColorPointGIntensity</description>
+    <attribute side="server" code="0x0038" name="ColorPointGIntensity" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_G_INTENSITY -->
-    <attribute side="server" code="0x003A" define="COLOR_CONTROL_COLOR_POINT_B_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
-      <description>ColorPointBX</description>
+    <attribute side="server" code="0x003A" name="ColorPointBX" define="COLOR_CONTROL_COLOR_POINT_B_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_B_X -->
-    <attribute side="server" code="0x003B" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
-      <description>ColorPointBY</description>
+    <attribute side="server" code="0x003B" name="ColorPointBY" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_B_Y -->
-    <attribute side="server" code="0x003C" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
-      <description>ColorPointBIntensity</description>
+    <attribute side="server" code="0x003C" name="ColorPointBIntensity" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_B_INTENSITY -->
-    <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="int16u" min="0x0000" max="0xFFFF" writable="false" optional="true">CoupleColorTempToLevelMinMireds</attribute>
-    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="int16u" min="0x0000" max="0xFEFF" writable="true" isNullable="true" optional="true">
-      <description>StartUpColorTemperatureMireds</description>
+    <attribute side="server" code="0x400D" name="CoupleColorTempToLevelMinMireds" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="int16u" optional="true">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CT"/>
+          <attribute name="ColorTemperatureMireds"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4010" name="StartUpColorTemperatureMireds" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="int16u" max="0xFEFF" writable="true" isNullable="true" optional="true">
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CT"/>
+          <attribute name="ColorTemperatureMireds"/>
+        </orTerm>
+      </mandatoryConform>
     </attribute>
 
     <command source="client" code="0x00" name="MoveToHue" optional="true" cli="zcl color-control movetohue">
@@ -267,6 +491,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x01" name="MoveHue" optional="true" cli="zcl color-control movehue">
@@ -277,6 +504,9 @@ limitations under the License.
       <arg name="Rate" type="int8u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x02" name="StepHue" optional="true" cli="zcl color-control stephue">
@@ -288,6 +518,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int8u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x03" name="MoveToSaturation" optional="true" cli="zcl color-control movetosat">
@@ -298,6 +531,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x04" name="MoveSaturation" optional="true" cli="zcl color-control movesat">
@@ -308,6 +544,9 @@ limitations under the License.
       <arg name="Rate" type="int8u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x05" name="StepSaturation" optional="true" cli="zcl color-control stepsat">
@@ -319,6 +558,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int8u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x06" name="MoveToHueAndSaturation" optional="true" cli="zcl color-control movetohueandsat">
@@ -330,6 +572,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x07" name="MoveToColor" optional="true" cli="zcl color-control movetocolor">
@@ -341,6 +586,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x08" name="MoveColor" optional="true" cli="zcl color-control movecolor">
@@ -351,6 +599,9 @@ limitations under the License.
       <arg name="RateY" type="int16s"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x09" name="StepColor" optional="true" cli="zcl color-control stepcolor">
@@ -362,6 +613,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x0A" name="MoveToColorTemperature" optional="true" cli="zcl color-control movetocolortemp">
@@ -372,20 +626,59 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
     </command>
   </cluster>
 
   <clusterExtension code="0x0300">
-    <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">EnhancedCurrentHue</attribute>
-    <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="EnhancedColorModeEnum" writable="false" default="0x01">EnhancedColorMode</attribute>
-    <attribute side="server" code="0x4002" define="COLOR_CONTROL_COLOR_LOOP_ACTIVE" type="int8u" min="0x00" max="0x01" writable="false" default="0x00" optional="true">ColorLoopActive</attribute>
-    <attribute side="server" code="0x4003" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="int8u" min="0x00" max="0x01" writable="false" default="0x00" optional="true">ColorLoopDirection</attribute>
-    <attribute side="server" code="0x4004" define="COLOR_CONTROL_COLOR_LOOP_TIME" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0019" optional="true">ColorLoopTime</attribute>
-    <attribute side="server" code="0x4005" define="COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x2300" optional="true">ColorLoopStartEnhancedHue</attribute>
-    <attribute side="server" code="0x4006" define="COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ColorLoopStoredEnhancedHue</attribute>
-    <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="ColorCapabilitiesBitmap" min="0x0000" max="0x001F" writable="false" default="0x0000">ColorCapabilities</attribute>
-    <attribute side="server" code="0x400B" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="int16u" min="0x0001" max="0xFEFF" writable="false" default="0x0000" optional="true">ColorTempPhysicalMinMireds</attribute>
-    <attribute side="server" code="0x400C" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0xFEFF" optional="true">ColorTempPhysicalMaxMireds</attribute>
+    <attribute side="server" code="0x4000" name="EnhancedCurrentHue" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4001" name="EnhancedColorMode" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="EnhancedColorModeEnum" writable="false" default="0x01">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x4002" name="ColorLoopActive" define="COLOR_CONTROL_COLOR_LOOP_ACTIVE" type="int8u" min="0x00" max="0x01" writable="false" default="0x00" optional="true">
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4003" name="ColorLoopDirection" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="int8u" min="0x00" max="0x01" writable="false" default="0x00" optional="true">
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4004" name="ColorLoopTime" define="COLOR_CONTROL_COLOR_LOOP_TIME" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0019" optional="true">
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4005" name="ColorLoopStartEnhancedHue" define="COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x2300" optional="true">
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x4006" name="ColorLoopStoredEnhancedHue" define="COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x400A" name="ColorCapabilities" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="ColorCapabilitiesBitmap" min="0x0000" max="0x001F" writable="false" default="0x0000">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x400B" name="ColorTempPhysicalMinMireds" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="int16u" min="0x0001" max="0xFEFF" writable="false" default="0x0000" optional="true">
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x400C" name="ColorTempPhysicalMaxMireds" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0xFEFF" optional="true">
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+    </attribute>
 
     <command source="client" code="0x40" name="EnhancedMoveToHue" optional="true" noDefaultImplementation="true" cli="zcl color-control emovetohue">
       <description>
@@ -396,6 +689,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x41" name="EnhancedMoveHue" optional="true" noDefaultImplementation="true" cli="zcl color-control emovehue">
@@ -406,6 +702,9 @@ limitations under the License.
       <arg name="Rate" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x42" name="EnhancedStepHue" optional="true" noDefaultImplementation="true" cli="zcl color-control estephue">
@@ -417,6 +716,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x43" name="EnhancedMoveToHueAndSaturation" optional="true" noDefaultImplementation="true" cli="zcl color-control emovetohueandsat">
@@ -428,6 +730,9 @@ limitations under the License.
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x44" name="ColorLoopSet" optional="true" noDefaultImplementation="true" cli="zcl color-control loop">
@@ -441,6 +746,9 @@ limitations under the License.
       <arg name="StartHue" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x47" name="StopMoveStep" optional="true" noDefaultImplementation="true" cli="zcl color-control stopmovestep">
@@ -449,6 +757,13 @@ limitations under the License.
       </description>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="HS"/>
+          <feature name="XY"/>
+          <feature name="CT"/>
+        </orTerm>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x4B" name="MoveColorTemperature" optional="true" noDefaultImplementation="true" cli="zcl color-control movecolortemp">
@@ -461,6 +776,9 @@ limitations under the License.
       <arg name="ColorTemperatureMaximumMireds" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x4C" name="StepColorTemperature" optional="true" noDefaultImplementation="true" cli="zcl color-control stepcolortemp">
@@ -474,6 +792,9 @@ limitations under the License.
       <arg name="ColorTemperatureMaximumMireds" type="int16u"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
       <arg name="OptionsOverride" type="OptionsBitmap"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
     </command>
   </clusterExtension>
 </configurator>

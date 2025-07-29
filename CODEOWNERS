@@ -67,5 +67,6 @@ stm32/                           @STYoannZamaron
 
 telink/                          @s07641069
 chip-build-telink/               @s07641069
+chip-build-telink-zephyr_3_3/    @s07641069
 
 webos/                           @joonhaengHeo

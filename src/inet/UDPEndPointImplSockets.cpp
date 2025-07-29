@@ -39,9 +39,9 @@
 #include <sys/ioctl.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
-#include <zephyr/net/socket.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+#include "ZephyrSocket.h" // nogncheck
+#endif
 
 #include <cerrno>
 #include <unistd.h>
@@ -56,10 +56,6 @@
 #ifndef INADDR_ANY
 #define INADDR_ANY 0
 #endif
-
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
-#include "ZephyrSocket.h"
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 
 /*
  * Some systems define both IPV6_{ADD,DROP}_MEMBERSHIP and

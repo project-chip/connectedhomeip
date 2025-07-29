@@ -20,9 +20,10 @@ import typing
 from dataclasses import asdict, dataclass, field, make_dataclass
 from typing import Any, ClassVar, Dict, List, Mapping, Union
 
-from chip import ChipUtility, tlv
-from chip.clusters.Types import Nullable, NullValue
 from dacite import from_dict  # type: ignore
+
+from .. import ChipUtility, tlv
+from ..clusters.Types import Nullable, NullValue
 
 
 def GetUnionUnderlyingType(typeToCheck, matchingType=None):
@@ -257,6 +258,7 @@ class Cluster(ClusterObject):
     especially the TLV decoding logic. Also ThreadNetworkDiagnostics has an attribute with the same name so we
     picked data_version as its name.
     '''
+    id: Any
 
     def __init_subclass__(cls, *args, **kwargs) -> None:
         """Register a subclass."""

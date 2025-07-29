@@ -62,6 +62,7 @@ target_include_directories(
     ${chip_dir}/src/app/clusters/ota-requestor
     ${chip_dir}/examples/ota-requestor-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/platform/ameba/observer
     ${chip_dir}/examples/providers
     ${sdk_root}/component/soc/realtek/amebad/fwlib/include
 )

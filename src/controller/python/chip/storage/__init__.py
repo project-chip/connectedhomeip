@@ -26,8 +26,7 @@ import logging
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
 from typing import IO, Dict, Optional
 
-import chip.exceptions
-import chip.native
+from ..native import GetLibraryHandle
 
 LOGGER = logging.getLogger(__name__)
 
@@ -112,7 +111,7 @@ class PersistentStorage:
         else:
             LOGGER.info("Initializing persistent storage from dict")
 
-        self._handle = chip.native.GetLibraryHandle()
+        self._handle = GetLibraryHandle()
         self._isActive = True
         self._path = path
 

@@ -462,7 +462,7 @@ void TimeSynchronizationServer::Init()
 
     // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
     // want time sync even if we can't register the deletgate here.
-    CHIP_ERROR err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    CHIP_ERROR err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync");
@@ -473,6 +473,7 @@ void TimeSynchronizationServer::Init()
 void TimeSynchronizationServer::Shutdown()
 {
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 }
 
 void TimeSynchronizationServer::OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event)
@@ -909,7 +910,7 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
         int32_t previousOffset         = dstList[activeDstIndex].offset;
         dstList[activeDstIndex].offset = 0; // not using dst and last DST item in the list is not active yet
         // TODO: This enum mixes state and transitions in a way that's very confusing. This should return either an active, an
-        // inactive or an invalid and the caller should make the judgement about whether that has changed OR this function should
+        // inactive or an invalid and the caller should make the judgment about whether that has changed OR this function should
         // just return a bool indicating whether a change happened
         return previousOffset == 0 ? TimeState::kStopped : TimeState::kChanged;
     }
@@ -1291,4 +1292,10 @@ void MatterTimeSynchronizationPluginServerInitCallback()
 {
     TimeSynchronizationServer::Instance().Init();
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterTimeSynchronizationPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    TimeSynchronizationServer::Instance().Shutdown();
 }

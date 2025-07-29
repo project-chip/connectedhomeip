@@ -22,15 +22,32 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 0
+#       --endpoint 1
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -170,7 +187,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Failure, "Incorrect error returned")
 
         self.step(6)
-        params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
+        params = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
         self.step(7)
         pase_nodeid = self.dut_node_id + 1
         await self.default_controller.FindOrEstablishPASESession(setupCode=params.commissioningParameters.setupQRCode, nodeid=pase_nodeid)

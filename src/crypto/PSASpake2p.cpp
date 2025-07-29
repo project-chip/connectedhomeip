@@ -94,11 +94,11 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
 
 CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_identity, size_t my_identity_len,
                                                          const uint8_t * peer_identity, size_t peer_identity_len,
-                                                         const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                                                         size_t w1in_len)
+                                                         const uint8_t * w0sin, size_t w0sin_len, const uint8_t * w1sin,
+                                                         size_t w1sin_len)
 {
-    VerifyOrReturnError(w0in_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(w1in_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(w0sin_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(w1sin_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t password[kSpake2p_WS_Length * 2];
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
@@ -107,13 +107,13 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
     psa_pake_cs_set_algorithm(&cp, PSA_ALG_SPAKE2P_MATTER);
     psa_pake_cs_set_primitive(&cp, PSA_PAKE_PRIMITIVE(PSA_PAKE_PRIMITIVE_TYPE_ECC, PSA_ECC_FAMILY_SECP_R1, 256));
 
-    memcpy(password + 0, w0in, w0in_len);
-    memcpy(password + w0in_len, w1in, w1in_len);
+    memcpy(password + 0, w0sin, w0sin_len);
+    memcpy(password + w0sin_len, w1sin, w1sin_len);
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
     psa_set_key_algorithm(&attributes, PSA_ALG_SPAKE2P_MATTER);
     psa_set_key_type(&attributes, PSA_KEY_TYPE_SPAKE2P_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
 
-    psa_status_t status = psa_import_key(&attributes, password, w0in_len + w1in_len, &mKey);
+    psa_status_t status = psa_import_key(&attributes, password, w0sin_len + w1sin_len, &mKey);
 
     psa_reset_key_attributes(&attributes);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);

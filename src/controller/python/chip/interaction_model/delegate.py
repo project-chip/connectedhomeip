@@ -20,10 +20,9 @@ from ctypes import CFUNCTYPE, POINTER, c_uint8, c_uint32, c_uint64, c_void_p
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
-import chip.exceptions
-import chip.native
-import chip.tlv
 from construct import Int8ul, Int16ul, Int32ul, Int64ul, Struct  # type: ignore
+
+from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 
 # The type should match CommandStatus in interaction_model/Delegate.h
 # CommandStatus should not contain padding
@@ -285,7 +284,7 @@ def _SetCommandIndexStatus(commandHandle: int, commandIndex: int, status):
         _commandIndexStatusDict[commandHandle] = indexDict
 
 
-@ _OnCommandResponseStatusCodeReceivedFunct
+@_OnCommandResponseStatusCodeReceivedFunct
 def _OnCommandResponseStatusCodeReceived(commandHandle: int, IMCommandStatusBuf, IMCommandStatusBufLen):
     status = IMCommandStatus.parse(ctypes.string_at(
         IMCommandStatusBuf, IMCommandStatusBufLen))
@@ -293,12 +292,12 @@ def _OnCommandResponseStatusCodeReceived(commandHandle: int, IMCommandStatusBuf,
                            status["CommandIndex"], status)
 
 
-@ _OnCommandResponseProtocolErrorFunct
+@_OnCommandResponseProtocolErrorFunct
 def _OnCommandResponseProtocolError(commandHandle: int, errorcode: int):
     pass
 
 
-@ _OnCommandResponseFunct
+@_OnCommandResponseFunct
 def _OnCommandResponse(commandHandle: int, errorcode: int):
     _SetCommandStatus(PLACEHOLDER_COMMAND_HANDLE, errorcode)
 
@@ -320,9 +319,9 @@ def _OnWriteResponseStatus(IMAttributeWriteResult, IMAttributeWriteResultLen):
 
 
 def InitIMDelegate():
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     if not handle.pychip_InteractionModelDelegate_SetCommandResponseStatusCallback.argtypes:
-        setter = chip.native.NativeLibraryHandleMethodArguments(handle)
+        setter = NativeLibraryHandleMethodArguments(handle)
         setter.Set("pychip_InteractionModelDelegate_SetCommandResponseStatusCallback", None, [
                    _OnCommandResponseStatusCodeReceivedFunct])
         setter.Set("pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback", None, [
@@ -330,7 +329,7 @@ def InitIMDelegate():
         setter.Set("pychip_InteractionModelDelegate_SetCommandResponseErrorCallback", None, [
                    _OnCommandResponseFunct])
         setter.Set("pychip_InteractionModel_GetCommandSenderHandle",
-                   chip.native.PyChipError, [ctypes.POINTER(c_uint64)])
+                   PyChipError, [ctypes.POINTER(c_uint64)])
         setter.Set("pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback", None, [
                    _OnWriteResponseStatusFunct])
 
@@ -387,7 +386,7 @@ def WaitCommandIndexStatus(commandHandle: int, commandIndex: int):
 
 
 def GetCommandSenderHandle() -> int:
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     resPointer = c_uint64()
     handle.pychip_InteractionModel_GetCommandSenderHandle(
         ctypes.pointer(resPointer)).raise_on_error()
