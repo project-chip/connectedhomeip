@@ -38,6 +38,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(NavigateTarget::
 } // namespace NavigateTarget
 
 } // namespace Commands
+
+namespace Events {
+namespace TargetUpdated {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TargetUpdated
+
+} // namespace Events
 } // namespace TargetNavigator
 } // namespace Clusters
 } // namespace app

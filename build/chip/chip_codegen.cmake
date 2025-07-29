@@ -61,11 +61,11 @@ function(chip_codegen TARGET_NAME)
         endforeach()
 
         # Python is expected to be in the path
-        #
-        # find_package(Python3 REQUIRED)
+        # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
+        find_package(Python3 REQUIRED)
         add_custom_command(
             OUTPUT ${OUT_NAMES}
-            COMMAND "${CHIP_ROOT}/scripts/codegen.py"
+            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/codegen.py"
             ARGS "--generator" "${ARG_GENERATOR}"
                  "--output-dir" "${GEN_FOLDER}"
                  "--expected-outputs" "${GEN_FOLDER}/expected.outputs"
@@ -181,8 +181,8 @@ function(chip_zapgen TARGET_NAME)
         endif()
 
         # Python is expected to be in the path
-        #
-        # find_package(Python3 REQUIRED)
+        # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
+        find_package(Python3 REQUIRED)
         #
         # TODO: lockfile support should be removed as this serializes zap
         # (slower), however this is currently done because on Darwin zap startup
@@ -190,7 +190,7 @@ function(chip_zapgen TARGET_NAME)
         #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
         add_custom_command(
             OUTPUT ${OUT_NAMES}
-            COMMAND "${CHIP_ROOT}/scripts/tools/zap/generate.py"
+            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/tools/zap/generate.py"
             ARGS
                 "--no-prettify-output"
                 "--templates" "${TEMPLATE_PATH}"

@@ -61,10 +61,6 @@ namespace UpdateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(UpdateTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace UpdateTwoDCartesianZone
-namespace GetTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(GetTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
-} // namespace GetTwoDCartesianZone
 namespace RemoveZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveZone::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
@@ -79,6 +75,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveTrigger::I
 } // namespace RemoveTrigger
 
 } // namespace Commands
+
+namespace Events {
+namespace ZoneTriggered {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ZoneTriggered
+namespace ZoneStopped {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ZoneStopped
+
+} // namespace Events
 } // namespace ZoneManagement
 } // namespace Clusters
 } // namespace app

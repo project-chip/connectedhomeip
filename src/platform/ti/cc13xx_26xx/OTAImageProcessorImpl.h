@@ -24,6 +24,10 @@
 
 #include <ti/drivers/NVS.h>
 
+#ifndef PACK_STRUCT_STRUCT
+#define PACK_STRUCT_STRUCT __attribute__((packed))
+#endif
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface

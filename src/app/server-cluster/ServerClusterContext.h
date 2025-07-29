@@ -18,6 +18,7 @@
 
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
@@ -29,6 +30,9 @@ namespace app {
 ///   - emit events
 ///   - potentially interact/review global metadata
 ///
+/// Prefer using `attributeStorage` over calling the global GetAttributePersistenceProvider()
+/// so that unit testing is easier and there is less coupling in code.
+///
 /// The context object is quite large in terms of exposed functionality and not all clusters use
 /// all the information within, however a common context is used to minimize RAM overhead
 /// for every cluster maintaining such a context.
@@ -36,13 +40,15 @@ struct ServerClusterContext
 {
     DataModel::Provider * const provider                          = nullptr; /// underlying provider that the cluster operates in
     PersistentStorageDelegate * const storage                     = nullptr; /// read/write persistent storage
+    AttributePersistenceProvider * const attributeStorage         = nullptr; /// read/write attribute data
     DataModel::InteractionModelContext * const interactionContext = nullptr; /// outside-world communication
 
     bool operator!=(const ServerClusterContext & other) const
     {
-        return (provider != other.provider)                     //
-            || (interactionContext != other.interactionContext) //
-            || (storage != other.storage);
+        return (provider != other.provider)                 //
+            || (storage != other.storage)                   //
+            || (attributeStorage != other.attributeStorage) //
+            || (interactionContext != other.interactionContext);
     }
 };
 

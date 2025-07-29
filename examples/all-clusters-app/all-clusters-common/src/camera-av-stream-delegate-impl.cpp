@@ -276,42 +276,6 @@ CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamSt
 }
 
 CHIP_ERROR
-CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::IsPrivacyModeActive(bool & isActive)
-{
-    return CHIP_NO_ERROR;
-}
-
-bool CameraAVStreamManager::HasAllocatedVideoStreams()
-{
-    return false;
-}
-
-bool CameraAVStreamManager::HasAllocatedAudioStreams()
-{
-    return false;
-}
-
-CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
     ChipLogDetail(Zcl, "Persistent attributes loaded");

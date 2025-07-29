@@ -34,41 +34,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import queue
 from typing import List
 
 import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import Status
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-
-
-class AttributeChangeCallback:
-    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
-        self._output = output
-        self._expected_attribute = expected_attribute
-
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        if path.AttributeType == self._expected_attribute:
-            q = (path, transaction)
-            logging.info(f'Got subscription report for {path.AttributeType}')
-            self._output.put(q)
-
-
-def WaitForAttributeReport(q: queue.Queue, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-    try:
-        path, transaction = q.get(block=True, timeout=10)
-    except queue.Empty:
-        asserts.fail("Failed to receive a report for the attribute change for {}".format(expected_attribute))
-
-    asserts.assert_equal(path.AttributeType, expected_attribute, "Received incorrect attribute report")
-    try:
-        transaction.GetAttribute(path)
-    except KeyError:
-        asserts.fail("Attribute not found in returned report")
 
 
 class TestGroupTableReports(MatterBaseTest):
@@ -121,39 +93,39 @@ class TestGroupTableReports(MatterBaseTest):
 
         self.print_step(4, "TH subscribes to the GroupTable attribute from the Group Key Management Cluster")
         subscription_gcm = await self.TH1.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.GroupKeyManagement.Attributes.GroupTable)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
-        gcm_queue = queue.Queue()
-        gcm_cb = AttributeChangeCallback(Clusters.GroupKeyManagement.Attributes.GroupTable, gcm_queue)
+        gcm_cb = AttributeSubscriptionHandler(expected_cluster=Clusters.GroupKeyManagement,
+                                              expected_attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         subscription_gcm.SetAttributeUpdateCallback(gcm_cb)
 
         self.print_step(5, "TH Adds Group1 to the Group Cluster")
         result = await self.TH1.SendCommand(self.dut_node_id, 1, Clusters.Groups.Commands.AddGroup(self.kGroup1, "Group1"))
 
         self.print_step(6, "TH waits for subscription report for the GroupTable attribute from the Group Key Management Cluster")
-        WaitForAttributeReport(gcm_queue, Clusters.GroupKeyManagement.Attributes.GroupTable)
+        gcm_cb.wait_for_attribute_report()
 
         self.print_step(7, "TH Adds Group2 to the Group Cluster")
         result = await self.TH1.SendCommand(self.dut_node_id, 1, Clusters.Groups.Commands.AddGroup(self.kGroup2, "Group2"))
 
         self.print_step(8, "TH waits for subscription report for the GroupTable attribute from the Group Key Management Cluster")
-        WaitForAttributeReport(gcm_queue, Clusters.GroupKeyManagement.Attributes.GroupTable)
+        gcm_cb.wait_for_attribute_report()
 
         self.print_step(9, "TH Adds Group3 to the Group Cluster")
         result = await self.TH1.SendCommand(self.dut_node_id, 1, Clusters.Groups.Commands.AddGroup(self.kGroup3, "Group3"))
 
         self.print_step(10, "TH waits for subscription report for the GroupTable attribute from the Group Key Management Cluster")
-        WaitForAttributeReport(gcm_queue, Clusters.GroupKeyManagement.Attributes.GroupTable)
+        gcm_cb.wait_for_attribute_report()
 
         self.print_step(12, "TH removes Group2 from the Group Cluster")
         result = await self.TH1.SendCommand(self.dut_node_id, 1, Clusters.Groups.Commands.RemoveGroup(self.kGroup2))
 
         self.print_step(13, "TH waits for subscription report for the GroupTable attribute from the Group Key Management Cluster")
-        WaitForAttributeReport(gcm_queue, Clusters.GroupKeyManagement.Attributes.GroupTable)
+        gcm_cb.wait_for_attribute_report()
 
         self.print_step(14, "TH removes All Groups from the Group Cluster")
         await self.TH1.SendCommand(self.dut_node_id, 1, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.print_step(15, "TH waits for subscription report for the GroupTable attribute from the Group Key Management Cluster")
-        WaitForAttributeReport(gcm_queue, Clusters.GroupKeyManagement.Attributes.GroupTable)
+        gcm_cb.wait_for_attribute_report()
 
 
 if __name__ == "__main__":

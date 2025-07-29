@@ -81,7 +81,6 @@ ti_simplelink_executable("light-switch_app") {
 
   sources = [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
-    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${project_dir}/src/AppTask.cpp",
     "${project_dir}/src/BindingHandler.cpp",
     "${project_dir}/src/LightSwitchManager.cpp",
@@ -96,6 +95,7 @@ ti_simplelink_executable("light-switch_app") {
     ":sysconfig",
     "${chip_root}/examples/light-switch-app/light-switch-common",
     "${chip_root}/examples/platform/ti/cc13x4_26x4:ti-attestation-credentials",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/openthread:openthread",
   ]

@@ -28,29 +28,14 @@
 #include "AppTask.h"
 #include "ota.h"
 
-#include <setup_payload/OnboardingCodesUtil.h>
-
-#include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
-#include <app/clusters/identify-server/identify-server.h>
-#include <app/server/Dnssd.h>
-#include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
-
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-
+#include "App_Battery.h"
 #include "ButtonHandler.h"
 #include "StatusLed.h"
+#include "ThermostaticRadiatorValveManager.h"
 #include "qPinCfg.h"
 
-#include <inet/EndPointStateOpenThread.h>
-
-#include "ThermostaticRadiatorValveManager.h"
-#include <DeviceInfoProviderImpl.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/server/Server.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -60,199 +45,29 @@ using namespace ::chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-
-#define APP_TASK_NAME "APP"
-#define APP_TASK_STACK_SIZE (2 * 1024)
-#define APP_TASK_PRIORITY 2
-#define APP_EVENT_QUEUE_SIZE 10
-#define SECONDS_IN_HOUR (3600)                                              // we better keep this 3600
-#define TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS (1 * SECONDS_IN_HOUR) // increment every hour
-
-#define NMBR_OF_RESETS_BLE_ADVERTISING (3)
-
-namespace {
-TaskHandle_t sAppTaskHandle;
-QueueHandle_t sAppEventQueue;
-
-bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
-bool sHaveBLEConnections      = false;
-bool sIsBLEAdvertisingEnabled = false;
-
-// NOTE! This key is for test/certification only and should not be available in production devices!
-uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-
-uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
-
-StaticQueue_t sAppEventQueueStruct;
-
-StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
-StaticTask_t appTaskStruct;
-
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
 const uint8_t StatusLedGpios[] = QPINCFG_STATUS_LED;
 const ButtonConfig_t buttons[] = QPINCFG_BUTTONS;
-} // namespace
 
 AppTask AppTask::sAppTask;
 
-namespace {
-constexpr int extDiscTimeoutSecs = 20;
-}
-
-Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-
-/**********************************************************
- * Identify Callbacks
- *********************************************************/
-
-namespace {
-void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
-{
-    sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-}
-} // namespace
-
-void OnTriggerIdentifyEffect(Identify * identify)
-{
-    sIdentifyEffect = identify->mCurrentEffectIdentifier;
-
-    if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
-    {
-        ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
-    }
-
-    switch (sIdentifyEffect)
-    {
-    case Clusters::Identify::EffectIdentifierEnum::kBlink:
-    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
-    case Clusters::Identify::EffectIdentifierEnum::kOkay:
-    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
-        SystemLayer().ScheduleLambda([identify] {
-            (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                                                               identify);
-        });
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
-        SystemLayer().ScheduleLambda([identify] {
-            (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-            (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                                                               identify);
-        });
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
-        SystemLayer().ScheduleLambda(
-            [identify] { (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify); });
-        sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-    }
-}
-
-Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnTriggerIdentifyEffect,
-};
-
-void LockOpenThreadTask(void)
-{
-    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
-}
-
-void UnlockOpenThreadTask(void)
-{
-    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
-}
-
-CHIP_ERROR AppTask::StartAppTask()
-{
-    sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
-    if (sAppEventQueue == nullptr)
-    {
-        ChipLogError(NotSpecified, "Failed to allocate app event queue");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    // Start App task.
-    sAppTaskHandle =
-        xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, MATTER_ARRAY_SIZE(appStack), nullptr, 1, appStack, &appTaskStruct);
-    if (sAppTaskHandle == nullptr)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void AppTask::InitServer(intptr_t arg)
-{
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
-    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb                = LockOpenThreadTask;
-    nativeParams.unlockCb              = UnlockOpenThreadTask;
-    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
-
-    // Use GenericFaultTestEventTriggerHandler to inject faults
-    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
-    static GenericFaultTestEventTriggerHandler sFaultTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
-    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFaultTestEventTriggerHandler) == CHIP_NO_ERROR);
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-
-    chip::Server::GetInstance().Init(initParams);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
-#endif
-}
-
-void AppTask::OpenCommissioning(intptr_t arg)
-{
-    // Enable BLE advertisements
-    chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
-}
-
 CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    const qResult_t res = qPinCfg_Init(NULL);
-
-    if (res != Q_OK)
+    // Initialize common code in base class
+    CHIP_ERROR err = BaseAppTask::Init();
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "qPinCfg_Init failed: %d", res);
+        ChipLogError(NotSpecified, "BaseAppTask::Init() failed");
+        return err;
     }
 
-    StatusLed_Init(StatusLedGpios, Q_ARRAY_SIZE(StatusLedGpios), true);
-
-    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
-
-    ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-
     // Init ZCL Data Model and start server
-    PlatformMgr().ScheduleWork(InitServer, 0);
+    PlatformMgr().ScheduleWork(AppTask::InitServerWrapper, 0);
 
-    // Initialize device attestation config
-    ReturnErrorOnFailure(mFactoryDataProvider.Init());
-    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
-    SetCommissionableDataProvider(&mFactoryDataProvider);
+    // Setup powercycle reset expired handler
+    gpAppFramework_SetResetExpiredHandler(AppTask::PowerCycleExpiredHandlerWrapper);
 
-    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    // Setup button handler
+    ButtonHandler_Init(buttons, Q_ARRAY_SIZE(buttons), BUTTON_LOW, AppTask::ButtonEventHandlerWrapper);
 
     err = ThermostaticRadiatorValveMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -261,47 +76,26 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    // Setup button handler
-    ButtonHandler_Init(buttons, Q_ARRAY_SIZE(buttons), BUTTON_LOW, ButtonEventHandler);
-
-    // Log device configuration
-    ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-
-    sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-    sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-    sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-    sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
-    UpdateLEDs();
-
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS),
-                                                      TotalHoursTimerHandler, this);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
-    }
+    gpSched_ScheduleEvent(1 * ONE_SECOND_US, Application_StartPeriodicBatteryUpdate);
 
     return err;
 }
 
-void AppTask::AppTaskMain(void * pvParameter)
+bool AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 {
-    AppEvent event;
-
-    while (true)
+    // Call base class ButtonEventHandler
+    bool eventHandled = BaseAppTask::ButtonEventHandler(btnIdx, btnPressed);
+    if (eventHandled)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
-        while (eventReceived == pdTRUE)
-        {
-            sAppTask.DispatchEvent(&event);
-            eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
-        }
+        return true;
     }
-}
 
-void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
-{
+    // Only go ahead if button index has a supported value
+    if (btnIdx != APP_READ_TEMPERATURE_BUTTON)
+    {
+        return false;
+    }
+
     ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
 
     AppEvent button_event              = {};
@@ -309,310 +103,23 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.ButtonEvent.Action    = btnPressed;
 
-    switch (btnIdx)
+    if (btnIdx == APP_READ_TEMPERATURE_BUTTON && btnPressed == true)
     {
-    case APP_READ_TEMPERATURE_BUTTON: {
-
-        if (btnPressed)
-        {
-            ThermostaticRadiatorValveManager::TempDisplayMode_t value = ThermostaticRadiatorValveMgr().GetTemperatureDisplayMode();
-
-            if (value != ThermostaticRadiatorValveManager::TempDisplayMode_t::kUnknownEnumValue)
-            {
-                // toggle the value
-                value = (value == ThermostaticRadiatorValveManager::TempDisplayMode_t::kCelsius)
-                    ? ThermostaticRadiatorValveManager::TempDisplayMode_t::kFahrenheit
-                    : ThermostaticRadiatorValveManager::TempDisplayMode_t::kCelsius;
-            }
-
-            ThermostaticRadiatorValveMgr().SetTemperatureDisplayMode(value); // update the attribute
-            ThermostaticRadiatorValveMgr().DisplayTemperature();
-        }
-        break;
+        ThermostaticRadiatorValveMgr().DisplayTemperature();
     }
-    case APP_COMMISSION_BUTTON: {
-        // Open commissioning after button pressed if no fabric was available
-        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
-        {
-            PlatformMgr().ScheduleWork(OpenCommissioning, 0);
-        }
-        break;
-    }
-    case APP_FUNCTION_BUTTON: {
-        /* In this example, this button is for triggering OTA or factory reset*/
-        button_event.Handler = FunctionHandler;
-        break;
-    }
-    default: {
-        // invalid button
-        return;
-    }
+    else
+    {
+        return false;
     }
 
     sAppTask.PostEvent(&button_event);
+
+    return true;
 }
 
-void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
+void AppTask::PowerCycleExpiredHandler(uint8_t resetCounts)
 {
-    AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = aAppState;
-    event.Handler            = FunctionTimerEventHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::TotalHoursTimerHandler(chip::System::Layer * aLayer, void * aAppState)
-{
-    ChipLogProgress(NotSpecified, "HourlyTimer");
-
-    CHIP_ERROR err;
-    uint32_t totalOperationalHours = 0;
-
-    err = ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
-                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / SECONDS_IN_HOUR));
-    }
-    else if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        totalOperationalHours = 0; // set this explicitly to 0 for safety
-        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
-                                                      (TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS / SECONDS_IN_HOUR));
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
-    }
-
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS),
-                                                      TotalHoursTimerHandler, nullptr);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
-    }
-}
-
-void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
-{
-    if (aEvent->Type != AppEvent::kEventType_Timer)
-    {
-        return;
-    }
-
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
-    {
-        ChipLogProgress(NotSpecified, "[BTN] Factory Reset selected. Release within %us to cancel.",
-                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
-
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
-        // cancel, if required.
-        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-
-        sAppTask.mFunction = kFunction_FactoryReset;
-
-        // Turn off all LEDs before starting blink to make sure blink is
-        // co-ordinated.
-        StatusLed_SetLed(SYSTEM_STATE_LED, false);
-
-        StatusLed_BlinkLed(SYSTEM_STATE_LED, 500, 500);
-    }
-    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
-    {
-        // Actually trigger Factory Reset
-        sAppTask.mFunction = kFunction_NoneSelected;
-        chip::Server::GetInstance().ScheduleFactoryReset();
-    }
-}
-
-void AppTask::FunctionHandler(AppEvent * aEvent)
-{
-    if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON)
-    {
-        return;
-    }
-
-    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
-    // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
-    // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
-    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
-    // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
-    // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
-    // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == true)
-    {
-        if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
-        {
-            ChipLogProgress(NotSpecified, "[BTN] Hold to select function:");
-            ChipLogProgress(NotSpecified, "[BTN] - Trigger OTA (0-3s)");
-            ChipLogProgress(NotSpecified, "[BTN] - Factory Reset (>6s)");
-
-            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-
-            sAppTask.mFunction = kFunction_SoftwareUpdate;
-        }
-    }
-    else
-    {
-        // If the button was released before factory reset got initiated, trigger a
-        // software update.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
-        {
-            sAppTask.CancelTimer();
-
-            sAppTask.mFunction = kFunction_NoneSelected;
-
-            ChipLogProgress(NotSpecified, "[BTN] Triggering OTA Query");
-
-            TriggerOTAQuery();
-        }
-        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
-        {
-            sAppTask.CancelTimer();
-
-            // Change the function to none selected since factory reset has been
-            // canceled.
-            sAppTask.mFunction = kFunction_NoneSelected;
-
-            ChipLogProgress(NotSpecified, "[BTN] Factory Reset has been Canceled");
-        }
-    }
-}
-
-void AppTask::CancelTimer()
-{
-    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
-    mFunctionTimerActive = false;
-}
-
-void AppTask::StartTimer(uint32_t aTimeoutInMs)
-{
-    CHIP_ERROR err;
-
-    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
-    SuccessOrExit(err);
-
-    mFunctionTimerActive = true;
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
-    }
-}
-
-void AppTask::PostEvent(const AppEvent * aEvent)
-{
-    if (sAppEventQueue != NULL)
-    {
-        if (!xQueueSend(sAppEventQueue, aEvent, 1))
-        {
-            ChipLogError(NotSpecified, "Failed to post event to app task event queue");
-        }
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
-    }
-}
-
-void AppTask::DispatchEvent(AppEvent * aEvent)
-{
-    if (aEvent->Handler)
-    {
-        aEvent->Handler(aEvent);
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Event received with no handler. Dropping event.");
-    }
-}
-
-void AppTask::UpdateLEDs(void)
-{
-    // If system has "full connectivity", keep the LED On constantly.
-    //
-    // If thread and service provisioned, but not attached to the thread network
-    // yet OR no connectivity to the service OR subscriptions are not fully
-    // established THEN blink the LED Off for a short period of time.
-    //
-    // If the system has ble connection(s) uptill the stage above, THEN blink
-    // the LEDs at an even rate of 100ms.
-    //
-    // Otherwise, turn the LED OFF.
-    if (sIsThreadProvisioned && sIsThreadEnabled)
-    {
-        StatusLed_SetLed(SYSTEM_STATE_LED, true);
-    }
-    else if (sIsThreadProvisioned && !sIsThreadEnabled)
-    {
-        StatusLed_BlinkLed(SYSTEM_STATE_LED, 950, 50);
-    }
-    else if (sHaveBLEConnections)
-    {
-        StatusLed_BlinkLed(SYSTEM_STATE_LED, 100, 100);
-    }
-    else if (sIsBLEAdvertisingEnabled)
-    {
-        StatusLed_BlinkLed(SYSTEM_STATE_LED, 50, 50);
-    }
-    else
-    {
-        // not commissioned yet
-        StatusLed_SetLed(SYSTEM_STATE_LED, false);
-    }
-}
-
-void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
-{
-    switch (event->Type)
-    {
-    case DeviceEventType::kServiceProvisioningChange: {
-        sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
-        UpdateLEDs();
-        break;
-    }
-
-    case DeviceEventType::kThreadConnectivityChange: {
-        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
-        UpdateLEDs();
-        break;
-    }
-
-    case DeviceEventType::kCHIPoBLEConnectionEstablished: {
-        sHaveBLEConnections = true;
-        UpdateLEDs();
-        break;
-    }
-
-    case DeviceEventType::kCHIPoBLEConnectionClosed: {
-        sHaveBLEConnections = false;
-        UpdateLEDs();
-        break;
-    }
-
-    case DeviceEventType::kCHIPoBLEAdvertisingChange: {
-        sIsBLEAdvertisingEnabled = (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started);
-        UpdateLEDs();
-        break;
-    }
-
-    default:
-        break;
-    }
-}
-
-extern "C" {
-void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
-{
-    uint8_t resetCount = gpAppFramework_Reset_GetResetCount();
-
-    ChipLogProgress(NotSpecified, "%d resets so far", resetCount);
-    if (resetCount >= NMBR_OF_RESETS_BLE_ADVERTISING)
+    if (resetCounts >= NMBR_OF_RESETS_BLE_ADVERTISING)
     {
         // Open commissioning if no fabric was available
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
@@ -621,5 +128,4 @@ void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
             AppTask::OpenCommissioning((intptr_t) 0);
         }
     }
-}
 }

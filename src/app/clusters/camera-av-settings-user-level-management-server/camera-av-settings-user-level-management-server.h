@@ -376,7 +376,7 @@ public:
      *  server list, at initialization.
      */
     virtual CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) = 0;
-    virtual CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> dptzStreams)               = 0;
+    virtual CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)             = 0;
 
     CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
 

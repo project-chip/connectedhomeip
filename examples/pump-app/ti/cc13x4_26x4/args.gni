@@ -45,6 +45,12 @@ chip_openthread_target =
 
 chip_openthread_ftd = true
 
+#NOTE: LwIP is no longer supported, these options must stay the same
+chip_system_config_use_openthread_inet_endpoints = true
+chip_with_lwip = false
+chip_enable_openthread = true
+chip_inet_config_enable_tcp_endpoint = false
+
 # Disable CHIP Logging
 chip_progress_logging = true
 chip_detail_logging = true
@@ -73,7 +79,5 @@ chip_enable_icd_dsls = false
 
 freertos_root = "//third_party/connectedhomeip/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/third_party/freertos"
 
-if (chip_openthread_target != "") {
-  openthread_root =
-      "//third_party/connectedhomeip/third_party/openthread/ot-ti/openthread"
-}
+openthread_root =
+    "//third_party/connectedhomeip/third_party/openthread/ot-ti/openthread"

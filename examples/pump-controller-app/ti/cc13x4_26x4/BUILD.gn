@@ -80,7 +80,6 @@ ti_simplelink_executable("pump_controller_app") {
   output_name = "chip-${ti_simplelink_board}-pump-controller-example.out"
 
   sources = [
-    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/PumpManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
@@ -94,6 +93,7 @@ ti_simplelink_executable("pump_controller_app") {
     ":sysconfig",
     "${chip_root}/examples/platform/ti/cc13x4_26x4:ti-attestation-credentials",
     "${chip_root}/examples/pump-controller-app/pump-controller-common",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",

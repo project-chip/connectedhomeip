@@ -30,16 +30,18 @@ public:
     ChimeManager() {}
 
     // Chime Delegate methods
-    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name);
-    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID);
+    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name) override;
+    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
 
-    chip::Protocols::InteractionModel::Status PlayChimeSound();
+    chip::Protocols::InteractionModel::Status PlayChimeSound() override;
 
 private:
     using ChimeSoundStructType = chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type;
 
-    const ChimeSoundStructType mChimeSounds[1] = {
+    const ChimeSoundStructType mChimeSounds[3] = {
         ChimeSoundStructType{ .chimeID = 0, .name = chip::CharSpan::fromCharString("Basic Door Chime") },
+        ChimeSoundStructType{ .chimeID = 1, .name = chip::CharSpan::fromCharString("Enhanced Door Chime") },
+        ChimeSoundStructType{ .chimeID = 2, .name = chip::CharSpan::fromCharString("Star Wars Door Chime") },
     };
 };
 

@@ -4525,6 +4525,28 @@ public class ClusterWriteMapping {
       writeUnitTestingGlobalEnumCommandParams
     );
     writeUnitTestingInteractionInfo.put("writeGlobalEnumAttribute", writeUnitTestingGlobalEnumAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingunsupportedAttributeRequiringAdminPrivilegeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams.put(
+        "value",
+        unitTestingunsupportedAttributeRequiringAdminPrivilegeCommandParameterInfo
+    );
+    InteractionInfo writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster).writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams
+    );
+    writeUnitTestingInteractionInfo.put("writeUnsupportedAttributeRequiringAdminPrivilegeAttribute", writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingunsupportedCommandParameterInfo =
         new CommandParameterInfo(

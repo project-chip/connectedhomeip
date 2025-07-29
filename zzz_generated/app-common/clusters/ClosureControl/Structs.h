@@ -37,10 +37,10 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 namespace Structs {
-namespace OverallStateStruct {
+namespace OverallCurrentStateStruct {
 enum class Fields : uint8_t
 {
-    kPositioning = 0,
+    kPosition    = 0,
     kLatch       = 1,
     kSpeed       = 2,
     kSecureState = 3,
@@ -49,10 +49,10 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<DataModel::Nullable<PositioningEnum>> positioning;
+    Optional<DataModel::Nullable<CurrentPositionEnum>> position;
     Optional<DataModel::Nullable<bool>> latch;
-    Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speed;
-    Optional<DataModel::Nullable<bool>> secureState;
+    Optional<Globals::ThreeLevelAutoEnum> speed;
+    DataModel::Nullable<bool> secureState;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -63,8 +63,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace OverallStateStruct
-namespace OverallTargetStruct {
+} // namespace OverallCurrentStateStruct
+namespace OverallTargetStateStruct {
 enum class Fields : uint8_t
 {
     kPosition = 0,
@@ -75,8 +75,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<TargetPositionEnum> position;
-    Optional<bool> latch;
+    Optional<DataModel::Nullable<TargetPositionEnum>> position;
+    Optional<DataModel::Nullable<bool>> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -88,7 +88,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace OverallTargetStruct
+} // namespace OverallTargetStateStruct
 } // namespace Structs
 } // namespace ClosureControl
 } // namespace Clusters

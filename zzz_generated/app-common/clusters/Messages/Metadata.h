@@ -48,6 +48,19 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace CancelMessagesRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace MessageQueued {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessageQueued
+namespace MessagePresented {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessagePresented
+namespace MessageComplete {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessageComplete
+
+} // namespace Events
 } // namespace Messages
 } // namespace Clusters
 } // namespace app

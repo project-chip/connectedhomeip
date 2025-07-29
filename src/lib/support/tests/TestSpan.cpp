@@ -357,3 +357,25 @@ TEST(TestSpan, TestConversionConstructors)
     // The following should not compile
     // Span<const Foo> error1 = std::array<Foo, 3>(); // Span would point into a temporary value
 }
+
+namespace {
+template <typename T>
+void PassSpanArg(const Span<T> &)
+{}
+} // namespace
+
+TEST(TestSpan, TestConstructorTypeDeduction)
+{
+    const uint8_t nums[]      = { 1, 2 };
+    const uint8_t otherNums[] = { 1, 2, 3 };
+
+    // These will fail to compile if type deduction is not working correctly.
+    PassSpanArg(Span(nums));
+    PassSpanArg(Span(nums, 1));
+
+    Span a(nums);
+    EXPECT_TRUE(a.data_equal(Span<const uint8_t>(otherNums, 2)));
+
+    Span b(nums, 1);
+    EXPECT_TRUE(b.data_equal(Span<const uint8_t>(otherNums, 1)));
+}

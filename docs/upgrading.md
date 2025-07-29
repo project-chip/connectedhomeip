@@ -2,6 +2,46 @@
 
 ## API changes and code migration
 
+### `AttributePersistenceProvider`
+
+`AttributePersistenceProvider` was moved to `src/app/persistence` and its
+interface was updated:
+
+-   Read/write operate over pure buffers, without type information
+
+This update was done so that the interface is decoupled from ember and metadata
+types. The reasons for this approach:
+
+-   simpler/more modular code (easier to maintain)
+-   Have more generic storage support (including variable size data)
+-   Ability to preserve backward compatibility with existing products without
+    increasing flash size by adding additional abstraction layers
+
+Callers will validate data validity on read instead of relying on data
+validation by the persistence provider.
+
+See <https://github.com/project-chip/connectedhomeip/pull/39693> for changes.
+
+The only change is that the `EmberAfAttributeMetadata` argument is not passed in
+anymore into `Read` and implementations are expected to just return the opaque
+data stored. API updates changed:
+
+-   FROM OLD
+
+    ```cpp
+    ReturnErrorOnFailure(ReadValue(aPath, aMetadata, aByteSpan));
+    ```
+
+-   TO NEW
+
+    ```cpp
+    ReturnErrorOnFailure(ReadValue(aPath, aByteSpan));
+    ReturnErrorOnFailure(ValidateData(aByteSpan, aMetadata));
+    ```
+
+    Where callers would implement `ValidateData`. Implementations do not have
+    the use of aMetadata anymore and cluster data is opaque now.
+
 ### `CommandHandler`
 
 `CommandHandler` ability to directly invoke `Prepare/TLV-Write/Finish` cycles
