@@ -88,7 +88,6 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         delay = self._get_initial_delay()
         next_ = now
         last = now + timeout
-        record_type = next(iter(self._query_record_types))
         try:
             self.async_clear_cache()
             zc.async_add_listener(self, None)
@@ -100,11 +99,12 @@ class MdnsAsyncServiceInfo(ServiceInfo):
                     first_request = False
 
                     # Prepare outgoing mDNS query message with
-                    # a single question and record type.
-                    out = DNSOutgoing(_FLAGS_QR_QUERY)
-                    question = DNSQuestion(self._name, record_type, _CLASS_IN)
-                    question.unicast = question_type is DNSQuestionType.QU
-                    out.add_question(question)
+                    # single or multiple record types
+                    for record_type in self._query_record_types:
+                        out = DNSOutgoing(_FLAGS_QR_QUERY)
+                        question = DNSQuestion(self._name, record_type, _CLASS_IN)
+                        question.unicast = question_type is DNSQuestionType.QU
+                        out.add_question(question)
 
                     # Send the query to the specified address and port.
                     zc.async_send(out, addr, port)
