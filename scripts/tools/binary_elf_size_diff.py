@@ -149,13 +149,13 @@ class SankeyGroupingRule:
     diagram_instances: dict[int, DiagramInstance] = field(default_factory=dict)
 
     def add_towards(
-        self, target_index: int, sakey_data: "SankeyData", value: int
+        self, target_index: int, sankey_data: "SankeyData", value: int
     ) -> int:
         if target_index in self.diagram_instances:
             self.diagram_instances[target_index].value += value
         else:
             self.diagram_instances[target_index] = DiagramInstance(
-                index=sakey_data.add_node(self.name, color=self.color),
+                index=sankey_data.add_node(self.name, color=self.color),
                 target_index=target_index,
                 value=value,
             )
