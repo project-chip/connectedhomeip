@@ -54,7 +54,9 @@ struct VideoStream
                 videoStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 videoStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 videoStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
-                videoStreamParams.maxResolution.height >= inputParams.maxResolution.height);
+                videoStreamParams.maxResolution.height >= inputParams.maxResolution.height &&
+                videoStreamParams.minBitRate <= inputParams.minBitRate &&
+                videoStreamParams.maxBitRate >= inputParams.maxBitRate);
     }
 };
 
@@ -83,11 +85,12 @@ struct SnapshotStream
     bool IsCompatible(const SnapshotStreamStruct & inputParams) const
     {
         return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
-                snapshotStreamParams.frameRate <= inputParams.frameRate &&
+                snapshotStreamParams.frameRate == inputParams.frameRate &&
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 snapshotStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
-                snapshotStreamParams.maxResolution.height >= inputParams.maxResolution.height);
+                snapshotStreamParams.maxResolution.height >= inputParams.maxResolution.height &&
+                snapshotStreamParams.quality == inputParams.quality);
     }
 };
 

@@ -278,6 +278,32 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & vi
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStream(uint16_t videoStreamId, const VideoStreamStruct & videoStream)
+{
+    mAllocatedVideoStreams.push_back(videoStream);
+
+    auto it = std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
+                           [videoStreamId](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; });
+
+    if (it == mAllocatedVideoStreams.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    it->minFrameRate    = videoStream.minFrameRate;
+    it->maxFrameRate    = videoStream.maxFrameRate;
+    it->minResolution   = videoStream.minResolution;
+    it->maxResolution   = videoStream.maxResolution;
+    it->minBitRate      = videoStream.minBitRate;
+    it->maxBitRate      = videoStream.maxBitRate;
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
+    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
 {
     mAllocatedVideoStreams.erase(
