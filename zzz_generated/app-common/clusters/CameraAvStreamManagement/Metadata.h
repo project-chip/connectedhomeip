@@ -202,7 +202,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StatusLightBrightness:
                                                           Access::Privilege::kManage, Access::Privilege::kManage);
 } // namespace StatusLightBrightness
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     MaxContentBufferSize::kMetadataEntry,
     MaxNetworkBandwidth::kMetadataEntry,
     SupportedStreamUsages::kMetadataEntry,

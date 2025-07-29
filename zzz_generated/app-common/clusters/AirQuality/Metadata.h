@@ -24,7 +24,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AirQuality::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace AirQuality
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     AirQuality::kMetadataEntry,
 };
 

@@ -64,7 +64,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelStep::Id, BitFlag
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LevelStep
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry, RemainingDuration::kMetadataEntry,
     CurrentState::kMetadataEntry, TargetState::kMetadataEntry,
 };

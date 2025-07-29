@@ -159,7 +159,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace EndpointList
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     Status::kMetadataEntry,
     Order::kMetadataEntry,
     Description::kMetadataEntry,

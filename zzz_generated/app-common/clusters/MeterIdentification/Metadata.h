@@ -40,7 +40,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerThreshold::Id, Bi
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PowerThreshold
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     MeterType::kMetadataEntry,
     PointOfDelivery::kMetadataEntry,
     MeterSerialNumber::kMetadataEntry,

@@ -20,7 +20,7 @@ inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
 
 };
 

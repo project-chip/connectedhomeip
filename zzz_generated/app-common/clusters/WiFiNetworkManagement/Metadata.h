@@ -28,7 +28,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PassphraseSurrogate::I
                                                           Access::Privilege::kManage, std::nullopt);
 } // namespace PassphraseSurrogate
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     Ssid::kMetadataEntry,
     PassphraseSurrogate::kMetadataEntry,
 };

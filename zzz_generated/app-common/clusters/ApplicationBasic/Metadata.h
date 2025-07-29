@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace AllowedVendorList
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     ApplicationName::kMetadataEntry,    Application::kMetadataEntry,       Status::kMetadataEntry,
     ApplicationVersion::kMetadataEntry, AllowedVendorList::kMetadataEntry,
 };

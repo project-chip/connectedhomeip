@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedLocales
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     ActiveLocale::kMetadataEntry,
     SupportedLocales::kMetadataEntry,
 };

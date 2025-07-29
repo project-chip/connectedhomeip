@@ -28,7 +28,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(IdentifyType::Id, BitF
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace IdentifyType
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     IdentifyTime::kMetadataEntry,
     IdentifyType::kMetadataEntry,
 };

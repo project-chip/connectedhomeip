@@ -40,7 +40,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantiti
                                                           std::nullopt);
 } // namespace MaximumMeteredQuantities
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     MeteredQuantity::kMetadataEntry,
     MeteredQuantityTimestamp::kMetadataEntry,
     MeasurementType::kMetadataEntry,

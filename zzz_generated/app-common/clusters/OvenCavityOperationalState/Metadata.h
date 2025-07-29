@@ -47,7 +47,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OperationalError::Id, 
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OperationalError
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     PhaseList::kMetadataEntry,        CurrentPhase::kMetadataEntry,     OperationalStateList::kMetadataEntry,
     OperationalState::kMetadataEntry, OperationalError::kMetadataEntry,
 };

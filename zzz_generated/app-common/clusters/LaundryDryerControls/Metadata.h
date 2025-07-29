@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedDrynessLevel::
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace SelectedDrynessLevel
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     SupportedDrynessLevels::kMetadataEntry,
     SelectedDrynessLevel::kMetadataEntry,
 };

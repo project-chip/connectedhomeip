@@ -92,7 +92,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     Reachable::kMetadataEntry,
     UniqueID::kMetadataEntry,
 };

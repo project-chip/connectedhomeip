@@ -32,7 +32,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AdminVendorId::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace AdminVendorId
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     WindowStatus::kMetadataEntry,
     AdminFabricIndex::kMetadataEntry,
     AdminVendorId::kMetadataEntry,

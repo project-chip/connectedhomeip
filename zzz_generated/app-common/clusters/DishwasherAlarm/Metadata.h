@@ -36,7 +36,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Supported::Id, BitFlag
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Supported
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     Mask::kMetadataEntry,
     State::kMetadataEntry,
     Supported::kMetadataEntry,

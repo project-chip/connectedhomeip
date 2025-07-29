@@ -32,7 +32,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kManage, std::nullopt);
 } // namespace LocationDirectory
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     DeviceDirectory::kMetadataEntry,
     LocationDirectory::kMetadataEntry,
 };

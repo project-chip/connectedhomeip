@@ -298,7 +298,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     LocalTemperature::kMetadataEntry,
     ControlSequenceOfOperation::kMetadataEntry,
     SystemMode::kMetadataEntry,

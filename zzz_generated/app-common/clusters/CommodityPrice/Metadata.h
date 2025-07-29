@@ -37,7 +37,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace PriceForecast
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     TariffUnit::kMetadataEntry,
     Currency::kMetadataEntry,
     CurrentPrice::kMetadataEntry,

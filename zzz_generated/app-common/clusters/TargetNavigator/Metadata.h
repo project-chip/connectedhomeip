@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentTarget::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentTarget
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     TargetList::kMetadataEntry,
 };
 

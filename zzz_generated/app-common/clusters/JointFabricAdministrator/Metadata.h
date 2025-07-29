@@ -25,7 +25,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AdministratorFabricInd
                                                           Access::Privilege::kAdminister, std::nullopt);
 } // namespace AdministratorFabricIndex
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
     AdministratorFabricIndex::kMetadataEntry,
 };
 
