@@ -105,7 +105,7 @@
     if (delegatesToRemove.count) {
         NSUInteger oldDelegatesCount = _delegates.count;
         [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ addDelegate: removed %lu", strongOwner, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
+        MTR_LOG("%@ addDelegate: removed %lu", strongOwner, static_cast<unsigned long>(oldDelegatesCount - _delegates.count));
     }
 
     [_delegates addObject:delegateInfo];
@@ -186,7 +186,7 @@
 
     if (delegatesToRemove.count) {
         [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ iterateDelegatesWithBlock: removed %lu remaining %lu", strongOwner, static_cast<unsigned long>(delegatesToRemove.count), (unsigned long) static_cast<unsigned long>(_delegates.count));
+        MTR_LOG("%@ iterateDelegatesWithBlock: removed %lu remaining %lu", strongOwner, static_cast<unsigned long>(delegatesToRemove.count), static_cast<unsigned long>(_delegates.count));
     }
 
     return _delegates.count;

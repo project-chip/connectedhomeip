@@ -74,7 +74,6 @@ MTR_TESTABLE
 #ifdef DEBUG
 
 // Returns number of still-alive delegates, without removing entries.
-// ones.
 - (NSUInteger)unitTestNonnullDelegateCount;
 
 // Calls the first delegate synchronously with the provided block.
