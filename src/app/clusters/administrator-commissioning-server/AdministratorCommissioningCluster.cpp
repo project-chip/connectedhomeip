@@ -99,7 +99,7 @@ CHIP_ERROR AdministratorCommissioningCluster::Attributes(const ConcreteClusterPa
 {
 
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(AdministratorCommissioning::Attributes::kMandatoryAttributes), {});
+    return listBuilder.Append(Span(AdministratorCommissioning::Attributes::kMandatoryAttributesMetadata), {});
 }
 
 std::optional<DataModel::ActionReturnStatus> AdministratorCommissioningWithBasicCommissioningWindowCluster::InvokeCommand(

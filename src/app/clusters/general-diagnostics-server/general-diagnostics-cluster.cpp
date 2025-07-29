@@ -333,15 +333,16 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
         { mEnabledAttributes.enableActiveHardwareFaults, GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry },
         { mEnabledAttributes.enableActiveRadioFaults, GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry },
         { mEnabledAttributes.enableActiveNetworkFaults, GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry },
+        /*
+        * Enforcing UpTime to always be added here because it is a mandatory attribute for
+        * revision 2 and beyond, but is left as optional in the XML for now for backwards 
+        * compatibility. This allows us to still use the code generated mandatory attributes
+        * and have support for UpTime.
+        */
+        { true, GeneralDiagnostics::Attributes::UpTime::kMetadataEntry },
     };
 
-    /*
-     * Not using the code generated mandatory attributes here, and instead manually
-     * making this array because from revision 2 onwards, the UpTime attribute is
-     * mandatory, but it's currently left as optional in the XML for backwards
-     * compatibility.
-     */
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
+    return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryAttributesMetadata), Span(optionalAttributeEntries));
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path,
