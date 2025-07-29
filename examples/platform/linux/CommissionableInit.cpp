@@ -19,7 +19,6 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #include "CommissionableInit.h"
 
@@ -27,67 +26,168 @@ namespace chip {
 namespace examples {
 
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 
-CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
+namespace {
+
+bool IsNotFound(CHIP_ERROR err)
 {
-    chip::Optional<uint32_t> setupPasscode;
-
-    if (options.payload.setUpPINCode != 0)
-    {
-        setupPasscode.SetValue(options.payload.setUpPINCode);
-    }
-    else if (!options.spake2pVerifier.HasValue())
-    {
-        uint32_t defaultTestPasscode = 0;
-        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
-
-        ChipLogError(Support,
-                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
-                     "given on command line. This is temporary and will disappear. Please update your scripts "
-                     "to explicitly configure onboarding credentials. ***",
-                     static_cast<unsigned>(defaultTestPasscode));
-        setupPasscode.SetValue(defaultTestPasscode);
-        options.payload.setUpPINCode = defaultTestPasscode;
-    }
-    else
-    {
-        // Passcode is 0, so will be ignored, and verifier will take over. Onboarding payload
-        // printed for debug will be invalid, but if the onboarding payload had been given
-        // properly to the commissioner later, PASE will succeed.
-    }
-
-    if (options.discriminator.HasValue())
-    {
-        options.payload.discriminator.SetLongValue(options.discriminator.Value());
-    }
-    else
-    {
-        uint16_t defaultTestDiscriminator = 0;
-        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestDiscriminator) == CHIP_NO_ERROR);
-
-        ChipLogError(Support,
-                     "*** WARNING: Using temporary test discriminator %u due to --discriminator not "
-                     "given on command line. This is temporary and will disappear. Please update your scripts "
-                     "to explicitly configure discriminator. ***",
-                     static_cast<unsigned>(defaultTestDiscriminator));
-        options.payload.discriminator.SetLongValue(defaultTestDiscriminator);
-    }
-
-    // Default to minimum PBKDF iterations
-    uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-    if (options.spake2pIterations != 0)
-    {
-        spake2pIterationCount = options.spake2pIterations;
-    }
-    ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
-
-    return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
-                         options.payload.discriminator.GetLongValue());
+    // PosixConfig should probably return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND, but some implementations use other error codes.
+    return (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ||
+            err == CHIP_ERROR_NOT_FOUND || err == CHIP_ERROR_KEY_NOT_FOUND);
 }
 
-CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, LinuxDeviceOptions & options)
+template <typename T>
+CHIP_ERROR ReadOptionalConfigValue(PosixConfig::Key key, Optional<T> & outValue)
+{
+    CHIP_ERROR err = PosixConfig::ReadConfigValue(key, outValue.Emplace());
+    if (err != CHIP_NO_ERROR)
+    {
+        outValue.ClearValue();
+        if (IsNotFound(err))
+        {
+            err = CHIP_NO_ERROR; // value is optional, not found is OK
+        }
+    }
+    return err;
+}
+
+CHIP_ERROR ReadOptionalConfigValueBin(PosixConfig::Key key, size_t bufSize, chip::Optional<std::vector<uint8_t>> & outValue)
+{
+    size_t length;
+    outValue.Emplace(bufSize);
+    CHIP_ERROR err = PosixConfig::ReadConfigValueBin(key, outValue.Value().data(), outValue.Value().size(), length);
+    if (err == CHIP_NO_ERROR)
+    {
+        outValue.Value().resize(length);
+    }
+    else
+    {
+        outValue.ClearValue();
+        if (IsNotFound(err))
+        {
+            err = CHIP_NO_ERROR; // value is optional, not found is OK
+        }
+    }
+    return err;
+}
+
+CHIP_ERROR GetPinCodeAndVerifier(const LinuxDeviceOptions & options, chip::Optional<uint32_t> & outPinCode,
+                                 chip::Optional<std::vector<uint8_t>> & outVerifier)
+{
+    // Command line options take precedence
+    outPinCode  = (options.payload.setUpPINCode != 0 ? MakeOptional(options.payload.setUpPINCode) : NullOptional);
+    outVerifier = options.spake2pVerifier;
+    if (outPinCode.HasValue() || outVerifier.HasValue())
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Read from PosixConfig
+    ReturnErrorOnFailure(ReadOptionalConfigValue(PosixConfig::kConfigKey_SetupPinCode, outPinCode));
+    ReturnErrorOnFailure(ReadOptionalConfigValueBin(PosixConfig::kConfigKey_Spake2pVerifier,
+                                                    Crypto::kSpake2p_VerifierSerialized_Length, outVerifier));
+    if (outPinCode.HasValue() || outVerifier.HasValue())
+    {
+        return CHIP_NO_ERROR;
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+    // Fall back to test parameters. Note: CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER is not supported.
+    outPinCode.SetValue(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
+    ChipLogError(NotSpecified,
+                 "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
+                 "given on command line or factory configuration. This is temporary and will disappear. "
+                 "Please update your scripts to explicitly configure onboarding credentials. ***",
+                 static_cast<unsigned>(outPinCode.Value()));
+    return CHIP_NO_ERROR;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+
+    ChipLogError(NotSpecified, "Unable to initialize commissionable device, no passcode or verifier configured");
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
+
+CHIP_ERROR GetSpake2pSalt(const LinuxDeviceOptions & options, chip::Optional<std::vector<uint8_t>> & outSalt)
+{
+    // Command line options take precedence
+    if (options.spake2pSalt.HasValue())
+    {
+        outSalt = options.spake2pSalt;
+        return CHIP_NO_ERROR;
+    }
+
+    // Read from PosixConfig. If not set a random salt will be generated by LinuxCommissionableDataProvider.
+    // Note: CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT is no longer supported.
+    return ReadOptionalConfigValueBin(PosixConfig::kConfigKey_Spake2pSalt, Crypto::kSpake2p_Max_PBKDF_Salt_Length, outSalt);
+}
+
+CHIP_ERROR GetIterationCount(const LinuxDeviceOptions & options, uint32_t & outIterationCount)
+{
+    // Command line options take precedence
+    if (options.spake2pIterations != 0)
+    {
+        outIterationCount = options.spake2pIterations;
+        return CHIP_NO_ERROR;
+    }
+
+    // Read from PosixConfig
+    CHIP_ERROR err = PosixConfig::ReadConfigValue(PosixConfig::kConfigKey_Spake2pIterationCount, outIterationCount);
+    VerifyOrReturnError(IsNotFound(err), err);
+
+    // CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT is no longer supported, default to minimum PBKDF iterations
+    outIterationCount = Crypto::kSpake2p_Min_PBKDF_Iterations;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetDiscriminator(const LinuxDeviceOptions & options, uint16_t & outDiscriminator)
+{
+    // Command line options take precedence
+    if (options.discriminator.HasValue())
+    {
+        outDiscriminator = options.discriminator.Value();
+        return CHIP_NO_ERROR;
+    }
+
+    // Read from PosixConfig
+    CHIP_ERROR err = PosixConfig::ReadConfigValue(PosixConfig::kConfigKey_SetupDiscriminator, outDiscriminator);
+    VerifyOrReturnError(IsNotFound(err), err);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+    // Fall back to test parameters
+    outDiscriminator = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+    ChipLogError(NotSpecified,
+                 "*** WARNING: Using temporary test discriminator %u due to --discriminator not "
+                 "given on command line or factory configuration. This is temporary and will disappear. "
+                 "Please update your scripts to explicitly configure onboarding credentials. ***",
+                 static_cast<unsigned>(outDiscriminator));
+    return CHIP_NO_ERROR;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+
+    ChipLogError(NotSpecified, "Unable to initialize commissionable device, no discriminator configured");
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
+
+} // namespace
+
+CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, const LinuxDeviceOptions & options)
+{
+    chip::Optional<uint32_t> setupPasscode;
+    chip::Optional<std::vector<uint8_t>> spake2pVerifier;
+    ReturnErrorOnFailure(GetPinCodeAndVerifier(options, setupPasscode, spake2pVerifier));
+
+    chip::Optional<std::vector<uint8_t>> spake2pSalt;
+    ReturnErrorOnFailure(GetSpake2pSalt(options, spake2pSalt));
+
+    uint32_t spake2pIterationCount;
+    ReturnErrorOnFailure(GetIterationCount(options, spake2pIterationCount));
+
+    uint16_t discriminator;
+    ReturnErrorOnFailure(GetDiscriminator(options, discriminator));
+
+    return provider.Init(spake2pVerifier, spake2pSalt, spake2pIterationCount, setupPasscode, discriminator);
+}
+
+CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, const LinuxDeviceOptions & options)
 {
     if (options.payload.vendorID != 0)
     {

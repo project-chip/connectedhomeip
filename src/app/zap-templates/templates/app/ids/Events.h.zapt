@@ -1,0 +1,9 @@
+{{> header}}
+// This file is generated from Events.h.zapt
+
+#pragma once
+
+{{#zcl_clusters}}
+#include <clusters/{{asUpperCamelCase label}}/EventIds.h>
+{{/zcl_clusters}}
+

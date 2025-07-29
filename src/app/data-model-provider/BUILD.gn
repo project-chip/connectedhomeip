@@ -24,6 +24,16 @@ source_set("metadata") {
   ]
 }
 
+source_set("core") {
+  public = [ "OperationTypes.h" ]
+
+  public_deps = [
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model",
+  ]
+}
+
 source_set("data-model-provider") {
   sources = [
     "ActionContext.h",
@@ -31,11 +41,8 @@ source_set("data-model-provider") {
     "ActionReturnStatus.h",
     "Context.h",
     "EventsGenerator.h",
-    "MetadataList.cpp",
-    "MetadataList.h",
     "MetadataLookup.cpp",
     "MetadataLookup.h",
-    "OperationTypes.h",
     "Provider.h",
     "ProviderChangeListener.h",
     "ProviderMetadataTree.cpp",
@@ -43,6 +50,7 @@ source_set("data-model-provider") {
   ]
 
   public_deps = [
+    ":core",
     ":metadata",
     "${chip_root}/src/app:attribute-access",
     "${chip_root}/src/app:command-handler",

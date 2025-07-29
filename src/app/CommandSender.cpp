@@ -87,18 +87,28 @@ CHIP_ERROR CommandSender::AllocateBuffer()
         mCommandMessageWriter.Reset();
 
         System::PacketBufferHandle commandPacket;
+        size_t bufferSizeToAllocate = kMaxSecureSduLengthBytes;
         if (mAllowLargePayload)
         {
-            commandPacket = System::PacketBufferHandle::New(kMaxLargeSecureSduLengthBytes);
+            bufferSizeToAllocate = kMaxLargeSecureSduLengthBytes;
         }
-        else
-        {
-            commandPacket = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-        }
+        commandPacket = System::PacketBufferHandle::New(bufferSizeToAllocate);
+
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+        // On some platforms we can get more available length in the packet than what we requested.
+        // It is vital that we only use up to bufferSizeToAllocate for the entire packet and
+        // nothing more.
+        uint32_t reservedSize = 0;
+        if (commandPacket->AvailableDataLength() > bufferSizeToAllocate)
+        {
+            reservedSize = static_cast<uint32_t>(commandPacket->AvailableDataLength() - bufferSizeToAllocate);
+        }
 
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeRequestBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
+        // Reserving space for MIC at the end.
+        ReturnErrorOnFailure(
+            mInvokeRequestBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         mInvokeRequestBuilder.SuppressResponse(mSuppressResponse).TimedRequest(mTimedRequest);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());

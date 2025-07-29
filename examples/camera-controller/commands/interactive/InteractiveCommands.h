@@ -21,6 +21,7 @@
 #include <commands/clusters/DataModelLogger.h>
 #include <commands/common/CHIPCommand.h>
 #include <commands/common/Commands.h>
+#include <websocket-server/WebSocketServer.h>
 
 #include <string>
 
@@ -42,7 +43,7 @@ public:
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
     bool NeedsOperationalAdvertising() override;
 
-    bool ParseCommand(char * command, int * status);
+    bool ParseCommand(const std::string & command, int * status);
 
 private:
     Commands * mHandler = nullptr;
@@ -61,8 +62,36 @@ public:
     CHIP_ERROR RunCommand() override;
 
 private:
-    char * GetCommand(char * command);
+    std::string GetCommand() const;
     std::string GetHistoryFilePath() const;
 };
 
 void PushCommand(const std::string & command);
+
+class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate, public RemoteDataModelLoggerDelegate
+{
+public:
+    InteractiveServerCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
+        InteractiveCommand("server", commandsHandler, "Start a websocket server that can receive commands sent by another process.",
+                           credsIssuerConfig)
+    {
+        AddArgument("port", 0, UINT16_MAX, &mPort, "Port the websocket will listen to. Defaults to 9002.");
+    }
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+    /////////// WebSocketServerDelegate Interface /////////
+    bool OnWebSocketMessageReceived(char * msg) override;
+
+    /////////// RemoteDataModelLoggerDelegate interface /////////
+    CHIP_ERROR LogJSON(const char * json) override;
+
+    void StopCommand();
+
+private:
+    WebSocketServer mWebSocketServer;
+    chip::Optional<uint16_t> mPort;
+};
+
+void StopInteractiveEventLoop();

@@ -26,11 +26,15 @@ import matter.tlv.TlvWriter
 class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   val chunkDuration: UInt,
   val CENCKey: Optional<ByteArray>,
+  val metadataEnabled: Optional<Boolean>,
+  val CENCKeyID: Optional<ByteArray>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
     append("\tchunkDuration : $chunkDuration\n")
     append("\tCENCKey : $CENCKey\n")
+    append("\tmetadataEnabled : $metadataEnabled\n")
+    append("\tCENCKeyID : $CENCKeyID\n")
     append("}\n")
   }
 
@@ -42,6 +46,14 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
         val optCENCKey = CENCKey.get()
         put(ContextSpecificTag(TAG_CENC_KEY), optCENCKey)
       }
+      if (metadataEnabled.isPresent) {
+        val optmetadataEnabled = metadataEnabled.get()
+        put(ContextSpecificTag(TAG_METADATA_ENABLED), optmetadataEnabled)
+      }
+      if (CENCKeyID.isPresent) {
+        val optCENCKeyID = CENCKeyID.get()
+        put(ContextSpecificTag(TAG_CENC_KEY_ID), optCENCKeyID)
+      }
       endStructure()
     }
   }
@@ -49,6 +61,8 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   companion object {
     private const val TAG_CHUNK_DURATION = 0
     private const val TAG_CENC_KEY = 1
+    private const val TAG_METADATA_ENABLED = 2
+    private const val TAG_CENC_KEY_ID = 3
 
     fun fromTlv(
       tlvTag: Tag,
@@ -62,10 +76,27 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
         } else {
           Optional.empty()
         }
+      val metadataEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
+        } else {
+          Optional.empty()
+        }
+      val CENCKeyID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY_ID))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY_ID)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterCMAFContainerOptionsStruct(chunkDuration, CENCKey)
+      return PushAvStreamTransportClusterCMAFContainerOptionsStruct(
+        chunkDuration,
+        CENCKey,
+        metadataEnabled,
+        CENCKeyID,
+      )
     }
   }
 }

@@ -117,12 +117,18 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="9" code="TEVT" name="Events" summary="Thermostat supports events">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
     <feature bit="10" code="PRESSUGGEST" name="Preset Suggestions" summary="Thermostat supports preset suggestions">
-      <optionalConform>
-        <feature name="PRES"/>
-      </optionalConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <feature name="PRES"/>
+        </optionalConform>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -522,14 +528,47 @@ Davis, CA 95616, USA
       </bitfield>
     </bitmap>
     <bitmap name="SuggestedPresetNotFollowingReasonBitmap">
-      <bitfield name="Unknown" bit="0" summary="Unknown reason">
-        <mandatoryConform/>
+      <bitfield name="DemandResponseEvent" bit="0" summary="Thermostat is responding to a Demand Response event">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </bitfield>
-      <bitfield name="DREvent" bit="1" summary="Thermostat is responding to a DR event">
-        <mandatoryConform/>
+      <bitfield name="OngoingHold" bit="1" summary="Thermostat has an ongoing setpoint hold">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </bitfield>
-      <bitfield name="OngoingHold" bit="2" summary="Thermostat has an ongoing setpoint hold">
-        <mandatoryConform/>
+      <bitfield name="Schedule" bit="2" summary="Thermostat is following a schedule">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </bitfield>
+      <bitfield name="Occupancy" bit="3" summary="Thermostat is following the occupancy signal">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </bitfield>
+      <bitfield name="VacationMode" bit="4" summary="Thermostat is set to Vacation mode">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </bitfield>
+      <bitfield name="TimeOfUseCostSavings" bit="5" summary="Thermostat is following a Time Of Use based cost savings plan">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </bitfield>
+      <bitfield name="PreCoolingOrPreHeating" bit="6" summary="Thermostat is precooling or preheating based on an energy forecast signal">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </bitfield>
     </bitmap>
     <struct name="PresetStruct">
@@ -612,8 +651,11 @@ Davis, CA 95616, USA
         <entry type="ScheduleTransitionStruct"/>
         <mandatoryConform/>
         <constraint>
-          <countBetween value="1">
-            <attribute name="NumberOfScheduleTransitions"/>
+          <countBetween>
+            <from value="1"/>
+            <to>
+              <attribute name="NumberOfScheduleTransitions"/>
+            </to>
           </countBetween>
         </constraint>
       </field>
@@ -690,16 +732,25 @@ Davis, CA 95616, USA
     </struct>
     <struct name="SuggestedPresetStruct">
       <field id="0" name="PresetHandle" type="octstr">
-        <mandatoryConform/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
         <constraint>
           <maxLength value="16"/>
         </constraint>
       </field>
       <field id="1" name="EffectiveTime" type="epoch-s">
-        <mandatoryConform/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </field>
       <field id="2" name="ExpirationTime" type="epoch-s">
-        <mandatoryConform/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </field>
     </struct>
     <struct name="WeeklyScheduleTransitionStruct">
@@ -720,7 +771,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="LocalTemperature" type="temperature" default="null">
+    <attribute id="0x0000" name="LocalTemperature" type="temperature">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
@@ -866,7 +917,9 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0015" name="MinHeatSetpointLimit" type="temperature">
-      <attribute name="AbsMinHeatSetpointLimit"/>
+      <default>
+        <attribute name="AbsMinHeatSetpointLimit"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -877,7 +930,9 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0016" name="MaxHeatSetpointLimit" type="temperature">
-      <attribute name="AbsMaxHeatSetpointLimit"/>
+      <default>
+        <attribute name="AbsMaxHeatSetpointLimit"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -888,7 +943,9 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0017" name="MinCoolSetpointLimit" type="temperature">
-      <attribute name="AbsMinCoolSetpointLimit"/>
+      <default>
+        <attribute name="AbsMinCoolSetpointLimit"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -899,7 +956,9 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0018" name="MaxCoolSetpointLimit" type="temperature">
-      <attribute name="AbsMaxCoolSetpointLimit"/>
+      <default>
+        <attribute name="AbsMaxCoolSetpointLimit"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -927,7 +986,7 @@ Davis, CA 95616, USA
       <quality persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x001B" name="ControlSequenceOfOperation" type="ControlSequenceOfOperationEnum" default="4">
+    <attribute id="0x001B" name="ControlSequenceOfOperation" type="ControlSequenceOfOperationEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -935,7 +994,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x001C" name="SystemMode" type="SystemModeEnum" default="1">
+    <attribute id="0x001C" name="SystemMode" type="SystemModeEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -1039,8 +1098,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="OccupiedSetbackMin"/>
-          <attribute name="OccupiedSetbackMax"/>
+          <from>
+            <attribute name="OccupiedSetbackMin"/>
+          </from>
+          <to>
+            <attribute name="OccupiedSetbackMax"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -1063,8 +1126,11 @@ Davis, CA 95616, USA
         <feature name="SB"/>
       </mandatoryConform>
       <constraint>
-        <between value="254">
-          <attribute name="OccupiedSetbackMin"/>
+        <between>
+          <from>
+            <attribute name="OccupiedSetbackMin"/>
+          </from>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
@@ -1079,8 +1145,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="UnoccupiedSetbackMin"/>
-          <attribute name="UnoccupiedSetbackMax"/>
+          <from>
+            <attribute name="UnoccupiedSetbackMin"/>
+          </from>
+          <to>
+            <attribute name="UnoccupiedSetbackMax"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -1109,8 +1179,11 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
       <constraint>
-        <between value="254">
-          <attribute name="UnoccupiedSetbackMin"/>
+        <between>
+          <from>
+            <attribute name="UnoccupiedSetbackMin"/>
+          </from>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
@@ -1272,32 +1345,35 @@ Davis, CA 95616, USA
       <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0053" name="CurrentSuggestedPreset" type="SuggestedPresetStruct" default="null">
+    <attribute id="0x0053" name="CurrentSuggestedPreset" type="SuggestedPresetStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRESSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
-    <attribute id="0x0054" name="UpcomingSuggestedPreset" type="SuggestedPresetStruct" default="null">
+    <attribute id="0x0054" name="UpcomingSuggestedPreset" type="SuggestedPresetStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRESSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
-    <attribute id="0x0055" name="SuggestedPresetNotFollowingReason" type="SuggestedPresetNotFollowingReasonBitmap" default="0">
+    <attribute id="0x0055" name="SuggestedPresetNotFollowingReason" type="SuggestedPresetNotFollowingReasonBitmap">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0056" name="FabricSuggestingPresets" type="fabric-idx" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRESSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>
@@ -1420,9 +1496,12 @@ Davis, CA 95616, USA
     </command>
     <command id="0x07" name="SetCurrentSuggestedPreset" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" fabricScoped="true"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRESSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="PresetHandle" type="octstr">
         <mandatoryConform/>
         <constraint>
@@ -1438,15 +1517,21 @@ Davis, CA 95616, USA
     </command>
     <command id="0x08" name="ClearCurrentSuggestedPreset" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" fabricScoped="true"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRESSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </command>
     <command id="0x09" name="SetUpcomingSuggestedPreset" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" fabricScoped="true"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRESSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="PresetHandle" type="octstr">
         <mandatoryConform/>
         <constraint>
@@ -1468,29 +1553,23 @@ Davis, CA 95616, USA
     </command>
     <command id="0x0A" name="ClearUpcomingSuggestedPreset" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" fabricScoped="true"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
-    </command>
-    <command id="0x0B" name="SetFabricSuggestingPresets" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" fabricScoped="true"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
-    </command>
-    <command id="0x0C" name="ClearFabricSuggestingPresets" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin"/>
-      <mandatoryConform>
-        <feature name="PRESSUGGEST"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PRESSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </command>
   </commands>
   <events>
     <event id="0x00" name="SystemModeChange" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="TEVT"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TEVT"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="PreviousSystemMode" type="SystemModeEnum">
         <optionalConform/>
       </field>
@@ -1500,14 +1579,17 @@ Davis, CA 95616, USA
     </event>
     <event id="0x01" name="LocalTemperatureChange" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="TEVT"/>
-          <notTerm>
-            <feature name="LTNE"/>
-          </notTerm>
-        </andTerm>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="TEVT"/>
+            <notTerm>
+              <feature name="LTNE"/>
+            </notTerm>
+          </andTerm>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="CurrentLocalTemperature" type="temperature">
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -1515,12 +1597,15 @@ Davis, CA 95616, USA
     </event>
     <event id="0x02" name="OccupancyChange" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="TEVT"/>
-          <feature name="OCC"/>
-        </andTerm>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="TEVT"/>
+            <feature name="OCC"/>
+          </andTerm>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="PreviousOccupancy" type="OccupancyBitmap">
         <optionalConform/>
       </field>
@@ -1530,9 +1615,12 @@ Davis, CA 95616, USA
     </event>
     <event id="0x03" name="SetpointChange" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="TEVT"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TEVT"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="SystemMode" type="SystemModeEnum">
         <mandatoryConform/>
         <constraint>
@@ -1560,9 +1648,12 @@ Davis, CA 95616, USA
     </event>
     <event id="0x04" name="RunningStateChange" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="TEVT"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TEVT"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="PreviousRunningState" type="RelayStateBitmap">
         <optionalConform/>
       </field>
@@ -1572,12 +1663,15 @@ Davis, CA 95616, USA
     </event>
     <event id="0x05" name="RunningModeChange" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="TEVT"/>
-          <feature name="AUTO"/>
-        </andTerm>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="TEVT"/>
+            <feature name="AUTO"/>
+          </andTerm>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="PreviousRunningMode" type="ThermostatRunningModeEnum">
         <optionalConform/>
       </field>
@@ -1587,12 +1681,15 @@ Davis, CA 95616, USA
     </event>
     <event id="0x06" name="ActiveScheduleChange" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="TEVT"/>
-          <feature name="MSCH"/>
-        </andTerm>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="TEVT"/>
+            <feature name="MSCH"/>
+          </andTerm>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="PreviousScheduleHandle" type="octstr">
         <quality nullable="true"/>
         <optionalConform/>
@@ -1610,12 +1707,15 @@ Davis, CA 95616, USA
     </event>
     <event id="0x07" name="ActivePresetChange" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="TEVT"/>
-          <feature name="PRES"/>
-        </andTerm>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="TEVT"/>
+            <feature name="PRES"/>
+          </andTerm>
+        </mandatoryConform>
+      </otherwiseConform>
       <field id="0" name="PreviousPresetHandle" type="octstr">
         <quality nullable="true"/>
         <optionalConform/>

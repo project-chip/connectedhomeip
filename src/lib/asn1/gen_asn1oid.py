@@ -134,18 +134,20 @@ oids = [
      [joint_iso_ccitt(2), ds(5), 4, 65]),
     ("AttributeType",  "DomainComponent",         16,
      [itu_t(0), 9, 2342, 19200300, 100, 1, 25]),
-    ("AttributeType",  "MatterNodeId",              17,      [iso(1), organization(
+    ("AttributeType",  "MatterNodeId",                  17,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 1]),
-    ("AttributeType",  "MatterFirmwareSigningId",   18,      [iso(1), organization(
+    ("AttributeType",  "MatterFirmwareSigningId",       18,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 2]),
-    ("AttributeType",  "MatterICACId",              19,      [iso(1), organization(
+    ("AttributeType",  "MatterICACId",                  19,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 3]),
-    ("AttributeType",  "MatterRCACId",              20,      [iso(1), organization(
+    ("AttributeType",  "MatterRCACId",                  20,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 4]),
-    ("AttributeType",  "MatterFabricId",            21,      [iso(1), organization(
+    ("AttributeType",  "MatterFabricId",                21,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 5]),
-    ("AttributeType",  "MatterCASEAuthTag",         22,      [iso(1), organization(
+    ("AttributeType",  "MatterCASEAuthTag",             22,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 6]),
+    ("AttributeType",  "MatterVidVerificationSignerId", 23,      [iso(1), organization(
+        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 7]),
 
     # Elliptic Curves
     ("EllipticCurve",  "prime256v1",              1,       [
@@ -201,7 +203,7 @@ def encodeOID(oid):
 
 TEMPLATE = '''/*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.

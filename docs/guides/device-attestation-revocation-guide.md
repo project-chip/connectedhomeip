@@ -44,9 +44,14 @@ pre-generated using the `generate_revocation_set.py` script.
 
 ### Test Vectors
 
-| Description           | DAC Provider                                                                                                                 | Revocation Set                                                                                                                     | Expected Result                              |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| PAI revoked by PAA    | [revoked-pai.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-pai.json)       | [revocation-set-for-paa.json](../../credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set-for-paa.json) | Commissioning fails with `kPaiRevoked` (202) |
-| DAC-01 revoked by PAI | [revoked-dac-01.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-01.json) | [revocation-set-for-pai.json](../../credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set-for-pai.json) | Commissioning fails with `kDacRevoked` (302) |
-| DAC-02 revoked by PAI | [revoked-dac-02.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-02.json) | [revocation-set-for-pai.json](../../credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set-for-pai.json) | Commissioning fails with `kDacRevoked` (302) |
-| DAC-03 revoked by PAI | [revoked-dac-03.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-03.json) | [revocation-set-for-pai.json](../../credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set-for-pai.json) | Commissioning fails with `kDacRevoked` (302) |
+Please use
+`credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json`
+as revocation set
+
+| Description           | DAC Provider                                                                                                                           | Expected Result                                    |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| PAI revoked by PAA    | [revoked-pai.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-pai.json)                 | Commissioning fails with `kPaiRevoked` (202)       |
+| DAC-01 revoked by PAI | [revoked-dac-01.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-01.json)           | Commissioning fails with `kDacRevoked` (302)       |
+| DAC-02 revoked by PAI | [revoked-dac-02.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-02.json)           | Commissioning fails with `kDacRevoked` (302)       |
+| DAC-03 revoked by PAI | [revoked-dac-03.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-03.json)           | Commissioning fails with `kDacRevoked` (302)       |
+| DAC and PAI revoked   | [revoked-dac-and-pai.json](../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-and-pai.json) | Commissioning fails with `kPaiAndDacRevoked` (208) |

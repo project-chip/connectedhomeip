@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "system/SystemClock.h"
 #include <cstdarg>
+#include <cstdio>
 #include <memory>
 #include <type_traits>
 
@@ -29,12 +29,10 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
 #include <controller/python/chip/native/PyChipError.h>
-#include <lib/support/CodeUtils.h>
-
-#include <cstdio>
-#include <lib/support/logging/CHIPLogging.h>
-
 #include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -112,13 +110,16 @@ public:
         // callback. If we do, that's a bug.
         //
         VerifyOrDie(!aPath.IsListItemOperation());
-        size_t bufferLen                  = (apData == nullptr ? 0 : apData->GetRemainingLength() + apData->GetLengthRead());
-        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(apData == nullptr ? nullptr : new uint8_t[bufferLen]);
-        size_t size                       = 0;
+
+        std::unique_ptr<uint8_t[]> buffer;
+        size_t size = 0;
+
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)
         {
+            size_t bufferLen = apData->GetRemainingLength() + apData->GetLengthRead();
+            buffer           = std::make_unique<uint8_t[]>(bufferLen);
             // The TLVReader's read head is not pointing to the first element in the container instead of the container itself, use
             // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with a anonymous tag, no extra "end of container" tag
             // at the end.)
@@ -262,8 +263,8 @@ struct __attribute__((packed)) PyReadAttributeParams
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               chip::python::PyWriteAttributeData * writeAttributesData,
-                                               size_t attributeDataLength);
+                                               chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
+                                               bool forceLegacyListEncoding);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT,
                                                     chip::python::PyWriteAttributeData * writeAttributesData,
@@ -343,7 +344,8 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength)
+                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
+                                               bool forceLegacyListEncoding)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -376,9 +378,13 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
         {
             dataVersion.SetValue(path.dataVersion);
         }
-        SuccessOrExit(
-            err = client->PutPreencodedAttribute(
-                chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
+
+        auto listEncodingOverride = forceLegacyListEncoding ? WriteClient::TestListEncodingOverride::kForceLegacyEncoding
+                                                            : WriteClient::TestListEncodingOverride::kNoOverride;
+
+        SuccessOrExit(err = client->PutPreencodedAttribute(
+                          chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
+                          reader, listEncodingOverride));
     }
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
@@ -515,11 +521,10 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
     // The readParamsBuf might be not aligned, using a memcpy to avoid some unexpected behaviors.
     memcpy(&pyParams, readParamsBuf, sizeof(pyParams));
 
-    std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
-
-    std::unique_ptr<AttributePathParams[]> attributePaths(new AttributePathParams[numAttributePaths]);
-    std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[numDataversionFilters]);
-    std::unique_ptr<EventPathParams[]> eventPaths(new EventPathParams[numEventPaths]);
+    auto callback           = std::make_unique<ReadClientCallback>(appContext);
+    auto attributePaths     = std::make_unique<AttributePathParams[]>(numAttributePaths);
+    auto dataVersionFilters = std::make_unique<chip::app::DataVersionFilter[]>(numDataversionFilters);
+    auto eventPaths         = std::make_unique<EventPathParams[]>(numEventPaths);
     std::unique_ptr<ReadClient> readClient;
 
     for (size_t i = 0; i < numAttributePaths; i++)

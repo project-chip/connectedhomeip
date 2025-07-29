@@ -359,3 +359,11 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback()
 
     GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&WiFiDiagnosticsServer::Instance());
 }
+
+void MatterWiFiNetworkDiagnosticsPluginServerShutdownCallback()
+{
+    GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(nullptr);
+
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gWiFiDiagnosticsInstance);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gWiFiDiagnosticsInstance);
+}

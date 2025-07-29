@@ -26,6 +26,12 @@ declare_args() {
   # Crypto storage: psa, raw, app.
   #   app: includes zero new files and disables the unit tests for the keystore.
   chip_crypto_keystore = ""
+
+  # Enable Trusty OS. IMX Trusty OS provided a fully security solution for
+  # i.MX devices, which runs in the secure world. For more information about
+  # Trusty TEE, please refer the website listed below:
+  # https://source.android.com/docs/security/features/trusty
+  chip_with_trusty_os = false
 }
 
 assert(

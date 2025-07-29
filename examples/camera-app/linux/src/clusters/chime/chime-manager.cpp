@@ -26,8 +26,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::Chime::Structs;
 
-using namespace Camera;
-
 // Chime Cluster Methods
 CHIP_ERROR ChimeManager::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
 {
@@ -63,6 +61,6 @@ Protocols::InteractionModel::Status ChimeManager::PlayChimeSound()
     auto selectedChime = mChimeServer->GetSelectedChime();
 
     // Play chime sound
-    ChipLogDetail(Zcl, "Playing Chime with sound ID: %u", unsigned(selectedChime));
+    ChipLogDetail(Camera, "Playing Chime with sound ID: %u", unsigned(selectedChime));
     return Protocols::InteractionModel::Status::Success;
 }

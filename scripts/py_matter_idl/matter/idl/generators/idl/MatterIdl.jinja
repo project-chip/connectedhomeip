@@ -18,6 +18,7 @@
 {% macro render_struct(s) -%}{#
  Macro for the output of a complete struct
 #}
+{%- if s.is_shared%}shared {% endif -%}
 {%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
 {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
 struct {{s.name}} {##}
@@ -29,13 +30,21 @@ struct {{s.name}} {##}
 }
 {%- endmacro -%}
 
+{% macro specification_name_clarification(s) -%}{#
+ Macro to add [spec_name="..."] if needed
+#}
+{%- if s.specification_name -%}
+{##} [spec_name = "{{s.specification_name}}"]
+{%- endif -%}
+{%- endmacro -%}
+
 
 // This IDL was auto-generated from a parsed data structure
 
 {% for enum in idl.global_enums %}
 enum {{enum.name}} : {{ enum.base_type}} {
   {% for entry in enum.entries %}
-  {{entry.name}} = {{entry.code}};
+  {{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
   {% endfor %}
 }
 
@@ -44,7 +53,7 @@ enum {{enum.name}} : {{ enum.base_type}} {
 {%- for bitmap in idl.global_bitmaps %}
 bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   {% for entry in bitmap.entries %}
-  {{entry.name}} = 0x{{"%X" | format(entry.code)}};
+  {{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
   {% endfor %}
 }
 
@@ -65,7 +74,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   /* GLOBAL:
   enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
-    {{entry.name}} = {{entry.code}};
+    {{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
     {% endfor %}
   }
   */
@@ -76,7 +85,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   /* GLOBAL:
   bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
-    {{entry.name}} = 0x{{"%X" | format(entry.code)}};
+    {{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
     {% endfor %}
   }
   */
@@ -91,18 +100,20 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   {% endfor %}
 
   {%- for enum in cluster.enums | rejectattr("is_global")%}
+  {%+ if enum.is_shared%}shared {% endif -%}
   enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
-    {{entry.name}} = {{entry.code}};
+    {{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
     {% endfor %}
   }
 
   {% endfor %}
 
   {%- for bitmap in cluster.bitmaps | rejectattr("is_global")%}
+  {%+ if bitmap.is_shared%}shared {% endif -%}
   bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
-    {{entry.name}} = 0x{{"%X" | format(entry.code)}};
+    {{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
     {% endfor %}
   }
 

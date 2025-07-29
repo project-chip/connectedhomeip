@@ -24,6 +24,7 @@
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
+#import "MTRCommissioningParameters_Internal.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
@@ -173,10 +174,9 @@ using namespace chip::Tracing::DarwinFramework;
             storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
                           startSuspended:(BOOL)startSuspended
 {
-    if (self = [super initForSubclasses:startSuspended]) {
+    if (self = [super initForSubclasses:startSuspended uniqueIdentifier:uniqueIdentifier]) {
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
-        self.uniqueIdentifier = uniqueIdentifier;
 
         // Setup assertion variables
         _keepRunningAssertionCounter = 0;
@@ -268,6 +268,7 @@ using namespace chip::Tracing::DarwinFramework;
         if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kDeviceControllerErrorPartialDacVerifierInit]) {
             return nil;
         }
+        _partialDACVerifier->EnableVerboseLogs(true);
 
         _operationalCredentialsDelegate = new MTROperationalCredentialsDelegate(self);
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kDeviceControllerErrorOperationalCredentialsInit]) {
@@ -692,7 +693,9 @@ using namespace chip::Tracing::DarwinFramework;
             trustStore = chip::Credentials::GetTestAttestationTrustStore();
         }
 
+        // TODO: Pass a revocation delegate to DefaultDACVerifier!
         _defaultDACVerifier = new chip::Credentials::DefaultDACVerifier(trustStore);
+        _defaultDACVerifier->EnableVerboseLogs(true);
 
         if (startupParams.certificationDeclarationCertificates) {
             auto cdTrustStore = _defaultDACVerifier->GetCertificationDeclarationTrustStore();
@@ -963,9 +966,22 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     auto block = ^BOOL {
         chip::Controller::CommissioningParameters params;
+
+        std::vector<chip::app::AttributePathParams> extraReadPaths;
         if (commissioningParams.readEndpointInformation) {
-            params.SetExtraReadPaths(MTREndpointInfo.requiredAttributePaths);
+            for (auto & path : MTREndpointInfo.requiredAttributePaths) {
+                extraReadPaths.emplace_back(path);
+            }
         }
+        if (commissioningParams.extraAttributesToRead != nil) {
+            for (MTRAttributeRequestPath * path in commissioningParams.extraAttributesToRead) {
+                [path convertToAttributePathParams:extraReadPaths.emplace_back()];
+            }
+        }
+        if (!extraReadPaths.empty()) {
+            params.SetExtraReadPaths(chip::Span(extraReadPaths.data(), extraReadPaths.size()));
+        }
+
         if (commissioningParams.csrNonce) {
             params.SetCSRNonce(AsByteSpan(commissioningParams.csrNonce));
         }
@@ -1074,6 +1090,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(deviceId);
+        self->_deviceControllerDelegateBridge->SetCommissioningParameters([commissioningParams copy]);
+
         auto errorCode = self->_cppCommissioner->Commission(deviceId, params);
         MATTER_LOG_METRIC(kMetricCommissionNode, errorCode);
         return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];

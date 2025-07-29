@@ -2762,7 +2762,7 @@ static NSString * const sClusterKey = @"clusterKey";
 @end
 
 @implementation MTRAttributePath
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path
+- (instancetype)initWithPath:(const ConcreteAttributePath &)path
 {
     if (self = [super initWithPath:path]) {
         _attribute = @(path.mAttributeId);
@@ -2772,7 +2772,7 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu, %@) 0x%llx (%llu, %@)>",
+    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu, %@) attribute 0x%llx (%llu, %@)>",
                      self.endpoint.unsignedShortValue,
                      self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(self.cluster.unsignedLongLongValue)),
                      _attribute.unsignedLongLongValue, _attribute.unsignedLongLongValue,

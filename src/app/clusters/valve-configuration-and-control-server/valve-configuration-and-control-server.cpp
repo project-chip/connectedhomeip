@@ -529,3 +529,8 @@ void MatterValveConfigurationAndControlPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
+
+void MatterValveConfigurationAndControlPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}

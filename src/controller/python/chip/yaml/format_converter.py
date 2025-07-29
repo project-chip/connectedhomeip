@@ -18,12 +18,12 @@
 import typing
 from dataclasses import dataclass
 
-from chip.clusters.enum import MatterIntEnum
-from chip.clusters.Types import Nullable, NullValue
-from chip.tlv import float32, uint
-from chip.yaml.errors import ValidationError
-
 from matter.idl import matter_idl_types
+
+from ..clusters.enum import MatterIntEnum
+from ..clusters.Types import Nullable, NullValue
+from ..tlv import float32, uint
+from .errors import ValidationError
 
 
 @dataclass

@@ -296,3 +296,8 @@ void MatterMediaInputPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gMediaInputAttrAccess);
 }
+
+void MatterMediaInputPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gMediaInputAttrAccess);
+}

@@ -46,7 +46,7 @@ class TlsClientManagementCluster(
 ) {
   class ProvisionEndpointResponse(val endpointID: UShort)
 
-  class FindEndpointResponse(val endpoints: List<TlsClientManagementClusterTLSEndpointStruct>)
+  class FindEndpointResponse(val endpoint: TlsClientManagementClusterTLSEndpointStruct)
 
   class ProvisionedEndpointsAttribute(val value: List<TlsClientManagementClusterTLSEndpointStruct>)
 
@@ -77,16 +77,6 @@ class TlsClientManagementCluster(
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -163,7 +153,7 @@ class TlsClientManagementCluster(
   }
 
   suspend fun findEndpoint(
-    endpointID: UShort?,
+    endpointID: UShort,
     timedInvokeTimeout: Duration? = null,
   ): FindEndpointResponse {
     val commandId: UInt = 2u
@@ -172,7 +162,7 @@ class TlsClientManagementCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_ENDPOINT_ID_REQ: Int = 0
-    endpointID?.let { tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT_ID_REQ), endpointID) }
+    tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT_ID_REQ), endpointID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -187,33 +177,26 @@ class TlsClientManagementCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_ENDPOINTS: Int = 0
-    var endpoints_decoded: List<TlsClientManagementClusterTLSEndpointStruct>? = null
+    val TAG_ENDPOINT: Int = 0
+    var endpoint_decoded: TlsClientManagementClusterTLSEndpointStruct? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_ENDPOINTS)) {
-        endpoints_decoded =
-          buildList<TlsClientManagementClusterTLSEndpointStruct> {
-            tlvReader.enterArray(tag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(TlsClientManagementClusterTLSEndpointStruct.fromTlv(AnonymousTag, tlvReader))
-            }
-            tlvReader.exitContainer()
-          }
+      if (tag == ContextSpecificTag(TAG_ENDPOINT)) {
+        endpoint_decoded = TlsClientManagementClusterTLSEndpointStruct.fromTlv(tag, tlvReader)
       } else {
         tlvReader.skipElement()
       }
     }
 
-    if (endpoints_decoded == null) {
-      throw IllegalStateException("endpoints not found in TLV")
+    if (endpoint_decoded == null) {
+      throw IllegalStateException("endpoint not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return FindEndpointResponse(endpoints_decoded)
+    return FindEndpointResponse(endpoint_decoded)
   }
 
   suspend fun removeEndpoint(endpointID: UShort, timedInvokeTimeout: Duration? = null) {
@@ -606,101 +589,6 @@ class TlsClientManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

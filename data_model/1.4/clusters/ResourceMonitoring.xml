@@ -120,11 +120,15 @@ Davis, CA 95616, USA
     <struct name="ReplacementProductStruct">
       <field id="0" name="ProductIdentifierType" type="ProductIdentifierTypeEnum">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="ProductIdentifierValue" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="20"/>
+        <constraint>
+          <maxLength value="20"/>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
@@ -141,7 +145,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="CON"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="ChangeIndication" type="ChangeIndicationEnum" default="0">
       <access read="true" readPrivilege="view"/>
@@ -163,7 +169,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="REP"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="5"/>
+      <constraint>
+        <maxCount value="5"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>

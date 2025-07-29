@@ -22,6 +22,7 @@
  */
 
 #include "MigrationManager.h"
+#include <cmsis_os2.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
@@ -40,29 +41,38 @@ namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
-KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
+namespace {
+
 uint16_t mKvsKeyMap[KeyValueStoreManagerImpl::kMaxEntries] = { 0 };
+
+} // namespace
+
+KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
 CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
 {
-    CHIP_ERROR err;
-    err = SilabsConfig::Init();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(SilabsConfig::Init());
 
     Silabs::MigrationManager::GetMigrationInstance().applyMigrations();
 
     memset(mKvsKeyMap, 0, sizeof(mKvsKeyMap));
-    size_t outLen;
-    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap, reinterpret_cast<uint8_t *>(mKvsKeyMap),
-                                           sizeof(mKvsKeyMap), outLen);
-
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND) // Initial boot
+    size_t outLen    = 0;
+    CHIP_ERROR error = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap,
+                                                        reinterpret_cast<uint8_t *>(mKvsKeyMap), sizeof(mKvsKeyMap), outLen);
+    if (error == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND) // Initial boot
     {
-        err = CHIP_NO_ERROR;
+        error = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(error);
+
+    constexpr osThreadAttr_t attr = { .name = "KvsKeyMapCleanupTask", .stack_size = 512 /* bytes */, .priority = osPriorityLow7 };
+    if (osThreadNew(KvsKeyMapCleanup, nullptr, &attr) == nullptr)
+    {
+        // We don't need to crash and force a reboot. we will retry at the next reboot
+        ChipLogError(DeviceLayer, "Failed to create KvsCleanupTask");
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 bool KeyValueStoreManagerImpl::IsValidKvsNvm3Key(uint32_t nvm3Key) const
@@ -109,7 +119,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint16_t 
             // Collision prevention
             // Read the data from NVM3 it should be prefixed by the kvsString
             // else we will look for another matching hash in the map
-            SilabsConfig::ReadConfigValueBin(tempNvm3key, reinterpret_cast<uint8_t *>(strPrefix), length, readCount, 0);
+
+            CHIP_ERROR err =
+                SilabsConfig::ReadConfigValueBin(tempNvm3key, reinterpret_cast<uint8_t *>(strPrefix), length, readCount, 0);
+            if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+            {
+                // No steps to be taken, clean up will be done at init
+                ChipLogError(DeviceLayer, "Key Hash with no associated NVM3 entry - potential Shadow key detected");
+            }
+
             if (strcmp(key, strPrefix) == 0)
             {
                 // String matches we have confirmed the hash pointed us the right key data
@@ -297,6 +315,34 @@ void KeyValueStoreManagerImpl::KvsMapMigration(void)
         // start with a fresh kvs section.
         KeyValueStoreMgrImpl().ErasePartition();
     }
+}
+
+void KeyValueStoreManagerImpl::KvsKeyMapCleanup(void * argument)
+{
+    bool requireKvsKeyMapSave = false;
+
+    for (uint16_t key = 0; key < KeyValueStoreManagerImpl::kMaxEntries; key++)
+    {
+        // Only check the keys that should have a NVM entry and
+        // we don't need to take a mutex - protection is done by the underlying nvm3 APIs called in ConfigValueExists
+        if (mKvsKeyMap[key] != 0 && !SilabsConfig::ConfigValueExists(CONVERT_KEYMAP_INDEX_TO_NVM3KEY(key)))
+        {
+            // We have found a shadow key (key with no NVM entry)
+            // Delete unused key to free up space
+            mKvsKeyMap[key]      = 0;
+            requireKvsKeyMapSave = true;
+        }
+    }
+
+    if (requireKvsKeyMapSave)
+    {
+        PlatformMgr().LockChipStack();
+        KeyValueStoreMgrImpl().ForceKeyMapSave();
+        PlatformMgr().UnlockChipStack();
+    }
+
+    // Single shot task at boot - delete the task when the clean up is complete
+    osThreadExit();
 }
 
 } // namespace PersistedStorage

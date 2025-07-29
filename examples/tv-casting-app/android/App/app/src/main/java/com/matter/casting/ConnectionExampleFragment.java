@@ -47,9 +47,6 @@ public class ConnectionExampleFragment extends Fragment {
   // Must be >= 3 minutes.
   private static final short MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
   private static final Integer DESIRED_TARGET_APP_VENDOR_ID = 65521;
-  // Use this Target Content Application Vendor ID, configured on the tv-app, to demonstrate the
-  // CastingPlayer/Commissioner-Generated passcode commissioning flow.
-  private static final Integer DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW = 1111;
   private static final long DEFAULT_COMMISSIONER_GENERATED_PASSCODE = 12345678;
   private static final int DEFAULT_DISCRIMINATOR_FOR_CGP_FLOW = 0;
   private final CastingPlayer targetCastingPlayer;
@@ -140,7 +137,6 @@ public class ConnectionExampleFragment extends Fragment {
                 // Set commissionerPasscode to true for CastingPlayer/Commissioner-Generated
                 // passcode commissioning.
                 idOptions = new IdentificationDeclarationOptions(false, false, true, false, false);
-                targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW);
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "

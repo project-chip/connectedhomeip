@@ -204,6 +204,13 @@ private:
     size_t mDataLen;
 };
 
+// Template deduction guides to allow construction of Span from a pointer or
+// array without having to specify the type of the entries explicitly.
+template <class T>
+Span(T * data, size_t size) -> Span<T>;
+template <class T, size_t N>
+Span(T (&databuf)[N]) -> Span<T>;
+
 inline namespace literals {
 
 inline constexpr Span<const char> operator""_span(const char * literal, size_t size)

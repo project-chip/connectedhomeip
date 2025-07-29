@@ -333,3 +333,4 @@ void ActionsServer::EndpointListModified(EndpointId aEndpoint)
 }
 
 void MatterActionsPluginServerInitCallback() {}
+void MatterActionsPluginServerShutdownCallback() {}

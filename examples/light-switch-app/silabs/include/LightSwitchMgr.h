@@ -52,28 +52,9 @@ public:
         .stepSize = 1, .transitionTime = 0, .optionsMask = 0, .optionsOverride = 0
     };
 
-    struct Timer
-    {
-        typedef void (*Callback)(Timer & timer);
-
-        Timer(uint32_t timeoutInMs, Callback callback, void * context);
-        ~Timer();
-
-        void Start();
-        void Stop();
-        void Timeout();
-
-        Callback mCallback = nullptr;
-        void * mContext    = nullptr;
-        bool mIsActive     = false;
-
-        osTimerId_t mHandler = nullptr;
-
-    private:
-        static void TimerCallback(void * timerCbArg);
-    };
-
     CHIP_ERROR Init(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
+
+    static LightSwitchMgr & GetInstance() { return sSwitch; }
 
     void GenericSwitchOnInitialPress();
     void GenericSwitchOnShortRelease();
@@ -82,36 +63,22 @@ public:
     void TriggerLevelControlAction(StepModeEnum stepMode, bool isGroupCommand = false);
 
     StepModeEnum getStepMode();
-
-    AppEvent CreateNewEvent(AppEvent::AppEventTypes type);
-
-    static LightSwitchMgr & GetInstance() { return sSwitch; }
+    void changeStepMode();
 
     /**
-     * @brief Event handler when a button is pressed
-     * Function posts an event for button processing
+     * @brief Button event processing function
+     *        Function triggers a switch action sent to the CHIP task
      *
-     * @param button BUTTON0 or BUTTON1
-     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
-     *                  SL_SIMPLE_BUTTON_RELEASED
+     * @param aEvent button event being processed
      */
-    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-
-    static void AppEventHandler(AppEvent * aEvent);
+    static void SwitchActionEventHandler(uint16_t eventType);
 
 private:
     static LightSwitchMgr sSwitch;
 
-    Timer * mLongPressTimer      = nullptr;
-    bool mFunctionButtonPressed  = false; // True when button0 is pressed, used to trigger factory reset
-    bool mActionButtonPressed    = false; // True when button1 is pressed, used to initiate toggle or level-up/down
-    bool mActionButtonSuppressed = false; // True when both button0 and button1 are pressed, used to switch step direction
-    bool mResetWarning           = false;
-
     // Default Step direction for Level control
     StepModeEnum stepDirection = StepModeEnum::kUp;
 
-    static void OnLongPressTimeout(Timer & timer);
     LightSwitchMgr() = default;
 
     /**
@@ -124,12 +91,4 @@ private:
 
     chip::EndpointId mLightSwitchEndpoint   = chip::kInvalidEndpointId;
     chip::EndpointId mGenericSwitchEndpoint = chip::kInvalidEndpointId;
-
-    /**
-     * @brief Button event processing function
-     *        Function triggers a switch action sent to the CHIP task
-     *
-     * @param aEvent button event being processed
-     */
-    static void SwitchActionEventHandler(AppEvent * aEvent);
 };

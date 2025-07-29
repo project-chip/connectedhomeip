@@ -24,10 +24,9 @@ from ctypes import c_void_p
 from datetime import timedelta
 from typing import List, Optional
 
-import chip.exceptions
-from chip import ChipStack, FabricAdmin
-from chip.native import PyChipError
-from chip.storage import PersistentStorage
+from . import ChipStack, FabricAdmin
+from .native import GetLibraryHandle, PyChipError
+from .storage import PersistentStorage
 
 LOGGER = logging.getLogger(__name__)
 
@@ -53,7 +52,7 @@ class CertificateAuthority:
     '''
     @classmethod
     def _Handle(cls):
-        return chip.native.GetLibraryHandle()
+        return GetLibraryHandle()
 
     @classmethod
     def logger(cls):
@@ -81,6 +80,9 @@ class CertificateAuthority:
         self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.restype = PyChipError
         self._Handle().pychip_OpCreds_SetMaximallyLargeCertsUsed.argtypes = [ctypes.c_void_p, ctypes.c_bool]
 
+        self._Handle().pychip_OpCreds_SetAlwaysOmitIcac.restype = PyChipError
+        self._Handle().pychip_OpCreds_SetAlwaysOmitIcac.argtypes = [ctypes.c_void_p, ctypes.c_bool]
+
         self._Handle().pychip_OpCreds_SetCertificateValidityPeriod.restype = PyChipError
         self._Handle().pychip_OpCreds_SetCertificateValidityPeriod.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
 
@@ -89,6 +91,7 @@ class CertificateAuthority:
 
         self._persistentStorage = persistentStorage
         self._maximizeCertChains = False
+        self._alwaysOmitIcac = False
         self._certificateValidityPeriodSec = CERTIFICATE_VALIDITY_PERIOD_SEC
 
         self._closure = self._chipStack.Call(
@@ -198,6 +201,10 @@ class CertificateAuthority:
         return self._maximizeCertChains
 
     @property
+    def alwaysOmitIcac(self) -> bool:
+        return self._alwaysOmitIcac
+
+    @property
     def certificateValidityPeriodSec(self) -> int:
         return self._certificateValidityPeriodSec
 
@@ -208,6 +215,14 @@ class CertificateAuthority:
         ).raise_on_error()
 
         self._maximizeCertChains = enabled
+
+    @alwaysOmitIcac.setter
+    def alwaysOmitIcac(self, enabled: bool):
+        self._chipStack.Call(
+            lambda: self._Handle().pychip_OpCreds_SetAlwaysOmitIcac(ctypes.c_void_p(self._closure), ctypes.c_bool(enabled))
+        ).raise_on_error()
+
+        self._alwaysOmitIcac = enabled
 
     @certificateValidityPeriodSec.setter
     def certificateValidityPeriodSec(self, validity: int):
@@ -229,7 +244,7 @@ class CertificateAuthorityManager:
     '''
     @classmethod
     def _Handle(cls):
-        return chip.native.GetLibraryHandle()
+        return GetLibraryHandle()
 
     @classmethod
     def logger(cls):

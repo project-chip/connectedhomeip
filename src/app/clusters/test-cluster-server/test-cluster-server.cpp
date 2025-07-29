@@ -1180,10 +1180,22 @@ bool emberAfUnitTestingClusterGlobalEchoRequestCallback(CommandHandler * command
     return true;
 }
 
+bool emberAfUnitTestingClusterTestCheckCommandFlagsCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                            const Commands::TestCheckCommandFlags::DecodableType & commandData)
+{
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
 void MatterUnitTestingPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterUnitTestingPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }

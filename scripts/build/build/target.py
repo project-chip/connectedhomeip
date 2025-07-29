@@ -251,7 +251,7 @@ class BuildTarget:
         """
         self.fixed_targets.append(parts)
 
-    def AppendModifier(self, name: str, **kargs):
+    def AppendModifier(self, name: str, **kwargs):
         """Appends a specific modifier to a build target. For example:
 
         target.AppendModifier(name='release', release=True)
@@ -259,7 +259,7 @@ class BuildTarget:
         target.AppendModifier(name='coverage', coverage=True).OnlyIfRe('-clang')
 
         """
-        part = TargetPart(name, **kargs)
+        part = TargetPart(name, **kwargs)
 
         self.modifiers.append(part)
 
@@ -276,17 +276,72 @@ class BuildTarget:
         result = self.name
         for fixed in self.fixed_targets:
             if len(fixed) > 1:
-                result += '-{' + ",".join(map(lambda x: x.name, fixed)) + '}'
+                result += '-{' + ",".join(sorted(map(lambda x: x.name, fixed))) + '}'
             else:
                 result += '-' + fixed[0].name
 
-        for modifier in self.modifiers:
+        for modifier in sorted(self.modifiers, key=lambda m: m.name):
             result += f"[-{modifier.name}]"
 
         return result
 
+    def CompletionStrings(self, value: str) -> List[str]:
+        """Get a list of completion strings for this target."""
+
+        if self.name.startswith(value):
+            return [self.name + "-"]
+        if not value.startswith(self.name + "-"):
+            return []
+
+        completions = []
+        prefix = self.name
+        suffix = value[len(self.name) + 1:]
+
+        for i, targets in enumerate(self.fixed_targets, 1):
+            # If we are not processing the last fixed target,
+            # append hyphen to the generated completions.
+            hyphen = '-' if i != len(self.fixed_targets) else ''
+            for target in targets:
+                if suffix.startswith(target.name + hyphen):
+                    # Strip the prefix and continue processing.
+                    prefix += f"-{target.name}"
+                    suffix = suffix[len(target.name) + 1:]
+                    break
+            else:
+                for target in targets:
+                    # NOTE: We are not validating whether the target is acceptable
+                    #       for the given value. Some validation rules require the
+                    #       full target name to be known, so in case of completions
+                    #       we just assume that the target is acceptable.
+                    completions.append(f"{prefix}-{target.name}{hyphen}")
+                # Return validated completions.
+                return [c for c in completions if c.startswith(value)]
+
+        modifiers = []
+        while True:
+            # Get modifiers which are already part of the value.
+            for modifier in self.modifiers:
+                if suffix.startswith(modifier.name):
+                    modifiers.append(modifier)
+                    # Strip the prefix and continue processing.
+                    prefix += f"-{modifier.name}"
+                    suffix = suffix[len(modifier.name) + 1:]
+                    break
+            else:
+                # No more modifiers in the suffix, break the loop.
+                break
+
+        completions.append(prefix)
+        # Return all valid modifiers that are not already part of the value.
+        for modifier in self.modifiers:
+            if modifier not in modifiers and modifier.Accept(prefix):
+                completions.append(f"{prefix}-{modifier.name}")
+
+        # Return validated completions.
+        return [c for c in completions if c.startswith(value)]
+
     def ToDict(self):
-        """Outputs a parseable description of the available variants
+        """Outputs a parsable description of the available variants
         and modifiers:
 
             like:

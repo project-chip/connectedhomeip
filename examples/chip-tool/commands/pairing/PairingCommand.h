@@ -42,6 +42,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndex,
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
+    Nfc,
 };
 
 enum class PairingNetworkType
@@ -117,6 +118,11 @@ public:
             AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery);
             break;
         case PairingMode::Ble:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+        case PairingMode::Nfc:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
@@ -215,6 +221,12 @@ public:
                         "Version number of the Terms and Conditions that were accepted by the user. This value is sent to the "
                         "device during commissioning to indicate which T&C version was acknowledged");
         }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        if ((mode == PairingMode::WiFiPAF) || (mode == PairingMode::Code))
+        {
+            AddArgument("freq", &mApFreqStr, "Frequency of the connected AP. It's required if AP is not at chnl#6 of 2.4G");
+        }
+#endif
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
@@ -283,7 +295,9 @@ private:
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> mDSTOffsetList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::Optional<char *> mApFreqStr;
+#endif
     uint16_t mRemotePort = 0;
     // mDiscriminator is only used for some situations, but in those situations
     // it's mandatory.  Track whether we're actually using it; the cases that do

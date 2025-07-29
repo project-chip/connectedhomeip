@@ -93,7 +93,11 @@ def get_sizes(p: Path, no_demangle: bool):
         size = int(size, 10)
 
         if not no_demangle:
-            name = cxxfilt.demangle(name)
+            try:
+                name = cxxfilt.demangle(name)
+            except cxxfilt.InvalidName:
+                # Keep non-demangled name if we cannot have a nice name
+                pass
 
         result[name] = Symbol(symbol_type=t, name=name, size=size)
 
@@ -172,14 +176,21 @@ def main(
     # We are interested in sizes that are DIFFERENT (add/remove or changed)
     delta = []
     total = 0
+    total1 = 0
+    total2 = 0
     for k in set(r1.keys()) | set(r2.keys()):
         if k in r1 and k in r2 and r1[k].size == r2[k].size:
+            total1 += r1[k].size
+            total2 += r2[k].size
             continue
 
         # At this point the value is in v1 or v2
         s1 = r1[k].size if k in r1 else 0
         s2 = r2[k].size if k in r2 else 0
         name = r1[k].name if k in r1 else r2[k].name
+
+        total1 += s1
+        total2 += s2
 
         if k in r1 and k in r2:
             change = "CHANGED"
@@ -195,14 +206,14 @@ def main(
         ):
             name = name[: name_truncate - 4] + "..."
 
-        delta.append([change, s1 - s2, name])
+        delta.append([change, s1 - s2, name, s1, s2])
         total += s1 - s2
 
     delta.sort(key=lambda x: x[1])
     if not skip_total:
-        delta.append(["TOTAL", total, ""])
+        delta.append(["TOTAL", total, "", total1, total2])
 
-    HEADER = ["Type", "Size", "Function"]
+    HEADER = ["Type", "Size", "Function", "Size1", "Size2"]
 
     if output_type == OutputType.TABLE:
         print(tabulate.tabulate(delta, headers=HEADER, tablefmt=style))

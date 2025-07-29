@@ -24,6 +24,7 @@
 #include "pw_sys_io_nrfconnect/init.h"
 #include <zephyr/logging/log.h>
 
+#include "Rpc.h"
 #include <zephyr/kernel.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);

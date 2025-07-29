@@ -436,7 +436,7 @@ private:
      */
     bool IsGroupRequest() { return mGroupRequest; }
 
-    bool ResponsesAccepted() { return !(mGroupRequest || mpResponder == nullptr); }
+    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest; }
 
     /**
      * Sets the state flag to keep the information that request we are handling is targeted to a group.

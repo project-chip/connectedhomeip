@@ -123,24 +123,24 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerWake)
     {
         Timestamp startTimestamp = System::SystemClock().GetMonotonicTimestamp();
         Timestamp wakeTimestamp  = Timestamp::max();
+        size_t count             = 0;
 
         Timestamp PrepareEvents(Timestamp now) override { return now + 400_ms; }
         void HandleEvents() override
         {
-            // StartTimer() (called by Schedule()) is liable to causes an immediate
-            // wakeup via Signal(), so ignore this call if it's only been a few ms.
-            auto now = System::SystemClock().GetMonotonicTimestamp();
-            if (now - startTimestamp >= 100_ms)
+            // The StartTimer() called by Schedule() causes an immediate wakeup
+            // via Signal(), hence we need to ignore the first call the handler.
+            if (++count == 2)
             {
-                wakeTimestamp = now;
+                wakeTimestamp = System::SystemClock().GetMonotonicTimestamp();
                 DeviceLayer::PlatformMgr().StopEventLoopTask();
             }
         }
     } loopHandler;
 
-    // Schedule a fallback timer to ensure the test stops
-    auto cancelFallback = Schedule(1000_ms, [] { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     SystemLayer().AddLoopHandler(loopHandler);
+    // Schedule a fallback timer to ensure the test stops.
+    auto cancelFallback = Schedule(1000_ms, [] { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     SystemLayer().RemoveLoopHandler(loopHandler);
     cancelFallback(); // avoid leaking the fallback timer

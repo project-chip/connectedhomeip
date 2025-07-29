@@ -129,6 +129,8 @@ CHIP_ERROR ThreadDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::Delay::Id:
     case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
+    case ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
+    case ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
         return WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
     default:
         break;
@@ -206,4 +208,10 @@ void MatterThreadNetworkDiagnosticsPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(&gDiagnosticDelegate);
+}
+
+void MatterThreadNetworkDiagnosticsPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(nullptr);
 }

@@ -410,3 +410,8 @@ void MatterChannelPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gChannelAttrAccess);
 }
+
+void MatterChannelPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gChannelAttrAccess);
+}

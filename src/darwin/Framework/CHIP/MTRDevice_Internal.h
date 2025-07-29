@@ -185,6 +185,10 @@ MTR_DIRECT_MEMBERS
 
 @end
 
+@interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+- (void)_deviceMayBeReachable;
+@end
+
 #pragma mark - MTRDevice internal state monitoring
 @protocol MTRDeviceInternalStateDelegate
 - (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
@@ -194,9 +198,6 @@ MTR_DIRECT_MEMBERS
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
-
-// Declared inside platform, but noting here for reference
-// static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 
 // Concrete to XPC internal state property dictionary keys
 static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
@@ -208,6 +209,7 @@ static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDe
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
 static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
 static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDeviceInternalPropertyDeviceCachePrimed";
+static NSString * const kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress = @"MTRDeviceInternalPropertyDiagnosticLogTransferInProgress";
 static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
 static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
 

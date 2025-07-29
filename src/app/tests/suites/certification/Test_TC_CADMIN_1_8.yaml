@@ -55,6 +55,7 @@ tests:
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1 0 --timedInteractionTimeoutMs 1000
 
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
 
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
@@ -117,6 +118,8 @@ tests:
 
           ./chip-tool administratorcommissioning  open-basic-commissioning-window 500 1 0  --timedInteractionTimeoutMs 1000
 
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
+
           Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
           [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
@@ -135,6 +138,7 @@ tests:
 
           ./chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
 
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
 
           Verify the Commissioning window is closed in TH_CE(all-clusters-app) Log
           [1661485834.635244][6993:6993] CHIP:DIS: mDNS service published: _matter._tcp
@@ -170,6 +174,7 @@ tests:
 
           ./chip-tool administratorcommissioning revoke-commissioning 1 0 --timedInteractionTimeoutMs 1000
 
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
 
           Verify the Commissioning window is closed in TH_CE(all-clusters-app) Log
 
@@ -243,6 +248,8 @@ tests:
             Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
 
           Verify the Commissioning window is opened in TH_CE(all-clusters-app) Log
 

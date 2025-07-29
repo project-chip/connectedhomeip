@@ -1,6 +1,6 @@
 from chip.testing.conformance import Choice, ConformanceDecisionWithChoice
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import AttributePathLocation, ProblemNotice, ProblemSeverity
+from chip.testing.problem_notices import AttributePathLocation, ProblemNotice, ProblemSeverity
 from chip.testing.spec_parsing import XmlCluster
 from chip.tlv import uint
 
@@ -31,7 +31,7 @@ def _evaluate_choices(location: AttributePathLocation, counts: dict[Choice, int]
 
 
 def evaluate_feature_choice_conformance(endpoint_id: int, cluster_id: int, xml_clusters: dict[int, XmlCluster], feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> list[ChoiceConformanceProblemNotice]:
-    all_features = [1 << i for i in range(32)]
+    all_features = [uint(1 << i) for i in range(32)]
     all_features = [f for f in all_features if f in xml_clusters[cluster_id].features.keys()]
 
     # Other pieces of the 10.2 test check for unknown features, so just remove them here to check choice conformance
@@ -39,7 +39,7 @@ def evaluate_feature_choice_conformance(endpoint_id: int, cluster_id: int, xml_c
     for f in all_features:
         xml_feature = xml_clusters[cluster_id].features[f]
         conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
-        _add_to_counts_if_required(conformance_decision_with_choice, (feature_map & f), counts)
+        _add_to_counts_if_required(conformance_decision_with_choice, (feature_map & f) != 0, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                      attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)

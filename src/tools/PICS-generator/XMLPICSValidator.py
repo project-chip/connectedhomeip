@@ -24,11 +24,11 @@ from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_l
 
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters  # noqa: E402
+from chip.testing.spec_parsing import build_xml_clusters  # noqa: E402
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--pics-template', required=True)
-parser.add_argument('--dm-xml')
+parser.add_argument('--dm-xml', required=True)
 args, unknown = parser.parse_known_args()
 
 xml_template_path_str = args.pics_template
@@ -37,10 +37,7 @@ print("Build list of PICS XML")
 pics_xml_file_list = pics_xml_file_list_loader(xml_template_path_str, True)
 
 print("Build list of spec XML")
-if args.dm_xml:
-    xml_clusters, problems = build_xml_clusters(Path(f"{args.dm_xml}/clusters"))
-else:
-    xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
+xml_clusters, problems = build_xml_clusters(Path(f"{args.dm_xml}/clusters"))
 
 
 for cluster in xml_clusters:

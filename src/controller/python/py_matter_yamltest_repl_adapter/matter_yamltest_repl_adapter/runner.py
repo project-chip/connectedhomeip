@@ -24,7 +24,8 @@ import chip.logging
 import chip.native
 from chip.ChipStack import ChipStack
 from chip.yaml.runner import ReplTestRunner
-from matter_yamltests.runner import TestRunner
+
+from matter.yamltests.runner import TestRunner
 
 
 class Runner(TestRunner):

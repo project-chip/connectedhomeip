@@ -162,7 +162,7 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 {
     [super setUp];
 
-    sController = [MTRTestCase createControllerOnTestFabric];
+    sController = [self createControllerOnTestFabric];
 
     // Start the helper apps our tests use. Note these payloads match kTestDiscriminators etc.
     for (NSString * payload in @[
@@ -175,18 +175,6 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
                                       payload:payload];
         XCTAssertTrue(started);
     }
-}
-
-+ (void)tearDown
-{
-    XCTAssertNotNil(sController);
-    [sController shutdown];
-    XCTAssertFalse([sController isRunning]);
-    sController = nil;
-
-    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
-
-    [super tearDown];
 }
 
 - (void)setUp

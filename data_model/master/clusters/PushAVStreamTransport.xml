@@ -62,12 +62,20 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0555" name="Push AV Stream Transport"/>
+    <clusterId id="0x0555" name="Push AV Stream Transport">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="PAVST" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PERZONESENS" name="PerZoneSensitivity" summary="Supports a sensitivity value per Zone">
       <optionalConform/>
+    </feature>
+    <feature bit="1" code="METADATA" name="Metadata" summary="Supports metadata transmission in Push transports">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -83,36 +91,28 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="StatusCodeEnum">
-      <item value="0x02" name="AllocationNotPermitted" summary="The specified transport cannot be allocated.">
+      <item value="0x02" name="InvalidTLSEndpoint" summary="The specified TLSEndpointID cannot be found.">
         <mandatoryConform/>
       </item>
-      <item value="0x03" name="InvalidTLSEndpoint" summary="The specified TLSEndpointID cannot be found.">
+      <item value="0x03" name="InvalidStream" summary="The specified VideoStreamID or AudioStreamID cannot be found.">
         <mandatoryConform/>
       </item>
-      <item value="0x04" name="InvalidStream" summary="The specified VideoStreamID or AudioStreamID cannot be found.">
+      <item value="0x04" name="InvalidURL" summary="The specified URL is invalid.">
         <mandatoryConform/>
       </item>
-      <item value="0x05" name="InvalidURL" summary="The Specified URL is invalid.">
+      <item value="0x05" name="InvalidZone" summary="A specified ZoneID was invalid.">
         <mandatoryConform/>
       </item>
-      <item value="0x06" name="InvalidZone" summary="A Specified ZoneID was invalid.">
+      <item value="0x06" name="UnsupportedContainerFormat" summary="The specified Container Format is not supported using the selected Ingestion Method.">
         <mandatoryConform/>
       </item>
-      <item value="0x07" name="UnsupportedContainerFormat" summary="The Specified Container Format is not supported using the selected Ingestion Method.">
+      <item value="0x07" name="UnsupportedIngestMethod" summary="The specified Ingestion Method is not supported.">
         <mandatoryConform/>
       </item>
-      <item value="0x08" name="UnsupportedIngestMethod" summary="The Specified Ingestion Method is not supported.">
+      <item value="0x08" name="InvalidTriggerType" summary="The trigger type is invalid for this command.">
         <mandatoryConform/>
       </item>
-      <item value="0x09" name="InvalidTriggerType" summary="The trigger type is invalid for this command.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x10" name="InvalidTransportStatus" summary="The Stream Transport Status is invalid for this command.">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="StreamMultiplexingEnum">
-      <item value="0" name="Interleaved" summary="AV Streams are interleaved">
+      <item value="0x09" name="InvalidTransportStatus" summary="The Stream Transport Status is invalid for this command.">
         <mandatoryConform/>
       </item>
     </enum>
@@ -162,6 +162,14 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="CENCKey" type="octstr">
         <optionalConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="2" name="MetadataEnabled" type="bool">
+        <optionalConform>
+          <feature name="METADATA"/>
+        </optionalConform>
       </field>
     </struct>
     <struct name="ContainerOptionsStruct">
@@ -177,17 +185,6 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
     </struct>
-    <struct name="MetadataOptionsStruct">
-      <field id="0" name="Multiplexing" type="StreamMultiplexingEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="IncludeMotionZones" type="bool">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="EnableMetadataPrivacySensitive" type="bool">
-        <mandatoryConform/>
-      </field>
-    </struct>
     <struct name="TransportConfigurationStruct">
       <field id="0" name="ConnectionID" type="PushTransportConnectionID">
         <mandatoryConform/>
@@ -196,8 +193,9 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="2" name="TransportOptions" type="TransportOptionsStruct">
-        <mandatoryConform/>
+        <optionalConform/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
     <struct name="TransportMotionTriggerTimeControlStruct">
       <field id="0" name="InitialDuration" type="uint16" default="10">
@@ -224,9 +222,11 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="VideoStreamID" type="VideoStreamID">
+        <quality nullable="true"/>
         <optionalConform choice="a" more="true" min="1"/>
       </field>
       <field id="2" name="AudioStreamID" type="AudioStreamID">
+        <quality nullable="true"/>
         <optionalConform choice="a" more="true" min="1"/>
       </field>
       <field id="3" name="EndpointID" type="TLSEndpointID">
@@ -235,7 +235,10 @@ Davis, CA 95616, USA
       <field id="4" name="URL" type="string">
         <mandatoryConform/>
         <constraint>
-          <maxLength value="2000"/>
+          <lengthBetween>
+            <from value="13"/>
+            <to value="2000"/>
+          </lengthBetween>
         </constraint>
       </field>
       <field id="5" name="TriggerOptions" type="TransportTriggerOptionsStruct">
@@ -250,10 +253,7 @@ Davis, CA 95616, USA
       <field id="8" name="ContainerOptions" type="ContainerOptionsStruct">
         <mandatoryConform/>
       </field>
-      <field id="9" name="MetadataOptions" type="MetadataOptionsStruct">
-        <optionalConform/>
-      </field>
-      <field id="10" name="ExpiryTime" type="epoch-s">
+      <field id="9" name="ExpiryTime" type="epoch-s">
         <optionalConform/>
       </field>
     </struct>
@@ -335,23 +335,28 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="SupportedContainerFormats" type="SupportedContainerFormatsBitmap">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="SupportedIngestMethods" type="SupportedIngestMethodsBitmap">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="CurrentConnections" type="list" default="empty">
-      <entry type="PushTransportConnectionID"/>
-      <access read="true" readPrivilege="view"/>
+      <entry type="TransportConfigurationStruct"/>
+      <access read="true" readPrivilege="view" fabricSensitive="true"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="AllocatePushTransport" direction="commandToServer" response="AllocatePushTransportResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="manage"/>
+      <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="TransportOptions" type="TransportOptionsStruct">
         <mandatoryConform/>
@@ -360,25 +365,19 @@ Davis, CA 95616, USA
     <command id="0x01" name="AllocatePushTransportResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform/>
-      <field id="0" name="ConnectionID" type="PushTransportConnectionID">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="TransportOptions" type="TransportOptionsStruct">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="TransportStatus" type="TransportStatusEnum">
+      <field id="0" name="TransportConfiguration" type="TransportConfigurationStruct">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x02" name="DeallocatePushTransport" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
+      <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="ConnectionID" type="PushTransportConnectionID">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x03" name="ModifyPushTransport" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
+      <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="ConnectionID" type="PushTransportConnectionID">
         <mandatoryConform/>
@@ -388,9 +387,10 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="SetTransportStatus" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
+      <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="ConnectionID" type="PushTransportConnectionID">
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="TransportStatus" type="TransportStatusEnum">
@@ -398,7 +398,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x05" name="ManuallyTriggerTransport" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="ConnectionID" type="PushTransportConnectionID">
         <mandatoryConform/>
@@ -408,14 +408,11 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TimeControl" type="TransportMotionTriggerTimeControlStruct">
         <optionalConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
     <command id="0x06" name="FindTransport" direction="commandToServer" response="FindTransportResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="ConnectionID" type="PushTransportConnectionID" default="null">
         <quality nullable="true"/>
@@ -425,7 +422,7 @@ Davis, CA 95616, USA
     <command id="0x07" name="FindTransportResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform/>
-      <field id="0" name="StreamConfigurations" type="list">
+      <field id="0" name="TransportConfigurations" type="list">
         <entry type="TransportConfigurationStruct"/>
         <mandatoryConform/>
       </field>

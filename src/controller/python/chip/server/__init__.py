@@ -16,8 +16,7 @@
 
 import ctypes
 
-from chip import native
-from chip.native import PostAttributeChangeCallback, c_PostAttributeChangeCallback
+from ..native import Library, PostAttributeChangeCallback, _GetLibraryHandle, c_PostAttributeChangeCallback
 
 __all__ = [
     "GetLibraryHandle",
@@ -32,7 +31,7 @@ def GetLibraryHandle(cb: c_PostAttributeChangeCallback) -> ctypes.CDLL:
       cb: A callback decorated by PostAttributeChangeCallback decorator.
     """
 
-    handle = native._GetLibraryHandle(native.Library.SERVER, False)
+    handle = _GetLibraryHandle(Library.SERVER, False)
     if not handle.initialized:
         handle.dll.pychip_server_native_init().raise_on_error()
         handle.dll.pychip_server_set_callbacks(cb)

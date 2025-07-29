@@ -605,6 +605,12 @@ MTR_DIRECT_MEMBERS
     return NO;
 }
 
+- (BOOL)diagnosticLogTransferInProgress
+{
+    MTR_ABSTRACT_METHOD();
+    return NO;
+}
+
 #pragma mark - Suspend/resume management
 
 - (void)controllerSuspended

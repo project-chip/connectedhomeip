@@ -55,6 +55,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <transport/raw/WiFiPAF.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <transport/raw/NFC.h>
+#endif
 
 namespace chip {
 
@@ -87,6 +90,10 @@ using DeviceTransportMgr =
                  ,
                  Transport::WiFiPAF<kMaxDeviceTransportWiFiPAFPendingPackets> /* WiFiPAF */
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                 ,
+                 Transport::NFC /* NFC */
+#endif
                  >;
 
 namespace Controller {
@@ -105,7 +112,7 @@ struct DeviceControllerSystemStateParams
     Ble::BleLayer * bleLayer = nullptr;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    Transport::WiFiPAFLayer * wifipaf_layer = nullptr;
+    WiFiPAF::WiFiPAFLayer * wifipaf_layer = nullptr;
 #endif
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
     Crypto::SessionKeystore * sessionKeystore          = nullptr;
@@ -237,6 +244,7 @@ public:
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
     chip::app::reporting::ReportScheduler * GetReportScheduler() const { return mReportScheduler; }
+    SessionResumptionStorage * GetSessionResumptionStorage() const { return mSessionResumptionStorage; }
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
     void SetTempFabricTable(FabricTable * tempFabricTable, bool enableServerInteractions)
