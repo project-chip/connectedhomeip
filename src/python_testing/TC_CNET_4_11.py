@@ -301,11 +301,18 @@ class TC_CNET_4_11(MatterBaseTest):
                      "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:"
                      " 1. NetworkingStatus is success which is '0'"
                      " 2. DebugText is of type string with max length 512 or empty"),
-            TestStep(16, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3"),
-            TestStep(17, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
-            TestStep(18, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
-            TestStep(19, "TH sends the CommissioningComplete command to the DUT"),
-            TestStep(20, "TH reads Networks attribute from the DUT"),
+            TestStep(16, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3"
+                     "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"),
+            TestStep(17, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network",
+                     "Verify that the TH successfully connects to the DUT"),
+            TestStep(18, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT",
+                     "Verify that the breadcrumb value is set to 3"),
+            TestStep(19, "TH sends the CommissioningComplete command to the DUT",
+                     "Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)"),
+            TestStep(20, "TH reads Networks attribute from the DUT",
+                     " Verify that the Networks attribute list has an entry with the following fields:"
+                     " 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
+                     " 2. Connected is of type bool and is TRUE"),
         ]
 
     def desc_TC_CNET_4_11(self):
