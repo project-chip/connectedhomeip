@@ -267,7 +267,7 @@ def name_transform(name: str) -> str:
         # avoid "(anonymous namespace)" or templates like <char, (unsigned char)1> or other template logic
         if (
             idx == 0  # (anonymouns namespace) at the start
-            or name[idx + 1 :].startswith("anonymous ")  # (anonymous namespace)
+            or name[idx + 1:].startswith("anonymous ")  # (anonymous namespace)
             or name[:idx].endswith(" ")  # <char, (unsigned char)1>
             or name[:idx].endswith("<")  # <(unsigned char)1
         ):
