@@ -334,7 +334,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
         { true, GeneralDiagnostics::Attributes::UpTime::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryAttributesMetadata), Span(optionalAttributeEntries));
+    return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path,
