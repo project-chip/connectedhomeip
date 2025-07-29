@@ -45,18 +45,21 @@ public:
     BitFlags<TimeFormatLocalization::Feature> GetFeatureMap() const;
 
     // Attributes handling for cluster
-    TimeFormatLocalization::HourFormatEnum GetHourFormat();
-    TimeFormatLocalization::CalendarTypeEnum GetActiveCalendarType();
+    TimeFormatLocalization::HourFormatEnum GetHourFormat() const;
+    TimeFormatLocalization::CalendarTypeEnum GetActiveCalendarType() const;
     DataModel::ActionReturnStatus setHourFormat(TimeFormatLocalization::HourFormatEnum rHour);
     DataModel::ActionReturnStatus setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar);
     CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
-    CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
+    CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) const;
 
 private:
     // Method used to validate if the requested calendar is valid, optionally can return a valid calendar from the
     // supported calendars list.
     bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
                                  TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
+
+    void InitializeCalendarType();
+    void InitializeHourFormat();
 
     BitFlags<TimeFormatLocalization::Feature> mFeatures;
     TimeFormatLocalization::HourFormatEnum mHourFormat;

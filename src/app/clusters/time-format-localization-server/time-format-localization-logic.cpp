@@ -20,6 +20,10 @@
 #include <app/EventLogging.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
+
+using namespace chip::app::Clusters::TimeFormatLocalization;
+using namespace chip::app::Clusters::TimeFormatLocalization::Attributes;
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -31,7 +35,7 @@ class AutoReleaseIterator
 public:
     using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
 
-    AutoReleaseIterator(Iterator * value) : mIterator(value) {}
+    explicit AutoReleaseIterator(Iterator * value) : mIterator(value) {}
     ~AutoReleaseIterator()
     {
         if (mIterator != nullptr)
@@ -40,12 +44,20 @@ public:
         }
     }
 
+    // Delete copy constuctor and assignement
+    AutoReleaseIterator(const AutoReleaseIterator&) = delete;
+    AutoReleaseIterator & operator=(const AutoReleaseIterator&) = delete;
+
     bool IsValid() const { return mIterator != nullptr; }
-    bool Next(TimeFormatLocalization::CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
+    bool Next(CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
 
 private:
     Iterator * mIterator;
 };
+
+constexpr CalendarTypeEnum DEFAULT_CALENDAR_TYPE = CalendarTypeEnum::kBuddhist;
+constexpr HourFormatEnum DEFAULT_HOUR_FORMAT = HourFormatEnum::k12hr;
+constexpr size_t MAX_EXPECTED_ATTRIBUTE_COUNT = 3;
 
 } // namespace
 
@@ -56,22 +68,53 @@ void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrPro
 
     mAttrProvider = attrProvider;
 
-    // TODO: Consider moving the storage handling inside the Logic layer.
-    // Get the current calendar type, if any.
-    TimeFormatLocalization::CalendarTypeEnum calendarType;
+    InitializeCalendarType();
+    InitializeHourFormat();
+}
+
+void TimeFormatLocalizationLogic::InitializeCalendarType()
+{
+    CalendarTypeEnum calendarType = DEFAULT_CALENDAR_TYPE;
+    
+    // Try to read existing calendar type from persistence
     MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
     CHIP_ERROR error = mAttrProvider->ReadValue(
-        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, calendarBytes);
-    // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
-    // If initial value is not one of the allowed values, pick one valid value and write it.
-    TimeFormatLocalization::CalendarTypeEnum validCalendar = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
-    IsSupportedCalendarType(calendarType, &validCalendar);
-    setActiveCalendarType(validCalendar);
+        { kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, calendarBytes);
+    
+    // If read failed or value is invalid, use default
+    // Can't tell for sure if ReadValue will not change previous variable value
+    // so will set it again to default.
+    if (error != CHIP_NO_ERROR) 
+    {
+        calendarType = DEFAULT_CALENDAR_TYPE;
+    }
+    
+    // Ensure the calendar type is within the supported CalendarList, otherwise choose one from that list.
+    CalendarTypeEnum validCalendar = DEFAULT_CALENDAR_TYPE;
+    if (!IsSupportedCalendarType(calendarType, &validCalendar))
+    {
+        calendarType = validCalendar;
+    }
+    
+    setActiveCalendarType(calendarType);
+}
 
-    TimeFormatLocalization::HourFormatEnum hourFormat;
+void TimeFormatLocalizationLogic::InitializeHourFormat()
+{
+    HourFormatEnum hourFormat = DEFAULT_HOUR_FORMAT;
+    
     MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
-    error = mAttrProvider->ReadValue(
-        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, hourBytes);
+    CHIP_ERROR error = mAttrProvider->ReadValue(
+        { kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, hourBytes);
+
+    // If read failed or value is invalid, use default
+    // Can't tell for sure if ReadValue will not change previous variable value
+    // so will set it again to default.
+    if (error != CHIP_NO_ERROR)
+    {
+        hourFormat = DEFAULT_HOUR_FORMAT;
+    }
+    
     setHourFormat(hourFormat);
 }
 
@@ -84,7 +127,7 @@ CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValue
     VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
 
     return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-        TimeFormatLocalization::CalendarTypeEnum type;
+        CalendarTypeEnum type;
 
         while (it.Next(type))
         {
@@ -94,8 +137,7 @@ CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValue
     });
 }
 
-bool TimeFormatLocalizationLogic::IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
-                                                          TimeFormatLocalization::CalendarTypeEnum * validCalendar)
+bool TimeFormatLocalizationLogic::IsSupportedCalendarType(CalendarTypeEnum reqCalendar, CalendarTypeEnum * validCalendar)
 {
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnValue(provider != nullptr, false);
@@ -103,7 +145,7 @@ bool TimeFormatLocalizationLogic::IsSupportedCalendarType(TimeFormatLocalization
     AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
     VerifyOrReturnValue(it.IsValid(), false);
 
-    TimeFormatLocalization::CalendarTypeEnum type;
+    CalendarTypeEnum type;
     bool found = false;
 
     while (it.Next(type))
@@ -126,7 +168,7 @@ bool TimeFormatLocalizationLogic::IsSupportedCalendarType(TimeFormatLocalization
     return found;
 }
 
-TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveCalendarType()
+TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveCalendarType() const
 {
     return mCalendarType;
 }
@@ -135,13 +177,13 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFor
 {
     VerifyOrReturnValue(mAttrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
 
-    if (rHour == TimeFormatLocalization::HourFormatEnum::kUnknownEnumValue)
+    if (rHour == HourFormatEnum::kUnknownEnumValue)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
     CHIP_ERROR result = mAttrProvider->WriteValue(
-        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id },
+        { kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id },
         { reinterpret_cast<const uint8_t *>(&rHour), sizeof(rHour) });
     if (result == CHIP_NO_ERROR)
     {
@@ -180,23 +222,23 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType
     return Protocols::InteractionModel::Status::WriteIgnored;
 }
 
-TimeFormatLocalization::HourFormatEnum TimeFormatLocalizationLogic::GetHourFormat()
+TimeFormatLocalization::HourFormatEnum TimeFormatLocalizationLogic::GetHourFormat() const
 {
     return mHourFormat;
 }
 
-CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) const
 {
     // Ensure capacity just in case
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(3 + DefaultServerCluster::GlobalAttributes().size()));
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(MAX_EXPECTED_ATTRIBUTE_COUNT + DefaultServerCluster::GlobalAttributes().size()));
     // Mandatory attributes
-    ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry));
+    ReturnErrorOnFailure(builder.Append(HourFormat::kMetadataEntry));
 
     // These attributes depend on the Feature CalendarFormat (CALFMT)
     if (mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
-        ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(ActiveCalendarType::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(SupportedCalendarTypes::kMetadataEntry));
     }
 
     // Finally, the global attributes
