@@ -151,11 +151,6 @@ public:
     const T * Get() const { return static_cast<const T *>(Base::Ptr()); }
     const T & operator[](size_t index) const { return Get()[index]; }
 
-    inline T * operator->() { return Get(); }
-    inline const T * operator->() const { return Get(); }
-    inline const T & operator*() const { return *Get(); }
-    inline T & operator*() { return *Get(); }
-
     /**
      * Releases the underlying buffer.
      *
