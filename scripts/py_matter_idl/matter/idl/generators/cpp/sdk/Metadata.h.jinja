@@ -39,6 +39,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(
 } // namespace {{attribute.definition.name | upfirst}}
 {% endfor %}
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+  {% for attribute in cluster.attributes | reject("global_attribute") -%}
+  {% if not attribute.definition.is_optional -%}
+  {{attribute.definition.name | upfirst}}::kMetadataEntry, 
+  {%- endif -%}
+  {% endfor %}
+};
+
 } // namespace Attributes
 
 namespace Commands {
