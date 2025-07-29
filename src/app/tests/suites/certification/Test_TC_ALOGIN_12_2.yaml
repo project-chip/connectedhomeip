@@ -124,7 +124,7 @@ tests:
           [1726125071.027072][4610:4610] CHIP:DMG: InvokeRequestMessage =
           [1726125071.027101][4610:4610] CHIP:DMG: {
           [1726125071.027126][4610:4610] CHIP:DMG:         suppressResponse = false,
-          [1726125071.027156][4610:4610] CHIP:DMG:         timedRequest = true, 
+          [1726125071.027156][4610:4610] CHIP:DMG:         timedRequest = true,
           [1726125071.027183][4610:4610] CHIP:DMG:         InvokeRequests =
           [1726125071.027221][4610:4610] CHIP:DMG:         [
           [1726125071.027248][4610:4610] CHIP:DMG:                 CommandDataIB =
@@ -136,7 +136,7 @@ tests:
           [1726125071.027452][4610:4610] CHIP:DMG:                                 CommandId = 0x2,
           [1726125071.027485][4610:4610] CHIP:DMG:                         },
           [1726125071.027520][4610:4610] CHIP:DMG:
-          [1726125071.027552][4610:4610] CHIP:DMG:                         CommandFields = 
+          [1726125071.027552][4610:4610] CHIP:DMG:                         CommandFields =
           [1726125071.027587][4610:4610] CHIP:DMG:                         {
           [1726125071.027623][4610:4610] CHIP:DMG:                                 0x0 = "11111" (5 chars),
           [1726125071.027660][4610:4610] CHIP:DMG:                                 0x1 = "20202021" (8 chars),
