@@ -107,7 +107,7 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
         { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
     };
 
-    // Not using code generated mandatory attribues since the array is empty, and default constructor should be used
+    // Not using code generated mandatory attributes since the array is empty, and default constructor should be used
     return listBuilder.Append(Span<const DataModel::AttributeEntry>() /* mandatory */, Span(optionalEntries));
 }
 
