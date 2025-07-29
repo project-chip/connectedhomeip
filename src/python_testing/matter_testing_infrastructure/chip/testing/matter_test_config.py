@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import List, Optional
 
-from matter_testing_defaults import DEFAULT_ADMIN_VENDOR_ID, DEFAULT_CONTROLLER_NODE_ID, DEFAULT_TRUST_ROOT_INDEX
+from chip.testing.matter_testing_defaults import DEFAULT_ADMIN_VENDOR_ID, DEFAULT_CONTROLLER_NODE_ID, DEFAULT_TRUST_ROOT_INDEX
 
 
 @dataclass
