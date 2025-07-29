@@ -1,5 +1,3 @@
-#pragma once
-
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
@@ -17,6 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#pragma once
 
 #include <tracing/backend.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>

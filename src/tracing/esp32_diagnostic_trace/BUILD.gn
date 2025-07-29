@@ -20,6 +20,13 @@ config("tracing") {
   include_dirs = [ "include" ]
 }
 
+config("diagnostic_config") {
+  defines = [
+    "CONFIG_ENABLE_TRACES=1",
+    "CONFIG_ENABLE_METRICS=1",
+  ]
+}
+
 static_library("backend") {
   output_name = "libEsp32DiagnosticsBackend"
   output_dir = "${root_out_dir}/lib"
@@ -44,5 +51,29 @@ static_library("backend") {
 source_set("esp32_diagnostic_tracing") {
   public = [ "include/matter/tracing/macros_impl.h" ]
   public_configs = [ ":tracing" ]
-  public_deps = [ ":backend" ]
+  deps = [ ":backend" ]
+}
+
+source_set("esp32_diagnostic_tracing_tests") {
+  public = [
+    "DiagnosticEntry.h",
+    "DiagnosticStorage.h",
+    "DiagnosticTracing.h",
+    "include/matter/tracing/macros_impl.h",
+  ]
+  public_configs = [
+    ":tracing",
+    ":diagnostic_config",
+  ]
+  sources = [
+    "Counter.cpp",
+    "Counter.h",
+    "DiagnosticEntry.cpp",
+    "DiagnosticStorage.cpp",
+    "DiagnosticTracing.cpp",
+  ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/tracing",
+  ]
 }

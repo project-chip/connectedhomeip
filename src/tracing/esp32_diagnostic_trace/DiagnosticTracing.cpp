@@ -32,12 +32,12 @@ uint32_t MurmurHash(const void * key)
 {
     const uint32_t kMultiplier = 0x5bd1e995;
     const uint32_t kShift      = 24;
-    const unsigned char * data = (const unsigned char *) key;
+    const unsigned char * data = static_cast<const unsigned char *>(key);
     uint32_t hash              = 0;
 
     while (*data)
     {
-        uint32_t value = tolower(*data++);
+        uint32_t value = static_cast<uint32_t>(tolower(static_cast<unsigned char>(*data++)));
         value *= kMultiplier;
         value ^= value >> kShift;
         value *= kMultiplier;
