@@ -45,8 +45,6 @@ _install_gcovr() {
     fi
 }
 
-_normpath() {
-    python3 -c "import os.path; print(os.path.normpath('$@'))"
 # Get absolute path from a relative and normalize (e.g "foo/bar/../baz" -> "/path/to/foo/baz")
 _abspath() {
     python3 -c "import os.path; print(os.path.abspath('$@'))"
