@@ -432,6 +432,7 @@ private:
 
     Transport::SecureSession * GetSession() const;
     SubjectDescriptor GetSubjectDescriptor() const { return GetSession()->GetSubjectDescriptor(); }
+    bool AllowsLargePayload() const { return GetSession()->AllowsLargePayload(); }
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 

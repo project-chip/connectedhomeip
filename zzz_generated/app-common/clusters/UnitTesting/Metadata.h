@@ -520,6 +520,19 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace TestDifferentVendorMeiRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace TestEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestEvent
+namespace TestFabricScopedEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestFabricScopedEvent
+namespace TestDifferentVendorMeiEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestDifferentVendorMeiEvent
+
+} // namespace Events
 } // namespace UnitTesting
 } // namespace Clusters
 } // namespace app

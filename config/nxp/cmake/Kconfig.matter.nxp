@@ -274,13 +274,13 @@ endchoice
 
 config NXP_USE_SMU2_STATIC
 	bool "Use SMU2"
-	depends on CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of SMU2.
 
 config NXP_USE_SMU2_DYNAMIC
 	bool "Use SMU2"
-	depends on CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of extra SMU2 after commissioning.
 

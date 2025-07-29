@@ -320,6 +320,25 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace ClearAliroReaderConfig
 
 } // namespace Commands
+
+namespace Events {
+namespace DoorLockAlarm {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DoorLockAlarm
+namespace DoorStateChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DoorStateChange
+namespace LockOperation {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LockOperation
+namespace LockOperationError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LockOperationError
+namespace LockUserChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LockUserChange
+
+} // namespace Events
 } // namespace DoorLock
 } // namespace Clusters
 } // namespace app

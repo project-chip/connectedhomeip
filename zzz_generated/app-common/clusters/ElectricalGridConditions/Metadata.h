@@ -38,6 +38,13 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace CurrentConditionsChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace CurrentConditionsChanged
+
+} // namespace Events
 } // namespace ElectricalGridConditions
 } // namespace Clusters
 } // namespace app

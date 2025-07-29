@@ -82,4 +82,4 @@ RUN set -x \
     && : # last line
 
 ENV ZEPHYR_TOOLCHAIN_VARIANT=zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=${NRF5_TOOLS_ROOT}/zephyr-sdk/toolchains/latest/opt/zephyr-sdk
+ENV ZEPHYR_SDK_INSTALL_DIR=${NRF5_TOOLS_ROOT}/zephyr-sdk/toolchains/latest
