@@ -11,6 +11,13 @@ namespace app {
 namespace Clusters {
 namespace JointFabricDatastore {
 namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 20;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace AddKeySet {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace AddKeySet

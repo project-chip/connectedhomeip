@@ -124,3 +124,17 @@ static_library("controller") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
+
+source_set("jcm") {
+  sources = [
+    "jcm/AutoCommissioner.cpp",
+    "jcm/AutoCommissioner.h",
+    "jcm/DeviceCommissioner.cpp",
+    "jcm/DeviceCommissioner.h",
+    "jcm/TrustVerification.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller:controller",
+  ]
+}
