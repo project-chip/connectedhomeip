@@ -345,7 +345,8 @@ class TestXmlParser(unittest.TestCase):
             ])
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(name='TestFeatures', code=20, bitmaps=[bitmap])
+                             Cluster(name='TestFeatures',
+                                     code=20, bitmaps=[bitmap])
                          ])),
 
     def testGlobalStruct(self):
@@ -389,7 +390,8 @@ class TestXmlParser(unittest.TestCase):
                                      attributes=[
                                          Attribute(
                                              definition=Field(
-                                                 data_type=DataType(name='int16u', min_value=4),
+                                                 data_type=DataType(
+                                                     name='int16u', min_value=4),
                                                  code=2,
                                                  name='SubjectsPerAccessControlEntry',
                                              ),
