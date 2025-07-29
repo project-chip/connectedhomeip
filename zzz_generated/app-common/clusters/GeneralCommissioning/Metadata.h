@@ -75,7 +75,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(IsCommissioningWithout
                                                           std::nullopt);
 } // namespace IsCommissioningWithoutPower
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     Breadcrumb::kMetadataEntry,         BasicCommissioningInfo::kMetadataEntry,       RegulatoryConfig::kMetadataEntry,
     LocationCapability::kMetadataEntry, SupportsConcurrentConnection::kMetadataEntry,
 };

@@ -29,7 +29,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentOutput::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentOutput
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     OutputList::kMetadataEntry,
     CurrentOutput::kMetadataEntry,
 };

@@ -32,7 +32,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace CurrentConnections
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     SupportedFormats::kMetadataEntry,
     CurrentConnections::kMetadataEntry,
 };

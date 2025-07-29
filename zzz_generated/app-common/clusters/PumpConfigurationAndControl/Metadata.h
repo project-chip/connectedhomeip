@@ -112,7 +112,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ControlMode::Id, BitFl
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace ControlMode
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     MaxPressure::kMetadataEntry,
     MaxSpeed::kMetadataEntry,
     MaxFlow::kMetadataEntry,

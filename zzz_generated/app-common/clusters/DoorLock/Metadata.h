@@ -221,7 +221,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfAliroEndpointK
                                                           std::nullopt);
 } // namespace NumberOfAliroEndpointKeysSupported
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     LockState::kMetadataEntry,
     LockType::kMetadataEntry,
     ActuatorEnabled::kMetadataEntry,

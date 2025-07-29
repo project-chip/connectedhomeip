@@ -44,7 +44,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PendingDatasetTimestam
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PendingDatasetTimestamp
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     BorderRouterName::kMetadataEntry, BorderAgentID::kMetadataEntry,          ThreadVersion::kMetadataEntry,
     InterfaceEnabled::kMetadataEntry, ActiveDatasetTimestamp::kMetadataEntry, PendingDatasetTimestamp::kMetadataEntry,
 };

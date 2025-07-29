@@ -40,7 +40,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedClientCertificates
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     MaxRootCertificates::kMetadataEntry,
     ProvisionedRootCertificates::kMetadataEntry,
     MaxClientCertificates::kMetadataEntry,

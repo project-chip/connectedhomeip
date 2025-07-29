@@ -116,7 +116,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     DataModelRevision::kMetadataEntry,
     VendorName::kMetadataEntry,
     VendorID::kMetadataEntry,

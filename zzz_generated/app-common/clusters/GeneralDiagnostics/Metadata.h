@@ -65,7 +65,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TestEventTriggersEnabl
                                                           std::nullopt);
 } // namespace TestEventTriggersEnabled
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     NetworkInterfaces::kMetadataEntry,
     RebootCount::kMetadataEntry,
     TestEventTriggersEnabled::kMetadataEntry,

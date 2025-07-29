@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxGroupKeysPerFabric:
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaxGroupKeysPerFabric
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     GroupKeyMap::kMetadataEntry,
     GroupTable::kMetadataEntry,
     MaxGroupsPerFabric::kMetadataEntry,

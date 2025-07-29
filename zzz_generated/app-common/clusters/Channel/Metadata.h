@@ -33,7 +33,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentChannel::Id, Bi
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentChannel
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
 
 };
 

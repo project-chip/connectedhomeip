@@ -76,7 +76,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpCurrentLevel::I
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace StartUpCurrentLevel
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     CurrentLevel::kMetadataEntry,
     Options::kMetadataEntry,
     OnLevel::kMetadataEntry,

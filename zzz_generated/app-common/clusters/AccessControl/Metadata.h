@@ -56,7 +56,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace Arl
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     Acl::kMetadataEntry,
     SubjectsPerAccessControlEntry::kMetadataEntry,
     TargetsPerAccessControlEntry::kMetadataEntry,

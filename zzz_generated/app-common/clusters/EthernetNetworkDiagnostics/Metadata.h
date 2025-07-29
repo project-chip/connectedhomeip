@@ -56,7 +56,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TimeSinceReset::Id, Bi
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TimeSinceReset
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
 
 };
 

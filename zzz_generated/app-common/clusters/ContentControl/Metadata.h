@@ -57,7 +57,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(BlockUnrated::Id, BitF
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BlockUnrated
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     Enabled::kMetadataEntry,
 };
 

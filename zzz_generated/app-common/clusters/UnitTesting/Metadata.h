@@ -397,7 +397,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MeiInt8u::Id, BitFlags
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace MeiInt8u
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     Boolean::kMetadataEntry,
     Bitmap8::kMetadataEntry,
     Bitmap16::kMetadataEntry,
