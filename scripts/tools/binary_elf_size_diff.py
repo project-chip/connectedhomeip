@@ -278,7 +278,7 @@ def name_transform(name: str) -> str:
 
 def sankey_diagram(input_list: List, sankey_rules: Optional[Any]):
     """
-    Generates a sanekey diagram based on the input list. The input list is expected
+    Generates a sankey diagram based on the input list. The input list is expected
     to contain values of (change_type, delta, name, size_in_1, size_in_2)
     """
 
