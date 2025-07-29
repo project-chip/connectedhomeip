@@ -65,7 +65,10 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 '''
 
 TCP_PICS_STR = "MCORE.SC.TCP"
-
+ONE_HOUR_IN_MS = 3600000
+MAX_SAT_VALUE = 65535
+MAX_T_VALUE = 6
+DISCOVERY_TIMEOUT_SEC = 30
 
 class TC_SC_4_3(MatterBaseTest):
 
@@ -90,10 +93,6 @@ class TC_SC_4_3(MatterBaseTest):
                 TestStep(11, "TH performs a DNS-SD browse for _matter._tcp.local",
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
                 ]
-
-    ONE_HOUR_IN_MS = 3600000
-    MAX_SAT_VALUE = 65535
-    MAX_T_VALUE = 6
 
     async def get_descriptor_server_list(self):
         return await self.read_single_attribute_check_success(
@@ -287,7 +286,7 @@ class TC_SC_4_3(MatterBaseTest):
         operational_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            discovery_timeout_sec=3,
+            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True
         )
 
@@ -408,7 +407,7 @@ class TC_SC_4_3(MatterBaseTest):
         op_sub_type = self.get_operational_subtype(log_result=True)
         ptr_records = await mdns.get_ptr_records(
             service_types=[op_sub_type],
-            discovery_timeout_sec=3,
+            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True,
         )
 
@@ -423,7 +422,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(11)
         ptr_records = await mdns.get_ptr_records(
             service_types=[MdnsServiceType.OPERATIONAL.value],
-            discovery_timeout_sec=3,
+            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True,
         )
 
