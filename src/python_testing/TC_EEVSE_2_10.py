@@ -120,7 +120,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
                      "Value has to be 0"),
             TestStep("9f", "TH reads from the DUT the MaximumDischargeCurrent",
                      "Value has to be 0"),
-            TestStep("10", "Wait 5 seconds"),
+            TestStep("10", "Wait 10 seconds"),
             TestStep("10a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x00 (Disabled)"),
             TestStep("10b", "TH reads from the DUT the ChargingEnabledUntil",
@@ -358,9 +358,9 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("MaximumDischargeCurrent", 0)
 
         self.step("10")
-        # Wait 5 seconds
-        logger.info("Waiting for 5 seconds for charging timer to expire")
-        time.sleep(5)
+        # Wait 10 seconds
+        logger.info("Waiting for 10 seconds for charging timer to expire")
+        time.sleep(10)
 
         self.step("10a")
         # TH reads from the DUT the SupplyState
