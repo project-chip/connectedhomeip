@@ -329,7 +329,7 @@ def sankey_diagram(input_list: List, sankey_rules: Optional[Any]):
         r.add_links(data)
 
     fig = go.Figure(data=[data.get_sankey()])
-    fig.update_layout(title_text="ELF size increases", font_size=10)
+    fig.update_layout(title_text="ELF size delta", font_size=10)
     fig.show()
 
 
