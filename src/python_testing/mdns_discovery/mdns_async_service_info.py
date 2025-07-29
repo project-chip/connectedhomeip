@@ -27,15 +27,23 @@ _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
 
 
 class MdnsAsyncServiceInfo(ServiceInfo):
-    def __init__(self, name: str | None = None, type_: str | None = None, server: str | None = None) -> None:
+    def __init__(self,
+                 name: str | None = None, # Fully qualified service name
+                 type_: str | None = None, # Fully qualified service type name
+                 server: str | None = None # Fully qualified name for service host (defaults to name)
+                 ) -> None:
+
+        # For AAAA address resolution, only server (hostname)
+        # is to be provided, this configuration is set by the
+        # AddressResolverIPv6 class which inherits from this class
         if server and not (name and type_):
-            # Use server-only mode (for address resolution)
-            super().__init__(type_="", name="", server=server)
+            super().__init__(type_=server, name=server, server=server)
             self._name = None
             self.type = None
             self.server = server
             return
 
+        # Validate a fully qualified service name, instance or subtype
         if not type_.endswith(service_type_name(name, strict=False)):
             raise BadTypeInNameException
 
