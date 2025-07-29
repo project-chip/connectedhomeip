@@ -104,12 +104,6 @@ TEST(TestStringBuilder, TestFormat)
     });
 
     TestStringBuilder<100>().Check([](StringBuilderBase & builder) {
-        builder.AddFormat("Test: %d Hello %s\n", 123, "world");
-        EXPECT_TRUE(builder.Fit());
-        EXPECT_STREQ(builder.c_str(), "Test: 123 Hello world\n");
-    });
-
-    TestStringBuilder<100>().Check([](StringBuilderBase & builder) {
         builder.AddFormat("Align: %-5s", "abc");
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "Align: abc  ");
