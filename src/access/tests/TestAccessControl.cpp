@@ -2307,7 +2307,6 @@ TEST_F(TestAccessControl, TestBaseDelegateDefaultMethods)
 
     // Actualities
     FabricIndex fabric = 1;
-    v = 999;
     EXPECT_EQ(d.GetEntryCount(fabric, v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
     v = 999;
