@@ -32,7 +32,7 @@ class TC_CNET_4_9(MatterBaseTest):
     Example Usage:
         To run the test case, use the following command:
         ```bash
-        python src/python_testing/TC_CNET_4_9.py --commissioning-method ble-wifi -discriminator <discriminator> -passcode <passcode> \
+        python3 src/python_testing/TC_CNET_4_9.py --commissioning-method ble-wifi --discriminator <discriminator> --passcode <passcode> \
                --endpoint <endpoint_value> --wifi-ssid <wifi_ssid> --wifi-passphrase <wifi_credentials>
         ```
         Where `<endpoint_value>` should be replaced with the actual endpoint
