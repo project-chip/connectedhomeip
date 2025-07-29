@@ -34,7 +34,8 @@ assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
            lwip_platform == "bl602" || lwip_platform == "mw320" ||
            lwip_platform == "bl702" || lwip_platform == "bl702l" ||
-           lwip_platform == "mt793x" || lwip_platform == "asr",
+           lwip_platform == "mt793x" || lwip_platform == "asr" ||
+           lwip_platform == "scm1612s",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -55,6 +56,8 @@ if (lwip_platform == "cc13xx_26xx") {
   import("${qpg_sdk_build_root}/qpg_sdk.gni")
 } else if (lwip_platform == "psoc6") {
   import("//build_overrides/psoc6.gni")
+} else if (lwip_platform == "scm1612s") {
+  import("//build_overrides/scm1612s.gni")
 } else if (lwip_platform == "cyw30739") {
   import("//build_overrides/cyw30739_sdk.gni")
 } else if (lwip_platform == "bl602") {
@@ -113,6 +116,12 @@ if (current_os == "zephyr" || current_os == "mbed") {
     public_deps = [ ":lwip_buildconfig" ]
     public_configs = [ "${chip_root}/src:includes" ]
     public_configs += [ "${psoc6_sdk_build_root}:psoc6_sdk_config" ]
+  }
+} else if (lwip_platform == "scm1612s") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_configs = [ "${chip_root}/src:includes" ]
+    public_deps += [ "${scm1612s_sdk_build_root}:scm1612s_build" ]
   }
 } else if (lwip_platform == "qpg") {
   import("${lwip_root}/lwip.gni")
