@@ -79,12 +79,12 @@ Git: 0.9.2-summer2025-228-g4ec7ea4c4
   </struct>
 
   <struct name="ViewportStruct" apiMaturity="provisional">
-    <item fieldId="0" name="X1" type="int16u" default="0"/>
-    <item fieldId="1" name="Y1" type="int16u" default="0"/>
-    <item fieldId="2" name="X2" type="int16u" default="0"/>
-    <item fieldId="3" name="Y2" type="int16u" default="0"/>
+    <item fieldId="0" name="X1" type="int16u"/>
+    <item fieldId="1" name="Y1" type="int16u"/>
+    <item fieldId="2" name="X2" type="int16u"/>
+    <item fieldId="3" name="Y2" type="int16u"/>
   </struct>
-  
+
   <struct name="ICECandidateStruct" apiMaturity="provisional">
     <item fieldId="0" name="Candidate" type="char_string"/>
     <item fieldId="1" name="SDPMid" type="char_string" isNullable="true" minLength="1"/>
