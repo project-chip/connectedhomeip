@@ -108,9 +108,6 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
->>>>>> > master
-
-
 class InternalTestRunnerHooks(TestRunnerHooks):
     """
     Implementation of TestRunnerHooks that logs test execution progress.
