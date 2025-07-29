@@ -264,17 +264,23 @@ Status TlsCertificateManagementCommandDelegate::GenerateClientCsr(EndpointId mat
 {
     VerifyOrReturnValue(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
-    UniquePtr<std::array<uint8_t, kSpecMaxCertBytes>> csrData(New<std::array<uint8_t, kSpecMaxCertBytes>>());
+    ScopedMemoryBuffer<uint8_t> csrData;
+    csrData.Alloc(kSpecMaxCertBytes);
     VerifyOrReturnValue(csrData, Status::ResourceExhausted);
+    MutableByteSpan csr(csrData.Get(), kSpecMaxCertBytes);
 
-    MutableByteSpan csr(*csrData);
     std::array<uint8_t, 128> nonceData;
     MutableByteSpan nonceSignature(nonceData);
 
+    ScopedMemoryBuffer<uint8_t> nocsrElementsData;
+    size_t nocsrElementsSize = kSpecMaxCertBytes + 128 + /*tlvPadding=*/100;
+    nocsrElementsData.Alloc(nocsrElementsSize);
+    MutableByteSpan nocsrElementsBuffer(nocsrElementsData.Get(), nocsrElementsSize);
+
     ClientCsrResponseType csrResponse;
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
-    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, csrResponse.ccdid, csr,
-                                                             nonceSignature);
+    auto result = mCertificateTable.PrepareClientCertificate(fabric, request.nonce, certBuffer->buffer, nocsrElementsBuffer,
+                                                             csrResponse.ccdid, csr, nonceSignature);
     VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
     csrResponse.csr   = csr;
     csrResponse.nonce = nonceSignature;
