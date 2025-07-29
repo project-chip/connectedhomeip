@@ -40,7 +40,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LightSensorType::Id, B
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LightSensorType
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     MeasuredValue::kMetadataEntry,
     MinMeasuredValue::kMetadataEntry,
     MaxMeasuredValue::kMetadataEntry,

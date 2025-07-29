@@ -234,7 +234,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpColorTemperatur
                                                           Access::Privilege::kManage);
 } // namespace StartUpColorTemperatureMireds
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     ColorMode::kMetadataEntry,         Options::kMetadataEntry,           NumberOfPrimaries::kMetadataEntry,
     EnhancedColorMode::kMetadataEntry, ColorCapabilities::kMetadataEntry,
 };

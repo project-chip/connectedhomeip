@@ -67,7 +67,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadVersion::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ThreadVersion
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     MaxNetworks::kMetadataEntry,          Networks::kMetadataEntry,      InterfaceEnabled::kMetadataEntry,
     LastNetworkingStatus::kMetadataEntry, LastNetworkID::kMetadataEntry, LastConnectErrorValue::kMetadataEntry,
 };

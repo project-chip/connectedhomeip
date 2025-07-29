@@ -34,7 +34,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Enabled::Id, BitFlags<
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Enabled
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     InstalledChimeSounds::kMetadataEntry,
     SelectedChime::kMetadataEntry,
     Enabled::kMetadataEntry,

@@ -115,7 +115,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SessionEnergyDischarge
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SessionEnergyDischarged
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     State::kMetadataEntry,
     SupplyState::kMetadataEntry,
     FaultState::kMetadataEntry,

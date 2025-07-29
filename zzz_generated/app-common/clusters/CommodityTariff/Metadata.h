@@ -110,7 +110,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultRandomizationTy
                                                           std::nullopt);
 } // namespace DefaultRandomizationType
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     TariffInfo::kMetadataEntry,
     TariffUnit::kMetadataEntry,
     StartDate::kMetadataEntry,

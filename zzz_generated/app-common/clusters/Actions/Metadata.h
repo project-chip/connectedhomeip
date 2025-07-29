@@ -34,7 +34,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SetupURL::Id, BitFlags
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SetupURL
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     ActionList::kMetadataEntry,
     EndpointLists::kMetadataEntry,
 };

@@ -33,7 +33,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ScheduleProgrammingVis
                                                           Access::Privilege::kManage);
 } // namespace ScheduleProgrammingVisibility
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     TemperatureDisplayMode::kMetadataEntry,
     KeypadLockout::kMetadataEntry,
 };

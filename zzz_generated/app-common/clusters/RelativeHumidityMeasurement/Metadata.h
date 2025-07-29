@@ -36,7 +36,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Tolerance::Id, BitFlag
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Tolerance
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     MeasuredValue::kMetadataEntry,
     MinMeasuredValue::kMetadataEntry,
     MaxMeasuredValue::kMetadataEntry,

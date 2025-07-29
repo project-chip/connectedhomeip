@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyReset:
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CumulativeEnergyReset
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     Accuracy::kMetadataEntry,
 };
 

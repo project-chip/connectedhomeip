@@ -89,7 +89,7 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace NodeEndpointList
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     AnchorRootCA::kMetadataEntry,
     AnchorNodeID::kMetadataEntry,
     AnchorVendorID::kMetadataEntry,

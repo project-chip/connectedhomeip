@@ -68,7 +68,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id,
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LatchControlModes
 
-constexpr DataModel::AttributeEntry kMandatoryAttributesMetadata[] = {
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     CurrentState::kMetadataEntry,
     TargetState::kMetadataEntry,
 };
