@@ -566,12 +566,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     __block id testDelegate = nil;
 #ifdef DEBUG
     // Save the first delegate for testing
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
-        testDelegate = delegateInfo.delegate;
-        break;
-    }
+    testDelegate = [_delegateManager firstDelegate];
 #endif
-    [_delegates removeAllObjects];
+    [_delegateManager removeAllDelegates];
 
     // Delete subscription callback object to tear down ReadClient
     MTRDeviceMatterCPPObjectsHolder * matterCPPObjectsHolder = self.matterCPPObjectsHolder;
