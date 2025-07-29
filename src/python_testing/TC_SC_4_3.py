@@ -165,7 +165,7 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify t_value is a decimal number without leading zeros and less than or equal to 6
         try:
             T_int = int(t_value)
-            if T_int < 0 or T_int > self.MAX_T_VALUE:
+            if T_int < 0 or T_int > MAX_T_VALUE:
                 return False, f"T value ({t_value}) is not in the range 0 to 6. ({t_value})"
             if str(t_value).startswith("0") and T_int != 0:
                 return False, f"T value ({t_value}) has leading zeros."
@@ -363,7 +363,7 @@ class TC_SC_4_3(MatterBaseTest):
 
             logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             sii_value = operational_record.txt_record['SII']
-            result, message = self.verify_decimal_value(sii_value, self.ONE_HOUR_IN_MS)
+            result, message = self.verify_decimal_value(sii_value, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # SAI TXT KEY
@@ -373,7 +373,7 @@ class TC_SC_4_3(MatterBaseTest):
 
             logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             sai_value = operational_record.txt_record['SAI']
-            result, message = self.verify_decimal_value(sai_value, self.ONE_HOUR_IN_MS)
+            result, message = self.verify_decimal_value(sai_value, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # SAT TXT KEY
@@ -381,7 +381,7 @@ class TC_SC_4_3(MatterBaseTest):
             logging.info(
                 "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
             sat_value = operational_record.txt_record['SAT']
-            result, message = self.verify_decimal_value(sat_value, self.MAX_SAT_VALUE)
+            result, message = self.verify_decimal_value(sat_value, MAX_SAT_VALUE)
             asserts.assert_true(result, message)
 
             if supports_icd:
