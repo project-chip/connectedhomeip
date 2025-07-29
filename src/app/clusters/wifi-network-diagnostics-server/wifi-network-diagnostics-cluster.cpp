@@ -101,20 +101,26 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
 {
     AttributeListBuilder attributeListBuilder(builder);
 
+
     const DataModel::AttributeEntry mandatoryAttributes[] = {
         Bssid::kMetadataEntry,         SecurityType::kMetadataEntry, WiFiVersion::kMetadataEntry,
         ChannelNumber::kMetadataEntry, Rssi::kMetadataEntry,
     };
 
+
+    const BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags = mLogic.GetFeatureFlags();
+
+    const bool hasErrorCounts = featureFlags.Has(Feature::kErrorCounts);
+    const bool hasPacketCounts = featureFlags.Has(Feature::kPacketCounts);
     // Define optional attributes based on features
     const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-        { mLogic.GetFeatureFlags().Has(Feature::kErrorCounts), BeaconLostCount::kMetadataEntry },
-        { mLogic.GetFeatureFlags().Has(Feature::kErrorCounts), OverrunCount::kMetadataEntry },
-        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), BeaconRxCount::kMetadataEntry },
-        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), PacketMulticastRxCount::kMetadataEntry },
-        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), PacketMulticastTxCount::kMetadataEntry },
-        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), PacketUnicastRxCount::kMetadataEntry },
-        { mLogic.GetFeatureFlags().Has(Feature::kPacketCounts), PacketUnicastTxCount::kMetadataEntry },
+        { hasErrorCounts, BeaconLostCount::kMetadataEntry },
+        { hasErrorCounts, OverrunCount::kMetadataEntry },
+        { hasPacketCounts, BeaconRxCount::kMetadataEntry },
+        { hasPacketCounts, PacketMulticastRxCount::kMetadataEntry },
+        { hasPacketCounts, PacketMulticastTxCount::kMetadataEntry },
+        { hasPacketCounts, PacketUnicastRxCount::kMetadataEntry },
+        { hasPacketCounts, PacketUnicastTxCount::kMetadataEntry },
         { mLogic.GetEnabledAttributes().enableCurrentMaxRate, CurrentMaxRate::kMetadataEntry },
     };
 

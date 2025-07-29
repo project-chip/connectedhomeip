@@ -40,7 +40,7 @@ LazyRegisteredServerCluster<WiFiDiagnosticsServerCluster> gServers[kWiFiNetworkD
 
 // Find the 0-based array index corresponding to the given endpoint id.
 // Log an error if not found.
-bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 {
     uint16_t arrayIndex =
         emberAfGetClusterServerEndpointIndex(endpointId, WiFiNetworkDiagnostics::Id, kWiFiNetworkDiagnosticsFixedClusterCount);
@@ -66,7 +66,7 @@ bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
 void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
+    if (!FindEndpointWithLog(endpointId, arrayIndex))
     {
         return;
     }
@@ -98,7 +98,7 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 void emberAfWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
+    if (!FindEndpointWithLog(endpointId, arrayIndex))
     {
         return;
     }
