@@ -17,7 +17,7 @@
 #include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
 
-namespace { // === test‑only constants ===
+namespace { // === test-only constants ===
 constexpr uint16_t kBleTestMtu           = 247;
 constexpr uint16_t kBleTestFragmentSize  = 100;
 constexpr uint16_t kBleTestScratchBufLen = 16;
