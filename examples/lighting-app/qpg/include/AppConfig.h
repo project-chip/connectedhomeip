@@ -16,9 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
-// ---- Lighting Example App Config ----
-
-#endif // APP_CONFIG_H
+#define BASE_APP_BUILD 0
+#define ACTIVATE_IDENTIFY_ON_EP2 0

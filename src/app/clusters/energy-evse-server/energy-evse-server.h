@@ -35,7 +35,7 @@ namespace Clusters {
 namespace EnergyEvse {
 
 // Spec-defined constraints
-constexpr int64_t kMinimumChargeCurrent         = 0;
+constexpr int64_t kMinimumChargeCurrentLimit    = 0;
 constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
 constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
 constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
@@ -43,6 +43,8 @@ constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
 /** @brief
  *    Defines methods for implementing application-specific logic for the EVSE Management Cluster.
  */
+class Instance;
+
 class Delegate
 {
 public:
@@ -50,6 +52,8 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     EndpointId GetEndpointId() { return mEndpointId; }
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+    Instance * GetInstance() { return mInstance; }
 
     /**
      * @brief Delegate should implement a handler to disable the EVSE.
@@ -153,6 +157,7 @@ public:
 
 protected:
     EndpointId mEndpointId = 0;
+    Instance * mInstance   = nullptr;
 };
 
 enum class OptionalAttributes : uint32_t
@@ -178,8 +183,13 @@ public:
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
+        mDelegate.SetInstance(this);
     }
-    ~Instance() { Shutdown(); }
+    ~Instance()
+    {
+        mDelegate.SetInstance(nullptr);
+        Shutdown();
+    }
 
     CHIP_ERROR Init();
     void Shutdown();

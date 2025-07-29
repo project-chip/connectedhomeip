@@ -54,7 +54,7 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
     const std::vector<Structs::SnapshotCapabilitiesStruct::Type> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
     const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-    const std::vector<Globals::StreamUsageEnum> & aRankedStreamPriorities) :
+    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
@@ -64,7 +64,7 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     mMicrophoneCapabilities(aMicrophoneCapabilities), mSpeakerCapabilities(aSpeakerCapabilities),
     mTwoWayTalkSupport(aTwoWayTalkSupport), mSnapshotCapabilitiesList(aSnapshotCapabilities),
     mMaxNetworkBandwidth(aMaxNetworkBandwidth), mSupportedStreamUsages(aSupportedStreamUsages),
-    mStreamUsagePriorities(aRankedStreamPriorities)
+    mStreamUsagePriorities(aStreamUsagePriorities)
 {
     mDelegate.SetCameraAVStreamMgmtServer(this);
 }
@@ -1648,6 +1648,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
     }
 }
+
 bool CameraAVStreamMgmtServer::StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities)
 {
     std::set<Globals::StreamUsageEnum> seenStreamUsages;
@@ -1685,12 +1686,12 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
     VerifyOrReturn(commandData.streamUsage != Globals::StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(commandData.videoCodec != VideoCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid video codec", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate &&
@@ -1914,7 +1915,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 
     VerifyOrReturn(commandData.imageCodec != ImageCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image codec", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(commandData.maxFrameRate > 0, {
@@ -1932,6 +1933,24 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image quality", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
+
+    // If WatermarkEnabled is provided then the Watermark feature has to be supported
+    if (commandData.watermarkEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kWatermark), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
+
+    // If OSDEnabled is provided then the OSD feature has to be supported
+    if (commandData.OSDEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
     SnapshotStreamStruct snapshotStreamArgs;
     snapshotStreamArgs.snapshotStreamID = 0;
@@ -1978,19 +1997,32 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
     auto & isOSDEnabled       = commandData.OSDEnabled;
     auto & snapshotStreamID   = commandData.snapshotStreamID;
 
-    // If Watermark feature is supported, then command should have the
-    // isWaterMarkEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If WatermarkEnabled is provided then the Watermark feature has to be supported
+    if (commandData.watermarkEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kWatermark), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
-    // If OSD feature is supported, then command should have the
-    // isOSDEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If OSDEnabled is provided then the OSD feature has to be supported
+    if (commandData.OSDEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
-    // Call the delegate
+    // One of WatermarkEnabled or OSDEnabled has to be present
+    VerifyOrReturn(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), {
+        ChipLogError(Zcl,
+                     "CameraAVStreamMgmt[ep=%d]: One of WatermarkEnabled or OSDEnabled must be provided in SnapshotStreamModify",
+                     mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+    });
+
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)
@@ -2023,7 +2055,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 {
 
     auto & streamPriorities = commandData.streamPriorities;
-    std::vector<Globals::StreamUsageEnum> rankedStreamPriorities;
+    std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
     auto iter = streamPriorities.begin();
 
     // If any video, audio or snapshot streams exist fail the command.
@@ -2043,7 +2075,8 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         auto it = std::find(mSupportedStreamUsages.begin(), mSupportedStreamUsages.end(), streamUsage);
         VerifyOrReturn(it != mSupportedStreamUsages.end(),
                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
-        rankedStreamPriorities.push_back(streamUsage);
+
+        streamUsagePriorities.push_back(streamUsage);
     }
 
     if (iter.GetStatus() != CHIP_NO_ERROR)
@@ -2054,10 +2087,10 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 
     // If there are duplicate stream usages in StreamPriorities,
     // return AlreadyExists
-    VerifyOrReturn(!StreamPrioritiesHasDuplicates(rankedStreamPriorities),
+    VerifyOrReturn(!StreamPrioritiesHasDuplicates(streamUsagePriorities),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists));
 
-    CHIP_ERROR err = SetStreamUsagePriorities(rankedStreamPriorities);
+    CHIP_ERROR err = SetStreamUsagePriorities(streamUsagePriorities);
 
     if (err != CHIP_NO_ERROR)
     {

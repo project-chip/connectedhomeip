@@ -24,7 +24,7 @@
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
-#       --string-arg th_server_app_path:out/linux-x64-camera/chip-camera-app
+#       --string-arg th_server_app_path:${CAMERA_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -97,9 +97,8 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
-            TestStep(4, "Connect the {TH_Server} from DUT"),
-            TestStep(5, "Activate the Fault injection to modify the session ID of the WebRTC Answer command from {TH_Server}"),
-            TestStep(6, "Send ProvideOffer command to the {TH_Server} from DUT"),
+            TestStep(4, "Activate the Fault injection to modify the session ID of the WebRTC Answer command from {TH_Server}"),
+            TestStep(5, "Send ProvideOffer command to the {TH_Server} from DUT"),
         ]
         return steps
 
@@ -156,19 +155,6 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
         )
 
         self.step(4)
-        # Prompt user with instructions
-        prompt_msg = (
-            "\nPlease connect the server app from DUT:\n"
-            "  webrtc connect 1 1\n"
-        )
-
-        if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
-            pass
-        else:
-            self.wait_for_user_input(prompt_msg)
-
-        self.step(5)
         logging.info("Injecting kFault_ModifyWebRTCAnswerSessionId on TH_SERVER")
 
         # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
@@ -193,11 +179,11 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
         )
         sleep(1)
 
-        self.step(6)
+        self.step(5)
         # Prompt user with instructions
         prompt_msg = (
             "\nSend 'ProvideOffer' command to the server app from DUT:\n"
-            "  webrtc provide-offer 3\n"
+            "  webrtc establish-session 1\n"
             "Input 'Y' if WebRTC session is failed with error 'NOT_FOUND'\n"
             "Input 'N' if WebRTC session is successfully established\n"
         )

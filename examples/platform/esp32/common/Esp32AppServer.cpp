@@ -29,6 +29,10 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #endif
@@ -60,22 +64,6 @@ using namespace chip::DeviceLayer;
 
 static constexpr char TAG[] = "ESP32Appserver";
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// NOTE:
-//   this is a hackish workaround for https://github.com/project-chip/connectedhomeip/issues/39441
-//   OpenaThread platform has a layering inversion and tries to pull in network commissioning. For
-//   ESP32 this translates into a link error due to NetworkCommissioning vtable not being defined.
-//
-//   We pull in the vtable here via a function that will never get called (otherwise it would
-//   actually crash ..)
-void do_not_call_workaround_only()
-{
-    static app::Clusters::NetworkCommissioning::Instance sInvalidInstance(
-        CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */,
-        (DeviceLayer::NetworkCommissioning::ThreadDriver *) nullptr);
-}
-#endif
-
 namespace {
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
@@ -93,6 +81,11 @@ app::Clusters::NetworkCommissioning::Instance
 app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID /* Endpoint Id */,
                                           &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(CONFIG_THREAD_NETWORK_ENDPOINT_ID);
 #endif
 
 #if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID)
@@ -231,6 +224,9 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #endif // CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#ifdef CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+    sThreadNetworkDriver.Init();
+#endif // CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
     {

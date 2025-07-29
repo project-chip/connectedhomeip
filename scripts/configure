@@ -36,6 +36,7 @@
 
 set -o pipefail
 shopt -s extglob
+unset CDPATH
 
 function usage() { # status
     info "Usage: $0 [OPTIONS] [--project=... [PROJECT OPTIONS]]"
@@ -67,7 +68,7 @@ function usage() { # status
 }
 
 function main() { # ...
-    CHIP_ROOT=$(cd "$(dirname "$0")/.." >/dev/null && pwd)
+    CHIP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
     BUILD_ENV_DEPS=(
         "${CHIP_ROOT}/scripts/setup/requirements.build.txt"
         "${CHIP_ROOT}/scripts/setup/constraints.txt"
@@ -99,8 +100,8 @@ function main() { # ...
     [[ -n "$PROJECT" || -n "$BUILD_ENV_DIR" ]] || usage 1
 
     if [[ -n "$PROJECT" ]]; then
-        PROJECT_PATH="$(cd "${CHIP_ROOT}" >/dev/null && cd "${PROJECT}" >/dev/null && pwd)"
-        [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' - missing .gn at '${PROJECT_PATH}'"
+        PROJECT_PATH="$(cd "${CHIP_ROOT}" 2>/dev/null && cd "${PROJECT}" 2>/dev/null && pwd)"
+        [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' (no such directory or missing .gn file)"
     fi
 
     if [[ -n "$PW_ROOT" ]]; then
@@ -131,7 +132,7 @@ function main() { # ...
 
     if [[ -n "$BUILD_ENV_DIR" ]]; then
         mkdir -p "$BUILD_ENV_DIR"
-        BUILD_ENV_PATH="$(cd "$BUILD_ENV_DIR" >/dev/null && pwd)"
+        BUILD_ENV_PATH="$(cd "$BUILD_ENV_DIR" && pwd)"
         [[ -n "$BUILD_ENV_PATH" ]] || fail "Invalid build-env-dir '${BUILD_ENV_DIR}'"
         BUILD_ENV_DIR="$BUILD_ENV_PATH" # absolute
     else
@@ -145,7 +146,7 @@ function main() { # ...
 
     # Create the build environment if necessary
     if ! check_build_env; then
-        check_python
+        check_python 3.11
         configure_python_env
         if [[ -z "$CHIP_PREGEN_DIR" ]] && ! check_binary zap-cli; then
             download_zap
@@ -281,8 +282,8 @@ function configure_python_env() {
     # Ensure pip and wheel are up to date first (using pip.pyz if necessary)
     "${BUILD_ENV_PATH}/bin/python3" "$pip" install --require-virtualenv --quiet --upgrade pip wheel
 
-    export PW_PROJECT_ROOT=$CHIP_ROOT
-    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet \
+    # Install build dependencies. Use PEP517 to silence warnings (see https://github.com/pypa/pip/issues/6334)
+    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet --use-pep517 \
         -r "${CHIP_ROOT}/scripts/setup/requirements.build.txt" \
         -c "${CHIP_ROOT}/scripts/setup/constraints.txt"
     info "ok"
@@ -322,19 +323,19 @@ function call_impl() { # func ...
     "$PYTHON" "${CHIP_ROOT}/scripts/configure.impl.py" "$@"
 }
 
-function check_python() {
-    progress "Checking for Python 3"
-    if have_binary python3; then
-        PYTHON="$(hash -t python3)"
+function check_python() { # version
+    local required="$1" major="${1%%.*}"
+    progress "Checking for Python $required or later"
+    if have_binary "python$major"; then
+        PYTHON="$(hash -t "python$major")"
     elif have_binary python; then
         PYTHON="$(hash -t python)"
-        local ver="$("$PYTHON" --version)"
-        if [[ "$ver" != "Python 3."* ]]; then
-            info "need Python 3 but found $ver"
-            return 1
-        fi
     else
         info "not found"
+        return 1
+    fi
+    if ! "$PYTHON" -c 'import sys; sys.exit(1 if sys.version_info < tuple(map(int,sys.argv[1].split("."))) else 0)' "$required"; then
+        info "not found ($PYTHON is $("$PYTHON" --version))"
         return 1
     fi
     info "$PYTHON"

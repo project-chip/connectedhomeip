@@ -224,7 +224,8 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         // Ensure that the Wifi task is started.
         CHIP_ERROR error = WifiInterface::GetInstance().StartWifiTask();
-        VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartWifiTask() failed: %s", ErrorStr(error)));
+        VerifyOrReturn(error == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "StartWifiTask() failed: %" CHIP_ERROR_FORMAT, error.Format()));
 
         // Ensure that station mode is enabled in the WiFi layer.
         WifiInterface::GetInstance().ConfigureStationMode();
@@ -257,7 +258,8 @@ void ConnectivityManagerImpl::DriveStationState()
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
 
             CHIP_ERROR error = WifiInterface::GetInstance().TriggerDisconnection();
-            SuccessOrExitAction(error, ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", ErrorStr(error)));
+            SuccessOrExitAction(error,
+                                ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format()));
 
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }
@@ -329,7 +331,10 @@ exit:
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-    NetworkCommissioning::SlWiFiDriver::GetInstance().OnConnectWiFiNetwork();
+    NetworkCommissioning::SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
+    // Cannot use the driver if the instance is not initialized.
+    VerifyOrDie(nwDriver != nullptr); // should never be null
+    nwDriver->OnConnectWiFiNetwork();
 
     UpdateInternetConnectivityState();
     // Alert other components of the new state.
@@ -362,7 +367,11 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
-        NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
+
+        NetworkCommissioning::SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
+        // Cannot use the driver if the instance is not initialized.
+        VerifyOrDie(nwDriver != nullptr); // should never be null
+        nwDriver->UpdateNetworkingStatus();
     }
 }
 

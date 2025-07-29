@@ -144,6 +144,10 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.cpp': {'set'},
     'src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h': {'string', 'vector'},
     'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h': {'string', 'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
     'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
@@ -171,6 +175,7 @@ ALLOW: Dict[str, Set[str]] = {
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
     'src/controller/ExamplePersistentStorage.h': {'string'},
+    'src/controller/jcm/TrustVerification.h': {'string'},
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
@@ -205,4 +210,9 @@ ALLOW: Dict[str, Set[str]] = {
     # Not intended for embedded clients
     'src/app/server/JointFabricDatastore.cpp': {'vector'},
     'src/app/server/JointFabricDatastore.h': {'vector'},
+
+    # For webrtc python bindings
+    'src/controller/webrtc/WebRTC.h': {'string'},
+    'src/controller/webrtc/WebRTCClient.h': {'map', 'string'},
+    'src/controller/webrtc/WebRTCTransportRequestorManager.cpp': {'string', 'vector'},
 }

@@ -32,6 +32,7 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.cpp",
   ]
 
   deps = [ "${chip_root}/${nxp_crypto_mw_root}:se05x" ]

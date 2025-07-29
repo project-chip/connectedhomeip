@@ -33,7 +33,7 @@ static_assert((SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig
 
 namespace {
 
-LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer;
+LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 
 // compile-time evaluated method if "is <EP>::SoftwareDiagnostics::<ATTR>" enabled
 constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)

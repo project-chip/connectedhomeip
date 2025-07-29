@@ -128,7 +128,10 @@ public:
      */
     void HandleStartStateCallback(GenericOperationalError & err) override
     {
-        mCountDownTime.SetNonNull(static_cast<uint32_t>(kExampleCountDown));
+        if (mCountDownTime.IsNull())
+        {
+            mCountDownTime.SetNonNull(static_cast<uint32_t>(kExampleCountDown));
+        }
         GenericOperationalStateDelegateImpl::HandleStartStateCallback(err);
     }
 

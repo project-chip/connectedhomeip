@@ -43,6 +43,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(LaunchURL::Id, B
 } // namespace LaunchURL
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ContentLauncher
 } // namespace Clusters
 } // namespace app
