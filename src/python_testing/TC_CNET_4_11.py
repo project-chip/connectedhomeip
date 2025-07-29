@@ -289,10 +289,18 @@ class TC_CNET_4_11(MatterBaseTest):
                      "This forcibly disarms the fail-safe and is expected to cause the changes of configuration to NetworkCommissioning cluster done so far to be reverted.",
                      "Verify that DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(11, "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"),
-            TestStep(12, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network"),
-            TestStep(13, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
-            TestStep(14, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"),
-            TestStep(15, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1"),
+            TestStep(12, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network",
+                     "Verify that the TH successfully connects to the DUT"),
+            TestStep(13, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
+                     "Verify that DUT sends ArmFailSafeResponse command to the TH"),
+            TestStep(14, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1",
+                     "Verify that DUT sends NetworkConfigResponse to command with the following response fields:"
+                     " 1. NetworkingStatus is success"
+                     " 2. NetworkIndex is 'Userwifi_netidx'"),
+            TestStep(15, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1",
+                     "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:"
+                     " 1. NetworkingStatus is success which is '0'"
+                     " 2. DebugText is of type string with max length 512 or empty"),
             TestStep(16, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3"),
             TestStep(17, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
             TestStep(18, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
