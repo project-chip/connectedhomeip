@@ -16,7 +16,6 @@ name: 19.9.1. [TC-AUDIOOUTPUT-7.1] Select Output Verification
 
 PICS:
     - AUDIOOUTPUT.S
-    - AUDIOOUTPUT.S.C00.Rsp
 
 config:
     nodeId: 0x12344321
