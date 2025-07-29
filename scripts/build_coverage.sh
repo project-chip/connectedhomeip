@@ -316,9 +316,6 @@ if [ "$GENERATE_XML" == true ]; then
     fi
 fi
 
-cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
-    "$COVERAGE_ROOT/webapp_config.yaml"
-
 HTML_INDEX=$(_abspath "$COVERAGE_ROOT/html/index.html")
 if [ -f "$HTML_INDEX" ]; then
     echo
@@ -330,3 +327,6 @@ else
     echo "WARNING: Coverage HTML index was not found at expected path:"
     echo "    $HTML_INDEX"
 fi
+
+cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
+    "$COVERAGE_ROOT/webapp_config.yaml"
