@@ -334,11 +334,11 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
         { mEnabledAttributes.enableActiveRadioFaults, GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry },
         { mEnabledAttributes.enableActiveNetworkFaults, GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry },
         /*
-        * Enforcing UpTime to always be added here because it is a mandatory attribute for
-        * revision 2 and beyond, but is left as optional in the XML for now for backwards
-        * compatibility. This allows us to still use the code generated mandatory attributes
-        * and have support for UpTime.
-        */
+         * Enforcing UpTime to always be added here because it is a mandatory attribute for
+         * revision 2 and beyond, but is left as optional in the XML for now for backwards
+         * compatibility. This allows us to still use the code generated mandatory attributes
+         * and have support for UpTime.
+         */
         { true, GeneralDiagnostics::Attributes::UpTime::kMetadataEntry },
     };
 
