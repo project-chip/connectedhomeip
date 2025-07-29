@@ -19,6 +19,8 @@
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
+#import "MTRMetricKeys.h"
+#import "MTRMetricsCollector.h"
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
 #import "NSStringSpanConversion.h"
 
@@ -28,6 +30,7 @@
 using namespace chip;
 using namespace chip::bdx;
 using namespace chip::app;
+using namespace chip::Tracing::DarwinFramework;
 
 constexpr uint16_t kMaxBdxBlockSize = 1024;
 
@@ -199,6 +202,13 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
     auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mPeer.GetFabricIndex()];
     VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
+    auto nodeId = @(mPeer.GetNodeId());
+
+    mNumBytesProcessed = 0;
+
+    MATTER_LOG_METRIC_BEGIN(kMetricOTATransfer);
+    MATTER_LOG_METRIC(kMetricOTATransferOffset, uint32_t(mTransfer.GetStartOffset()));
+
     MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
 
     auto completionHandler = ^(NSError * _Nullable error) {
@@ -237,8 +247,6 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
                               // should already have been destroyed anyway.
                           }];
     };
-
-    auto nodeId = @(mPeer.GetNodeId());
 
     auto strongDelegate = mDelegate;
     auto delegateQueue = mDelegateNotificationQueue;
@@ -283,6 +291,18 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
         LogErrorOnFailure(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
+
+    auto * device = [MTRDevice deviceWithNodeID:nodeId controller:controller];
+
+    MATTER_LOG_METRIC(kMetricOTADeviceVendorID, device.vendorID.unsignedIntValue);
+    MATTER_LOG_METRIC(kMetricOTADeviceProductID, device.productID.unsignedIntValue);
+    MATTER_LOG_METRIC(kMetricOTADeviceUsesThread, mIsPeerNodeAKnownThreadDevice);
+    MATTER_LOG_METRIC(kMetricOTATNumBytesProcessed, uint32_t(mNumBytesProcessed));
+    MATTER_LOG_METRIC_END(kMetricOTATransfer, error);
+
+    // Always collect the metrics to avoid unbounded growth of the stats in the collector
+    MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCategory:@("ota") removeMetrics:YES];
+    [device otaTransferComplete:metrics];
 
     auto nsError = [MTRError errorForCHIPErrorCode:error];
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
@@ -330,6 +350,9 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
     MTROTAImageTransferHandlerWrapper * __weak weakWrapper = mOTAImageTransferHandlerWrapper;
 
     auto respondWithBlock = ^(NSData * _Nullable data, BOOL isEOF) {
+        if (data) {
+            mNumBytesProcessed += data.length;
+        }
         [controller
             asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
