@@ -16,12 +16,12 @@
 #
 
 import socket
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from ipaddress import IPv6Address
 from typing import Optional, Union
-from dataclasses import dataclass, field
 
 from zeroconf._utils.ipaddress import ZeroconfIPv6Address
+
 from .json_serializable import JsonSerializable
 
 

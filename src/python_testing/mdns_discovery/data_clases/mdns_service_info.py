@@ -16,8 +16,10 @@
 #
 
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional
+
 from zeroconf.asyncio import AsyncServiceInfo
+
 from .json_serializable import JsonSerializable
 
 

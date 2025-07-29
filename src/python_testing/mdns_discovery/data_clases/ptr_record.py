@@ -16,6 +16,7 @@
 #
 
 from dataclasses import dataclass, field
+
 from .json_serializable import JsonSerializable
 
 
