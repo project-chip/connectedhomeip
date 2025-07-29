@@ -18,8 +18,9 @@
 # requires-python = ">=3.10"
 # dependencies = [
 #     "click",
-#     "cxxfilt",
 #     "coloredlogs",
+#     "cxxfilt",
+#     "plotly",
 #     "tabulate",
 # ]
 # ///
@@ -46,11 +47,13 @@ import sys
 from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
+from typing import List
 
 import click
 import coloredlogs
 import cxxfilt
 import tabulate
+import plotly.graph_objects as go
 
 
 @dataclass
@@ -71,13 +74,15 @@ __LOG_LEVELS__ = {
 
 
 class OutputType(Enum):
-    TABLE = (auto(),)
-    CSV = (auto(),)
+    TABLE = auto()
+    CSV = auto()
+    SANKEY = auto()
 
 
 __OUTPUT_TYPES__ = {
     "table": OutputType.TABLE,
     "csv": OutputType.CSV,
+    "sankey": OutputType.SANKEY,
 }
 
 
@@ -115,6 +120,87 @@ def default_cols():
         return 120
 
 
+@dataclass
+class SankeyLink:
+    source_index: int
+    target_index: int
+    value: int
+
+
+class SankeyData:
+    """Gathers sankey data: keeps track of labels and indices that correspond to them."""
+
+    def __init__(self):
+        self.labels = []
+        self.colors = []
+        self.links = []
+
+    def add_node(self, label: str, color: str = 'blue') -> int:
+        self.labels.append(label)
+        self.colors.append(color)
+        return len(self.labels) - 1
+
+    def add_link(self, source: int, target: int, value: int):
+        self.links.append(
+            SankeyLink(
+                source_index=source,
+                target_index=target,
+                value=value,
+            )
+        )
+
+    def get_sankey(self):
+        source = []
+        target = []
+        value = []
+
+        for link in self.links:
+            source.append(link.source_index)
+            target.append(link.target_index)
+            value.append(link.value)
+
+        return go.Sankey(
+            node=dict(
+                pad=15,
+                thickness=20,
+                line=dict(color="black", width=0.5),
+                label=self.labels,
+                color=self.colors,
+            ),
+            link=dict(
+                source = source,
+                target = target,
+                value = value,
+            ),
+        )
+
+
+def sankey_diagram(input_list: List):
+    """
+    Generates a sanekey diagram based on the input list. The input list is expected
+    to contain values of (change_type, delta, name, size_in_1, size_in_2)
+    """
+
+    data = SankeyData()
+
+    inc_idx = data.add_node("INCREASE", color="red")
+    dec_idx = data.add_node("DECREASE", color="green")
+
+    # TODO: intermediate layer
+    for entry in input_list:
+        delta = entry[1]
+        name = entry[2]
+        idx = data.add_node(name)
+        if delta > 0:
+            data.add_link(idx, inc_idx, delta)
+        else:
+            data.add_link(idx, dec_idx, -delta)
+
+    fig = go.Figure(data=[data.get_sankey()])
+    fig.update_layout(title_text="Basic Sankey Diagram", font_size=10)
+    fig.show()
+
+
 @click.command()
 @click.option(
     "--log-level",
@@ -134,13 +220,13 @@ def default_cols():
     "--skip-total",
     default=False,
     is_flag=True,
-    help="Skip the output of a TOTAL line (i.e. a sum of all size deltas)"
+    help="Skip the output of a TOTAL line (i.e. a sum of all size deltas)",
 )
 @click.option(
     "--no-demangle",
     default=False,
     is_flag=True,
-    help="Skip CXX demangling. Note that this will not deduplicate inline method instantiations."
+    help="Skip CXX demangling. Note that this will not deduplicate inline method instantiations.",
 )
 @click.option(
     "--style",
@@ -212,20 +298,23 @@ def main(
         delta.append([change, s1 - s2, name, s1, s2])
         total += s1 - s2
 
-    delta.sort(key=lambda x: x[1])
-    if not skip_total:
-        delta.append(["TOTAL", total, "", total1, total2])
-
-    HEADER = ["Type", "Size", "Function", "Size1", "Size2"]
-
-    if output_type == OutputType.TABLE:
-        print(tabulate.tabulate(delta, headers=HEADER, tablefmt=style))
-    elif output_type == OutputType.CSV:
-        writer = csv.writer(sys.stdout)
-        writer.writerow(HEADER)
-        writer.writerows(delta)
+    if output_type == OutputType.SANKEY:
+        sankey_diagram(delta)
     else:
-        raise Exception("Unknown output type: %r" % output)
+        delta.sort(key=lambda x: x[1])
+        if not skip_total:
+            delta.append(["TOTAL", total, "", total1, total2])
+
+        HEADER = ["Type", "Size", "Function", "Size1", "Size2"]
+
+        if output_type == OutputType.TABLE:
+            print(tabulate.tabulate(delta, headers=HEADER, tablefmt=style))
+        elif output_type == OutputType.CSV:
+            writer = csv.writer(sys.stdout)
+            writer.writerow(HEADER)
+            writer.writerows(delta)
+        else:
+            raise Exception("Unknown output type: %r" % output)
 
 
 if __name__ == "__main__":
