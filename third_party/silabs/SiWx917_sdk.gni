@@ -276,7 +276,7 @@ template("siwx917_sdk") {
         "SI917Y_DEVKIT=1",
       ]
     }
- 
+
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {

@@ -106,7 +106,7 @@ si917_wifi_boards = [
   "BRD2708A",
   "BRD2911A",
 ]
- 
+
 # Check if silabs_board is a Si917 board
 is_si917_board = false
 foreach(board, si917_wifi_boards) {
@@ -114,14 +114,14 @@ foreach(board, si917_wifi_boards) {
     is_si917_board = true
   }
 }
- 
+
 if (is_si917_board) {
   if (silabs_board == "BRD2605A") {
     sl_enable_rgb_led = true
   }
   silabs_family = "SiWx917-common"
   wifi_soc = true
- 
+
   if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
     is_si917y_mcu = true
     silabs_mcu = "SIWG917Y111MGABA"
