@@ -18,7 +18,13 @@ namespace ProxyConfiguration {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+
+};
+
+} // namespace Attributes
 
 namespace Commands {} // namespace Commands
 

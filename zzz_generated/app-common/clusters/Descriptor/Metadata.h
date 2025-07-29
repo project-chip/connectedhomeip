@@ -49,6 +49,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(EndpointUniqueID::Id, 
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace EndpointUniqueID
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    DeviceTypeList::kMetadataEntry,
+    ServerList::kMetadataEntry,
+    ClientList::kMetadataEntry,
+    PartsList::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

@@ -18,7 +18,13 @@ namespace AccountLogin {
 
 inline constexpr uint32_t kRevision = 2;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+
+};
+
+} // namespace Attributes
 
 namespace Commands {
 namespace GetSetupPIN {

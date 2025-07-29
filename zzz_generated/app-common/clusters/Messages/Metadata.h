@@ -31,6 +31,11 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ActiveMessageIDs
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    Messages::kMetadataEntry,
+    ActiveMessageIDs::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

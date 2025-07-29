@@ -110,6 +110,26 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultRandomizationTy
                                                           std::nullopt);
 } // namespace DefaultRandomizationType
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    TariffInfo::kMetadataEntry,
+    TariffUnit::kMetadataEntry,
+    StartDate::kMetadataEntry,
+    DayEntries::kMetadataEntry,
+    DayPatterns::kMetadataEntry,
+    CalendarPeriods::kMetadataEntry,
+    IndividualDays::kMetadataEntry,
+    CurrentDay::kMetadataEntry,
+    NextDay::kMetadataEntry,
+    CurrentDayEntry::kMetadataEntry,
+    CurrentDayEntryDate::kMetadataEntry,
+    NextDayEntry::kMetadataEntry,
+    NextDayEntryDate::kMetadataEntry,
+    TariffComponents::kMetadataEntry,
+    TariffPeriods::kMetadataEntry,
+    CurrentTariffComponents::kMetadataEntry,
+    NextTariffComponents::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

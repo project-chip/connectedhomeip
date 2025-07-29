@@ -25,6 +25,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace Sources
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    Sources::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

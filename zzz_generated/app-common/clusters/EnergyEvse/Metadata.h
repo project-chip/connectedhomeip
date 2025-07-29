@@ -115,6 +115,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SessionEnergyDischarge
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SessionEnergyDischarged
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    State::kMetadataEntry,
+    SupplyState::kMetadataEntry,
+    FaultState::kMetadataEntry,
+    ChargingEnabledUntil::kMetadataEntry,
+    CircuitCapacity::kMetadataEntry,
+    MinimumChargeCurrent::kMetadataEntry,
+    MaximumChargeCurrent::kMetadataEntry,
+    SessionID::kMetadataEntry,
+    SessionDuration::kMetadataEntry,
+    SessionEnergyCharged::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

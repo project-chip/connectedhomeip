@@ -25,6 +25,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategor
                                                           std::nullopt);
 } // namespace SupportedDeviceCategories
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    SupportedDeviceCategories::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

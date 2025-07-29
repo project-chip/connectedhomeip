@@ -68,6 +68,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AirflowDirection::Id, 
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace AirflowDirection
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    FanMode::kMetadataEntry,
+    FanModeSequence::kMetadataEntry,
+    PercentSetting::kMetadataEntry,
+    PercentCurrent::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

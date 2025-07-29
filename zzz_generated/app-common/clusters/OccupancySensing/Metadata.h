@@ -86,6 +86,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalContactUnoccup
                                                           Access::Privilege::kManage);
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    Occupancy::kMetadataEntry,
+    OccupancySensorType::kMetadataEntry,
+    OccupancySensorTypeBitmap::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

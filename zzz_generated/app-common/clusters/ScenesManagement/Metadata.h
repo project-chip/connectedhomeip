@@ -30,6 +30,11 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace FabricSceneInfo
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    SceneTableSize::kMetadataEntry,
+    FabricSceneInfo::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

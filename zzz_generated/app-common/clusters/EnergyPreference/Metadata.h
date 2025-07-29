@@ -46,6 +46,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentLowPowerModeSen
                                                           Access::Privilege::kOperate);
 } // namespace CurrentLowPowerModeSensitivity
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

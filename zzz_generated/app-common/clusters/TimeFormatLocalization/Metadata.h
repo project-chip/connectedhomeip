@@ -34,6 +34,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedCalendarTypes
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    HourFormat::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

@@ -26,6 +26,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace CurrentSessions
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    CurrentSessions::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

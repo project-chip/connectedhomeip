@@ -202,6 +202,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StatusLightBrightness:
                                                           Access::Privilege::kManage, Access::Privilege::kManage);
 } // namespace StatusLightBrightness
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    MaxContentBufferSize::kMetadataEntry,
+    MaxNetworkBandwidth::kMetadataEntry,
+    SupportedStreamUsages::kMetadataEntry,
+    StreamUsagePriorities::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

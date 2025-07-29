@@ -35,6 +35,11 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ForecastConditions
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    LocalGenerationAvailable::kMetadataEntry,
+    CurrentConditions::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

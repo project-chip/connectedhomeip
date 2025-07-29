@@ -24,6 +24,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(FlipFlop::Id, BitFlags
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace FlipFlop
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    FlipFlop::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

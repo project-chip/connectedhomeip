@@ -39,6 +39,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedRinses
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

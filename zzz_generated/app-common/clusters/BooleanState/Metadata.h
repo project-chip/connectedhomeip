@@ -24,6 +24,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StateValue::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace StateValue
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    StateValue::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

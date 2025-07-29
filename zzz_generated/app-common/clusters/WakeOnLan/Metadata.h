@@ -28,6 +28,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LinkLocalAddress::Id, 
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LinkLocalAddress
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

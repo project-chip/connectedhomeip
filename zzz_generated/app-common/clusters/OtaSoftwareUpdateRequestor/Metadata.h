@@ -38,6 +38,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(UpdateStateProgress::I
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace UpdateStateProgress
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    DefaultOTAProviders::kMetadataEntry,
+    UpdatePossible::kMetadataEntry,
+    UpdateState::kMetadataEntry,
+    UpdateStateProgress::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

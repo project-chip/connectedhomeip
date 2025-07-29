@@ -290,6 +290,28 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Rloc16::Id, BitFlags<D
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Rloc16
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    Channel::kMetadataEntry,
+    RoutingRole::kMetadataEntry,
+    NetworkName::kMetadataEntry,
+    PanId::kMetadataEntry,
+    ExtendedPanId::kMetadataEntry,
+    MeshLocalPrefix::kMetadataEntry,
+    NeighborTable::kMetadataEntry,
+    RouteTable::kMetadataEntry,
+    PartitionId::kMetadataEntry,
+    Weighting::kMetadataEntry,
+    DataVersion::kMetadataEntry,
+    StableDataVersion::kMetadataEntry,
+    LeaderRouterId::kMetadataEntry,
+    SecurityPolicy::kMetadataEntry,
+    ChannelPage0Mask::kMetadataEntry,
+    OperationalDatasetComponents::kMetadataEntry,
+    ActiveNetworkFaultsList::kMetadataEntry,
+    ExtAddress::kMetadataEntry,
+    Rloc16::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

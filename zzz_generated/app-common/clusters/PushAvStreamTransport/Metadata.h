@@ -32,6 +32,11 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace CurrentConnections
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    SupportedFormats::kMetadataEntry,
+    CurrentConnections::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

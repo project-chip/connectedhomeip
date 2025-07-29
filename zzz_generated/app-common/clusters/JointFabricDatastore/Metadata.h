@@ -89,6 +89,23 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace NodeEndpointList
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    AnchorRootCA::kMetadataEntry,
+    AnchorNodeID::kMetadataEntry,
+    AnchorVendorID::kMetadataEntry,
+    FriendlyName::kMetadataEntry,
+    GroupKeySetList::kMetadataEntry,
+    GroupList::kMetadataEntry,
+    NodeList::kMetadataEntry,
+    AdminList::kMetadataEntry,
+    Status::kMetadataEntry,
+    EndpointGroupIDList::kMetadataEntry,
+    EndpointBindingList::kMetadataEntry,
+    NodeKeySetList::kMetadataEntry,
+    NodeACLList::kMetadataEntry,
+    NodeEndpointList::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

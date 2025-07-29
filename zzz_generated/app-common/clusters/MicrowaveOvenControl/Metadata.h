@@ -57,6 +57,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(WattRating::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace WattRating
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    CookTime::kMetadataEntry,
+    MaxCookTime::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

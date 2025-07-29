@@ -68,6 +68,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace AvailableTextTracks
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    CurrentState::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

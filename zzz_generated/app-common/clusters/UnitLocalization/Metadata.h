@@ -30,6 +30,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedTemperatureUnits
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
