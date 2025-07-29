@@ -204,11 +204,6 @@ class TC_SC_4_3(MatterBaseTest):
             return False
 
     @staticmethod
-    def extract_ipv6_address(text):
-        items = text.split(',')
-        return items[-1]
-
-    @staticmethod
     def verify_hostname(hostname: str) -> bool:
         # Remove any trailing dot
         if hostname.endswith('.'):
