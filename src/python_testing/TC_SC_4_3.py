@@ -70,6 +70,7 @@ MAX_SAT_VALUE = 65535
 MAX_T_VALUE = 6
 DISCOVERY_TIMEOUT_SEC = 30
 
+
 class TC_SC_4_3(MatterBaseTest):
 
     def steps_TC_SC_4_3(self):

@@ -28,9 +28,9 @@ _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
 
 class MdnsAsyncServiceInfo(ServiceInfo):
     def __init__(self,
-                 name: str | None = None, # Fully qualified service name
-                 type_: str | None = None, # Fully qualified service type name
-                 server: str | None = None # Fully qualified name for service host (defaults to name)
+                 name: str | None = None,  # Fully qualified service name
+                 type_: str | None = None,  # Fully qualified service type name
+                 server: str | None = None  # Fully qualified name for service host (defaults to name)
                  ) -> None:
 
         # For AAAA address resolution, only server (hostname)
