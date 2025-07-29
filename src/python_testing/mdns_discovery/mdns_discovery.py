@@ -24,9 +24,9 @@ from typing import Dict, List, Optional
 from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
 from mdns_discovery.data_clases.ptr_record import PtrRecord
 from mdns_discovery.data_clases.quada_record import QuadaRecord
+from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from mdns_discovery.service_listeners.mdns_service_listener import MdnsServiceListener
-from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mdns_discovery.utils.net_utils import get_ipv6_addresses
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncZeroconf, AsyncZeroconfServiceTypes
