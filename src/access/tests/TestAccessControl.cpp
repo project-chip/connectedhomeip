@@ -2295,7 +2295,7 @@ TEST_F(TestAccessControl, TestBaseDelegateDefaultMethods)
     size_t v = 999;
     EXPECT_EQ(d.GetMaxEntriesPerFabric(v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
-    v = 999; // reset for 
+    v = 999;
     EXPECT_EQ(d.GetMaxSubjectsPerEntry(v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
     v = 999;
@@ -2307,7 +2307,7 @@ TEST_F(TestAccessControl, TestBaseDelegateDefaultMethods)
 
     // Actualities
     FabricIndex fabric = 1;
-    size_t v = 999;
+    v = 999;
     EXPECT_EQ(d.GetEntryCount(fabric, v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
     v = 999;
