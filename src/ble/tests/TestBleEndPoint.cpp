@@ -65,9 +65,7 @@ public:
         ResetCounters();
     }
     void TearDown() override
-    {
-        mBleLayer.Shutdown();
-    }
+    { mBleLayer.Shutdown(); }
 
     BLEEndPoint * CreateCentralEndPoint()
     {
