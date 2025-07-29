@@ -2195,5 +2195,97 @@ TEST_F(TestAccessControl, TestUpdateEntry)
     }
 }
 
+TEST_F(TestAccessControl, TestCreateUpdateDeleteWithListener)
+{
+    //------------------------------------------------------------------
+    // Fresh state + listener registration
+    //------------------------------------------------------------------
+    ASSERT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
+
+    struct CountingListener : public AccessControl::EntryListener
+    {
+        void OnEntryChanged(const SubjectDescriptor *, FabricIndex, size_t, const Entry *, ChangeType type) override
+        {
+            switch (type)
+            {
+            case ChangeType::kAdded:
+                adds++;
+                break;
+            case ChangeType::kUpdated:
+                updates++;
+                break;
+            case ChangeType::kRemoved:
+                removes++;
+                break;
+            }
+        }
+        int adds    = 0;
+        int updates = 0;
+        int removes = 0;
+    } listener;
+
+    accessControl.AddEntryListener(listener);
+
+    //------------------------------------------------------------------
+    // Build a valid entry
+    //------------------------------------------------------------------
+    Entry entry;
+    ASSERT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetPrivilege(Privilege::kOperate), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.AddSubject(nullptr, kOperationalNodeId0), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.AddTarget(nullptr, Target{ Target::kCluster, kOnOffCluster, 0, 0 }), CHIP_NO_ERROR);
+
+    SubjectDescriptor sd{ .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId0 };
+
+    //------------------------------------------------------------------
+    // ❸ CreateEntry (subject‑aware overload)
+    //------------------------------------------------------------------
+    size_t idx = ~0u;
+    ASSERT_EQ(accessControl.CreateEntry(&sd, /*fabric=*/1, &idx, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(idx, 0u);
+    EXPECT_EQ(listener.adds, 1);
+    EXPECT_EQ(listener.updates, 0);
+    EXPECT_EQ(listener.removes, 0);
+
+    //------------------------------------------------------------------
+    // UpdateEntry
+    //------------------------------------------------------------------
+    ASSERT_EQ(entry.SetPrivilege(Privilege::kManage), CHIP_NO_ERROR);
+    ASSERT_EQ(accessControl.UpdateEntry(&sd, /*fabric=*/1, idx, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(listener.adds, 1);
+    EXPECT_EQ(listener.updates, 1);
+    EXPECT_EQ(listener.removes, 0);
+
+    //------------------------------------------------------------------
+    // DeleteEntry  (listener still registered)
+    //------------------------------------------------------------------
+    ASSERT_EQ(accessControl.DeleteEntry(&sd, /*fabric=*/1, idx), CHIP_NO_ERROR);
+    EXPECT_EQ(listener.adds, 1);
+    EXPECT_EQ(listener.updates, 1);
+    EXPECT_EQ(listener.removes, 1);
+
+    //------------------------------------------------------------------
+    // Listener removal — no more callbacks expected
+    //------------------------------------------------------------------
+    accessControl.RemoveEntryListener(listener);
+    ASSERT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetPrivilege(Privilege::kView), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.AddSubject(nullptr, kOperationalNodeId1), CHIP_NO_ERROR);
+    ASSERT_EQ(accessControl.CreateEntry(&sd, 1, nullptr, entry), CHIP_NO_ERROR);
+
+    EXPECT_EQ(listener.adds, 1);
+    EXPECT_EQ(listener.updates, 1);
+    EXPECT_EQ(listener.removes, 1);
+
+    //------------------------------------------------------------------
+    // Sanity‑check helper: IsAccessRestrictionListSupported()
+    //------------------------------------------------------------------
+    EXPECT_FALSE(accessControl.IsAccessRestrictionListSupported());
+}
+
 } // namespace Access
 } // namespace chip
