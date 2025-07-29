@@ -116,6 +116,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SafetyStatus::Id, BitF
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SafetyStatus
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    Type::kMetadataEntry,           ConfigStatus::kMetadataEntry, OperationalStatus::kMetadataEntry,
+    EndProductType::kMetadataEntry, Mode::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

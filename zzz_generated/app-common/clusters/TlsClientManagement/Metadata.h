@@ -30,6 +30,11 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedEndpoints
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    MaxProvisioned::kMetadataEntry,
+    ProvisionedEndpoints::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

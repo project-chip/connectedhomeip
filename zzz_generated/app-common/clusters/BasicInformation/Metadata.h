@@ -116,6 +116,25 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    DataModelRevision::kMetadataEntry,
+    VendorName::kMetadataEntry,
+    VendorID::kMetadataEntry,
+    ProductName::kMetadataEntry,
+    ProductID::kMetadataEntry,
+    NodeLabel::kMetadataEntry,
+    Location::kMetadataEntry,
+    HardwareVersion::kMetadataEntry,
+    HardwareVersionString::kMetadataEntry,
+    SoftwareVersion::kMetadataEntry,
+    SoftwareVersionString::kMetadataEntry,
+    UniqueID::kMetadataEntry,
+    CapabilityMinima::kMetadataEntry,
+    SpecificationVersion::kMetadataEntry,
+    MaxPathsPerInvoke::kMetadataEntry,
+    ConfigurationVersion::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

@@ -50,6 +50,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TwoDCartesianMax::Id, 
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TwoDCartesianMax
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    MaxZones::kMetadataEntry,
+    Zones::kMetadataEntry,
+    Triggers::kMetadataEntry,
+    SensitivityMax::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

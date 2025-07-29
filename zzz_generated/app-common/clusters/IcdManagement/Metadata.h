@@ -65,6 +65,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumCheckInBackOff:
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaximumCheckInBackOff
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    IdleModeDuration::kMetadataEntry,
+    ActiveModeDuration::kMetadataEntry,
+    ActiveModeThreshold::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

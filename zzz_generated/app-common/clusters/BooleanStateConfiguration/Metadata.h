@@ -53,6 +53,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SensorFault::Id, BitFl
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SensorFault
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+
+};
+
 } // namespace Attributes
 
 namespace Commands {

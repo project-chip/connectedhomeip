@@ -40,6 +40,13 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedClientCertificates
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    MaxRootCertificates::kMetadataEntry,
+    ProvisionedRootCertificates::kMetadataEntry,
+    MaxClientCertificates::kMetadataEntry,
+    ProvisionedClientCertificates::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

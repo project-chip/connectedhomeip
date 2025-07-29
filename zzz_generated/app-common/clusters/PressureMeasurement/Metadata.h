@@ -56,6 +56,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Scale::Id, BitFlags<Da
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Scale
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    MeasuredValue::kMetadataEntry,
+    MinMeasuredValue::kMetadataEntry,
+    MaxMeasuredValue::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

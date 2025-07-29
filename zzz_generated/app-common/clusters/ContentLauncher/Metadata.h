@@ -30,6 +30,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedStreamingProt
                                                           std::nullopt);
 } // namespace SupportedStreamingProtocols
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+
+};
+
 } // namespace Attributes
 
 namespace Commands {

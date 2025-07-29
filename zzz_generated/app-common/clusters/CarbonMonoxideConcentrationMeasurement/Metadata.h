@@ -65,6 +65,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelValue::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LevelValue
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    MeasurementMedium::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

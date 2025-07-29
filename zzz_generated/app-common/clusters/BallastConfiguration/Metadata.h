@@ -76,6 +76,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LampBurnHoursTripPoint
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace LampBurnHoursTripPoint
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    PhysicalMinLevel::kMetadataEntry, PhysicalMaxLevel::kMetadataEntry, MinLevel::kMetadataEntry,
+    MaxLevel::kMetadataEntry,         LampQuantity::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

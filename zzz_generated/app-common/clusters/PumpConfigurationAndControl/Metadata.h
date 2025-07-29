@@ -112,6 +112,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ControlMode::Id, BitFl
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace ControlMode
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    MaxPressure::kMetadataEntry,
+    MaxSpeed::kMetadataEntry,
+    MaxFlow::kMetadataEntry,
+    EffectiveOperationMode::kMetadataEntry,
+    EffectiveControlMode::kMetadataEntry,
+    Capacity::kMetadataEntry,
+    OperationMode::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

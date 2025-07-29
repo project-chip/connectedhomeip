@@ -72,6 +72,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OverrunCount::Id, BitF
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OverrunCount
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    Bssid::kMetadataEntry,         SecurityType::kMetadataEntry, WiFiVersion::kMetadataEntry,
+    ChannelNumber::kMetadataEntry, Rssi::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

@@ -53,6 +53,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OptOutState::Id, BitFl
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OptOutState
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    ESAType::kMetadataEntry,     ESACanGenerate::kMetadataEntry, ESAState::kMetadataEntry,
+    AbsMinPower::kMetadataEntry, AbsMaxPower::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

@@ -25,6 +25,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace Binding
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    Binding::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands

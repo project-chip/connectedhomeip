@@ -40,6 +40,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpOnOff::Id, BitF
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace StartUpOnOff
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    OnOff::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

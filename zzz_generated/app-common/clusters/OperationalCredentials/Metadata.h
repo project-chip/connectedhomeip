@@ -48,6 +48,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentFabricIndex::Id
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentFabricIndex
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    NOCs::kMetadataEntry,
+    Fabrics::kMetadataEntry,
+    SupportedFabrics::kMetadataEntry,
+    CommissionedFabrics::kMetadataEntry,
+    TrustedRootCertificates::kMetadataEntry,
+    CurrentFabricIndex::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {
