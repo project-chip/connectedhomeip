@@ -186,8 +186,8 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-camera-ipv6only \
     --target linux-x64-camera-controller-ipv6only \
     --target linux-x64-closure-ipv6only \
-    --target linux-x64-jf-control-ipv6only \
-    --target linux-x64-jf-admin-ipv6only \
+    --target linux-x64-jf-control-app-ipv6only \
+    --target linux-x64-jf-admin-app-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
