@@ -30,19 +30,9 @@ class TestStringBuilder
     StringBuilder<N> builder;
 
 public:
-    TestStringBuilder() {}
-
-    TestStringBuilder(const char * data, size_t size, bool add_marker_if_overflow = true) :
-        builder(data, size, add_marker_if_overflow)
+    template <typename... Args>
+    TestStringBuilder(Args &&... args) : builder(std::forward<Args>(args)...)
     {}
-
-    TestStringBuilder(const CharSpan & span, bool add_marker_if_overflow = true) : builder(span, add_marker_if_overflow) {}
-
-    TestStringBuilder(const uint8_t * data, size_t size, bool add_marker_if_overflow = true) :
-        builder(data, size, add_marker_if_overflow)
-    {}
-
-    TestStringBuilder(const ByteSpan & span, bool add_marker_if_overflow = true) : builder(span, add_marker_if_overflow) {}
 
     template <typename F>
     void Check(F check)
