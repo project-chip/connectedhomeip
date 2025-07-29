@@ -21,13 +21,20 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${OTA_REQUESTOR_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --passcode 20202021
+#       --secured-device-port 5541
+#       --KVS /tmp/chip_kvs_requestor
+#       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --vendor-id 65521
+#       --product-id 32769
 #       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -114,18 +121,14 @@ class TC_SU_4_1(MatterBaseTest):
         # ------------------------------------------------------------------------------------
         # Manual Setup
         # ------------------------------------------------------------------------------------
-        # 1. Launch OTA Provider (TH2) from Terminal 1:
-        #     ./out/debug/chip-ota-provider-app --filepath firmware_v2.ota
-        # 2. Manually commission the OTA Provider using Node ID 1 (Terminal 2):
-        #     ./out/chip-tool/chip-tool pairing onnetwork 1 20202021
-        # 3. Launch OTA Requestor (TH1 / DUT) from Terminal 3:
+        # 1. Launch OTA Requestor (TH1 / DUT) from Terminal 3:
         #     ./out/debug/chip-ota-requestor-app \
         #         --discriminator 1234 \
         #         --passcode 20202021 \
         #         --secured-device-port 5541 \
         #         --autoApplyImage \
         #         --KVS /tmp/chip_kvs_requestor
-        # 4. Run Python test with commission Provisioner/Requestor (Terminal 2):
+        # 2. Run Python test with commission Provisioner/Requestor (Terminal 2):
         #     python3 src/python_testing/TC_SU_4_1.py \
         #         --commissioning-method on-network \
         #         --discriminator 1234 \
