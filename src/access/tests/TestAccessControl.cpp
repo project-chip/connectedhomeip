@@ -2240,7 +2240,7 @@ TEST_F(TestAccessControl, TestCreateUpdateDeleteWithListener)
     SubjectDescriptor sd{ .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId0 };
 
     //------------------------------------------------------------------
-    // ❸ CreateEntry (subject‑aware overload)
+    // CreateEntry (subject‑aware overload)
     //------------------------------------------------------------------
     size_t idx = ~0u;
     ASSERT_EQ(accessControl.CreateEntry(&sd, /*fabric=*/1, &idx, entry), CHIP_NO_ERROR);
@@ -2285,6 +2285,49 @@ TEST_F(TestAccessControl, TestCreateUpdateDeleteWithListener)
     // Sanity‑check helper: IsAccessRestrictionListSupported()
     //------------------------------------------------------------------
     EXPECT_FALSE(accessControl.IsAccessRestrictionListSupported());
+}
+
+TEST_F(TestAccessControl, TestBaseDelegateDefaultMethods)
+{
+    AccessControl::Delegate d;
+
+    // Capabilities
+    size_t v = 999;
+    EXPECT_EQ(d.GetMaxEntriesPerFabric(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+    EXPECT_EQ(d.GetMaxSubjectsPerEntry(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+    EXPECT_EQ(d.GetMaxTargetsPerEntry(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+    EXPECT_EQ(d.GetMaxEntryCount(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+
+    // Actualities
+    FabricIndex fabric = 1;
+    EXPECT_EQ(d.GetEntryCount(fabric, v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+    EXPECT_EQ(d.GetEntryCount(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+
+    // Preparation
+    Entry e;
+    EXPECT_EQ(d.PrepareEntry(e), CHIP_NO_ERROR);
+
+    // CRUD (defaults just return CHIP_NO_ERROR)
+    size_t idx = 123;
+    EXPECT_EQ(d.CreateEntry(&idx, e, &fabric), CHIP_NO_ERROR);
+    EXPECT_EQ(d.ReadEntry(0, e, &fabric), CHIP_NO_ERROR);
+    EXPECT_EQ(d.UpdateEntry(0, e, &fabric), CHIP_NO_ERROR);
+    EXPECT_EQ(d.DeleteEntry(0, &fabric), CHIP_NO_ERROR);
+
+    // Iteration
+    EntryIterator it;
+    EXPECT_EQ(d.Entries(it, &fabric), CHIP_NO_ERROR);
+
+    // Check (default returns ACCESS_DENIED)
+    SubjectDescriptor sd{};
+    RequestPath rp{ .cluster = 1, .endpoint = 1 };
+    EXPECT_EQ(d.Check(sd, rp, Privilege::kView), CHIP_ERROR_ACCESS_DENIED);
 }
 
 } // namespace Access
