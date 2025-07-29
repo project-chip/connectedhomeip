@@ -336,9 +336,11 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
     };
 
     /*
-    Not using the code generated mandatory attributes here, and instead manually making this array because from revision 2
-    onwards, the UpTime attribute is mandatory, but it's currently left as optional in the XML for backwards compatibility
-    */
+     * Not using the code generated mandatory attributes here, and instead manually
+     * making this array because from revision 2 onwards, the UpTime attribute is
+     * mandatory, but it's currently left as optional in the XML for backwards
+     * compatibility.
+     */
     return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
 }
 
