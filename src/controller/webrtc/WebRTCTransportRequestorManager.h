@@ -29,6 +29,8 @@ using OnAnswerCallback        = int (*)(uint16_t, const char *);
 using OnICECandidatesCallback = int (*)(uint16_t, const char **, const int);
 using OnEndCallback           = int (*)(uint16_t, uint8_t);
 
+constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
+
 class WebRTCTransportRequestorManager : public chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate
 {
 public:

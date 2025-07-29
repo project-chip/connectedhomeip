@@ -20,7 +20,7 @@
 
 #include "WebRTCTransportRequestorManager.h"
 #include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
-#include <controller/access_control/AccessControl.h>
+#include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -43,7 +43,7 @@ using namespace chip::python;
 
 void WebRTCTransportRequestorManager::Init()
 {
-    Controller::AccessControl::InitAccessControl();
+    Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
 
     mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());

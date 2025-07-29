@@ -20,8 +20,8 @@ import("${chip_root}/src/app/common_flags.gni")
 
 static_library("access_control") {
   sources = [
-    "AccessControl.cpp",
-    "AccessControl.h",
+    "WebRTCAccessControl.cpp",
+    "WebRTCAccessControl.h",
   ]
 
   public_deps = [

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "AccessControl.h"
+#include "WebRTCAccessControl.h"
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -44,14 +44,17 @@ public:
 
 class AccessControlDelegate : public Access::AccessControl::Delegate
 {
+public:
+    void SetWebRTCEndpointId(EndpointId endpointId) { mWebRtcEndpointId = endpointId; }
+
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
         // Check for WebRTC Transport Requestor endpoint and cluster
         bool isWebRtcTransportRequestor =
-            (requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
+            (requestPath.endpoint == mWebRtcEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
 
-        // If the request is not from WebRTC Transport Requestor, deny access
+        // If the request is not for WebRTC Transport Requestor, deny access
         if (!isWebRtcTransportRequestor)
         {
             return CHIP_ERROR_ACCESS_DENIED;
@@ -64,16 +67,11 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        // Allow CASE, PASE, and internal device access
-        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase &&
-            subjectDescriptor.authMode != AuthMode::kInternalDeviceAccess)
-        {
-            ChipLogError(AppServer, "Unsupported auth mode for WebRTC: %u", static_cast<uint8_t>(subjectDescriptor.authMode));
-            return CHIP_ERROR_ACCESS_DENIED;
-        }
-
         return CHIP_NO_ERROR;
     }
+
+private:
+    EndpointId mWebRtcEndpointId = kInvalidEndpointId;
 };
 
 struct ControllerAccessControl
@@ -82,16 +80,16 @@ struct ControllerAccessControl
     AccessControlDelegate mDelegate;
     bool mInitialized = false;
 
-    // Remove constructor initialization
     ControllerAccessControl() = default;
 
-    // Add explicit Init method
-    CHIP_ERROR Init()
+    CHIP_ERROR Init(EndpointId endpointId)
     {
         if (mInitialized)
         {
             return CHIP_NO_ERROR;
         }
+
+        mDelegate.SetWebRTCEndpointId(endpointId);
 
         CHIP_ERROR err = GetAccessControl().Init(&mDelegate, mDeviceTypeResolver);
         if (err == CHIP_NO_ERROR)
@@ -110,16 +108,16 @@ namespace chip {
 namespace Controller {
 namespace AccessControl {
 
-void InitAccessControl()
+void InitAccessControl(EndpointId endpointId)
 {
-    CHIP_ERROR err = gControllerAccessControl.get().Init();
+    CHIP_ERROR err = gControllerAccessControl.get().Init(endpointId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to initialize access control: %" CHIP_ERROR_FORMAT, err.Format());
     }
     else
     {
-        ChipLogProgress(AppServer, "Access control initialized successfully");
+        ChipLogProgress(AppServer, "Access control initialized successfully for endpoint %u", endpointId);
     }
 }
 

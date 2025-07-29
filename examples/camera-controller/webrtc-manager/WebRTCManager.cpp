@@ -19,7 +19,7 @@
 #include "WebRTCManager.h"
 
 #include <commands/interactive/InteractiveCommands.h>
-#include <controller/access_control/AccessControl.h>
+#include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
@@ -39,8 +39,9 @@ namespace {
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
 
-constexpr const char * kStreamGstDestIp    = "127.0.0.1";
-constexpr uint16_t kVideoStreamGstDestPort = 5000;
+constexpr const char * kStreamGstDestIp                      = "127.0.0.1";
+constexpr uint16_t kVideoStreamGstDestPort                   = 5000;
+constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
@@ -94,7 +95,7 @@ WebRTCManager::~WebRTCManager()
 
 void WebRTCManager::Init()
 {
-    Controller::AccessControl::InitAccessControl();
+    Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
 
     mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());

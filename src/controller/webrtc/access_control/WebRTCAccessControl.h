@@ -17,17 +17,17 @@
 
 #include <lib/core/DataModelTypes.h>
 
-constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
-
 namespace chip {
 namespace Controller {
 namespace AccessControl {
 
 /**
- * Initialize the access control module. Must be called on the Matter task
- * queue.
+ * Initialize the access control module with the specified WebRTC endpoint ID.
+ * Must be called on the Matter task queue.
+ *
+ * @param endpointId The endpoint ID where the WebRTC Transport Requestor cluster is hosted
  */
-void InitAccessControl();
+void InitAccessControl(chip::EndpointId endpointId);
 
 } // namespace AccessControl
 } // namespace Controller
