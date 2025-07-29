@@ -189,7 +189,7 @@ struct EmberAfAttributeMetadata
 
     /**
      * Check whether this attribute is readonly.
-     * Note: IsReadOnly is deprecated: Keeping it for backward compatiblity
+     * Note: IsReadOnly is deprecated: Keeping it for backward compatibility
      */
     bool IsReadOnly() const { return IsReadable() && !IsWritable(); }
 

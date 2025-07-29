@@ -421,7 +421,7 @@ class MatterIdlTransformer(Transformer):
     def attribute(self, qualities, definition_tuple):
         (definition, acl) = definition_tuple
 
-        # Since the Attribute is neither "readonly" nor "writeonly", it is Read/Write
+        # If the attribute is neither "readonly" nor "writeonly", then it must be Read/Write
         if AttributeQuality.READABLE not in qualities and AttributeQuality.WRITABLE not in qualities:
             qualities |= AttributeQuality.READABLE
             qualities |= AttributeQuality.WRITABLE
