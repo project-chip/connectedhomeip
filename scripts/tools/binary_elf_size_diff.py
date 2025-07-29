@@ -276,7 +276,7 @@ def name_transform(name: str) -> str:
     return name
 
 
-def sankey_diagram(input_list: List, sankey_rules: Optional[Any]):
+def sankey_diagram(input_list: List, sankey_rules: Optional[Any], skip_name_transform: bool):
     """
     Generates a sankey diagram based on the input list. The input list is expected
     to contain values of (change_type, delta, name, size_in_1, size_in_2)
@@ -320,7 +320,8 @@ def sankey_diagram(input_list: List, sankey_rules: Optional[Any]):
             target_index = r.add_towards(target_index, data, delta)
             break
 
-        name = name_transform(name)
+        if not skip_name_transform:
+            name = name_transform(name)
         idx = data.add_node(name, color)
         data.add_link(idx, target_index, delta)
 
@@ -355,6 +356,12 @@ def sankey_diagram(input_list: List, sankey_rules: Optional[Any]):
     help="Skip the output of a TOTAL line (i.e. a sum of all size deltas)",
 )
 @click.option(
+    "--skip-name-transform",
+    default=False,
+    is_flag=True,
+    help="Skip attempting to make function names shorter for easier viewing: this removes function arguments from display",
+)
+@click.option(
     "--no-demangle",
     default=False,
     is_flag=True,
@@ -387,6 +394,7 @@ def main(
     skip_total,
     no_demangle,
     sankey_rules,
+    skip_name_transform,
     style: str,
     name_truncate: int,
     f1: Path,
@@ -427,19 +435,23 @@ def main(
         else:
             change = "REMOVED"
 
-        if (
-            output_type == OutputType.TABLE
-            and name_truncate > 10
-            and len(name) > name_truncate
-        ):
-            name = name[: name_truncate - 4] + "..."
-
         delta.append([change, s1 - s2, name, s1, s2])
         total += s1 - s2
 
     if output_type == OutputType.SANKEY:
-        sankey_diagram(delta, sankey_rules)
+        sankey_diagram(delta, sankey_rules, skip_name_transform)
     else:
+        # post-process name transformations
+        for line in delta:
+            if not skip_name_transform:
+                line[2] = name_transform(line[2])
+            if (
+                output_type == OutputType.TABLE
+                and name_truncate > 10
+                and len(line[2]) > name_truncate
+            ):
+                line[2] = line[2][: name_truncate - 4] + "..."
+
         delta.sort(key=lambda x: x[1])
         if not skip_total:
             delta.append(["TOTAL", total, "", total1, total2])
