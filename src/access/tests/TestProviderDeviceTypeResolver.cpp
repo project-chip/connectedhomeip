@@ -33,6 +33,13 @@ namespace {
 constexpr EndpointId kTestEndpointRoot  = 1; // Example: could represent the main/root device
 constexpr EndpointId kTestEndpointLight = 2; // Example: could represent a lighting device
 
+// In real applications, DeviceTypeId could represent specific
+// device types like "Smart Bulb", "Thermostat", etc.
+constexpr DeviceTypeId kDeviceTypeId1 = 0x0000'0001;
+constexpr DeviceTypeId kDeviceTypeId2 = 0x0000'0002;
+constexpr DeviceTypeId kDeviceTypeId3 = 0x0000'0003;
+constexpr DeviceTypeId kDeviceTypeId4 = 0x0000'0004;
+
 class FakeProvider final : public Provider
 {
 public:
@@ -43,8 +50,8 @@ public:
         {
             // Hardcoded device types for endpoint 1
             constexpr DeviceTypeEntry types[] = {
-                { .deviceTypeId = 0x0000'0001, .deviceTypeRevision = 1 },
-                { .deviceTypeId = 0x0000'0002, .deviceTypeRevision = 1 },
+                { .deviceTypeId = kDeviceTypeId1, .deviceTypeRevision = 1 },
+                { .deviceTypeId = kDeviceTypeId2, .deviceTypeRevision = 1 },
             };
             return builder.AppendElements(chip::Span(types));
         }
@@ -52,7 +59,7 @@ public:
         {
             // Hardcoded device types for endpoint 2
             constexpr DeviceTypeEntry types[] = {
-                { .deviceTypeId = 0x0000'0003, .deviceTypeRevision = 1 },
+                { .deviceTypeId = kDeviceTypeId3, .deviceTypeRevision = 1 },
             };
             return builder.AppendElements(chip::Span(types));
         }
@@ -117,18 +124,18 @@ public:
 // is actually present on a given endpoint (for example, a particular room or appliance port).
 TEST_F(TestDeviceTypeResolver, PositiveMatches)
 {
-    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0001, kTestEndpointRoot));
-    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0002, kTestEndpointRoot));
-    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0003, kTestEndpointLight));
+    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(kDeviceTypeId1, kTestEndpointRoot));
+    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(kDeviceTypeId2, kTestEndpointRoot));
+    EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(kDeviceTypeId3, kTestEndpointLight));
 }
 
 // Checks that the system does not mistakenly identify a device type as present on an endpoint where it
 // doesn’t actually exist (for example, asking if a light switch is in the kitchen when it isn't).
 TEST_F(TestDeviceTypeResolver, NegativeMatches)
 {
-    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(0x0000'0004, kTestEndpointRoot));  // wrong device type
-    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(0x0000'0001, kTestEndpointLight)); // wrong endpoint
-    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(0x0000'0001, 99)); // unknown endpoint
+    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(kDeviceTypeId4, kTestEndpointRoot));  // wrong device type
+    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(kDeviceTypeId1, kTestEndpointLight)); // wrong endpoint
+    EXPECT_FALSE(resolver.IsDeviceTypeOnEndpoint(kDeviceTypeId1, 99));                 // unknown endpoint
 }
 
 } // namespace chip::Access
