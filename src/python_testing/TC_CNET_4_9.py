@@ -102,11 +102,12 @@ class TC_CNET_4_9(MatterBaseTest):
     def pics_TC_CNET_4_9(self):
         return ['CNET.S']
     
-    def validate_empty_wifi_parameters(value, name):
+    @staticmethod
+    def validate_empty_wifi_parameters(value: str, name: str) -> None:
         if not isinstance(value, str):
-            raise AssertionError(f"{name} is not a string")
+            raise TypeError(f"Expected a string for {name}, but got {type(value).__name__}")
         if not value.strip():
-            raise ValueError(f"The argument {name} is empty")
+            raise ValueError(f"The argument {name} must not be empty or contain only whitespace.")
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
