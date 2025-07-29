@@ -26,8 +26,7 @@ namespace {
 constexpr uint16_t kMinFrameRate        = 30;
 constexpr uint16_t kMaxFrameRate        = 120;
 constexpr uint32_t kDefaultBitRate      = 10000; // bits per second
-constexpr uint16_t kMinKeyFrameInterval = 1000;
-constexpr uint16_t kMaxKeyFrameInterval = 10000;
+constexpr uint16_t kKeyFrameInterval    = 4000;
 constexpr uint16_t kMinWidth            = 640;
 constexpr uint16_t kMinHeight           = 360;
 constexpr uint16_t kMaxWidth            = 1920;
@@ -69,8 +68,7 @@ CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId end
     mVideoStreamAllocate.minBitRate = kDefaultBitRate;
     mVideoStreamAllocate.maxBitRate = kDefaultBitRate;
 
-    mVideoStreamAllocate.minKeyFrameInterval = kMinKeyFrameInterval;
-    mVideoStreamAllocate.maxKeyFrameInterval = kMaxKeyFrameInterval;
+    mVideoStreamAllocate.keyFrameInterval = kKeyFrameInterval;
 
     mVideoStreamAllocate.watermarkEnabled.SetValue(false);
     mVideoStreamAllocate.OSDEnabled.SetValue(false);
