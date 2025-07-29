@@ -225,7 +225,7 @@ void SlWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 exit:
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
@@ -275,7 +275,7 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "StartNetworkScan failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "StartNetworkScan failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
