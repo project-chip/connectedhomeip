@@ -18,6 +18,7 @@
 import json
 from dataclasses import asdict
 
+
 class JsonSerializable:
     def json_dict(self) -> dict:
         raw = asdict(self)

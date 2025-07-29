@@ -20,6 +20,7 @@ from typing import Optional, List, Dict
 from zeroconf.asyncio import AsyncServiceInfo
 from .json_serializable import JsonSerializable
 
+
 @dataclass
 class MdnsServiceInfo(JsonSerializable):
     service_info: AsyncServiceInfo = field(repr=False, compare=False)
