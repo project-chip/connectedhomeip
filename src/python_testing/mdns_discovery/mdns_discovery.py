@@ -446,7 +446,7 @@ class MdnsDiscovery:
         self._discovered_services = {}
         aiobrowser = AsyncServiceBrowser(zeroconf=self._azc.zeroconf,
                                          type_=service_types,
-                                         handlers=[partial(self._on_service_state_change, unlock_service=False)]
+                                         handlers=[partial(self._on_service_state_change, query_service=False)]
                                          )
 
         try:
@@ -504,7 +504,7 @@ class MdnsDiscovery:
                            log_output: bool,
                            discovery_timeout_sec: float,
                            service_name: str = None,
-                           unlock_service: bool = True
+                           query_service: bool = True
                            ) -> Optional[MdnsServiceInfo]:
         """
         Asynchronously discovers a specific type of mDNS service within the network and returns its details.
@@ -514,7 +514,7 @@ class MdnsDiscovery:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
             service_name (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available.
-            unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
+            query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
@@ -526,7 +526,7 @@ class MdnsDiscovery:
         await self._discover(
             discovery_timeout_sec=discovery_timeout_sec,
             log_output=log_output,
-            unlock_service=unlock_service,
+            query_service=query_service,
         )
 
         if self._verbose_logging:
@@ -547,7 +547,7 @@ class MdnsDiscovery:
                         log_output: bool,
                         service_types: Optional[List[str]] = None,
                         all_services: bool = False,
-                        unlock_service: bool = True,
+                        query_service: bool = True,
                         ) -> None:
         """
         Asynchronously discovers network services using multicast DNS (mDNS).
@@ -558,7 +558,7 @@ class MdnsDiscovery:
             log_output (bool): If True, logs the discovered services to the console in JSON format for debugging or informational
                             purposes. Defaults to False.
             service_types (Optional[List[str]]): Specific service types to discover (e.g., ['_matterc._udp.local.']).
-            unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
+            query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
             all_services (bool): If True, discovers all available mDNS services. If False, discovers services based on the
                                 predefined `_service_types` list. Defaults to False.
 
@@ -587,15 +587,12 @@ class MdnsDiscovery:
 
         aiobrowser = AsyncServiceBrowser(zeroconf=self._azc.zeroconf,
                                          type_=self._service_types,
-                                         handlers=[partial(self._on_service_state_change, unlock_service=unlock_service)]
+                                         handlers=[partial(self._on_service_state_change, query_service=query_service)]
                                          )
         try:
             await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
         except TimeoutError:
-            if unlock_service:
-                logger.info("mDNS browse finished after %d seconds.", discovery_timeout_sec)
-            else:
-                logger.error("mDNS service discovery timed out after %d seconds.", discovery_timeout_sec)
+            logger.error("mDNS browse timed out after %d seconds.", discovery_timeout_sec)
         finally:
             self._event.set()
             await aiobrowser.async_cancel()
@@ -605,7 +602,7 @@ class MdnsDiscovery:
 
     def _on_service_state_change(
         self,
-        unlock_service: bool,
+        query_service: bool,
         zeroconf: Zeroconf,
         service_type: str,
         name: str,
@@ -618,7 +615,7 @@ class MdnsDiscovery:
         It handles the addition of new services by initiating a query for their detailed information.
 
         Args:
-            unlock_service (bool): If True, queries the service info for each of the discovered service names.
+            query_service (bool): If True, queries the service info for each of the discovered service names.
             zeroconf (Zeroconf): The Zeroconf instance managing the network operations.
             service_type (str): The service type of the mDNS service that changed state.
             name (str): The service name of the mDNS service.
@@ -641,7 +638,7 @@ class MdnsDiscovery:
         if self._verbose_logging:
             logger.info("Received service data. Unlocking service information")
 
-        if unlock_service:
+        if query_service:
             # Get service information
             ensure_future(self._query_service_info(
                 service_type,
