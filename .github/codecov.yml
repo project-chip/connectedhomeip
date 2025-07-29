@@ -1,0 +1,10 @@
+coverage:
+  status:
+    project:
+      # default is the status check's name, not default settings
+      default:
+        if_ci_failed: ignore
+    patch:
+      # default is the status check's name, not default settings
+      default:
+        if_ci_failed: ignore

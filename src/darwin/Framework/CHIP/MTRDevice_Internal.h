@@ -183,6 +183,11 @@ MTR_DIRECT_MEMBERS
 
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
+/**
+ * Returns true if a diagnostic log transfer is ongoing.
+ */
+@property (readonly) BOOL diagnosticLogTransferInProgress;
+
 @end
 
 @interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)

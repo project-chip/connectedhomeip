@@ -27,7 +27,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <optional>
-#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -51,7 +50,7 @@ private:
 };
 
 std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
-                                         EventLoggingDelegate & delegate, bool isScopedEvent);
+                                         EventLoggingDelegate & delegate, bool isFabricSensitiveEvent);
 
 template <typename G, typename T>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
