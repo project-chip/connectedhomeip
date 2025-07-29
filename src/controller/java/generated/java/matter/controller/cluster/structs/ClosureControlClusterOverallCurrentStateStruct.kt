@@ -27,7 +27,7 @@ class ClosureControlClusterOverallCurrentStateStruct(
   val position: Optional<UByte>?,
   val latch: Optional<Boolean>?,
   val speed: Optional<UByte>,
-  val secureState: Optional<Boolean>?,
+  val secureState: Boolean?,
 ) {
   override fun toString(): String = buildString {
     append("ClosureControlClusterOverallCurrentStateStruct {\n")
@@ -62,10 +62,7 @@ class ClosureControlClusterOverallCurrentStateStruct(
         put(ContextSpecificTag(TAG_SPEED), optspeed)
       }
       if (secureState != null) {
-        if (secureState.isPresent) {
-          val optsecureState = secureState.get()
-          put(ContextSpecificTag(TAG_SECURE_STATE), optsecureState)
-        }
+        put(ContextSpecificTag(TAG_SECURE_STATE), secureState)
       } else {
         putNull(ContextSpecificTag(TAG_SECURE_STATE))
       }
@@ -111,11 +108,7 @@ class ClosureControlClusterOverallCurrentStateStruct(
         }
       val secureState =
         if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_SECURE_STATE))) {
-            Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_SECURE_STATE)))
-          } else {
-            Optional.empty()
-          }
+          tlvReader.getBoolean(ContextSpecificTag(TAG_SECURE_STATE))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_SECURE_STATE))
           null

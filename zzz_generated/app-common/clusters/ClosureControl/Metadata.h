@@ -54,15 +54,33 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Stop::Id, BitFla
                                                                 Access::Privilege::kOperate);
 } // namespace Stop
 namespace MoveTo {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MoveTo::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(MoveTo::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kOperate);
 } // namespace MoveTo
 namespace Calibrate {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Calibrate::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(Calibrate::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kManage);
 } // namespace Calibrate
 
 } // namespace Commands
+
+namespace Events {
+namespace OperationalError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationalError
+namespace MovementCompleted {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MovementCompleted
+namespace EngageStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EngageStateChanged
+namespace SecureStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SecureStateChanged
+
+} // namespace Events
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app

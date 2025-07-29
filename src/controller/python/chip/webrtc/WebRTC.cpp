@@ -49,16 +49,17 @@ void webrtc_client_destroy(WebRTCClientHandle handle)
     g_clients.erase(handle);
 }
 
-CHIP_ERROR webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
+PyChipError webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        return it->second->CreatePeerConnection(stun_url);
+        CHIP_ERROR err = it->second->CreatePeerConnection(stun_url);
+        return ToPyChipError(err);
     }
 
-    return CHIP_NO_ERROR;
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 void webrtc_client_create_offer(WebRTCClientHandle handle)
@@ -122,6 +123,84 @@ void webrtc_client_set_ice_candidate_callback(WebRTCClientHandle handle, IceCand
             cb(candidate.c_str(), mid.c_str(), user_data);
         });
     }
+}
+
+const char * webrtc_get_local_description(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        return it->second->GetLocalSessionDescriptionInternal();
+    }
+    return "";
+}
+
+int webrtc_get_peer_connection_state(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        return it->second->GetPeerConnectionState();
+    }
+    return -1;
+}
+
+void webrtc_client_set_gathering_complete_callback(WebRTCClientHandle handle, GatheringCompleteCallback cb)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        it->second->OnGatheringComplete(cb);
+    }
+}
+
+void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateChangeCallback cb)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        it->second->OnStateChange(cb);
+    }
+}
+
+void webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        it->second->WebRTCProviderClientInit(nodeId, fabricIndex, endpoint);
+    }
+}
+
+void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle handle,
+                                                         OnCommandSenderResponseCallback onCommandSenderResponseCallback,
+                                                         OnCommandSenderErrorCallback onCommandSenderErrorCallback,
+                                                         OnCommandSenderDoneCallback onCommandSenderDoneCallback)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        it->second->WebRTCProviderClientInitCallbacks(onCommandSenderResponseCallback, onCommandSenderErrorCallback,
+                                                      onCommandSenderDoneCallback);
+    }
+}
+
+PyChipError webrtc_provider_client_send_command(WebRTCClientHandle handle, void * appContext, uint16_t endpointId,
+                                                uint32_t clusterId, uint32_t commandId, const uint8_t * payload, size_t length)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        return it->second->SendCommand(appContext, endpointId, clusterId, commandId, payload, length);
+    }
+    return ToPyChipError(CHIP_ERROR_INTERNAL);
 }
 
 } // namespace webrtc

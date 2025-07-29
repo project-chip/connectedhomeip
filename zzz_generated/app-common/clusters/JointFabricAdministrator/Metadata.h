@@ -55,6 +55,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceJointFab
 } // namespace AnnounceJointFabricAdministrator
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace JointFabricAdministrator
 } // namespace Clusters
 } // namespace app

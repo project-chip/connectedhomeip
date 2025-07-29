@@ -61,6 +61,8 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/low-power/LowPowerManager.cpp",
     "${project_dir}/common/clusters/media-input/MediaInputManager.cpp",
     "${project_dir}/common/clusters/media-playback/MediaPlaybackManager.cpp",
+    "${project_dir}/common/clusters/microwave-oven-control/chef-microwave-oven-control.cpp",
+    "${project_dir}/common/clusters/microwave-oven-mode/chef-microwave-oven-mode.cpp",
     "${project_dir}/common/clusters/oven-cavity-operational-state/chef-oven-cavity-operational-state.cpp",
     "${project_dir}/common/clusters/oven-mode/chef-oven-mode.cpp",
     "${project_dir}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp",

@@ -33,7 +33,7 @@ void pychip_webrtc_client_destroy(void * client)
     chip::webrtc::webrtc_client_destroy(client);
 }
 
-CHIP_ERROR pychip_webrtc_client_create_peer_connection(void * client, char * stun_url)
+PyChipError pychip_webrtc_client_create_peer_connection(void * client, char * stun_url)
 {
     return chip::webrtc::webrtc_client_create_peer_connection(client, stun_url);
 }
@@ -66,5 +66,46 @@ void pychip_webrtc_client_set_local_description_callback(void * client, LocalDes
 void pychip_webrtc_client_set_ice_candidate_callback(void * client, IceCandidateCallback cb, void * user_data)
 {
     chip::webrtc::webrtc_client_set_ice_candidate_callback(client, cb, user_data);
+}
+
+const char * pychip_webrtc_get_local_description(WebRTCClientHandle handle)
+{
+    return chip::webrtc::webrtc_get_local_description(handle);
+}
+
+int pychip_webrtc_get_peer_connection_state(WebRTCClientHandle handle)
+{
+    return chip::webrtc::webrtc_get_peer_connection_state(handle);
+}
+
+void pychip_webrtc_client_set_gathering_complete_callback(WebRTCClientHandle handle, GatheringCompleteCallback cb)
+{
+    chip::webrtc::webrtc_client_set_gathering_complete_callback(handle, cb);
+}
+
+void pychip_webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateChangeCallback cb)
+{
+    chip::webrtc::webrtc_client_set_state_change_callback(handle, cb);
+}
+
+void pychip_webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+{
+    chip::webrtc::webrtc_provider_client_init(handle, nodeId, fabricIndex, endpoint);
+}
+
+void pychip_webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle handle,
+                                                                OnCommandSenderResponseCallback onCommandSenderResponseCallback,
+                                                                OnCommandSenderErrorCallback onCommandSenderErrorCallback,
+                                                                OnCommandSenderDoneCallback onCommandSenderDoneCallback)
+{
+    chip::webrtc::webrtc_provider_client_init_commandsender_callbacks(handle, onCommandSenderResponseCallback,
+                                                                      onCommandSenderErrorCallback, onCommandSenderDoneCallback);
+}
+
+PyChipError pychip_webrtc_provider_client_send_command(WebRTCClientHandle handle, void * appContext, uint16_t endpointId,
+                                                       uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
+                                                       size_t length)
+{
+    return chip::webrtc::webrtc_provider_client_send_command(handle, appContext, endpointId, clusterId, commandId, payload, length);
 }
 }

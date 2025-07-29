@@ -20,7 +20,9 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/python_wheel.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/controller/flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/python.gni")
 import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
@@ -98,6 +100,7 @@ shared_library("ChipDeviceCtrl") {
         "chip/webrtc/RTCClient.cpp",
         "chip/webrtc/WebRTC.cpp",
         "chip/webrtc/WebRTC.h",
+        "chip/webrtc/WebRTCTransportCluster.cpp",
       ]
     }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
@@ -159,7 +162,6 @@ shared_library("ChipDeviceCtrl") {
 
   if (chip_support_commissioning_in_controller) {
     public_deps += [
-      "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
       "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/tracing/json",
@@ -172,6 +174,23 @@ shared_library("ChipDeviceCtrl") {
       "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
+
+    if (chip_build_controller_dynamic_server) {
+      defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
+
+      deps += [ "${chip_root}/src/controller:nodatamodel" ]
+
+      # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
+      # defined and application is supposed to provide it. This adds the sources
+      # in the same way "data_model" implementations do
+      #
+      # DynamicDispatcher in src/app:interaction-model implements the actual required
+      # ember callbacks in this case...
+      sources += codegen_data_model_SOURCES
+      public_deps += codegen_data_model_PUBLIC_DEPS
+    } else {
+      public_deps += [ "${chip_root}/src/controller/data_model" ]
+    }
   } else {
     public_deps += [ "$chip_data_model" ]
   }
@@ -244,9 +263,13 @@ chip_python_wheel_action("chip-core") {
       if (chip_support_webrtc_python_bindings) {
         sources += [
           "chip/webrtc/__init__.py",
-          "chip/webrtc/callbacks.py",
+          "chip/webrtc/command.py",
           "chip/webrtc/library_handle.py",
+          "chip/webrtc/peer_connection.py",
           "chip/webrtc/types.py",
+          "chip/webrtc/utils.py",
+          "chip/webrtc/webrtc_client.py",
+          "chip/webrtc/webrtc_manager.py",
         ]
       }
 

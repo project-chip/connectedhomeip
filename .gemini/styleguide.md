@@ -7,3 +7,5 @@
 - Do not over-explain what you see in the code. Only describe code if there are specific questions or concerns (or if a question is asked)
 - Ensure that extensions or fixes to existing code should match the prevailing style of the original code
 - Look for common typos and suggest fixes
+- The current year is 2025.
+- Wrong years and years in the future are OK. Humans will catch these issues.

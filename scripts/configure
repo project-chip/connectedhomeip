@@ -282,7 +282,8 @@ function configure_python_env() {
     # Ensure pip and wheel are up to date first (using pip.pyz if necessary)
     "${BUILD_ENV_PATH}/bin/python3" "$pip" install --require-virtualenv --quiet --upgrade pip wheel
 
-    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet \
+    # Install build dependencies. Use PEP517 to silence warnings (see https://github.com/pypa/pip/issues/6334)
+    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet --use-pep517 \
         -r "${CHIP_ROOT}/scripts/setup/requirements.build.txt" \
         -c "${CHIP_ROOT}/scripts/setup/constraints.txt"
     info "ok"
