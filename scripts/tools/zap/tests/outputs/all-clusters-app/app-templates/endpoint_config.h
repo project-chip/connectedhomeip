@@ -626,10 +626,10 @@
         { (uint16_t) 0xFA, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* StartUpColorTemperatureMireds */                                \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Ballast Configuration (server) */                                                                 \
-        { (uint16_t) 0x1, (uint16_t) 0x1, (uint16_t) 0xFE },     /* MinLevel */                                                    \
-        { (uint16_t) 0xFE, (uint16_t) 0x1, (uint16_t) 0xFE },    /* MaxLevel */                                                    \
-        { (uint16_t) 0xFF, (uint16_t) 0x64, (uint16_t) 0xFFFF }, /* BallastFactorAdjustment */                                     \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 },      /* LampAlarmMode */                                               \
+        { (uint16_t) 0x1, (uint16_t) 0x1, (uint16_t) 0xFE },   /* MinLevel */                                                      \
+        { (uint16_t) 0xFE, (uint16_t) 0x1, (uint16_t) 0xFE },  /* MaxLevel */                                                      \
+        { (uint16_t) 0xFF, (uint16_t) 0x64, (uint16_t) 0xFF }, /* BallastFactorAdjustment */                                       \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 },    /* LampAlarmMode */                                                 \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Chime (server) */                                                                                 \
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFF }, /* SelectedChime */                                                   \
