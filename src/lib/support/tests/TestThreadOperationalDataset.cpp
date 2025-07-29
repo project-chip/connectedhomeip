@@ -266,7 +266,7 @@ static void TestExampleDatasetTemplate()
 
     char networkName[Thread::kSizeNetworkName + 1];
     EXPECT_EQ(dataset.GetNetworkName(networkName), CHIP_NO_ERROR);
-    EXPECT_EQ(strncmp(networkName, "OpenThread-5938", sizeof(networkName)), 0);
+    EXPECT_STREQ(networkName, "OpenThread-5938");
 
     uint16_t panId;
     EXPECT_EQ(dataset.GetPanId(panId), CHIP_NO_ERROR);
@@ -389,13 +389,13 @@ TEST_F(TestThreadOperationalDataset, TestGrowAndShrinkValue)
     EXPECT_EQ(dataset.GetPanId(panId), CHIP_NO_ERROR);
     EXPECT_EQ(panId, 0x4321u);
     EXPECT_EQ(dataset.GetNetworkName(networkName), CHIP_NO_ERROR);
-    EXPECT_EQ(strncmp(networkName, "BB", sizeof(networkName)), 0);
+    EXPECT_STREQ(networkName, "BB");
     EXPECT_EQ(dataset.SetNetworkName("C"), CHIP_NO_ERROR); // 1 byte shorter
     EXPECT_EQ(dataset.AsByteSpan().size(), 7u);
     EXPECT_EQ(dataset.GetPanId(panId), CHIP_NO_ERROR);
     EXPECT_EQ(panId, 0x4321u);
     EXPECT_EQ(dataset.GetNetworkName(networkName), CHIP_NO_ERROR);
-    EXPECT_EQ(strncmp(networkName, "C", sizeof(networkName)), 0);
+    EXPECT_STREQ(networkName, "C");
 }
 
 TEST_F(TestThreadOperationalDataset, TestInitWithViewInitAndModify)
