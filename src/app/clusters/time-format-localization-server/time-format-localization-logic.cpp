@@ -45,8 +45,8 @@ public:
     }
 
     // Delete copy constuctor and assignement
-    AutoReleaseIterator(const AutoReleaseIterator&) = delete;
-    AutoReleaseIterator & operator=(const AutoReleaseIterator&) = delete;
+    AutoReleaseIterator(const AutoReleaseIterator &)             = delete;
+    AutoReleaseIterator & operator=(const AutoReleaseIterator &) = delete;
 
     bool IsValid() const { return mIterator != nullptr; }
     bool Next(CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
@@ -56,8 +56,8 @@ private:
 };
 
 constexpr CalendarTypeEnum DEFAULT_CALENDAR_TYPE = CalendarTypeEnum::kBuddhist;
-constexpr HourFormatEnum DEFAULT_HOUR_FORMAT = HourFormatEnum::k12hr;
-constexpr size_t MAX_EXPECTED_ATTRIBUTE_COUNT = 3;
+constexpr HourFormatEnum DEFAULT_HOUR_FORMAT     = HourFormatEnum::k12hr;
+constexpr size_t MAX_EXPECTED_ATTRIBUTE_COUNT    = 3;
 
 } // namespace
 
@@ -78,8 +78,8 @@ void TimeFormatLocalizationLogic::InitializeCalendarType()
 
     // Try to read existing calendar type from persistence
     MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
-    CHIP_ERROR error = mAttrProvider->ReadValue(
-        { kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, calendarBytes);
+    CHIP_ERROR error =
+        mAttrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, calendarBytes);
 
     // If read failed or value is invalid, use default
     // Can't tell for sure if ReadValue will not change previous variable value
@@ -104,8 +104,7 @@ void TimeFormatLocalizationLogic::InitializeHourFormat()
     HourFormatEnum hourFormat = DEFAULT_HOUR_FORMAT;
 
     MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
-    CHIP_ERROR error = mAttrProvider->ReadValue(
-        { kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, hourBytes);
+    CHIP_ERROR error = mAttrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, hourBytes);
 
     // If read failed or value is invalid, use default
     // Can't tell for sure if ReadValue will not change previous variable value
@@ -182,9 +181,8 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFor
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    CHIP_ERROR result = mAttrProvider->WriteValue(
-        { kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id },
-        { reinterpret_cast<const uint8_t *>(&rHour), sizeof(rHour) });
+    CHIP_ERROR result = mAttrProvider->WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id },
+                                                  { reinterpret_cast<const uint8_t *>(&rHour), sizeof(rHour) });
     if (result == CHIP_NO_ERROR)
     {
         mHourFormat = rHour;
@@ -230,7 +228,8 @@ TimeFormatLocalization::HourFormatEnum TimeFormatLocalizationLogic::GetHourForma
 CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) const
 {
     // Ensure capacity just in case
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(MAX_EXPECTED_ATTRIBUTE_COUNT + DefaultServerCluster::GlobalAttributes().size()));
+    ReturnErrorOnFailure(
+        builder.EnsureAppendCapacity(MAX_EXPECTED_ATTRIBUTE_COUNT + DefaultServerCluster::GlobalAttributes().size()));
     // Mandatory attributes
     ReturnErrorOnFailure(builder.Append(HourFormat::kMetadataEntry));
 
