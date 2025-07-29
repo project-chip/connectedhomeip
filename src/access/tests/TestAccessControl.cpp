@@ -2295,17 +2295,22 @@ TEST_F(TestAccessControl, TestBaseDelegateDefaultMethods)
     size_t v = 999;
     EXPECT_EQ(d.GetMaxEntriesPerFabric(v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
+    v = 999; // reset for 
     EXPECT_EQ(d.GetMaxSubjectsPerEntry(v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
+    v = 999;
     EXPECT_EQ(d.GetMaxTargetsPerEntry(v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
+    v = 999;
     EXPECT_EQ(d.GetMaxEntryCount(v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
 
     // Actualities
     FabricIndex fabric = 1;
+    size_t v = 999;
     EXPECT_EQ(d.GetEntryCount(fabric, v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
+    v = 999;
     EXPECT_EQ(d.GetEntryCount(v), CHIP_NO_ERROR);
     EXPECT_EQ(v, 0u);
 
