@@ -101,7 +101,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
     def pics_TC_CNET_4_9(self):
         return ['CNET.S']
-    
+
     @staticmethod
     def validate_empty_wifi_parameters(value: str, name: str) -> None:
         if not isinstance(value, str):
