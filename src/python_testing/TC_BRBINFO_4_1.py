@@ -214,6 +214,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                 params.commissioningParameters.setupManualCode,
                 params.commissioningParameters.setupQRCode)
         else:
+            # Automatically commission the ICD server to the DUT using the command line interface
+            # provided by either the unified fabric-sync app or the fabric-admin + fabric-bridge apps.
             if self.user_params.get("unified_fabric_sync_app"):
                 setupQRCode = params.commissioningParameters.setupQRCode
                 self.dut_fsa_stdin.write(f"app pair-device 2 {setupQRCode} --enable-icd-registration\n")
