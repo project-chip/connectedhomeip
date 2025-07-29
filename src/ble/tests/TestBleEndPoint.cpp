@@ -26,6 +26,8 @@ constexpr uint16_t kBleTestScratchBufLen = 16;
 namespace chip {
 namespace Ble {
 
+DLL_EXPORT BleLayerDelegate * mBleTransport = nullptr;
+
 static unsigned int gConnCounter = 0;
 template <typename T>
 static inline typename std::enable_if<std::is_integral<T>::value, T>::type MakeConnObj(unsigned int n)
@@ -62,10 +64,14 @@ public:
         CHIP_ERROR err = mBleLayer.Init(/* platformDelegate */ this, /* appDelegate */ this, &DeviceLayer::SystemLayer());
         ASSERT_EQ(err, CHIP_NO_ERROR);
         mBleLayer.mBleTransport = this;
+        mBleTransport           = this;
         ResetCounters();
     }
     void TearDown() override
-    { mBleLayer.Shutdown(); }
+    {
+        mBleTransport = nullptr;
+        mBleLayer.Shutdown(); 
+    }
 
     BLEEndPoint * CreateCentralEndPoint()
     {
