@@ -75,34 +75,34 @@ void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrPro
 void TimeFormatLocalizationLogic::InitializeCalendarType()
 {
     CalendarTypeEnum calendarType = DEFAULT_CALENDAR_TYPE;
-    
+
     // Try to read existing calendar type from persistence
     MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
     CHIP_ERROR error = mAttrProvider->ReadValue(
         { kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, calendarBytes);
-    
+
     // If read failed or value is invalid, use default
     // Can't tell for sure if ReadValue will not change previous variable value
     // so will set it again to default.
-    if (error != CHIP_NO_ERROR) 
+    if (error != CHIP_NO_ERROR)
     {
         calendarType = DEFAULT_CALENDAR_TYPE;
     }
-    
+
     // Ensure the calendar type is within the supported CalendarList, otherwise choose one from that list.
     CalendarTypeEnum validCalendar = DEFAULT_CALENDAR_TYPE;
     if (!IsSupportedCalendarType(calendarType, &validCalendar))
     {
         calendarType = validCalendar;
     }
-    
+
     setActiveCalendarType(calendarType);
 }
 
 void TimeFormatLocalizationLogic::InitializeHourFormat()
 {
     HourFormatEnum hourFormat = DEFAULT_HOUR_FORMAT;
-    
+
     MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
     CHIP_ERROR error = mAttrProvider->ReadValue(
         { kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, hourBytes);
@@ -114,7 +114,7 @@ void TimeFormatLocalizationLogic::InitializeHourFormat()
     {
         hourFormat = DEFAULT_HOUR_FORMAT;
     }
-    
+
     setHourFormat(hourFormat);
 }
 
