@@ -1,5 +1,5 @@
 /*
- *    Copyr2025 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ CHIP_ERROR RamAttributePersistenceProvider::WriteValue(const app::ConcreteAttrib
     else
     {
         // No existing entry, create a new one.
-        mEntries.push_back({ aPath, std::vector<uint8_t>(aValue.begin(), aValue.end()) });
+        mEntries.push_back({ aPath, { aValue.begin(), aValue.end() } });
     }
 
     return CHIP_NO_ERROR;

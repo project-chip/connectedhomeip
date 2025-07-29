@@ -75,6 +75,7 @@ class PascalBuffer
 {
 public:
     using LengthType                           = typename PascalPrefixOperations<PREFIX_LEN>::LengthType;
+    using ValueType                            = Span<const T>;
     static constexpr LengthType kInvalidLength = PascalPrefixOperations<PREFIX_LEN>::kInvalidLength;
 
     static_assert(sizeof(T) == 1);
@@ -161,6 +162,10 @@ public:
         LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetContentLength(span.data());
         return len == kInvalidLength || (static_cast<size_t>(len + PREFIX_LEN) <= span.size());
     }
+
+    /// Is the buffer that the pascal string points into a valid
+    /// pascal string (null or valid length?)
+    bool IsValidContent() const { return IsValid({ mData, static_cast<size_t>(mMaxSize) + PREFIX_LEN }); }
 
 private:
     T * mData;

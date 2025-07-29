@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,7 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model/Nullable.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/PascalString.h>
 
 namespace chip::app {
 
@@ -31,33 +35,82 @@ bool VerifySuccessLogOnFailure(const ConcreteAttributePath & path, CHIP_ERROR er
     return false;
 }
 
+void LogInvalidPascalContent(const ConcreteAttributePath & path)
+{
+    ChipLogError(Zcl, "Invalid pascal content: %u/" ChipLogFormatMEI "/" ChipLogFormatMEI, path.mEndpointId,
+                 ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+}
+
+template <typename StringType>
+bool LoadPascalStringImpl(AttributePersistenceProvider & provider, const ConcreteAttributePath & path, StringType & value,
+                          std::optional<typename StringType::ValueType> valueOnLoadFailure)
+{
+    MutableByteSpan rawBytes = value.RawFullBuffer();
+
+    if (VerifySuccessLogOnFailure(path, provider.ReadValue(path, rawBytes)))
+    {
+        // value is read, however it has to be a valid pascal value
+        // The value MUST be valid over the read range (i.e. rawBytes)
+        auto concrete = reinterpret_cast<const typename StringType::ValueType::pointer>(rawBytes.data());
+        if (value.IsValid({ concrete, rawBytes.size() }))
+        {
+            return true;
+        }
+
+        LogInvalidPascalContent(path);
+    }
+
+    // failed, try to set some default
+    if (!valueOnLoadFailure.has_value() || !value.SetValue(*valueOnLoadFailure))
+    {
+        value.SetNull();
+    }
+    return false;
+}
+
 } // namespace
 
 bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value,
                                 std::optional<CharSpan> valueOnLoadFailure)
 {
-    MutableByteSpan rawBytes = value.RawFullBuffer();
+    return LoadPascalStringImpl(mProvider, path, value, valueOnLoadFailure);
+}
 
-    if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
-    {
-        if (valueOnLoadFailure.has_value() && value.SetValue(*valueOnLoadFailure))
-        {
-            // have a default that could be set
-            return false;
-        }
-        // no default value or default set failed. Set null
-        value.SetNull();
-        return false;
-    }
-    return true;
+bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalBytes & value,
+                                std::optional<ByteSpan> valueOnLoadFailure)
+{
+    return LoadPascalStringImpl(mProvider, path, value, valueOnLoadFailure);
 }
 
 DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                                           Storage::ShortPascalString & value)
 {
-    CharSpan spanValue;
+    DataModel::Nullable<CharSpan> spanValue;
     ReturnErrorOnFailure(decoder.Decode(spanValue));
-    VerifyOrReturnError(value.SetValue(spanValue), Protocols::InteractionModel::Status::ConstraintError);
+    if (spanValue.IsNull())
+    {
+        value.SetNull();
+    }
+    else
+    {
+        VerifyOrReturnError(value.SetValue(spanValue.Value()), Protocols::InteractionModel::Status::ConstraintError);
+    }
+    return mProvider.WriteValue(path, value.ContentWithLenPrefix());
+}
+
+DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                                          Storage::ShortPascalBytes & value)
+{
+    DataModel::Nullable<ByteSpan> spanValue;
+    ReturnErrorOnFailure(decoder.Decode(spanValue));
+    if (spanValue.IsNull())
+    {
+        value.SetNull();
+    }
+    else
+    {
+        VerifyOrReturnError(value.SetValue(spanValue.Value()), Protocols::InteractionModel::Status::ConstraintError);
+    }
     return mProvider.WriteValue(path, value.ContentWithLenPrefix());
 }
 
@@ -67,10 +120,18 @@ bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttrib
     MutableByteSpan rawBytes(reinterpret_cast<uint8_t *>(data), size);
     if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
     {
-        /// in case of failure, set the default value
+        // in case of failure, set the default value
         memcpy(data, valueOnLoadFailure, size);
         return false;
     }
+
+    if (rawBytes.size() != size)
+    {
+        // short read: the value is not valid
+        memcpy(data, valueOnLoadFailure, size);
+        return false;
+    }
+
     return true;
 }
 

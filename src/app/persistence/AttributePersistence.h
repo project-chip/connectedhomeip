@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,13 +37,13 @@ class AttributePersistence
 public:
     AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
 
-    /// Loads a native-entianess stored value into `T` from the persistence provider.
+    /// Loads a native-endianness stored value into `T` from the persistence provider.
     ///
     /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
     ///
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
-    template <typename T, typename std::enable_if<std::is_fundamental_v<T>>::type * = nullptr>
+    template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
     bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
     {
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
@@ -58,13 +58,22 @@ public:
     ///
     /// if valueOnLoadFailure cannot be set into value, value will be set to NULL (which never fails)
     bool Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value, std::optional<CharSpan> valueOnLoadFailure);
+    bool Load(const ConcreteAttributePath & path, Storage::ShortPascalBytes & value, std::optional<ByteSpan> valueOnLoadFailure);
 
     /// Interprets the `buffer` value as a `StringType` (generally ShortPascalString or similar) for the purposes of loading
-    template <typename StringType, size_t N>
+    template <size_t N>
     bool LoadPascalString(const ConcreteAttributePath & path, char (&buffer)[N], std::optional<CharSpan> valueOnLoadFailure)
     {
 
-        StringType value(buffer);
+        Storage::ShortPascalString value(buffer);
+        return Load(path, value, valueOnLoadFailure);
+    }
+
+    template <size_t N>
+    bool LoadPascalString(const ConcreteAttributePath & path, uint8_t (&buffer)[N], std::optional<ByteSpan> valueOnLoadFailure)
+    {
+
+        Storage::ShortPascalBytes value(buffer);
         return Load(path, value, valueOnLoadFailure);
     }
 
@@ -72,22 +81,36 @@ public:
     ///   - decode the given char span
     ///   - store it in the given pascal string
     ///   - write the value to persistent storage as a "prefixed value"
+    ///
+    /// Will store/support NULL values.
+    ///
     DataModel::ActionReturnStatus Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                         Storage::ShortPascalString & value);
+    DataModel::ActionReturnStatus Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                        Storage::ShortPascalBytes & value);
 
     /// helper to not create a separate ShortPascalString out of a buffer.
-    template <typename StringType, size_t N>
+    template <size_t N>
     DataModel::ActionReturnStatus StorePascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                                     char (&buffer)[N])
     {
-        StringType value(buffer);
+        Storage::ShortPascalString value(buffer);
+        return Store(path, decoder, value);
+    }
+
+    /// helper to not create a separate ShortPascalBytes out of a buffer.
+    template <size_t N>
+    DataModel::ActionReturnStatus StorePascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+                                                    uint8_t (&buffer)[N])
+    {
+        Storage::ShortPascalBytes value(buffer);
         return Store(path, decoder, value);
     }
 
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - write to storage
-    template <typename T, typename std::enable_if<std::is_fundamental_v<T>>::type * = nullptr>
+    template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
     DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                                          T & value)
     {
