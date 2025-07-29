@@ -46,7 +46,7 @@ tests:
                   - name: Name
                     type: string
 
-    - label: "TH reads the CurrentOutput attribute"
+    - label: "Step 2: TH reads the CurrentOutput attribute"
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:
