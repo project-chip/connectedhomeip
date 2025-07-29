@@ -17683,7 +17683,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinKeyFrameInterval(8),MaxKeyFrameInterval(9),WatermarkEnabled(10),OSDEnabled(11),;
+                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),KeyFrameInterval(8),WatermarkEnabled(9),OSDEnabled(10),;
                     private final int id;
                     VideoStreamAllocateCommandField(int id) {
                         this.id = id;

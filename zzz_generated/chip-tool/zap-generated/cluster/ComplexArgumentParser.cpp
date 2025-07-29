@@ -510,6 +510,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("videoStreamID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.audioStreamID", "audioStreamID",
                                                                   value.isMember("audioStreamID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.metadataEnabled", "metadataEnabled",
+                                                                  value.isMember("metadataEnabled")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "id");
@@ -536,11 +538,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreamID, value["audioStreamID"]));
     valueCopy.removeMember("audioStreamID");
 
-    if (value.isMember("metadataEnabled"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "metadataEnabled");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.metadataEnabled, value["metadataEnabled"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "metadataEnabled");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.metadataEnabled, value["metadataEnabled"]));
     valueCopy.removeMember("metadataEnabled");
 
     if (value.isMember("fabricIndex"))
@@ -6426,10 +6425,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minBitRate", "minBitRate", value.isMember("minBitRate")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxBitRate", "maxBitRate", value.isMember("maxBitRate")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minKeyFrameInterval", "minKeyFrameInterval",
-                                                                  value.isMember("minKeyFrameInterval")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxKeyFrameInterval", "maxKeyFrameInterval",
-                                                                  value.isMember("maxKeyFrameInterval")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.keyFrameInterval", "keyFrameInterval",
+                                                                  value.isMember("keyFrameInterval")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.referenceCount", "referenceCount",
                                                                   value.isMember("referenceCount")));
 
@@ -6470,13 +6467,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxBitRate, value["maxBitRate"]));
     valueCopy.removeMember("maxBitRate");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minKeyFrameInterval");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minKeyFrameInterval, value["minKeyFrameInterval"]));
-    valueCopy.removeMember("minKeyFrameInterval");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxKeyFrameInterval");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxKeyFrameInterval, value["maxKeyFrameInterval"]));
-    valueCopy.removeMember("maxKeyFrameInterval");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "keyFrameInterval");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.keyFrameInterval, value["keyFrameInterval"]));
+    valueCopy.removeMember("keyFrameInterval");
 
     if (value.isMember("watermarkEnabled"))
     {
@@ -6510,8 +6503,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManageme
     ComplexArgumentParser::Finalize(request.maxResolution);
     ComplexArgumentParser::Finalize(request.minBitRate);
     ComplexArgumentParser::Finalize(request.maxBitRate);
-    ComplexArgumentParser::Finalize(request.minKeyFrameInterval);
-    ComplexArgumentParser::Finalize(request.maxKeyFrameInterval);
+    ComplexArgumentParser::Finalize(request.keyFrameInterval);
     ComplexArgumentParser::Finalize(request.watermarkEnabled);
     ComplexArgumentParser::Finalize(request.OSDEnabled);
     ComplexArgumentParser::Finalize(request.referenceCount);

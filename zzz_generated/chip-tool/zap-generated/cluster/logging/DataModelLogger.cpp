@@ -5753,18 +5753,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("MinKeyFrameInterval", indent + 1, value.minKeyFrameInterval);
+        CHIP_ERROR err = LogValue("KeyFrameInterval", indent + 1, value.keyFrameInterval);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinKeyFrameInterval'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxKeyFrameInterval", indent + 1, value.maxKeyFrameInterval);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxKeyFrameInterval'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'KeyFrameInterval'");
             return err;
         }
     }

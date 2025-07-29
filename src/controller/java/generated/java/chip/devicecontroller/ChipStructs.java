@@ -13658,8 +13658,7 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
   public ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution;
   public Long minBitRate;
   public Long maxBitRate;
-  public Integer minKeyFrameInterval;
-  public Integer maxKeyFrameInterval;
+  public Integer keyFrameInterval;
   public Optional<Boolean> watermarkEnabled;
   public Optional<Boolean> OSDEnabled;
   public Integer referenceCount;
@@ -13672,11 +13671,10 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
   private static final long MAX_RESOLUTION_ID = 6L;
   private static final long MIN_BIT_RATE_ID = 7L;
   private static final long MAX_BIT_RATE_ID = 8L;
-  private static final long MIN_KEY_FRAME_INTERVAL_ID = 9L;
-  private static final long MAX_KEY_FRAME_INTERVAL_ID = 10L;
-  private static final long WATERMARK_ENABLED_ID = 11L;
-  private static final long OSD_ENABLED_ID = 12L;
-  private static final long REFERENCE_COUNT_ID = 13L;
+  private static final long KEY_FRAME_INTERVAL_ID = 9L;
+  private static final long WATERMARK_ENABLED_ID = 10L;
+  private static final long OSD_ENABLED_ID = 11L;
+  private static final long REFERENCE_COUNT_ID = 12L;
 
   public CameraAvStreamManagementClusterVideoStreamStruct(
     Integer videoStreamID,
@@ -13688,8 +13686,7 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution,
     Long minBitRate,
     Long maxBitRate,
-    Integer minKeyFrameInterval,
-    Integer maxKeyFrameInterval,
+    Integer keyFrameInterval,
     Optional<Boolean> watermarkEnabled,
     Optional<Boolean> OSDEnabled,
     Integer referenceCount
@@ -13703,8 +13700,7 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     this.maxResolution = maxResolution;
     this.minBitRate = minBitRate;
     this.maxBitRate = maxBitRate;
-    this.minKeyFrameInterval = minKeyFrameInterval;
-    this.maxKeyFrameInterval = maxKeyFrameInterval;
+    this.keyFrameInterval = keyFrameInterval;
     this.watermarkEnabled = watermarkEnabled;
     this.OSDEnabled = OSDEnabled;
     this.referenceCount = referenceCount;
@@ -13721,8 +13717,7 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     values.add(new StructElement(MAX_RESOLUTION_ID, maxResolution.encodeTlv()));
     values.add(new StructElement(MIN_BIT_RATE_ID, new UIntType(minBitRate)));
     values.add(new StructElement(MAX_BIT_RATE_ID, new UIntType(maxBitRate)));
-    values.add(new StructElement(MIN_KEY_FRAME_INTERVAL_ID, new UIntType(minKeyFrameInterval)));
-    values.add(new StructElement(MAX_KEY_FRAME_INTERVAL_ID, new UIntType(maxKeyFrameInterval)));
+    values.add(new StructElement(KEY_FRAME_INTERVAL_ID, new UIntType(keyFrameInterval)));
     values.add(new StructElement(WATERMARK_ENABLED_ID, watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType())));
     values.add(new StructElement(OSD_ENABLED_ID, OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType())));
     values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
@@ -13743,8 +13738,7 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution = null;
     Long minBitRate = null;
     Long maxBitRate = null;
-    Integer minKeyFrameInterval = null;
-    Integer maxKeyFrameInterval = null;
+    Integer keyFrameInterval = null;
     Optional<Boolean> watermarkEnabled = Optional.empty();
     Optional<Boolean> OSDEnabled = Optional.empty();
     Integer referenceCount = null;
@@ -13794,15 +13788,10 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
           UIntType castingValue = element.value(UIntType.class);
           maxBitRate = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == MIN_KEY_FRAME_INTERVAL_ID) {
+      } else if (element.contextTagNum() == KEY_FRAME_INTERVAL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          minKeyFrameInterval = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == MAX_KEY_FRAME_INTERVAL_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          maxKeyFrameInterval = castingValue.value(Integer.class);
+          keyFrameInterval = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == WATERMARK_ENABLED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
@@ -13831,8 +13820,7 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
       maxResolution,
       minBitRate,
       maxBitRate,
-      minKeyFrameInterval,
-      maxKeyFrameInterval,
+      keyFrameInterval,
       watermarkEnabled,
       OSDEnabled,
       referenceCount
@@ -13870,11 +13858,8 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     output.append("\tmaxBitRate: ");
     output.append(maxBitRate);
     output.append("\n");
-    output.append("\tminKeyFrameInterval: ");
-    output.append(minKeyFrameInterval);
-    output.append("\n");
-    output.append("\tmaxKeyFrameInterval: ");
-    output.append(maxKeyFrameInterval);
+    output.append("\tkeyFrameInterval: ");
+    output.append(keyFrameInterval);
     output.append("\n");
     output.append("\twatermarkEnabled: ");
     output.append(watermarkEnabled);
@@ -15169,7 +15154,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
-  public Optional<Boolean> metadataEnabled;
+  public Boolean metadataEnabled;
   public Integer fabricIndex;
   private static final long ID_ID = 0L;
   private static final long PEER_NODE_ID_ID = 1L;
@@ -15187,7 +15172,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
-    Optional<Boolean> metadataEnabled,
+    Boolean metadataEnabled,
     Integer fabricIndex
   ) {
     this.id = id;
@@ -15208,7 +15193,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
-    values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
+    values.add(new StructElement(METADATA_ENABLED_ID, new BooleanType(metadataEnabled)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -15224,7 +15209,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
-    Optional<Boolean> metadataEnabled = Optional.empty();
+    Boolean metadataEnabled = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
@@ -15260,7 +15245,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
       } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          metadataEnabled = Optional.of(castingValue.value(Boolean.class));
+          metadataEnabled = castingValue.value(Boolean.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15487,7 +15472,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
-  public Optional<Boolean> metadataEnabled;
+  public Boolean metadataEnabled;
   public Integer fabricIndex;
   private static final long ID_ID = 0L;
   private static final long PEER_NODE_ID_ID = 1L;
@@ -15505,7 +15490,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
-    Optional<Boolean> metadataEnabled,
+    Boolean metadataEnabled,
     Integer fabricIndex
   ) {
     this.id = id;
@@ -15526,7 +15511,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
-    values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
+    values.add(new StructElement(METADATA_ENABLED_ID, new BooleanType(metadataEnabled)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -15542,7 +15527,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
-    Optional<Boolean> metadataEnabled = Optional.empty();
+    Boolean metadataEnabled = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
@@ -15578,7 +15563,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
       } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          metadataEnabled = Optional.of(castingValue.value(Boolean.class));
+          metadataEnabled = castingValue.value(Boolean.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
