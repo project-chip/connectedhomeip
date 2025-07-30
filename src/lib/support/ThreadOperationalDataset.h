@@ -50,6 +50,8 @@ class OperationalDataset;
 class OperationalDatasetView
 {
 public:
+    OperationalDatasetView() = default;
+
     /**
      * This method initializes the dataset view with the given data.
      * The data itself is not copied, so it must remain valid for the lifetime of the view.
@@ -229,6 +231,8 @@ private:
 
     ByteSpan mData;
 
+    OperationalDatasetView(uint8_t * buffer) : mData(ByteSpan(buffer, 0)) {}
+
     const ThreadTLV * Locate(uint8_t aType) const;
     bool Has(uint8_t aType) const { return Locate(aType) != nullptr; }
 };
@@ -240,6 +244,23 @@ private:
 class OperationalDataset : public OperationalDatasetView
 {
 public:
+    OperationalDataset() : OperationalDatasetView(mBuffer) {}
+
+    // Delegate copy construction and assignment to the overloads taking an OperationalDatasetView.
+    OperationalDataset(const OperationalDataset & other) : OperationalDataset(static_cast<const OperationalDatasetView &>(other)) {}
+    OperationalDataset & operator=(const OperationalDataset & other)
+    {
+        return *this = static_cast<const OperationalDatasetView &>(other);
+    }
+
+    OperationalDataset(const OperationalDatasetView & view) : OperationalDatasetView(view) { CopyData(); }
+    OperationalDataset & operator=(const OperationalDatasetView & view)
+    {
+        static_cast<OperationalDatasetView &>(*this) = view;
+        CopyData();
+        return *this;
+    }
+
     /**
      * Initializes the dataset by copying the provided data into an internal buffer.
      *
@@ -378,7 +399,8 @@ public:
 private:
     uint8_t mBuffer[kSizeOperationalDataset];
 
-    void CopyIfNecessary();
+    void CopyData();
+    void CopyDataIfNecessary();
     void Remove(uint8_t aType);
     void Remove(ThreadTLV * aTlv);
     ThreadTLV * InsertOrReplace(uint8_t aType, size_t aValueSize);
