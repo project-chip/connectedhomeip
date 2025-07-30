@@ -15,44 +15,47 @@
 #    limitations under the License.
 #
 
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
+
+from zeroconf.asyncio import AsyncServiceInfo
+
+from .json_serializable import JsonSerializable
 
 
 @dataclass
-class MdnsServiceInfo:
-    # The unique name of the mDNS service.
-    service_name: str
+class MdnsServiceInfo(JsonSerializable):
+    service_info: AsyncServiceInfo = field(repr=False, compare=False)
 
-    # The instance name of the service.
-    instance_name: str
+    service_name: Optional[str] = field(init=False)
+    service_type: Optional[str] = field(init=False)
+    instance_name: Optional[str] = field(init=False)
+    server: Optional[str] = field(init=False)
+    port: Optional[int] = field(init=False)
+    addresses: Optional[List[str]] = field(init=False)
+    txt_record: Optional[Dict[str, str]] = field(init=False)
+    priority: Optional[int] = field(init=False)
+    interface_index: Optional[int] = field(init=False)
+    weight: Optional[int] = field(init=False)
+    host_ttl: Optional[int] = field(init=False)
+    other_ttl: Optional[int] = field(init=False)
 
-    # The domain name of the machine hosting the service.
-    server: str
+    def __post_init__(self):
+        si = self.service_info
 
-    # The network port on which the service is available.
-    port: int
+        self.service_name = si.name
+        self.service_type = si.type
+        self.server = si.server
+        self.port = si.port
+        self.addresses = si.parsed_addresses()
+        self.txt_record = si.decoded_properties
+        self.priority = si.priority
+        self.interface_index = si.interface_index
+        self.weight = si.weight
+        self.host_ttl = si.host_ttl
+        self.other_ttl = si.other_ttl
 
-    # A list of IP addresses associated with the service.
-    addresses: list[str]
-
-    # A dictionary of key-value pairs representing the service's metadata.
-    txt_record: dict[str, str]
-
-    # The priority of the service, used in service selection when multiple instances are available.
-    priority: int
-
-    # The network interface index on which the service is advertised.
-    interface_index: int
-
-    # The relative weight for records with the same priority, used in load balancing.
-    weight: int
-
-    # The time-to-live value for the host name in the DNS record.
-    host_ttl: int
-
-    # The time-to-live value for other records associated with the service.
-    other_ttl: int
-
-    # The service type of the service, typically indicating the service protocol and domain.
-    service_type: Optional[str] = None
+        if self.service_name and self.service_type and self.service_name.endswith(f".{self.service_type}"):
+            self.instance_name = self.service_name[: -len(self.service_type) - 1]
+        else:
+            self.instance_name = self.service_name

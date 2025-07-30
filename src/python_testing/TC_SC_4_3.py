@@ -65,6 +65,10 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 '''
 
 TCP_PICS_STR = "MCORE.SC.TCP"
+ONE_HOUR_IN_MS = 3600000
+MAX_SAT_VALUE = 65535
+MAX_T_VALUE = 6
+DISCOVERY_TIMEOUT_SEC = 30
 
 
 class TC_SC_4_3(MatterBaseTest):
@@ -90,10 +94,6 @@ class TC_SC_4_3(MatterBaseTest):
                 TestStep(11, "TH performs a DNS-SD browse for _matter._tcp.local",
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
                 ]
-
-    ONE_HOUR_IN_MS = 3600000
-    MAX_SAT_VALUE = 65535
-    MAX_T_VALUE = 6
 
     async def get_descriptor_server_list(self):
         return await self.read_single_attribute_check_success(
@@ -165,7 +165,7 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify t_value is a decimal number without leading zeros and less than or equal to 6
         try:
             T_int = int(t_value)
-            if T_int < 0 or T_int > self.MAX_T_VALUE:
+            if T_int < 0 or T_int > MAX_T_VALUE:
                 return False, f"T value ({t_value}) is not in the range 0 to 6. ({t_value})"
             if str(t_value).startswith("0") and T_int != 0:
                 return False, f"T value ({t_value}) has leading zeros."
@@ -202,11 +202,6 @@ class TC_SC_4_3(MatterBaseTest):
         except ipaddress.AddressValueError:
             # If an AddressValueError is raised, the current address is not a valid IPv6 address.
             return False
-
-    @staticmethod
-    def extract_ipv6_address(text):
-        items = text.split(',')
-        return items[-1]
 
     @staticmethod
     def verify_hostname(hostname: str) -> bool:
@@ -292,7 +287,7 @@ class TC_SC_4_3(MatterBaseTest):
         operational_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            discovery_timeout_sec=3,
+            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True
         )
 
@@ -368,7 +363,7 @@ class TC_SC_4_3(MatterBaseTest):
 
             logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             sii_value = operational_record.txt_record['SII']
-            result, message = self.verify_decimal_value(sii_value, self.ONE_HOUR_IN_MS)
+            result, message = self.verify_decimal_value(sii_value, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # SAI TXT KEY
@@ -378,7 +373,7 @@ class TC_SC_4_3(MatterBaseTest):
 
             logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             sai_value = operational_record.txt_record['SAI']
-            result, message = self.verify_decimal_value(sai_value, self.ONE_HOUR_IN_MS)
+            result, message = self.verify_decimal_value(sai_value, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # SAT TXT KEY
@@ -386,7 +381,7 @@ class TC_SC_4_3(MatterBaseTest):
             logging.info(
                 "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
             sat_value = operational_record.txt_record['SAT']
-            result, message = self.verify_decimal_value(sat_value, self.MAX_SAT_VALUE)
+            result, message = self.verify_decimal_value(sat_value, MAX_SAT_VALUE)
             asserts.assert_true(result, message)
 
             if supports_icd:
@@ -413,7 +408,7 @@ class TC_SC_4_3(MatterBaseTest):
         op_sub_type = self.get_operational_subtype(log_result=True)
         ptr_records = await mdns.get_ptr_records(
             service_types=[op_sub_type],
-            discovery_timeout_sec=3,
+            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True,
         )
 
@@ -428,7 +423,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(11)
         ptr_records = await mdns.get_ptr_records(
             service_types=[MdnsServiceType.OPERATIONAL.value],
-            discovery_timeout_sec=3,
+            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True,
         )
 
