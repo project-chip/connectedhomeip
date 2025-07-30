@@ -100,8 +100,8 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
                     # Prepare outgoing mDNS query message with
                     # single or multiple record types
+                    out = DNSOutgoing(_FLAGS_QR_QUERY)
                     for record_type in self._query_record_types:
-                        out = DNSOutgoing(_FLAGS_QR_QUERY)
                         question = DNSQuestion(self._name, record_type, _CLASS_IN)
                         question.unicast = question_type is DNSQuestionType.QU
                         out.add_question(question)
