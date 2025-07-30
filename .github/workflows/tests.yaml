@@ -382,7 +382,7 @@ jobs:
               uses: actions/cache/save@v4
               with:
                   path: .ccache
-                  key: ${{ steps.ccache-restore.outputs.cache-primary-key }}
+                  key: ${{ env.CACHE_KEY }}
 
     test_suites_darwin:
         name: Test Suites - Darwin
@@ -525,7 +525,7 @@ jobs:
               uses: actions/cache/save@v4
               with:
                   path: .ccache
-                  key: ${{ steps.ccache-restore.outputs.cache-primary-key }}
+                  key: ${{ env.CACHE_KEY }}
 
     repl_tests_linux:
         name: REPL Tests - Linux
@@ -872,7 +872,7 @@ jobs:
               uses: actions/cache/save@v4
               with:
                   path: .ccache
-                  key: ${{ steps.ccache-restore.outputs.cache-primary-key }}
+                  key: ${{ env.CACHE_KEY }}
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
@@ -967,4 +967,4 @@ jobs:
               uses: actions/cache/save@v4
               with:
                   path: .ccache
-                  key: ${{ steps.ccache-restore.outputs.cache-primary-key }}
+                  key: ${{ env.CACHE_KEY }}

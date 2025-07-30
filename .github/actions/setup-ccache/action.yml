@@ -10,7 +10,7 @@ inputs:
 outputs:
   cache-primary-key:
     description: "The primary key used for the cache"
-    value: ${{ steps.ccache-restore.outputs.cache-primary-key }}
+    value: ${{ steps.generate-cache-key.outputs.cache_key }}
 runs:
   using: "composite"
   steps:
@@ -30,12 +30,19 @@ runs:
         echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
         echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
         echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
+    - name: Generate cache key
+      shell: bash
+      id: generate-cache-key
+      run: |
+        CACHE_KEY="ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-${{ github.sha }}"
+        echo "CACHE_KEY=${CACHE_KEY}" >> $GITHUB_ENV
+        echo "cache_key=${CACHE_KEY}" >> $GITHUB_OUTPUT
     - name: ccache restore
       id: ccache-restore
       uses: actions/cache/restore@v4
       with:
         path: .ccache
-        key: ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-${{ github.sha }}
+        key: ${{ env.CACHE_KEY }}
         restore-keys: |
           ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-
           ccache-master-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-
