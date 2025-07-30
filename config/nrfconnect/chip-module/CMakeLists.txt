@@ -160,6 +160,7 @@ matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FA
 matter_add_gn_arg_bool  ("chip_enable_read_client"                CONFIG_CHIP_ENABLE_READ_CLIENT)
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
+matter_add_gn_arg_bool  ("enable_im_pretty_print"                 CONFIG_CHIP_IM_PRETTY_PRINT)
 
 matter_add_gn_arg_bool  ("chip_system_config_use_sockets"                   NOT CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
 matter_add_gn_arg_bool  ("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
