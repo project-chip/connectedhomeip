@@ -436,7 +436,7 @@ class DeviceProxyWrapper():
 
 
 DiscoveryFilterType: typing.TypeAlias = discovery.FilterType
-DiscoveryType = discovery.DiscoveryType
+DiscoveryType: typing.TypeAlias = discovery.DiscoveryType
 
 
 class ChipDeviceControllerBase():
@@ -2942,7 +2942,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return None
         return rcac_bytes
 
-    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:  # type: ignore
+    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         '''
         Commission with the given nodeid from the setupPayload.
         setupPayload may be a QR or manual code.
@@ -2964,7 +2964,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)  # type: ignore
+                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
