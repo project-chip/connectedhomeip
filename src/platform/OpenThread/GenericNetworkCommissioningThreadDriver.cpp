@@ -204,14 +204,23 @@ Status GenericThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mu
 void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     NetworkCommissioning::Status status = MatchesNetworkId(mStagingNetwork, networkId);
+    uint8_t datasetBytes[Thread::kSizeOperationalDataset];
+    size_t datasetLength;
 
-    if (!GetEnabled())
+    CHIP_ERROR error = KeyValueStoreMgr().Get(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), datasetBytes,
+                                              sizeof(datasetBytes), &datasetLength);
+
+    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        // Set InterfaceEnabled to default value (true).
-        ReturnOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
+        error = BackupConfiguration();
+    }
+    else if (error == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        // A backup exists, which is what we are checking for. This is not an error in this context.
+        error = CHIP_NO_ERROR;
     }
 
-    if (status == Status::kSuccess && BackupConfiguration() != CHIP_NO_ERROR)
+    if (status == Status::kSuccess && error != CHIP_NO_ERROR)
     {
         status = Status::kUnknownError;
     }
@@ -303,12 +312,13 @@ CHIP_ERROR GenericThreadDriver::BackupConfiguration()
     mRevertOnServerReady = false;
 
     // If configuration is already backed up, return with no error
-    if (BackupExists())
+    CHIP_ERROR err   = KeyValueStoreMgr().Get(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), nullptr, 0);
+    ByteSpan dataset = mStagingNetwork.AsByteSpan();
+
+    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL || dataset.size() == 0)
     {
         return CHIP_NO_ERROR;
     }
-
-    ByteSpan dataset = mStagingNetwork.AsByteSpan();
 
     return KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), dataset.data(), dataset.size());
 }
