@@ -37,30 +37,62 @@ HEADER = """/*
  */
 
 // This file is generated automatically by write_sdk_version_header.py
+
 """
 
+def git_version() -> str:
+    # Define the Git command to get a descriptive version string:
+    # --tags: use annotated tags if available
+    # --always: fallback to commit hash if no tags are found
+    cmd = ["git", "describe", "--always", "--tags"]
+
+    return subprocess.check_output(cmd).decode("utf-8").strip()
+
+def spec_version() -> str:
+    spec_version = "../../SPECIFICATION_VERSION"
+    with open(spec_version, "r") as version:
+        return version.read().strip() 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate header file with the SDK version.")
-    parser.add_argument("--output", required=True, help="Name of the output header file")
+    parser = argparse.ArgumentParser(description="Generate files with the SDK version.")
+    parser.add_argument("--output", required=True, help="Name of the output files")
     parser.add_argument("--gen-dir", required=True, help="Directory where the output file should be created")
+    parser.add_argument("--git", action="store_true", help="Use version obtained from git")
 
     args = parser.parse_args()
 
-    output = os.path.join(args.gen_dir, args.output)
     os.makedirs(args.gen_dir, exist_ok=True)
 
-    cmd = ["git", "describe", "--always", "--tags"]
-    try:
-        git_ver = subprocess.check_output(cmd).decode("utf-8").strip()
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        git_ver = ""
+    if args.git:
+        try:
+            ver = git_version()
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            # In case Git is not installed, fall back to version from spec file
+           ver = spec_version()
+    else:
+        ver = spec_version()
 
-    with open(output, "w") as header:
-        header.write(HEADER)
-        header.write(f'#define CHIP_SDK_VERSION "{git_ver}"\n')
+    output = os.path.join(args.gen_dir, '{}.h'.format(args.output))
+    content = HEADER + '#pragma once\nextern const char* const CHIP_SDK_VERSION;\n'
 
-    return 0
+    # Do not write to the file if it exists to prevent relinking
+    if not os.path.exists(output):
+        with open(output, "w") as header:
+            header.write(content)
+
+    output = os.path.join(args.gen_dir, '{}.cpp'.format(args.output))
+    content = HEADER + '#include "MatterSdkVersion.h"\nconst char* const CHIP_SDK_VERSION = "{}";\n'.format(ver)
+
+    # Check if the file already exists and has the same content
+    if os.path.exists(output):
+        with open(output, "r") as cpp:
+            if content == cpp.read():
+                # If version didn't change, skip writing to avoid relinking
+                return
+
+    with open(output, "w") as cpp:
+        cpp.write(content)
 
 
-main()
+if __name__ == "__main__":
+    main()

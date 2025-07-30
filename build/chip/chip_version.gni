@@ -29,11 +29,15 @@ declare_args() {
 }
 
 template("gen_sdk_version") {
-  action(target_name) {
+  action("gen_${target_name}") {
     filename = invoker.filename
     directory = invoker.directory
+    is_git_repository = path_exists("${chip_root}/.git/logs/HEAD")
 
-    outputs = [ "${directory}/${filename}" ]
+    if (is_git_repository) {
+      inputs = [ "${chip_root}/.git/logs/HEAD" ]
+    }
+    outputs = [ "${directory}/${filename}.h", "${directory}/${filename}.cpp" ]
 
     script = "${chip_root}/build/chip/write_sdk_version_header.py"
 
@@ -43,5 +47,16 @@ template("gen_sdk_version") {
       "--gen-dir",
       rebase_path(directory, root_build_dir),
     ]
+
+    if (is_git_repository) {
+      args += [ "--git" ]
+    }
+  }
+  source_set(target_name) {
+    filename = invoker.filename
+    directory = invoker.directory
+
+    sources = [ "${directory}/${filename}.cpp" ]
+    public_deps = [ ":gen_${target_name}" ]
   }
 }

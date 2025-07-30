@@ -56,7 +56,9 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #endif
 
+#if CHIP_ENABLE_SDK_VERSION
 #include <MatterSdkVersion.h>
+#endif
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -929,10 +931,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
+#if CHIP_ENABLE_SDK_VERSION
     case kOptionSdkVersion:
         printf("matter-sdk version %s\n", CHIP_SDK_VERSION);
         exit(0);
         break;
+#endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;

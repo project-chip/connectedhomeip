@@ -23,12 +23,15 @@
 
 #pragma once
 
-#include <MatterSdkVersion.h>
 #include <platform/AttributeList.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
+
+#if CHIP_ENABLE_SDK_VERSION
+#include <MatterSdkVersion.h>
+#endif
 
 namespace chip {
 
@@ -375,7 +378,9 @@ inline CHIP_ERROR PlatformManager::InitChipStack()
         return CHIP_NO_ERROR;
     }
 
+#if CHIP_ENABLE_SDK_VERSION
     ChipLogDetail(NotSpecified, "Matter SDK Version: %s", CHIP_SDK_VERSION);
+#endif
 
     CHIP_ERROR err = static_cast<ImplClass *>(this)->_InitChipStack();
     mInitialized   = (err == CHIP_NO_ERROR);

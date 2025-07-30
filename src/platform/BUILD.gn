@@ -22,13 +22,6 @@ import("${chip_root}/src/system/system.gni")
 
 import("device.gni")
 
-import("${chip_root}/build/chip/chip_version.gni")
-
-gen_sdk_version("matter_sdk_version") {
-  filename = "MatterSdkVersion.h"
-  directory = "${root_gen_dir}/include"
-}
-
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 
@@ -108,6 +101,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # Define the default endpoint id for the generic Thread network commissioning instance
     chip_device_config_thread_network_endpoint_id = 0
+
+    # Generate MatterSdkVersion.h header file
+    chip_enable_sdk_version = true
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -162,6 +158,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
       "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
       "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${chip_device_config_enable_joint_fabric}",
+      "CHIP_ENABLE_SDK_VERSION=${chip_enable_sdk_version}"
     ]
 
     public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
@@ -487,7 +484,6 @@ source_set("platform_config_header") {
 if (chip_device_platform != "none") {
   source_set("platform_base") {
     public_deps = [
-      ":matter_sdk_version",
       ":platform_config_header",
       "${chip_root}/src/app/icd/server:icd-server-config",
       "${chip_root}/src/ble",
@@ -667,6 +663,10 @@ if (chip_device_platform != "none") {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
 
+  if (chip_enable_sdk_version) {
+    public_deps += [ ":matter_sdk_version" ]
+  }
+
     public_deps += [ _platform_target ]
 
     # The platform target needs to include the headers, so allow that here.
@@ -687,4 +687,13 @@ if (chip_device_platform != "none") {
 
 source_set("syscalls_stub") {
   sources = [ "SyscallStubs.cpp" ]
+}
+
+if (chip_enable_sdk_version) {
+  import("${chip_root}/build/chip/chip_version.gni")
+
+  gen_sdk_version("matter_sdk_version") {
+    filename = "MatterSdkVersion"
+    directory = "${root_gen_dir}/include"
+  }
 }
