@@ -366,10 +366,12 @@ void PassSpanArg(const Span<T> &)
 
 TEST(TestSpan, TestConstructorTypeDeduction)
 {
-    const uint8_t nums[]                              = { 1, 2 };
-    const uint8_t otherNums[]                         = { 1, 2, 3 };
-    std::array<uint8_t, 2> numsArray                  = { 1, 2 };
-    const std::array<const uint8_t, 2> constNumsArray = { 1, 2 };
+    const uint8_t nums[]                                   = { 1, 2 };
+    const uint8_t otherNums[]                              = { 1, 2, 3 };
+    std::array<uint8_t, 2> numsArray                       = { 1, 2 };
+    const std::array<uint8_t, 2> numsConstArray            = { 1, 2 };
+    std::array<const uint8_t, 2> constNumsArray            = { 1, 2 };
+    const std::array<const uint8_t, 2> constNumsConstArray = { 1, 2 };
 
     // These will fail to compile if type deduction is not working correctly.
     PassSpanArg(Span(nums));
@@ -386,6 +388,12 @@ TEST(TestSpan, TestConstructorTypeDeduction)
     Span c(numsArray);
     EXPECT_TRUE(c.data_equal(Span<const uint8_t>(otherNums, 2)));
 
-    Span d(constNumsArray);
-    EXPECT_TRUE(c.data_equal(Span<const uint8_t>(otherNums, 2)));
+    Span d(numsConstArray);
+    EXPECT_TRUE(d.data_equal(Span<const uint8_t>(otherNums, 2)));
+
+    Span e(constNumsArray);
+    EXPECT_TRUE(e.data_equal(Span<const uint8_t>(otherNums, 2)));
+
+    Span f(constNumsConstArray);
+    EXPECT_TRUE(f.data_equal(Span<const uint8_t>(otherNums, 2)));
 }

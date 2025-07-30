@@ -212,7 +212,9 @@ Span(T * data, size_t size) -> Span<T>;
 template <class T, size_t N>
 Span(T (&databuf)[N]) -> Span<T>;
 template <class T, size_t N>
-Span(const std::array<T, N> & data) -> Span<T>;
+Span(std::array<T, N> & data) -> Span<T>;
+template <class T, size_t N>
+Span(const std::array<T, N> & data) -> Span<const T>;
 
 inline namespace literals {
 
