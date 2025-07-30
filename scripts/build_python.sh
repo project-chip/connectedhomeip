@@ -51,11 +51,8 @@ declare -a extra_packages
 declare -a extra_gn_args
 declare chip_build_controller_dynamic_server=true
 declare enable_pw_rpc=false
-<<<<<<< HEAD
 declare enable_ccache=no
-=======
 declare enable_webrtc=true
->>>>>>> master
 
 help() {
 
@@ -302,7 +299,7 @@ if [[ "$enable_ccache" == "yes" ]]; then
 fi
 
 # Compile Python wheels
-ninja -v -C "$OUTPUT_ROOT" python_wheels
+ninja -C "$OUTPUT_ROOT" python_wheels
 
 # Add wheels from chip_python_wheel_action templates.
 WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
