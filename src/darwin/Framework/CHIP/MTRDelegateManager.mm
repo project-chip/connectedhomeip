@@ -217,7 +217,7 @@
         MTR_LOG("%@ %lu delegates called for %s", strongOwner, static_cast<unsigned long>(delegatesCalled), logString);
     }
 
-    return delegatesCalled;
+    return delegatesCalled > 0;
 }
 
 #ifdef DEBUG
