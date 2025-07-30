@@ -87,7 +87,7 @@ Input Options:
   -ds, --chip_build_controller_dynamic_server <true/false>  Enable dynamic server in controller.
                                                             Defaults to $chip_build_controller_dynamic_server.
   -pw  --enable_pw_rpc <true/false>                         Build Pw Python wheels. Defaults to $enable_pw_rpc.
-  --enable-ccache                                         Use ccache for building python wheels.
+  --enable-ccache     <yes|no>                              Use ccache for building python wheels. Defaults to $enable_ccache.
 "
 }
 
