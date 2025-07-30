@@ -25,8 +25,10 @@ namespace {
 
 using namespace chip;
 
-// Don't warn/fail on self assignments in these tests.
+// Don't warn/error on self assignments in these tests.
+#ifdef __clang__
 #pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#endif
 
 class TestThreadOperationalDataset : public ::testing::Test
 {
