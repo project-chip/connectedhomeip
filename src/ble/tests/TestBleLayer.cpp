@@ -177,7 +177,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle buf) override
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
     {
         return CHIP_NO_ERROR;
     }
