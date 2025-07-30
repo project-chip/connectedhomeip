@@ -447,7 +447,7 @@ class TC_SU_4_1(MatterBaseTest):
         logger.info(f'Step #7 - Read UpdatePossible attribute on DUT using TH4 (fabric 1): {update_possible_th4}')
 
         # Verify UpdatePossible is true
-        asserts.assert_equal(update_possible_th4, True, "Expected UpdatePossible to be True on fabric 1")
+        asserts.assert_true(update_possible_th4, "Expected UpdatePossible to be True on fabric 1")
 
         # Verify DefaultOTAProviders attribute on the DUT after write (TH3 on Fabric 2)
         update_possible_th3 = await self.read_single_attribute_check_success(
@@ -458,7 +458,7 @@ class TC_SU_4_1(MatterBaseTest):
         logger.info(f'Step #7 - Read UpdatePossible attribute on DUT using TH3 (fabric 2): {update_possible_th3}')
 
         # Verify UpdatePossible is true
-        asserts.assert_equal(update_possible_th3, True, "Expected UpdatePossible to be True on fabric 2")
+        asserts.assert_true(update_possible_th3, "Expected UpdatePossible to be True on fabric 2")
 
         self.step(8)
         # Step #8 - Read UpdateState from TH4 (fabric 1)
