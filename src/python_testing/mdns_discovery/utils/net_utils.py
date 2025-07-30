@@ -18,7 +18,7 @@
 import ipaddress
 import logging
 
-import netifaces
+import ifaddr
 from zeroconf import InterfaceChoice
 
 logger = logging.getLogger(__name__)
@@ -26,41 +26,37 @@ logger = logging.getLogger(__name__)
 
 def get_ipv6_addresses():
     results = []
-    for iface in netifaces.interfaces():
-        try:
-            # Get list of IPv6 addresses for the interface
-            addrs = netifaces.ifaddresses(iface).get(netifaces.AF_INET6, [])
-        except ValueError:
-            # Skip interfaces that don’t support IPv6
-            continue
 
-        for addr_info in addrs:
-            addr = addr_info.get('addr', '')
-            if not addr:
-                continue
+    for adapter in ifaddr.get_adapters():
+        # Get list of IPv6 addresses for the interface
+        for ip in adapter.ips:
+            # Get IPv6 address and interface
+            if isinstance(ip.ip, tuple) and ':' in ip.ip[0]:
+                base_addr = ip.ip[0]
+                iface_name = adapter.nice_name
 
-            # Normalize by stripping any existing scope
-            base_addr = addr.split('%')[0]
+                # Verify valid IPv6 address
+                try:
+                    ipv6 = ipaddress.IPv6Address(base_addr)
+                except ValueError:
+                    continue
 
-            try:
-                ip = ipaddress.IPv6Address(base_addr)
-            except ValueError:
-                # Skip invalid addresses
-                continue
+                # Skip ::1 (loopback)
+                if ipv6.is_loopback:
+                    continue
 
-            # Include link-local, ULA (fdxx::/8), and global (2000::/3), skip loopback (::1)
-            if ip.is_loopback:
-                continue  # Skip ::1 (loopback); not usable for external discovery
-
-            if ip.is_link_local:
-                results.append(f"{base_addr}%{iface}")  # Append scope for link-local
-            elif ip.is_private or ip.is_global:
-                results.append(base_addr)  # ULA or global addresses
+                if ipv6.is_link_local:
+                    # Link-local addresses require a scope identifier (interface name)
+                    # to be usable for communication, so we append it
+                    results.append(f"{base_addr}%{iface_name}")
+                elif ipv6.is_private or ipv6.is_global:
+                    # ULA (fd00::/8) and global (2000::/3) addresses are routable and
+                    # do not require a scope, so we keep only the base address
+                    results.append(base_addr)
 
     if not results:
-        # No usable IPv6, fallback to Zeroconf default
-        logger.info("\n\nDefaulting to InterfaceChoice.All\n")
+        logger.info("Returning Zeroconf's interface defualts")
         return InterfaceChoice.All
 
-    logger.info(f"\n\nDiscovered IPv6 addresses: {results}\n")
+    logger.info(f"Discovered IPv6 addresses: {results}")
     return results
