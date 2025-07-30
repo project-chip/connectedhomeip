@@ -42,20 +42,32 @@ class MdnsDiscovery:
 
     def __init__(self, verbose_logging: bool = False):
         """
-        Initializes the MdnsDiscovery instance.
+        A class for performing asynchronous mDNS service discovery using Zeroconf.
 
-        Main methods:
-            - get_commissioner_service
-            - get_commissionable_service
-            - get_operational_service
-            - get_border_router_service
-            - get_all_services
-            - get_service_types
-            - get_srv_record
-            - get_txt_record
-            - get_quada_records
-            - get_ptr_records
-            - get_commissionable_subtypes
+        This utility supports querying various types of mDNS records (PTR, SRV, TXT, AAAA)
+        over IPv6 interfaces and can discover Matter-specific services such as
+        commissioner, commissionable, operational, and border router services.
+
+        Key Methods:
+            - `get_commissioner_service()`: Discover Matter commissioner services.
+            - `get_commissionable_service()`: Discover Matter commissionable devices.
+            - `get_operational_service()`: Discover operational Matter nodes.
+            - `get_border_router_service()`: Discover Thread border routers.
+            - `get_all_services()`: Get service info from all available discovered services.
+            - `get_service_types()`: Discover all available service types.
+            - `get_ptr_records()`: Discover PTR records for given service types.
+            - `get_srv_record()`: Query SRV records for a given service instance.
+            - `get_txt_record()`: Query TXT records for a given service instance.
+            - `get_quada_records()`: Query A/AAAA records for a given host.
+            - `get_commissionable_subtypes()`: Discover supported subtypes for commissionable nodes.
+
+        Attributes:
+            interfaces (list[str]): IPv6 interfaces used for discovery.
+            _azc (AsyncZeroconf): Zeroconf manager instance.
+            _discovered_services (dict): Stores results of service discovery.
+            _name_filter (str | None): Optional filter for matching specific service names.
+            _event (asyncio.Event): Event used to synchronize async discovery.
+            _verbose_logging (bool): Enables detailed logging output.
         """
         # List of IPv6 addresses to use for mDNS discovery.
         self.interfaces = get_ipv6_addresses()
@@ -65,9 +77,6 @@ class MdnsDiscovery:
 
         # A dictionary to store discovered services.
         self._discovered_services = {}
-
-        # A list of service types
-        self._service_types = []
 
         # Filtering to apply for received data items
         self._name_filter = None
@@ -522,13 +531,17 @@ class MdnsDiscovery:
         if all_services and service_types:
             raise ValueError("Specify either 'all_services' or 'service_types', not both.")
 
+        types = []
         if all_services:
-            self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces)))
+            types = await self.get_service_types(
+                discovery_timeout_sec=discovery_timeout_sec,
+                log_output=False
+            )
 
         if service_types:
-            self._service_types = service_types
+            types = service_types
 
-        logger.info(f"Browsing for mDNS service(s) of type: {service_types}")
+        logger.info(f"Browsing for mDNS service(s) of type: {types}")
 
         self._event.clear()
         self._discovered_services = {}
@@ -536,7 +549,7 @@ class MdnsDiscovery:
 
         aiobrowser = AsyncServiceBrowser(
             zeroconf=self._azc.zeroconf,
-            type_=service_types,
+            type_=types,
             handlers=[partial(self._on_service_state_change, query_service=query_service)]
         )
 
