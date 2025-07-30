@@ -92,7 +92,7 @@ jobs:
                     echo "CACHE_PREFIX=master" >> $GITHUB_ENV
                   fi
 
-            - name: Configure ccache for performance
+            - name: Configure ccache
               run: |
                 echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
                 echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
