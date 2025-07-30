@@ -397,7 +397,7 @@ def run_tests_no_exit(
     # Lazy import to avoid circular dependency
     from typing import TYPE_CHECKING
 
-    from chip.testing.matter_testing import MatterStackState
+    from chip.testing.matter_stack_state import MatterStackState
     if TYPE_CHECKING:
         from chip.testing.commissioning import CommissionDeviceTest
     else:
@@ -565,8 +565,8 @@ class MockTestRunner():
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
                  pics: Optional[dict[bool, str]] = None, paa_trust_store_path=None):
 
+        from chip.testing.matter_stack_state import MatterStackState
         from chip.testing.matter_test_config import MatterTestConfig
-        from chip.testing.matter_testing import MatterStackState
 
         self.kvs_storage = 'kvs_admin.json'
 
