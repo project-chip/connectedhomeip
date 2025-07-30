@@ -430,7 +430,7 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
       within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
-    default 1290 if SOC_RISCV_TELINK_W91
+    default 1280 if SOC_RISCV_TELINK_W91
     default 1128 if ZEPHYR_VERSION_3_3
     default 1250
 
