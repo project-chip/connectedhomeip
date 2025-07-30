@@ -397,4 +397,15 @@ config CHIP_WIFI
 	imply NET_STATISTICS_USER_API
 	imply NET_CONFIG_NEED_IPV6
 
+config CHIP_IM_PRETTY_PRINT
+	bool "Enable detailed logging of Matter messages"
+	depends on !CHIP_LOG_SIZE_OPTIMIZATION
+	depends on MATTER_LOG_LEVEL_DBG
+	help
+	  Enables enhanced verbosity for logging content of Matter messages. This configuration option
+	  facilitates detailed tracking of interactions, including Cluster ID, Endpoint ID, Attribute ID,
+	  or Command ID as well as payload content for all interaction types (like Read Request or Invoke
+	  Request). This option helps in debugging and development of message exchanges within the Matter
+	  protocol.
+
 endif # CHIP
