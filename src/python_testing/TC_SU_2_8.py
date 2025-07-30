@@ -31,6 +31,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
+import logging
+import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
@@ -57,26 +59,30 @@ class TC_SU_2_8(MatterBaseTest):
         steps = [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
             TestStep(1, "DUT sends a QueryImage command to TH1/OTA-P."),
-            TestStep(2, "DUT sends a QueryImage command to TH1/OTA-P. TH1/OTA-P does not respond with QueryImageResponse."),
+            TestStep(2, "TH1/OTA-P does not respond with QueryImageResponse."),
         ]
         return steps
-
-    async def _get_provider_struct(self, th, endpoint=0):
-        provider_struct = Clusters.Objects.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=self.dut_node_id,
-            endpoint=endpoint,
-            fabricIndex=th.fabricId
-        )
-
-        return provider_struct
 
     @async_test_body
     async def test_TC_SU_2_8(self):
 
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
-        attr = Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
-        th1 = self.default_controller
+        th2 = self.default_controller
+        cluster = Clusters.Objects.BasicInformation
+        attr = Clusters.Objects.BasicInformation.Attributes
+
+        provider_th1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=0xDEAD,
+            endpoint=0,
+            fabricIndex=1
+        )
+
+        provider_th2 = Clusters.Objects.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=self.dut_node_id,
+            endpoint=endpoint,
+            fabricIndex=th2.fabricId
+        )
 
         # Commissioning
         self.step(0)
@@ -84,7 +90,8 @@ class TC_SU_2_8(MatterBaseTest):
         # DUT sends a QueryImage command to TH1/OTA-P.
         self.step(1)
 
-        provider_th1 = await self._get_provider_struct(th1, endpoint=endpoint)
+        logging.info(f"TH1 provider: {provider_th1}")
+
         resp = await self.write_single_attribute(
             attribute_value=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(
                 value=[provider_th1]
@@ -92,21 +99,48 @@ class TC_SU_2_8(MatterBaseTest):
             endpoint_id=endpoint
         )
 
+        logging.info(f"Response from TH1: {resp}")
+
         asserts.assert_equal(resp, Status.Success, "Failed to write DefaultOTAProviders for TH1")
 
-        state = await self.read_single_attribute_check_success(
+        update_state = await self.read_single_attribute_check_success(
             node_id=dut_node_id,
             endpoint=endpoint,
             attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
             cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
         )
 
-        asserts.assert_equal(state, 0, "UpdateState should be Idle after setting TH1")
+        logging.info(f"State: {update_state}")
 
-        # DUT sends a QueryImage command to TH1/OTA-P. TH1/OTA-P does not respond with QueryImageResponse.
+        th1_state = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        asserts.assert_equal(update_state, th1_state,
+                             f"UpdateState is {update_state} and it should be {th1_state} after setting TH1")
+
+        query_image_server = await self.read_single_attribute_check_success(
+            node_id=dut_node_id,
+            endpoint=endpoint,
+            attribute=attr,
+            cluster=cluster
+        )
+
+        bdx_protocol = Clusters.Objects.OtaSoftwareUpdateProvider.Enums.kBDXSynchronous
+
+        # asserts.assert_equal(query_image_server.vendorID, , f"Vendor ID in server side is {query_image_server.vendorID} and it should be {}.")
+        # asserts.assert_equal(query_image_server.productID, , f"Product ID in server side is {query_image_server.productID} and it should be {}.")
+        # asserts.assert_equal(query_image_server.softwareVersion, , f"Software version in server side is {query_image_server.softwareVersion} and it should be {}.")
+        # asserts.assert_equal(query_image_server.hardwareVersion, , f"Hardware version in server side is {query_image_server.hardwareVersion} and it should be {}.")
+        # asserts.assert_true(bdx_protocol in query_image_server.protocolsSupported,
+        #                     f"BDX protocol: {bdx_protocol} is not in protocolsSupported list: {query_image_server.protocolsSupported}")
+
+        # MCORE.OTA.HTTPS validation
+
+        # RequestorCanConsent validation
+
+        # asserts.assert_equal(query_image_server.location, , f"Location in server side is {query_image_server.location} and it should be {}")
+
+        # TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
 
-        provider_th2 = await self._get_provider_struct(self.th2, endpoint=endpoint)
         resp = await self.write_single_attribute(
             attribute_value=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(
                 value=[provider_th2]
