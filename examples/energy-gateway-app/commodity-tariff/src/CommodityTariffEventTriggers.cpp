@@ -16,11 +16,9 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
 #include <CommodityTariffMain.h>
 #include <CommodityTariffSamples.h>
-#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
-
-#include <fstream>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,39 +34,47 @@ uint8_t presetIndex = 0;
 static uint8_t days_ctr    = 0;
 static uint8_t entries_ctr = 0;
 bool first_start           = true;
-namespace TariffPresets {
+namespace TariffDataSamples {
 // Number of presets (compile-time constant)
-static constexpr size_t kCount = 2;
-
-// Array of all presets
-static constexpr std::array<const char *, kCount> kAllPresets = { TariffPresets::tariff_sample_1, TariffPresets::tariff_sample_2 };
 
 // Safe accessor function
-static constexpr const char * GetPreset(size_t index)
+static const TariffDataSet & GetPreset(size_t index)
 {
     if (index == kCount - 1)
     {
         presetIndex = 0;
     }
 
-    return kAllPresets[index];
+    return kTariffPresets[index];
 }
-} // namespace TariffPresets
+} // namespace TariffDataSamples
+
+static void ProcessTariffData(const TariffDataSamples::TariffDataSet &data) {
+    if (!data.TariffInfo.IsNull())
+    {
+        printf("Processing tariff: %.*s\n", 
+               static_cast<int>(data.TariffInfo.Value().tariffLabel.Value().size()),
+               data.TariffInfo.Value().tariffLabel.Value().data());
+    }
+
+    if (!data.TariffComponents.IsNull())
+    {
+        printf("Contains %zu tariff components\n", data.TariffComponents.Value().size());
+    }
+}
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
+    const TariffDataSet & tariff_preset = TariffDataSamples::GetPreset(presetIndex++);
+
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
 
-    if (const char * preset = TariffPresets::GetPreset(presetIndex++))
+    if (CHIP_NO_ERROR == dg->LoadTariffData(tariff_preset))
     {
-        LoadTariffFromJSONString(preset, dg);
+        dg->TariffDataUpdate();
     }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Tariff data erasing");
-        dg->CleanupTariffData();
-        presetIndex = 0;
-    }
+
+    //ProcessTariffData();
 }
 
 void SetTestEventTrigger_TariffDataClear()

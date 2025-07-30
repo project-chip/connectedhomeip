@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include "CommodityTariffConsts.h"
 
 #include <cassert>
 #include <cstdint>
@@ -138,6 +139,8 @@ inline bool operator!=(const DayEntryStruct::Type & lhs, const DayEntryStruct::T
     return !(lhs == rhs);
 }
 
+
+
 } // namespace Structs
 } // namespace CommodityTariff
 
@@ -249,6 +252,246 @@ struct StrToSpan
         }
     }
 };
+
+using namespace CommodityTariffConsts;
+using namespace chip::app::Clusters::CommodityTariff::Structs;
+
+template <typename T>
+CHIP_ERROR CopyData(const T& input, T& output);
+
+template <>
+CHIP_ERROR CopyData<TariffInformationStruct::Type>(const TariffInformationStruct::Type & input, TariffInformationStruct::Type & output)
+{
+    output.tariffLabel.SetNull();
+    output.providerName.SetNull();
+    output.currency.ClearValue();
+    output.blockMode.SetNull();
+
+    if (!input.tariffLabel.IsNull())
+    {
+        if (!SpanCopier<char>::Copy(input.tariffLabel.Value(), output.tariffLabel, input.tariffLabel.Value().size()))
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    if (!input.providerName.IsNull())
+    {
+        if (!SpanCopier<char>::Copy(input.providerName.Value(), output.providerName, input.providerName.Value().size()))
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    if (!input.currency.HasValue())
+    {
+        output.currency.Value().SetNull();
+
+        if (!input.currency.Value().IsNull())
+        {
+            output.currency.Value().SetNonNull(input.currency.Value().Value());
+        }
+    }
+
+    if (!input.blockMode.IsNull())
+    {
+        output.blockMode.SetNonNull(input.blockMode.Value());
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<DayEntryStruct::Type>(const DayEntryStruct::Type & input, DayEntryStruct::Type & output)
+{
+    output.dayEntryID = input.dayEntryID;
+    output.startTime = input.startTime;
+    
+    output.duration.ClearValue();
+    if (input.duration.HasValue())
+    {
+        output.duration.SetValue(input.duration.Value());
+    }
+    
+    output.randomizationOffset.ClearValue();
+    if (input.randomizationOffset.HasValue())
+    {
+        output.randomizationOffset.SetValue(input.randomizationOffset.Value());
+    }
+    
+    output.randomizationType.ClearValue();
+    if (input.randomizationType.HasValue())
+    {
+        output.randomizationType.SetValue(input.randomizationType.Value());
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Type & input, TariffComponentStruct::Type & output)
+{
+    output.tariffComponentID = input.tariffComponentID;
+    
+    output.price.ClearValue();
+    if (input.price.HasValue())
+    {
+        output.price.Emplace();
+        output.price.Value().SetNull();
+        if (!input.price.Value().IsNull())
+        {
+            auto & priceInput = input.price.Value().Value();
+            auto & priceOutput = output.price.Value().Value();
+            priceOutput.priceType = priceInput.priceType;
+            
+            priceOutput.price.ClearValue();
+            if (priceInput.price.HasValue())
+            {
+                priceOutput.price.SetValue(priceInput.price.Value());
+            }
+            
+            priceOutput.priceLevel.ClearValue();
+            if (priceInput.priceLevel.HasValue())
+            {
+                priceOutput.priceLevel.SetValue(priceInput.priceLevel.Value());
+            }
+        }
+    }
+    
+    output.friendlyCredit.ClearValue();
+    if (input.friendlyCredit.HasValue())
+    {
+        output.friendlyCredit.SetValue(input.friendlyCredit.Value());
+    }
+    
+    output.auxiliaryLoad.ClearValue();
+    if (input.auxiliaryLoad.HasValue())
+    {
+        output.auxiliaryLoad.Emplace();
+        output.auxiliaryLoad.Value().number = input.auxiliaryLoad.Value().number;
+        output.auxiliaryLoad.Value().requiredState = input.auxiliaryLoad.Value().requiredState;
+    }
+    
+    output.peakPeriod.ClearValue();
+    if (input.peakPeriod.HasValue())
+    {
+        output.peakPeriod.Emplace();
+        output.peakPeriod.Value().severity = input.peakPeriod.Value().severity;
+        output.peakPeriod.Value().peakPeriod = input.peakPeriod.Value().peakPeriod;
+    }
+    
+    output.powerThreshold.ClearValue();
+    if (input.powerThreshold.HasValue())
+    {
+        output.powerThreshold.Emplace();
+        // Assuming PowerThresholdStruct has simple fields that can be directly copied
+        output.powerThreshold.Value() = input.powerThreshold.Value();
+    }
+    
+    output.threshold.SetNull();
+    if (!input.threshold.IsNull())
+    {
+        output.threshold.SetNonNull(input.threshold.Value());
+    }
+    
+    output.label.ClearValue();
+    if (input.label.HasValue())
+    {
+        output.label.Emplace();
+        output.label.Value().SetNull();
+        if (!input.label.Value().IsNull())
+        {
+            if (!SpanCopier<char>::Copy(
+                input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()))
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+    }
+    
+    output.predicted.ClearValue();
+    if (input.predicted.HasValue())
+    {
+        output.predicted.SetValue(input.predicted.Value());
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<TariffPeriodStruct::Type>(const TariffPeriodStruct::Type & input, TariffPeriodStruct::Type & output)
+{
+    output.label.SetNull();
+    if (!input.label.IsNull())
+    {
+        if (!SpanCopier<char>::Copy(
+            input.label.Value(), output.label, input.label.Value().size()))
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+    
+    // For lists, we assume the output has already been initialized with sufficient capacity
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kTariffPeriodItemMaxIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()), output.tariffComponentIDs, kTariffPeriodItemMaxIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<DayPatternStruct::Type>(const DayPatternStruct::Type & input, DayPatternStruct::Type & output)
+{
+    output.dayPatternID = input.dayPatternID;
+    output.daysOfWeek = input.daysOfWeek;
+    
+    // For lists, we assume the output has already been initialized with sufficient capacity
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kDayPatternItemMaxDayEntryIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<DayStruct::Type>(const DayStruct::Type & input, DayStruct::Type & output)
+{
+    output.date = input.date;
+    output.dayType = input.dayType;
+    
+    // For lists, we assume the output has already been initialized with sufficient capacity
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kDayStructItemMaxDayEntryIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<CalendarPeriodStruct::Type>(const CalendarPeriodStruct::Type & input, CalendarPeriodStruct::Type & output)
+{
+    output.startDate.SetNull();
+    if (!input.startDate.IsNull())
+    {
+        output.startDate.SetNonNull(input.startDate.Value());
+    }
+    
+    // For lists, we assume the output has already been initialized with sufficient capacity
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayPatternIDs.data(), input.dayPatternIDs.size()), output.dayPatternIDs, kCalendarPeriodItemMaxDayPatternIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    return CHIP_NO_ERROR;
+}
 
 /// @brief Type trait for nullable types
 template <typename U>
@@ -431,57 +674,9 @@ public:
 
     /**
      * @brief Get mutable reference to stored value
-     * @return T& Reference to the active value storage
-     * @warning Not thread-safe for write operations
+     * @return ValueType & Reference to the active value storage
      */
-    T & GetValue() { return GetValueRef(); }
-
-    /**
-     * @brief Get const reference to stored value
-     * @return const T& Const reference to the active value storage
-     * @note Thread-safe for concurrent reads
-     */
-    const T & GetValue() const { return GetValueRef(); }
-
-    /**
-     * @brief Get pointer to the raw payload data
-     * @return ExtractPayloadType_t<ValueType>* Pointer to payload if available
-     * @retval nullptr if:
-     *         - Not in initialized state
-     *         - Value is null (for nullable types)
-     *         - List is empty (for list types)
-     */
-    auto GetValueData() -> ExtractPayloadType_t<ValueType> *
-    {
-        if (mUpdateState < UpdateState::kInitialized)
-        {
-            return nullptr;
-        }
-
-        if constexpr (IsValueNullable())
-        {
-            if (GetValueRef().IsNull())
-            {
-                return nullptr;
-            }
-            if constexpr (IsList<WrappedType>::value)
-            {
-                return GetValueRef().Value().data();
-            }
-            else
-            {
-                return &GetValueRef().Value();
-            }
-        }
-        else if constexpr (IsValueList())
-        {
-            return GetValueRef().data();
-        }
-        else
-        {
-            return &GetValueRef();
-        }
-    }
+    ValueType & GetValue() { return GetValueRef(); }
 
     /**
      * @brief Check if current update is validated
@@ -511,42 +706,63 @@ public:
      *       - Creates default-initialized value
      *       - Ignores size parameter
      */
-    CHIP_ERROR CreateNewValue(size_t size)
+    CHIP_ERROR CreateNewListValue(size_t size)
     {
         if (mUpdateState != UpdateState::kIdle)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        if constexpr (IsValueList() || IsList<WrappedType>::value)
+        if constexpr (!IsValueList())
         {
-            if (size >= 1)
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        if (size >= 1)
+        {
+            auto * buffer = static_cast<PayloadType *>(Platform::MemoryCalloc(size, sizeof(PayloadType)));
+            if (!buffer)
             {
-                auto * buffer = static_cast<PayloadType *>(Platform::MemoryCalloc(size, sizeof(PayloadType)));
-
-                if (!buffer)
-                {
-                    return CHIP_ERROR_NO_MEMORY;
-                }
-
-                if constexpr (IsValueNullable())
-                {
-                    GetNewValueRef().SetNonNull(DataModel::List<PayloadType>(buffer, size));
-                }
-                else
-                {
-                    GetNewValueRef() = DataModel::List<PayloadType>(buffer, size);
-                }
+                return CHIP_ERROR_NO_MEMORY;
+            }
+            if constexpr (IsValueNullable())
+            {
+                GetNewValueRef().SetNonNull(DataModel::List<PayloadType>(buffer, size));
             }
             else
             {
-                if constexpr (IsValueNullable())
-                {
-                    GetNewValueRef().SetNull();
-                }
+                GetNewValueRef() = DataModel::List<PayloadType>(buffer, size);
             }
         }
-        else if constexpr (IsValueNullable())
+        else
+        {
+            if constexpr (IsValueNullable())
+            {
+                GetNewValueRef().SetNull();
+            }
+            else
+            {
+                GetNewValueRef() = DataModel::List<PayloadType>();
+            }
+        }
+
+        mUpdateState = UpdateState::kInitialized;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CreateNewSingleValue()
+    {
+        if (mUpdateState != UpdateState::kIdle)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        if constexpr (IsValueList())
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        if constexpr (IsValueNullable())
         {
             GetNewValueRef().SetNull();
         }
@@ -557,6 +773,58 @@ public:
 
         mUpdateState = UpdateState::kInitialized;
         return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetNewValue(const WrappedType & newValue)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if constexpr (IsValueList())
+        {
+            err = CreateNewListValue(newValue.size());
+
+            if (CHIP_NO_ERROR == err)
+            {
+                auto buffer = GetNewValueData();
+                for (size_t idx = 0; idx < newValue.size(); idx++)
+                {
+                    if (CHIP_NO_ERROR == (err = CopyData<PayloadType>(newValue[idx], buffer[idx])))
+                    {
+                        continue;
+                    }
+                    break;
+                }
+            }
+        }
+        else if constexpr (IsValueStruct())
+        {
+            err = CreateNewSingleValue();
+
+            if (CHIP_NO_ERROR == err)
+            {
+                err = CopyData<PayloadType>(newValue, GetNewValueData());                    
+            }
+        }
+        else if constexpr (IsValueScalar())
+        {
+            err = CreateNewSingleValue();
+
+            if (CHIP_NO_ERROR == err)
+            {
+                GetNewValueData() = newValue;
+            }
+        }
+
+        if (err == CHIP_NO_ERROR)
+        {
+            MarkAsAssigned();
+        }
+        else
+        {
+            CleanupValue(GetNewValueRef());
+        }
+
+        return err;
     }
 
     /**
@@ -737,9 +1005,13 @@ private:
 
     void SwapActiveValueStorage() { mActiveValueIdx = !mActiveValueIdx; }
 
-    static constexpr bool IsValueNullable() { return IsNullable<T>::value; }
+    static constexpr bool IsValueNullable() { return IsNullable<ValueType>::value; }
 
-    static constexpr bool IsValueList() { return IsList<T>::value; }
+    static constexpr bool IsValueList() { return IsList<WrappedType>::value; }
+
+    static constexpr bool IsValueStruct() { return IsStruct<WrappedType>::value; }
+
+    static constexpr bool IsValueScalar() { return (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value) ; }
 
     enum class StorageState : uint8_t
     {
@@ -784,7 +1056,7 @@ private:
                 {
                     CleanupList(aValue.Value());
                 }
-                else if constexpr (IsStruct<WrappedType>::value)
+                else if constexpr (IsValueStruct())
                 {
                     CleanupStruct(aValue.Value());
                 }
@@ -813,7 +1085,7 @@ private:
     void CleanupStruct(PayloadType & aValue) { CleanupStructValue(aValue); }
 
 protected:
-    T mValueStorage[2]; // Double-buffered storage
+    ValueType mValueStorage[2]; // Double-buffered storage
 
     void * mAuxData = nullptr;                  // Validation context
     const AttributeId mAttrId;                     // Attribute identifier
@@ -868,7 +1140,7 @@ protected:
         return false;
     }
 
-    bool NullableNotEqual(const T & a, const T & b)
+    bool NullableNotEqual(const ValueType & a, const ValueType & b)
     {
         bool is_neq = false;
         if (a.IsNull() || b.IsNull())
@@ -881,7 +1153,7 @@ protected:
             {
                 is_neq = ListsNotEqual(a.Value(), b.Value());
             }
-            else if constexpr (IsStruct<WrappedType>::value)
+            else if constexpr (IsValueStruct())
             {
                 is_neq = CompareStructValue(a.Value(), b.Value());
             }

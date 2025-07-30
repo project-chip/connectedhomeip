@@ -17,12 +17,9 @@
  */
 #pragma once
 
-#include <json/json.h>
-
+#include <CommodityTariffSamples.h>
 #include <app/clusters/commodity-tariff-server/CommodityTariffAttrsDataMgmt.h>
 #include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
-#include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace app {
@@ -37,7 +34,7 @@ public:
     CommodityTariffDelegate();
     ~CommodityTariffDelegate() = default;
 
-    CHIP_ERROR LoadTariffData(const Json::Value & value);
+    CHIP_ERROR LoadTariffData(const TariffDataSamples::TariffDataSet &data);
 
     bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) override;
 };
