@@ -317,7 +317,7 @@ class MdnsDiscovery:
                 timeout=discovery_timeout_sec * 1000)
 
             if not is_discovered:
-                logger.warning(f"No AAAA record found for '{hostname}' within {discovery_timeout_sec}s")
+                logger.info(f"No AAAA record found for '{hostname}' within {discovery_timeout_sec}s")
                 return None
 
             # Get IPv6 addresses and convert to QuadaRecord class
@@ -582,8 +582,8 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        DNS_TYPE_MAP = {_TYPE_TXT: "TXT", _TYPE_SRV: "SRV"}
-        rec_types_str = "(" + ", ".join(DNS_TYPE_MAP.get(t, str(t)) for t in query_record_types) + ")"
+        DNS_TYPE_MAP = {_TYPE_SRV: "SRV", _TYPE_TXT: "TXT", _TYPE_A: "A", _TYPE_AAAA: "AAAA"}
+        rec_types = "(" + ", ".join(DNS_TYPE_MAP.get(t, str(t)) for t in query_record_types) + ")"
 
         async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             mdns_service_info = None
@@ -594,11 +594,11 @@ class MdnsDiscovery:
 
             # Wait for the add/update service event or timeout
             try:
-                logger.info(f"Service record information lookup {rec_types_str} for '{service_name}' in progress...")
+                logger.info(f"Service record information lookup {rec_types} for '{service_name}' in progress...")
                 await wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
             except TimeoutError:
                 logger.info(
-                    f"Service record information lookup {rec_types_str} for '{service_name}' timeout ({discovery_timeout_sec} seconds) reached without an update.")
+                    f"Service record information lookup {rec_types} for '{service_name}' timeout ({discovery_timeout_sec} seconds) reached without an update.")
             finally:
                 await azc.async_remove_service_listener(service_listener)
 
@@ -613,7 +613,7 @@ class MdnsDiscovery:
             self._event.set()
             if is_discovered:
                 if self._verbose_logging:
-                    logger.warning(f"Service record information {rec_types_str} for '{service_name}'/'{service_type}' discovered.")
+                    logger.info(f"Service record information {rec_types} for '{service_name}'/'{service_type}' discovered.")
 
                 mdns_service_info = MdnsServiceInfo(service_info)
                 self._discovered_services = {}
@@ -623,7 +623,7 @@ class MdnsDiscovery:
 
                 return mdns_service_info
             else:
-                logger.error(f"Service record information {rec_types_str} for '{service_name}' not found.")
+                logger.error(f"Service record information {rec_types} for '{service_name}' not found.")
                 return None
 
     async def _monitor_discovery_silence(self, silence_threshold: float):
