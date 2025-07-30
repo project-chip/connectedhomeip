@@ -80,35 +80,12 @@ jobs:
             - name: Set up a IPV6 known environment
               uses: ./.github/actions/add-ipv6
 
-            - name: Setup ccache
-              run: |
-                  mkdir -p .ccache
-
-            - name: Set cache prefix
-              run: |
-                  if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-                    echo "CACHE_PREFIX=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-                  else
-                    echo "CACHE_PREFIX=master" >> $GITHUB_ENV
-                  fi
-
-            - name: Configure ccache
-              run: |
-                echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
-                echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
-                echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
-                echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
-
-            - name: ccache restore
-              id: ccache-restore
-              uses: actions/cache/restore@v4
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
               with:
-                  path: .ccache
-                  key: ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-150-${{ github.sha }}
-                  restore-keys: |
-                      ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-150-
-                      ccache-master-${{ runner.os }}-${{ matrix.build_variant }}-150-
-                      ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-
+                cache-version: '153' 
+                build-variant: ${{ matrix.build_variant }}
 
             - name: Validate that xml are parsable
               # The sub-items being run here are the same as the input XMLs listed
@@ -444,35 +421,12 @@ jobs:
                   platform: darwin
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
-            - name: Setup ccache
-              run: |
-                  mkdir -p .ccache
-
-            - name: Set cache prefix
-              run: |
-                  if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-                    echo "CACHE_PREFIX=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-                  else
-                    echo "CACHE_PREFIX=master" >> $GITHUB_ENV
-                  fi
-
-            - name: Configure ccache for performance
-              run: |
-                echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
-                echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
-                echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
-                echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
-
-            - name: ccache restore
-              id: ccache-restore
-              uses: actions/cache/restore@v4
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
               with:
-                  path: .ccache
-                  key: ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-150-${{ github.sha }}
-                  restore-keys: |
-                      ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-150-
-                      ccache-master-${{ runner.os }}-${{ matrix.build_variant }}-150-
-                      ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-
+                cache-version: '153' 
+                build-variant: ${{ matrix.build_variant }}
 
             - name: Build Python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
@@ -614,35 +568,12 @@ jobs:
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
-            - name: Setup ccache
-              run: |
-                  mkdir -p .ccache
-
-            - name: Set cache prefix
-              run: |
-                  if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-                    echo "CACHE_PREFIX=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-                  else
-                    echo "CACHE_PREFIX=master" >> $GITHUB_ENV
-                  fi
-
-            - name: Configure ccache for performance
-              run: |
-                echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
-                echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
-                echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
-                echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
-
-            - name: ccache restore
-              id: ccache-restore
-              uses: actions/cache/restore@v4
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
               with:
-                  path: .ccache
-                  key: ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-150-${{ github.sha }}
-                  restore-keys: |
-                      ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-150-
-                      ccache-master-${{ runner.os }}-${{ matrix.build_variant }}-150-
-                      ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.build_variant }}-
+                cache-version: '153' 
+                build-variant: ${{ matrix.build_variant }}
 
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
@@ -977,6 +908,13 @@ jobs:
                   platform: darwin
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
+              with:
+                cache-version: '153' 
+                build-variant: ${{ matrix.build_variant }}
+
             - name: Build Python REPL and example apps
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
@@ -986,6 +924,10 @@ jobs:
                       build \
                       --copy-artifacts-to objdir-clone \
                    "
+            - name: ccache stats
+              run: |
+                ccache -s
+
             - name: Run Tests
               if: false # disable darwin test runs for now as they were very flaky in the past
               run: |
@@ -1019,3 +961,10 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: ccache save
+              id: ccache-save
+              if: always()
+              uses: actions/cache/save@v4
+              with:
+                  path: .ccache
+                  key: ${{ steps.ccache-restore.outputs.cache-primary-key }}

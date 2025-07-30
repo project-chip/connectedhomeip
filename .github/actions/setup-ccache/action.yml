@@ -1,0 +1,41 @@
+name: 'Setup ccache'
+description: 'Configures and restores the ccache cache'
+inputs:
+  cache-version:
+    required: true
+    description: 'A version string to bust the cache'
+  build-variant:
+    required: true
+    description: 'The build variant for cache key uniqueness'
+outputs:
+  cache-primary-key:
+    description: "The primary key used for the cache"
+    value: ${{ steps.ccache-restore.outputs.cache-primary-key }}
+runs:
+  using: "composite"
+  steps:
+    - name: Set cache prefix
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          echo "CACHE_PREFIX=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+        else
+          echo "CACHE_PREFIX=master" >> $GITHUB_ENV
+        fi
+    - name: Configure ccache
+      shell: bash
+      run: |
+        mkdir -p .ccache
+        echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
+        echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
+        echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
+        echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
+    - name: ccache restore
+      id: ccache-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: .ccache
+        key: ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-${{ github.sha }}
+        restore-keys: |
+          ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-
+          ccache-master-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-
