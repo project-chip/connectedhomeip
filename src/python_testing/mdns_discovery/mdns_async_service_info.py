@@ -32,6 +32,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
     only resolution or full service info queries. It also overrides
     the **async_request** method to disable caching.
     """
+
     def __init__(self,
                  name: str | None = None,  # Fully qualified service name
                  type_: str | None = None,  # Fully qualified service type name
