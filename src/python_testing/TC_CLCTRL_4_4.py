@@ -154,7 +154,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         if not is_countdown_time_supported:
             logging.info("CountdownTime attribute not supported, skipping test")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped("2c")
             return
 
         self.step("2c")

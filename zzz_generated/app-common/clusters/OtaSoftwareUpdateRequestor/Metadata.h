@@ -43,10 +43,23 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(UpdateStateProgress::I
 namespace Commands {
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceOTAProvider::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+                                                                Access::Privilege::kAdminister);
 } // namespace AnnounceOTAProvider
 
 } // namespace Commands
+
+namespace Events {
+namespace StateTransition {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateTransition
+namespace VersionApplied {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace VersionApplied
+namespace DownloadError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DownloadError
+
+} // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace Clusters
 } // namespace app

@@ -10415,3 +10415,49 @@ PICS:
       id: AVSM.S.A0027
     - label: " Does the device implement the StatusLightBrightnesss attribute?"
       id: AVSM.S.A0028
+
+    #
+    # Commodity Metering Cluster
+    #
+    - label:
+          "Does the device implement the Commodity Metering Cluster as a server?"
+      id: COMMTR.S
+
+    # Server attributes
+    - label: "Does the device implement the MeteredQuantity attribute?"
+      id: COMMTR.S.A0000
+
+    - label: "Does the device implement the MeteredQuantityTimestamp attribute?"
+      id: COMMTR.S.A0001
+
+    - label: "Does the device implement the TariffUnit attribute?"
+      id: COMMTR.S.A0002
+
+    #
+    # Meter Identification
+    #
+    - label:
+          "Does the device implement the Meter Identification Cluster as a
+          server?"
+      id: MTRID.S
+
+    #  Features
+    - label:
+          "Does the device supports information about Power Threshold feature?"
+      id: MTRID.S.F00
+
+    # Server attributes
+    - label: "Does the device implement the MeterType attribute?"
+      id: MTRID.S.A0000
+
+    - label: "Does the device implement the PointOfDelivery attribute?"
+      id: MTRID.S.A0001
+
+    - label: "Does the device implement the MeterSerialNumber attribute?"
+      id: MTRID.S.A0002
+
+    - label: "Does the device implement the ProtocolVersion attribute?"
+      id: MTRID.S.A0003
+
+    - label: "Does the device implement the PowerThreshold attribute?"
+      id: MTRID.S.A0004

@@ -37,6 +37,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AddArguments::Id
 } // namespace AddArguments
 
 } // namespace Commands
+
+namespace Events {
+namespace PingCountEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PingCountEvent
+
+} // namespace Events
 } // namespace SampleMei
 } // namespace Clusters
 } // namespace app
