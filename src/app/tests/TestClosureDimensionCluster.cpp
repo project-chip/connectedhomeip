@@ -1729,8 +1729,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangeLatchW
     latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
         .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
-    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(false), NullOptional),
-              Status::Success);
+    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(false), NullOptional), Status::Success);
     DataModel::Nullable<GenericDimensionStateStruct> target;
     EXPECT_EQ(logic->GetTargetState(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.Value().latch.Value(), false);
