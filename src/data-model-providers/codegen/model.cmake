@@ -22,8 +22,6 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/EmberAttributeDataBuffer.cpp"
   "${BASE_DIR}/EmberAttributeDataBuffer.h"
   "${BASE_DIR}/Instance.cpp"
-  "${BASE_DIR}/ServerClusterInterfaceRegistry.cpp"
-  "${BASE_DIR}/ServerClusterInterfaceRegistry.h"
 
   # These are dependencies from model.gni that are not included directly in cmake
   # "${chip_root}/src/app/server-cluster",
@@ -34,4 +32,6 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/../../app/server-cluster/ServerClusterContext.h"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.h"
+  "${BASE_DIR}/../../app/server-cluster/ServerClusterInterfaceRegistry.cpp"
+  "${BASE_DIR}/../../app/server-cluster/ServerClusterInterfaceRegistry.h"
 )
