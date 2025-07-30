@@ -483,13 +483,13 @@ class MdnsDiscovery:
         if self._verbose_logging:
             logger.info("Getting service from discovered services: %s", self._discovered_services)
 
-        if service_type.value in self._discovered_services:
+        if service_type in self._discovered_services:
             if service_name is not None:
-                for service in self._discovered_services[service_type.value]:
+                for service in self._discovered_services[service_type]:
                     if service.service_name == service_name.replace("._MATTER._TCP.LOCAL.", "._matter._tcp.local."):
                         return service
             else:
-                return self._discovered_services[service_type.value][0]
+                return self._discovered_services[service_type][0]
         else:
             return None
 
@@ -542,7 +542,7 @@ class MdnsDiscovery:
 
         # Background monitor to end discovery early after
         # a period of inactivity (no new services)
-        create_task(self._monitor_discovery_silence(silence_sec=2))
+        create_task(self._monitor_discovery_silence(silence_threshold=2))
 
         try:
             # Wait for either the inactivity timeout (triggered by the background monitor)
@@ -593,11 +593,12 @@ class MdnsDiscovery:
                 logger.info("   Name does NOT match \'%s\' vs \'%s\'", self._name_filter, name.upper())
             return
 
-        if self._verbose_logging:
-            logger.info("Received service data. Unlocking service information")
+        self._last_discovery_time = time.time()
 
         if query_service:
             # Get service information
+            if self._verbose_logging:
+                logger.info("Received service data. Querying service information")
             ensure_future(self._query_service_info(
                 service_type,
                 name)
@@ -663,27 +664,35 @@ class MdnsDiscovery:
 
             self._event.set()
 
-    async def _monitor_discovery_silence(self, silence_sec: float):
+    async def _monitor_discovery_silence(self, silence_threshold: float):
         """
-        Monitor service discovery for a period of inactivity (silence).
+        Monitor service discovery and end it after a period of inactivity (silence).
 
-        This coroutine repeatedly checks the time since the last discovered service.
-        If no new services are discovered within the specified `silence_sec` window,
-        it signals completion by setting the internal event (`self._event`), allowing
-        the main discovery logic to exit early.
+        Periodically checks how much time has passed since the last discovered service.
+        If the duration exceeds the specified `silence_threshold` *and* at least one
+        service has been discovered, it considers the discovery process complete and
+        sets an internal event (`self._event`) to signal early termination of the main
+        discovery logic.
 
         Args:
-            silence_sec (float): Number of seconds to wait after the last discovery
-                                 before considering discovery complete.
+            silence_threshold (float): Number of seconds to wait after the last discovery
+                                    before ending the discovery process early.
 
         Returns:
             None
         """
         while True:
-            await sleep(0.25)
-            if time.time() - self._last_discovery_time >= silence_sec:
+            # Polling delay of 0.5 seconds between checks
+            # for inactivity to reduce CPU usage
+            await sleep(0.5)
+
+            time_since_last_discovery = time.time() - self._last_discovery_time
+
+            # If the time since the last discovered service exceeds the silence threshold,
+            # we assume discovery is complete and signal to stop the browsing process.
+            if self._discovered_services and time_since_last_discovery >= silence_threshold:
                 if self._verbose_logging:
-                    logger.info("No new mDNS services after %.1f seconds, stopping browse", silence_sec)
+                    logger.info(f"No new mDNS services after {silence_threshold:.1f} seconds, stopping browse")
                 self._event.set()
                 break
 
