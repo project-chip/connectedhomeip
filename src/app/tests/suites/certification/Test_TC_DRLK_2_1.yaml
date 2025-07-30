@@ -299,12 +299,28 @@ tests:
               minValue: 0
               maxValue: 4294967294
 
+    - label: "Step 5a: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0004
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
     - label: "Step 5b: TH writes DoorOpenEvents attribute as 0"
       PICS: DRLK.S.A0004
       command: "writeAttribute"
       attribute: "DoorOpenEvents"
       arguments:
           value: 0
+
+    - label: "Step 5b: TH writes DoorOpenEvents attribute as 0"
+      PICS: "!DRLK.S.A0004"
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     #- label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
     #  PICS: DRLK.S.A0004.Write
@@ -353,12 +369,28 @@ tests:
               minValue: 0
               maxValue: 4294967294
 
+    - label: "Step 6a: TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.F05 && !DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
     - label: "Step 6b: TH writes DoorClosedEvents attribute as 0"
       PICS: DRLK.S.A0005
       command: "writeAttribute"
       attribute: "DoorClosedEvents"
       arguments:
           value: 0
+
+    - label: "Step 6b: TH writes DoorClosedEvents attribute as 0"
+      PICS: "!DRLK.S.A0005"
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     #- label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
     #  PICS: DRLK.S.A0005.Write
@@ -368,7 +400,7 @@ tests:
     #      value: 11
 
     #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
-    - label: "Step 6c: TH reads DoorOpenEvents attribute from DUT"
+    - label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
       PICS: DRLK.S.A0005 && PICS_USER_PROMPT
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
