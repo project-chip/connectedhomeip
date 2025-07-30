@@ -8,3 +8,7 @@ coverage:
       # default is the status check's name, not default settings
       default:
         if_ci_failed: ignore
+
+parsers:
+  cobertura:
+    partials_as_hits: true
