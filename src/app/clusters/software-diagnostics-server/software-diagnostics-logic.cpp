@@ -108,7 +108,8 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
     };
 
     size_t spanSize = sizeof(Attributes::kMandatoryMetadata) / sizeof(chip::app::DataModel::AttributeEntry);
-    return listBuilder.Append(Span<const DataModel::AttributeEntry>(SoftwareDiagnostics::Attributes::kMandatoryMetadata, spanSize), Span(optionalEntries));
+    return listBuilder.Append(Span<const DataModel::AttributeEntry>(SoftwareDiagnostics::Attributes::kMandatoryMetadata, spanSize),
+                              Span(optionalEntries));
 }
 
 } // namespace Clusters
