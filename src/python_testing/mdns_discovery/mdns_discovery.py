@@ -87,13 +87,13 @@ class MdnsDiscovery:
 
         Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 15 seconds.
+            discovery_timeout_sec (float): Defaults to 30 seconds.
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
         self._name_filter = None
-        return await self._get_service(MdnsServiceType.COMMISSIONER, log_output, discovery_timeout_sec)
+        return await self._get_service(MdnsServiceType.COMMISSIONER.value, log_output, discovery_timeout_sec)
 
     async def get_commissionable_service(self, log_output: bool = False,
                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
@@ -103,13 +103,13 @@ class MdnsDiscovery:
 
         Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 15 seconds.
+            discovery_timeout_sec (float): Defaults to 30 seconds.
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
         self._name_filter = None
-        return await self._get_service(MdnsServiceType.COMMISSIONABLE, log_output, discovery_timeout_sec)
+        return await self._get_service(MdnsServiceType.COMMISSIONABLE.value, log_output, discovery_timeout_sec)
 
     async def get_operational_service(self,
                                       node_id: Optional[int] = None,
@@ -122,7 +122,7 @@ class MdnsDiscovery:
 
         Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 15 seconds.
+            discovery_timeout_sec (float): Defaults to 30 seconds.
             node_id: the node id to create the service name from
             compressed_fabric_id: the fabric id to create the service name from
 
@@ -136,7 +136,7 @@ class MdnsDiscovery:
 
         self._name_filter = f'{compressed_fabric_id:016x}-{node_id:016x}.{MdnsServiceType.OPERATIONAL.value}'.upper()
         logger.info(f"name filter {self._name_filter}")
-        return await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec, self._name_filter)
+        return await self._get_service(MdnsServiceType.OPERATIONAL.value, log_output, discovery_timeout_sec, self._name_filter)
 
     async def get_border_router_service(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
@@ -146,12 +146,12 @@ class MdnsDiscovery:
 
         Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 15 seconds.
+            discovery_timeout_sec (float): Defaults to 30 seconds.
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
-        return await self._get_service(MdnsServiceType.BORDER_ROUTER, log_output, discovery_timeout_sec)
+        return await self._get_service(MdnsServiceType.BORDER_ROUTER.value, log_output, discovery_timeout_sec)
 
     async def get_all_services(self, log_output: bool = False,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
@@ -161,7 +161,7 @@ class MdnsDiscovery:
 
         Optional args:
             log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 15 seconds.
+            discovery_timeout_sec (float): Defaults to 30 seconds.
 
         Returns:
             Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types (str) to
@@ -403,42 +403,14 @@ class MdnsDiscovery:
             log_output (bool): If True, logs the discovered PTR records grouped by service type as JSON.
 
         Returns:
-            list[PtrRecord]: A flat list of all discovered PtrRecord objects across all requested service types.
-
-        Note:
-            This method performs a PTR browse using AsyncServiceBrowser for each specified service type.
-            It waits up to the specified timeout for responses and handles them via internal callbacks.
-            The resulting records include instance name extraction and optional subtype support.
+            list[PtrRecord]: A list of all discovered PtrRecord objects across all requested service types.
         """
-        self._event.clear()
-        self._discovered_services = {}
-        self._last_discovery_time = time.time()
-
-        logger.info(f"Browsing for PTR mDNS service(s) of type: {service_types}")
-
-        aiobrowser = AsyncServiceBrowser(
-            zeroconf=self._azc.zeroconf,
-            type_=service_types,
-            handlers=[partial(self._on_service_state_change, query_service=False)]
+        await self._discover(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=log_output,
+            service_types=service_types,
+            query_service=False,
         )
-
-        # Background monitor to end discovery early after
-        # a period of inactivity (no new services)
-        create_task(self._monitor_discovery_silence(silence_sec=2))
-
-        try:
-            # Wait for either the inactivity timeout (triggered by the background monitor)
-            # or the full discovery timeout to elapse, whichever comes first
-            await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
-        except TimeoutError:
-            logger.info("mDNS PTR browse finished after %d seconds.", discovery_timeout_sec)
-        finally:
-            logger.info("Stopping mDNS PTR browse and cleaning up.")
-            self._event.set()
-            await aiobrowser.async_cancel()
-
-        if log_output:
-            self._log_output()
 
         ptr_records = [
             record
@@ -480,7 +452,7 @@ class MdnsDiscovery:
         return sub_types
 
     # Private methods
-    async def _get_service(self, service_type: MdnsServiceType,
+    async def _get_service(self, service_type: str,
                            log_output: bool,
                            discovery_timeout_sec: float,
                            service_name: str = None,
@@ -490,9 +462,9 @@ class MdnsDiscovery:
         Asynchronously discovers a specific type of mDNS service within the network and returns its details.
 
         Args:
-            service_type (MdnsServiceType): The enum representing the type of mDNS service to discover.
+            service_type (str): Represents the type of mDNS service to discover.
             log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 15 seconds.
+            discovery_timeout_sec (float): Defaults to 30 seconds.
             service_name (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available.
             query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
 
@@ -504,7 +476,7 @@ class MdnsDiscovery:
         await self._discover(
             discovery_timeout_sec=discovery_timeout_sec,
             log_output=log_output,
-            service_types=[service_type.value],
+            service_types=[service_type],
             query_service=query_service,
         )
 
@@ -546,10 +518,6 @@ class MdnsDiscovery:
 
         Returns:
             None: This method does not return any value.
-
-        Note:
-            The discovery duration may need to be adjusted based on network conditions and expected response times for service
-            announcements.
         """
         if all_services and service_types:
             raise ValueError("Specify either 'all_services' or 'service_types', not both.")
@@ -560,18 +528,30 @@ class MdnsDiscovery:
         if service_types:
             self._service_types = service_types
 
-        logger.info(f"Browsing for mDNS service(s) of type: {self._service_types}")
+        logger.info(f"Browsing for mDNS service(s) of type: {service_types}")
 
         self._event.clear()
-        aiobrowser = AsyncServiceBrowser(zeroconf=self._azc.zeroconf,
-                                         type_=self._service_types,
-                                         handlers=[partial(self._on_service_state_change, query_service=query_service)]
-                                         )
+        self._discovered_services = {}
+        self._last_discovery_time = time.time()
+
+        aiobrowser = AsyncServiceBrowser(
+            zeroconf=self._azc.zeroconf,
+            type_=service_types,
+            handlers=[partial(self._on_service_state_change, query_service=query_service)]
+        )
+
+        # Background monitor to end discovery early after
+        # a period of inactivity (no new services)
+        create_task(self._monitor_discovery_silence(silence_sec=2))
+
         try:
+            # Wait for either the inactivity timeout (triggered by the background monitor)
+            # or the full discovery timeout to elapse, whichever comes first
             await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
         except TimeoutError:
-            logger.error("mDNS browse timed out after %d seconds.", discovery_timeout_sec)
+            logger.info("mDNS browse finished after %d seconds.", discovery_timeout_sec)
         finally:
+            logger.info("Stopping mDNS browse and cleaning up.")
             self._event.set()
             await aiobrowser.async_cancel()
 

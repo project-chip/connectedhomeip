@@ -27,6 +27,11 @@ _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
 
 
 class MdnsAsyncServiceInfo(ServiceInfo):
+    """
+    This subclass of **zeroconf.ServiceInfo** enables AAAA address
+    only resolution or full service info queries. It also overrides
+    the **async_request** method to disable caching.
+    """
     def __init__(self,
                  name: str | None = None,  # Fully qualified service name
                  type_: str | None = None,  # Fully qualified service type name
@@ -63,18 +68,9 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         """Returns true if the service could be discovered on the
         network, and updates this object with details discovered.
 
-        This method will be run in the event loop.
-
-        Passing addr and port is optional, and will default to the
-        mDNS multicast address and port. This is useful for directing
-        requests to a specific host that may be able to respond across
-        subnets.
-
         This override of **zeroconf.ServiceInfo.async_request** disables
         known-answer caching and clears the cache to ensure a fresh
-        response each time. Unlike the original implementation, which
-        sends all questions at once, this version sends one question
-        type at a time (e.g., SRV, TXT, AAAA).
+        response each time.
         """
         if not zc.started:
             await zc.async_wait_for_start()
