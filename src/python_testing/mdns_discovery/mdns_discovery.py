@@ -304,7 +304,7 @@ class MdnsDiscovery:
             log_output (bool, optional): Whether to log the discovered information. Defaults to False.
 
         Returns:
-            Returns a QuadaRecord containing the resolved IPv6 addresses, or None if resolution fails.
+            Optional[list[QuadaRecord]]: A list of discovered QuadaRecord objects, or None if no services were found.
         """
         logger.info(f"Service record information lookup (AAAA) for '{hostname}' in progress...")
 
@@ -316,44 +316,47 @@ class MdnsDiscovery:
                 azc.zeroconf,
                 timeout=discovery_timeout_sec * 1000)
 
-            if not is_discovered:
-                logger.info(f"No AAAA record found for '{hostname}' within {discovery_timeout_sec}s")
+            if is_discovered:
+                if self._verbose_logging:
+                    logger.info(f"Service record information (AAAA) for '{hostname}' discovered.")
+
+                # Get IPv6 addresses and convert to QuadaRecord objects
+                ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
+                if ipv6_addresses:
+                    quada_records: list[QuadaRecord] = [
+                        QuadaRecord(ipv6)
+                        for ipv6 in ipv6_addresses
+                    ]
+
+                # Adds service to discovered services
+                self._discovered_services = {}
+                self._discovered_services[hostname] = []
+                for ipv6 in quada_records:
+                    self._discovered_services[hostname].append(ipv6)
+
+                if log_output:
+                    self._log_output()
+
+                return quada_records
+            else:
+                logger.error(f"Service record information (AAAA) for '{hostname}' not found.")
                 return None
-
-            # Get IPv6 addresses and convert to QuadaRecord class
-            ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
-            if ipv6_addresses:
-                quada_records: list[QuadaRecord] = [
-                    QuadaRecord(ipv6)
-                    for ipv6 in ipv6_addresses
-                ]
-
-            # Adds service to discovered services
-            self._discovered_services = {}
-            self._discovered_services[hostname] = []
-            for ipv6 in quada_records:
-                self._discovered_services[hostname].append(ipv6)
-
-            if log_output:
-                self._log_output()
-
-            return quada_records
 
     async def get_ptr_records(self,
                               service_types: list[str],
                               discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                               log_output: bool = False,
-                              ) -> list[PtrRecord]:
+                              ) -> Optional[list[PtrRecord]]:
         """
         Asynchronously discovers mDNS PTR records for the given service types.
 
         Args:
-            discovery_timeout_sec (float): Time in seconds to wait for responses after sending the browse request.
             service_types (list[str]): A list of service types (e.g., "_matter._tcp.local.", "_Ixxxx._sub._matter._tcp.local.") to browse for.
+            discovery_timeout_sec (float): Time in seconds to wait for responses after sending the browse request.
             log_output (bool): If True, logs the discovered PTR records grouped by service type as JSON.
 
         Returns:
-            list[PtrRecord]: A list of all discovered PtrRecord objects across all requested service types.
+            Optional[list[PtrRecord]]: A list of discovered PtrRecord objects, or None if no services were found.
         """
         logger.info(f"Service record information lookup (PTR) for '{service_types}' in progress...")
         await self._discover(
@@ -363,13 +366,18 @@ class MdnsDiscovery:
             query_service=False,
         )
 
-        ptr_records = [
-            record
-            for records in self._discovered_services.values()
-            for record in records
-        ]
-
-        return ptr_records
+        if self._discovered_services:
+            if self._verbose_logging:
+                logger.info(f"Service record information (PTR) for '{service_types}' discovered.")
+            ptr_records = [
+                record
+                for records in self._discovered_services.values()
+                for record in records
+            ]
+            return ptr_records
+        else:
+            logger.error(f"Service record information (PTR) for '{service_types}' not found.")
+            return None
 
     async def get_commissionable_subtypes(self,
                                           discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
