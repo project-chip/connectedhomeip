@@ -104,7 +104,7 @@ struct TestServerClusterInterfaceRegistry : public ::testing::Test
 
 TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
 {
-    ServerClusterInterfaceRegistry registry;
+    SingleEndpointServerClusterRegistry registry;
 
     FakeServerClusterInterface cluster1(kEp1, kCluster1);
     FakeServerClusterInterface cluster2(kEp2, kCluster2);
@@ -218,7 +218,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
         registrations.emplace_back(items[i]);
     }
 
-    ServerClusterInterfaceRegistry registry;
+    SingleEndpointServerClusterRegistry registry;
 
     for (size_t test = 0; test < kTestIterations; test++)
     {
@@ -309,7 +309,7 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
         registrations.emplace_back(items[i]);
     }
 
-    ServerClusterInterfaceRegistry registry;
+    SingleEndpointServerClusterRegistry registry;
 
     // place the clusters on the respecitve endpoints
     for (ClusterId i = 0; i < kClusterTestCount; i++)
@@ -359,7 +359,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
     ServerClusterRegistration registration3(cluster3);
 
     {
-        ServerClusterInterfaceRegistry registry;
+        SingleEndpointServerClusterRegistry registry;
         EXPECT_FALSE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
@@ -438,7 +438,7 @@ TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
     MultiPathCluster cluster(kTestPaths);
     ServerClusterRegistration registration(cluster);
 
-    ServerClusterInterfaceRegistry registry;
+    SingleEndpointServerClusterRegistry registry;
     ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
 
     for (auto & p : kTestPaths)
@@ -452,17 +452,36 @@ TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
     ASSERT_EQ(registry.Get({ 3, 200 }), nullptr);
     ASSERT_EQ(registry.Get({ 4, 33 }), nullptr);
 
-    // Verify listing works
-    ServerClusterInterfaceRegistry::ClustersList clusters = registry.ClustersOnEndpoint(15);
-    auto it                                               = clusters.begin();
+    // Verify listing works: we should get the cluster once
+    size_t cluster_count = 0;
+    for (auto * c : registry.AllClusters())
+    {
+        ASSERT_EQ(c, &cluster);
+        cluster_count++;
+    }
+    ASSERT_EQ(cluster_count, 1u);
 
-    for (auto & p : kTestPaths)
+    // We can also iterate by endpoint and find all the paths.
+    SingleEndpointServerClusterRegistry::ClustersList clusters = registry.ClustersOnEndpoint(15);
+    auto it                                                    = clusters.begin();
+
+    std::vector<ClusterId> returned_clusters;
+    for (size_t i = 0; i < kTestPaths.size(); ++i)
     {
         ASSERT_NE(it, clusters.end());
-        ASSERT_EQ(*it, p.mClusterId);
+        returned_clusters.push_back(*it);
         ++it;
     }
     ASSERT_EQ(it, clusters.end());
+
+    std::sort(returned_clusters.begin(), returned_clusters.end());
+    std::vector<ClusterId> expected_clusters;
+    for (const auto & path : kTestPaths)
+    {
+        expected_clusters.push_back(path.mClusterId);
+    }
+    std::sort(expected_clusters.begin(), expected_clusters.end());
+    ASSERT_EQ(returned_clusters, expected_clusters);
 
     ASSERT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
     for (auto & p : kTestPaths)
@@ -481,7 +500,7 @@ TEST_F(TestServerClusterInterfaceRegistry, RejectDifferentEndpointPaths)
         MultiPathCluster cluster(kTestPaths);
         ServerClusterRegistration registration(cluster);
 
-        ServerClusterInterfaceRegistry registry;
+        SingleEndpointServerClusterRegistry registry;
         ASSERT_EQ(registry.Register(registration), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -494,8 +513,41 @@ TEST_F(TestServerClusterInterfaceRegistry, RejectDifferentEndpointPaths)
         MultiPathCluster cluster(kTestPaths);
         ServerClusterRegistration registration(cluster);
 
-        ServerClusterInterfaceRegistry registry;
+        SingleEndpointServerClusterRegistry registry;
         ASSERT_EQ(registry.Register(registration), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, AcceptDifferentEndpointPaths)
+{
+    {
+        const std::array<ConcreteClusterPath, 2> kTestPaths{ {
+            { 1, 100 },
+            { 2, 88 },
+        } };
+        MultiPathCluster cluster(kTestPaths);
+        ServerClusterRegistration registration(cluster);
+
+        ServerClusterInterfaceRegistry registry;
+        ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
+        ASSERT_EQ(registry.Get({ 1, 100 }), &cluster);
+        ASSERT_EQ(registry.Get({ 2, 88 }), &cluster);
+    }
+
+    {
+        const std::array<ConcreteClusterPath, 3> kTestPaths{ {
+            { 1, 100 },
+            { 1, 200 },
+            { 3, 100 },
+        } };
+        MultiPathCluster cluster(kTestPaths);
+        ServerClusterRegistration registration(cluster);
+
+        ServerClusterInterfaceRegistry registry;
+        ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
+        ASSERT_EQ(registry.Get({ 1, 100 }), &cluster);
+        ASSERT_EQ(registry.Get({ 1, 200 }), &cluster);
+        ASSERT_EQ(registry.Get({ 3, 100 }), &cluster);
     }
 }
 
@@ -508,7 +560,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)
     ServerClusterRegistration registration2(cluster2);
 
     {
-        ServerClusterInterfaceRegistry registry;
+        SingleEndpointServerClusterRegistry registry;
         EXPECT_FALSE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
 
@@ -549,4 +601,45 @@ TEST_F(TestServerClusterInterfaceRegistry, LazyRegistrationTest)
     EXPECT_EQ(obj.Registration().serverClusterInterface, &obj.Cluster());
     obj.Destroy();
     EXPECT_FALSE(obj.IsConstructed());
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, AllClustersIteration)
+{
+    SingleEndpointServerClusterRegistry registry;
+
+    FakeServerClusterInterface cluster1(kEp1, kCluster1);
+    FakeServerClusterInterface cluster2(kEp2, kCluster2);
+    FakeServerClusterInterface cluster3(kEp2, kCluster3);
+
+    ServerClusterRegistration registration1(cluster1);
+    ServerClusterRegistration registration2(cluster2);
+    ServerClusterRegistration registration3(cluster3);
+
+    EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(registration3), CHIP_NO_ERROR);
+
+    std::vector<ServerClusterInterface *> found_clusters;
+    for (auto * cluster : registry.AllClusters())
+    {
+        found_clusters.push_back(cluster);
+    }
+
+    EXPECT_EQ(found_clusters.size(), 3u);
+    EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster1), found_clusters.end());
+    EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster2), found_clusters.end());
+    EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster3), found_clusters.end());
+
+    registry.Unregister(&cluster2);
+
+    found_clusters.clear();
+    for (auto * cluster : registry.AllClusters())
+    {
+        found_clusters.push_back(cluster);
+    }
+
+    EXPECT_EQ(found_clusters.size(), 2u);
+    EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster1), found_clusters.end());
+    EXPECT_EQ(std::find(found_clusters.begin(), found_clusters.end(), &cluster2), found_clusters.end());
+    EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster3), found_clusters.end());
 }

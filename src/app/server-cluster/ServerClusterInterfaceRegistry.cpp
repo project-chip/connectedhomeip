@@ -27,20 +27,6 @@
 namespace chip {
 namespace app {
 
-ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
-{
-    while (mRegistrations != nullptr)
-    {
-        ServerClusterRegistration * next = mRegistrations->next;
-        if (mContext.has_value())
-        {
-            mRegistrations->serverClusterInterface->Shutdown();
-        }
-        mRegistrations->next = nullptr;
-        mRegistrations       = next;
-    }
-}
-
 CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & entry)
 {
     // we have no strong way to check if entry is already registered somewhere else, so we use "next" as some
@@ -58,10 +44,6 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & 
         // Double-checking for duplicates makes the checks O(n^2) on the total number of registered
         // items. We preserve this however we may want to make this optional at some point in time.
         VerifyOrReturnError(Get(path) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
-
-        // Codegen registry requirements (so that we can support endpoint unregistration): every
-        // path must belong to the same endpoint id.
-        VerifyOrReturnError(path.mEndpointId == paths[0].mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     if (mContext.has_value())
@@ -115,54 +97,6 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * w
     }
 
     return CHIP_ERROR_NOT_FOUND;
-}
-
-ServerClusterInterfaceRegistry::ClustersList ServerClusterInterfaceRegistry::ClustersOnEndpoint(EndpointId endpointId)
-{
-    return { mRegistrations, endpointId };
-}
-
-void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpointId)
-{
-    ServerClusterRegistration * prev    = nullptr;
-    ServerClusterRegistration * current = mRegistrations;
-    while (current != nullptr)
-    {
-        // Requirements for Paths:
-        //   - GetPaths() MUST be non-empty
-        //   - GetPaths() MUST belong to the same endpoint
-        // Loop below relies on that: if the endpoint matches, it can be removed
-        auto paths = current->serverClusterInterface->GetPaths();
-        if (paths.empty() || paths.front().mEndpointId == endpointId)
-        {
-            if (mCachedInterface == current->serverClusterInterface)
-            {
-                mCachedInterface = nullptr;
-            }
-            if (prev == nullptr)
-            {
-                mRegistrations = current->next;
-            }
-            else
-            {
-                prev->next = current->next;
-            }
-            ServerClusterRegistration * actual_next = current->next;
-
-            current->next = nullptr; // Make sure current does not look like part of a list.
-            if (mContext.has_value())
-            {
-                current->serverClusterInterface->Shutdown();
-            }
-
-            current = actual_next;
-        }
-        else
-        {
-            prev    = current;
-            current = current->next;
-        }
-    }
 }
 
 ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClusterPath & clusterPath)
@@ -242,6 +176,88 @@ void ServerClusterInterfaceRegistry::ClearContext()
     }
 
     mContext.reset();
+}
+
+ServerClusterInterfaceRegistry::AllClustersList ServerClusterInterfaceRegistry::AllClusters()
+{
+    return { mRegistrations };
+}
+
+SingleEndpointServerClusterRegistry::~SingleEndpointServerClusterRegistry()
+{
+    while (mRegistrations != nullptr)
+    {
+        ServerClusterRegistration * next = mRegistrations->next;
+        if (mContext.has_value())
+        {
+            mRegistrations->serverClusterInterface->Shutdown();
+        }
+        mRegistrations->next = nullptr;
+        mRegistrations       = next;
+    }
+}
+
+CHIP_ERROR SingleEndpointServerClusterRegistry::Register(ServerClusterRegistration & entry)
+{
+    Span<const ConcreteClusterPath> paths = entry.serverClusterInterface->GetPaths();
+    VerifyOrReturnError(!paths.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Codegen registry requirements (so that we can support endpoint unregistration): every
+    // path must belong to the same endpoint id.
+    for (const ConcreteClusterPath & path : paths)
+    {
+        VerifyOrReturnError(path.mEndpointId == paths[0].mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return ServerClusterInterfaceRegistry::Register(entry);
+}
+
+SingleEndpointServerClusterRegistry::ClustersList SingleEndpointServerClusterRegistry::ClustersOnEndpoint(EndpointId endpointId)
+{
+    return { mRegistrations, endpointId };
+}
+
+void SingleEndpointServerClusterRegistry::UnregisterAllFromEndpoint(EndpointId endpointId)
+{
+    ServerClusterRegistration * prev    = nullptr;
+    ServerClusterRegistration * current = mRegistrations;
+    while (current != nullptr)
+    {
+        // Requirements for Paths:
+        //   - GetPaths() MUST be non-empty
+        //   - GetPaths() MUST belong to the same endpoint
+        // Loop below relies on that: if the endpoint matches, it can be removed
+        auto paths = current->serverClusterInterface->GetPaths();
+        if (paths.empty() || paths.front().mEndpointId == endpointId)
+        {
+            if (mCachedInterface == current->serverClusterInterface)
+            {
+                mCachedInterface = nullptr;
+            }
+            if (prev == nullptr)
+            {
+                mRegistrations = current->next;
+            }
+            else
+            {
+                prev->next = current->next;
+            }
+            ServerClusterRegistration * actual_next = current->next;
+
+            current->next = nullptr; // Make sure current does not look like part of a list.
+            if (mContext.has_value())
+            {
+                current->serverClusterInterface->Shutdown();
+            }
+
+            current = actual_next;
+        }
+        else
+        {
+            prev    = current;
+            current = current->next;
+        }
+    }
 }
 
 } // namespace app

@@ -56,7 +56,7 @@ public:
     void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
-    ServerClusterInterfaceRegistry & Registry() { return mRegistry; }
+    SingleEndpointServerClusterRegistry & Registry() { return mRegistry; }
 
     /// Generic model implementations
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
@@ -121,7 +121,7 @@ private:
     // Ember requires a persistence provider, so we make sure we can always have something
     PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
-    ServerClusterInterfaceRegistry mRegistry;
+    SingleEndpointServerClusterRegistry mRegistry;
 
     /// Finds the specified ember cluster
     ///

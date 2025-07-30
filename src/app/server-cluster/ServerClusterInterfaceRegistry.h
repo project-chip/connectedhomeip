@@ -132,6 +132,86 @@ private:
 class ServerClusterInterfaceRegistry
 {
 public:
+    virtual ~ServerClusterInterfaceRegistry() = default;
+
+    /// Add the given entry to the registry.
+    ///
+    /// Requirements:
+    ///   - entry MUST NOT be part of any other registration
+    ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
+    ///
+    /// There can be only a single registration for a given `endpointId/clusterId` path.
+    [[nodiscard]] virtual CHIP_ERROR Register(ServerClusterRegistration & entry);
+
+    /// Remove an existing registration
+    ///
+    /// Will return CHIP_ERROR_NOT_FOUND if the given registration is not found.
+    CHIP_ERROR Unregister(ServerClusterInterface *);
+
+    /// Return the interface registered for the given cluster path or nullptr if one does not exist
+    ServerClusterInterface * Get(const ConcreteClusterPath & path);
+
+    // Set up the underlying context for all clusters that are managed by this registry.
+    //
+    // The values within context will be copied and used.
+    CHIP_ERROR SetContext(ServerClusterContext && context);
+
+    // Invalidates current context.
+    void ClearContext();
+
+    class AllClustersList
+    {
+    public:
+        class Iterator
+        {
+        public:
+            Iterator(ServerClusterRegistration * registration) : mRegistration(registration) {}
+
+            Iterator & operator++()
+            {
+                if (mRegistration)
+                {
+                    mRegistration = mRegistration->next;
+                }
+                return *this;
+            }
+            bool operator==(const Iterator & other) const { return mRegistration == other.mRegistration; }
+            bool operator!=(const Iterator & other) const { return mRegistration != other.mRegistration; }
+            ServerClusterInterface * operator*() { return mRegistration ? mRegistration->serverClusterInterface : nullptr; }
+
+        private:
+            ServerClusterRegistration * mRegistration;
+        };
+
+        constexpr AllClustersList(ServerClusterRegistration * start) : mStart(start) {}
+        Iterator begin() { return { mStart }; }
+        Iterator end() { return { nullptr }; }
+
+    private:
+        ServerClusterRegistration * mStart;
+    };
+
+    AllClustersList AllClusters();
+
+protected:
+    ServerClusterRegistration * mRegistrations = nullptr;
+
+    // A one-element cache to speed up finding a cluster within an endpoint.
+    // The endpointId specifies which endpoint the cache belongs to.
+    ServerClusterInterface * mCachedInterface = nullptr;
+
+    // Managing context for this registry
+    std::optional<ServerClusterContext> mContext;
+};
+
+/// This class specializes ServerClusterInterfaceRegistry to register ServerClusterInterface references
+/// that are limited to a single endpoint. In other words, GetPaths() must return path(s) in the same
+/// endpoint.
+/// The assumption that every ServerClusterInterface registered is limited to a single endpoint
+/// allows us to provide additional helper methods such as `ClustersOnEndpoint()` and `UnregisterAllFromEndpoint()`.
+class SingleEndpointServerClusterRegistry : public ServerClusterInterfaceRegistry
+{
+public:
     /// represents an iterable list of clusters
     class ClustersList
     {
@@ -199,27 +279,19 @@ public:
         ServerClusterRegistration * mStart;
     };
 
-    ~ServerClusterInterfaceRegistry();
+    ~SingleEndpointServerClusterRegistry();
 
     /// Add the given entry to the registry.
     /// NOTE the requirement of entries to be part of the same endpoint.
     ///
     /// Requirements:
     ///   - entry MUST NOT be part of any other registration
-    ///   - paths MUST be part of the same endpoint (requirement for codegen server cluster interface implementations)
+    ///   - paths MUST be part of the same endpoint
     ///
     ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
     ///
     /// There can be only a single registration for a given `endpointId/clusterId` path.
-    [[nodiscard]] CHIP_ERROR Register(ServerClusterRegistration & entry);
-
-    /// Remove an existing registration
-    ///
-    /// Will return CHIP_ERROR_NOT_FOUND if the given registration is not found.
-    CHIP_ERROR Unregister(ServerClusterInterface *);
-
-    /// Return the interface registered for the given cluster path or nullptr if one does not exist
-    ServerClusterInterface * Get(const ConcreteClusterPath & path);
+    [[nodiscard]] CHIP_ERROR Register(ServerClusterRegistration & entry) override;
 
     /// Provides a list of clusters that are registered for the given endpoint.
     ///
@@ -229,25 +301,8 @@ public:
 
     /// Unregister all registrations for the given endpoint.
     void UnregisterAllFromEndpoint(EndpointId endpointId);
-
-    // Set up the underlying context for all clusters that are managed by this registry.
-    //
-    // The values within context will be copied and used.
-    CHIP_ERROR SetContext(ServerClusterContext && context);
-
-    // Invalidates current context.
-    void ClearContext();
-
-private:
-    ServerClusterRegistration * mRegistrations = nullptr;
-
-    // A one-element cache to speed up finding a cluster within an endpoint.
-    // The endpointId specifies which endpoint the cache belongs to.
-    ServerClusterInterface * mCachedInterface = nullptr;
-
-    // Managing context for this registry
-    std::optional<ServerClusterContext> mContext;
 };
+
 
 } // namespace app
 } // namespace chip

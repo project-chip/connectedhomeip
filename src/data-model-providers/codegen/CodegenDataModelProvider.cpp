@@ -279,7 +279,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     //
     // To allow cluster implementations to be incrementally converted to storing their own data versions,
     // instead of relying on the out-of-band emberAfDataVersionStorage, first check for clusters that are
-    // using the new data version storage and are registered via ServerClusterInterfaceRegistry, then fill
+    // using the new data version storage and are registered via SingleEndpointServerClusterRegistry, then fill
     // in the data versions for the rest via the out-of-band mechanism.
 
     // assume the clusters on endpoint does not change in between these two loops
