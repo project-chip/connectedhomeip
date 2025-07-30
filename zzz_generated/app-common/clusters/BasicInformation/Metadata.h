@@ -125,6 +125,22 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MfgSpecificPing:
 } // namespace MfgSpecificPing
 
 } // namespace Commands
+
+namespace Events {
+namespace StartUp {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StartUp
+namespace ShutDown {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ShutDown
+namespace Leave {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Leave
+namespace ReachableChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ReachableChanged
+
+} // namespace Events
 } // namespace BasicInformation
 } // namespace Clusters
 } // namespace app

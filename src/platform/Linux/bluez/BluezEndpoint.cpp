@@ -97,31 +97,29 @@ gboolean BluezEndpoint::BluezCharacteristicReadValue(BluezGattCharacteristic1 * 
 gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                                         GUnixFDList * aFDList, GVariant * aOptions)
 {
-    int fds[2] = { -1, -1 };
-#if CHIP_ERROR_LOGGING
-    char * errStr;
-#endif // CHIP_ERROR_LOGGING
+    int fds[2]             = { -1, -1 };
     BluezConnection * conn = nullptr;
+    const char * deviceObjectPath;
     uint16_t mtu;
 
-    conn = GetBluezConnectionViaDevice();
     VerifyOrReturnValue(
-        conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection"));
-
-    ChipLogDetail(DeviceLayer, "BluezCharacteristicAcquireWrite is called, conn: %p", conn);
-
+        g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), FALSE,
+        ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path"));
     VerifyOrReturnValue(
         g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value"));
+
+    conn = GetBluezConnection(deviceObjectPath);
+    VerifyOrReturnValue(
+        conn != nullptr, FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device"));
+
     conn->SetMTU(mtu);
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
-#if CHIP_ERROR_LOGGING
-        errStr = strerror(errno);
-#endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(strerror(errno)), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         return FALSE;
     }
@@ -148,40 +146,37 @@ static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * 
 gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                                          GUnixFDList * aFDList, GVariant * aOptions)
 {
-    int fds[2] = { -1, -1 };
-#if CHIP_ERROR_LOGGING
-    char * errStr;
-#endif // CHIP_ERROR_LOGGING
+    int fds[2]                   = { -1, -1 };
     BluezConnection * conn       = nullptr;
     bool isAdditionalAdvertising = false;
+    const char * deviceObjectPath;
     uint16_t mtu;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     isAdditionalAdvertising = (aChar == mC3.get());
 #endif
 
-    if (bluez_gatt_characteristic1_get_notifying(aChar))
-    {
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying");
-        return FALSE;
-    }
-
-    conn = GetBluezConnectionViaDevice();
     VerifyOrReturnValue(
-        conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection"));
-
+        !bluez_gatt_characteristic1_get_notifying(aChar), FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying"));
+    VerifyOrReturnValue(
+        g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), FALSE,
+        ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path"));
     VerifyOrReturnValue(
         g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"););
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value"));
+
+    conn = GetBluezConnection(deviceObjectPath);
+    VerifyOrReturnValue(
+        conn != nullptr, FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device"));
+
     conn->SetMTU(mtu);
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
-#if CHIP_ERROR_LOGGING
-        errStr = strerror(errno);
-#endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(strerror(errno)), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         return FALSE;
     }
@@ -208,10 +203,13 @@ static gboolean BluezCharacteristicAcquireNotifyError(BluezGattCharacteristic1 *
     return TRUE;
 }
 
+// NOTE: When using with BlueZ >= 5.80, this method can be removed. Also, the GetBluezConnectionViaDevice
+//       method will no longer be needed, since every callback will have the device object path available
+//       in the options parameter.
 gboolean BluezEndpoint::BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation)
 {
     BluezConnection * conn = GetBluezConnectionViaDevice();
-    ChipLogDetail(Ble, "Indication confirmation, %p", conn);
+    ChipLogDetail(DeviceLayer, "Indication confirmation: conn=%p", conn);
     bluez_gatt_characteristic1_complete_confirm(aChar, aInvocation);
     BLEManagerImpl::HandleTXComplete(conn);
     return TRUE;

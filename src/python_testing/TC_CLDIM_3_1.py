@@ -163,7 +163,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("2b")
         if not is_positioning_supported:
             logging.info("Positioning Feature is not supported. Skipping remaining steps.")
-            self.skip_all_remaining_steps("2c")
+            self.mark_all_remaining_steps_skipped("2c")
             return
 
         # STEP 2c: Read LimitRange attribute if supported

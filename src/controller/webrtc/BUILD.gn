@@ -52,4 +52,7 @@ static_library("chip_webrtc") {
     "ssl",
     "crypto",
   ]
+
+  # suppress known `libdatachannel` int conversion issues
+  cflags = [ "-Wno-implicit-int-conversion" ]
 }
