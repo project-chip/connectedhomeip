@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
