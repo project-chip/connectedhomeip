@@ -15,9 +15,12 @@
 #    limitations under the License.
 #
 
+import logging
 from dataclasses import dataclass, field
 
 from .json_serializable import JsonSerializable
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -38,5 +41,6 @@ class PtrRecord(JsonSerializable):
                 self.instance_name = self.service_name[: -len(base_type)].rstrip('.')
             else:
                 self.instance_name = self.service_name  # fallback
-        except Exception:
+        except (AttributeError, IndexError, TypeError) as e:
+            logger.info("Failed to extract instance_name from PTR record: %s", e)
             self.instance_name = self.service_name  # final fallback
