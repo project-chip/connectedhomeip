@@ -108,7 +108,8 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
     };
 
     // Not using code generated mandatory attributes since the array is empty, and default constructor should be used
-    return listBuilder.Append(Span<const DataModel::AttributeEntry>() /* mandatory */, Span(optionalEntries));
+    return listBuilder.Append(Span<const DataModel::AttributeEntry>(SoftwareDiagnostics::Attributes::kMandatoryMetadata, sizeof(Attributes::kMandatoryMetadata) / sizeof(chip::app::DataModel::AttributeEntry)
+), Span(optionalEntries));
 }
 
 } // namespace Clusters
