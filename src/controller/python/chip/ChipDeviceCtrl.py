@@ -435,7 +435,7 @@ class DeviceProxyWrapper():
         ).raise_on_error()
 
 
-DiscoveryFilterType = discovery.FilterType
+DiscoveryFilterType: typing.TypeAlias = discovery.FilterType
 DiscoveryType = discovery.DiscoveryType
 
 
@@ -1768,8 +1768,8 @@ class ChipDeviceControllerBase():
         for v in attributes:
             if len(v) == 2:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
-                    invalid_endpoint, v[0], v[1], 1, v[0].value))
+                    # 'value' added dynamically to ClusterAttributeDescriptor
+                    invalid_endpoint, v[0], v[1], 1, v[0].value))  # type: ignore[attr-defined]
             else:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     invalid_endpoint, v[0], 0, 0, v[0].value))
@@ -2871,7 +2871,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._fabricCheckNodeId
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE,  # type: ignore[valid-type]
+                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE,
                                   filter: typing.Any = None,
                                   discoveryTimeoutMsec: int = 30000) -> int:
         '''
