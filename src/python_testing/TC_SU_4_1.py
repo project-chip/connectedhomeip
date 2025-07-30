@@ -65,7 +65,9 @@ class TC_SU_4_1(MatterBaseTest):
             AssertionError: If any attribute read/write response does not match the expected outcome.
 
     """
-    cluster_otap = Clusters.OtaSoftwareUpdateProvider
+
+    # Reference variable for the OTA Software Update Provider cluster.
+    # cluster_otap = Clusters.OtaSoftwareUpdateProvider
     cluster_otar = Clusters.OtaSoftwareUpdateRequestor
 
     async def write_acl(self, controller, acl):
