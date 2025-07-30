@@ -2,5 +2,5 @@ mobly
 pyasn1
 pyasn1_modules
 zeroconf
-netifaces==0.11.0
+ifaddr
 langcodes
