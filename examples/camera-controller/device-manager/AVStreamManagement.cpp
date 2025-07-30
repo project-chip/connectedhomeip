@@ -23,14 +23,14 @@ using namespace ::chip;
 
 namespace {
 
-constexpr uint16_t kMinFrameRate        = 30;
-constexpr uint16_t kMaxFrameRate        = 120;
-constexpr uint32_t kDefaultBitRate      = 10000; // bits per second
-constexpr uint16_t kKeyFrameInterval    = 4000;
-constexpr uint16_t kMinWidth            = 640;
-constexpr uint16_t kMinHeight           = 360;
-constexpr uint16_t kMaxWidth            = 1920;
-constexpr uint16_t kMaxHeight           = 1080;
+constexpr uint16_t kMinFrameRate     = 30;
+constexpr uint16_t kMaxFrameRate     = 120;
+constexpr uint32_t kDefaultBitRate   = 10000; // bits per second
+constexpr uint16_t kKeyFrameInterval = 4000;
+constexpr uint16_t kMinWidth         = 640;
+constexpr uint16_t kMinHeight        = 360;
+constexpr uint16_t kMaxWidth         = 1920;
+constexpr uint16_t kMaxHeight        = 1080;
 
 } // namespace
 
