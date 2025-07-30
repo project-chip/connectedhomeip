@@ -1,6 +1,6 @@
 mobly
 pyasn1
 pyasn1_modules
-zeroconf
+netifaces --only-binary :all:
 netifaces
 langcodes
