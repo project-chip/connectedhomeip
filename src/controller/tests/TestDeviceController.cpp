@@ -110,6 +110,7 @@ private:
 TEST_F(TestDeviceController, DeviceCommissioner_)
 {
     DeviceController device;
+    DeviceCommissioner commissioner;
     SetupParams dParams;
 
     chip::TestPersistentStorageDelegate cerStorage;
@@ -162,9 +163,18 @@ TEST_F(TestDeviceController, DeviceCommissioner_)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    DeviceControllerFactory::GetInstance().SetupController(dParams, device);//;SetupCommissioner();
-    
+
+    dParams.controllerVendorId = VendorId::TestVendor1;
+    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupController(dParams, device), CHIP_NO_ERROR);
+    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(dParams, commissioner), CHIP_ERROR_INVALID_ARGUMENT);
+
+    EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
+    DeviceControllerFactory::GetInstance().Shutdown();
+
     //Test retain and release system state
+    err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
     DeviceControllerFactory::GetInstance().RetainSystemState();
     DeviceControllerFactory::GetInstance().RetainSystemState();
     EXPECT_FALSE(DeviceControllerFactory::GetInstance().GetSystemState()->IsShutDown());
@@ -175,17 +185,11 @@ TEST_F(TestDeviceController, DeviceCommissioner_)
     //Reinit system state
     EXPECT_EQ(DeviceControllerFactory::GetInstance().EnsureAndRetainSystemState(), CHIP_NO_ERROR);
 
-    //DeviceControllerFactory::GetInstance().SetupController(SetupParams params, DeviceController & controller);
-    //DeviceControllerFactory::GetInstance().SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner);
-
     //Delete all environment before to end
     EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
     DeviceControllerFactory::GetInstance().Shutdown();
     opCertStore.Finish();
-    ChipLogProgress(NotSpecified, "otro init release,2");
     engine->Shutdown();
-    device.Shutdown();
-    ChipLogProgress(NotSpecified, "termino");
 }
 
 // Add more test cases as needed to cover different scenarios
