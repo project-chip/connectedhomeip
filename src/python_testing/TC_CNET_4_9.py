@@ -102,19 +102,13 @@ class TC_CNET_4_9(MatterBaseTest):
     def pics_TC_CNET_4_9(self):
         return ['CNET.S']
 
-    @staticmethod
-    def validate_wifi_parameters(value: str, name: str) -> None:
-        if not isinstance(value, str):
-            raise TypeError(f"Expected a string for {name}, but got {type(value).__name__}")
-        assert_non_empty_string(value, name)
-
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
         ssid = self.get_wifi_ssid()
         credentials = self.get_credentials()
 
-        self.validate_wifi_parameters(ssid, "--wifi-ssid")
-        self.validate_wifi_parameters(credentials, "--wifi-passphrase")
+        assert_non_empty_string(ssid, "--wifi-ssid")
+        assert_non_empty_string(credentials, "--wifi-passphrase")
 
         # Commissioning is already done
         self.step("Precondition")
