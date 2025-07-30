@@ -167,14 +167,14 @@ class TC_SU_4_1(MatterBaseTest):
         logger.info(f'Step #1 - Read actaul DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
 
         # TH2 is the OTA Provider (NodeID=1) for fabric 1
-        provider_th2_for_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+        provider_th2_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
             providerNodeID=1,   # TH2 is the OTA Provider (NodeID=1)
             endpoint=0,
             fabricIndex=1       # Fabric ID from TH1 (controller writing to DUT)
         )
 
         # DefaultOTAProviders attribute with the provider list
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider_th2_for_fabric1])
+        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=[provider_th2_for_fabric1])
 
         # Write the DefaultOTAProviders attribute to the DUT (TH1)
         resp = await self.write_single_attribute(
@@ -235,14 +235,14 @@ class TC_SU_4_1(MatterBaseTest):
 
         # Use TH3 controller (already commissioned) to write DefaultOTAProviders on fabric 2
         # TH3 is the OTA Provider (NodeID=3) for fabric 2
-        provider_th3_for_fabric2 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+        provider_th3_for_fabric2 = self.cluster_otar.Structs.ProviderLocation(
             providerNodeID=th3.nodeId,  # TH3 is the OTA Provider (NodeID=3)
             endpoint=0,
             fabricIndex=th3.fabricId    # Fabric ID from TH3
         )
 
         # Update attribute with new providers list  (TH3 for fabric 2)
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[provider_th3_for_fabric2])
+        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=[provider_th3_for_fabric2])
 
         # Write updated DefaultOTAProviders attribute to DUT (TH1)
         resp = await th3.WriteAttribute(
@@ -320,7 +320,7 @@ class TC_SU_4_1(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],  # Optional [th4.nodeId]
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0, cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
+                endpoint=0, cluster=self.cluster_otar.id)]
         )
         view_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
@@ -335,7 +335,7 @@ class TC_SU_4_1(MatterBaseTest):
         logger.info(f'Step #5 - TH4 have the necessary permissions to perform operation: {resp}')
 
         # TH4 is the OTA Provider (NodeID=4) for fabric 1
-        provider_th4_for_fabric1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+        provider_th4_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
             providerNodeID=th4.nodeId,   # TH4 is the OTA Provider (NodeID=4)
             endpoint=0,
             fabricIndex=th4.fabricId       # Fabric ID from TH4
@@ -353,7 +353,7 @@ class TC_SU_4_1(MatterBaseTest):
         logger.info(f'Step #5 - Providers list updated with provider "TH4 and TH2 for fabric 1": {providers_list}')
 
         # Update attribute with providers list  (TH2 and TH4 for fabric 1)
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list)
+        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=providers_list)
 
         # --- Optional verification before write ---
         # Verify DefaultOTAProviders attribute before write (TH4 on Fabric 1)
@@ -395,7 +395,7 @@ class TC_SU_4_1(MatterBaseTest):
         logger.info(f'Step #6 - Providers list updated with provider empty: {providers_list_empty}')
 
         # Update attribute with empty providers list (TH3 for fabric 2)
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=providers_list_empty)
+        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=providers_list_empty)
 
         # Write updated DefaultOTAProviders attribute to TH3
         resp = await th3.WriteAttribute(
