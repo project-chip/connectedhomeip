@@ -392,7 +392,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify that the SAI key is present if the SAT key is present
         asserts.assert_true(
-            not 'SAT' in commissionable_service.txt_record
+            'SAT' not in commissionable_service.txt_record
             or 'SAI' in commissionable_service.txt_record,
             "SAI key must be present if SAT key is present."
         )
