@@ -40,6 +40,8 @@ ignoreAttributeDecodeFailureList = [
      Clusters.Objects.UnitTesting.Attributes.ClusterErrorBoolean),
     (1, Clusters.Objects.UnitTesting,
      Clusters.Objects.UnitTesting.Attributes.FailureInt32U),
+    (1, Clusters.Objects.UnitTesting,
+     Clusters.Objects.UnitTesting.Attributes.WriteOnlyInt8u),
 ]
 
 
