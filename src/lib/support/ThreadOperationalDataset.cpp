@@ -318,15 +318,20 @@ CHIP_ERROR OperationalDataset::Init(ByteSpan aData)
     return CHIP_NO_ERROR;
 }
 
-void OperationalDataset::CopyIfNecessary()
+void OperationalDataset::CopyDataIfNecessary()
 {
     // It's possible that mData points into an external buffer if someone has
     // called OperationalDatasetView::Init() instead of our copying version.
     if (mData.data() != mBuffer)
     {
-        memmove(mBuffer, mData.data(), mData.size());
-        mData = ByteSpan(mBuffer, mData.size());
+        CopyData();
     }
+}
+
+void OperationalDataset::CopyData()
+{
+    memmove(mBuffer, mData.data(), mData.size());
+    mData = ByteSpan(mBuffer, mData.size());
 }
 
 void OperationalDataset::Remove(ThreadTLV * tlv)
@@ -339,7 +344,7 @@ void OperationalDataset::Remove(ThreadTLV * tlv)
 
 void OperationalDataset::Remove(uint8_t aType)
 {
-    CopyIfNecessary();
+    CopyDataIfNecessary();
     ThreadTLV * tlv = const_cast<ThreadTLV *>(Locate(aType));
     if (tlv != nullptr)
     {
@@ -351,7 +356,7 @@ void OperationalDataset::Remove(uint8_t aType)
 // of the same type if one exists. Returns nullptr if there is not enough space.
 ThreadTLV * OperationalDataset::InsertOrReplace(uint8_t aType, size_t aValueSize)
 {
-    CopyIfNecessary();
+    CopyDataIfNecessary();
     ThreadTLV * tlv = const_cast<ThreadTLV *>(Locate(aType));
     if (tlv != nullptr)
     {

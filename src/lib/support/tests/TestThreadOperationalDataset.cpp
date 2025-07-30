@@ -25,6 +25,9 @@ namespace {
 
 using namespace chip;
 
+// Don't warn/fail on self assignments in these tests.
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+
 class TestThreadOperationalDataset : public ::testing::Test
 {
 public:
@@ -222,23 +225,24 @@ TEST_F(TestThreadOperationalDataset, TestClear)
     }
 }
 
+static constexpr uint8_t kValidExampleDataset[] = {
+    0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, // Active Timestamp 1
+    0x00, 0x03, 0x00, 0x00, 0x0f,                               // Channel 15
+    0x35, 0x04, 0x07, 0xff, 0xf8, 0x00,                         // Channel Mask 0x07fff800
+    0x02, 0x08, 0x39, 0x75, 0x8e, 0xc8, 0x14, 0x4b, 0x07, 0xfb, // Ext PAN ID 39758ec8144b07fb
+    0x07, 0x08, 0xfd, 0xf1, 0xf1, 0xad, 0xd0, 0x79, 0x7d, 0xc0, // Mesh Local Prefix fdf1:f1ad:d079:7dc0::/64
+    0x05, 0x10, 0xf3, 0x66, 0xce, 0xc7, 0xa4, 0x46, 0xba, 0xb9, 0x78, 0xd9, 0x0d, 0x27, 0xab, 0xe3, 0x8f, 0x23, // Network Key
+    0x03, 0x0f, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x2d, 0x35, 0x39, 0x33, 0x38,       // "OpenThread-5938"
+    0x01, 0x02, 0x59, 0x38,                                                                                     // PAN ID : 0x5938
+    0x04, 0x10, 0x3c, 0xa6, 0x7c, 0x96, 0x9e, 0xfb, 0x0d, 0x0c, 0x74, 0xa4, 0xd8, 0xee, 0x92, 0x3b, 0x57, 0x6c, // PKSc
+    0x0c, 0x04, 0x02, 0xa0, 0xf7, 0xf8,                                                                         // Security Policy
+};
+
 template <typename T>
 static void TestExampleDatasetTemplate()
 {
     T dataset;
-    const uint8_t example[] = {
-        0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, // Active Timestamp 1
-        0x00, 0x03, 0x00, 0x00, 0x0f,                               // Channel 15
-        0x35, 0x04, 0x07, 0xff, 0xf8, 0x00,                         // Channel Mask 0x07fff800
-        0x02, 0x08, 0x39, 0x75, 0x8e, 0xc8, 0x14, 0x4b, 0x07, 0xfb, // Ext PAN ID 39758ec8144b07fb
-        0x07, 0x08, 0xfd, 0xf1, 0xf1, 0xad, 0xd0, 0x79, 0x7d, 0xc0, // Mesh Local Prefix fdf1:f1ad:d079:7dc0::/64
-        0x05, 0x10, 0xf3, 0x66, 0xce, 0xc7, 0xa4, 0x46, 0xba, 0xb9, 0x78, 0xd9, 0x0d, 0x27, 0xab, 0xe3, 0x8f, 0x23, // Network Key
-        0x03, 0x0f, 0x4f, 0x70, 0x65, 0x6e, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x2d, 0x35, 0x39, 0x33, 0x38, // "OpenThread-5938"
-        0x01, 0x02, 0x59, 0x38,                                                                               // PAN ID : 0x5938
-        0x04, 0x10, 0x3c, 0xa6, 0x7c, 0x96, 0x9e, 0xfb, 0x0d, 0x0c, 0x74, 0xa4, 0xd8, 0xee, 0x92, 0x3b, 0x57, 0x6c, // PKSc
-        0x0c, 0x04, 0x02, 0xa0, 0xf7, 0xf8, // Security Policy
-    };
-    EXPECT_EQ(dataset.Init(ByteSpan(example)), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.Init(ByteSpan(kValidExampleDataset)), CHIP_NO_ERROR);
 
     uint64_t activeTimestamp;
     EXPECT_EQ(dataset.GetActiveTimestamp(activeTimestamp), CHIP_NO_ERROR);
@@ -403,7 +407,7 @@ TEST_F(TestThreadOperationalDataset, TestInitWithViewInitAndModify)
     uint64_t activeTimestamp;
     uint8_t example[] = { 0x0e, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }; // Active Timestamp 1
 
-    EXPECT_EQ(dataset.Thread::OperationalDatasetView::Init(ByteSpan(example)), CHIP_NO_ERROR);
+    EXPECT_EQ(dataset.Thread::OperationalDatasetView::Init(ByteSpan(example)), CHIP_NO_ERROR); // super class Init
     EXPECT_EQ(dataset.GetActiveTimestamp(activeTimestamp), CHIP_NO_ERROR);
     EXPECT_EQ(activeTimestamp, 1u);
     EXPECT_EQ(dataset.SetActiveTimestamp(42), CHIP_NO_ERROR);
@@ -417,4 +421,51 @@ TEST_F(TestThreadOperationalDataset, TestInitWithViewInitAndModify)
     EXPECT_EQ(activeTimestamp, 1u);
 }
 
+TEST_F(TestThreadOperationalDataset, TestCopyAndAssignView)
+{
+    ByteSpan data(kValidExampleDataset);
+    Thread::OperationalDatasetView view1;
+    EXPECT_EQ(view1.Init(data), CHIP_NO_ERROR);
+    EXPECT_EQ(view1.AsByteSpan().data(), data.data());
+    EXPECT_EQ(view1.AsByteSpan().size(), data.size());
+
+    view1 = view1; // self-assignment
+    EXPECT_EQ(view1.AsByteSpan().data(), data.data());
+    EXPECT_EQ(view1.AsByteSpan().size(), data.size());
+
+    Thread::OperationalDatasetView view2(view1);
+    EXPECT_EQ(view2.AsByteSpan().data(), data.data());
+    EXPECT_EQ(view2.AsByteSpan().size(), data.size());
+
+    Thread::OperationalDatasetView view3;
+    EXPECT_TRUE(view3.IsEmpty());
+    view3 = view1;
+    EXPECT_EQ(view3.AsByteSpan().data(), data.data());
+    EXPECT_EQ(view3.AsByteSpan().size(), data.size());
+}
+
+TEST_F(TestThreadOperationalDataset, TestCopyAndAssignDataset)
+{
+    ByteSpan data(kValidExampleDataset);
+    EXPECT_EQ(dataset.Init(data), CHIP_NO_ERROR);
+    const uint8_t * buffer = dataset.AsByteSpan().data();
+    EXPECT_NE(buffer, data.data());
+    EXPECT_TRUE(dataset.AsByteSpan().data_equal(data));
+
+    dataset = dataset; // self-assignment
+    EXPECT_EQ(dataset.AsByteSpan().data(), buffer);
+    EXPECT_TRUE(dataset.AsByteSpan().data_equal(data));
+
+    Thread::OperationalDataset dataset2(dataset);
+    EXPECT_NE(dataset2.AsByteSpan().data(), dataset.AsByteSpan().data());
+    EXPECT_NE(dataset2.AsByteSpan().data(), data.data());
+    EXPECT_TRUE(dataset2.AsByteSpan().data_equal(data));
+
+    Thread::OperationalDataset dataset3;
+    EXPECT_TRUE(dataset3.IsEmpty());
+    dataset3 = static_cast<const Thread::OperationalDatasetView &>(dataset);
+    EXPECT_NE(dataset3.AsByteSpan().data(), dataset.AsByteSpan().data());
+    EXPECT_NE(dataset3.AsByteSpan().data(), data.data());
+    EXPECT_TRUE(dataset3.AsByteSpan().data_equal(data));
+}
 } // namespace
