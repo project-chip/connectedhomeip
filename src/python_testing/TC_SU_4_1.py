@@ -56,6 +56,13 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_4_1(MatterBaseTest):
     """
+        Validate OTA Requestor (DUT) attribute behavior across fabrics:
+        - DefaultOTAProviders
+        - UpdatePossible
+        - UpdateState
+
+        Raises:
+            AssertionError: If any attribute read/write response does not match the expected outcome.
 
     """
     cluster_otap = Clusters.OtaSoftwareUpdateProvider
