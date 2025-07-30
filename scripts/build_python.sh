@@ -284,13 +284,13 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[*]}"
 
 # Set up ccache environment for compilation
 if [[ "$enable_ccache" == "yes" ]]; then
-  # Only wrap if not already wrapped with ccache
-  if [[ -n "$CC" ]] && [[ "$CC" != ccache* ]]; then
-    export CC="ccache $CC"
-  fi
-  if [[ -n "$CXX" ]] && [[ "$CXX" != ccache* ]]; then
-    export CXX="ccache $CXX"
-  fi
+    # Only wrap if not already wrapped with ccache
+    if [[ -n "$CC" ]] && [[ "$CC" != ccache* ]]; then
+        export CC="ccache $CC"
+    fi
+    if [[ -n "$CXX" ]] && [[ "$CXX" != ccache* ]]; then
+        export CXX="ccache $CXX"
+    fi
 fi
 
 # Compile Python wheels
