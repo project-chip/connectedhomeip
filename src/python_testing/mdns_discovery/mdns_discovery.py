@@ -15,9 +15,10 @@
 #    limitations under the License.
 #
 
+import time
 import json
 import logging
-from asyncio import Event, TimeoutError, ensure_future, wait_for
+from asyncio import Event, TimeoutError, ensure_future, wait_for, create_task, sleep
 from functools import partial
 from typing import Dict, List, Optional
 
@@ -410,20 +411,29 @@ class MdnsDiscovery:
             The resulting records include instance name extraction and optional subtype support.
         """
         self._event.clear()
-
-        logger.info(f"Browsing for mDNS service(s) of type: {service_types}")
-
         self._discovered_services = {}
-        aiobrowser = AsyncServiceBrowser(zeroconf=self._azc.zeroconf,
-                                         type_=service_types,
-                                         handlers=[partial(self._on_service_state_change, query_service=False)]
-                                         )
+        self._last_discovery_time = time.time()
+
+        logger.info(f"Browsing for PTR mDNS service(s) of type: {service_types}")
+
+        aiobrowser = AsyncServiceBrowser(
+            zeroconf=self._azc.zeroconf,
+            type_=service_types,
+            handlers=[partial(self._on_service_state_change, query_service=False)]
+        )
+
+        # Background monitor to end discovery early after
+        # a period of inactivity (no new services)
+        create_task(self._monitor_discovery_silence(silence_sec=2))
 
         try:
+            # Wait for either the inactivity timeout (triggered by the background monitor)
+            # or the full discovery timeout to elapse, whichever comes first
             await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
         except TimeoutError:
-            logger.info("mDNS browse finished after %d seconds.", discovery_timeout_sec)
+            logger.info("mDNS PTR browse finished after %d seconds.", discovery_timeout_sec)
         finally:
+            logger.info("Stopping mDNS PTR browse and cleaning up.")
             self._event.set()
             await aiobrowser.async_cancel()
 
@@ -491,11 +501,10 @@ class MdnsDiscovery:
                                     any. Returns None if no service of the specified type is discovered within
                                     the timeout period.
         """
-        self._service_types = [service_type.value]
-
         await self._discover(
             discovery_timeout_sec=discovery_timeout_sec,
             log_output=log_output,
+            service_types=[service_type.value],
             query_service=query_service,
         )
 
@@ -545,8 +554,6 @@ class MdnsDiscovery:
         if all_services and service_types:
             raise ValueError("Specify either 'all_services' or 'service_types', not both.")
 
-        self._event.clear()
-
         if all_services:
             self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces)))
 
@@ -555,6 +562,7 @@ class MdnsDiscovery:
 
         logger.info(f"Browsing for mDNS service(s) of type: {self._service_types}")
 
+        self._event.clear()
         aiobrowser = AsyncServiceBrowser(zeroconf=self._azc.zeroconf,
                                          type_=self._service_types,
                                          handlers=[partial(self._on_service_state_change, query_service=query_service)]
@@ -674,6 +682,30 @@ class MdnsDiscovery:
                 logger.warning(f"Service information for '{service_name}' not found.")
 
             self._event.set()
+
+    async def _monitor_discovery_silence(self, silence_sec: float):
+        """
+        Monitor service discovery for a period of inactivity (silence).
+
+        This coroutine repeatedly checks the time since the last discovered service.
+        If no new services are discovered within the specified `silence_sec` window,
+        it signals completion by setting the internal event (`self._event`), allowing
+        the main discovery logic to exit early.
+
+        Args:
+            silence_sec (float): Number of seconds to wait after the last discovery
+                                 before considering discovery complete.
+
+        Returns:
+            None
+        """
+        while True:
+            await sleep(0.25)
+            if time.time() - self._last_discovery_time >= silence_sec:
+                if self._verbose_logging:
+                    logger.info("No new mDNS services after %.1f seconds, stopping browse", silence_sec)
+                self._event.set()
+                break
 
     def _log_output(self) -> str:
         """
