@@ -106,7 +106,7 @@ union EmberAfDefaultOrMinMaxAttributeValue
 
 // Attribute masks modify how attributes are used by the framework
 // The following define names are relevant to the ZAP_ATTRIBUTE_MASK macro.
-// Attribute that has this mask is NOT read-only
+// Attribute that has this mask is writable
 #define MATTER_ATTRIBUTE_FLAG_WRITABLE (0x01)
 // Attribute that has this mask is saved in non-volatile memory
 #define MATTER_ATTRIBUTE_FLAG_NONVOLATILE (0x02)
@@ -118,7 +118,7 @@ union EmberAfDefaultOrMinMaxAttributeValue
 #define MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE (0x08)
 // Attribute deferred to external storage
 #define MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE (0x10)
-// Attribute that has this mask is NOT write-only
+// Attribute that has this mask is readable
 #define MATTER_ATTRIBUTE_FLAG_READABLE (0x20)
 // Attribute is nullable
 #define MATTER_ATTRIBUTE_FLAG_NULLABLE (0x40)
