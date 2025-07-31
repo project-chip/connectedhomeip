@@ -379,17 +379,18 @@ used to set exact times for testing. This allows testing specific edge
 conditions in tests, helps reduce test flakiness due to race conditions, and
 reduces the time required for testing as tests no long require real-time waits.
 
-### [RAII](https://en.cppreference.com/w/cpp/language/raii.html) Mock clock
+### Wrapper for Mock clock
 
-The RAII wrapper for mock clock is located in
+The [RAII](https://en.cppreference.com/w/cpp/language/raii.html) wrapper for
+mock clock is located in
 [src/system/RAIIMockClock.h](https://github.com/project-chip/connectedhomeip/blob/master/src/system/RAIIMockClock.h)
 as `System::Clock::Internal::RAIIMockClock`.
 
 There also exists an implementation of a simple wrapper which automatically
 handles setting mock clock for unit testing upon object instantiation and
 re-establishing `chip::System::SystemClock()` at destruction. It effectively
-(and simply) provides a RAII wrapper around `System::Clock::Internal::MockClock`
-by publicly inheriting from it.
+(and simply) provides a wrapper around `System::Clock::Internal::MockClock` by
+publicly inheriting from it.
 
 -   Example
 
