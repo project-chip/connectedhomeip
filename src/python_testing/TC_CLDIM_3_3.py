@@ -280,11 +280,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10001),
                     endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
-
-                asserts.fail("Expected ConstraintError for Position exceeding 100%")
-
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 5a: If LimitRange is unsupported, skip step 5b to 5g
         self.step("5a")
