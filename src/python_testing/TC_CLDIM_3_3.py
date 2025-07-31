@@ -101,7 +101,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep("5a", "If LimitRange is unsupported, skip step 5b to 5g"),
             TestStep("5b", "Send SetTarget command with Position 0%"),
             TestStep("5c", "Verify TargetState attribute is updated"),
-            TestStep("5d", "Wait for CurrentState.Position to be updated to 0%"),
+            TestStep("5d", "Wait for CurrentState.Position to be updated to MinPosition"),
             TestStep("5e", "Send SetTarget command with Position 100%"),
             TestStep("5f", "Verify TargetState attribute is updated"),
             TestStep("5g", "Wait for CurrentState.Position to be updated to 100%"),
@@ -305,11 +305,11 @@ class TC_CLDIM_3_3(MatterBaseTest):
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
 
-            # STEP 5d: Wait for CurrentState.Position to be updated to 0%
+            # STEP 5d: Wait for CurrentState.Position to be updated to MinPosition
             self.step("5d")
             if initial_state.position > 0:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matchers=[current_position_matcher(0)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
             else:
                 logging.info("Initial Position not > 0. Skipping step 5d.")
                 self.mark_current_step_skipped()
