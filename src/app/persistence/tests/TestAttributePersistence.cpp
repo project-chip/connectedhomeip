@@ -19,34 +19,41 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/persistence/AttributePersistence.h>
-#include <app/persistence/PascalString.h>
-#include <app/persistence/tests/RamAttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/String.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+#include <unistd.h>
 
 namespace {
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Testing;
-using namespace chip::app::Storage;
-using namespace chip::Testing;
 
 TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
-    ConcreteAttributePath path(1, 2, 3);
-    ConcreteAttributePath wrongPath(1, 2, 4);
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
     constexpr uint32_t kValueToStore = 42;
     constexpr uint32_t kOtherValue   = 99;
 
     // Store a fake value
     {
         const uint32_t value = kValueToStore;
-        EXPECT_EQ(ramProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) }), CHIP_NO_ERROR);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      &value, sizeof(value)),
+                  CHIP_NO_ERROR);
     }
 
     // Test loading a value
@@ -67,7 +74,9 @@ TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
 
     // Test loading a removed value
     {
-        EXPECT_EQ(ramProvider.DeleteValue(path), CHIP_NO_ERROR);
+        EXPECT_EQ(storageDelegate.SyncDeleteKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName()),
+                  CHIP_NO_ERROR);
 
         uint32_t valueRead = 0;
         ASSERT_FALSE(persistence.LoadNativeEndianValue(path, valueRead, kOtherValue));
@@ -75,45 +84,16 @@ TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
     }
 }
 
-TEST(TestAttributePersistence, TestLoadAndStoreString)
-{
-    RamAttributePersistenceProvider ramProvider;
-    AttributePersistence persistence(ramProvider);
-    ConcreteAttributePath path(1, 2, 3);
-
-    // Store a fake value
-    {
-        const uint8_t buffer[] = { 5, 'h', 'e', 'l', 'l', 'o' };
-        EXPECT_EQ(ramProvider.WriteValue(path, { buffer, sizeof(buffer) }), CHIP_NO_ERROR);
-    }
-
-    // Test loading a value
-    {
-        char bufferRead[16];
-        ShortPascalString stringRead(bufferRead);
-
-        ASSERT_TRUE(persistence.Load(path, stringRead, std::nullopt));
-        ASSERT_TRUE(stringRead.Content().data_equal("hello"_span));
-    }
-
-    // Test loading a non-existent value
-    {
-        ConcreteAttributePath wrongPath(1, 2, 4);
-        char bufferRead[16];
-        ShortPascalString stringRead(bufferRead);
-
-        ASSERT_FALSE(persistence.Load(wrongPath, stringRead, "default"_span));
-        ASSERT_TRUE(stringRead.Content().data_equal("default"_span));
-    }
-}
-
 TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
 
-    ConcreteAttributePath path(1, 2, 3);
-    ConcreteAttributePath wrongPath(1, 2, 4);
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
     constexpr uint32_t kValueToStore = 0x12345678;
     constexpr uint32_t kOtherValue   = 0x99887766;
     uint32_t valueRead               = 0;
@@ -150,210 +130,99 @@ TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
     }
 }
 
-TEST(TestAttributePersistence, TestStringViaDecoder)
+TEST(TestAttributePersistence, TestStrings)
 {
-    RamAttributePersistenceProvider ramProvider;
-    AttributePersistence persistence(ramProvider);
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
 
-    ConcreteAttributePath path(1, 2, 3);
-
-    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
-    {
-        WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor("hello world"_span);
-
-        char buffer[32];
-        EXPECT_EQ(persistence.StorePascalString(path, decoder, buffer), CHIP_NO_ERROR);
-
-        ShortPascalString stringStored(buffer);
-        EXPECT_TRUE(stringStored.Content().data_equal("hello world"_span));
-    }
-
-    {
-        char bufferRead[32];
-        ShortPascalString stringRead(bufferRead);
-
-        ASSERT_TRUE(persistence.Load(path, stringRead, std::nullopt));
-        ASSERT_TRUE(stringRead.Content().data_equal("hello world"_span));
-    }
-}
-
-TEST(TestAttributePersistence, TestByteStringViaDecoder)
-{
-    RamAttributePersistenceProvider ramProvider;
-    AttributePersistence persistence(ramProvider);
-
-    ConcreteAttributePath path(1, 2, 3);
-    const uint8_t binary_data[] = { 1, 2, 3, 4, 0, 255, 128 };
-
-    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
-    {
-        WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(ByteSpan(binary_data));
-
-        uint8_t buffer[32];
-        EXPECT_EQ(persistence.StorePascalString(path, decoder, buffer), CHIP_NO_ERROR);
-
-        ShortPascalBytes bytesStored(buffer);
-        EXPECT_TRUE(bytesStored.Content().data_equal(ByteSpan(binary_data)));
-    }
-
-    {
-        uint8_t bufferRead[32];
-        ShortPascalBytes bytesRead(bufferRead);
-
-        ASSERT_TRUE(persistence.Load(path, bytesRead, std::nullopt));
-        ASSERT_TRUE(bytesRead.Content().data_equal(ByteSpan(binary_data)));
-    }
-}
-
-TEST(TestAttributePersistence, TestByteStringLoadWithDefaults)
-{
-    RamAttributePersistenceProvider ramProvider;
-    AttributePersistence persistence(ramProvider);
-
-    ConcreteAttributePath path(1, 2, 3);
-    const uint8_t default_binary_data[] = { 10, 20, 30, 40 };
-
-    uint8_t bufferRead[32];
-    ShortPascalBytes bytesRead(bufferRead);
-
-    ASSERT_FALSE(persistence.Load(path, bytesRead, ByteSpan(default_binary_data)));
-    ASSERT_TRUE(bytesRead.Content().data_equal(ByteSpan(default_binary_data)));
-}
-
-TEST(TestAttributePersistence, TestCharStringLoadWithDefaults)
-{
-    RamAttributePersistenceProvider ramProvider;
-    AttributePersistence persistence(ramProvider);
-
-    ConcreteAttributePath path(1, 2, 3);
-
-    char bufferRead[32];
-    ShortPascalString stringRead(bufferRead);
-
-    ASSERT_FALSE(persistence.Load(path, stringRead, "default value"_span));
-    ASSERT_TRUE(stringRead.Content().data_equal("default value"_span));
-}
-
-TEST(TestAttributePersistence, TestStoreNullByteString)
-{
-    RamAttributePersistenceProvider ramProvider;
     AttributePersistence persistence(ramProvider);
 
     const ConcreteAttributePath path(1, 2, 3);
-    const ConcreteAttributePath path2(1, 2, 4);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
 
-    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
     {
-        WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<ByteSpan>());
+        Storage::String<8> testString;
 
-        uint8_t buffer[32];
-        EXPECT_EQ(persistence.StorePascalString(path, decoder, buffer), CHIP_NO_ERROR);
-
-        ShortPascalBytes bytesStored(buffer);
-        EXPECT_TRUE(bytesStored.IsNull());
+        ASSERT_TRUE(testString.SetContent("foo"_span));
+        ASSERT_EQ(persistence.StoreString(path, testString), CHIP_NO_ERROR);
     }
 
-    // reading back on an invalid path will fail the load and a default value will be returned
     {
-        uint8_t bufferRead[32];
-        ShortPascalBytes bytesRead(bufferRead);
-
-        const uint8_t default_binary_data[] = { 1, 2, 3 };
-
-        ASSERT_FALSE(persistence.Load(path2, bytesRead, ByteSpan(default_binary_data)));
-        ASSERT_TRUE(bytesRead.Content().data_equal(ByteSpan(default_binary_data)));
-    }
-}
-
-TEST(TestAttributePersistence, TestStoreNullCharString)
-{
-    RamAttributePersistenceProvider ramProvider;
-    AttributePersistence persistence(ramProvider);
-
-    const ConcreteAttributePath path(1, 2, 3);
-    const ConcreteAttributePath path2(1, 2, 4);
-
-    // Store a value using an encoder (these are a PAIN to create, so use data model provider helpers)
-    {
-        WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(DataModel::Nullable<CharSpan>());
-
-        char buffer[32];
-        EXPECT_EQ(persistence.StorePascalString(path, decoder, buffer), CHIP_NO_ERROR);
-
-        ShortPascalString stringStored(buffer);
-        EXPECT_TRUE(stringStored.IsNull());
+        Storage::String<16> readString;
+        ASSERT_TRUE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().data_equal("foo"_span));
     }
 
-    // reading back on an invalid path will fail the load and a default value will be returned
+    // fits exactly. Load should succeed
     {
-        char bufferRead[32];
-        ShortPascalString stringRead(bufferRead);
-
-        ASSERT_FALSE(persistence.Load(path2, stringRead, "default value"_span));
-        ASSERT_TRUE(stringRead.Content().data_equal("default value"_span));
-    }
-}
-
-TEST(TestAttributePersistence, TestLoadInvalidPascalString)
-{
-    RamAttributePersistenceProvider ramProvider;
-    AttributePersistence persistence(ramProvider);
-    ConcreteAttributePath path(1, 2, 3);
-
-    {
-        // valid pascal string for "hello" that requires 6 bytes to store (1 for length)
-        uint8_t buffer[] = { 5, 'h', 'e', 'l', 'l', 'o' };
-        EXPECT_EQ(ramProvider.WriteValue(path, ByteSpan(buffer)), CHIP_NO_ERROR);
+        Storage::String<3> readString;
+        ASSERT_TRUE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().data_equal("foo"_span));
     }
 
-    // Test loading with too short of a buffer
+    // no space: data is cleared on load error
     {
-        char bufferRead[5]; // need 6 bytes here...
-        ShortPascalString stringRead(bufferRead);
+        Storage::String<2> readString;
+        ASSERT_FALSE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().empty());
 
-        ASSERT_FALSE(persistence.Load(path, stringRead, "def"_span));
-        ASSERT_TRUE(stringRead.Content().data_equal("def"_span));
+        ASSERT_TRUE(readString.SetContent("xy"_span));
+        ASSERT_FALSE(readString.Content().empty());
+        ASSERT_FALSE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().empty());
     }
 
-    // Test loading with too short of a buffer and too long of a default:
-    //  - string load fails (insufficient buffer)
-    //  - default load fails because default does not fit either
-    //  - this moves the data to be null
+    // wrong path: data is cleared on load error
     {
-        char bufferRead[5]; // need 6 bytes here...
-        ShortPascalString stringRead(bufferRead);
+        Storage::String<16> readString;
 
-        ASSERT_FALSE(persistence.Load(path, stringRead, "default"_span));
+        ASSERT_TRUE(readString.SetContent("xy"_span));
+        ASSERT_FALSE(readString.Content().empty());
+        ASSERT_FALSE(persistence.LoadString(wrongPath, readString));
+        ASSERT_TRUE(readString.Content().empty());
+    }
 
-        // default could not be set (too long)
-        ASSERT_TRUE(stringRead.IsNull());
+    // empty string can be stored and loaded
+    {
+        Storage::String<8> testString;
+        Storage::String<16> readString;
+
+        ASSERT_TRUE(testString.SetContent(""_span));
+        ASSERT_EQ(persistence.StoreString(path, testString), CHIP_NO_ERROR);
+
+        ASSERT_TRUE(readString.SetContent("some value"_span));
+        ASSERT_TRUE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().empty());
     }
 }
 
 TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
 {
-    RamAttributePersistenceProvider ramProvider;
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
     AttributePersistence persistence(ramProvider);
-    ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath path(1, 2, 3);
 
     // This string is invalid as stored
     {
         uint8_t buffer[] = { 10, 'h', 'e', 'l', 'l', 'o' }; // length 10, but only 5 chars
-        EXPECT_EQ(ramProvider.WriteValue(path, ByteSpan(buffer)), CHIP_NO_ERROR);
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      buffer, sizeof(buffer)),
+                  CHIP_NO_ERROR);
     }
 
     // Load into a buffer that COULD contain the string, but
     // stored string is invalid
     {
-        char bufferRead[16];
-        ShortPascalString stringRead(bufferRead);
+        Storage::String<16> readString;
 
-        ASSERT_FALSE(persistence.Load(path, stringRead, "default"_span));
-        ASSERT_TRUE(stringRead.Content().data_equal("default"_span));
+        ASSERT_TRUE(readString.SetContent("some value"_span));
+        ASSERT_FALSE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().empty());
     }
 }
 

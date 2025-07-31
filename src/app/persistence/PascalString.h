@@ -78,6 +78,9 @@ public:
     using ValueType                            = Span<const T>;
     static constexpr LengthType kInvalidLength = PascalPrefixOperations<PREFIX_LEN>::kInvalidLength;
 
+    /// How many bytes of buffer are needed to store a max `charCount` sized buffer.
+    static constexpr size_t BufferSizeFor(size_t charCount) { return PREFIX_LEN + charCount; }
+
     static_assert(sizeof(T) == 1);
 
     PascalBuffer(PascalBuffer &&)      = default;
@@ -89,6 +92,11 @@ public:
         static_assert(N >= PREFIX_LEN);
         static_assert(N <= kInvalidLength);
     }
+
+    /// Allocates a pascal buffer of the given size.
+    ///
+    /// buffer_size includes the prefix.
+    PascalBuffer(T * data, size_t buffer_size) : mData(data), mMaxSize(static_cast<LengthType>(buffer_size - PREFIX_LEN)) {}
 
     /// Returns the content of the pascal string.
     /// Uses the prefix size information

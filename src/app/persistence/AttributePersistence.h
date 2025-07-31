@@ -16,11 +16,11 @@
 #pragma once
 
 #include <app/AttributeValueDecoder.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/PascalString.h>
+#include <app/persistence/String.h>
 
-#include <optional>
 #include <type_traits>
 
 namespace chip::app {
@@ -49,74 +49,23 @@ public:
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
     }
 
-    /// Loads a short pascal string from persistent storage
-    ///
-    /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
-    ///
-    /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
-    /// reason for the load failure).
-    ///
-    /// if valueOnLoadFailure cannot be set into value, value will be set to NULL (which never fails)
-    bool Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value, std::optional<CharSpan> valueOnLoadFailure);
-    bool Load(const ConcreteAttributePath & path, Storage::ShortPascalBytes & value, std::optional<ByteSpan> valueOnLoadFailure);
-
-    /// Interprets the `buffer` value as a `StringType` (generally ShortPascalString or similar) for the purposes of loading
-    template <size_t N>
-    bool LoadPascalString(const ConcreteAttributePath & path, char (&buffer)[N], std::optional<CharSpan> valueOnLoadFailure)
-    {
-
-        Storage::ShortPascalString value(buffer);
-        return Load(path, value, valueOnLoadFailure);
-    }
-
-    template <size_t N>
-    bool LoadPascalString(const ConcreteAttributePath & path, uint8_t (&buffer)[N], std::optional<ByteSpan> valueOnLoadFailure)
-    {
-
-        Storage::ShortPascalBytes value(buffer);
-        return Load(path, value, valueOnLoadFailure);
-    }
-
-    /// Performs all the steps of:
-    ///   - decode the given char span
-    ///   - store it in the given pascal string
-    ///   - write the value to persistent storage as a "prefixed value"
-    ///
-    /// Will store/support NULL values.
-    ///
-    DataModel::ActionReturnStatus Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                        Storage::ShortPascalString & value);
-    DataModel::ActionReturnStatus Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                        Storage::ShortPascalBytes & value);
-
-    /// helper to not create a separate ShortPascalString out of a buffer.
-    template <size_t N>
-    DataModel::ActionReturnStatus StorePascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                                    char (&buffer)[N])
-    {
-        Storage::ShortPascalString value(buffer);
-        return Store(path, decoder, value);
-    }
-
-    /// helper to not create a separate ShortPascalBytes out of a buffer.
-    template <size_t N>
-    DataModel::ActionReturnStatus StorePascalString(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                                    uint8_t (&buffer)[N])
-    {
-        Storage::ShortPascalBytes value(buffer);
-        return Store(path, decoder, value);
-    }
-
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - write to storage
     template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
-    DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                                         T & value)
+    CHIP_ERROR StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
         ReturnErrorOnFailure(decoder.Decode(value));
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
+
+    /// Load the given string from concrete storage.
+    ///
+    /// Returns true on success, false on failure. On failure the string is reset to empty.
+    bool LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
+
+    /// Store the given string in persistent storage.
+    CHIP_ERROR StoreString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
 
 private:
     AttributePersistenceProvider & mProvider;

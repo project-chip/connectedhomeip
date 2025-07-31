@@ -17,7 +17,8 @@
 #include <app/data-model/Nullable.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/PascalString.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 
 namespace chip::app {
 
@@ -27,7 +28,7 @@ bool VerifySuccessLogOnFailure(const ConcreteAttributePath & path, CHIP_ERROR er
 {
     VerifyOrReturnValue(err != CHIP_NO_ERROR, true);
 
-    // assume value not found being typical.
+    // Value not found is typical. Not an error worth logging.
     VerifyOrReturnValue(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, false);
 
     ChipLogError(Zcl, "Failed to load attribute %u/" ChipLogFormatMEI "/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
@@ -35,84 +36,7 @@ bool VerifySuccessLogOnFailure(const ConcreteAttributePath & path, CHIP_ERROR er
     return false;
 }
 
-void LogInvalidPascalContent(const ConcreteAttributePath & path)
-{
-    ChipLogError(Zcl, "Invalid pascal content: %u/" ChipLogFormatMEI "/" ChipLogFormatMEI, path.mEndpointId,
-                 ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-}
-
-template <typename StringType>
-bool LoadPascalStringImpl(AttributePersistenceProvider & provider, const ConcreteAttributePath & path, StringType & value,
-                          std::optional<typename StringType::ValueType> valueOnLoadFailure)
-{
-    MutableByteSpan rawBytes = value.RawFullBuffer();
-
-    if (VerifySuccessLogOnFailure(path, provider.ReadValue(path, rawBytes)))
-    {
-        // value is read, however it has to be a valid pascal value
-        // The value MUST be valid over the read range (i.e. rawBytes)
-        auto concrete = reinterpret_cast<const typename StringType::ValueType::pointer>(rawBytes.data());
-        if (value.IsValid({ concrete, rawBytes.size() }))
-        {
-            return true;
-        }
-
-        LogInvalidPascalContent(path);
-    }
-
-    // failed, try to set some default
-    if (!valueOnLoadFailure.has_value() || !value.SetValue(*valueOnLoadFailure))
-    {
-        value.SetNull();
-    }
-    return false;
-}
-
 } // namespace
-
-bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalString & value,
-                                std::optional<CharSpan> valueOnLoadFailure)
-{
-    return LoadPascalStringImpl(mProvider, path, value, valueOnLoadFailure);
-}
-
-bool AttributePersistence::Load(const ConcreteAttributePath & path, Storage::ShortPascalBytes & value,
-                                std::optional<ByteSpan> valueOnLoadFailure)
-{
-    return LoadPascalStringImpl(mProvider, path, value, valueOnLoadFailure);
-}
-
-DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                                          Storage::ShortPascalString & value)
-{
-    DataModel::Nullable<CharSpan> spanValue;
-    ReturnErrorOnFailure(decoder.Decode(spanValue));
-    if (spanValue.IsNull())
-    {
-        value.SetNull();
-    }
-    else
-    {
-        VerifyOrReturnError(value.SetValue(spanValue.Value()), Protocols::InteractionModel::Status::ConstraintError);
-    }
-    return mProvider.WriteValue(path, value.ContentWithLenPrefix());
-}
-
-DataModel::ActionReturnStatus AttributePersistence::Store(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                                          Storage::ShortPascalBytes & value)
-{
-    DataModel::Nullable<ByteSpan> spanValue;
-    ReturnErrorOnFailure(decoder.Decode(spanValue));
-    if (spanValue.IsNull())
-    {
-        value.SetNull();
-    }
-    else
-    {
-        VerifyOrReturnError(value.SetValue(spanValue.Value()), Protocols::InteractionModel::Status::ConstraintError);
-    }
-    return mProvider.WriteValue(path, value.ContentWithLenPrefix());
-}
 
 bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data,
                                                             const void * valueOnLoadFailure, size_t size)
@@ -133,6 +57,25 @@ bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttrib
     }
 
     return true;
+}
+
+bool AttributePersistence::LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value)
+{
+    Storage::Internal::ShortStringIO io(value);
+    MutableByteSpan rawBytes = io.ReadBuffer();
+
+    if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
+    {
+        value.SetContent(""_span);
+        return false;
+    }
+    return io.FinalizeRead(rawBytes);
+}
+
+CHIP_ERROR AttributePersistence::StoreString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value)
+{
+    Storage::Internal::ShortStringIO io(value);
+    return mProvider.WriteValue(path, io.ContentWithPrefix());
 }
 
 } // namespace chip::app
