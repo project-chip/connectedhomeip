@@ -759,8 +759,7 @@ PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::Devic
 
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    CommissioningParameters params;
-    return ToPyChipError(devCtrl->Commission(nodeid, params));
+    return ToPyChipError(devCtrl->Commission(nodeid, sCommissioningParameters));
 }
 
 PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
