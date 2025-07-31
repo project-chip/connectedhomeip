@@ -545,7 +545,7 @@ def BuildNxpTarget():
     ])
 
     target.AppendModifier(name="factory", enable_factory_data=True)
-    target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
+    target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor|lock-app')
     target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('mcxw71-freertos-lighting')
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('rw61x')

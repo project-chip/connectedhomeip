@@ -384,7 +384,8 @@ class NxpBuilder(GnBuilder):
             "br" if self.enable_wifi and self.enable_thread else None,
             "ota" if self.enable_ota else None,
             "fdata" if self.enable_factory_data else None,
-            "onnetwork" if self.disable_ble else None
+            "onnetwork" if self.disable_ble else None,
+            "low_power" if self.low_power else None
         ]
 
         prj_file = "_".join(filter(None, components)) + ".conf"
