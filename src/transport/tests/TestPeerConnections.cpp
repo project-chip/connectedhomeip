@@ -28,8 +28,8 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
-#include <transport/SecureSessionTable.h>
 #include <system/RAIIMockClock.h>
+#include <transport/SecureSessionTable.h>
 
 namespace {
 

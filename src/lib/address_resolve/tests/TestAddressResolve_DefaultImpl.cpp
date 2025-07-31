@@ -20,9 +20,9 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/IPAddressSorter.h>
 #include <lib/support/StringBuilder.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemLayerImpl.h>
 #include <transport/raw/PeerAddress.h>
-#include <system/RAIIMockClock.h>
 
 #include <functional>
 #include <optional>

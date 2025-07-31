@@ -3,10 +3,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <protocols/bdx/BdxTransferDiagnosticLog.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemClock.h>
 #include <system/SystemTimer.h>
-#include <system/RAIIMockClock.h>
-
 
 using namespace ::chip;
 using namespace ::chip::bdx;
