@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/persistence/String.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/PlatformManager.h>
@@ -81,7 +82,7 @@ private:
 
     BitFlags<OptionalBasicInformationAttributes> mEnabledOptionalAttributes;
 
-    char mNodeLabelBuffer[32 + 1];
+    Storage::String<32> mNodeLabel;
     bool mLocalConfigDisabled = false;
 };
 

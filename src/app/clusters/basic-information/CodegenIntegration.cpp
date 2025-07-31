@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "data-model-providers/codegen/ServerClusterInterfaceRegistry.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/static-cluster-config/BasicInformation.h>

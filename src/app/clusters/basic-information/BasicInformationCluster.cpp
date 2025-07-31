@@ -274,7 +274,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case ClusterRevision::Id:
         return encoder.Encode<uint32_t>(BasicInformation::kRevision);
     case NodeLabel::Id:
-        return encoder.Encode(Storage::ShortPascalString(mNodeLabelBuffer).Content());
+        return encoder.Encode(mNodeLabel.Content());
     case LocalConfigDisabled::Id:
         return encoder.Encode(mLocalConfigDisabled);
     case DataModelRevision::Id:
@@ -353,8 +353,12 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         VerifyOrReturnError(location.size() == kFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
         return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
     }
-    case NodeLabel::Id:
-        return persistence.StorePascalString(request.path, decoder, mNodeLabelBuffer);
+    case NodeLabel::Id: {
+        CharSpan label;
+        ReturnErrorOnFailure(decoder.Decode(label));
+        VerifyOrReturnError(mNodeLabel.SetContent(label), Protocols::InteractionModel::Status::ConstraintError);
+        return persistence.StoreString(request.path, mNodeLabel);
+    }
     case LocalConfigDisabled::Id:
         return persistence.StoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
     default:
@@ -395,8 +399,7 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence persistence(*context.attributeStorage);
 
-    (void) persistence.LoadPascalString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabelBuffer,
-                                        ""_span);
+    (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabel);
     (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
                                                    mLocalConfigDisabled, false);
 
