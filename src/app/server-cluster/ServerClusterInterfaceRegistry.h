@@ -303,6 +303,5 @@ public:
     void UnregisterAllFromEndpoint(EndpointId endpointId);
 };
 
-
 } // namespace app
 } // namespace chip
