@@ -36,7 +36,7 @@ namespace {
 
 LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 
-// Check if attribute is enabled (statically or dynamically) through ember read
+// Check if attribute is enabled (statically or dynamically) through ember
 bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
 {
     return emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, attributeId);

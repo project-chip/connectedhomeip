@@ -42,7 +42,7 @@ LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
 LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 #endif
 
-// Check if attribute is enabled (statically or dynamically) through ember read
+// Check if attribute is enabled (statically or dynamically) through ember
 bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
 {
     return emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, attributeId);
