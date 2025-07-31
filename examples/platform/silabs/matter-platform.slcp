@@ -94,6 +94,9 @@ configuration:
   value: 0
 - {name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED, value: '0'}
 - {name: SL_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED, value: '1'}
+- condition: [uartdrv_eusart]
+  name: SL_UARTDRV_EUSART_VCOM_BAUDRATE
+  value: '921600'
 - condition: [uartdrv_usart]
   name: UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
   value: '1'
