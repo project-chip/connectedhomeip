@@ -101,7 +101,7 @@ public:
     // These could be implemented, however for now we assume people should just use the underlying Span() to set
     // the values.
     String(String &&)                   = delete;
-    String & operator=(const String &&) = delete;
+    String & operator=(String &&) = delete;
     String(const String &)              = delete;
     String & operator=(const String &)  = delete;
 
