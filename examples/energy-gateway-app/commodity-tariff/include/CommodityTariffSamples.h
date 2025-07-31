@@ -1,9 +1,24 @@
-// TariffDataSamples.h
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <cstdint>
+#include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
 
 namespace TariffDataSamples {
 
@@ -22,7 +37,7 @@ inline CharSpan MakeCharSpan(const char * str) {
 // Sample 1 Data
 namespace Sample1 {
 
-TariffInformationStruct::Type TariffInfo() {
+static const TariffInformationStruct::Type TariffInfo() {
     TariffInformationStruct::Type info;
     info.tariffLabel.SetNonNull(MakeCharSpan("Full Tariff One"));
     info.providerName.SetNonNull(MakeCharSpan("Default Provider"));
@@ -36,11 +51,11 @@ TariffInformationStruct::Type TariffInfo() {
     return info;
 }
 
-const uint32_t dayEntryIDs1[] = {10, 11, 12, 13, 14, 15, 16};
-const uint32_t dayEntryIDs2[] = {20, 21, 22, 23, 24, 25, 26};
-const uint32_t dayEntryIDs3[] = {30};
+static const uint32_t dayEntryIDs1[] = {10, 11, 12, 13, 14, 15, 16};
+static const uint32_t dayEntryIDs2[] = {20, 21, 22, 23, 24, 25, 26};
+static const uint32_t dayEntryIDs3[] = {30};
 
-DayEntryStruct::Type DayEntries[] = {
+static DayEntryStruct::Type DayEntries[] = {
     {10, 0, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
     {11, 240, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
     {12, 480, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
@@ -58,22 +73,22 @@ DayEntryStruct::Type DayEntries[] = {
     {30, 0, MakeOptional(static_cast<uint16_t>(1500)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))}
 };
 
-DayPatternStruct::Type DayPatterns[] = {
+static DayPatternStruct::Type DayPatterns[] = {
     {0, BitMask<DayPatternDayOfWeekBitmap>(0x55), List<const uint32_t>(dayEntryIDs1)},
     {1, BitMask<DayPatternDayOfWeekBitmap>(0x2A), List<const uint32_t>(dayEntryIDs2)}
 };
 
 const uint32_t dayPatternIDs[] = {0, 1};
 
-CalendarPeriodStruct::Type CalendarPeriods[] = {
+static CalendarPeriodStruct::Type CalendarPeriods[] = {
     {Nullable<uint32_t>(0), List<const uint32_t>(dayPatternIDs)}
 };
 
-DayStruct::Type IndividualDays[] = {
+static DayStruct::Type IndividualDays[] = {
     {1745427104, static_cast<DayTypeEnum>(1), List<const uint32_t>(dayEntryIDs3)}
 };
 
-TariffComponentStruct::Type TariffComponents[] = {
+static TariffComponentStruct::Type TariffComponents[] = {
     {
         10,
         MakeOptional(Nullable<TariffPriceStruct::Type>({
@@ -126,18 +141,18 @@ TariffComponentStruct::Type TariffComponents[] = {
     }
 };
 
-const uint32_t period1DayEntries[] = {10, 14, 21, 25};
-const uint32_t period1Components[] = {10};
-const uint32_t period2DayEntries[] = {11, 15, 22, 26};
-const uint32_t period2Components[] = {20};
-const uint32_t period3DayEntries[] = {12, 16, 23};
-const uint32_t period3Components[] = {10};
-const uint32_t period4DayEntries[] = {13, 20, 24};
-const uint32_t period4Components[] = {20};
-const uint32_t period5DayEntries[] = {30};
-const uint32_t period5Components[] = {10};
+static const uint32_t period1DayEntries[] = {10, 14, 21, 25};
+static const uint32_t period1Components[] = {10};
+static const uint32_t period2DayEntries[] = {11, 15, 22, 26};
+static const uint32_t period2Components[] = {20};
+static const uint32_t period3DayEntries[] = {12, 16, 23};
+static const uint32_t period3Components[] = {10};
+static const uint32_t period4DayEntries[] = {13, 20, 24};
+static const uint32_t period4Components[] = {20};
+static const uint32_t period5DayEntries[] = {30};
+static const uint32_t period5Components[] = {10};
 
-TariffPeriodStruct::Type TariffPeriods[] = {
+static TariffPeriodStruct::Type TariffPeriods[] = {
     {Nullable<CharSpan>(MakeCharSpan("Period 1")), List<const uint32_t>(period1DayEntries), List<const uint32_t>(period1Components)},
     {Nullable<CharSpan>(MakeCharSpan("Period 2")), List<const uint32_t>(period2DayEntries), List<const uint32_t>(period2Components)},
     {Nullable<CharSpan>(MakeCharSpan("Period 3")), List<const uint32_t>(period3DayEntries), List<const uint32_t>(period3Components)},
@@ -150,7 +165,7 @@ TariffPeriodStruct::Type TariffPeriods[] = {
 // Sample 2 Data
 namespace Sample2 {
 
-TariffInformationStruct::Type TariffInfo() {
+static const TariffInformationStruct::Type TariffInfo() {
     TariffInformationStruct::Type info;
     info.tariffLabel.SetNonNull(MakeCharSpan("Full Tariff Two"));
     info.providerName.SetNonNull(MakeCharSpan("Example Provider"));
@@ -166,7 +181,7 @@ TariffInformationStruct::Type TariffInfo() {
 
 const uint32_t dayEntryIDs[] = {10, 11, 12, 13, 14, 15, 16};
 
-DayEntryStruct::Type DayEntries[] = {
+static DayEntryStruct::Type DayEntries[] = {
     {10, 0, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
     {11, 240, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
     {12, 480, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
@@ -176,17 +191,17 @@ DayEntryStruct::Type DayEntries[] = {
     {16, 1440, MakeOptional(static_cast<uint16_t>(60)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))}
 };
 
-DayPatternStruct::Type DayPatterns[] = {
+static DayPatternStruct::Type DayPatterns[] = {
     {0, BitMask<DayPatternDayOfWeekBitmap>(0x7F), List<const uint32_t>(dayEntryIDs)}
 };
 
-const uint32_t dayPatternIDs[] = {0};
+static const uint32_t dayPatternIDs[] = {0};
 
-CalendarPeriodStruct::Type CalendarPeriods[] = {
+static CalendarPeriodStruct::Type CalendarPeriods[] = {
     {Nullable<uint32_t>(0), List<const uint32_t>(dayPatternIDs)}
 };
 
-TariffComponentStruct::Type TariffComponents[] = {
+static TariffComponentStruct::Type TariffComponents[] = {
     {
         10,
         MakeOptional(Nullable<TariffPriceStruct::Type>({
@@ -264,14 +279,14 @@ TariffComponentStruct::Type TariffComponents[] = {
     }
 };
 
-const uint32_t period1DayEntries[] = {10, 13, 16};
-const uint32_t period1Components[] = {10};
-const uint32_t period2DayEntries[] = {11, 14};
-const uint32_t period2Components[] = {20};
-const uint32_t period3DayEntries[] = {12, 15};
-const uint32_t period3Components[] = {30};
+static const uint32_t period1DayEntries[] = {10, 13, 16};
+static const uint32_t period1Components[] = {10};
+static const uint32_t period2DayEntries[] = {11, 14};
+static const uint32_t period2Components[] = {20};
+static const uint32_t period3DayEntries[] = {12, 15};
+static const uint32_t period3Components[] = {30};
 
-TariffPeriodStruct::Type TariffPeriods[] = {
+static TariffPeriodStruct::Type TariffPeriods[] = {
     {Nullable<CharSpan>(MakeCharSpan("Period 1")), List<const uint32_t>(period1DayEntries), List<const uint32_t>(period1Components)},
     {Nullable<CharSpan>(MakeCharSpan("Period 2")), List<const uint32_t>(period2DayEntries), List<const uint32_t>(period2Components)},
     {Nullable<CharSpan>(MakeCharSpan("Period 3")), List<const uint32_t>(period3DayEntries), List<const uint32_t>(period3Components)}
@@ -279,12 +294,11 @@ TariffPeriodStruct::Type TariffPeriods[] = {
 
 } // namespace Sample2
 
-// First, define your attribute macro list
-#define COMMODITY_TARIFF_ATTRIBUTES                                                         \
+#define COMMODITY_TARIFF_ATTRIBUTES                                                \
     X(TariffUnit,                   Nullable<TariffUnitEnum>)                      \
-    X(StartDate,                    Nullable<uint32_t>)                                     \
-    X(DefaultRandomizationOffset,   Nullable<int16_t>)                                      \
-    X(DefaultRandomizationType,     Nullable<DayEntryRandomizationTypeEnum>)                \
+    X(StartDate,                    Nullable<uint32_t>)                            \
+    X(DefaultRandomizationOffset,   Nullable<int16_t>)                             \
+    X(DefaultRandomizationType,     Nullable<DayEntryRandomizationTypeEnum>)       \
     X(TariffInfo,                   Nullable<TariffInformationStruct::Type>)       \
     X(DayEntries,                   Nullable<List<DayEntryStruct::Type>>)          \
     X(DayPatterns,                  Nullable<List<DayPatternStruct::Type>>)        \
@@ -304,7 +318,7 @@ struct TariffDataSet {
 static constexpr size_t kCount = 2;
 
 // Array of all presets
-TariffDataSet kTariffPresets[] = {
+const TariffDataSet kTariffPresets[] = {
     // Sample 1
     {
         .TariffInfo = MakeNullable(Sample1::TariffInfo()),
@@ -328,10 +342,10 @@ TariffDataSet kTariffPresets[] = {
             std::size(TariffDataSamples::Sample1::IndividualDays))),
         .TariffComponents = MakeNullable(List<TariffComponentStruct::Type>(
            Sample1::TariffComponents,
-            std::size(TariffDataSamples::Sample1::TariffComponents))),
+            std::size(Sample1::TariffComponents))),
         .TariffPeriods = MakeNullable(List<TariffPeriodStruct::Type>(
            Sample1::TariffPeriods,
-            std::size(TariffDataSamples::Sample1::TariffPeriods))),
+            std::size(Sample1::TariffPeriods))),
 
         .TariffTestTimestamp = 0, //01-Dec-2024
     },
@@ -342,8 +356,10 @@ TariffDataSet kTariffPresets[] = {
         .StartDate =  Nullable<uint32_t>(0),
         .DefaultRandomizationOffset = Nullable<int16_t>(0),
         .DefaultRandomizationType = Nullable<DayEntryRandomizationTypeEnum>(DayEntryRandomizationTypeEnum::kNone),
-
-        .DayEntries = MakeNullable(List<DayEntryStruct::Type>()),
+        .DayEntries = MakeNullable(List<DayEntryStruct::Type>(
+            Sample2::DayEntries,
+            std::size(Sample2::DayEntries)
+        )),
         .DayPatterns = MakeNullable(List<DayPatternStruct::Type>(
            Sample2::DayPatterns,
             std::size(TariffDataSamples::Sample2::DayPatterns))),

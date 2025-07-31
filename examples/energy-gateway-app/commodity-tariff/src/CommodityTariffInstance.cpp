@@ -52,46 +52,6 @@ void CommodityTariffInstance::Shutdown()
     Instance::Shutdown();
 }
 
-CHIP_ERROR CommodityTariffDelegate::LoadTariffData(const TariffDataSamples::TariffDataSet &data)
-{/*
-    const std::map<std::string, std::function<CHIP_ERROR(const Json::Value &)>> generic_tariff_items = {
-        { "DayPatterns",
-          [this](const Json::Value & v) { return JSON_Utilities::DayPatterns_LoadDataSample(v, this->GetDayPatterns_MgmtObj()); } },
-        { "IndividualDays",
-          [this](const Json::Value & v) {
-              return JSON_Utilities::IndividualDays_LoadDataSample(v, this->GetIndividualDays_MgmtObj());
-          } },
-        { "CalendarPeriods",
-          [this](const Json::Value & v) {
-              return JSON_Utilities::CalendarPeriods_LoadDataSample(v, this->GetCalendarPeriods_MgmtObj());
-          } },
-    };*/
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    const std::map<bool, std::string> required_tariff_items = {
-        {data.StartDate.IsNull(), "TariffUnit"},
-        {data.StartDate.IsNull(),  "StartDate"},
-        {data.TariffInfo.IsNull(), "TariffInfo"},
-        {data.DayEntries.IsNull(), "DayEntries"},
-        {data.TariffComponents.IsNull(), "TariffComponents"},
-        {data.TariffPeriods.IsNull(), "TariffPeriods"},
-    };
-
-    for (const auto & item : required_tariff_items)
-    {
-        if (!item.first)
-        {
-            continue;
-        }
-
-        ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\"is not present", item.second.c_str());
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return err;
-}
-
 bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 {
     bool DayEntriesData_is_available = false;
@@ -156,7 +116,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         }
     }
 
-    if (GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().GetNewValueData() != nullptr))
+    if (GetIndividualDays_MgmtObj().IsValid() && (!GetIndividualDays_MgmtObj().GetNewValue().IsNull()))
     {
 
         assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
@@ -178,7 +138,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         DayEntriesData_is_available = true;
     }
 
-    if (GetCalendarPeriods_MgmtObj().IsValid() && (GetCalendarPeriods_MgmtObj().GetNewValueData() != nullptr))
+    if (GetCalendarPeriods_MgmtObj().IsValid() && (!GetCalendarPeriods_MgmtObj().GetNewValue().IsNull()))
     {
         assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
 

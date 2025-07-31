@@ -49,33 +49,76 @@ static const TariffDataSet & GetPreset(size_t index)
 }
 } // namespace TariffDataSamples
 
-static void ProcessTariffData(const TariffDataSamples::TariffDataSet &data) {
-    if (!data.TariffInfo.IsNull())
-    {
-        printf("Processing tariff: %.*s\n", 
-               static_cast<int>(data.TariffInfo.Value().tariffLabel.Value().size()),
-               data.TariffInfo.Value().tariffLabel.Value().data());
-    }
+#define COMMODITY_TARIFF_ATTRIBUTES_REQ \
+    X(TariffUnit)                   \
+    X(StartDate)                    \
+    X(TariffInfo)                   \
+    X(DayEntries)                   \
+    X(TariffComponents)             \
+    X(TariffPeriods)
 
-    if (!data.TariffComponents.IsNull())
-    {
-        printf("Contains %zu tariff components\n", data.TariffComponents.Value().size());
-    }
-}
+#define COMMODITY_TARIFF_ATTRIBUTES_OPT \
+    X(DefaultRandomizationOffset)   \
+    X(DefaultRandomizationType)     \
+    X(DayPatterns)                  \
+    X(IndividualDays)               \
+    X(CalendarPeriods)
+
+#define ATTR_ITEM(field) \
+    {!tariff_preset.field.IsNull(), { dg->Get##field##_MgmtObj().SetNewValue(tariff_preset.field), #field}}
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
-    const TariffDataSet & tariff_preset = TariffDataSamples::GetPreset(presetIndex++);
-
+    const TariffDataSamples::TariffDataSet & tariff_preset = TariffDataSamples::GetPreset(presetIndex++);
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
 
-    if (CHIP_NO_ERROR == dg->LoadTariffData(tariff_preset))
+    const std::vector<std::pair<bool, std::pair<CHIP_ERROR, const char*>>> required_tariff_items = {
+#define X(attrName) ATTR_ITEM(attrName),
+    COMMODITY_TARIFF_ATTRIBUTES_REQ
+#undef X
+    };
+
+    const std::vector<std::pair<bool, std::pair<CHIP_ERROR, const char*>>> optional_tariff_items = {
+#define X(attrName) ATTR_ITEM(attrName),
+    COMMODITY_TARIFF_ATTRIBUTES_OPT
+#undef X
+    };
+
+    for (const auto & item : required_tariff_items)
     {
-        dg->TariffDataUpdate();
+        if (!item.first) // isNull is true
+        {
+             ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\"is not present", item.second.second);
+             return;
+        }
+        else
+        {
+            if (item.second.first != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", item.second.second);
+                return;
+            }
+        }
     }
 
-    //ProcessTariffData();
+    for (const auto & item : optional_tariff_items)
+    {
+        if (item.first)
+        {
+            if (item.second.first != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", item.second.second);
+                return;
+            }
+        }
+    }
+
+    dg->TariffDataUpdate();
 }
+
+#undef COMMODITY_TARIFF_ATTRIBUTES_REQ
+#undef COMMODITY_TARIFF_ATTRIBUTES_OPT
+#undef TARIFF_ITEM
 
 void SetTestEventTrigger_TariffDataClear()
 {

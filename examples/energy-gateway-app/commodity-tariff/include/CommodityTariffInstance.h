@@ -34,8 +34,6 @@ public:
     CommodityTariffDelegate();
     ~CommodityTariffDelegate() = default;
 
-    CHIP_ERROR LoadTariffData(const TariffDataSamples::TariffDataSet &data);
-
     bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) override;
 };
 
