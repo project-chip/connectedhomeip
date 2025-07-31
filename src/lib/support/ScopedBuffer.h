@@ -69,6 +69,7 @@ public:
     /** Check if a buffer is valid */
     explicit operator bool() const { return mBuffer != nullptr; }
     bool operator!() const { return mBuffer == nullptr; }
+    inline bool IsNull() const { return mBuffer == nullptr; }
 
     /** Release memory used */
     void Free()
@@ -131,6 +132,8 @@ public:
  * methods.
  *
  * Use for RAII to auto-free after use.
+ *
+ * For a single element RAII with dtor, use Platform::UniquePtr<>
  */
 template <typename T, class MemoryManagement = Impl::PlatformMemoryManagement>
 class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
