@@ -28,7 +28,7 @@ bool VerifySuccessLogOnFailure(const ConcreteAttributePath & path, CHIP_ERROR er
 {
     VerifyOrReturnValue(err != CHIP_NO_ERROR, true);
 
-    // assume value not found being typical.
+    // Value not fount is typical. Not an error worth logging.
     VerifyOrReturnValue(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, false);
 
     ChipLogError(Zcl, "Failed to load attribute %u/" ChipLogFormatMEI "/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
