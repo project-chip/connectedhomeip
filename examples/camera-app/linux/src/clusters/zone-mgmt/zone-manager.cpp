@@ -161,8 +161,6 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
         // Advance time since initial trigger by the timer timeout period
         trigCtxtIter->timeSinceInitialTrigger += kTimerPeriod;
 
-        // ChipLogProgress(Camera, "Time since initial trigger = %u, triggerDetectedDuration = %u",
-        // trigCtxtIter->timeSinceInitialTrigger, trigCtxtIter->triggerDetectedDuration);
         if (trigCtxtIter->timeSinceInitialTrigger > trigCtxtIter->triggerDetectedDuration)
         {
             // Emit ZoneStopped with reason ActionStopped

@@ -51,19 +51,19 @@ public:
     }
 
     /**
-     * The spec requires zones to be a simple polygon.  That is a piecewise-linear
+     * The Spec requires zones to be a simple polygon.  That is a piecewise-linear
      * continuous map from a circle to the plane (a loop) that is not
      * self-intersecting (i.e. is a 1-1 or injective map).
      *
      * Being a map from a circle, continuity, and piecewise-linearity are guaranteed
-     * by the way we define the zone in terms of a set of vertices that we connect in
+     * by the way we define the zone in terms of an ordered set of vertices that we connect in
      * a cycle, so we only need to check that the map is 1-1.
      *
      * Algorithm for Checking Self-Intersection of a Zone
      * --------------------------------------------------
      *
      * 1. If any vertex appears more than once in the list of vertices, the mapping
-     *    is not 1-1 so the zone is self-intersecting.
+     *    is not 1-1. So, the zone is self-intersecting.
      * 2. For a polygon of 3 vertices, flag it as self-intersecting if all
      *    vertices are collinear. Otherwise, it is a simple triangle and a valid
      *    polygon.
@@ -76,11 +76,11 @@ public:
      * -------------------------------------------
      * 1. If points p1 and q1 lie on the opposite sides of segment p2q2 AND points p2
      *    and q2 lie on opposite sides of segment p1q1, the segments intersect.
-     *    Orientation(pq, r) is used to determine which side of the vecror pq point r
+     *    Orientation(pq, r) is used to determine which side of the vector pq point r
      *    lies on, or whether it lies on the line containing pq.
      * 2. If either endpoint of one segment lies on the other segment, the segments
      *    intersect.
-     * 3. In all other cases the segments do not intersect.
+     * 3. In all other cases, the segments do not intersect.
      *
      * Algorithm for Orientation(pq, r)
      * ----------------------------------
@@ -98,24 +98,24 @@ public:
      * -----------------------------------------------------------
      *
      * 1. As noted in the algorithm description, if a vertex is repeated the zone is
-     *    self-intersecting.  In what follows we can therefore assume no repeated
-     *    vertices and no zero-length edges.
+     *    self-intersecting.  In what follows, we can, therefore, assume no repeated
+     *    vertices and no zero-length edges(consecutive repeated vertices).
      * 2. For the 3-vertex case, since the edges are all adjacent to each other, the
-     *    only way for them to intersect (i.e. share a point other than the vertex
-     *    where they are adjacent) is for the two edges to lie on the same line (the
-     *    one passing through that shared vertex and the intersection point).  But
-     *    then all three of the vertices have to lie on the same line, so it's enough
-     *    to check for that to detect self-intersections.
+     *    only way for two edges to intersect (i.e. share a point other than the vertex
+     *    where they are adjacent), is for them to overlap. But then all three of the
+     *    vertices have to be collinear, so it's enough to check for that to detect
+     *    self-intersections.
      * 3. When there are 4 or more distinct vertices in the polygon, let's consider
      *    the case when two adjacent edges intersect.  As noted in point 2, the edges
-     *    must lie on the same line.  Since there are no repeated vertices, the two
-     *    edges must have different lengths.  Let 'l' denote the longer edge and 's'
-     *    denote the shorter edge. The non-shared end vertex of 's' lies on 'l'. Let
-     *    this point be P. There must be two edges that meet at P.  One of them is
-     *    's'; call the other one 't'.  Since there are at least 4 vertices, there
-     *    are also at least 4 edges.  Because 's' and 't' are adjacent, 't' is not
-     *    adjacent to 'l' (then there would be only 3 edges!).  So in this case we
-     *    have non-adjacent edges 't' and 'l' that intersect (at point P).
+     *    must overlap.  Since there are no repeated vertices, the two adjacent edges
+     *    must have different lengths.  Let 'l' denote the longer edge and 's'
+     *    denote the shorter edge. The non-shared end vertex of 's', thus, lies on 'l'.
+     *    Let this point be P. Given the polygon is a cycle with each vertex having
+     *    degree 2, there must be two edges that meet at P. One of them is 's';
+     *    Let's call the other one 't'. Since there are at least 4 vertices, there
+     *    are also at least 4 edges. Because 's' and 't' are adjacent, 't' is not
+     *    adjacent to 'l' (otherwise, there would only be 3 edges!). So, in this case,
+     *    we have non-adjacent edges 't' and 'l' that intersect (at point P).
      *
      *    Therefore, if there are any self-intersection in a polygon with 4 or more
      *    vertices, there must be intersecting non-adjacent edges.
@@ -169,12 +169,12 @@ public:
         // If there are only 3 vertices, it's enough to check whether they are collinear.
         if (vertexCount == 3)
         {
-            if (Orientation(vertices[0], vertices[1], vertices[2]) == OrientationEnum::kCollinear))
+            if (Orientation(vertices[0], vertices[1], vertices[2]) == OrientationEnum::kCollinear)
             {
                 ChipLogDetail(Zcl, "Degenerate case of 3 collinear vertices");
                 return true;
             }
-            
+
             return false;
         }
 
@@ -237,7 +237,8 @@ private:
     static OrientationEnum Orientation(const TwoDCartesianVertexStruct & p, const TwoDCartesianVertexStruct & q,
                                        const TwoDCartesianVertexStruct & r)
     {
-        long long val = static_cast<long long>((q.x - p.x) * (r.y - p.y)) - static_cast<long long>((q.y - p.y) * (r.x - p.x));
+        long long val = (static_cast<long long>(q.x - p.x) * static_cast<long long>(r.y - p.y)) -
+            (static_cast<long long>(q.y - p.y) * static_cast<long long>(r.x - p.x));
 
         if (val == 0) // Collinear
         {

@@ -666,6 +666,10 @@ Status ZoneMgmtServer::ValidateTrigger(const ZoneTriggerControlStruct & trigger)
 
     VerifyOrReturnError(trigger.maxDuration >= trigger.initialDuration, Status::ConstraintError);
 
+    // If PerZoneSensitivity feature is supported, then command should have the
+    // sensitivity field in the Trigger. Or, if it is not supported, then command should
+    // not have the field.
+    VerifyOrReturnError((HasFeature(Feature::kPerZoneSensitivity) == trigger.sensitivity.HasValue()), Status::InvalidCommand);
     if (HasFeature(Feature::kPerZoneSensitivity))
     {
         VerifyOrReturnError(trigger.sensitivity.Value() >= 1 && trigger.sensitivity.Value() <= mSensitivityMax,
