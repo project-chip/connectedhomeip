@@ -192,6 +192,10 @@ TEST_F(TestTransferFacilitator, PollsForOutput)
 {
     TestInitiator initiator;
 
+    // hook a callback to the StartTimerHook
+    bool timerStarted                    = false;
+    gSystemLayerAndClock.mStartTimerHook = [&timerStarted](auto, auto, void *) { timerStarted = true; };
+
     auto r = initiator.InitiateTransfer(&gSystemLayerAndClock, TransferRole::kSender, TransferSession::TransferInitData(),
                                         System::Clock::Seconds16(60), System::Clock::Milliseconds32(500));
 
@@ -200,10 +204,6 @@ TEST_F(TestTransferFacilitator, PollsForOutput)
     // hook a callback to the output handler
     bool outputHandled                      = false;
     initiator.mTransferSessionOutputHandler = [&outputHandled](TransferSession::OutputEvent & event) { outputHandled = true; };
-
-    // hook a callback to the StartTimerHook
-    bool timerStarted                    = false;
-    gSystemLayerAndClock.mStartTimerHook = [&timerStarted](auto, auto, void *) { timerStarted = true; };
 
     // Simulate a poll
     initiator.PollForOutput();
