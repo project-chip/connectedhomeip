@@ -18,6 +18,7 @@
 
 #include <lib/support/EnforceFormat.h>
 #include <platform/DeviceInfoProvider.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -30,41 +31,51 @@ public:
     ~SampleDeviceProvider() override {}
 
     // Iterators
-    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override;
-    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override;
-    SupportedLocalesIterator * IterateSupportedLocales() override;
-    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override;
-
-    static SampleDeviceProvider & GetDefaultInstance();
+    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return nullptr; };
+    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; };
+    SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; };
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override 
+    {
+        return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
+    }
 
 protected:
     class UserLabelIteratorImpl : public UserLabelIterator
     {
     public:
-        UserLabelIteratorImpl(SampleDeviceProvider & provider, EndpointId endpoint);
-        size_t Count() override { return mTotal; }
-        bool Next(UserLabelType & output) override;
-        void Release() override { chip::Platform::Delete(this); }
-
-    private:
-        size_t mTotal = 0;
+        UserLabelIteratorImpl() = default;
+        size_t Count() override { return 0; }
+        bool Next(UserLabelType & output) override { return false; }
+        void Release() override {  }
     };
 
     class SupportedLocalesIteratorImpl : public SupportedLocalesIterator
     {
     public:
         SupportedLocalesIteratorImpl() = default;
-        size_t Count() override;
-        bool Next(CharSpan & output) override;
-        void Release() override { chip::Platform::Delete(this); }
+        size_t Count() override { return 0; }
+        bool Next(CharSpan & output) override { return false; }
+        void Release() override {  }
     };
 
     class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
     {
     public:
         SupportedCalendarTypesIteratorImpl() = default;
-        size_t Count() override;
-        bool Next(CalendarType & output) override;
+        size_t Count() override { return kNumSupportedCalendarTypes; }
+        bool Next(CalendarType & output) override 
+        {
+            static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] = {
+                app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian,
+                app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kChinese,
+                app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese
+            };
+
+            VerifyOrReturnError(mIndex < kNumSupportedCalendarTypes, false);
+            output = kAllSupportedCalendarTypes[mIndex];
+            mIndex++;
+            return true;
+        };
         void Release() override { chip::Platform::Delete(this); }
 
     private:
@@ -72,10 +83,10 @@ protected:
         size_t mIndex                                      = 0;
     };
 
-    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;
-    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override;
-    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override;
-    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override;
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; };
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override { return CHIP_NO_ERROR; };
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; };
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; };
 };
 
 } // namespace DeviceLayer
