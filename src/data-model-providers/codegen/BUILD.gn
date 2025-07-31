@@ -43,4 +43,3 @@ source_set("instance-header") {
   # generally being unit tests or data_model.gni/data_model.cmake files)
   sources = [ "Instance.h" ]
 }
-

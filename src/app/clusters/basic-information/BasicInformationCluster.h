@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/persistence/String.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/PlatformManager.h>
