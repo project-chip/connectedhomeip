@@ -85,6 +85,7 @@ if(CONFIG_ENABLE_PW_RPC)
   pw_set_backend(pw_sys_io pw_sys_io.esp32)
   pw_set_backend(pw_trace pw_trace_tokenized)
   pw_set_backend(pw_sync.interrupt_spin_lock pw_sync_freertos.interrupt_spin_lock)
+  pw_set_backend(pw_interrupt.context pw_interrupt_freertos.context)
 
   add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
   add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
