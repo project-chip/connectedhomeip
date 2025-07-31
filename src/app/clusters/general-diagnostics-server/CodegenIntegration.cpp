@@ -19,6 +19,7 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
+#include <app/util/util.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -41,24 +42,10 @@ LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
 LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 #endif
 
-// compile-time evaluated method if "is <EP>::GeneralDiagnostics::<ATTR>" enabled
-constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
+// Check if attribute is enabled (statically or dynamically) through ember read
+bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
 {
-    for (auto & config : GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig)
-    {
-        if (config.endpointNumber != endpointId)
-        {
-            continue;
-        }
-        for (auto & attr : config.enabledAttributes)
-        {
-            if (attr == attributeId)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
+    return emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, attributeId);
 }
 } // namespace
 
