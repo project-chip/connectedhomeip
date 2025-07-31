@@ -34,9 +34,10 @@
 # --build-env-dir option. The build environment directory can be shared by any
 # number of build directories, independently of target / tool chain.
 
+# Check if this script is being sourced; this could be in any shell, not just bash.
 if [ -z "$BASH" -o "$BASH_SOURCE" != "$0" ]; then
     echo "configure does not support being sourced" >&2
-    return
+    return 1
 fi
 
 set -o pipefail
