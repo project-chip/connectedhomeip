@@ -706,6 +706,8 @@ jobs:
                   echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
                   echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test/closure-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: objdir-clone/push_av_server/server.py" >> /tmp/test_env.yaml
+                  echo "OTA_REQUESTOR: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
+                  echo "OTA_PROVIDER: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
 
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
