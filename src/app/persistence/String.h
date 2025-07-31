@@ -41,7 +41,7 @@ public:
     ShortString(char * buffer, size_t buffer_size) : mBuffer(buffer), mPascalSize(static_cast<uint8_t>(buffer_size - 1))
     {
         // for a buffer to be usable we need 1 byte for size, 1 byte for content and 1 byte for null terminator.
-        // Strings without any size make no sense
+        // Strings without any size make no sense.
         VerifyOrDie(buffer_size >= 3);
         VerifyOrDie(buffer_size < 256);
     }
