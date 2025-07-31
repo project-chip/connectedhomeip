@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${OTA_REQUESTOR_APP}
+#     app: ${OTA_REQUESTOR}
 #     app-args: >
 #       --discriminator 1234
 #       --passcode 20202021
