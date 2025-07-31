@@ -114,8 +114,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep("7f", "If not Resolution == 1: Wait for CurrentState.Position to be updated"),
             TestStep("7g", "Send SetTarget command with Position not a multiple of Resolution"),
             TestStep("7h", "Verify TargetState attribute is updated"),
-            TestStep("7i", "If not Resolution > 2: Wait for CurrentState.Position to be updated"),
-            TestStep("7j", "If not Resolution <= 2: Wait for CurrentState.Position to be updated"),
+            TestStep("7i", "If Resolution <= 2 and position change expected: Wait for CurrentState.Position to be updated"),
+            TestStep("7j", "If Resolution > 2 and position change expected: Wait for CurrentState.Position to be updated"),
             TestStep(8, "Send SetTarget command with Latch field when MotionLatching is unsupported"),
             TestStep(9, "Send SetTarget command with Speed field when Speed is unsupported"),
             TestStep(10, "Send SetTarget command with invalid Speed when Speed is unsupported"),
@@ -396,6 +396,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             else:
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
+                initial_state.position = min_position
 
             # STEP 7f: If not Resolution == 1: Wait for CurrentState.Position to be updated
             self.step("7f")
@@ -404,6 +405,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             else:
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(min_position + resolution)], timeout_sec=timeout)
+                initial_state.position = min_position + resolution
 
             # STEP 7g: Send SetTarget command with Position not a multiple of Resolution
             self.step("7g")
@@ -426,17 +428,17 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(target_state.position, max_position - resolution,
                                      "TargetState Position does not match expected value")
 
-            # STEP 7i: If not Resolution > 2: Wait for CurrentState.Position to be updated
+            # STEP 7i: If Resolution <= 2 and position change expected: Wait for CurrentState.Position to be updated
             self.step("7i")
-            if (resolution > 2):
+            if (resolution > 2 or initial_state.position == max_position):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
-            # STEP 7j: If not Resolution <= 2: Wait for CurrentState.Position to be updated
+            # STEP 7j: If Resolution > 2 and position change expected: Wait for CurrentState.Position to be updated
             self.step("7j")
-            if (resolution <= 2):
+            if (resolution <= 2 or initial_state.position == max_position - resolution):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
