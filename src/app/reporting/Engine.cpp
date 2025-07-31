@@ -278,6 +278,7 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         .cluster     = path.mClusterId,
         .endpoint    = path.mEndpointId,
         .requestType = RequestType::kEventReadRequest,
+        .entityId    = path.mEventId,
     };
     CHIP_ERROR err = GetAccessControl().Check(subjectDescriptor, requestPath, Access::Privilege::kView);
     if (IsTranslatableAclError(path, err, outStatus))
@@ -307,8 +308,6 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
         outStatus = StatusIB(status);
         return CHIP_NO_ERROR;
     }
-
-    requestPath.entityId = path.mEventId;
 
     // Per spec, the required-privilege ACL check is performed only after path existence is validated
     err = GetAccessControl().Check(subjectDescriptor, requestPath, eventInfo.readPrivilege);
