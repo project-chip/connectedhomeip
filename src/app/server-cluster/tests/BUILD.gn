@@ -18,7 +18,11 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libServerClusterInterfaceTests"
 
-  test_sources = [ "TestDefaultServerCluster.cpp" ]
+  test_sources = [
+    "TestAttributeListBuilder.cpp",
+    "TestDefaultServerCluster.cpp",
+    "TestServerClusterInterfaceRegistry.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
@@ -26,6 +30,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/server-cluster:registry",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
   ]

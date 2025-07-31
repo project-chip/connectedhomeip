@@ -38,6 +38,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Microwave Oven Control
     - Chime
     - Camera AV Stream Management
+    - Push AV Stream Transport
     - Commissioner Control
     - Commodity Price
     - Energy EVSE

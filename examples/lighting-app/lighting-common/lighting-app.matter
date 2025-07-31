@@ -1070,7 +1070,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -2723,7 +2723,7 @@ endpoint 0 {
     callback attribute currentMaxRate;
     callback attribute overrunCount;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
 
     handle command ResetCounts;
   }

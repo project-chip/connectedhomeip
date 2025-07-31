@@ -108,9 +108,13 @@ public:
 
     void SendData(const char * data, size_t size) override
     {
-        if (mTrack)
+        if (mTrack && mTrack->isOpen())
         {
             mTrack->send(reinterpret_cast<const std::byte *>(data), size);
+        }
+        else
+        {
+            ChipLogError(Camera, "Track is closed");
         }
     }
 
