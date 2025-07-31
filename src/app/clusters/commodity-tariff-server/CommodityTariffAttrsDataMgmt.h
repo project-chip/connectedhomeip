@@ -257,10 +257,10 @@ using namespace CommodityTariffConsts;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
 template <typename T>
-CHIP_ERROR CopyData(const T& input, T& output);
+inline CHIP_ERROR CopyData(const T& input, T& output);
 
 template <>
-CHIP_ERROR CopyData<TariffInformationStruct::Type>(const TariffInformationStruct::Type & input, TariffInformationStruct::Type & output)
+inline CHIP_ERROR CopyData<TariffInformationStruct::Type>(const TariffInformationStruct::Type & input, TariffInformationStruct::Type & output)
 {
     output.tariffLabel.SetNull();
     output.providerName.SetNull();
@@ -283,11 +283,14 @@ CHIP_ERROR CopyData<TariffInformationStruct::Type>(const TariffInformationStruct
         }
     }
 
-    if (!input.currency.HasValue())
+    if (input.currency.HasValue())
     {
-        output.currency.Value().SetNull();
-
-        if (!input.currency.Value().IsNull())
+        output.currency.Emplace();
+        if (input.currency.Value().IsNull())
+        {
+            output.currency.Value().SetNull();
+        }
+        else
         {
             output.currency.Value().SetNonNull(input.currency.Value().Value());
         }
@@ -302,7 +305,7 @@ CHIP_ERROR CopyData<TariffInformationStruct::Type>(const TariffInformationStruct
 }
 
 template <>
-CHIP_ERROR CopyData<DayEntryStruct::Type>(const DayEntryStruct::Type & input, DayEntryStruct::Type & output)
+inline CHIP_ERROR CopyData<DayEntryStruct::Type>(const DayEntryStruct::Type & input, DayEntryStruct::Type & output)
 {
     output.dayEntryID = input.dayEntryID;
     output.startTime = input.startTime;
@@ -329,7 +332,7 @@ CHIP_ERROR CopyData<DayEntryStruct::Type>(const DayEntryStruct::Type & input, Da
 }
 
 template <>
-CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Type & input, TariffComponentStruct::Type & output)
+inline CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Type & input, TariffComponentStruct::Type & output)
 {
     output.tariffComponentID = input.tariffComponentID;
     
@@ -340,21 +343,22 @@ CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Ty
         output.price.Value().SetNull();
         if (!input.price.Value().IsNull())
         {
-            auto & priceInput = input.price.Value().Value();
-            auto & priceOutput = output.price.Value().Value();
-            priceOutput.priceType = priceInput.priceType;
+            auto & priceInput = input.price.Value().Value();            
+            TariffPriceStruct::Type tmp_price;
+
+            tmp_price.priceType = priceInput.priceType;
             
-            priceOutput.price.ClearValue();
             if (priceInput.price.HasValue())
             {
-                priceOutput.price.SetValue(priceInput.price.Value());
+                tmp_price.price.SetValue(priceInput.price.Value());
             }
             
-            priceOutput.priceLevel.ClearValue();
             if (priceInput.priceLevel.HasValue())
             {
-                priceOutput.priceLevel.SetValue(priceInput.priceLevel.Value());
+                tmp_price.priceLevel.SetValue(priceInput.priceLevel.Value());
             }
+
+            output.price.Value().SetNonNull(tmp_price);
         }
     }
     
@@ -419,7 +423,7 @@ CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Ty
 }
 
 template <>
-CHIP_ERROR CopyData<TariffPeriodStruct::Type>(const TariffPeriodStruct::Type & input, TariffPeriodStruct::Type & output)
+inline CHIP_ERROR CopyData<TariffPeriodStruct::Type>(const TariffPeriodStruct::Type & input, TariffPeriodStruct::Type & output)
 {
     output.label.SetNull();
     if (!input.label.IsNull())
@@ -446,7 +450,7 @@ CHIP_ERROR CopyData<TariffPeriodStruct::Type>(const TariffPeriodStruct::Type & i
 }
 
 template <>
-CHIP_ERROR CopyData<DayPatternStruct::Type>(const DayPatternStruct::Type & input, DayPatternStruct::Type & output)
+inline CHIP_ERROR CopyData<DayPatternStruct::Type>(const DayPatternStruct::Type & input, DayPatternStruct::Type & output)
 {
     output.dayPatternID = input.dayPatternID;
     output.daysOfWeek = input.daysOfWeek;
@@ -461,7 +465,7 @@ CHIP_ERROR CopyData<DayPatternStruct::Type>(const DayPatternStruct::Type & input
 }
 
 template <>
-CHIP_ERROR CopyData<DayStruct::Type>(const DayStruct::Type & input, DayStruct::Type & output)
+inline CHIP_ERROR CopyData<DayStruct::Type>(const DayStruct::Type & input, DayStruct::Type & output)
 {
     output.date = input.date;
     output.dayType = input.dayType;
@@ -476,7 +480,7 @@ CHIP_ERROR CopyData<DayStruct::Type>(const DayStruct::Type & input, DayStruct::T
 }
 
 template <>
-CHIP_ERROR CopyData<CalendarPeriodStruct::Type>(const CalendarPeriodStruct::Type & input, CalendarPeriodStruct::Type & output)
+inline CHIP_ERROR CopyData<CalendarPeriodStruct::Type>(const CalendarPeriodStruct::Type & input, CalendarPeriodStruct::Type & output)
 {
     output.startDate.SetNull();
     if (!input.startDate.IsNull())
@@ -620,7 +624,7 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  *
  * ### Complete Successful Sequence:
  * 1. CreateNewValue()   // kIdle → kInitialized
- * 2. Modify value       // (via GetNewValueData())
+ * 2. Modify value       // 
  * 3. MarkAsAssigned()   // kInitialized → kAssigned
  * 4. UpdateBegin()      // kAssigned → kValidated
  * 5. UpdateCommit()     // kValidated → kUpdated
@@ -632,7 +636,6 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  * - UpdateEnd() can be called at any state for cleanup
  *
  * @see CreateNewValue()
- * @see GetNewValueData()
  * @see MarkAsAssigned()
  * @see UpdateBegin()
  * @see UpdateCommit()
@@ -665,18 +668,19 @@ public:
         {
             GetValueRef() = ValueType();
         }
-        mHoldState   = StorageState::kEmpty;
+        mHoldState[mActiveValueIdx]   = StorageState::kEmpty;
         mUpdateState = UpdateState::kIdle;
     }
 
     /// @brief Virtual destructor for proper cleanup
-    virtual ~CTC_BaseDataClass() { Cleanup(); }
+    virtual ~CTC_BaseDataClass() { CleanupValue(GetValueRef()); CleanupValue(GetNewValueRef()); }
 
     /**
      * @brief Get mutable reference to stored value
      * @return ValueType & Reference to the active value storage
      */
     ValueType & GetValue() { return GetValueRef(); }
+    ValueType & GetNewValue() { return GetNewValueRef(); }
 
     /**
      * @brief Check if current update is validated
@@ -688,7 +692,7 @@ public:
      * @brief Check if value storage contains valid data
      * @return true if storage is in kHold state
      */
-    bool HasValue() const { return (mHoldState == StorageState::kHold); }
+    bool HasValue() const { return (mHoldState[!mActiveValueIdx] == StorageState::kHold); }
 
     /**
      * @brief Prepares a new value for modification
@@ -775,9 +779,18 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetNewValue(const WrappedType & newValue)
+    CHIP_ERROR SetNewValue(const ValueType & aValue)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (aValue.IsNull())
+        {
+            mUpdateState = UpdateState::kInitialized;
+            MarkAsAssigned();
+            return CHIP_NO_ERROR;
+        }
+
+        auto & newValue = aValue.Value();
 
         if constexpr (IsValueList())
         {
@@ -785,7 +798,7 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                auto buffer = GetNewValueData();
+                auto buffer = GetNewValueRef().Value().data();
                 for (size_t idx = 0; idx < newValue.size(); idx++)
                 {
                     if (CHIP_NO_ERROR == (err = CopyData<PayloadType>(newValue[idx], buffer[idx])))
@@ -802,7 +815,12 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                err = CopyData<PayloadType>(newValue, GetNewValueData());                    
+                PayloadType tmpValue = newValue;
+                err = CopyData<PayloadType>(newValue, tmpValue); 
+                if (err == CHIP_NO_ERROR)
+                {
+                    GetNewValueRef().SetNonNull(tmpValue);
+                }
             }
         }
         else if constexpr (IsValueScalar())
@@ -811,7 +829,7 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                GetNewValueData() = newValue;
+                GetNewValueRef().SetNonNull(newValue);
             }
         }
 
@@ -825,48 +843,6 @@ public:
         }
 
         return err;
-    }
-
-    /**
-     * @brief Accesses the pending new value's payload for modification
-     * @return Pointer to modifiable payload value if available
-     * @retval nullptr if:
-     *         - Not in kInitialized state
-     *         - Value is null (for nullable types)
-     *         - List is empty (for list types)
-     *
-     * @warning Pointer becomes invalid after UpdateCommit()/UpdateEnd()
-     */
-    auto GetNewValueData() -> ExtractPayloadType_t<ValueType> *
-    {
-        if (mUpdateState < UpdateState::kInitialized)
-        {
-            return nullptr;
-        }
-
-        if constexpr (IsValueNullable())
-        {
-            if (GetNewValueRef().IsNull())
-            {
-                return nullptr;
-            }
-            if constexpr (IsList<WrappedType>::value)
-            {
-                return GetNewValueRef().Value().data();
-            }
-            else
-            {
-                return &GetNewValueRef().Value();
-            }
-        }
-        else if constexpr (IsValueList())
-        {
-            return GetNewValueRef().data();
-        }
-        else
-        {
-            return &GetNewValueRef();
-        }
     }
 
     /**
@@ -909,13 +885,12 @@ public:
 
         if (aValidationBypass != true)
         {
+            mAuxData = aUpdCtx;            
             err = ValidateNewValue();
         }
 
         if (err == CHIP_NO_ERROR)
         {
-            mAuxData = aUpdCtx;
-
             if (aUpdCb != nullptr)
             {
                 mAuxCb = aUpdCb;
@@ -947,11 +922,10 @@ public:
 
         if (HasChanged())
         {
-            if (mHoldState == StorageState::kHold)
+            if (mHoldState[mActiveValueIdx] == StorageState::kHold)
             {
-                Cleanup(); // Cleanup current value
+                CleanupValue(GetValueRef()); // Cleanup current value
             }
-            mHoldState   = StorageState::kHold;
             mUpdateState = UpdateState::kUpdated;
         }
 
@@ -993,7 +967,7 @@ public:
     void Cleanup()
     {
         CleanupValue(GetValueRef());
-        mHoldState = StorageState::kEmpty;
+        mHoldState[mActiveValueIdx] = StorageState::kEmpty;
     }
 
 private:
@@ -1086,12 +1060,12 @@ private:
 
 protected:
     ValueType mValueStorage[2]; // Double-buffered storage
+    StorageState mHoldState[2]  = {StorageState::kEmpty};
 
     void * mAuxData = nullptr;                  // Validation context
     const AttributeId mAttrId;                     // Attribute identifier
     void (*mAuxCb)(AttributeId, void *) = nullptr; // Update callback
 
-    StorageState mHoldState  = StorageState::kEmpty;
     UpdateState mUpdateState = UpdateState::kIdle;
 
     virtual CHIP_ERROR Validate(const ValueType & aValue) const { return CHIP_NO_ERROR; }

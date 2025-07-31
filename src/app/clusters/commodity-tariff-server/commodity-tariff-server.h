@@ -295,7 +295,7 @@ private:
     bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
 #define X(attrName, attrType)                                                                                                      \
-    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb, true) != CHIP_NO_ERROR)                             \
+    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb, false) != CHIP_NO_ERROR)                             \
     {                                                                                                                              \
         return false;                                                                                                              \
     }
