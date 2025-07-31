@@ -223,7 +223,6 @@ TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
         ASSERT_TRUE(readString.SetContent("some value"_span));
         ASSERT_FALSE(persistence.LoadString(path, readString));
         ASSERT_TRUE(readString.Content().empty());
-
     }
 }
 
