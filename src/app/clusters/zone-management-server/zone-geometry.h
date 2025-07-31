@@ -51,125 +51,107 @@ public:
     }
 
     /**
+     * The spec requires zones to be a simple polygon.  That is a piecewise-linear
+     * continuous map from a circle to the plane (a loop) that is not
+     * self-intersecting (i.e. is a 1-1 or injective map).
+     *
+     * Being a map from a circle, continuity, and piecewise-linearity are guaranteed
+     * by the way we define the zone in terms of a set of vertices that we connect in
+     * a cycle, so we only need to check that the map is 1-1.
+     *
      * Algorithm for Checking Self-Intersection of a Zone
      * --------------------------------------------------
      *
-     * 1. If any vertex is repeated in the ordered list of vertices:
-     *      a. This causes smaller or no loops in the polygon and creates degenerate
-     *         cases violating the definition of a simple polygon.
-     *         Return "True" for self-intersection.
-     *         Note: We are also simplifying by rejecting consecutive repeated vertices.
+     * 1. If any vertex appears more than once in the list of vertices, the mapping
+     *    is not 1-1 so the zone is self-intersecting.
      * 2. For a polygon of 3 vertices, flag it as self-intersecting if all
      *    vertices are collinear. Otherwise, it is a simple triangle and a valid
      *    polygon.
-     * 3. For all polygons of > 3 vertices, go through the list of vertices:
-     *      a. Pick unique non-adjacent edges (p1q1 and p2q2) to check for self-intersection.
-     *      b. If SegmentsIntersect(p1q1, p2q2) :
-     *           i. Return "True" for self-intersection.
-     * 4. Return "False" for self-intersection.
+     * 3. For all polygons of > 3 vertices, go through all pairs of non-adjacent edges
+     *    p1q1 and p2q2.  If any non-adjacent edges intersect, the zone is
+     *    self-intersecting. If all such pairs do not intersect, the zone is not
+     *    self-intersecting.
      *
      * Algorithm for SegmentsIntersect(p1q1, p2q2)
      * -------------------------------------------
-     * 1. If points p1 and q1 lie on the opposite sides of segment p2q2 AND
-     *    points p2 and q2 lie on opposite sides of segment p1q1:
-     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
-     *         This is figured out by evaluating the Orientation (OnLeft,
-     *         OnRight, Collinear) of a point 'r' w.r.t a segment 'pq'.
-     * 2. If p2 lies on p1q1 (collinear and p2 lies on segment p1q1)
-     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
-     * 3. If q2 lies on p1q1 (collinear and q2 lies on segment p1q1)
-     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
-     * 4. If p1 lies on p2q2 (collinear and p1 lies on segment p2q2)
-     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
-     * 5. If q1 lies on p2q2 (collinear and q1 lies on segment p2q2)
-     *      a. Return True for segments p1q1 and p2q2 intersecting each other.
+     * 1. If points p1 and q1 lie on the opposite sides of segment p2q2 AND points p2
+     *    and q2 lie on opposite sides of segment p1q1, the segments intersect.
+     *    Orientation(pq, r) is used to determine which side of the vecror pq point r
+     *    lies on, or whether it lies on the line containing pq.
+     * 2. If either endpoint of one segment lies on the other segment, the segments
+     *    intersect.
+     * 3. In all other cases the segments do not intersect.
      *
-     * Algorithm for Orientation(p, q, r)
+     * Algorithm for Orientation(pq, r)
      * ----------------------------------
      * 1. Compute cross-product of vectors pq and pr.
      * 2. If cross-product > 0:
-     *      Point r lies to the left of vector pq (Counter-clockwise from pq to pr)
+     *      Point r lies to the left of ray pq (Counter-clockwise from pq to pr)
      *    Else if cross-product < 0:
-     *      Point r lies to the right of vector pq (Clockwise from pq to pr)
+     *      Point r lies to the right of ray pq (Clockwise from pq to pr)
      *    Else
      *      Point r is collinear with pq
      */
 
     /**
-     * Proof of Correctness
-     * --------------------
+     * Proof of Correctness of Overall Self-Intersection Algorithm
+     * -----------------------------------------------------------
      *
-     * 1. Filtering vertex repetition(including consecutive and non-consecutive)
-     *    a. Consecutive repeated vertices (e.g., A, B, B, C.) :
-     *       If V_i == V_i+1, then we have an edge (V_i, V_i+1) of zero length
-     *       and it is a degenerate polygon. Note, we are not collapsing all
-     *       consecutive identical vertices into a single one.
-     *    b. Non-consecutive repeated vertices (e.g., A, B, C, D, B, E) :
-     *       If a vertex V appears at index i and again at index k(i < k and not
-     *       consecutive), the polygon's path revisits a point before
-     *       completing its cycle. In a cycle, the degree of each vertex is 2,
-     *       whereas with vertex repetition, there are vertices with higher degree.
-     *       This means the polygon's boundary self-intersects, and creates
-     *       these smaller loops that degenerates its form.
+     * 1. As noted in the algorithm description, if a vertex is repeated the zone is
+     *    self-intersecting.  In what follows we can therefore assume no repeated
+     *    vertices and no zero-length edges.
+     * 2. For the 3-vertex case, since the edges are all adjacent to each other, the
+     *    only way for them to intersect (i.e. share a point other than the vertex
+     *    where they are adjacent) is for the two edges to lie on the same line (the
+     *    one passing through that shared vertex and the intersection point).  But
+     *    then all three of the vertices have to lie on the same line, so it's enough
+     *    to check for that to detect self-intersections.
+     * 3. When there are 4 or more distinct vertices in the polygon, let's consider
+     *    the case when two adjacent edges intersect.  As noted in point 2, the edges
+     *    must lie on the same line.  Since there are no repeated vertices, the two
+     *    edges must have different lengths.  Let 'l' denote the longer edge and 's'
+     *    denote the shorter edge. The non-shared end vertex of 's' lies on 'l'. Let
+     *    this point be P. There must be two edges that meet at P.  One of them is
+     *    's'; call the other one 't'.  Since there are at least 4 vertices, there
+     *    are also at least 4 edges.  Because 's' and 't' are adjacent, 't' is not
+     *    adjacent to 'l' (then there would be only 3 edges!).  So in this case we
+     *    have non-adjacent edges 't' and 'l' that intersect (at point P).
      *
-     * 2. Correctness of SegmentsIntersect(p1q1, p2q2) :
-     *    a. General case: where points p1 and q1 lie on opposite sides of
-     *       p2q2, AND points p2 and q2 lie on opposite sides of p1q1.
-     *       --This is the standard geometric test for proper intersection at a
-     *         point that is not one of the vertices of the segments.
-     *       --Orientation(p, q, r) is used here: To check if p1 and q1 are on
-     *         opposite sides of p2q2, Orientation(p2, q2, p1) and
-     *         Orientation(p2, q2, q1) must be different (one OnLeft and one
-     *         OnRight), thus p1q1 crossing over p2q2. Applying this
-     *         symmetrically to both p1q1 and p2q2 ensures they intersect each
-     *         other.
-     *    b. Collinearity and Overlap:
-     *       Orientation(p, q, r) returning 0 indicates collinearity of the 3
-     *       points.
-     *       --The check for a point 'q' lying on segment 'pr' [OnSegment(p, q, r)] involves
-     *         verifying that 'q' is collinear with 'pr', AND the coordinates of
-     *         'q' lies on 'pr' (fall within the bounding box defined by 'pr').
-     *         This correctly identifies overlapping segments when they are
-     *         collinear, or shared endpoints.
-     *    c. Thus, SegmentsIntersect correctly identifies if two given line
-     *       segments intersect in any way (proper crossing, collinear overlap,
-     *       or shared endpoint).
+     *    Therefore, if there are any self-intersection in a polygon with 4 or more
+     *    vertices, there must be intersecting non-adjacent edges.
+     */
+
+    /*
+     * Proofs of correctness for SegmentsIntersect and Orientation
+     * -----------------------------------------------------------
      *
-     * 3. Correctness of Orientation(p, q, r):
+     * 1. Correctness of SegmentsIntersect(p1q1, p2q2) :
+     *    a. If points p1 and q1 lie on opposite sides of p2q2, then segment p1q1
+     *       intersects the line containing p2q2.  Similarly, if points p2 and q2 lie
+     *       on opposite sides of p1q1, then the segment p2q2 intersects the line
+     *       containing p1q1.  Since the two lines can only intersect at one point,
+     *       this point must also lie on both segments, and the two segments intersect.
+     *    b. If the endpoint of one of the segments lies on the other segment, then
+     *       they intersect at that point.
+     *    c. If the two segments intersect at all at some point P, then either P
+     *       is the endpoint of one of the segments (and thus we are in
+     *       the case described in (b)), or it's in the interior of both segments.
+     *       If P is in the interior of both segments and the segments are not
+     *       collinear, then we are in the case described in (a).  If the two
+     *       segments _are_ collinear and have a shared point P that is not an
+     *       endpoint, then the endpoint (p1, q1, p2, or q2) closest to P has to lie
+     *       on both segments and hence we are in the case described in (b).
+     *
+     * 2. Correctness of Orientation(p, q, r):
      *    a. Compute cross-product of vectors pq and pr.
      *       --The sign determines the direction of thumb in the right hand
      *         rule of turning from vector pq to pr.
-     *    b. If cross-product > 0, r lies to the left of vector
+     *    b. If cross-product > 0, r lies to the left of ray
      *       pq (Counter-clockwise turn from vector pq to pr)
-     *    c. If cross-product < 0, r lies to the right of vector
+     *    c. If cross-product < 0, r lies to the right of ray
      *       pq (Clockwise turn from vector pq to pr)
      *    d. If cross-product is 0, p, q, r are collinear.
      *
-     * 4. Correctness of overall iteration over non-adjacent edges to check for
-     *    self-intersection:
-     *    a. Adjacent edges share a common vertex by definition, and intersect
-     *       at that common vertex. This is an expected part of a simple polygon
-     *       (cycle graph) with each vertex having degree 2, and does not
-     *       constitute self-intersection.
-     *    b. For a polygon(with > 3 vertices) that self-intersects, it must have
-     *       at least one pair of non-adjacent edges that intersect.
-     *       Proof:
-     *       i)  Regular case where adjacent edges do not overlap:
-     *           Since adjacent edges only share their end-vertices, they only
-     *           intersect at their end vertices and that is not a self
-     *           intersection. Any other self intersection, if it exists,
-     *           must be between non-adjacent edges.
-     *       ii) Case where adjacent edges overlap:
-     *           When 2 adjacent edges overlap, let 'l' denote the longer edge
-     *           and 's' denote the shorter edge. The non-shared end vertex
-     *           of 's' lies on 'l'. Let this point be P. Since, a polygon with
-     *           no duplicate vertices is a cycle graph, each vertex has degree 2.
-     *           So, there must be another edge 't' that is incident on P. This
-     *           makes non-adjacent edges 't' and 'l' intersect by meeting at
-     *           point P.
-     *       Thus, by checking every unique pair of non-adjacent edges, the
-     *       algorithm guarantees that if a self-intersection exists, it will
-     *       be found.
      */
 
     // Method to check for self-intersecting zones
@@ -184,30 +166,35 @@ public:
             return true;
         }
 
-        // The degenerate case of 3 collinear vertices is self-intersecting
-        if (vertexCount == 3 && Orientation(vertices[0], vertices[1], vertices[2]) == OrientationEnum::kCollinear)
+        // If there are only 3 vertices, it's enough to check whether they are collinear.
+        if (vertexCount == 3)
         {
-            ChipLogDetail(Zcl, "Degenerate case of 3 collinear vertices");
-            return true;
+            if (Orientation(vertices[0], vertices[1], vertices[2]) == OrientationEnum::kCollinear))
+            {
+                ChipLogDetail(Zcl, "Degenerate case of 3 collinear vertices");
+                return true;
+            }
+            
+            return false;
         }
 
         // Iterate through all pairs of non-adjacent segments
         for (size_t i = 0; i < vertexCount; ++i)
         {
-            TwoDCartesianVertexStruct p1 = vertices[i];
-            TwoDCartesianVertexStruct q1 = vertices[(i + 1) % vertexCount];
+            auto & p1 = vertices[i];
+            auto & q1 = vertices[(i + 1) % vertexCount];
 
-            // j starts from i+2, skipping the adjacent vertex i+1.
+            // j starts from i+2, skipping the adjacent edge (vertices[i+1], vertices[i+2])
             for (size_t j = i + 2; j < vertexCount; ++j)
             {
-                TwoDCartesianVertexStruct p2 = vertices[j];
-                TwoDCartesianVertexStruct q2 = vertices[(j + 1) % vertexCount];
-
-                // Skip segments that share an endpoint (i.e., adjacent segments)
+                // Skip edges that share an endpoint (i.e., adjacent edges)
                 if ((j + 1) % vertexCount == i)
                 {
                     continue;
                 }
+
+                auto & p2 = vertices[j];
+                auto & q2 = vertices[(j + 1) % vertexCount];
 
                 if (DoSegmentsIntersect(p1, q1, p2, q2))
                 {
@@ -232,14 +219,14 @@ private:
         return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) && q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
     }
 
-    // Helper function: Determine the orientation of the ordered triplet (p, q, r) of vertices.
-    // The purpose of this function is to determine if 'r' is to the left, right
-    // of the vector 'pq', or is collinear with it.
+    // Helper function: Determine the orientation of the point r with respect to ray pq: in
+    // the left half-plane when facing in the direction of the ray, in the right half-plane,
+    // or collinear with the ray.
     // Employs the cross-product computation (determinant of the coordinate matrix) of
     // vectors pq and pr to find the direction of the Z axis. The rotation
     // considered is from vector pq to pr.
     // The sign of the determinant is used to infer the direction of the cross-product vector
-    // and hence the orientation of the 3 coordinates. A value of 0 indicates that the points
+    // and hence the orientation of the point with respect to the ray. A value of 0 indicates that the points
     // are collinear.
     // Using the right-hand rule Z > 0 means pointing upward from the 2D
     // plane (counter-clockwise rotation) and Z < 0 means pointing downward into
