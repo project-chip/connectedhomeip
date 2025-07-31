@@ -233,7 +233,7 @@ class NxpBuilder(GnBuilder):
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw71"
                 else:
-                    return "mcxw72evk"
+                    return "mcxw71evk"
 
             case _:
                 raise Exception("Unknown NXP board")
