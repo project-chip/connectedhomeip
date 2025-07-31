@@ -65,7 +65,8 @@ import tempfile
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main
+from chip.testing.commissioning import SetupParameters
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
@@ -180,7 +181,8 @@ class TC_ECOINFO_2_2(MatterBaseTest):
         if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Add a bridged device using method indicated by the manufacturer")
         else:
-            # Add some server to the DUT_FSA's Aggregator/Bridge.
+            # Automatically commission some server to the DUT_FSA using the command line interface provided
+            # by either the unified fabric-sync app or the fabric-admin + fabric-bridge apps.
             if self.user_params.get("unified_fabric_sync_app"):
                 self.dut_fsa_stdin.write(f"app pair-device 2 {self.th_server_setup_params.qr_code}\n")
             else:
@@ -222,7 +224,8 @@ class TC_ECOINFO_2_2(MatterBaseTest):
         if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input("Removed bridged device added in step 2a using method indicated by the manufacturer")
         else:
-            # Remove previously added server from the DUT_FSA's Aggregator/Bridge.
+            # Remove previously added server from the DUT_FSA using the command line interface provided
+            # by either the unified fabric-sync app or the fabric-admin + fabric-bridge apps.
             if self.user_params.get("unified_fabric_sync_app"):
                 self.dut_fsa_stdin.write("app remove-device 2\n")
             else:
