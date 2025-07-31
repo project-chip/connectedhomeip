@@ -13,6 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPError.h"
+#include "lib/support/Span.h"
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <app/persistence/AttributePersistence.h>
@@ -55,6 +57,25 @@ bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttrib
     }
 
     return true;
+}
+
+bool AttributePersistence::LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value)
+{
+    Storage::Internal::ShortStringIO io(value);
+    MutableByteSpan rawBytes = io.ReadBuffer();
+
+    if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
+    {
+        value.SetContent(""_span);
+        return false;
+    }
+    return io.FinalizeRead(rawBytes);
+}
+
+CHIP_ERROR AttributePersistence::StoreString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value)
+{
+    Storage::Internal::ShortStringIO io(value);
+    return mProvider.WriteValue(path, io.ContentWithPrefix());
 }
 
 } // namespace chip::app

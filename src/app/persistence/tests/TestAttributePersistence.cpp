@@ -20,11 +20,13 @@
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/String.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <unistd.h>
 
 namespace {
 
@@ -125,6 +127,60 @@ TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
 
         ASSERT_FALSE(persistence.LoadNativeEndianValue(path, largeValue, kOther));
         ASSERT_EQ(largeValue, kOther);
+    }
+}
+
+TEST(TestAttributePersistence, TestStrings)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    const ConcreteAttributePath path(1, 2, 3);
+    const ConcreteAttributePath wrongPath(1, 2, 4);
+
+    {
+        Storage::String<8> testString;
+
+        ASSERT_TRUE(testString.SetContent("foo"_span));
+        ASSERT_EQ(persistence.StoreString(path, testString), CHIP_NO_ERROR);
+    }
+
+    {
+        Storage::String<16> readString;
+        ASSERT_TRUE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().data_equal("foo"_span));
+    }
+
+    // fits exactly. Load should succeed
+    {
+        Storage::String<3> readString;
+        ASSERT_TRUE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().data_equal("foo"_span));
+    }
+
+    // no space: data is cleared on load error
+    {
+        Storage::String<2> readString;
+        ASSERT_FALSE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().empty());
+
+        ASSERT_TRUE(readString.SetContent("xy"_span));
+        ASSERT_FALSE(readString.Content().empty());
+        ASSERT_FALSE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().empty());
+    }
+
+    // wrong path: data is cleared on load error
+    {
+        Storage::String<16> readString;
+
+        ASSERT_TRUE(readString.SetContent("xy"_span));
+        ASSERT_FALSE(readString.Content().empty());
+        ASSERT_FALSE(persistence.LoadString(wrongPath, readString));
+        ASSERT_TRUE(readString.Content().empty());
     }
 }
 

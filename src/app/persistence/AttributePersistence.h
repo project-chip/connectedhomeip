@@ -15,9 +15,11 @@
  */
 #pragma once
 
+#include "app/ConcreteAttributePath.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/String.h>
 
 #include <type_traits>
 
@@ -51,12 +53,19 @@ public:
     ///   - decode the given raw data
     ///   - write to storage
     template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
-    DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                                         T & value)
+    CHIP_ERROR StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
         ReturnErrorOnFailure(decoder.Decode(value));
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
+
+    /// Load the given string from concrete storage.
+    ///
+    /// Returns true on success, false on failure. On failure the string is reset to empty.
+    bool LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
+
+    /// Store the given string in persistent storage.
+    CHIP_ERROR StoreString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
 
 private:
     AttributePersistenceProvider & mProvider;
