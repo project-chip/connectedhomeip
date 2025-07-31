@@ -1601,8 +1601,6 @@
 		7521D2932CBECE3F00218E16 /* codegen-data-model-provider */ = {
 			isa = PBXGroup;
 			children = (
-				7567A2022D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp */,
-				7567A2012D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h */,
 				7592BD092CC6BCC300EB74A0 /* EmberAttributeDataBuffer.h */,
 				7592BD0A2CC6BCC300EB74A0 /* EmberAttributeDataBuffer.cpp */,
 				7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */,
@@ -1630,6 +1628,8 @@
 		7567A2082DA5ABA500D91529 /* server-cluster */ = {
 			isa = PBXGroup;
 			children = (
+				7567A2022D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp */,
+				7567A2012D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h */,
 				7567A20B2DA5ABCE00D91529 /* DefaultServerCluster.cpp */,
 				7567A2092DA5ABCE00D91529 /* DefaultServerCluster.h */,
 				7567A20A2DA5ABCE00D91529 /* ServerClusterContext.h */,
