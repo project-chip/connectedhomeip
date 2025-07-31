@@ -366,7 +366,7 @@ tests.
 
 ### Mock clock
 
-Please see [Wrapper for Mock Clock](#raii-mock-clock)
+Please see [Wrapper for Mock Clock](#wrapper-for-mock-clock)
 
 The mock clock is located in
 [src/system/SystemClock.h](https://github.com/project-chip/connectedhomeip/blob/master/src/system/SystemClock.h)
