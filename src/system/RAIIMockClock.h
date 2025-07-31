@@ -26,8 +26,6 @@ namespace System {
 namespace Clock {
 namespace Internal {
 
-using namespace chip::System::Clock::Internal;
-
 // A RAII wrapper for MockClock that sets the system clock to the mock clock and restores the original clock on destruction.
 class RAIIMockClock : public MockClock
 {
