@@ -67,8 +67,8 @@ class TC_CNET_4_23(MatterBaseTest):
                 TestStep(8, 'TH sends RemoveNetwork Command to the DUT `operating_endpoint_id` endpoint with NetworkID field set to `network_id`. '
                             'Verify that DUT sends NetworkConfigResponse to command with the following fields: NetworkingStatus is Success, NetworkIndex matches previously saved `network_index`'),
                 TestStep(9, 'If `commissioning_network` is "Wi-Fi", set `network_id` to th_xpan_1 and `operating_endpoint_id` to PIXIT.CNET.ENDPOINT_THREAD, '
-                             'otherwise set `network_id` to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and `operating_endpoint_id` to PIXIT.CNET.ENDPOINT_WIFI. '
-                             'If `commissioning_network` is "Thread", skip step 10a'),
+                         'otherwise set `network_id` to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and `operating_endpoint_id` to PIXIT.CNET.ENDPOINT_WIFI. '
+                         'If `commissioning_network` is "Thread", skip step 10a'),
                 TestStep("10a", 'TH sends AddOrUpdateThreadNetwork command to the DUT `operating_endpoint_id` endpoint with operational dataset field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET. '
                                 'Skip step 10b. '
                                 'Verify that DUT sends the NetworkConfigResponse command to the TH with the following fields: NetworkingStatus is Success, DebugText is of type string with max length 512 or empty'),
@@ -142,10 +142,13 @@ class TC_CNET_4_23(MatterBaseTest):
         operational_dataset_str = self.user_params.get('PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET')
 
         asserts.assert_true(test_endpoint is not None, "Missing params: --endpoint <endpoint_value>")
-        asserts.assert_true(wifi_ssid_str is not None and isinstance(wifi_ssid_str, str), "Missing params: --string-arg PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID:<wifi_ssid>")
-        asserts.assert_true(wifi_credential_str is not None and isinstance(wifi_credential_str, str), "Missing params: --string-arg PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS:<wifi_credential>")
+        asserts.assert_true(wifi_ssid_str is not None and isinstance(wifi_ssid_str, str),
+                            "Missing params: --string-arg PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID:<wifi_ssid>")
+        asserts.assert_true(wifi_credential_str is not None and isinstance(wifi_credential_str, str),
+                            "Missing params: --string-arg PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS:<wifi_credential>")
         # TC_CNET_4_12.py sets Thread dataset as string-arg, keep consistent with that.
-        asserts.assert_true(operational_dataset_str is not None and isinstance(operational_dataset_str, str), "Missing params: --string-arg PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET:<thread_dataset>")
+        asserts.assert_true(operational_dataset_str is not None and isinstance(operational_dataset_str, str),
+                            "Missing params: --string-arg PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET:<thread_dataset>")
 
         setup_payload = self.get_setup_payload_info()
         if not setup_payload:
@@ -166,7 +169,7 @@ class TC_CNET_4_23(MatterBaseTest):
         asserts.assert_equal(len(th_xpan_1), 8, f"Extracted ExtPANID must be 8 bytes long.")
 
         self.step(1)
-        await self.default_controller.EstablishPASESessionBLE(setup_payload[0].passcode, setup_payload[0].filter_value, self.dut_node_id);
+        await self.default_controller.EstablishPASESessionBLE(setup_payload[0].passcode, setup_payload[0].filter_value, self.dut_node_id)
 
         self.step(2)
         feature_map_response = await self.default_controller.ReadAttribute(self.dut_node_id, [(Clusters.NetworkCommissioning.Attributes.FeatureMap)], fabricFiltered=True)
@@ -196,7 +199,7 @@ class TC_CNET_4_23(MatterBaseTest):
             commissioning_network = "Wi-Fi"
             network_id = wifi_ssid
             operating_endpoint_id = wifi_endpoint
-            self.default_controller.SetWiFiCredentials(wifi_ssid.decode("utf-8"), wifi_credential.decode("utf-8"));
+            self.default_controller.SetWiFiCredentials(wifi_ssid.decode("utf-8"), wifi_credential.decode("utf-8"))
         elif thread_endpoint == test_endpoint:
             commissioning_network = "Thread"
             network_id = th_xpan_1
@@ -249,7 +252,7 @@ class TC_CNET_4_23(MatterBaseTest):
             cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(operationalDataset=operational_dataset)
             add_network_results = await self.send_single_cmd(endpoint=operating_endpoint_id, cmd=cmd)
             asserts.assert_true(add_network_results.networkingStatus ==
-                            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "AddOrUpdateThreadNetwork command failed")
+                                Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "AddOrUpdateThreadNetwork command failed")
             self.skip_step("10b")
         else:
             self.skip_step("10a")
@@ -257,7 +260,7 @@ class TC_CNET_4_23(MatterBaseTest):
             cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(ssid=wifi_ssid, credentials=wifi_credential)
             add_network_results = await self.send_single_cmd(endpoint=operating_endpoint_id, cmd=cmd)
             asserts.assert_true(add_network_results.networkingStatus ==
-                            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "AddOrUpdateWiFiNetwork command failed")
+                                Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "AddOrUpdateWiFiNetwork command failed")
 
         self.step(11)
         await self.SendConnectNetworkWithFailure(networkID=network_id, endpoint=operating_endpoint_id)
@@ -302,7 +305,7 @@ class TC_CNET_4_23(MatterBaseTest):
             cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(ssid=wifi_ssid, credentials=wifi_credential)
             add_network_results = await self.send_single_cmd(endpoint=operating_endpoint_id, cmd=cmd)
             asserts.assert_true(add_network_results.networkingStatus ==
-                            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "AddOrUpdateWiFiNetwork command failed")
+                                Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "AddOrUpdateWiFiNetwork command failed")
             self.skip_step("17b")
         else:
             self.skip_step("17a")
@@ -310,7 +313,7 @@ class TC_CNET_4_23(MatterBaseTest):
             cmd = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(operationalDataset=operational_dataset)
             add_network_results = await self.send_single_cmd(endpoint=operating_endpoint_id, cmd=cmd)
             asserts.assert_true(add_network_results.networkingStatus ==
-                            Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "AddOrUpdateThreadNetwork command failed")
+                                Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess, "AddOrUpdateThreadNetwork command failed")
 
         self.step(18)
         await self.SendConnectNetworkWithFailure(networkID=network_id, endpoint=operating_endpoint_id)
