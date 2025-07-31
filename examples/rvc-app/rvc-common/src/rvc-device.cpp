@@ -142,7 +142,7 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
 {
     switch (mOperationalStateInstance.GetCurrentOperationalState())
     {
-    case to_underlying(OperationalState::OperationalStateEnum::kStopped): 
+    case to_underlying(OperationalState::OperationalStateEnum::kStopped):
     case to_underlying(OperationalState::OperationalStateEnum::kPaused):
     case to_underlying(OperationalState::OperationalStateEnum::kRunning):
     {
@@ -153,10 +153,10 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
             return;
         }
 
-        // Spec requires device to be in Idle RVC Run Mode _after_ docking happens, 
+        // Spec requires device to be in Idle RVC Run Mode _after_ docking happens,
         // but to avoid need for an additional state variable, set Idle now.
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
-        
+
         auto error = mOperationalStateInstance.SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
 
