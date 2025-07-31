@@ -183,7 +183,7 @@ ServerClusterInterfaceRegistry::AllClustersList ServerClusterInterfaceRegistry::
     return { mRegistrations };
 }
 
-SingleEndpointServerClusterRegistry::~SingleEndpointServerClusterRegistry()
+ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
 {
     while (mRegistrations != nullptr)
     {

@@ -132,7 +132,7 @@ private:
 class ServerClusterInterfaceRegistry
 {
 public:
-    virtual ~ServerClusterInterfaceRegistry() = default;
+    ~ServerClusterInterfaceRegistry();
 
     /// Add the given entry to the registry.
     ///
@@ -141,7 +141,7 @@ public:
     ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
     ///
     /// There can be only a single registration for a given `endpointId/clusterId` path.
-    [[nodiscard]] virtual CHIP_ERROR Register(ServerClusterRegistration & entry);
+    [[nodiscard]] CHIP_ERROR Register(ServerClusterRegistration & entry);
 
     /// Remove an existing registration
     ///
@@ -279,7 +279,7 @@ public:
         ServerClusterRegistration * mStart;
     };
 
-    ~SingleEndpointServerClusterRegistry();
+    ~SingleEndpointServerClusterRegistry() = default;
 
     /// Add the given entry to the registry.
     /// NOTE the requirement of entries to be part of the same endpoint.
@@ -291,7 +291,7 @@ public:
     ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
     ///
     /// There can be only a single registration for a given `endpointId/clusterId` path.
-    [[nodiscard]] CHIP_ERROR Register(ServerClusterRegistration & entry) override;
+    [[nodiscard]] CHIP_ERROR Register(ServerClusterRegistration & entry);
 
     /// Provides a list of clusters that are registered for the given endpoint.
     ///
