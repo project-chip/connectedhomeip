@@ -197,6 +197,5 @@ ServerClusterInterfaceRegistry::ServerClusterInstances ServerClusterInterfaceReg
     return { mRegistrations };
 }
 
-
 } // namespace app
 } // namespace chip
