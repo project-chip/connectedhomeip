@@ -23,6 +23,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAttributePersistence.cpp",
     "TestPascalString.cpp",
+    "TestString.cpp",
   ]
 
   public_deps = [

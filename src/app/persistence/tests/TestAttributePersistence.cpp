@@ -182,6 +182,49 @@ TEST(TestAttributePersistence, TestStrings)
         ASSERT_FALSE(persistence.LoadString(wrongPath, readString));
         ASSERT_TRUE(readString.Content().empty());
     }
+
+    // empty string can be stored and loaded
+    {
+        Storage::String<8> testString;
+        Storage::String<16> readString;
+
+        ASSERT_TRUE(testString.SetContent(""_span));
+        ASSERT_EQ(persistence.StoreString(path, testString), CHIP_NO_ERROR);
+
+        ASSERT_TRUE(readString.SetContent("some value"_span));
+        ASSERT_TRUE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().empty());
+    }
+}
+
+TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+    const ConcreteAttributePath path(1, 2, 3);
+
+    // This string is invalid as stored
+    {
+        uint8_t buffer[] = { 10, 'h', 'e', 'l', 'l', 'o' }; // length 10, but only 5 chars
+        EXPECT_EQ(storageDelegate.SyncSetKeyValue(
+                      DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(),
+                      buffer, sizeof(buffer)),
+                  CHIP_NO_ERROR);
+    }
+
+    // Load into a buffer that COULD contain the string, but
+    // stored string is invalid
+    {
+        Storage::String<16> readString;
+
+        ASSERT_TRUE(readString.SetContent("some value"_span));
+        ASSERT_FALSE(persistence.LoadString(path, readString));
+        ASSERT_TRUE(readString.Content().empty());
+
+    }
 }
 
 } // namespace
