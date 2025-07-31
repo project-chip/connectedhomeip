@@ -100,7 +100,7 @@ public:
     // internal shortstring is self-referencing pointers. That cannot be copied, so we assume no copy for now
     // These could be implemented, however for now we assume people should just use the underlying Span() to set
     // the values.
-    String(const String &&)             = delete;
+    String(String &&)                   = delete;
     String & operator=(const String &&) = delete;
     String(const String &)              = delete;
     String & operator=(const String &)  = delete;
