@@ -32,20 +32,14 @@ using namespace chip::System::Clock::Internal;
 class RAIIMockClock : public MockClock
 {
 public:
-    RAIIMockClock(): mRealClock{&System::SystemClock()}
-    {
-        System::Clock::Internal::SetSystemClockForTesting(this);
-    }
+    RAIIMockClock() : mRealClock{ &System::SystemClock() } { System::Clock::Internal::SetSystemClockForTesting(this); }
 
-    RAIIMockClock( const RAIIMockClock & ) = delete;
-    RAIIMockClock & operator=( const RAIIMockClock & ) = delete;
-    RAIIMockClock( RAIIMockClock && ) = delete;
-    RAIIMockClock & operator=( RAIIMockClock && ) = delete;
+    RAIIMockClock(const RAIIMockClock &)             = delete;
+    RAIIMockClock & operator=(const RAIIMockClock &) = delete;
+    RAIIMockClock(RAIIMockClock &&)                  = delete;
+    RAIIMockClock & operator=(RAIIMockClock &&)      = delete;
 
-    ~RAIIMockClock()
-    {
-        System::Clock::Internal::SetSystemClockForTesting(mRealClock);
-    }
+    ~RAIIMockClock() { System::Clock::Internal::SetSystemClockForTesting(mRealClock); }
 
 private:
     System::Clock::ClockBase * mRealClock{ nullptr };

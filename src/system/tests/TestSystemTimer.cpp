@@ -32,10 +32,10 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemConfig.h>
 #include <system/SystemError.h>
 #include <system/SystemLayerImpl.h>
-#include <system/RAIIMockClock.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>

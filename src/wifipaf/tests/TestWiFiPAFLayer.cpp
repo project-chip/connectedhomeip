@@ -30,9 +30,9 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/RAIIMockClock.h>
 
 #include <wifipaf/WiFiPAFError.h>
 #include <wifipaf/WiFiPAFLayer.h>
