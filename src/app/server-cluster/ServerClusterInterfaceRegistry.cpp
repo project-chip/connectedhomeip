@@ -27,6 +27,20 @@
 namespace chip {
 namespace app {
 
+ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
+{
+    while (mRegistrations != nullptr)
+    {
+        ServerClusterRegistration * next = mRegistrations->next;
+        if (mContext.has_value())
+        {
+            mRegistrations->serverClusterInterface->Shutdown();
+        }
+        mRegistrations->next = nullptr;
+        mRegistrations       = next;
+    }
+}
+
 CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & entry)
 {
     // we have no strong way to check if entry is already registered somewhere else, so we use "next" as some
@@ -181,20 +195,6 @@ void ServerClusterInterfaceRegistry::ClearContext()
 ServerClusterInterfaceRegistry::AllClustersList ServerClusterInterfaceRegistry::AllClusters()
 {
     return { mRegistrations };
-}
-
-ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
-{
-    while (mRegistrations != nullptr)
-    {
-        ServerClusterRegistration * next = mRegistrations->next;
-        if (mContext.has_value())
-        {
-            mRegistrations->serverClusterInterface->Shutdown();
-        }
-        mRegistrations->next = nullptr;
-        mRegistrations       = next;
-    }
 }
 
 CHIP_ERROR SingleEndpointServerClusterRegistry::Register(ServerClusterRegistration & entry)
