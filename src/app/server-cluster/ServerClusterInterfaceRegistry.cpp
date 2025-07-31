@@ -197,66 +197,6 @@ ServerClusterInterfaceRegistry::ServerClusterInstances ServerClusterInterfaceReg
     return { mRegistrations };
 }
 
-CHIP_ERROR SingleEndpointServerClusterRegistry::Register(ServerClusterRegistration & entry)
-{
-    Span<const ConcreteClusterPath> paths = entry.serverClusterInterface->GetPaths();
-    VerifyOrReturnError(!paths.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (const ConcreteClusterPath & path : paths)
-    {
-        VerifyOrReturnError(path.mEndpointId == paths[0].mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    return ServerClusterInterfaceRegistry::Register(entry);
-}
-
-SingleEndpointServerClusterRegistry::ClustersList SingleEndpointServerClusterRegistry::ClustersOnEndpoint(EndpointId endpointId)
-{
-    return { mRegistrations, endpointId };
-}
-
-void SingleEndpointServerClusterRegistry::UnregisterAllFromEndpoint(EndpointId endpointId)
-{
-    ServerClusterRegistration * prev    = nullptr;
-    ServerClusterRegistration * current = mRegistrations;
-    while (current != nullptr)
-    {
-        // Requirements for Paths:
-        //   - GetPaths() MUST be non-empty
-        //   - GetPaths() MUST belong to the same endpoint
-        // Loop below relies on that: if the endpoint matches, it can be removed
-        auto paths = current->serverClusterInterface->GetPaths();
-        if (paths.empty() || paths.front().mEndpointId == endpointId)
-        {
-            if (mCachedInterface == current->serverClusterInterface)
-            {
-                mCachedInterface = nullptr;
-            }
-            if (prev == nullptr)
-            {
-                mRegistrations = current->next;
-            }
-            else
-            {
-                prev->next = current->next;
-            }
-            ServerClusterRegistration * actual_next = current->next;
-
-            current->next = nullptr; // Make sure current does not look like part of a list.
-            if (mContext.has_value())
-            {
-                current->serverClusterInterface->Shutdown();
-            }
-
-            current = actual_next;
-        }
-        else
-        {
-            prev    = current;
-            current = current->next;
-        }
-    }
-}
 
 } // namespace app
 } // namespace chip

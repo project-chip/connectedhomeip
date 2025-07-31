@@ -23,7 +23,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/ReadOnlyBuffer.h>
