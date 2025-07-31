@@ -144,9 +144,9 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     {
     case to_underlying(OperationalState::OperationalStateEnum::kStopped):
     case to_underlying(OperationalState::OperationalStateEnum::kPaused):
-    case to_underlying(OperationalState::OperationalStateEnum::kRunning):
-    {
-        if (mOperationalStateInstance.GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kStopped) &&
+    case to_underlying(OperationalState::OperationalStateEnum::kRunning): {
+        if (mOperationalStateInstance.GetCurrentOperationalState() ==
+                to_underlying(OperationalState::OperationalStateEnum::kStopped) &&
             mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeIdle)
         {
             err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
