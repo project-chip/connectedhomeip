@@ -454,7 +454,7 @@ TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
 
     // Verify listing works: we should get the cluster once
     size_t cluster_count = 0;
-    for (auto * c : registry.AllClusters())
+    for (auto * c : registry.AllServerClusterInstances())
     {
         ASSERT_EQ(c, &cluster);
         cluster_count++;
@@ -620,7 +620,7 @@ TEST_F(TestServerClusterInterfaceRegistry, AllClustersIteration)
     EXPECT_EQ(registry.Register(registration3), CHIP_NO_ERROR);
 
     std::vector<ServerClusterInterface *> found_clusters;
-    for (auto * cluster : registry.AllClusters())
+    for (auto * cluster : registry.AllServerClusterInstances())
     {
         found_clusters.push_back(cluster);
     }
@@ -633,7 +633,7 @@ TEST_F(TestServerClusterInterfaceRegistry, AllClustersIteration)
     registry.Unregister(&cluster2);
 
     found_clusters.clear();
-    for (auto * cluster : registry.AllClusters())
+    for (auto * cluster : registry.AllServerClusterInstances())
     {
         found_clusters.push_back(cluster);
     }

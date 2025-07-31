@@ -153,13 +153,16 @@ public:
 
     // Set up the underlying context for all clusters that are managed by this registry.
     //
-    // The values within context will be copied and used.
+    // The values within context will be moved and used as-is.
     CHIP_ERROR SetContext(ServerClusterContext && context);
 
     // Invalidates current context.
     void ClearContext();
 
-    class AllClustersList
+    // Represents an iterable list of all clusters registered in this registry.
+    // The list is only valid as long as the registry is not modified.
+    // The list is not guaranteed to be in any particular order.
+    class ServerClusterInstances
     {
     public:
         class Iterator
@@ -183,7 +186,7 @@ public:
             ServerClusterRegistration * mRegistration;
         };
 
-        constexpr AllClustersList(ServerClusterRegistration * start) : mStart(start) {}
+        constexpr ServerClusterInstances(ServerClusterRegistration * start) : mStart(start) {}
         Iterator begin() { return { mStart }; }
         Iterator end() { return { nullptr }; }
 
@@ -191,7 +194,7 @@ public:
         ServerClusterRegistration * mStart;
     };
 
-    AllClustersList AllClusters();
+    ServerClusterInstances AllServerClusterInstances();
 
 protected:
     ServerClusterRegistration * mRegistrations = nullptr;

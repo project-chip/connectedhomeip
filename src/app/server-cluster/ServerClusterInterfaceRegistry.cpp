@@ -192,7 +192,7 @@ void ServerClusterInterfaceRegistry::ClearContext()
     mContext.reset();
 }
 
-ServerClusterInterfaceRegistry::AllClustersList ServerClusterInterfaceRegistry::AllClusters()
+ServerClusterInterfaceRegistry::ServerClusterInstances ServerClusterInterfaceRegistry::AllServerClusterInstances()
 {
     return { mRegistrations };
 }
