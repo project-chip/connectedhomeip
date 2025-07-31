@@ -202,8 +202,6 @@ CHIP_ERROR SingleEndpointServerClusterRegistry::Register(ServerClusterRegistrati
     Span<const ConcreteClusterPath> paths = entry.serverClusterInterface->GetPaths();
     VerifyOrReturnError(!paths.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Codegen registry requirements (so that we can support endpoint unregistration): every
-    // path must belong to the same endpoint id.
     for (const ConcreteClusterPath & path : paths)
     {
         VerifyOrReturnError(path.mEndpointId == paths[0].mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);

@@ -605,8 +605,6 @@ TEST_F(TestServerClusterInterfaceRegistry, LazyRegistrationTest)
 
 TEST_F(TestServerClusterInterfaceRegistry, AllClustersIteration)
 {
-    SingleEndpointServerClusterRegistry registry;
-
     FakeServerClusterInterface cluster1(kEp1, kCluster1);
     FakeServerClusterInterface cluster2(kEp2, kCluster2);
     FakeServerClusterInterface cluster3(kEp2, kCluster3);
@@ -614,6 +612,8 @@ TEST_F(TestServerClusterInterfaceRegistry, AllClustersIteration)
     ServerClusterRegistration registration1(cluster1);
     ServerClusterRegistration registration2(cluster2);
     ServerClusterRegistration registration3(cluster3);
+
+    SingleEndpointServerClusterRegistry registry;
 
     EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
     EXPECT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
