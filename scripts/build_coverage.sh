@@ -225,7 +225,7 @@ fi
 # ------------------------------------------------------------------------------
 # Coverage Generation
 # ----------------------------------------------------------------------------
-LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused,gcov" # Some error types mentioned twice is needed to suppress the warnings.
+LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused,gcov,gcov" # Some error types mentioned twice is needed to suppress the warnings.
 LCOV_EXCLUDE_INCLUDE_OPTIONS=()
 
 # Exclude files we do NOT want included in coverage
