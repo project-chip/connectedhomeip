@@ -35,7 +35,9 @@ class ShortString
 public:
     /// Use the input buffer as a short pascal string.
     ///
-    /// The input buffer is to have an extra 1 byte for c_str to work.
+    /// The input buffer is assumed to have an extra 1 byte for c_str to work.
+    ///
+    /// This class is considered Internal, use chip::app::Storage::String<MAX_LENGTH> in application code.
     ShortString(char * buffer, size_t buffer_size) : mBuffer(buffer), mPascalSize(buffer_size - 1)
     {
         VerifyOrDie(buffer_size < 256);
@@ -66,7 +68,7 @@ private:
 
 /// Provides internal access and processing to a ShortString class.
 ///
-/// Do not use directly.
+/// Meant for internal use only, this is NOT public API outside the SDK code itself.
 class ShortStringIO
 {
 public:

@@ -15,8 +15,8 @@
  */
 #pragma once
 
-#include "app/ConcreteAttributePath.h"
 #include <app/AttributeValueDecoder.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/String.h>

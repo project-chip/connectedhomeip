@@ -13,12 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/CHIPError.h"
-#include "lib/support/Span.h"
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 
 namespace chip::app {
 
