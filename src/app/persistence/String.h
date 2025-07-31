@@ -94,7 +94,7 @@ private:
 
 } // namespace Internal
 
-template <size_t N, typename = std::enable_if_t<(N < 255)>>
+template <size_t N, typename = std::enable_if_t<(N < 255) && (N > 1)>>
 class String : public Internal::ShortString
 {
 public:
