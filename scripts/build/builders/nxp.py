@@ -366,6 +366,9 @@ class NxpBuilder(GnBuilder):
         if self.se05x_enable:
             flags.append('-DCONFIG_CHIP_SE05X=y')
 
+        if self.board == NxpBoard.MCXW71:
+            flags.append('-DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n')
+
         build_flags = " ".join(flags)
 
         return build_flags
