@@ -145,6 +145,20 @@ class TC_SU_2_2(MatterBaseTest):
         # Read the Steps
 
         self.step(1)
+        logger.info("Step #1 - DUT sends QueryImage command to TH/OTA-P")
+
+        # Establishing TH1 controller - DUT is TH1, NodeID=2, Fabric=1
+        th1 = self.default_controller
+        th1_node_id = self.dut_node_id
+        th1_fabric_id = th1.fabricId
+        logger.info(f'Step #1 - DUT NodeID (OTA Requestor): {th1_node_id}')
+        logger.info(f'Step #1 - TH1 FabricID (Should be Fabric 1): {th1_fabric_id}')
+
+        # 1.1 Send QueryImage command from DUT (requestor) to TH (provider)
+
+        # 1.2 Verify that QueryImageResponse QueryStatus is UpdateAvailable
+
+        # 1.3 Verify that software image transfer from TH/OTA-P to DUT is successful
 
 
 if __name__ == "__main__":
