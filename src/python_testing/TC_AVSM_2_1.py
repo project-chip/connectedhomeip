@@ -38,7 +38,9 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -161,6 +163,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxConcurrentEncoders
             )
             logger.info(f"Rx'd MaxConcurrentEncoders: {value}")
+            asserts.assert_is_not_none(value, "MaxConcurrentEncoders is None")
+            matter_asserts.assert_valid_uint8(value, "MaxConcurrentEncoders is not a valid uint8 value")
 
         self.step(3)
         if self.pics_guard(self.check_pics("AVSM.S.A0001")):
@@ -168,6 +172,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
             )
             logger.info(f"Rx'd MaxEncodedPixelRate: {value}")
+            asserts.assert_is_not_none(value, "MaxEncodedPixelRate is None")
+            matter_asserts.assert_valid_uint32(value, "MaxEncodedPixelRate is not a valid uint32 value")
 
         self.step(4)
         if self.pics_guard(self.check_pics("AVSM.S.A0002")):
@@ -175,6 +181,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
             )
             logger.info(f"Rx'd VideoSensorParams: {value}")
+            asserts.assert_is_not_none(value, "VideoSensorParams is None")
 
         self.step(5)
         if self.pics_guard(self.check_pics("AVSM.S.A0003")):
@@ -182,11 +189,13 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionUsesInfrared
             )
             logger.info(f"Rx'd NightVisionUsesInfrared: {value}")
+            asserts.assert_is_not_none(value, "NightVisionUsesInfrared is None")
 
         self.step(6)
         if self.pics_guard(self.check_pics("AVSM.S.A0004")):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport)
             logger.info(f"Rx'd MinViewport: {value}")
+            asserts.assert_is_not_none(value, "MinViewport is None")
 
         self.step(7)
         if self.pics_guard(self.check_pics("AVSM.S.A0005")):
@@ -194,6 +203,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
             )
             logger.info(f"Rx'd RateDistortionTradeOffPoints: {value}")
+            asserts.assert_is_not_none(value, "RateDistortionTradeOffPoints is None")
 
         self.step(8)
         if self.pics_guard(self.check_pics("AVSM.S.A0006")):
@@ -201,6 +211,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxContentBufferSize
             )
             logger.info(f"Rx'd MaxContentBufferSize: {value}")
+            matter_asserts.assert_valid_uint32(value, "MaxContentBufferSize is not a valid uint32 value")
 
         self.step(9)
         if self.pics_guard(self.check_pics("AVSM.S.A0007")):
@@ -208,6 +219,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
             )
             logger.info(f"Rx'd MicrophoneCapabilities: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneCapabilities is None")
 
         self.step(10)
         if self.pics_guard(self.check_pics("AVSM.S.A0008")):
@@ -215,6 +227,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerCapabilities
             )
             logger.info(f"Rx'd SpeakerCapabilities: {value}")
+            asserts.assert_is_not_none(value, "SpeakerCapabilities is None")
 
         self.step(11)
         if self.pics_guard(self.check_pics("AVSM.S.A0009")):
@@ -222,6 +235,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.TwoWayTalkSupport
             )
             logger.info(f"Rx'd TwoWayTalkSupport: {value}")
+            asserts.assert_is_not_none(value, "TwoWayTalkSupport is None")
 
         self.step(12)
         if self.pics_guard(self.check_pics("AVSM.S.A000A")):
@@ -229,6 +243,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
             )
             logger.info(f"Rx'd SnapshotCapabilities: {value}")
+            asserts.assert_is_not_none(value, "SnapshotCapabilities is None")
 
         self.step(13)
         if self.pics_guard(self.check_pics("AVSM.S.A000B")):
@@ -236,6 +251,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxNetworkBandwidth
             )
             logger.info(f"Rx'd MaxNetworkBandwidth: {value}")
+            matter_asserts.assert_valid_uint32(value, "MaxNetworkBandwidth is not a valid uint32 value")
 
         self.step(14)
         if self.pics_guard(self.check_pics("AVSM.S.A000C")):
@@ -243,6 +259,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.CurrentFrameRate
             )
             logger.info(f"Rx'd CurrentFrameRate: {value}")
+            asserts.assert_is_not_none(value, "CurrentFrameRate is None")
+            matter_asserts.assert_valid_uint16(value, "CurrentFrameRate is not a valid uint16 value")
 
         self.step(15)
         if self.pics_guard(self.check_pics("AVSM.S.A000D")):
@@ -250,6 +268,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.HDRModeEnabled
             )
             logger.info(f"Rx'd HDRModeEnabled: {value}")
+            asserts.assert_is_not_none(value, "HDRModeEnabled is None")
 
         self.step(16)
         if self.pics_guard(self.check_pics("AVSM.S.A000E")):
@@ -264,6 +283,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
             )
             logger.info(f"Rx'd AllocatedVideoStreams: {value}")
+            asserts.assert_is_not_none(value, "AllocatedVideoStreams is None")
 
         self.step(18)
         if self.pics_guard(self.check_pics("AVSM.S.A0010")):
@@ -271,6 +291,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
             )
             logger.info(f"Rx'd AllocatedAudioStreams: {value}")
+            asserts.assert_is_not_none(value, "AllocatedAudioStreams is None")
 
         self.step(19)
         if self.pics_guard(self.check_pics("AVSM.S.A0011")):
@@ -278,6 +299,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
             )
             logger.info(f"Rx'd AllocatedSnapshotStreams: {value}")
+            asserts.assert_is_not_none(value, "AllocatedSnapshotStreams is None")
 
         self.step(20)
         if self.pics_guard(self.check_pics("AVSM.S.A0012")):
@@ -292,6 +314,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
             )
             logger.info(f"Rx'd SoftRecordingPrivacyModeEnabled: {value}")
+            asserts.assert_is_not_none(value, "SoftRecordingPrivacyModeEnabled is None")
 
         self.step(22)
         if self.pics_guard(self.check_pics("AVSM.S.A0014")):
@@ -299,6 +322,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
             )
             logger.info(f"Rx'd SoftLivestreamPrivacyModeEnabled: {value}")
+            asserts.assert_is_not_none(value, "SoftLivestreamPrivacyModeEnabled is None")
 
         self.step(23)
         if self.pics_guard(self.check_pics("AVSM.S.A0015")):
@@ -306,11 +330,13 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.HardPrivacyModeOn
             )
             logger.info(f"Rx'd HardPrivacyModeOn: {value}")
+            asserts.assert_is_not_none(value, "HardPrivacyModeOn is None")
 
         self.step(24)
         if self.pics_guard(self.check_pics("AVSM.S.A0016")):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.NightVision)
             logger.info(f"Rx'd NightVision: {value}")
+            asserts.assert_is_not_none(value, "NightVision is None")
 
         self.step(25)
         if self.pics_guard(self.check_pics("AVSM.S.A0017")):
@@ -318,16 +344,19 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum
             )
             logger.info(f"Rx'd NightVisionIllum: {value}")
+            asserts.assert_is_not_none(value, "NightVisionIllum is None")
 
         self.step(26)
         if self.pics_guard(self.check_pics("AVSM.S.A0018")):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.Viewport)
             logger.info(f"Rx'd Viewport: {value}")
+            asserts.assert_is_not_none(value, "Viewport is None")
 
         self.step(27)
         if self.pics_guard(self.check_pics("AVSM.S.A0019")):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMuted)
             logger.info(f"Rx'd SpeakerMuted: {value}")
+            asserts.assert_is_not_none(value, "SpeakerMuted is None")
 
         self.step(28)
         if self.pics_guard(self.check_pics("AVSM.S.A001A")):
@@ -335,6 +364,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerVolumeLevel
             )
             logger.info(f"Rx'd SpeakerVolumeLevel: {value}")
+            asserts.assert_is_not_none(value, "SpeakerVolumeLevel is None")
+            matter_asserts.assert_valid_uint8(value, "SpeakerVolumeLevel is not a valid uint8 value")
 
         self.step(29)
         if self.pics_guard(self.check_pics("AVSM.S.A001B")):
@@ -342,6 +373,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMaxLevel
             )
             logger.info(f"Rx'd SpeakerMaxLevel: {value}")
+            asserts.assert_is_not_none(value, "SpeakerMaxLevel is None")
+            matter_asserts.assert_valid_uint8(value, "SpeakerMaxLevel is not a valid uint8 value")
 
         self.step(30)
         if self.pics_guard(self.check_pics("AVSM.S.A001C")):
@@ -349,6 +382,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMinLevel
             )
             logger.info(f"Rx'd SpeakerMinLevel: {value}")
+            asserts.assert_is_not_none(value, "SpeakerMinLevel is None")
+            matter_asserts.assert_valid_uint8(value, "SpeakerMinLevel is not a valid uint8 value")
 
         self.step(31)
         if self.pics_guard(self.check_pics("AVSM.S.A001D")):
@@ -356,6 +391,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMuted
             )
             logger.info(f"Rx'd MicrophoneMuted: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneMuted is None")
 
         self.step(32)
         if self.pics_guard(self.check_pics("AVSM.S.A001E")):
@@ -363,6 +399,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneVolumeLevel
             )
             logger.info(f"Rx'd MicrophoneVolumeLevel: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneVolumeLevel is None")
+            matter_asserts.assert_valid_uint8(value, "MicrophoneVolumeLevel is not a valid uint8 value")
 
         self.step(33)
         if self.pics_guard(self.check_pics("AVSM.S.A001F")):
@@ -370,6 +408,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMaxLevel
             )
             logger.info(f"Rx'd MicrophoneMaxLevel: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneMaxLevel is None")
+            matter_asserts.assert_valid_uint8(value, "MicrophoneMaxLevel is not a valid uint8 value")
 
         self.step(34)
         if self.pics_guard(self.check_pics("AVSM.S.A0020")):
@@ -377,6 +417,8 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMinLevel
             )
             logger.info(f"Rx'd MicrophoneMinLevel: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneMinLevel is None")
+            matter_asserts.assert_valid_uint8(value, "MicrophoneMinLevel is not a valid uint8 value")
 
         self.step(35)
         if self.pics_guard(self.check_pics("AVSM.S.A0021")):
@@ -384,11 +426,14 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled
             )
             logger.info(f"Rx'd MicrophoneAGCEnabled: {value}")
+            asserts.assert_is_not_none(value, "MicrophoneAGCEnabled is None")
 
         self.step(36)
         if self.pics_guard(self.check_pics("AVSM.S.A0022")):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageRotation)
             logger.info(f"Rx'd ImageRotation: {value}")
+            asserts.assert_is_not_none(value, "ImageRotation is None")
+            matter_asserts.assert_valid_uint16(value, "ImageRotation is not a valid uint16 value")
 
         self.step(37)
         if self.pics_guard(self.check_pics("AVSM.S.A0023")):
@@ -396,6 +441,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal
             )
             logger.info(f"Rx'd ImageFlipHorizontal: {value}")
+            asserts.assert_is_not_none(value, "ImageFlipHorizontal is None")
 
         self.step(38)
         if self.pics_guard(self.check_pics("AVSM.S.A0024")):
@@ -403,6 +449,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical
             )
             logger.info(f"Rx'd ImageFlipVertical: {value}")
+            asserts.assert_is_not_none(value, "ImageFlipVertical is None")
 
         self.step(39)
         if self.pics_guard(self.check_pics("AVSM.S.A0025")):
@@ -410,6 +457,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalVideoRecordingEnabled
             )
             logger.info(f"Rx'd LocalVideoRecordingEnabled: {value}")
+            asserts.assert_is_not_none(value, "LocalVideoRecordingEnabled is None")
 
         self.step(40)
         if self.pics_guard(self.check_pics("AVSM.S.A0026")):
@@ -417,6 +465,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
             )
             logger.info(f"Rx'd LocalSnapshotRecordingEnabled: {value}")
+            asserts.assert_is_not_none(value, "LocalSnapshotRecordingEnabled is None")
 
         self.step(41)
         if self.pics_guard(self.check_pics("AVSM.S.A0027")):
@@ -424,6 +473,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled
             )
             logger.info(f"Rx'd StatusLightEnabled: {value}")
+            asserts.assert_is_not_none(value, "StatusLightEnabled is None")
 
         self.step(42)
         if self.pics_guard(self.check_pics("AVSM.S.A0028")):
@@ -431,6 +481,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness
             )
             logger.info(f"Rx'd StatusLightBrightness: {value}")
+            asserts.assert_is_not_none(value, "StatusLightBrightness is None")
 
 
 if __name__ == "__main__":
