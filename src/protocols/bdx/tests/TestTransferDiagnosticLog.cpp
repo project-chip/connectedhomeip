@@ -5,6 +5,8 @@
 #include <protocols/bdx/BdxTransferDiagnosticLog.h>
 #include <system/SystemClock.h>
 #include <system/SystemTimer.h>
+#include <system/RAIIMockClock.h>
+
 
 using namespace ::chip;
 using namespace ::chip::bdx;
@@ -26,9 +28,7 @@ protected:
 
 TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
 {
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock mockClock;
 
     mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, uint16_t{ 512 }, 1000_ms);
 
@@ -72,8 +72,6 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
     r = proxyDiagnosticLog.Init(&mTransferSession);
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititatorDrivesTransfer)
