@@ -1282,6 +1282,7 @@ RVC
 rw
 RXD
 sandboxed
+sankey
 saveAs
 saveDataVersschemaionAs
 sbin
