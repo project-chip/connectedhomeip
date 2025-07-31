@@ -52,6 +52,7 @@ MTR_TESTABLE
 MTR_TESTABLE
 @interface MTRDelegateManager<DelegateType, DelegateInfoType : MTRDelegateInfo *> : NSObject
 
+// Owner is used for logging only, and held weakly.
 - (instancetype)initWithOwner:(id)owner;
 
 - (void)addDelegateInfo:(DelegateInfoType)delegateInfo;
