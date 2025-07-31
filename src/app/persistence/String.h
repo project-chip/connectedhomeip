@@ -38,7 +38,7 @@ public:
     /// The input buffer is assumed to have an extra 1 byte for c_str to work.
     ///
     /// This class is considered Internal, use chip::app::Storage::String<MAX_LENGTH> in application code.
-    ShortString(char * buffer, size_t buffer_size) : mBuffer(buffer), mPascalSize(buffer_size - 1)
+    ShortString(char * buffer, size_t buffer_size) : mBuffer(buffer), mPascalSize(static_cast<uint8_t>(buffer_size - 1))
     {
         VerifyOrDie(buffer_size < 256);
     }
@@ -100,11 +100,10 @@ public:
     // internal shortstring is self-referencing pointers. That cannot be copied, so we assume no copy for now
     // These could be implemented, however for now we assume people should just use the underlying Span() to set
     // the values.
-    String(const String &&) = delete;
-    String& operator=(const String &&) = delete;
-    String(const String &) = delete;
-    String& operator=(const String &) = delete;
-
+    String(const String &&)             = delete;
+    String & operator=(const String &&) = delete;
+    String(const String &)              = delete;
+    String & operator=(const String &)  = delete;
 
 private:
     //   - 1 byte to null-terminate to allow for a c_str() implementation
