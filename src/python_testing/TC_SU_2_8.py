@@ -63,26 +63,43 @@ class TC_SU_2_8(MatterBaseTest):
         ]
         return steps
 
+    async def write_ota_providers(self, controller, providers, endpoint):
+        resp = await controller.WriteAttribute(
+            self.dut_node_id,
+            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(providers))]
+        )
+        asserts.assert_equal(resp[0].Status, Status.Success, "Write OTA providers failed.")
+
     @async_test_body
     async def test_TC_SU_2_8(self):
 
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
-        th2 = self.default_controller
-        cluster = Clusters.Objects.BasicInformation
-        attr = Clusters.Objects.BasicInformation.Attributes
+        controller = self.default_controller
+        fabric_id_th2 = 2
+
+        valid_states = {
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnUserConsent
+        }
 
         provider_th1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
             providerNodeID=0xDEAD,
             endpoint=0,
-            fabricIndex=1
+            fabricIndex=controller.fabricId
         )
 
         provider_th2 = Clusters.Objects.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
             providerNodeID=self.dut_node_id,
             endpoint=endpoint,
-            fabricIndex=th2.fabricId
+            fabricIndex=fabric_id_th2
         )
+
+        if fabric_id_th2 == controller.fabricId:
+            raise AssertionError(f"Fabric IDs are the same for TH1: {controller.fabricId} and TH2: {fabric_id_th2}.")
 
         # Commissioning
         self.step(0)
@@ -92,63 +109,34 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info(f"TH1 provider: {provider_th1}")
 
-        resp = await self.write_single_attribute(
-            attribute_value=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(
-                value=[provider_th1]
-            ),
-            endpoint_id=endpoint
-        )
+        await self.write_ota_providers(controller=controller, providers=[provider_th1], endpoint=endpoint)
+        await self.write_ota_providers(controller=controller, providers=[provider_th2], endpoint=endpoint)  # Is this ok?
 
-        logging.info(f"Response from TH1: {resp}")
-
-        asserts.assert_equal(resp, Status.Success, "Failed to write DefaultOTAProviders for TH1")
-
-        update_state = await self.read_single_attribute_check_success(
-            node_id=dut_node_id,
-            endpoint=endpoint,
-            attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
-            cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
-        )
-
-        logging.info(f"State: {update_state}")
-
-        th1_state = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
-        asserts.assert_equal(update_state, th1_state,
-                             f"UpdateState is {update_state} and it should be {th1_state} after setting TH1")
-
-        query_image_server = await self.read_single_attribute_check_success(
-            node_id=dut_node_id,
-            endpoint=endpoint,
-            attribute=attr,
-            cluster=cluster
-        )
-
-        bdx_protocol = Clusters.Objects.OtaSoftwareUpdateProvider.Enums.kBDXSynchronous
-
-        # asserts.assert_equal(query_image_server.vendorID, , f"Vendor ID in server side is {query_image_server.vendorID} and it should be {}.")
-        # asserts.assert_equal(query_image_server.productID, , f"Product ID in server side is {query_image_server.productID} and it should be {}.")
-        # asserts.assert_equal(query_image_server.softwareVersion, , f"Software version in server side is {query_image_server.softwareVersion} and it should be {}.")
-        # asserts.assert_equal(query_image_server.hardwareVersion, , f"Hardware version in server side is {query_image_server.hardwareVersion} and it should be {}.")
-        # asserts.assert_true(bdx_protocol in query_image_server.protocolsSupported,
-        #                     f"BDX protocol: {bdx_protocol} is not in protocolsSupported list: {query_image_server.protocolsSupported}")
-
-        # MCORE.OTA.HTTPS validation
-
-        # RequestorCanConsent validation
-
-        # asserts.assert_equal(query_image_server.location, , f"Location in server side is {query_image_server.location} and it should be {}")
-
-        # TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
 
-        resp = await self.write_single_attribute(
-            attribute_value=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(
-                value=[provider_th2]
-            ),
-            endpoint_id=endpoint
-        )
+        max_wait = 30
+        interval = 5
+        elapsed = 0
 
-        asserts.assert_equal(resp, Status.Success, "Failed to write DefaultOTAProviders for TH2")
+        update_state = None
+        while elapsed < max_wait:
+            update_state = await self.read_single_attribute_check_success(
+                node_id=dut_node_id,
+                endpoint=endpoint,
+                attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+                cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
+            )
+
+            logging.info(f"UpdateState after {elapsed}s: {update_state.name}")
+
+            if update_state in valid_states:
+                break
+
+            time.sleep(interval)
+            elapsed += interval
+
+        asserts.assert_true(update_state in valid_states,
+                            f"DUT did not reach {valid_states} state after fallback to TH2. The state is {update_state}.")
 
 
 if __name__ == "__main__":
