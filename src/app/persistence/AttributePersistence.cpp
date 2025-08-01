@@ -72,7 +72,7 @@ bool AttributePersistence::LoadString(const ConcreteAttributePath & path, Storag
     return io.FinalizeRead(rawBytes);
 }
 
-CHIP_ERROR AttributePersistence::StoreString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value)
+CHIP_ERROR AttributePersistence::StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value)
 {
     Storage::Internal::ShortStringIO io(value);
     return mProvider.WriteValue(path, io.ContentWithPrefix());

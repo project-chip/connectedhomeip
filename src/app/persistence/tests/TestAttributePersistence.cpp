@@ -34,7 +34,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Testing;
 
-TEST(TestAttributePersistence, TestLoadAndStoreNativeEndian)
+TEST(TestAttributePersistence, TestLoadAndDecodeAndStoreNativeEndian)
 {
     TestPersistentStorageDelegate storageDelegate;
     DefaultAttributePersistenceProvider ramProvider;
@@ -102,7 +102,7 @@ TEST(TestAttributePersistence, TestNativeRawValueViaDecoder)
     {
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(kValueToStore);
-        EXPECT_EQ(persistence.StoreNativeEndianValue(path, decoder, valueRead), CHIP_NO_ERROR);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_NO_ERROR);
         EXPECT_EQ(valueRead, kValueToStore);
     }
 

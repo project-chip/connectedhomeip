@@ -53,7 +53,7 @@ public:
     ///   - decode the given raw data
     ///   - write to storage
     template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
-    CHIP_ERROR StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
+    CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
         ReturnErrorOnFailure(decoder.Decode(value));
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
@@ -65,7 +65,7 @@ public:
     bool LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
 
     /// Store the given string in persistent storage.
-    CHIP_ERROR StoreString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
+    CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
 
 private:
     AttributePersistenceProvider & mProvider;
