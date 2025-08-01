@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP" />
+
+  <struct name="MembershipStruct" isFabricScoped="true">
+    <cluster code="0x0064"/>
+    <item fieldId="1" name="GroupId" type="group_id"/>
+    <item fieldId="2" name="Endpoints" type="endpoint_no" array="true"/>
+  </struct>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Groupcast</name>
+    <code>0x0064</code>
+    <define>GROUPCAST_CLUSTER</define>
+    <description>The Groupcast Cluster.</description>
+
+    <features>
+      <feature bit="0" code="LN" name="Listener" summary="Supports joining a multicast group of nodes as a listener.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="LN" name="Sender" summary="Supports sending multicast message to a targeted group of nodes.">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x0000" name="Membership" define="GROUPCAST_MEMBERSHIP" type="array" length="254" entryType="MembershipStruct" writable="false" optional="false">
+      <access op="read" privilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+
+    <attribute side="server" code="0x0001" name="MaxMembershipCount" define="GROUPCAST_MEMBERSHIP_COUNT" type="int8u" writable="false" optional="false">
+      <access op="read" privilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+
+    <command source="client" code="0x00" name="JoinGroup" isFabricScoped="true" optional="false" cli="zcl Groupcast JoinGroup">
+      <description>Instructs the server to join a multicast group.</description>
+      <arg name="GroupId" type="group_id"/>
+      <arg name="Endpoints" type="endpoint_no" array="true"/>
+      <arg name="Key" type="octet_string" length="16"/>
+      <arg name="GroupName" type="char_string" length="32"/>
+      <arg name="GracePeriod" type="epoch_s"/>
+      <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
+    </command>
+
+    <command source="server" code="0x81" name="JoinGroupResponse" optional="false" disableDefaultResponse="true">
+      <description>Response to JoinGroup</description>
+      <arg name="Address" type="octet_string" length="16"/>
+      <mandatoryConform/>
+    </command>
+
+    <command source="client" code="0x01" name="LeaveGroup" isFabricScoped="true" optional="false" cli="zcl Groupcast LeaveGroup">
+      <description>Request that the server withdraws specific endpoints from a specific group.</description>
+      <arg name="GroupId" type="group_id"/>
+      <arg name="Endpoints" type="endpoint_no" array="true"/>
+      <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
+    </command>
+
+    <command source="client" code="0x03" name="LeaveAllGroups" isFabricScoped="true" optional="false" cli="zcl Groupcast LeaveAllGroups">
+      <description>Requests that the server withdraws itself from all groups of this client’s fabric..</description>
+      <arg name="Endpoints" type="endpoint_no" array="true"/>
+      <access op="invoke" privilege="administer"/>
+      <mandatoryConform/>
+    </command>
+
+  </cluster>
+</configurator>

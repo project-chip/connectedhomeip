@@ -29,6 +29,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <platform/LockTracker.h>
+#include <credentials/GroupcastDataProvider.h>
 
 #include <string>
 
@@ -149,6 +150,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     sGroupDataProvider.SetSessionKeystore(factoryInitParams.sessionKeystore);
     ReturnLogErrorOnFailure(sGroupDataProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupDataProvider);
+    chip::Groupcast::DataProvider::Instance().Initialize(&mDefaultStorage, factoryInitParams.sessionKeystore);
     factoryInitParams.groupDataProvider = &sGroupDataProvider;
 
     uint16_t port = mDefaultStorage.GetListenPort();

@@ -1638,6 +1638,48 @@
           ]
         },
         {
+          "name": "Groupcast",
+          "code": 100,
+          "mfgCode": null,
+          "define": "GROUPCAST_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "JoinGroup",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "LeaveGroup",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "LeaveAllGroups",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "JoinGroupResponse",
+              "code": 129,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
           "name": "HEPA Filter Monitoring",
           "code": 113,
           "mfgCode": null,
@@ -3312,7 +3354,8 @@
           "mfgCode": null,
           "define": "COMMODITY_METERING_CLUSTER",
           "side": "client",
-          "enabled": 1
+          "enabled": 1,
+          "apiMaturity": "provisional"
         },
         {
           "name": "Unit Testing",

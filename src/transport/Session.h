@@ -28,6 +28,7 @@
 #include <messaging/SessionParameters.h>
 #include <platform/LockTracker.h>
 #include <transport/SessionDelegate.h>
+#include <transport/raw/PeerAddress.h>
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/TCP.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -283,6 +284,9 @@ public:
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
+    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+    void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
+
     SecureSession * AsSecureSession();
     UnauthenticatedSession * AsUnauthenticatedSession();
     IncomingGroupSession * AsIncomingGroupSession();
@@ -342,9 +346,11 @@ protected:
     const OutgoingGroupSession * AsConstOutgoingGroupSession() const;
 
     IntrusiveList<SessionHolder> mHolders;
+    PeerAddress mPeerAddress;
 
 private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // The underlying TCP connection object over which the session is
     // established.

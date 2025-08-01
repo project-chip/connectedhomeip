@@ -413,6 +413,9 @@ private:
      */
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
 
+    void ProcessGroupCommand(ClusterId clusterId, CommandId commandId, EndpointId endpointId,
+                                             TLV::TLVReader & commandDataReader);
+
     CHIP_ERROR TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
