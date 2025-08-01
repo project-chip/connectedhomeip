@@ -261,6 +261,11 @@ private:
     void SetInstance(Instance * aInstance) { mInstance = aInstance; }
     
 protected:
+    /**
+     * @brief Provides access to the Instance pointer.
+     *
+     * @return A pointer to the Instance object associated with this delegate.
+     */
     Instance * GetInstance() const { return mInstance; }
 };
 
