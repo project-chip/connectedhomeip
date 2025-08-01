@@ -2377,7 +2377,7 @@ cluster MediaPlayback = 1286 {
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 cluster MediaInput = 1287 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum InputTypeEnum : enum8 {
     kInternal = 0;
@@ -2422,13 +2422,13 @@ cluster MediaInput = 1287 {
     char_string name = 1;
   }
 
-  /** Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List. */
+  /** Upon receipt, this command SHALL change the media input on the device to the input at a specific index in the Input List. */
   command SelectInput(SelectInputRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL display the active status of the input list on screen. */
+  /** Upon receipt, this command SHALL display the active status of the input list on screen. */
   command ShowInputStatus(): DefaultSuccess = 1;
-  /** Upon receipt, this SHALL hide the input list from the screen. */
+  /** Upon receipt, this command SHALL hide the input list from the screen. */
   command HideInputStatus(): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus. */
+  /** Upon receipt, this command SHALL rename the input at a specific index in the Input List. */
   command access(invoke: manage) RenameInput(RenameInputRequest): DefaultSuccess = 3;
 }
 
@@ -3178,7 +3178,7 @@ endpoint 0 {
     callback attribute currentMaxRate;
     callback attribute overrunCount;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster EthernetNetworkDiagnostics {
