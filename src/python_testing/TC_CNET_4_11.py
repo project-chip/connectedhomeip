@@ -224,6 +224,15 @@ class TC_CNET_4_11(MatterBaseTest):
     def default_timeout(self) -> int:
         return TIMEOUT
 
+    async def find_network_and_assert(self, networks, ssid, should_be_connected=True):
+        asserts.assert_is_not_none(networks, "Could not read networks.")
+        for idx, network in enumerate(networks):
+            if network.networkID == ssid.encode():
+                connection_state = "connected" if network.connected else "not connected"
+                asserts.assert_equal(network.connected, should_be_connected, f"Wifi network {ssid} is {connection_state}.")
+                return idx
+        asserts.fail(f"Wifi network not found for SSID: {ssid}")
+
     async def verify_operational_network(self, ssid):
         networks = None
         retry = 1
@@ -250,12 +259,9 @@ class TC_CNET_4_11(MatterBaseTest):
         else:
             asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
 
-        asserts.assert_is_not_none(networks, "Could not read networks.")
-        for idx, network in enumerate(networks):
-            if network.networkID == ssid.encode():
-                asserts.assert_true(network.connected, f"Wifi network {ssid} is not connected.")
-                logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
-                break
+        userwifi_netidx = await self.find_network_and_assert(networks, ssid)
+        if userwifi_netidx is not None:
+            logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
 
     def steps_TC_CNET_4_11(self):
         return [
@@ -393,14 +399,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # Verify that the Networks attribute list has an entry with the following fields:
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
-        userwifi_netidx = None
-        for idx, network in enumerate(networks):
-            if network.networkID == wifi_1st_ap_ssid.encode():
-                userwifi_netidx = idx
-                logger.info(f" --- Step 3: NetworkID of 1st SSID: {network.networkID.decode()}")
-                asserts.assert_true(network.connected, f"Wifi network {wifi_1st_ap_ssid} is not connected.")
-                break
-        asserts.assert_true(userwifi_netidx is not None, f"Wifi network not found for 1st SSID: {wifi_1st_ap_ssid}")
+        userwifi_netidx = await self.find_network_and_assert(networks, wifi_1st_ap_ssid)
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
         self.step(4)
@@ -453,14 +452,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is FALSE
-        userwifi_2nd_netidx = None
-        for idx, network in enumerate(networks):
-            if network.networkID == wifi_2nd_ap_ssid.encode():
-                logger.info(f" --- Step 6: NetworkID of 2nd SSID: {network.networkID.decode()}")
-                userwifi_2nd_netidx = idx
-                asserts.assert_false(network.connected, f"Wifi network {wifi_2nd_ap_ssid} should not be connected.")
-                break
-        asserts.assert_true(userwifi_2nd_netidx is not None, f"Wifi network not found for 2nd SSID: {wifi_2nd_ap_ssid}")
+        await self.find_network_and_assert(networks, wifi_2nd_ap_ssid, False)
 
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2
         self.step(7)
@@ -632,12 +624,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
-        for idx, network in enumerate(networks):
-            if network.networkID == wifi_2nd_ap_ssid.encode():
-                userwifi_2nd_netidx = idx
-                asserts.assert_true(network.connected, f"Wifi network {wifi_2nd_ap_ssid} is not connected.")
-                break
-        asserts.assert_true(userwifi_2nd_netidx is not None, "Wifi network not found")
+        await self.find_network_and_assert(networks, wifi_2nd_ap_ssid)
 
 
 if __name__ == "__main__":
