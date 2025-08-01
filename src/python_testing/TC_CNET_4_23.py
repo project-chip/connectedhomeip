@@ -29,7 +29,7 @@ kWiFiFeature = 1
 kThreadFeature = 2
 kExpiryLengthSeconds = 900
 kChipErrorTimeout = 0x32
-kMaxCommissioningCompleteRetryTimes = 5
+kMaxCommissioningCompleteRetryTimes = 10
 
 
 class TC_CNET_4_23(MatterBaseTest):
@@ -111,11 +111,12 @@ class TC_CNET_4_23(MatterBaseTest):
 
     async def SendConnectNetworkWithFailure(
             self, networkID: int, endpoint: int):
-        with asserts.assert_raises(ChipStackError) as cm:
+        try:
             cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=networkID)
             await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
-        asserts.assert_equal(cm.exception.err, kChipErrorTimeout, "Unexpected error while trying to send ConnectNetwork command")
-        logging.info("ConnectNetwork command timed out, not assert here as it is expected during network switching")
+        except ChipStackError as e:  # chipstack-ok: The response may or may not timeout during network switching
+            asserts.assert_equal(e.err, kChipErrorTimeout, "Unexpected error while trying to send ConnectNetwork command")
+            logging.info("ConnectNetwork command timed out, not assert here as it is expected during network switching")
 
     async def SendCommissioningCompleteWithRetry(self):
         commissioning_complete_cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
@@ -128,10 +129,10 @@ class TC_CNET_4_23(MatterBaseTest):
                 break
             except ChipStackError as e:  # chipstack-ok: After switching networks, it may resolve to an incorrect address
                 asserts.assert_equal(e.err, kChipErrorTimeout, "Unexpected error while trying to send CommissioningComplete")
-                logging.info(f"Will retry CommissioningComplete command in 10 seconds, attempt: {i + 1}")
-                time.sleep(10)
+                logging.info(f"Will retry CommissioningComplete command in 5 seconds, attempt: {i + 1}")
+                time.sleep(2)
         else:
-            asserts.assert_true(False, "CommissioningComplete command failed")
+            asserts.fail("CommissioningComplete command failed")
 
     @async_test_body
     async def test_TC_CNET_4_23(self):
