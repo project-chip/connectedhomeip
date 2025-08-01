@@ -144,7 +144,7 @@ class CADMINBaseTest(MatterBaseTest):
 
     async def get_all_txt_records(self):
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        await discovery._discover(
+        await discovery.discover(
             discovery_timeout_sec=240,
             log_output=False,
             service_types=[MdnsServiceType.COMMISSIONABLE.value]

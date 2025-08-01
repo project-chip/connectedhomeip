@@ -178,7 +178,7 @@ class MdnsDiscovery:
             Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types (str) to
                                             lists of MdnsServiceInfo objects.
         """
-        await self._discover(discovery_timeout_sec, log_output, all_services=True)
+        await self.discover(discovery_timeout_sec, log_output, all_services=True)
 
         return self._discovered_services
 
@@ -356,7 +356,7 @@ class MdnsDiscovery:
             Optional[list[PtrRecord]]: A list of discovered PtrRecord objects, or None if no services were found.
         """
         logger.info(f"Service record information lookup (PTR) for '{service_types}' in progress...")
-        await self._discover(
+        await self.discover(
             discovery_timeout_sec=discovery_timeout_sec,
             log_output=log_output,
             service_types=service_types,
@@ -407,49 +407,7 @@ class MdnsDiscovery:
 
         return sub_types
 
-    # Private methods
-    async def _get_service(self, service_type: str,
-                           log_output: bool,
-                           discovery_timeout_sec: float,
-                           service_name: str = None,
-                           query_service: bool = True
-                           ) -> Optional[MdnsServiceInfo]:
-        """
-        Asynchronously discovers a specific type of mDNS service within the network and returns its details.
-
-        Args:
-            service_type (str): Represents the type of mDNS service to discover.
-            log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 30 seconds.
-            service_name (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available.
-            query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
-
-        Returns:
-            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
-                                    any. Returns None if no service of the specified type is discovered within
-                                    the timeout period.
-        """
-        await self._discover(
-            discovery_timeout_sec=discovery_timeout_sec,
-            log_output=log_output,
-            service_types=[service_type],
-            query_service=query_service,
-        )
-
-        if self._verbose_logging:
-            logger.info("Getting service from discovered services: %s", self._discovered_services)
-
-        if service_type in self._discovered_services:
-            if service_name is not None:
-                for service in self._discovered_services[service_type]:
-                    if service.service_name == service_name.replace("._MATTER._TCP.LOCAL.", "._matter._tcp.local."):
-                        return service
-            else:
-                return self._discovered_services[service_type][0]
-        else:
-            return None
-
-    async def _discover(self,
+    async def discover(self,
                         discovery_timeout_sec: float,
                         log_output: bool,
                         service_types: Optional[List[str]] = None,
@@ -545,6 +503,48 @@ class MdnsDiscovery:
                     tasks.append(limited_query(ptr))
 
             await asyncio.gather(*tasks)
+
+    # Private methods
+    async def _get_service(self, service_type: str,
+                           log_output: bool,
+                           discovery_timeout_sec: float,
+                           service_name: str = None,
+                           query_service: bool = True
+                           ) -> Optional[MdnsServiceInfo]:
+        """
+        Asynchronously discovers a specific type of mDNS service within the network and returns its details.
+
+        Args:
+            service_type (str): Represents the type of mDNS service to discover.
+            log_output (bool): Logs the discovered services to the console. Defaults to False.
+            discovery_timeout_sec (float): Defaults to 30 seconds.
+            service_name (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available.
+            query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
+
+        Returns:
+            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
+                                    any. Returns None if no service of the specified type is discovered within
+                                    the timeout period.
+        """
+        await self.discover(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=log_output,
+            service_types=[service_type],
+            query_service=query_service,
+        )
+
+        if self._verbose_logging:
+            logger.info("Getting service from discovered services: %s", self._discovered_services)
+
+        if service_type in self._discovered_services:
+            if service_name is not None:
+                for service in self._discovered_services[service_type]:
+                    if service.service_name == service_name.replace("._MATTER._TCP.LOCAL.", "._matter._tcp.local."):
+                        return service
+            else:
+                return self._discovered_services[service_type][0]
+        else:
+            return None
 
     def _on_service_state_change(
         self,
