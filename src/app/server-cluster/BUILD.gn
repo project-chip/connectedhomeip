@@ -43,6 +43,8 @@ source_set("registry") {
   sources = [
     "ServerClusterInterfaceRegistry.cpp",
     "ServerClusterInterfaceRegistry.h",
+    "SingleEndpointServerClusterRegistry.cpp",
+    "SingleEndpointServerClusterRegistry.h",
   ]
 
   public_deps = [

@@ -2477,10 +2477,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 7;
 
     handle command MoveToColorTemperature;
-    handle command EnhancedMoveHue;
-    handle command EnhancedStepHue;
-    handle command EnhancedMoveToHueAndSaturation;
-    handle command ColorLoopSet;
     handle command StopMoveStep;
     handle command MoveColorTemperature;
     handle command StepColorTemperature;

@@ -4568,8 +4568,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    if (attributePathsToReport.count > 0) {
-        MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    // Log each changed path on a separate line, so log line truncation does not
+    // hide which attributes actually changed in this report.  Note that for
+    // things that did not change we log them one per line above in the
+    // !shouldReportAttribute case.
+    for (MTRAttributePath * path in attributePathsToReport) {
+        MTR_LOG("%@ report from reported values %@", self, path);
     }
 
     return attributesToReport;
