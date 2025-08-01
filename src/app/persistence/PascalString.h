@@ -95,7 +95,7 @@ public:
 
     /// Allocates a pascal buffer of the given size.
     ///
-    /// buffer_size includes the prefix.
+    /// buffer_size includes the prefix and must be at least PREFIX_LEN.
     PascalBuffer(T * data, size_t buffer_size) : mData(data), mMaxSize(static_cast<LengthType>(buffer_size - PREFIX_LEN)) {}
 
     /// Returns the content of the pascal string.
