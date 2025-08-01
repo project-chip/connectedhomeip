@@ -682,10 +682,6 @@ class DiscoveryCommandAction(BaseAction):
         if test_step.command == 'FindCommissionable':
             return discovery.FilterType.NONE, None
 
-        if test_step.command == 'FindCommissionableByCommissioningMode':
-            # this is just a "_CM" subtype
-            return discovery.FilterType.COMMISSIONING_MODE, None
-
         # all the items below require a "value" to use for filtering
         args = test_step.arguments['values']
         request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
@@ -700,6 +696,9 @@ class DiscoveryCommandAction(BaseAction):
 
         if test_step.command == 'FindCommissionableByShortDiscriminator':
             return discovery.FilterType.SHORT_DISCRIMINATOR, filter
+
+        if test_step.command == 'FindCommissionableByCommissioningMode':
+            return discovery.FilterType.COMMISSIONING_MODE, filter
 
         if test_step.command == 'FindCommissionableByVendorId':
             return discovery.FilterType.VENDOR_ID, filter

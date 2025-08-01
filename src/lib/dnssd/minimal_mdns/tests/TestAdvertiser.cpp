@@ -105,7 +105,9 @@ TxtResourceRecord txtOperational2       = TxtResourceRecord(kInstanceName2, kTxt
 const QNamePart kMatterCommissionableNodeQueryParts[3] = { "_matterc", "_udp", "local" };
 const QNamePart kLongSubPartsFullLen[]                 = { "_L4094", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kShortSubPartsFullLen[]                = { "_S15", "_sub", "_matterc", "_udp", "local" };
-const QNamePart kCmSubParts[]                          = { "_CM", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kCmDisabledSubParts[]                  = { "_CM0", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kCmEnabledBasicSubParts[]              = { "_CM1", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kCmEnabledEnhancedSubParts[]           = { "_CM2", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kLongSubParts[]                        = { "_L22", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kShortSubParts[]                       = { "_S2", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kVendorSubParts[]                      = { "_V555", "_sub", "_matterc", "_udp", "local" };
@@ -113,7 +115,9 @@ const QNamePart kDeviceTypeSubParts[]                  = { "_T70000", "_sub", "_
 const FullQName kMatterCommissionableNodeQueryName     = FullQName(kMatterCommissionableNodeQueryParts);
 FullQName kLongSubFullLenName                          = FullQName(kLongSubPartsFullLen);
 FullQName kShortSubFullLenName                         = FullQName(kShortSubPartsFullLen);
-FullQName kCmSubName                                   = FullQName(kCmSubParts);
+FullQName kCmDisabledSubName                           = FullQName(kCmDisabledSubParts);
+FullQName kCmEnabledBasicSubName                       = FullQName(kCmEnabledBasicSubParts);
+FullQName kCmEnabledEnhancedSubName                    = FullQName(kCmEnabledEnhancedSubParts);
 FullQName kLongSubName                                 = FullQName(kLongSubParts);
 FullQName kShortSubName                                = FullQName(kShortSubParts);
 FullQName kVendorSubName                               = FullQName(kVendorSubParts);
@@ -121,7 +125,9 @@ FullQName kDeviceTypeSubName                           = FullQName(kDeviceTypeSu
 PtrResourceRecord ptrCommissionableNodeService         = PtrResourceRecord(kDnsSdQueryName, kMatterCommissionableNodeQueryName);
 PtrResourceRecord ptrServiceSubLFullLen                = PtrResourceRecord(kDnsSdQueryName, kLongSubFullLenName);
 PtrResourceRecord ptrServiceSubSFullLen                = PtrResourceRecord(kDnsSdQueryName, kShortSubFullLenName);
-PtrResourceRecord ptrServiceSubCM                      = PtrResourceRecord(kDnsSdQueryName, kCmSubName);
+PtrResourceRecord ptrServiceSubCMDisabled              = PtrResourceRecord(kDnsSdQueryName, kCmDisabledSubName);
+PtrResourceRecord ptrServiceSubCMEnabledBasic          = PtrResourceRecord(kDnsSdQueryName, kCmEnabledBasicSubName);
+PtrResourceRecord ptrServiceSubCMEnabledEnhanced       = PtrResourceRecord(kDnsSdQueryName, kCmEnabledEnhancedSubName);
 PtrResourceRecord ptrServiceSubLong                    = PtrResourceRecord(kDnsSdQueryName, kLongSubName);
 PtrResourceRecord ptrServiceSubShort                   = PtrResourceRecord(kDnsSdQueryName, kShortSubName);
 PtrResourceRecord ptrServiceSubVendor                  = PtrResourceRecord(kDnsSdQueryName, kVendorSubName);
@@ -445,7 +451,7 @@ TEST_F(TestAdvertiser, CommissionableAdverts)
     server.AddExpectedRecord(&ptrCommissionableNodeService);
     server.AddExpectedRecord(&ptrServiceSubLong);
     server.AddExpectedRecord(&ptrServiceSubShort);
-    server.AddExpectedRecord(&ptrServiceSubCM);
+    server.AddExpectedRecord(&ptrServiceSubCMEnabledBasic);
     server.AddExpectedRecord(&ptrServiceSubVendor);
     server.AddExpectedRecord(&ptrServiceSubDeviceType);
     EXPECT_EQ(SendQuery(kDnsSdQueryName), CHIP_NO_ERROR);
@@ -477,7 +483,7 @@ TEST_F(TestAdvertiser, CommissionableAdverts)
     server.AddExpectedRecord(&ptrCommissionableNodeService);
     server.AddExpectedRecord(&ptrServiceSubLong);
     server.AddExpectedRecord(&ptrServiceSubShort);
-    server.AddExpectedRecord(&ptrServiceSubCM);
+    server.AddExpectedRecord(&ptrServiceSubCMEnabledEnhanced);
     server.AddExpectedRecord(&ptrServiceSubVendor);
     server.AddExpectedRecord(&ptrServiceSubDeviceType);
     EXPECT_EQ(SendQuery(kDnsSdQueryName), CHIP_NO_ERROR);
@@ -545,7 +551,7 @@ TEST_F(TestAdvertiser, CommissionableAndOperationalAdverts)
     server.AddExpectedRecord(&ptrCommissionableNodeService);
     server.AddExpectedRecord(&ptrServiceSubLong);
     server.AddExpectedRecord(&ptrServiceSubShort);
-    server.AddExpectedRecord(&ptrServiceSubCM);
+    server.AddExpectedRecord(&ptrServiceSubCMEnabledEnhanced);
     server.AddExpectedRecord(&ptrServiceSubVendor);
     server.AddExpectedRecord(&ptrServiceSubDeviceType);
     server.AddExpectedRecord(&ptrServiceSubCompressedId1);

@@ -145,8 +145,9 @@ TEST(TestServiceNaming, TestMakeServiceNameSubtype)
 
     // Commissioning mode tests
     filter.type = DiscoveryFilterType::kCommissioningMode;
+    filter.code = 3;
     EXPECT_EQ(MakeServiceSubtype(buffer, sizeof(buffer), filter), CHIP_NO_ERROR);
-    EXPECT_STREQ(buffer, "_CM");
+    EXPECT_STREQ(buffer, "_CM3");
 
     // Compressed fabric ID tests.
     filter.type = DiscoveryFilterType::kCompressedFabricId;
@@ -220,8 +221,9 @@ TEST(TestServiceNaming, TestMakeServiceTypeName)
 
     // Commissioning mode tests
     filter.type = DiscoveryFilterType::kCommissioningMode;
+    filter.code = 2;
     EXPECT_EQ(MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
-    EXPECT_STREQ(buffer, "_CM._sub._matterc");
+    EXPECT_STREQ(buffer, "_CM2._sub._matterc");
 
     // Compressed fabric ID tests
     filter.type = DiscoveryFilterType::kCompressedFabricId;
@@ -247,9 +249,10 @@ TEST(TestServiceNaming, TestMakeServiceTypeName)
     EXPECT_EQ(MakeServiceTypeName(buffer, 9, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
     EXPECT_STREQ(buffer, "_matterc");
 
-    // Test buffer exactly the right size for subtype - "_CM._sub._matterc" = 17 + nullchar = 18
+    // Test buffer exactly the right size for subtype - "_CM2._sub._matterc" = 18 + nullchar = 19
     filter.type = DiscoveryFilterType::kCommissioningMode;
-    EXPECT_EQ(MakeServiceTypeName(buffer, 18, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
-    EXPECT_STREQ(buffer, "_CM._sub._matterc");
+    filter.code = 2;
+    EXPECT_EQ(MakeServiceTypeName(buffer, 19, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
+    EXPECT_STREQ(buffer, "_CM2._sub._matterc");
 }
 } // namespace

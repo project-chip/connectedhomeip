@@ -276,5 +276,5 @@ Note: Capture the [manual pairing code]
 On the Ecosystem A Joint Fabric Controller application
 
 ```
-pairing code 10 [manual pairing code] --jcm true
+pairing onnetwork-commissioning-mode 10 [manual pairing code] --jcm true
 ```

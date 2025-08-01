@@ -124,7 +124,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         requiredSize = snprintf(buffer, bufferLen, "_T%" PRIu32, static_cast<uint32_t>(subtype.code));
         break;
     case DiscoveryFilterType::kCommissioningMode:
-        requiredSize = snprintf(buffer, bufferLen, "_CM");
+        requiredSize = snprintf(buffer, bufferLen, "_CM%u", static_cast<uint16_t>(subtype.code));
         break;
     case DiscoveryFilterType::kCommissioner:
         if (subtype.code > 1)
