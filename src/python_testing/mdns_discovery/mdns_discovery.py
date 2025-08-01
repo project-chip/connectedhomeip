@@ -407,13 +407,13 @@ class MdnsDiscovery:
         return sub_types
 
     async def discover(self,
-                        discovery_timeout_sec: float,
-                        log_output: bool,
-                        service_types: Optional[List[str]] = None,
-                        all_services: bool = False,
-                        query_service: bool = True,
-                        append_results: bool = False
-                        ) -> None:
+                       discovery_timeout_sec: float,
+                       log_output: bool,
+                       service_types: Optional[List[str]] = None,
+                       all_services: bool = False,
+                       query_service: bool = True,
+                       append_results: bool = False
+                       ) -> None:
         """
         Asynchronously discovers network services using multicast DNS (mDNS).
 
