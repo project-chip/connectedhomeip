@@ -37,7 +37,10 @@ template("gen_sdk_version") {
     if (is_git_repository) {
       inputs = [ "${chip_root}/.git/logs/HEAD" ]
     }
-    outputs = [ "${directory}/${filename}.h", "${directory}/${filename}.cpp" ]
+    outputs = [
+      "${directory}/${filename}.h",
+      "${directory}/${filename}.cpp",
+    ]
 
     script = "${chip_root}/build/chip/write_sdk_version_header.py"
 

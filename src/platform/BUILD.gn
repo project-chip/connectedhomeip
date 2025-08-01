@@ -158,7 +158,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
       "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
       "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${chip_device_config_enable_joint_fabric}",
-      "CHIP_ENABLE_SDK_VERSION=${chip_enable_sdk_version}"
+      "CHIP_ENABLE_SDK_VERSION=${chip_enable_sdk_version}",
     ]
 
     public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
@@ -663,9 +663,9 @@ if (chip_device_platform != "none") {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
 
-  if (chip_enable_sdk_version) {
-    public_deps += [ ":matter_sdk_version" ]
-  }
+    if (chip_enable_sdk_version) {
+      public_deps += [ ":matter_sdk_version" ]
+    }
 
     public_deps += [ _platform_target ]
 
