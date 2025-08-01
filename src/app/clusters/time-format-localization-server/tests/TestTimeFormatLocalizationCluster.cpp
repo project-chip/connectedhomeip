@@ -175,14 +175,25 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
     public:
         TestAttributeProvider()
         {
+            Reset();
+        }
+
+        void Reset()
+        {
             currentCalendar   = TimeFormatLocalization::CalendarTypeEnum::kChinese;
             currentHourFormat = TimeFormatLocalization::HourFormatEnum::k24hr;
+            shouldFailWrite   = false;
         }
 
         ~TestAttributeProvider() = default;
 
         CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
         {
+            if (shouldFailWrite)
+            {
+                return CHIP_ERROR_WRITE_FAILED;
+            }
+
             ConcreteAttributePath hourPath = { 0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id };
             ConcreteAttributePath calendarPath = { 0, TimeFormatLocalization::Id,
                                                    TimeFormatLocalization::Attributes::ActiveCalendarType::Id };
@@ -223,37 +234,114 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
             return CHIP_NO_ERROR;
         }
 
+        void SetShouldFailWrite(bool fail) { shouldFailWrite = fail; }
+
     private:
         TimeFormatLocalization::CalendarTypeEnum currentCalendar;
         TimeFormatLocalization::HourFormatEnum currentHourFormat;
+        bool shouldFailWrite;
     };
 
-    BitFlags<TimeFormatLocalization::Feature> features{ 0 };
-    features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
     // Save old provider
     DeviceLayer::DeviceInfoProvider * oldProvider = DeviceLayer::GetDeviceInfoProvider();
     // Set new SampleProvider
     DeviceLayer::SampleDeviceProvider testProvider;
     DeviceLayer::SetDeviceInfoProvider(&testProvider);
 
-    TimeFormatLocalizationLogic clusterSim(features);
-
     TestAttributeProvider testAttrProvider;
 
-    clusterSim.Startup(&testAttrProvider);
+    // Test 1: Basic functionality with features enabled
+    {
+        testAttrProvider.Reset();
+        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
+        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        TimeFormatLocalizationLogic clusterSim(features);
+        clusterSim.Startup(&testAttrProvider);
 
-    EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k24hr);
-    EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kChinese);
+        // Verify initial values
+        EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k24hr);
+        EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kChinese);
 
-    clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr);
-    EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k12hr);
+        // Test valid writes
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr), 
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k12hr);
 
-    clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian);
-    EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kGregorian);
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kGregorian);
+    }
+
+    // Test 2: Invalid hour format value
+    {
+        testAttrProvider.Reset();
+        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
+        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        TimeFormatLocalizationLogic clusterSim(features);
+        clusterSim.Startup(&testAttrProvider);
+
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::kUnknownEnumValue),
+                  Protocols::InteractionModel::Status::ConstraintError);
+        // Value should remain unchanged
+        EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k24hr);
+    }
+
+    // Test 3: Unsupported calendar type
+    {
+        testAttrProvider.Reset();
+        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
+        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        TimeFormatLocalizationLogic clusterSim(features);
+        clusterSim.Startup(&testAttrProvider);
+
+        // Try to set a calendar type that's not in the supported list
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kPersian),
+                  Protocols::InteractionModel::Status::ConstraintError);
+        // Value should remain unchanged
+        EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kChinese);
+    }
+
+    // Test 4: Calendar operations without calendar feature
+    {
+        testAttrProvider.Reset();
+        BitFlags<TimeFormatLocalization::Feature> features{ 0 }; // No features enabled
+        TimeFormatLocalizationLogic clusterSim(features);
+        clusterSim.Startup(&testAttrProvider);
+
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian),
+                  Protocols::InteractionModel::Status::UnsupportedAttribute);
+    }
+
+    // Test 5: Writing with null provider
+    {
+        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
+        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        TimeFormatLocalizationLogic clusterSim(features);
+        // Don't call Startup, leaving provider as nullptr
+
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr),
+                  Protocols::InteractionModel::Status::Failure);
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian),
+                  Protocols::InteractionModel::Status::Failure);
+    }
+
+    // Test 6: Provider write failure
+    {
+        testAttrProvider.Reset();
+        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
+        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        TimeFormatLocalizationLogic clusterSim(features);
+        clusterSim.Startup(&testAttrProvider);
+
+        testAttrProvider.SetShouldFailWrite(true);
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr),
+                  Protocols::InteractionModel::Status::WriteIgnored);
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian),
+                  Protocols::InteractionModel::Status::WriteIgnored);
+        testAttrProvider.SetShouldFailWrite(false);
+    }
 
     // Revert provider to old state
     DeviceLayer::SetDeviceInfoProvider(oldProvider);
-
-    EXPECT_TRUE(true);
 }
 } // namespace
