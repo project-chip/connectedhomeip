@@ -374,8 +374,8 @@ CHIP_ERROR CastingServer::ReadMACAddress(TargetEndpointInfo * endpoint)
                 if (response.data() != nullptr && response.size() > 0)
                 {
                     videoPlayerInfo->SetMACAddress(response);
-                    ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %.*s",
-                                    static_cast<int>(response.size()), response.data());
+                    ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %s",
+                                    NullTerminated(response).c_str());
                     CHIP_ERROR error = CastingServer::GetInstance()->mPersistenceManager.AddVideoPlayer(videoPlayerInfo);
                     if (error != CHIP_NO_ERROR)
                     {

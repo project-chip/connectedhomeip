@@ -47,6 +47,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetWatermarks:
 } // namespace ResetWatermarks
 
 } // namespace Commands
+
+namespace Events {
+namespace SoftwareFault {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SoftwareFault
+
+} // namespace Events
 } // namespace SoftwareDiagnostics
 } // namespace Clusters
 } // namespace app

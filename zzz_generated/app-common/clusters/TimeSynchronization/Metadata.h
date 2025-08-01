@@ -101,6 +101,25 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetDefaultNTP::I
 } // namespace SetDefaultNTP
 
 } // namespace Commands
+
+namespace Events {
+namespace DSTTableEmpty {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DSTTableEmpty
+namespace DSTStatus {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DSTStatus
+namespace TimeZoneStatus {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TimeZoneStatus
+namespace TimeFailure {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TimeFailure
+namespace MissingTrustedTimeSource {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MissingTrustedTimeSource
+
+} // namespace Events
 } // namespace TimeSynchronization
 } // namespace Clusters
 } // namespace app

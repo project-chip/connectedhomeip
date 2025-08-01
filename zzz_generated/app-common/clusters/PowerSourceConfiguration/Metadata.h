@@ -28,6 +28,8 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace PowerSourceConfiguration
 } // namespace Clusters
 } // namespace app

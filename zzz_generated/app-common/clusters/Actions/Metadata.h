@@ -87,6 +87,16 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace DisableActionWithDuration
 
 } // namespace Commands
+
+namespace Events {
+namespace StateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateChanged
+namespace ActionFailed {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ActionFailed
+
+} // namespace Events
 } // namespace Actions
 } // namespace Clusters
 } // namespace app

@@ -32,10 +32,9 @@
 namespace chip {
 namespace app {
 
-/// Handles cluster interactions for a specific cluster id.
+/// Handles cluster interactions for a specific set of cluster instances
 ///
-/// A `ServerClusterInterface` instance is associated with a single endpointId and represents
-/// a cluster that exists at a given `endpointId/clusterId` path.
+/// A `ServerClusterInterface` instance may be associated with multiple `endpointId/clusterId` paths.
 ///
 /// Provides metadata as well as interaction processing (attribute read/write and command handling).
 class ServerClusterInterface

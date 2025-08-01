@@ -126,11 +126,6 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
 
 ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == Test::kRejectedDataVersion)
-    {
-        return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
-    }
-
     TestOnlyAttributeValueDecoderAccessor decodeAccess(decoder);
 
     decodeAccess.SetTriedDecode(true);

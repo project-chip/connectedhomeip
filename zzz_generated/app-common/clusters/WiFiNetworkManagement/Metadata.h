@@ -37,6 +37,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace NetworkPassphraseRequest
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace WiFiNetworkManagement
 } // namespace Clusters
 } // namespace app

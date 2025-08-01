@@ -57,6 +57,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CancelBoost::Id,
 } // namespace CancelBoost
 
 } // namespace Commands
+
+namespace Events {
+namespace BoostStarted {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace BoostStarted
+namespace BoostEnded {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace BoostEnded
+
+} // namespace Events
 } // namespace WaterHeaterManagement
 } // namespace Clusters
 } // namespace app

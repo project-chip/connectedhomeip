@@ -52,6 +52,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
 } // namespace {{command.name | upfirst}}
 {% endfor %}
 } // namespace Commands
+
+namespace Events {
+{% for event in cluster.events -%}
+namespace {{event.name | upfirst}} {
+inline constexpr DataModel::EventEntry kMetadataEntry{
+    {{ event.readacl | as_privilege }}
+};
+} // namespace {{event.name | upfirst}}
+{% endfor %}
+} // namespace Events
 } // namespace {{cluster.name}}
 } // namespace Clusters
 } // namespace app

@@ -15,7 +15,7 @@
 #  limitations under the License.
 #
 
-from ctypes import CDLL, c_char_p, c_int, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
+from ctypes import CDLL, c_char_p, c_int, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
 
 from ..clusters.Command import (_OnCommandSenderDoneCallbackFunct, _OnCommandSenderErrorCallbackFunct,
                                 _OnCommandSenderResponseCallbackFunct)
@@ -64,7 +64,7 @@ def _GetWebRTCLibraryHandle() -> CDLL:
         lib.pychip_webrtc_client_set_gathering_complete_callback.argtypes = [WebRTCClientHandle, GatheringCompleteCallbackType]
         lib.pychip_webrtc_client_set_state_change_callback.argtypes = [WebRTCClientHandle, StateChangeCallback]
 
-        lib.pychip_webrtc_provider_client_init.argtypes = [WebRTCClientHandle, c_uint32, c_uint8, c_uint16]
+        lib.pychip_webrtc_provider_client_init.argtypes = [WebRTCClientHandle, c_uint64, c_uint8, c_uint16]
         lib.pychip_webrtc_provider_client_init_commandsender_callbacks.argtypes = [
             WebRTCClientHandle,
             _OnCommandSenderResponseCallbackFunct,

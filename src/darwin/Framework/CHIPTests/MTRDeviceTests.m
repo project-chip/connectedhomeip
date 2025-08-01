@@ -32,6 +32,7 @@
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRSecureCodingTestHelpers.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestControllerDelegate.h"
@@ -3329,41 +3330,21 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
 
-- (NSData *)_encodeEncodable:(id<NSSecureCoding>)encodable
-{
-    // We know all our encodables are in fact NSObject.
-    NSObject * obj = (NSObject *) encodable;
-
-    NSError * encodeError;
-    NSData * encodedData = [NSKeyedArchiver archivedDataWithRootObject:encodable requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
-    return encodedData;
-}
-
 - (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
 {
-    NSData * encodedData = [self _encodeEncodable:encodable];
-
     // We know all our encodables are in fact NSObject.
     NSObject * obj = (NSObject *) encodable;
 
     NSError * decodeError;
-    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    id decodedValue = RoundTripEncodable(encodable, &decodeError);
     XCTAssertNil(decodeError, @"Failed to decode %@", NSStringFromClass([obj class]));
-    XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
-
     XCTAssertEqualObjects(obj, decodedValue, @"Decoding for %@ did not round-trip correctly", NSStringFromClass([obj class]));
 }
 
 - (void)_ensureDecodeFails:(id<NSSecureCoding>)encodable
 {
-    NSData * encodedData = [self _encodeEncodable:encodable];
-
-    // We know all our encodables are in fact NSObject.
-    NSObject * obj = (NSObject *) encodable;
-
     NSError * decodeError;
-    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    id decodedValue = RoundTripEncodable(encodable, &decodeError);
     XCTAssertNil(decodedValue);
     XCTAssertNotNil(decodeError);
 }

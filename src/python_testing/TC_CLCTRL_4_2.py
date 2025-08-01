@@ -177,7 +177,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         self.step("2b")
         if not is_latching_supported:
             logging.info("Latching feature is not supported, skipping remaining steps.")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped("2c")
             return
         else:
             logging.info("Latching feature is supported, proceeding with the test.")

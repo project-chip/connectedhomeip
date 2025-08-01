@@ -83,6 +83,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace Step
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ClosureDimension
 } // namespace Clusters
 } // namespace app

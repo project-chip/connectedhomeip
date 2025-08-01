@@ -67,6 +67,19 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace ReviewFabricRestrictions
 
 } // namespace Commands
+
+namespace Events {
+namespace AccessControlEntryChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace AccessControlEntryChanged
+namespace AccessControlExtensionChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace AccessControlExtensionChanged
+namespace FabricRestrictionReviewUpdate {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace FabricRestrictionReviewUpdate
+
+} // namespace Events
 } // namespace AccessControl
 } // namespace Clusters
 } // namespace app

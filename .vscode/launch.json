@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Current File with Arguments",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": []
+        },
+        {
             "name": "Python: Mock Server Tests",
             "type": "debugpy",
             "request": "launch",
@@ -50,6 +58,14 @@
             "program": "${workspaceFolder}/out/${input:outAppDarwin}",
             "args": [],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run application Energy-Gtw-Sample (Darwin arm64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/darwin-arm64-energy-gateway/chip-energy-gateway-app",
+            "args": ["--enable-key", "00112233445566778899aabbccddeeff"],
+            "cwd": "${workspaceFolder}/examples/energy-gateway-app"
         },
         {
             "name": "Run application (Linux x64)",

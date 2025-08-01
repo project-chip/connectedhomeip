@@ -62,7 +62,6 @@ static_library("ESP32") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "SystemTimeSupport.h",
   ]
 
   deps = [

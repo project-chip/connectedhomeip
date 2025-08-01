@@ -799,7 +799,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
+  command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
@@ -2756,7 +2756,7 @@ endpoint 1 {
     ram      attribute autoRelockTime default = 0;
     ram      attribute soundVolume default = 0;
     ram      attribute operatingMode default = 0;
-    ram      attribute supportedOperatingModes default = 0xFFFF;
+    ram      attribute supportedOperatingModes default = 0xFFF6;
     ram      attribute enableOneTouchLocking default = 0;
     ram      attribute enablePrivacyModeButton default = 0;
     ram      attribute wrongCodeEntryLimit default = 3;

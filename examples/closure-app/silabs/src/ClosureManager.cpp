@@ -23,6 +23,7 @@
 #include "ClosureDimensionEndpoint.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -113,6 +114,21 @@ void ClosureManager::Init()
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 2 set successfully");
     VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 3 set successfully");
+
+    TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+
+    if (pTestEventDelegate != nullptr)
+    {
+        CHIP_ERROR err = pTestEventDelegate->AddHandler(&mClosureEndpoint1.GetDelegate());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to add handler for delegate: %s", chip::ErrorStr(err));
+        }
+    }
+    else
+    {
+        ChipLogError(AppServer, "TestEventTriggerDelegate is null, cannot add handler for delegate");
+    }
 
     DeviceLayer::PlatformMgr().UnlockChipStack();
 }
@@ -224,7 +240,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
         ChipLogDetail(AppServer, "Initiating unlatch action");
         // Unlatch action check is a prerequisite for the move to action.
         // In a real application, this would be replaced with actual unlatch logic.
-        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
+        instance.StartTimer(kMotionCountdownTimeMs);
         break;
     case Action_t::SET_TARGET_ACTION:
         ChipLogDetail(AppServer, "Initiating set target action");
@@ -293,6 +309,9 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
         break;
     case Action_t::MOVE_TO_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureMotionAction(); });
+        break;
+    case Action_t::UNLATCH_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
         break;
     case Action_t::SET_TARGET_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {

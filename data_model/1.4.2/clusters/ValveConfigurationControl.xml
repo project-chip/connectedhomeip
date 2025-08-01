@@ -112,7 +112,7 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="OpenDuration" type="elapsed-s" default="null">
+    <attribute id="0x0000" name="OpenDuration" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
@@ -120,7 +120,7 @@ Davis, CA 95616, USA
         <min value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="DefaultOpenDuration" type="elapsed-s" default="null">
+    <attribute id="0x0001" name="DefaultOpenDuration" type="elapsed-s">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -128,36 +128,36 @@ Davis, CA 95616, USA
         <min value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="AutoCloseTime" type="epoch-us" default="null">
+    <attribute id="0x0002" name="AutoCloseTime" type="epoch-us">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
         <feature name="TS"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0003" name="RemainingDuration" type="elapsed-s" default="null">
+    <attribute id="0x0003" name="RemainingDuration" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0004" name="CurrentState" type="ValveStateEnum" default="null">
+    <attribute id="0x0004" name="CurrentState" type="ValveStateEnum">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0005" name="TargetState" type="ValveStateEnum" default="null">
+    <attribute id="0x0005" name="TargetState" type="ValveStateEnum">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0006" name="CurrentLevel" type="percent" default="null">
+    <attribute id="0x0006" name="CurrentLevel" type="percent">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
         <feature name="LVL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0007" name="TargetLevel" type="percent" default="null">
+    <attribute id="0x0007" name="TargetLevel" type="percent">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>

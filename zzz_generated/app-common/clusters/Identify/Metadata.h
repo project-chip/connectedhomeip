@@ -41,6 +41,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(TriggerEffect::I
 } // namespace TriggerEffect
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Identify
 } // namespace Clusters
 } // namespace app

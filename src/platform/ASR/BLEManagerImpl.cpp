@@ -400,7 +400,7 @@ void BLEManagerImpl::DriveBLEState(void)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -499,7 +499,7 @@ void BLEManagerImpl::SetAdvStartFlag(void)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "SetAdvStartFlag to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "SetAdvStartFlag to error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -516,7 +516,7 @@ void BLEManagerImpl::SetAdvEndFlag(void)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "SetAdvEndFlag to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "SetAdvEndFlag to error: %" CHIP_ERROR_FORMAT, err.Format());
     }
     if (mFlags.Has(Flags::kFlag_AdvertisingRestarted))
     {
@@ -552,7 +552,7 @@ bool BLEManagerImpl::HandleRXCharWrite(uint8_t connection_id, uint16_t length, u
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
     else
@@ -600,7 +600,7 @@ bool BLEManagerImpl::HandleTXCharCCCDWrite(uint8_t connection_id, uint16_t lengt
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
     else

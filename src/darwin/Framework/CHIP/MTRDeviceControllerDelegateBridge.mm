@@ -135,7 +135,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     BOOL wantCommissioneeInfo = [strongDelegate respondsToSelector:@selector(controller:readCommissioneeInfo:)];
     BOOL wantProductIdentity = [strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)];
     if (wantCommissioneeInfo || wantProductIdentity) {
-        auto * commissioneeInfo = [[MTRCommissioneeInfo alloc] initWithCommissioningInfo:info];
+        auto * commissioneeInfo = [[MTRCommissioneeInfo alloc] initWithCommissioningInfo:info commissioningParameters:mCommissioningParameters];
         dispatch_async(mQueue, ^{
             if (wantCommissioneeInfo) { // prefer the newer delegate method over the deprecated one
                 [strongDelegate controller:strongController readCommissioneeInfo:commissioneeInfo];
@@ -144,6 +144,9 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
             }
         });
     }
+
+    // Don't hold on to the commissioning parameters now that we don't need them anymore.
+    mCommissioningParameters = nil;
 }
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
@@ -213,4 +216,9 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId
 void MTRDeviceControllerDelegateBridge::SetDeviceNodeID(chip::NodeId deviceNodeId)
 {
     mDeviceNodeId = deviceNodeId;
+}
+
+void MTRDeviceControllerDelegateBridge::SetCommissioningParameters(MTRCommissioningParameters * commissioningParameters)
+{
+    mCommissioningParameters = commissioningParameters;
 }

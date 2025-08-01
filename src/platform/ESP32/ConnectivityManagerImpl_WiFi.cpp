@@ -108,7 +108,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
             return;
         }
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);

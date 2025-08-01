@@ -248,7 +248,7 @@ limitations under the License.
     <!-- NOTE: write_only_int8u should not have been added in the 0x4... range
          where the nullable versions of attributes go, but now we have to be a
          bit careful about our attribute IDs as a result. -->
-    <attribute side="server" code="0x402A" define="WRITE_ONLY_INT8U" type="int8u" writable="true" default="0" optional="true">write_only_int8u</attribute>
+    <attribute side="server" code="0x402A" define="WRITE_ONLY_INT8U" type="int8u" writable="true" readable="false" default="0" optional="true">write_only_int8u</attribute>
 
     <attribute side="server" code="0x4033" define="NULLABLE_GLOBAL_ENUM" type="TestGlobalEnum" isNullable="true" writable="true">nullable_global_enum</attribute>
     <attribute side="server" code="0x4034" define="NULLABLE_GLOBAL_STRUCT" type="TestGlobalStruct" isNullable="true" writable="true">nullable_global_struct</attribute>

@@ -243,6 +243,7 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
 
     chip::Optional<chip::DataVersion> dataVersion;
     dataVersion.SetValue(kAcceptedDataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
@@ -282,6 +283,9 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
     };
 
     chip::Optional<chip::DataVersion> dataVersion(kRejectedDataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    static_assert(kAcceptedDataVersion != kRejectedDataVersion);
+
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 

@@ -69,6 +69,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(OnWithTimedOff::
 } // namespace OnWithTimedOff
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace OnOff
 } // namespace Clusters
 } // namespace app

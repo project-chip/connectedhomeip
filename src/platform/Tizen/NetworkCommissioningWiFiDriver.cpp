@@ -20,7 +20,6 @@
 #include <limits>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -140,8 +139,8 @@ void TizenWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %.*s",
-                    static_cast<int>(sizeof(mStagingNetwork.ssid)), reinterpret_cast<char *>(mStagingNetwork.ssid));
+    ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %s",
+                    NullTerminated(mStagingNetwork.ssid, mStagingNetwork.ssidLen).c_str());
 
     err = DeviceLayer::Internal::WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid),
                                                    reinterpret_cast<char *>(mStagingNetwork.credentials), callback);
@@ -154,7 +153,7 @@ exit:
 
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
 }

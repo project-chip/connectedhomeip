@@ -123,7 +123,8 @@ class TC_JCM_1_1(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -182,7 +183,8 @@ class TC_JCM_1_1(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -396,6 +398,10 @@ class TC_JCM_1_1(MatterBaseTest):
             int('0xFFFFFFFD'+self.ecoBCATs, 16),
             response[0][Clusters.AccessControl].acl[0].subjects[0],
             "EcoA Server App Subjects field has wrong value")
+
+        # Shutdown the Python Controllers started at the beginning of this script
+        devCtrlEcoA.Shutdown()
+        devCtrlEcoB.Shutdown()
 
 
 if __name__ == "__main__":

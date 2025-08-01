@@ -81,6 +81,43 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelfTestRequest:
 } // namespace SelfTestRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace SmokeAlarm {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SmokeAlarm
+namespace COAlarm {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace COAlarm
+namespace LowBattery {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LowBattery
+namespace HardwareFault {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace HardwareFault
+namespace EndOfService {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EndOfService
+namespace SelfTestComplete {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SelfTestComplete
+namespace AlarmMuted {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace AlarmMuted
+namespace MuteEnded {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MuteEnded
+namespace InterconnectSmokeAlarm {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace InterconnectCOAlarm
+namespace AllClear {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace AllClear
+
+} // namespace Events
 } // namespace SmokeCoAlarm
 } // namespace Clusters
 } // namespace app

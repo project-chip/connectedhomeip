@@ -28,7 +28,7 @@ base. They should be easy to review, as a "yes, that's better". Refrain from
 requesting review until all PR checks have completed successfully, lest you tire
 your reviewers.
 
-See a guideline [here](./pull_request_guidelines.md)
+See a guideline [here](./contributing/pull_request_guidelines.md)
 
 ### Milestones
 

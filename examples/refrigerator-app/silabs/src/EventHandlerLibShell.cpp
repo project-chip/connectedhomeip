@@ -28,8 +28,7 @@ constexpr uint8_t kRefEndpointId = 1;
 
 using namespace chip;
 using namespace chip::app;
-using namespace Clusters::RefrigeratorAlarm;
-using namespace Clusters::TemperatureControl;
+using namespace chip::app::Clusters;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
@@ -113,7 +112,7 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
     int value = std::stoi(argv[0]); // Safe to use now, as we validated the input earlier
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
-    data->eventId                     = Events::Notify::Id;
+    data->eventId                     = RefrigeratorAlarm::Events::Notify::Id;
     data->doorState                   = static_cast<AlarmBitmap>(value);
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
@@ -163,7 +162,7 @@ void EventWorkerFunction(intptr_t context)
 
     switch (data->eventId)
     {
-    case Events::Notify::Id: {
+    case RefrigeratorAlarm::Events::Notify::Id: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
         RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, alarmData->doorState);
         break;

@@ -48,7 +48,10 @@ set(CHIP_CFLAGS
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
+set(CONFIG_ZEPHYR_PIGWEED_MODULE 1)
+set(CONFIG_PIGWEED_ASSERT 1)
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+add_subdirectory(${PIGWEED_ROOT} "${CMAKE_BINARY_DIR}/pigweed")
 
 # ==================================================
 # Build 'all tests' runner
@@ -58,26 +61,11 @@ project(AllChipTests)
 enable_testing()
 
 target_sources(app PRIVATE main/runner.cpp)
-target_include_directories(app PUBLIC
-  ${PIGWEED_ROOT}/pw_assert/public
-  ${PIGWEED_ROOT}/pw_assert_zephyr/public
-  ${PIGWEED_ROOT}/pw_assert_zephyr/public_overrides
-  ${PIGWEED_ROOT}/pw_bytes/public
-  ${PIGWEED_ROOT}/pw_preprocessor/public
-  ${PIGWEED_ROOT}/pw_polyfill/public
-  ${PIGWEED_ROOT}/pw_polyfill/standard_library_public
-  ${PIGWEED_ROOT}/pw_polyfill/public_overrides
-  ${PIGWEED_ROOT}/pw_result/public
-  ${PIGWEED_ROOT}/pw_span/public
-  ${PIGWEED_ROOT}/pw_span/public_overrides
-  ${PIGWEED_ROOT}/pw_status/public
-  ${PIGWEED_ROOT}/pw_string/public
-  ${PIGWEED_ROOT}/pw_unit_test/public
-  ${PIGWEED_ROOT}/pw_unit_test/light_public_overrides
-  ${PIGWEED_ROOT}/pw_containers/public
-  ${PIGWEED_ROOT}/third_party/fuchsia/repo/sdk/lib/stdcompat/include
+target_link_libraries(app PUBLIC
+  chip
+  $<TARGET_FILE:kernel>
+  pw_unit_test
 )
-target_link_libraries(app PUBLIC chip $<TARGET_FILE:kernel>)
 target_compile_definitions(app PUBLIC CHIP_HAVE_CONFIG_H)
 
 add_test(AllChipTests zephyr/zephyr.exe)

@@ -47,11 +47,6 @@ config HWINFO
 	bool
 	default y
 
-# Generic networking options
-config NET_SOCKETS_POSIX_NAMES
-	bool
-	default n
-
 # Application stack size
 config MAIN_STACK_SIZE
 	int

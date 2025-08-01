@@ -54,6 +54,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id
 } // namespace ChangeToMode
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ModeSelect
 } // namespace Clusters
 } // namespace app

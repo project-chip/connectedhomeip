@@ -51672,8 +51672,11 @@ class JointFabricAdministrator(Cluster):
             kUnknownEnumValue = 3
 
         class StatusCodeEnum(MatterIntEnum):
-            kVIDNotVerified = 0x02
-            kInvalidAdministratorFabricIndex = 0x03
+            kBusy = 0x02
+            kPAKEParameterError = 0x03
+            kWindowNotOpen = 0x04
+            kVIDNotVerified = 0x05
+            kInvalidAdministratorFabricIndex = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown

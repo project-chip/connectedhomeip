@@ -42,7 +42,10 @@ get_filename_component(NXP_MATTER_SUPPORT_DIR ${CHIP_ROOT}/third_party/nxp/nxp_m
 # Add the CHIP stack & NXP port libs as an external module
 list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/config/nxp/chip-cmake-freertos)
 
-# If CONF_FILE_NAME is provided, add the full path in front of CONF_FILE
+# Add se05x secure element library as an external module
+list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter)
+
+# If CONF_FILE_NAME is provided, append its full path to CONF_FILE
 if (DEFINED CONF_FILE_NAME)
     set(CONF_FILE ${CHIP_ROOT}/examples/platform/nxp/config/${CONF_FILE_NAME} ${CONF_FILE})
 endif()

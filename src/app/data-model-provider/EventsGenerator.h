@@ -16,20 +16,23 @@
  */
 #pragma once
 
+#include <app/ConcreteEventPath.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <optional>
-#include <type_traits>
 
 namespace chip {
 namespace app {
 namespace DataModel {
+
+class EventsGenerator;
 
 namespace internal {
 template <typename T>
@@ -46,60 +49,29 @@ private:
     const T & mEventData;
 };
 
-template <typename G, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
+                                         EventLoggingDelegate & delegate, bool isFabricSensitiveEvent);
+
+template <typename G, typename T>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
 {
     internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-    ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
+
+    constexpr bool isFabricScoped = DataModel::IsFabricScoped<T>::value;
+
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    if constexpr (isFabricScoped)
+    {
+        fabricIndex = aEventData.GetFabricIndex();
+    }
+
     EventOptions eventOptions;
-    eventOptions.mPath        = path;
+
+    eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
-    eventOptions.mFabricIndex = aEventData.GetFabricIndex();
+    eventOptions.mFabricIndex = fabricIndex;
 
-    // this skips generating the event if it is fabric-scoped but the provided event data is not
-    // associated with any fabric.
-    if (eventOptions.mFabricIndex == kUndefinedFabricIndex)
-    {
-        ChipLogError(EventLogging, "Event encode failure: no fabric index for fabric scoped event");
-        return std::nullopt;
-    }
-
-    //
-    // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,
-    // fabric-sensitive events don't require that since the actual omission of the event in its entirety
-    // happens within the event management framework itself at the time of access.
-    //
-    // The 'mFabricIndex' field in the event options above is encoded out-of-band alongside the event payload
-    // and used to match against the accessing fabric.
-    //
-    EventNumber eventNumber;
-    CHIP_ERROR err = generator.GenerateEvent(&eventPayloadWriter, eventOptions, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(EventLogging, "Failed to generate event: %" CHIP_ERROR_FORMAT, err.Format());
-        return std::nullopt;
-    }
-
-    return eventNumber;
-}
-
-template <typename G, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
-std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId endpointId)
-{
-    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-    ConcreteEventPath path(endpointId, aEventData.GetClusterId(), aEventData.GetEventId());
-    EventOptions eventOptions;
-    eventOptions.mPath     = path;
-    eventOptions.mPriority = aEventData.GetPriorityLevel();
-    EventNumber eventNumber;
-    CHIP_ERROR err = generator.GenerateEvent(&eventPayloadWriter, eventOptions, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(EventLogging, "Failed to generate event: %" CHIP_ERROR_FORMAT, err.Format());
-        return std::nullopt;
-    }
-
-    return eventNumber;
+    return GenerateEvent(eventOptions, generator, eventPayloadWriter, isFabricScoped);
 }
 
 } // namespace internal

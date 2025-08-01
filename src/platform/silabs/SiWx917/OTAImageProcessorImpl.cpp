@@ -139,7 +139,6 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    int32_t status        = SL_STATUS_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     if (imageProcessor == nullptr)
@@ -212,8 +211,6 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
-    int32_t status = SL_STATUS_OK;
-
     ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::HandleApply()");
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
@@ -256,7 +253,6 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
     int32_t status        = SL_STATUS_OK;
-    int32_t content_block = 0;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -274,7 +270,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (chip_error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Matter image header parser error %s", chip::ErrorStr(chip_error));
+        ChipLogError(SoftwareUpdate, "Matter image header parser error: %" CHIP_ERROR_FORMAT, chip_error.Format());
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return;
     }

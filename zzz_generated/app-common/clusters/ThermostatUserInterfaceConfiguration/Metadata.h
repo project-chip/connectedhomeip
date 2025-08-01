@@ -36,6 +36,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ScheduleProgrammingVis
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ThermostatUserInterfaceConfiguration
 } // namespace Clusters
 } // namespace app

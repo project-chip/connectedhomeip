@@ -198,6 +198,23 @@ It is also supported to provide Kconfig symbols in the build command line with
 `-DCONFIG_CHIP_DEVICE_DISCRIMINATOR=3841` will set the discriminator Kconfig
 `CONFIG_CHIP_DEVICE_DISCRIMINATOR` to `3841`.
 
+###### CMake Build with Secure Element
+
+-   Build the example with below kconfig options to offload crypto operations to
+    SE05x using CMAKE configuration :
+
+```
+-DCONFIG_CHIP_SE05X=y
+```
+
+To enable secure channel protocol use kconfig `-DCONFIG_SE05X_SCP03` Example :
+
+```
+ubuntu@ubuntu-Latitude-5420:~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y
+```
+
+Refer [SE05x](./nxp_se05x_guide.md) for more details on configurations of SE05x.
+
 #### GN build system
 
 NXP CHIP examples support to build with GN build system. The configuration of

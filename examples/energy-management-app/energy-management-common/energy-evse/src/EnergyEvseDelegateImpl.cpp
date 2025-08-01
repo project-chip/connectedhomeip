@@ -730,8 +730,9 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
 Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
 
-    if (!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value()))
+    if ((!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value())) || (mVehicleID.IsNull() && newValue.empty()))
     {
+        // No change in VehicleID, nothing to do
         return Status::Success;
     }
 
@@ -753,7 +754,7 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
     memcpy(mVehicleIDBuf, newValue.data(), newValue.size());
     mVehicleID = MakeNullable(CharSpan(mVehicleIDBuf, newValue.size()));
 
-    ChipLogDetail(AppServer, "VehicleID updated %.*s", static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data());
+    ChipLogDetail(AppServer, "VehicleID updated %s", NullTerminated(mVehicleID.Value()).c_str());
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
 
     return Status::Success;
@@ -770,6 +771,12 @@ CHIP_ERROR EnergyEvseDelegate::HwGetVehicleID(DataModel::Nullable<MutableCharSpa
     {
         outValue.SetNull();
         return CHIP_NO_ERROR;
+    }
+
+    if (outValue.IsNull())
+    {
+        // Defensive: outValue must be non-null to copy into it
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return CopyCharSpanToMutableCharSpan(mVehicleID.Value(), outValue.Value());

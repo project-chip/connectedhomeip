@@ -64,6 +64,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GoHome::Id, BitF
 } // namespace GoHome
 
 } // namespace Commands
+
+namespace Events {
+namespace OperationalError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationalError
+namespace OperationCompletion {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationCompletion
+
+} // namespace Events
 } // namespace RvcOperationalState
 } // namespace Clusters
 } // namespace app

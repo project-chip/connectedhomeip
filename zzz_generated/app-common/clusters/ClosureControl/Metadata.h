@@ -65,6 +65,22 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace Calibrate
 
 } // namespace Commands
+
+namespace Events {
+namespace OperationalError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationalError
+namespace MovementCompleted {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MovementCompleted
+namespace EngageStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EngageStateChanged
+namespace SecureStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SecureStateChanged
+
+} // namespace Events
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app

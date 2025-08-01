@@ -119,7 +119,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         webrtc_peer.set_remote_offer(remote_offer_sdp)
 
         self.step(3)
-        local_answer = webrtc_peer.get_local_answer()
+        local_answer = await webrtc_peer.get_local_answer()
         await self.send_single_cmd(
             cmd=WebRTCTransportRequestor.Commands.Answer(webRTCSessionID=session_id, sdp=local_answer),
             endpoint=endpoint,

@@ -59,6 +59,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Scale::Id, BitFlags<Da
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace PressureMeasurement
 } // namespace Clusters
 } // namespace app

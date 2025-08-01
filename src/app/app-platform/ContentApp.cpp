@@ -159,7 +159,7 @@ CHIP_ERROR ContentAppClientCommandSender::SendMessage(chip::Messaging::ExchangeM
     CHIP_ERROR err       = cluster.InvokeCommand(request, nullptr, OnCommandResponse, OnCommandFailure);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Controller, "ContentAppClientCommandSender SendMessage error err %s", ErrorStr(err));
+        ChipLogDetail(Controller, "ContentAppClientCommandSender SendMessage error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     mIsBusy = false;
@@ -170,7 +170,7 @@ CHIP_ERROR ContentAppClientCommandSender::SendMessage(chip::Messaging::ExchangeM
 
 void ContentAppClientCommandSender::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR err)
 {
-    ChipLogProgress(Controller, "ContentAppClientCommandSender::OnDeviceConnectedFn error err %s", ErrorStr(err));
+    ChipLogProgress(Controller, "ContentAppClientCommandSender::OnDeviceConnectedFn error: %" CHIP_ERROR_FORMAT, err.Format());
 
     ContentAppClientCommandSender * sender = reinterpret_cast<ContentAppClientCommandSender *>(context);
     VerifyOrReturn(sender != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
@@ -191,7 +191,7 @@ void ContentAppClientCommandSender::OnCommandResponse(void * context, const Cont
 
 void ContentAppClientCommandSender::OnCommandFailure(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "ContentAppClientCommandSender::OnCommandFailure error err %s", ErrorStr(error));
+    ChipLogProgress(Controller, "ContentAppClientCommandSender::OnCommandFailure error: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
 } // namespace AppPlatform

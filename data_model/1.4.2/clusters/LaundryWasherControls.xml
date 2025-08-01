@@ -113,7 +113,7 @@ Davis, CA 95616, USA
         <maxCount value="16"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="SpinSpeedCurrent" type="uint8" default="desc">
+    <attribute id="0x0001" name="SpinSpeedCurrent" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -123,7 +123,7 @@ Davis, CA 95616, USA
         <max value="15"/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="NumberOfRinses" type="NumberOfRinsesEnum" default="1">
+    <attribute id="0x0002" name="NumberOfRinses" type="NumberOfRinsesEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform>
         <feature name="RINSE"/>

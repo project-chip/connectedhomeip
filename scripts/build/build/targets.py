@@ -266,6 +266,8 @@ def BuildEfr32Target():
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4342a', board=Efr32Board.BRD4342A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd2708a', board=Efr32Board.BRD2708A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd2911a', board=Efr32Board.BRD2911A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -568,6 +570,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
     target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw71")
     target.AppendModifier(name="no-ble", disable_ble=True)
+    target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
 
     return target
 

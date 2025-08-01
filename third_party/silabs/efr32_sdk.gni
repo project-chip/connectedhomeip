@@ -500,7 +500,6 @@ template("efr32_sdk") {
       "SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE=\"sl_openthread_features_config.h\"",
       "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
       "CIRCULAR_QUEUE_USE_LOCAL_CONFIG_HEADER=1",
-      "SILABS_LOG_OUT_UART=${sl_uart_log_output}",
       "SL_RAIL_3_API=1",
       "SL_CODE_COMPONENT_OPENTHREAD=openthread",
       "SL_CODE_COMPONENT_INTERRUPT_MANAGER=interrupt_manager",
@@ -510,6 +509,12 @@ template("efr32_sdk") {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {
       defines += [ "SILABS_LOG_ENABLED=0" ]
+    }
+
+    if (sl_uart_log_output) {
+      defines += [ "SILABS_LOG_OUT_UART=1" ]
+    } else {
+      defines += [ "SILABS_LOG_OUT_UART=0" ]
     }
 
     if (use_silabs_thread_lib) {

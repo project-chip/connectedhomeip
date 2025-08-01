@@ -60,6 +60,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Start::Id, BitFl
 } // namespace Start
 
 } // namespace Commands
+
+namespace Events {
+namespace OperationalError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationalError
+namespace OperationCompletion {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationCompletion
+
+} // namespace Events
 } // namespace OvenCavityOperationalState
 } // namespace Clusters
 } // namespace app

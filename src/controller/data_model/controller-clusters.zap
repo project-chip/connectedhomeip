@@ -3010,14 +3010,6 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "GetTariffComponent",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
               "name": "GetTariffComponentResponse",
               "code": 0,
               "mfgCode": null,
@@ -3026,8 +3018,8 @@
               "isEnabled": 1
             },
             {
-              "name": "GetDayEntry",
-              "code": 1,
+              "name": "GetTariffComponent",
+              "code": 0,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
@@ -3039,6 +3031,14 @@
               "mfgCode": null,
               "source": "server",
               "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetDayEntry",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
               "isEnabled": 1
             }
           ]
