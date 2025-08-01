@@ -570,6 +570,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
     target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw71")
     target.AppendModifier(name="no-ble", disable_ble=True)
+    target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
 
     return target
 

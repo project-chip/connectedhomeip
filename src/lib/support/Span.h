@@ -54,8 +54,9 @@ public:
         VerifyOrDie(databuf != nullptr || datalen == 0); // not constexpr on some platforms
     }
 
-    // A Span can only point to null if it is empty (size == 0). The default constructor
-    // should be used to construct empty Spans. All other cases involving null are invalid.
+    // The only valid length for a span pointing to null is 0 (i.e. it's an empty span).  Disallow
+    // construction of spans from compile-time-known null.  The default constructor should be used
+    // to construct empty Spans. All other cases involving null are invalid.
     Span(std::nullptr_t null, size_t size) = delete;
 
     // Creates a Span view of a plain array.
@@ -210,6 +211,10 @@ template <class T>
 Span(T * data, size_t size) -> Span<T>;
 template <class T, size_t N>
 Span(T (&databuf)[N]) -> Span<T>;
+template <class T, size_t N>
+Span(std::array<T, N> & data) -> Span<T>;
+template <class T, size_t N>
+Span(const std::array<T, N> & data) -> Span<const T>;
 
 inline namespace literals {
 

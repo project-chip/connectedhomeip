@@ -24,43 +24,55 @@ namespace {
 
 using namespace chip;
 
+template <size_t N>
+class TestStringBuilder
+{
+    StringBuilder<N> builder;
+
+public:
+    template <typename... Args>
+    TestStringBuilder(Args &&... args) : builder(std::forward<Args>(args)...)
+    {}
+
+    template <typename F>
+    void Check(F check)
+    {
+        check(builder);
+    }
+};
+
 TEST(TestStringBuilder, TestStringBuilder)
 {
+    TestStringBuilder<64>().Check([](StringBuilderBase & builder) {
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "");
 
-    StringBuilder<64> builder;
+        builder.Add("foo");
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "foo");
 
-    EXPECT_TRUE(builder.Fit());
-    EXPECT_STREQ(builder.c_str(), "");
-
-    builder.Add("foo");
-    EXPECT_TRUE(builder.Fit());
-    EXPECT_STREQ(builder.c_str(), "foo");
-
-    builder.Add("bar");
-    EXPECT_TRUE(builder.Fit());
-    EXPECT_STREQ(builder.c_str(), "foobar");
+        builder.Add("bar");
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "foobar");
+    });
 }
 
 TEST(TestStringBuilder, TestIntegerAppend)
 {
+    TestStringBuilder<64>().Check([](StringBuilderBase & builder) {
+        builder.Add("nr: ").Add(1234);
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "nr: 1234");
 
-    StringBuilder<64> builder;
-
-    builder.Add("nr: ").Add(1234);
-    EXPECT_TRUE(builder.Fit());
-    EXPECT_STREQ(builder.c_str(), "nr: 1234");
-
-    builder.Add(", ").Add(-22);
-    EXPECT_TRUE(builder.Fit());
-    EXPECT_STREQ(builder.c_str(), "nr: 1234, -22");
+        builder.Add(", ").Add(-22);
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "nr: 1234, -22");
+    });
 }
 
 TEST(TestStringBuilder, TestOverflow)
 {
-
-    {
-        StringBuilder<4> builder;
-
+    TestStringBuilder<4>().Check([](StringBuilderBase & builder) {
         builder.Add("foo");
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "foo");
@@ -68,129 +80,95 @@ TEST(TestStringBuilder, TestOverflow)
         builder.Add("bar");
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "foo");
-    }
+    });
 
-    {
-        StringBuilder<7> builder;
-
+    TestStringBuilder<7>().Check([](StringBuilderBase & builder) {
         builder.Add("x: ").Add(12345);
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "x: 123");
-    }
+    });
 }
 
 TEST(TestStringBuilder, TestFormat)
 {
-    {
-        StringBuilder<100> builder;
-
+    TestStringBuilder<100>().Check([](StringBuilderBase & builder) {
         builder.AddFormat("Test: %d Hello %s\n", 123, "world");
-
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "Test: 123 Hello world\n");
-    }
+    });
 
-    {
-        StringBuilder<100> builder;
-
+    TestStringBuilder<100>().Check([](StringBuilderBase & builder) {
         builder.AddFormat("Align: %-5s", "abc");
-
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "Align: abc  ");
-    }
+    });
 
-    {
-        StringBuilder<100> builder;
-
-        builder.AddFormat("Multi: %d", 1234);
-        builder.AddFormat(", then 0x%04X", 0xab);
-
+    TestStringBuilder<100>().Check([](StringBuilderBase & builder) {
+        builder.AddFormat("Multi: %d", 1234).AddFormat(", then 0x%04X", 0xab);
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "Multi: 1234, then 0x00AB");
-    }
+    });
 
-    {
-        const char str[]      = "1234567890";
-        const char expected[] = "1234567890";
+    const char str[] = "1234567890";
 
-        StringBuilder<11> builder1(str, strlen(str));
-        EXPECT_TRUE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    const char expected[] = "1234567890";
 
-        StringBuilder<11> builder2(CharSpan::fromCharString(str));
-        EXPECT_TRUE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    auto check = [&](StringBuilderBase & builder) {
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), expected);
+    };
 
-    {
-        const uint8_t str[]   = "12\x01"
-                                "34\x02"
-                                "56\x03"
-                                "7890";
-        const char expected[] = "12.34.56.7890";
+    TestStringBuilder<11>(str, strlen(str)).Check(check);
 
-        StringBuilder<14> builder1(str, strlen(reinterpret_cast<const char *>(str)));
-        EXPECT_TRUE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    TestStringBuilder<11>(CharSpan::fromCharString(str)).Check(check);
 
-        StringBuilder<14> builder2(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))));
-        EXPECT_TRUE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    const uint8_t str2[] = "12\x01"
+                           "34\x02"
+                           "56\x03"
+                           "7890";
 
-    {
-        const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0' };
-        const char expected[] = "12.34.56.7890";
+    const char expected2[] = "12.34.56.7890";
 
-        StringBuilder<14> builder1(bytes, sizeof(bytes));
-        EXPECT_TRUE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    auto check2 = [&](StringBuilderBase & builder) {
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), expected2);
+    };
 
-        StringBuilder<14> builder2(ByteSpan(bytes, sizeof(bytes)));
-        EXPECT_TRUE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    TestStringBuilder<14>(str2, strlen(reinterpret_cast<const char *>(str2))).Check(check2);
 
-    {
-        const char str[]      = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0' };
-        const char expected[] = "12.34.56.7890";
+    TestStringBuilder<14>(ByteSpan(str2, strlen(reinterpret_cast<const char *>(str2)))).Check(check2);
 
-        StringBuilder<14> builder1(CharSpan(str, sizeof(str)));
-        EXPECT_TRUE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0' };
 
-        StringBuilder<14> builder2(str, sizeof(str));
-        EXPECT_TRUE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    TestStringBuilder<14>(bytes, sizeof(bytes)).Check(check2);
+
+    TestStringBuilder<14>(ByteSpan(bytes, sizeof(bytes))).Check(check2);
+
+    const char arr[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0' };
+
+    TestStringBuilder<14>(CharSpan(arr, sizeof(arr))).Check(check2);
+
+    TestStringBuilder<14>(arr, sizeof(arr)).Check(check2);
 }
 
 TEST(TestStringBuilder, TestFormatOverflow)
 {
-    {
-        StringBuilder<13> builder;
-
+    TestStringBuilder<13>().Check([](StringBuilderBase & builder) {
         builder.AddFormat("Test: %d Hello %s\n", 123, "world");
-
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "Test: 123 He");
-    }
+    });
 
-    {
-        StringBuilder<11> builder;
-
+    TestStringBuilder<11>().Check([](StringBuilderBase & builder) {
         builder.AddFormat("%d %d %d %d %d", 1, 2, 3, 4, 1234);
-
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "1 2 3 4 12");
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "1 2 3 4...");
-    }
+    });
 
-    {
-        StringBuilder<11> builder;
-
+    TestStringBuilder<11>().Check([](StringBuilderBase & builder) {
         builder.AddFormat("%d", 1234);
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "1234");
@@ -208,180 +186,137 @@ TEST(TestStringBuilder, TestFormatOverflow)
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "1234abc...");
-    }
+    });
 
-    {
-        const char str[]      = "1234567890a";
-        const char expected[] = "1234567890";
+    const char str[] = "1234567890a";
 
-        StringBuilder<11> builder1(str, strlen(str), false);
-        EXPECT_FALSE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    const char expected[] = "1234567890";
 
-        StringBuilder<11> builder2(CharSpan::fromCharString(str), false);
-        EXPECT_FALSE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    auto check = [&](StringBuilderBase & builder) {
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), expected);
+    };
 
-    {
-        const uint8_t str[]   = "12\x01"
-                                "34\x02"
-                                "56\x03"
-                                "7890a";
-        const char expected[] = "12.34.56.7890";
+    TestStringBuilder<11>(str, strlen(str), false).Check(check);
 
-        StringBuilder<14> builder1(str, strlen(reinterpret_cast<const char *>(str)), false);
-        EXPECT_FALSE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    TestStringBuilder<11>(CharSpan::fromCharString(str), false).Check(check);
 
-        StringBuilder<14> builder2(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))), false);
-        EXPECT_FALSE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    const uint8_t str2[] = "12\x01"
+                           "34\x02"
+                           "56\x03"
+                           "7890a";
 
-    {
-        const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
-        const char expected[] = "12.34.56.7890";
+    const char expected2[] = "12.34.56.7890";
 
-        StringBuilder<14> builder1(bytes, sizeof(bytes), false);
-        EXPECT_FALSE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    auto check2 = [&](StringBuilderBase & builder) {
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), expected2);
+    };
 
-        StringBuilder<14> builder2(ByteSpan(bytes, sizeof(bytes)), false);
-        EXPECT_FALSE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    TestStringBuilder<14>(str2, strlen(reinterpret_cast<const char *>(str2)), false).Check(check2);
 
-    {
-        const char str[]      = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
-        const char expected[] = "12.34.56.7890";
+    TestStringBuilder<14>(ByteSpan(str2, strlen(reinterpret_cast<const char *>(str2))), false).Check(check2);
 
-        StringBuilder<14> builder1(CharSpan(str, sizeof(str)), false);
-        EXPECT_FALSE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
 
-        StringBuilder<14> builder2(str, sizeof(str), false);
-        EXPECT_FALSE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    TestStringBuilder<14>(bytes, sizeof(bytes), false).Check(check2);
+
+    TestStringBuilder<14>(ByteSpan(bytes, sizeof(bytes)), false).Check(check2);
+
+    const char arr[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
+
+    TestStringBuilder<14>(CharSpan(arr, sizeof(arr)), false).Check(check2);
+
+    TestStringBuilder<14>(arr, sizeof(arr), false).Check(check2);
 }
 
 TEST(TestStringBuilder, TestOverflowMarker)
 {
-    {
-        StringBuilder<1> builder; // useless builder, but ok
-
+    TestStringBuilder<1>().Check([](StringBuilderBase & builder) {
         builder.Add("abc123");
-
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "");
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "");
-    }
+    });
 
-    {
-        StringBuilder<2> builder;
-
+    TestStringBuilder<2>().Check([](StringBuilderBase & builder) {
         builder.Add("abc123");
-
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "a");
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), ".");
-    }
+    });
 
-    {
-        StringBuilder<3> builder;
-
+    TestStringBuilder<3>().Check([](StringBuilderBase & builder) {
         builder.Add("abc123");
-
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "ab");
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "..");
-    }
+    });
 
-    {
-        StringBuilder<4> builder;
-
+    TestStringBuilder<4>().Check([](StringBuilderBase & builder) {
         builder.Add("abc123");
-
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "abc");
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "...");
-    }
+    });
 
-    {
-        StringBuilder<5> builder;
-
+    TestStringBuilder<5>().Check([](StringBuilderBase & builder) {
         builder.Add("abc123");
-
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "abc1");
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "a...");
-    }
+    });
 
-    {
-        const char str[]      = "1234567890a";
-        const char expected[] = "1234567...";
+    const char str[] = "1234567890a";
 
-        StringBuilder<11> builder1(str, strlen(str));
-        EXPECT_FALSE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    const char expected[] = "1234567...";
 
-        StringBuilder<11> builder2(CharSpan::fromCharString(str));
-        EXPECT_FALSE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    auto check = [&](StringBuilderBase & builder) {
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), expected);
+    };
 
-    {
-        const uint8_t str[]   = "12\x01"
-                                "34\x02"
-                                "56\x03"
-                                "7890a";
-        const char expected[] = "12.34.56.7...";
+    TestStringBuilder<11>(str, strlen(str)).Check(check);
 
-        StringBuilder<14> builder1(str, strlen(reinterpret_cast<const char *>(str)));
-        EXPECT_FALSE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    TestStringBuilder<11>(CharSpan::fromCharString(str)).Check(check);
 
-        StringBuilder<14> builder2(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))));
-        EXPECT_FALSE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    const uint8_t str2[] = "12\x01"
+                           "34\x02"
+                           "56\x03"
+                           "7890a";
 
-    {
-        const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
-        const char expected[] = "12.34.56.7...";
+    const char expected2[] = "12.34.56.7...";
 
-        StringBuilder<14> builder1(bytes, sizeof(bytes));
-        EXPECT_FALSE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    auto check2 = [&](StringBuilderBase & builder) {
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), expected2);
+    };
 
-        StringBuilder<14> builder2(ByteSpan(bytes, sizeof(bytes)));
-        EXPECT_FALSE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    TestStringBuilder<14>(str2, strlen(reinterpret_cast<const char *>(str2))).Check(check2);
 
-    {
-        const char str[]      = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
-        const char expected[] = "12.34.56.7...";
+    TestStringBuilder<14>(ByteSpan(str2, strlen(reinterpret_cast<const char *>(str2)))).Check(check2);
 
-        StringBuilder<14> builder1(CharSpan(str, sizeof(str)));
-        EXPECT_FALSE(builder1.Fit());
-        EXPECT_STREQ(builder1.c_str(), expected);
+    const uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
 
-        StringBuilder<14> builder2(str, sizeof(str));
-        EXPECT_FALSE(builder2.Fit());
-        EXPECT_STREQ(builder2.c_str(), expected);
-    }
+    TestStringBuilder<14>(bytes, sizeof(bytes)).Check(check2);
+
+    TestStringBuilder<14>(ByteSpan(bytes, sizeof(bytes))).Check(check2);
+
+    const char arr[] = { '1', '2', '\0', '3', '4', '\0', '5', '6', '\0', '7', '8', '9', '0', 'a' };
+
+    TestStringBuilder<14>(CharSpan(arr, sizeof(arr))).Check(check2);
+
+    TestStringBuilder<14>(arr, sizeof(arr)).Check(check2);
 }
 
 } // namespace

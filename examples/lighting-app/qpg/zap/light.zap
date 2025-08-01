@@ -42,7 +42,7 @@
         "profileId": 259,
         "label": "MA-otarequestor",
         "name": "MA-otarequestor",
-        "deviceTypeOrder": 0
+        "deviceTypeOrder": 1
       },
       "deviceTypes": [
         {
@@ -50,7 +50,7 @@
           "profileId": 259,
           "label": "MA-otarequestor",
           "name": "MA-otarequestor",
-          "deviceTypeOrder": 0
+          "deviceTypeOrder": 1
         },
         {
           "code": 22,
@@ -58,15 +58,24 @@
           "label": "MA-rootdevice",
           "name": "MA-rootdevice",
           "deviceTypeOrder": 1
+        },
+        {
+          "code": 17,
+          "profileId": 259,
+          "label": "MA-powersource",
+          "name": "MA-powersource",
+          "deviceTypeOrder": 2
         }
       ],
       "deviceVersions": [
-        3,
-        1
+        1,
+        1,
+        0
       ],
       "deviceIdentifiers": [
         18,
-        22
+        22,
+        17
       ],
       "deviceTypeName": "MA-otarequestor",
       "deviceTypeCode": 18,
@@ -383,13 +392,6 @@
             {
               "name": "AccessControlEntryChanged",
               "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "AccessControlExtensionChanged",
-              "code": 1,
               "mfgCode": null,
               "side": "server",
               "included": 1
@@ -1155,6 +1157,22 @@
               "reportableChange": 0
             },
             {
+              "name": "WiredCurrentType",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "type": "WiredCurrentTypeEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "EndpointList",
               "code": 31,
               "mfgCode": null,
@@ -1228,7 +1246,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1244,7 +1262,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3290,7 +3308,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3306,7 +3324,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4336,7 +4354,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        4
       ],
       "deviceIdentifiers": [
         269
@@ -5456,7 +5474,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5472,7 +5490,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5488,7 +5506,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5504,7 +5522,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6308,7 +6326,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0x009A",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -6430,7 +6448,7 @@
       "profileId": 259,
       "endpointId": 1,
       "networkId": 0,
-      "parentEndpointIdentifier": null
+      "parentEndpointIdentifier": 0
     }
   ]
 }
