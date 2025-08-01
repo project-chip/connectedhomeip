@@ -15,11 +15,10 @@
 #    limitations under the License.
 #
 
-import asyncio
 import json
 import logging
 import time
-from asyncio import Event, TimeoutError, create_task, sleep, wait_for
+from asyncio import Event, TimeoutError, Semaphore, create_task, sleep, wait_for, gather
 from typing import Dict, List, Optional
 
 from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
@@ -486,7 +485,7 @@ class MdnsDiscovery:
         # system overload by limiting concurrent mDNS queries.
         if query_service:
             logger.info("Querying service information for discovered services...")
-            semaphore = asyncio.Semaphore(5)  # Limit to 5 concurrent queries
+            semaphore = Semaphore(5)  # Limit to 5 concurrent queries
 
             async def limited_query(ptr):
                 async with semaphore:
@@ -504,7 +503,7 @@ class MdnsDiscovery:
 
             self._discovered_services = {}
 
-            await asyncio.gather(*tasks)
+            await gather(*tasks)
 
             if append_results and log_output:
                 self._log_output()
