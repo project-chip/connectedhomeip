@@ -32,9 +32,9 @@ bool ShortString::SetContent(CharSpan value)
     return true;
 }
 
-bool ShortStringIO::FinalizeRead(MutableByteSpan actuallyRead)
+bool ShortStringWriteIO::FinalizeRead(ByteSpan actuallyRead)
 {
-    if (!ShortPascalString::IsValid({ reinterpret_cast<const char *>(actuallyRead.data()), actuallyRead.size() }))
+    if (!ShortPascalString::IsValid(actuallyRead))
     {
         mValue.SetContent(""_span);
         return false;

@@ -48,7 +48,7 @@ public:
         // for a buffer to be usable we need 1 byte for size, 1 byte for content and 1 byte for null terminator.
         // Strings without any size make no sense.
         VerifyOrDie(buffer_size >= 3);
-        VerifyOrDie(buffer_size < 256);
+        VerifyOrDie(buffer_size <= 1 + 254 + 1); // prefix + 254 length string + null terminator
     }
 
     /// Returns the content as a character span
@@ -61,7 +61,8 @@ public:
     /// If the set fails, the value is set to empty string and false is returned.
     bool SetContent(CharSpan value);
 
-    friend class ShortStringIO;
+    friend class ShortStringReadIO;
+    friend class ShortStringWriteIO;
 
 private:
     char * mBuffer;
@@ -77,29 +78,44 @@ private:
 /// Provides internal access and processing to a ShortString class.
 ///
 /// Meant for internal use only, this is NOT public API outside the SDK code itself.
-class ShortStringIO
+class ShortStringWriteIO
 {
 public:
-    ShortStringIO(ShortString & value) : mValue(value) {}
-    MutableByteSpan ReadBuffer()
-    {
-        return { reinterpret_cast<uint8_t *>(mValue.mBuffer), static_cast<size_t>(mValue.mPascalSize) };
-    }
+    ShortStringWriteIO(ShortString & value) : mValue(value) {}
+    MutableByteSpan ReadBuffer() { return mValue.AsPascal().RawFullBuffer(); }
 
     /// Method to be called once data has been read into ReadBuffer
     ///
     /// Validates that the read span is valid, sets the value to empty string on failure.
-    bool FinalizeRead(MutableByteSpan actuallyRead);
-
-    ByteSpan ContentWithPrefix() const { return mValue.AsPascal().ContentWithLenPrefix(); }
+    /// ByteSpan MUST be a subset of the buffer inside of the mValue.AsPascal().
+    bool FinalizeRead(ByteSpan actuallyRead);
 
 private:
     ShortString & mValue;
 };
 
+/// Provides internal access and processing to a ShortString class.
+///
+/// Meant for internal use only, this is NOT public API outside the SDK code itself.
+class ShortStringReadIO
+{
+public:
+    ShortStringReadIO(const ShortString & value) : mValue(value) {}
+    ByteSpan ContentWithPrefix() const { return mValue.AsPascal().ContentWithLenPrefix(); }
+
+private:
+    const ShortString & mValue;
+};
+
 } // namespace Internal
 
-template <size_t N, typename = std::enable_if_t<(N < 255) && (N > 1)>>
+/// Represents a string of maximum length of `N` characters
+///
+/// The string storage will be formatted specifically to support persistent storage I/O,
+/// specifically stored as a length-prefixed string and it also maintas a null terminator
+/// so that both char-span and null terminated views are usable. The storage
+/// overhead of this string is 2 bytes (one for length prefix, one for null terminator).
+template <size_t N, typename = std::enable_if_t<(N < 255) && (N > 0)>>
 class String : public Internal::ShortString
 {
 public:

@@ -61,10 +61,18 @@ public:
 
     /// Load the given string from concrete storage.
     ///
+    /// NOTE: `value` is take as an internal short string to avoid the templates that Storage::String
+    /// imply, however callers are generally expected to pass in a `Storage::String` value and
+    /// not use internal classes directly.
+    ///
     /// Returns true on success, false on failure. On failure the string is reset to empty.
     bool LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
 
     /// Store the given string in persistent storage.
+    ///
+    /// NOTE: `value` is take as an internal short string to avoid the templates that Storage::String
+    /// imply, however callers are generally expected to pass in a `Storage::String` value and
+    /// not use internal classes directly.
     CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
 
 private:

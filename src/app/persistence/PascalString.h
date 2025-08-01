@@ -164,7 +164,7 @@ public:
 
     /// Checks if the given span is a valid Pascal string: i.e. its size prefix
     /// is either Invalid (i.e. null marker) or it has a size that fits in the buffer
-    static bool IsValid(Span<const T> span)
+    static bool IsValid(ByteSpan span)
     {
         VerifyOrReturnValue(span.size() >= PREFIX_LEN, false);
         LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetContentLength(span.data());

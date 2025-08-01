@@ -61,7 +61,7 @@ bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttrib
 
 bool AttributePersistence::LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value)
 {
-    Storage::Internal::ShortStringIO io(value);
+    Storage::Internal::ShortStringWriteIO io(value);
     MutableByteSpan rawBytes = io.ReadBuffer();
 
     if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
@@ -74,7 +74,7 @@ bool AttributePersistence::LoadString(const ConcreteAttributePath & path, Storag
 
 CHIP_ERROR AttributePersistence::StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value)
 {
-    Storage::Internal::ShortStringIO io(value);
+    Storage::Internal::ShortStringReadIO io(value);
     return mProvider.WriteValue(path, io.ContentWithPrefix());
 }
 
