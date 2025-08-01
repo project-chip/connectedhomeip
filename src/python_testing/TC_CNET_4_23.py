@@ -162,11 +162,11 @@ class TC_CNET_4_23(MatterBaseTest):
         marker_index = operational_dataset.find(ext_pan_id_marker)
         asserts.assert_true(
             marker_index != -1 and len(operational_dataset) >= marker_index + len(ext_pan_id_marker) + 8,
-            f"Could not find ExtPANID marker in PIXIT dataset or dataset too short in PIXIT bytes."
+            "Could not find ExtPANID marker in PIXIT dataset or dataset too short in PIXIT bytes."
         )
         ext_pan_id_start = marker_index + len(ext_pan_id_marker)
         th_xpan_1 = operational_dataset[ext_pan_id_start: ext_pan_id_start + 8]
-        asserts.assert_equal(len(th_xpan_1), 8, f"Extracted ExtPANID must be 8 bytes long.")
+        asserts.assert_equal(len(th_xpan_1), 8, "Extracted ExtPANID must be 8 bytes long.")
 
         self.step(1)
         await self.default_controller.EstablishPASESessionBLE(setup_payload[0].passcode, setup_payload[0].filter_value, self.dut_node_id)
@@ -222,16 +222,8 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(7)
         networks_response = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning,
                                                                            attribute=Clusters.NetworkCommissioning.Attributes.Networks, endpoint=operating_endpoint_id)
-        index = 0
-        network_index = 0
-        verification = False
-        for network_info in networks_response:
-            if network_info.connected and network_info.networkID == network_id:
-                network_index = index
-                verification = True
-                break
-            index += 1
-        asserts.assert_true(verification, "There is no correct entry in Networks attribute list")
+        network_index = next((i for i, info in enumerate(networks_response) if info.connected and info.networkID == network_id), None)
+        asserts.assert_true(network_index != None, "There is no correct entry in Networks attribute list")
 
         self.step(8)
         remove_network_cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=network_id)
@@ -271,15 +263,8 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(13)
         networks_response = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning,
                                                                            attribute=Clusters.NetworkCommissioning.Attributes.Networks, endpoint=operating_endpoint_id)
-        verification = False
-        index = 0
-        for network_info in networks_response:
-            if network_info.connected and network_info.networkID == network_id:
-                network_index = index
-                verification = True
-                break
-            index += 1
-        asserts.assert_true(verification, "There is no correct entry in Networks attribute list")
+        network_index = next((i for i, info in enumerate(networks_response) if info.connected and info.networkID == network_id), None)
+        asserts.assert_true(network_index != None, "There is no correct entry in Networks attribute list")
 
         self.step(14)
         arm_fail_safe_results = await self.send_single_cmd(endpoint=kRootEndpointId, cmd=arm_failsafe_cmd)
@@ -324,11 +309,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(20)
         networks_response = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning,
                                                                            attribute=Clusters.NetworkCommissioning.Attributes.Networks, endpoint=operating_endpoint_id)
-        verification = False
-        for network_info in networks_response:
-            if network_info.connected and network_info.networkID == network_id:
-                verification = True
-                break
+        verification = any(info.connected and info.networkID == network_id for info in networks_response)
         asserts.assert_true(verification, "There is no correct entry in Networks attribute list")
 
 
