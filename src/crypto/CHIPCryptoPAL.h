@@ -630,6 +630,11 @@ public:
     /** Release resources associated with this key pair */
     void Clear();
 
+#if CHIP_CRYPTO_TRUSTY_OS
+    uint64_t p256_handler = 0;
+    uint8_t fabricIndex   = 0;
+#endif
+
 protected:
 #if CHIP_WITH_NLFAULTINJECTION
     mutable P256PublicKey mPublicKey;
