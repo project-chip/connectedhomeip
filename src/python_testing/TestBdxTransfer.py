@@ -39,6 +39,7 @@
 
 import asyncio
 import random
+import os
 
 import chip.clusters as Clusters
 from chip.bdx import BdxProtocol, BdxTransfer
@@ -179,6 +180,12 @@ class TestBdxTransfer(MatterBaseTest):
 
                 # Cancel the BDX receive transaction since no BDX transfer occurred (e.g., response was inline).
                 bdx_future.cancel()
+
+            # Clean up the temporary log file used in this iteration.
+            try:
+                os.remove(filename)
+            except FileNotFoundError:
+                pass
 
 
 if __name__ == "__main__":
