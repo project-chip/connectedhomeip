@@ -182,13 +182,7 @@ class Delegate
 public:
     Delegate() = default;
 
-    virtual ~Delegate() = default;
-
-    /**
-     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
-     * @param aInstance A pointer to the Instance object related to this delegate object.
-     */
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+    virtual ~Delegate() = default;    
 
     // The following functions should be overridden by the SDK user to implement the business logic of their application.
     /**
@@ -259,6 +253,12 @@ private:
     friend class Instance;
 
     Instance * mInstance = nullptr;    
+    
+    /**
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
+     * @param aInstance A pointer to the Instance object related to this delegate object.
+     */
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
     
 protected:
     Instance * GetInstance() const { return mInstance; }
