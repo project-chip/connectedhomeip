@@ -359,11 +359,10 @@ class NxpBuilder(GnBuilder):
         if self.w8801_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.88W8801=y')
 
-        if self.iwx12_transceiver:
+        if self.iwx12_transceiver or self.iw610_transceiver:
             flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X=y')
-        
         if self.iw610_transceiver:
-            flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X=y -DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.board_murata_2ll_m2=y')
+            flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.board_murata_2ll_m2=y')
 
         if self.board == NxpBoard.RT1170:
             flags.append('-Dcore_id=cm7')
