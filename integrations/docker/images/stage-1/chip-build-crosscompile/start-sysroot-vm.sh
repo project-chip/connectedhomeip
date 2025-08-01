@@ -123,7 +123,7 @@ packages:
   - libcairo2-dev
   - libcurl4-openssl-dev
   - libdbus-1-dev
-  - libgirepository1.0-dev
+  - libgirepository-2.0-dev
   - libglib2.0-dev
   - libgstreamer1.0-0
   - libgstreamer1.0-dev
