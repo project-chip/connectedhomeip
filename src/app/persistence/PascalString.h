@@ -75,7 +75,11 @@ class PascalBuffer
 {
 public:
     using LengthType                           = typename PascalPrefixOperations<PREFIX_LEN>::LengthType;
+    using ValueType                            = Span<const T>;
     static constexpr LengthType kInvalidLength = PascalPrefixOperations<PREFIX_LEN>::kInvalidLength;
+
+    /// How many bytes of buffer are needed to store a max `charCount` sized buffer.
+    static constexpr size_t BufferSizeFor(size_t charCount) { return PREFIX_LEN + charCount; }
 
     static_assert(sizeof(T) == 1);
 
@@ -89,9 +93,13 @@ public:
         static_assert(N <= kInvalidLength);
     }
 
+    /// Allocates a pascal buffer of the given size.
+    ///
+    /// buffer_size includes the prefix.
+    PascalBuffer(T * data, size_t buffer_size) : mData(data), mMaxSize(static_cast<LengthType>(buffer_size - PREFIX_LEN)) {}
+
     /// Returns the content of the pascal string.
     /// Uses the prefix size information
-    Span<T> Content() { return { mData + PREFIX_LEN, GetContentLength() }; }
     Span<const T> Content() const { return { mData + PREFIX_LEN, GetContentLength() }; }
 
     /// Accesses the "PASCAL" string (i.e. valid data including the string prefix)
@@ -161,6 +169,10 @@ public:
         LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetContentLength(span.data());
         return len == kInvalidLength || (static_cast<size_t>(len + PREFIX_LEN) <= span.size());
     }
+
+    /// Is the buffer that the pascal string points into a valid
+    /// pascal string (null or valid length?)
+    bool IsValidContent() const { return IsValid({ mData, static_cast<size_t>(mMaxSize) + PREFIX_LEN }); }
 
 private:
     T * mData;
