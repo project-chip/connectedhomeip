@@ -173,7 +173,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
      * connectivity used
      */
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ZIGBEE
     controllerMask |= conn802_15_4_c;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
