@@ -68,8 +68,8 @@ private:
     char * mBuffer;
     uint8_t mPascalSize;
 
-    ShortPascalString AsPascal() { return { mBuffer, mPascalSize }; }
-    ShortConstPascalString AsPascal() const { return { mBuffer, mPascalSize }; }
+    ShortPascalString AsPascal() { return Span{ mBuffer, mPascalSize }; }
+    ShortConstPascalString AsPascal() const { return CharSpan{ mBuffer, mPascalSize }; }
 
     /// Places a null terminator after the pascal string content, so that c_str() works
     void NullTerminate() { mBuffer[AsPascal().ContentWithLenPrefix().size()] = 0; }
