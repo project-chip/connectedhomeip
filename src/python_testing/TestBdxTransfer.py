@@ -38,8 +38,8 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import random
 import os
+import random
 
 import chip.clusters as Clusters
 from chip.bdx import BdxProtocol, BdxTransfer
