@@ -55,10 +55,6 @@ private:
     Iterator * mIterator;
 };
 
-constexpr CalendarTypeEnum DEFAULT_CALENDAR_TYPE = CalendarTypeEnum::kBuddhist;
-constexpr HourFormatEnum DEFAULT_HOUR_FORMAT     = HourFormatEnum::k12hr;
-constexpr size_t MAX_EXPECTED_ATTRIBUTE_COUNT    = 3;
-
 } // namespace
 
 void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrProvider)
@@ -74,7 +70,7 @@ void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrPro
 
 void TimeFormatLocalizationLogic::InitializeCalendarType()
 {
-    CalendarTypeEnum calendarType = DEFAULT_CALENDAR_TYPE;
+    CalendarTypeEnum calendarType = kDefaultCalendarType;
 
     // Try to read existing calendar type from persistence
     MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
@@ -86,11 +82,11 @@ void TimeFormatLocalizationLogic::InitializeCalendarType()
     // so will set it again to default.
     if (error != CHIP_NO_ERROR)
     {
-        calendarType = DEFAULT_CALENDAR_TYPE;
+        calendarType = kDefaultCalendarType;
     }
 
     // Ensure the calendar type is within the supported CalendarList, otherwise choose one from that list.
-    CalendarTypeEnum validCalendar = DEFAULT_CALENDAR_TYPE;
+    CalendarTypeEnum validCalendar = kDefaultCalendarType;
     if (!IsSupportedCalendarType(calendarType, &validCalendar))
     {
         calendarType = validCalendar;
@@ -101,7 +97,7 @@ void TimeFormatLocalizationLogic::InitializeCalendarType()
 
 void TimeFormatLocalizationLogic::InitializeHourFormat()
 {
-    HourFormatEnum hourFormat = DEFAULT_HOUR_FORMAT;
+    HourFormatEnum hourFormat = kDefaultHourFormat;
 
     MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
     CHIP_ERROR error = mAttrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, hourBytes);
@@ -111,7 +107,7 @@ void TimeFormatLocalizationLogic::InitializeHourFormat()
     // so will set it again to default.
     if (error != CHIP_NO_ERROR)
     {
-        hourFormat = DEFAULT_HOUR_FORMAT;
+        hourFormat = kDefaultHourFormat;
     }
 
     setHourFormat(hourFormat);
@@ -229,7 +225,7 @@ CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataMod
 {
     // Ensure capacity just in case
     ReturnErrorOnFailure(
-        builder.EnsureAppendCapacity(MAX_EXPECTED_ATTRIBUTE_COUNT + DefaultServerCluster::GlobalAttributes().size()));
+        builder.EnsureAppendCapacity(kMaxExpectedAttributeCount + DefaultServerCluster::GlobalAttributes().size()));
     // Mandatory attributes
     ReturnErrorOnFailure(builder.Append(HourFormat::kMetadataEntry));
 
