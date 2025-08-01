@@ -43,7 +43,7 @@ public:
     ///
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
-    template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
     bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
     {
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
