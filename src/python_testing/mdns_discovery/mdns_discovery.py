@@ -18,7 +18,7 @@
 import json
 import logging
 import time
-from asyncio import Event, TimeoutError, Semaphore, create_task, sleep, wait_for, gather
+from asyncio import Event, Semaphore, TimeoutError, create_task, gather, sleep, wait_for
 from typing import Dict, List, Optional
 
 from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
