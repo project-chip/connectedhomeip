@@ -272,8 +272,7 @@ CHIP_ERROR Instance::SetTariffUnit(DataModel::Nullable<Globals::TariffUnitEnum> 
         else if (EnsureKnownEnumValue(newValue.Value()) != Globals::TariffUnitEnum::kUnknownEnumValue)
         {
             mTariffUnit = newValue;
-            ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId,
-                          to_underlying(mTariffUnit.Value()));
+            ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId, to_underlying(mTariffUnit.Value()));
         }
         else
         {
