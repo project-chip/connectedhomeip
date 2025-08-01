@@ -3,11 +3,11 @@ coverage:
     project:
       # default is the status check's name, not default settings
       default:
-        if_ci_failed: ignore
+        if_ci_failed: success
     patch:
       # default is the status check's name, not default settings
       default:
-        if_ci_failed: ignore
+        if_ci_failed: success
 
 parsers:
   cobertura:
