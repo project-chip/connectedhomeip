@@ -152,6 +152,7 @@ TEST(TestAttributePersistence, TestStrings)
         Storage::String<16> readString;
         ASSERT_TRUE(persistence.LoadString(path, readString));
         ASSERT_TRUE(readString.Content().data_equal("foo"_span));
+        ASSERT_STREQ(readString.c_str(), "foo");
     }
 
     // fits exactly. Load should succeed
@@ -159,6 +160,7 @@ TEST(TestAttributePersistence, TestStrings)
         Storage::String<3> readString;
         ASSERT_TRUE(persistence.LoadString(path, readString));
         ASSERT_TRUE(readString.Content().data_equal("foo"_span));
+        ASSERT_STREQ(readString.c_str(), "foo");
     }
 
     // no space: data is cleared on load error
@@ -171,6 +173,7 @@ TEST(TestAttributePersistence, TestStrings)
         ASSERT_FALSE(readString.Content().empty());
         ASSERT_FALSE(persistence.LoadString(path, readString));
         ASSERT_TRUE(readString.Content().empty());
+        ASSERT_STREQ(readString.c_str(), "");
     }
 
     // wrong path: data is cleared on load error
@@ -181,6 +184,7 @@ TEST(TestAttributePersistence, TestStrings)
         ASSERT_FALSE(readString.Content().empty());
         ASSERT_FALSE(persistence.LoadString(wrongPath, readString));
         ASSERT_TRUE(readString.Content().empty());
+        ASSERT_STREQ(readString.c_str(), "");
     }
 
     // empty string can be stored and loaded
@@ -194,6 +198,7 @@ TEST(TestAttributePersistence, TestStrings)
         ASSERT_TRUE(readString.SetContent("some value"_span));
         ASSERT_TRUE(persistence.LoadString(path, readString));
         ASSERT_TRUE(readString.Content().empty());
+        ASSERT_STREQ(readString.c_str(), "");
     }
 }
 
