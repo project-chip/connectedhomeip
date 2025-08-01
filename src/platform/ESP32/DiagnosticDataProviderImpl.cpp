@@ -203,7 +203,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next(ifa))
         {
             NetworkInterface * ifp = new NetworkInterface();
-            uint8_t addressSize = 0;
+            uint8_t addressSize    = 0;
             Platform::CopyString(ifp->Name, esp_netif_get_ifkey(ifa));
             ifp->name          = CharSpan::fromCharString(ifp->Name);
             ifp->isOperational = true;
