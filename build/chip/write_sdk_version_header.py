@@ -40,6 +40,7 @@ HEADER = """/*
 
 """
 
+
 def git_version() -> str:
     # Define the Git command to get a descriptive version string:
     # --tags: use annotated tags if available
@@ -48,10 +49,12 @@ def git_version() -> str:
 
     return subprocess.check_output(cmd).decode("utf-8").strip()
 
+
 def spec_version() -> str:
     spec_version = "../../SPECIFICATION_VERSION"
     with open(spec_version, "r") as version:
-        return version.read().strip() 
+        return version.read().strip()
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate files with the SDK version.")
@@ -68,7 +71,7 @@ def main() -> int:
             ver = git_version()
         except (subprocess.CalledProcessError, FileNotFoundError):
             # In case Git is not installed, fall back to version from spec file
-           ver = spec_version()
+            ver = spec_version()
     else:
         ver = spec_version()
 
