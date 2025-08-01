@@ -40,9 +40,30 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 1a: TH sends a StopApp command to DUT to stop a running
+          "Step 1: TH sends a LaunchApp command to DUT to launch and bring an
+          application to the foreground"
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "Data"
+                type:  octstr
+                value: "Hello World"
+              - name: "Application"
+                value:
+                    {
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "Data"
+                value: octstr
+
+    - label:
+          "Step 2a: TH sends a StopApp command to DUT to stop a running
           application"
-      PICS: APPLAUNCHER.S.C01.Rsp
       command: "StopApp"
       arguments:
           values:
@@ -57,7 +78,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1b: TH reads the Status attribute"
+    - label: "Step 2b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint
       cluster: "Application Basic"
       command: "readAttribute"

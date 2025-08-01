@@ -41,11 +41,11 @@ tests:
     - label:
           "Step 1: TH sends a LaunchApp command to DUT to launch and bring an
           application to the foreground"
-      PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:
           values:
               - name: "Data"
+                type:  octstr
                 value: "Hello World"
               - name: "Application"
                 value:
@@ -57,11 +57,12 @@ tests:
           values:
               - name: "Status"
                 value: 0
+              - name: "Data"
+                value: octstr
 
     - label:
           "Step 2: TH sends a LaunchApp command to DUT to launch an app which is
           not available"
-      PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:
           values:
@@ -77,3 +78,5 @@ tests:
           values:
               - name: "Status"
                 value: 1
+              - name: "Data"
+                value: octstr                

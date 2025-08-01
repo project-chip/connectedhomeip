@@ -40,9 +40,30 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 1a: TH sends a HideApp command to DUT to Hide a running and
+            "Step 1: TH sends a LaunchApp command to DUT to launch and bring an
+                   application to the foreground"
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "Data"
+                type:  octstr
+                value: "Hello World"
+              - name: "Application"
+                value:
+                    {
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "Data"
+                value: octstr
+
+    - label:
+          "Step 2a: TH sends a HideApp command to DUT to Hide a running and
           Active application"
-      PICS: APPLAUNCHER.S.C02.Rsp
       command: "HideApp"
       arguments:
           values:
@@ -52,12 +73,19 @@ tests:
                         CatalogVendorID: catalogVendorId,
                         ApplicationID: applicationId,
                     }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "Data"
+                value: octstr
 
-    - label: "Step 1b: TH reads the Status attribute"
+
+    - label: "Step 2b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint
       cluster: "Application Basic"
       command: "readAttribute"
       attribute: "Status"
       response:
           constraints:
-              anyOf: [0, 2]
+              anyOf: [0, 2] # ACTIVE_HIDDEN (2) or STOPPED (0) as per spec
