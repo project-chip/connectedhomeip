@@ -470,7 +470,7 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t lengt
             CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
             if (error != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Cannot post event [error: %s]", ErrorStr(error));
+                ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
             }
         }
         // cleanup the provisioning data as it is configured per each connect request

@@ -146,7 +146,7 @@ void SetTestEventTrigger_PowerAdjustment()
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(sPowerAdjustmentCapability);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed %s", chip::ErrorStr(err));
+        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -168,7 +168,7 @@ void SetTestEventTrigger_ClearForecast()
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(powerAdjustmentCapabilityStruct);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed %s", chip::ErrorStr(err));
+        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
