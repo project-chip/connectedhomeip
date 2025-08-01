@@ -77,56 +77,56 @@ client1 = Client(
     checkInNodeID=1,
     subjectId=1,
     key=b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-    clientType=ClientTypeEnum.kEphemeral
+    clientType=ClientTypeEnum.kPermanent
 )
 
 client2 = Client(
     checkInNodeID=1,
     subjectId=2,
     key=b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1e",
-    clientType=ClientTypeEnum.kEphemeral
+    clientType=ClientTypeEnum.kPermanent
 )
 
 client3 = Client(
     checkInNodeID=1,
     subjectId=3,
     key=b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1d",
-    clientType=ClientTypeEnum.kEphemeral
+    clientType=ClientTypeEnum.kPermanent
 )
 
 client4 = Client(
     checkInNodeID=1,
     subjectId=4,
     key=b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1c",
-    clientType=ClientTypeEnum.kEphemeral
+    clientType=ClientTypeEnum.kPermanent
 )
 
 client5 = Client(
     checkInNodeID=5,
     subjectId=5,
     key=b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1b",
-    clientType=ClientTypeEnum.kEphemeral
+    clientType=ClientTypeEnum.kPermanent
 )
 
 client6 = Client(
     checkInNodeID=5,
     subjectId=6,
     key=b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1a",
-    clientType=ClientTypeEnum.kEphemeral
+    clientType=ClientTypeEnum.kPermanent
 )
 
 client7 = Client(
     checkInNodeID=5,
     subjectId=7,
     key=b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x0f",
-    clientType=ClientTypeEnum.kEphemeral
+    clientType=ClientTypeEnum.kPermanent
 )
 
 client8 = Client(
     checkInNodeID=5,
     subjectId=8,
     key=b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x0e",
-    clientType=ClientTypeEnum.kEphemeral
+    clientType=ClientTypeEnum.kPermanent
 )
 
 
@@ -245,6 +245,7 @@ class TC_ICDM_3_2(MatterBaseTest):
             self.step("2d")
             if not is_ci:
                 time.sleep(wait_time_reboot)
+                self.default_controller.ExpireSessions(self.dut_node_id)
 
             self.step("2e")
             registeredClients = await self._read_icdm_attribute_expect_success(
