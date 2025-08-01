@@ -360,7 +360,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         return persistence.StoreString(request.path, mNodeLabel);
     }
     case LocalConfigDisabled::Id:
-        return persistence.StoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
+        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
