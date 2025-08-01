@@ -616,6 +616,13 @@ jobs:
                   build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
 
+            - name: Build linux-x64-ota-requestor
+              run: >-
+                ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                --target linux-x64-ota-requestor-ipv6only-no-ble-no-wifi-tsan-clang-test
+                build --copy-artifacts-to objdir-clone
+                && rm -rf out/linux-x64-ota-requestor-ipv6only-no-ble-no-wifi-tsan-clang-test"
+
             # TODO: camera app needs clang support
             - name: Build linux-x64-camera
               run: >-
