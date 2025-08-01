@@ -234,7 +234,7 @@ CHIP_ERROR Instance::SetValue(T & currValue, T & newValue, uint32_t attrId)
     if (hasChanged)
     {
         currValue = newValue;
-        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, attrId);
+        AttributeUpdCb(attrId);
     }
 
     return CHIP_NO_ERROR;
@@ -279,8 +279,13 @@ static uint32_t GetCurrentTimestamp()
     return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
 }
 
-void Instance::TariffDataUpdatedCb(bool is_erased)
+void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aUpdatedAttrIds)
 {
+    for (const auto & attr_id : aUpdatedAttrIds)
+    {
+        AttributeUpdCb(attr_id);
+    }
+
     if (is_erased)
     {
         UpdateCurrentAttrs(UpdateEventCode::TariffErased);
@@ -331,16 +336,6 @@ void Instance::ScheduleDayEntryUpdate(uint16_t minutesSinceMidnight)
             static_cast<Instance *>(context)->UpdateCurrentAttrs(UpdateEventCode::DayEntryUpdating);
         },
         this);
-}
-
-static void TariffComponentUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx)
-{
-    if (CbCtx != nullptr)
-    {
-        EndpointId * pEndpointId = (EndpointId *) CbCtx;
-        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
-        MatterReportingAttributeChangeCallback(*pEndpointId, CommodityTariff::Id, aAttrId);
-    }
 }
 
 namespace Utils {
@@ -509,7 +504,7 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByTariffComponentId(Cu
     return nullptr;
 }
 
-CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
+CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
                                                   TariffComponentsDataClass & mgmtObj)
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
@@ -567,18 +562,18 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
         err = mgmtObj.SetNewValue(MakeNullable(tempList));
         if (err == CHIP_NO_ERROR)
         {
-            mgmtObj.MarkAsAssigned();
-            if ((err = mgmtObj.UpdateBegin(&aCtx.mEndpointId, TariffComponentUpd_AttrChangeCb, true)) == CHIP_NO_ERROR)
+            if ((err = mgmtObj.UpdateBegin(nullptr)) == CHIP_NO_ERROR)
             {
-                mgmtObj.UpdateCommit(); // Success path
+                if (mgmtObj.UpdateCommit()) // Success path
+                {
+                    aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
+                }
             }
             else
             {
-                mgmtObj.UpdateEnd(); // Clean up on validation failure
+                mgmtObj.UpdateFinish(); // Clean up on validation failure
             }
         }
-
-
     }
 
     // Cleanup if we still own the data
@@ -596,10 +591,9 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
 }
 } // namespace Utils
 
-static void AttrsCtxInit(Delegate & aTariffProvider, CurrentTariffAttrsCtx & aCtx, EndpointId aEndpointId)
+static void AttrsCtxInit(Delegate & aTariffProvider, CurrentTariffAttrsCtx & aCtx)
 {
     aCtx.mTariffProvider = &aTariffProvider;
-    aCtx.mEndpointId     = aEndpointId;
 
     Utils::ListToMap<Structs::DayPatternStruct::Type, &Structs::DayPatternStruct::Type::dayPatternID>(
         aTariffProvider.GetDayPatterns().Value(), aCtx.DayPatternsMap);
@@ -657,7 +651,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
             ScheduleTariffActivation(mDelegate.GetStartDate().Value() - timestampNow);
             return;
         }
-        AttrsCtxInit(mDelegate, mServerTariffAttrsCtx, mEndpointId);
+        AttrsCtxInit(mDelegate, mServerTariffAttrsCtx);
         // Fall through to days updating
         [[fallthrough]];
     }
@@ -712,7 +706,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
             tmpDayEntry.SetNonNull(*current);
             tmpDate.SetNonNull(mCurrentDay.Value().date);
             if (CHIP_NO_ERROR !=
-                Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, current->dayEntryID,
+                Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, current->dayEntryID,
                                                               mCurrentTariffComponents_MgmtObj))
             {
                 ChipLogError(NotSpecified, "Unable to update the CurrentTariffComponents attribute!");
@@ -730,7 +724,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         {
             tmpDayEntry.SetNonNull(*next);
             if (CHIP_NO_ERROR !=
-                Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID,
+                Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, next->dayEntryID,
                                                               mNextTariffComponents_MgmtObj))
             {
                 ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");

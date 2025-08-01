@@ -605,7 +605,7 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  * @section update_flow Update Flow
  * @brief State machine for managing atomic attribute updates
  *
- * The complete update process requires explicit UpdateEnd() call:
+ * The complete update process requires explicit UpdateFinish() call:
  *
  * @dot
  * digraph update_flow {
@@ -613,12 +613,12 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  *   kInitialized -> kAssigned [label="MarkAsAssigned()"];
  *   kAssigned -> kValidated [label="UpdateBegin()"];
  *   kValidated -> kUpdated  [label="UpdateCommit()"];
- *   kUpdated -> kIdle  [label="UpdateEnd() (mandatory)"];
+ *   kUpdated -> kIdle  [label="UpdateFinish() (mandatory)"];
  *
  *   // Early termination paths
- *   kInitialized -> kIdle [label="UpdateEnd()" style="dashed"];
- *   kAssigned -> kIdle [label="UpdateEnd()" style="dashed"];
- *   kValidated -> kIdle [label="UpdateEnd()" style="dashed"];
+ *   kInitialized -> kIdle [label="UpdateFinish()" style="dashed"];
+ *   kAssigned -> kIdle [label="UpdateFinish()" style="dashed"];
+ *   kValidated -> kIdle [label="UpdateFinish()" style="dashed"];
  * }
  * @enddot
  *
@@ -628,18 +628,18 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  * 3. MarkAsAssigned()   // kInitialized → kAssigned
  * 4. UpdateBegin()      // kAssigned → kValidated
  * 5. UpdateCommit()     // kValidated → kUpdated
- * 6. UpdateEnd()        // kUpdated → kIdle (mandatory cleanup)
+ * 6. UpdateFinish()        // kUpdated → kIdle (mandatory cleanup)
  *
  * ### Critical Notes:
- * - UpdateEnd() MUST be called after UpdateCommit()
- * - Omitting UpdateEnd() will leak resources
- * - UpdateEnd() can be called at any state for cleanup
+ * - UpdateFinish() MUST be called after UpdateCommit()
+ * - Omitting UpdateFinish() will leak resources
+ * - UpdateFinish() can be called at any state for cleanup
  *
  * @see CreateNewValue()
  * @see MarkAsAssigned()
  * @see UpdateBegin()
  * @see UpdateCommit()
- * @see UpdateEnd()
+ * @see UpdateFinish()
  */
 template <typename T>
 class CTC_BaseDataClass
@@ -673,7 +673,7 @@ public:
     }
 
     /// @brief Virtual destructor for proper cleanup
-    virtual ~CTC_BaseDataClass() { CleanupValue(GetValueRef()); CleanupValue(GetNewValueRef()); }
+    virtual ~CTC_BaseDataClass() { Cleanup(); }
 
     /**
      * @brief Get mutable reference to stored value
@@ -692,7 +692,8 @@ public:
      * @brief Check if value storage contains valid data
      * @return true if storage is in kHold state
      */
-    bool HasValue() const { return (mHoldState[!mActiveValueIdx] == StorageState::kHold); }
+    bool HasValue() const { return (mHoldState[mActiveValueIdx] == StorageState::kHold); }
+    bool HasNewValue() const { return (mHoldState[!mActiveValueIdx] == StorageState::kHold); }
 
     /**
      * @brief Prepares a new value for modification
@@ -785,6 +786,7 @@ public:
 
         if (aValue.IsNull())
         {
+            CleanupByIdx(!mActiveValueIdx);
             mUpdateState = UpdateState::kInitialized;
             MarkAsAssigned();
             return CHIP_NO_ERROR;
@@ -835,11 +837,12 @@ public:
 
         if (err == CHIP_NO_ERROR)
         {
+            mHoldState[!mActiveValueIdx] = StorageState::kHold;
             MarkAsAssigned();
         }
         else
         {
-            CleanupValue(GetNewValueRef());
+            CleanupByIdx(!mActiveValueIdx);
         }
 
         return err;
@@ -863,12 +866,10 @@ public:
     /**
      * @brief Validates and prepares the new value for commit
      * @param aUpdCtx Context pointer for callback
-     * @param aUpdCb Callback to invoke on successful commit
-     * @param aValidationBypass Allows update the attribute value without validation
      * @return CHIP_NO_ERROR if validation succeeds
      * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
      */
-    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(AttributeId, void *), bool aValidationBypass)
+    CHIP_ERROR UpdateBegin(void * aUpdCtx)
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
@@ -883,7 +884,7 @@ public:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        if (aValidationBypass != true)
+        if (aUpdCtx != nullptr)
         {
             mAuxData = aUpdCtx;            
             err = ValidateNewValue();
@@ -891,11 +892,6 @@ public:
 
         if (err == CHIP_NO_ERROR)
         {
-            if (aUpdCb != nullptr)
-            {
-                mAuxCb = aUpdCb;
-            }
-
             mUpdateState = UpdateState::kValidated;
         }
         else
@@ -907,67 +903,83 @@ public:
     }
 
     /**
-     * @brief Commits the validated new value
-     * @note Performs atomic swap if value changed
+     * @brief commits the validated new value if it differs from the previous one
+     * @return The return value indicates that the stored value is changed.
      */
-    void UpdateCommit()
+    bool UpdateCommit()
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
         {
-            return;
+            return false;
         }
 
         assert(mUpdateState == UpdateState::kValidated);
 
         if (HasChanged())
         {
-            if (mHoldState[mActiveValueIdx] == StorageState::kHold)
-            {
-                CleanupValue(GetValueRef()); // Cleanup current value
-            }
             mUpdateState = UpdateState::kUpdated;
         }
 
-        UpdateEnd();
+        return UpdateFinish();
     }
 
     /**
-     * @brief Aborts the current update process
+     * @brief the function performs a correct completion of the value update process
+     * @return The return value indicates that the stored value is changed.
      * @note Performs cleanup and resets to idle state
      */
-    void UpdateEnd()
+    bool UpdateFinish()
     {
+        bool ret = false;
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
         {
-            return;
+            return false;
         }
 
         if (mUpdateState == UpdateState::kUpdated)
         {
+            if (HasValue())
+            {
+                CleanupByIdx(mActiveValueIdx); // Cleanup current value
+            }
+
             SwapActiveValueStorage();
 
-            if (mAuxCb)
-            {
-                mAuxCb(mAttrId, mAuxData);
-            }
+            ret = true;
         }
         else
         {
-            CleanupValue(GetNewValueRef());
+            CleanupByIdx(!mActiveValueIdx);
         }
 
         mUpdateState = UpdateState::kIdle;
+
+        return ret;
     }
 
     /**
-     * @brief Clean up current active value storage
+     * @brief Full cleanup of the value storage
+     * @return The return value indicates that the stored value is changed.
      */
-    void Cleanup()
+    bool Cleanup()
     {
-        CleanupValue(GetValueRef());
-        mHoldState[mActiveValueIdx] = StorageState::kEmpty;
+        bool ret = false;
+        if (HasValue())
+        {
+            ret = true;
+        }
+
+        CleanupByIdx(!mActiveValueIdx);
+        CleanupByIdx(mActiveValueIdx);
+
+        return ret;
+    }
+
+    AttributeId GetAttrId()
+    {
+        return  mAttrId;
     }
 
 private:
@@ -1020,7 +1032,21 @@ private:
         }
     }
 
-    void CleanupValue(ValueType & aValue)
+    void CleanupByIdx(uint8_t aIdx)
+    {
+        if (mActiveValueIdx == aIdx)
+        {
+            CleanupValueByRef(mValueStorage[mActiveValueIdx]);
+            mHoldState[mActiveValueIdx] = StorageState::kEmpty;
+        }
+        else
+        {
+            CleanupValueByRef(mValueStorage[!mActiveValueIdx]);
+            mHoldState[!mActiveValueIdx] = StorageState::kEmpty;
+        }
+    }
+
+    void CleanupValueByRef(ValueType & aValue)
     {
         if constexpr (IsValueNullable())
         {
@@ -1064,7 +1090,6 @@ protected:
 
     void * mAuxData = nullptr;                  // Validation context
     const AttributeId mAttrId;                     // Attribute identifier
-    void (*mAuxCb)(AttributeId, void *) = nullptr; // Update callback
 
     UpdateState mUpdateState = UpdateState::kIdle;
 

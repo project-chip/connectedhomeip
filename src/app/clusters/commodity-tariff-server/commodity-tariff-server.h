@@ -209,7 +209,7 @@ public:
 
     bool HasFeature(Feature aFeature) { return mFeature.Has(aFeature); }
 
-    void SetTariffUpdCb(std::function<void(bool)> cb) { mTariffDataUpdatedCb = cb; }
+    void SetTariffUpdCb(std::function<void(bool, std::vector<AttributeId>&)> cb) { mTariffDataUpdatedCb = cb; }
 
     /**
      * @brief Process incoming tariff data updates
@@ -233,21 +233,25 @@ public:
         }
         else
         {
-            TariffDataUpd_Commit();
+            std::vector<AttributeId> UpdatedAttrIds;
 
-            if (UpdCtx.mAnyHasChanged)
+            TariffDataUpd_Commit(UpdatedAttrIds);
+
+            if (!UpdatedAttrIds.empty())
             {
                 ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
 
                 if (mTariffDataUpdatedCb != nullptr)
                 {
-                    mTariffDataUpdatedCb(false);
+                    mTariffDataUpdatedCb(false, UpdatedAttrIds);
                 }
             }
             else
             {
                 ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
             }
+
+            UpdatedAttrIds.clear();
 
             return;
         }
@@ -268,13 +272,20 @@ public:
 
     void CleanupTariffData()
     {
-#define X(attrName, attrType) m##attrName##_MgmtObj.Cleanup();
+        std::vector<AttributeId> UpdatedAttrIds;
+#define X(attrName, attrType) \
+        if (m##attrName##_MgmtObj.Cleanup()) \
+        {                                                               \
+            UpdatedAttrIds.push_back(m##attrName##_MgmtObj.GetAttrId());  \
+        }
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
         if (mTariffDataUpdatedCb != nullptr)
         {
-            mTariffDataUpdatedCb(true);
+            mTariffDataUpdatedCb(true, UpdatedAttrIds);
         }
+
+        UpdatedAttrIds.clear();
     }
 
 private:
@@ -295,7 +306,7 @@ private:
     bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
 #define X(attrName, attrType)                                                                                                      \
-    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb, false) != CHIP_NO_ERROR)                             \
+    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx) != CHIP_NO_ERROR) \
     {                                                                                                                              \
         return false;                                                                                                              \
     }
@@ -306,16 +317,20 @@ private:
 
     virtual bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return true; }
 
-    void TariffDataUpd_Commit()
+    void TariffDataUpd_Commit(std::vector<AttributeId> & aUpdatedAttrIds)
     {
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateCommit();
+#define X(attrName, attrType) \
+        if (m##attrName##_MgmtObj.UpdateCommit());                      \
+        {                                                               \
+            aUpdatedAttrIds.push_back(m##attrName##_MgmtObj.GetAttrId());  \
+        }
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
     }
 
     void TariffDataUpd_Abort()
     {
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateEnd();
+#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateFinish();
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
     }
@@ -323,7 +338,7 @@ private:
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;
-    std::function<void(bool)> mTariffDataUpdatedCb;
+    std::function<void(bool, std::vector<AttributeId>&)> mTariffDataUpdatedCb;
 };
 
 struct CurrentTariffAttrsCtx
@@ -363,7 +378,7 @@ public:
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
         mEndpointId = aEndpointId;
-        mDelegate.SetTariffUpdCb([this](bool is_erased) { this->TariffDataUpdatedCb(is_erased); });
+        mDelegate.SetTariffUpdCb([this](bool is_erased, std::vector<AttributeId> & UpdatedAttrIds) { this->TariffDataUpdatedCb(is_erased, UpdatedAttrIds); });
         mDelegate.SetFeatures(aFeature);
     }
 
@@ -374,7 +389,10 @@ public:
 
     bool HasFeature(Feature aFeature) const;
 
-    void TariffComponentUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx);
+    void AttributeUpdCb(AttributeId aAttrId) {
+        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, aAttrId);
+    }
 
     /**
      * @brief Passes the specified time offset value to the context variable that is used to override the real-time stamp.
@@ -425,7 +443,7 @@ private:
     template <typename T>
     CHIP_ERROR SetValue(T & currValue, T & newValue, uint32_t attrId);
 
-    void TariffDataUpdatedCb(bool is_erased);
+    void TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aUpdatedAttrIds);
     void ResetCurrentAttributes();
 
     // Current attrs (time depended) update methods
