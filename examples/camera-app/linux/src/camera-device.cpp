@@ -38,6 +38,7 @@ using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
+using namespace chip::app::Clusters::ZoneManagement;
 
 using namespace Camera;
 
@@ -324,6 +325,9 @@ CameraDevice::CameraDevice()
 
     // Set the CameraDevice interface in WebRTCManager
     mWebRTCProviderManager.SetCameraDevice(this);
+
+    // Set the CameraDevice interface in ZoneManager
+    mZoneManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -1157,6 +1161,40 @@ CameraError CameraDevice::SetZoom(uint8_t aZoom)
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)
+{
+    mDetectionSensitivity = aSensitivity;
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::CreateZoneTrigger(const ZoneTriggerControlStruct & zoneTrigger)
+{
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::UpdateZoneTrigger(const ZoneTriggerControlStruct & zoneTrigger)
+{
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
+{
+
+    return CameraError::SUCCESS;
+}
+
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
+{
+    mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+}
+
+void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
+{
+    mZoneManager.OnZoneStoppedEvent(zoneID, ZoneEventStoppedReasonEnum::kActionStopped);
+}
+
 void CameraDevice::InitializeVideoStreams()
 {
     // Create single video stream with typical supported parameters
@@ -1236,6 +1274,11 @@ CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
 CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
+}
+
+ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
+{
+    return mZoneManager;
 }
 
 MediaController & CameraDevice::GetMediaController()

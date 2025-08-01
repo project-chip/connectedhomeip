@@ -81,6 +81,7 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/tests",
       "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
       "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/srp/tests",
     ]
 
