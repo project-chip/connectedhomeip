@@ -222,8 +222,9 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(7)
         networks_response = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning,
                                                                            attribute=Clusters.NetworkCommissioning.Attributes.Networks, endpoint=operating_endpoint_id)
-        network_index = next((i for i, info in enumerate(networks_response) if info.connected and info.networkID == network_id), None)
-        asserts.assert_true(network_index != None, "There is no correct entry in Networks attribute list")
+        network_index = next((i for i, info in enumerate(networks_response)
+                             if info.connected and info.networkID == network_id), None)
+        asserts.assert_true(network_index is not None, "There is no correct entry in Networks attribute list")
 
         self.step(8)
         remove_network_cmd = Clusters.NetworkCommissioning.Commands.RemoveNetwork(networkID=network_id)
@@ -263,8 +264,9 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(13)
         networks_response = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning,
                                                                            attribute=Clusters.NetworkCommissioning.Attributes.Networks, endpoint=operating_endpoint_id)
-        network_index = next((i for i, info in enumerate(networks_response) if info.connected and info.networkID == network_id), None)
-        asserts.assert_true(network_index != None, "There is no correct entry in Networks attribute list")
+        network_index = next((i for i, info in enumerate(networks_response)
+                             if info.connected and info.networkID == network_id), None)
+        asserts.assert_true(network_index is not None, "There is no correct entry in Networks attribute list")
 
         self.step(14)
         arm_fail_safe_results = await self.send_single_cmd(endpoint=kRootEndpointId, cmd=arm_failsafe_cmd)
