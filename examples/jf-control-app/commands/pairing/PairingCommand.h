@@ -332,7 +332,6 @@ private:
     bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
-    chip::Optional<bool> mExecuteJCM;
     ::pw::rpc::NanopbClientReader<::RequestOptions> rpcGetStream;
 
     // For unpair

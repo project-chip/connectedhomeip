@@ -836,6 +836,9 @@ public:
                                          /* fireAndForget = */ true);
     }
 
+    // Check if the commissioning mode is valid for the current commissioning parameters.
+    virtual bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData);
+
 protected:
     // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
     // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
