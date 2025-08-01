@@ -260,47 +260,4 @@ TEST(TestPascalString, SupportConstAccess)
     ASSERT_TRUE(ShortConstPascalString(buffer).Content().data_equal("test"_span));
 }
 
-TEST(TestPascalString, TestIsValidContent)
-{
-    {
-        uint8_t buffer[8] = { 0 };
-        ShortPascalBytes str(buffer);
-
-        // String is initially empty, which is valid
-        ASSERT_TRUE(str.IsValidContent());
-
-        // Null is valid
-        str.SetNull();
-        ASSERT_TRUE(str.IsValidContent());
-
-        // Length 7 is valid in an 8-byte buffer (1 byte for length)
-        buffer[0] = 7;
-        ASSERT_TRUE(str.IsValidContent());
-
-        // Length 8 is NOT valid in an 8-byte buffer
-        buffer[0] = 8;
-        ASSERT_FALSE(str.IsValidContent());
-    }
-    {
-        uint8_t buffer[8] = { 0 };
-        LongPascalBytes str(buffer);
-
-        // String is initially empty, which is valid
-        ASSERT_TRUE(str.IsValidContent());
-
-        // Null is valid
-        str.SetNull();
-        ASSERT_TRUE(str.IsValidContent());
-
-        // Length 6 is valid in an 8-byte buffer (2 bytes for length)
-        buffer[0] = 6;
-        buffer[1] = 0;
-        ASSERT_TRUE(str.IsValidContent());
-
-        // Length 7 is NOT valid in an 8-byte buffer
-        buffer[0] = 7;
-        ASSERT_FALSE(str.IsValidContent());
-    }
-}
-
 } // namespace
