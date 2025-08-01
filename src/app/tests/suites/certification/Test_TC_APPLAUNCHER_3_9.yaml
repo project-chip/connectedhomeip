@@ -27,6 +27,9 @@ config:
     applicationId:
         type: char_string
         defaultValue: "exampleid"
+    DataValue:
+        type: octet_string
+        defaultValue: "CSA"
     #ApplicationBasic cluster endpoint
     ApplicationBasic.Endpoint: 3
 
@@ -46,8 +49,7 @@ tests:
       arguments:
           values:
               - name: "Data"
-                type: octstr
-                value: "Hello World"
+                value: DataValue
               - name: "Application"
                 value:
                     {
@@ -59,7 +61,7 @@ tests:
               - name: "Status"
                 value: 0
               - name: "Data"
-                value: octstr
+                value: DataValue
 
     - label:
           "Step 2a: TH sends a HideApp command to DUT to Hide a running and
@@ -78,7 +80,7 @@ tests:
               - name: "Status"
                 value: 0
               - name: "Data"
-                value: octstr
+                value: DataValue
 
     - label: "Step 2b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint

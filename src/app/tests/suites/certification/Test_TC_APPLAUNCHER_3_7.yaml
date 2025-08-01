@@ -28,6 +28,10 @@ config:
     applicationId:
         type: char_string
         defaultValue: "exampleid"
+    DataValue:
+        type: octet_string
+        defaultValue: "CSA"
+    ApplicationBasic.Endpoint: 3
 
 tests:
     - label: "Step 0: Wait for the commissioned device to be retrieved"
@@ -39,14 +43,13 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 1: TH sends a LaunchApp command to DUT to launch and bring an
+          "Step 1a: TH sends a LaunchApp command to DUT to launch and bring an
           application to the foreground"
       command: "LaunchApp"
       arguments:
           values:
               - name: "Data"
-                type: octstr
-                value: "Hello World"
+                value: DataValue
               - name: "Application"
                 value:
                     {
@@ -58,16 +61,24 @@ tests:
               - name: "Status"
                 value: 0
               - name: "Data"
-                value: octstr
-
+                value: DataValue
+  
+    - label: "Step 1b: TH reads the Status attribute"
+      endpoint: ApplicationBasic.Endpoint
+      cluster: "Application Basic"
+      command: "readAttribute"
+      attribute: "Status"
+      response:
+          value: 1
+   
     - label:
-          "Step 2: TH sends a LaunchApp command to DUT to launch an app which is
+          "Step 2a: TH sends a LaunchApp command to DUT to launch an app which is
           not available"
       command: "LaunchApp"
       arguments:
           values:
               - name: "Data"
-                value: "Hello World"
+                value: DataValue
               - name: "Application"
                 value:
                     {
@@ -79,4 +90,12 @@ tests:
               - name: "Status"
                 value: 1
               - name: "Data"
-                value: octstr
+                value: DataValue
+
+    - label: "Step 2b: TH reads the Status attribute"
+      endpoint: ApplicationBasic.Endpoint
+      cluster: "Application Basic"
+      command: "readAttribute"
+      attribute: "Status"
+      response:
+          value: 1
