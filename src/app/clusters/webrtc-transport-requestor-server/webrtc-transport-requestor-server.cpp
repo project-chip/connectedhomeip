@@ -241,7 +241,6 @@ void WebRTCTransportRequestorServer::HandleOffer(HandlerContext & ctx, const Com
         args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
     }
 
-    WebRTCSessionStruct outSession;
     // Delegate processing: handle the SDP offer, gather ICE candidates, SDP answer, etc.
     Protocols::InteractionModel::ClusterStatusCode delegateStatus =
         Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleOffer(sessionId, args));
