@@ -164,7 +164,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd MaxConcurrentEncoders: {value}")
             asserts.assert_is_not_none(value, "MaxConcurrentEncoders is None")
-            matter_asserts.assert_valid_uint8(value, "MaxConcurrentEncoders is not a valid uint8 value")
+            matter_asserts.assert_valid_uint8(value, "MaxConcurrentEncoders")
 
         self.step(3)
         if self.pics_guard(self.check_pics("AVSM.S.A0001")):
@@ -173,7 +173,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd MaxEncodedPixelRate: {value}")
             asserts.assert_is_not_none(value, "MaxEncodedPixelRate is None")
-            matter_asserts.assert_valid_uint32(value, "MaxEncodedPixelRate is not a valid uint32 value")
+            matter_asserts.assert_valid_uint32(value, "MaxEncodedPixelRate")
 
         self.step(4)
         if self.pics_guard(self.check_pics("AVSM.S.A0002")):
@@ -211,7 +211,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxContentBufferSize
             )
             logger.info(f"Rx'd MaxContentBufferSize: {value}")
-            matter_asserts.assert_valid_uint32(value, "MaxContentBufferSize is not a valid uint32 value")
+            matter_asserts.assert_valid_uint32(value, "MaxContentBufferSize")
 
         self.step(9)
         if self.pics_guard(self.check_pics("AVSM.S.A0007")):
@@ -251,7 +251,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxNetworkBandwidth
             )
             logger.info(f"Rx'd MaxNetworkBandwidth: {value}")
-            matter_asserts.assert_valid_uint32(value, "MaxNetworkBandwidth is not a valid uint32 value")
+            matter_asserts.assert_valid_uint32(value, "MaxNetworkBandwidth")
 
         self.step(14)
         if self.pics_guard(self.check_pics("AVSM.S.A000C")):
@@ -260,7 +260,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd CurrentFrameRate: {value}")
             asserts.assert_is_not_none(value, "CurrentFrameRate is None")
-            matter_asserts.assert_valid_uint16(value, "CurrentFrameRate is not a valid uint16 value")
+            matter_asserts.assert_valid_uint16(value, "CurrentFrameRate")
 
         self.step(15)
         if self.pics_guard(self.check_pics("AVSM.S.A000D")):
@@ -365,7 +365,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd SpeakerVolumeLevel: {value}")
             asserts.assert_is_not_none(value, "SpeakerVolumeLevel is None")
-            matter_asserts.assert_valid_uint8(value, "SpeakerVolumeLevel is not a valid uint8 value")
+            matter_asserts.assert_valid_uint8(value, "SpeakerVolumeLevel")
 
         self.step(29)
         if self.pics_guard(self.check_pics("AVSM.S.A001B")):
@@ -374,7 +374,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd SpeakerMaxLevel: {value}")
             asserts.assert_is_not_none(value, "SpeakerMaxLevel is None")
-            matter_asserts.assert_valid_uint8(value, "SpeakerMaxLevel is not a valid uint8 value")
+            matter_asserts.assert_valid_uint8(value, "SpeakerMaxLevel")
 
         self.step(30)
         if self.pics_guard(self.check_pics("AVSM.S.A001C")):
@@ -383,7 +383,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd SpeakerMinLevel: {value}")
             asserts.assert_is_not_none(value, "SpeakerMinLevel is None")
-            matter_asserts.assert_valid_uint8(value, "SpeakerMinLevel is not a valid uint8 value")
+            matter_asserts.assert_valid_uint8(value, "SpeakerMinLevel")
 
         self.step(31)
         if self.pics_guard(self.check_pics("AVSM.S.A001D")):
@@ -400,7 +400,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd MicrophoneVolumeLevel: {value}")
             asserts.assert_is_not_none(value, "MicrophoneVolumeLevel is None")
-            matter_asserts.assert_valid_uint8(value, "MicrophoneVolumeLevel is not a valid uint8 value")
+            matter_asserts.assert_valid_uint8(value, "MicrophoneVolumeLevel")
 
         self.step(33)
         if self.pics_guard(self.check_pics("AVSM.S.A001F")):
@@ -409,7 +409,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd MicrophoneMaxLevel: {value}")
             asserts.assert_is_not_none(value, "MicrophoneMaxLevel is None")
-            matter_asserts.assert_valid_uint8(value, "MicrophoneMaxLevel is not a valid uint8 value")
+            matter_asserts.assert_valid_uint8(value, "MicrophoneMaxLevel")
 
         self.step(34)
         if self.pics_guard(self.check_pics("AVSM.S.A0020")):
@@ -418,7 +418,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd MicrophoneMinLevel: {value}")
             asserts.assert_is_not_none(value, "MicrophoneMinLevel is None")
-            matter_asserts.assert_valid_uint8(value, "MicrophoneMinLevel is not a valid uint8 value")
+            matter_asserts.assert_valid_uint8(value, "MicrophoneMinLevel")
 
         self.step(35)
         if self.pics_guard(self.check_pics("AVSM.S.A0021")):
@@ -433,7 +433,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageRotation)
             logger.info(f"Rx'd ImageRotation: {value}")
             asserts.assert_is_not_none(value, "ImageRotation is None")
-            matter_asserts.assert_valid_uint16(value, "ImageRotation is not a valid uint16 value")
+            matter_asserts.assert_valid_uint16(value, "ImageRotation")
 
         self.step(37)
         if self.pics_guard(self.check_pics("AVSM.S.A0023")):
