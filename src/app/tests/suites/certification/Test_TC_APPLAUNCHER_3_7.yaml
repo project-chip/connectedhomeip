@@ -79,4 +79,4 @@ tests:
               - name: "Status"
                 value: 1
               - name: "Data"
-                value: octstr                
+                value: octstr
