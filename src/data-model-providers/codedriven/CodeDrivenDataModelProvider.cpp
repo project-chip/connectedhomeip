@@ -23,70 +23,15 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <iterator>
+
 using chip::Protocols::InteractionModel::Status;
-
-namespace {
-
-using namespace chip;
-using namespace chip::app;
-
-CHIP_ERROR StartupServerClusters(EndpointInterface * endpoint, ServerClusterContext & serverClusterContext)
-{
-    VerifyOrReturnError(endpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    bool had_failure = false;
-
-    ReadOnlyBufferBuilder<ServerClusterInterface *> serverClusterBuilder;
-    ReturnErrorOnFailure(endpoint->ServerClusters(serverClusterBuilder));
-    auto serverClusters = serverClusterBuilder.TakeBuffer();
-
-    for (auto * serverCluster : serverClusters)
-    {
-        VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        CHIP_ERROR err = serverCluster->Startup(serverClusterContext);
-        if (err != CHIP_NO_ERROR)
-        {
-            had_failure = true;
-            VerifyOrDie(!serverCluster->GetPaths().empty()); // API says it must have at least one path
-
-            for (auto path : serverCluster->GetPaths())
-            {
-                ChipLogError(DataManagement, "Failed to startup cluster " ChipLogFormatMEI " on Endpoint %u startup failed: %" CHIP_ERROR_FORMAT,
-                    ChipLogValueMEI(path.mClusterId), path.mEndpointId, err.Format());
-            }
-        }
-    }
-    if (had_failure)
-    {
-        // If we had any failures during the startup of clusters, return an error.
-        return CHIP_ERROR_HAD_FAILURES;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ShutdownServerClusters(EndpointInterface * endpoint)
-{
-    VerifyOrReturnError(endpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReadOnlyBufferBuilder<ServerClusterInterface *> serverClusterBuilder;
-    ReturnErrorOnFailure(endpoint->ServerClusters(serverClusterBuilder));
-    auto serverClusters = serverClusterBuilder.TakeBuffer();
-
-    for (auto * serverCluster : serverClusters)
-    {
-        if (serverCluster != nullptr)
-        {
-            // TODO: The API for ServerClusterInterface->Shutdown swallows errors here. We should update it to return CHIP_ERROR.
-            serverCluster->Shutdown();
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-} // namespace
 
 namespace chip {
 namespace app {
+
+using std::begin;
+using std::end;
 
 CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
@@ -98,11 +43,11 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
         .interactionContext = &mContext,
     }));
 
-    // Startup all server clusters across all endpoints
+    // Startup all registered server clusters
     bool had_failure = false;
-    for (auto * endpoint : mEndpointInterfaceRegistry)
+    for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
     {
-        if (StartupServerClusters(endpoint, *mServerClusterContext) != CHIP_NO_ERROR)
+        if (cluster->Startup(*mServerClusterContext) != CHIP_NO_ERROR)
         {
             had_failure = true;
         }
@@ -112,15 +57,16 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
     {
         return CHIP_ERROR_HAD_FAILURES;
     }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
 {
-    // Shutdown all server clusters across all endpoints
-    for (auto * endpoint : mEndpointInterfaceRegistry)
+    // Shutdown all registered server clusters
+    for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
     {
-        ShutdownServerClusters(endpoint);
+        cluster->Shutdown();
     }
     mServerClusterContext.reset();
     return CHIP_NO_ERROR;
@@ -129,7 +75,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
 DataModel::ActionReturnStatus CodeDrivenDataModelProvider::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                          AttributeValueEncoder & encoder)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(request.path);
     VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
     return serverCluster->ReadAttribute(request, encoder);
 }
@@ -137,7 +83,7 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::ReadAttribute(const D
 DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                           AttributeValueDecoder & decoder)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(request.path);
     VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
     return serverCluster->WriteAttribute(request, decoder);
 }
@@ -145,7 +91,7 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const 
 void CodeDrivenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & path,
                                                                  DataModel::ListWriteOperation opType)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturn(serverCluster != nullptr);
     serverCluster->ListAttributeWriteNotification(path, opType);
 }
@@ -154,7 +100,7 @@ std::optional<DataModel::ActionReturnStatus> CodeDrivenDataModelProvider::Invoke
                                                                                         TLV::TLVReader & input_arguments,
                                                                                         CommandHandler * handler)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(request.path.mEndpointId, request.path.mClusterId);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(request.path);
     VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
     return serverCluster->InvokeCommand(request, input_arguments, handler);
 }
@@ -212,33 +158,28 @@ CHIP_ERROR CodeDrivenDataModelProvider::ClientClusters(EndpointId endpointId, Re
 CHIP_ERROR CodeDrivenDataModelProvider::ServerClusters(EndpointId endpointId,
                                                        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & out)
 {
-    EndpointInterface * epProvider = GetEndpointInterface(endpointId);
-    if (epProvider == nullptr)
+    size_t count = 0;
+    for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
     {
-        return CHIP_ERROR_NOT_FOUND;
+        for (const auto & path : cluster->GetPaths())
+        {
+            if (path.mEndpointId == endpointId)
+            {
+                count++;
+            }
+        }
     }
 
-    ReadOnlyBufferBuilder<ServerClusterInterface *> serverClusterBuilder;
-    ReturnErrorOnFailure(epProvider->ServerClusters(serverClusterBuilder));
-    auto serverClusters = serverClusterBuilder.TakeBuffer();
+    ReturnErrorOnFailure(out.EnsureAppendCapacity(count));
 
-    // Calculate total number of paths for capacity.
-    size_t totalPaths = 0;
-    for (const auto * serverCluster : serverClusters)
+    for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
     {
-        VerifyOrDie(!serverCluster->GetPaths().empty()); // API says it must have at least one path
-        totalPaths += serverCluster->GetPaths().size();
-    }
-    ReturnErrorOnFailure(out.EnsureAppendCapacity(totalPaths));
-
-    for (const auto * serverCluster : serverClusters)
-    {
-        for (const auto & path : serverCluster->GetPaths())
+        for (const auto & path : cluster->GetPaths())
         {
             if (path.mEndpointId == endpointId)
             {
                 ReturnErrorOnFailure(
-                    out.Append({ path.mClusterId, serverCluster->GetDataVersion(path), serverCluster->GetClusterFlags(path) }));
+                    out.Append({ path.mClusterId, cluster->GetDataVersion(path), cluster->GetClusterFlags(path) }));
             }
         }
     }
@@ -247,14 +188,14 @@ CHIP_ERROR CodeDrivenDataModelProvider::ServerClusters(EndpointId endpointId,
 
 CHIP_ERROR CodeDrivenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & out)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return serverCluster->GeneratedCommands(path, out);
 }
 CHIP_ERROR CodeDrivenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & out)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return serverCluster->AcceptedCommands(path, out);
 }
@@ -262,14 +203,14 @@ CHIP_ERROR CodeDrivenDataModelProvider::AcceptedCommands(const ConcreteClusterPa
 CHIP_ERROR CodeDrivenDataModelProvider::Attributes(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & out)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return serverCluster->Attributes(path, out);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
 {
-    ServerClusterInterface * serverCluster = GetServerCluster(path.mEndpointId, path.mClusterId);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return serverCluster->EventInfo(path, eventInfo);
 }
@@ -287,31 +228,65 @@ void CodeDrivenDataModelProvider::Temporary_ReportAttributeChanged(const Attribu
 CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistration & registration)
 {
     VerifyOrReturnError(registration.endpointInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (registration.endpointEntry.id == kInvalidEndpointId)
+    {
+        registration.endpointEntry.id = mNextAvailableEndpointId;
+    }
+    else if (registration.endpointEntry.id < mNextAvailableEndpointId)
+    {
+        // If the endpoint ID is already in use, return an error.
+        return CHIP_ERROR_DUPLICATE_KEY_ID;
+    }
+
     ReturnErrorOnFailure(mEndpointInterfaceRegistry.Register(registration));
 
-    // If the provider has not been started, return early, no need to startup clusters.
-    VerifyOrReturnError(mContext.dataModelChangeListener != nullptr, CHIP_NO_ERROR);
+    // Update the next available endpoint ID
+    mNextAvailableEndpointId = registration.endpointEntry.id + 1;
 
-    // If the provider has already been started (its mContext is initialized) AND its server
-    // cluster context is also set up, then the clusters for this new endpoint should be started.
-    VerifyOrReturnError(mServerClusterContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
-    return StartupServerClusters(registration.endpointInterface, *mServerClusterContext);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId)
 {
-    EndpointInterface * provider = mEndpointInterfaceRegistry.Get(endpointId);
-    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_NOT_FOUND);
+    // Note: This does not remove clusters on this endpoint. The caller is responsible
+    // for removing clusters before removing the endpoint.
+    return mEndpointInterfaceRegistry.Unregister(endpointId);
+}
 
-    // If the provider has been started (its mContext is initialized),
-    // then the clusters for this endpoint might have been started and should be shut down.
-    // We also need mServerClusterContext to have been set up.
-    if (mContext.dataModelChangeListener != nullptr) // Provider has been Startup()-ed
+CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & entry)
+{
+    VerifyOrReturnError(entry.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (const auto & path : entry.serverClusterInterface->GetPaths())
     {
-        ShutdownServerClusters(provider);
+        // Ensure the endpoint for each path is already registered.
+        VerifyOrReturnError(GetEndpointInterface(path.mEndpointId) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    return mEndpointInterfaceRegistry.Unregister(endpointId);
+    ReturnErrorOnFailure(mServerClusterRegistry.Register(entry));
+
+    // If the provider has already been started, startup the cluster.
+    if (mServerClusterContext.has_value())
+    {
+        ReturnErrorOnFailure(entry.serverClusterInterface->Startup(*mServerClusterContext));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * cluster)
+{
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(mServerClusterRegistry.Unregister(cluster));
+
+    if (mServerClusterContext.has_value())
+    {
+        cluster->Shutdown();
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 EndpointInterface * CodeDrivenDataModelProvider::GetEndpointInterface(EndpointId endpointId)
@@ -319,11 +294,9 @@ EndpointInterface * CodeDrivenDataModelProvider::GetEndpointInterface(EndpointId
     return mEndpointInterfaceRegistry.Get(endpointId);
 }
 
-ServerClusterInterface * CodeDrivenDataModelProvider::GetServerCluster(EndpointId endpointId, ClusterId clusterId)
+ServerClusterInterface * CodeDrivenDataModelProvider::GetServerClusterInterface(const ConcreteClusterPath & clusterPath)
 {
-    EndpointInterface * epProvider = GetEndpointInterface(endpointId);
-    VerifyOrReturnValue(epProvider != nullptr, nullptr);
-    return epProvider->GetServerCluster(clusterId);
+    return mServerClusterRegistry.Get(clusterPath);
 }
 
 } // namespace app

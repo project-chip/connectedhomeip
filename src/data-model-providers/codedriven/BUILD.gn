@@ -22,6 +22,7 @@ source_set("codedriven") {
   public_deps = [
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/server-cluster:registry",
     "${chip_root}/src/data-model-providers/codedriven/endpoint",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",

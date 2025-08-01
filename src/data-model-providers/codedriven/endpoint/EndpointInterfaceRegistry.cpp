@@ -66,7 +66,7 @@ CHIP_ERROR EndpointInterfaceRegistry::Unregister(EndpointId endpointId)
         prev    = current;
         current = current->next;
     }
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 EndpointInterface * EndpointInterfaceRegistry::Get(EndpointId endpointId)

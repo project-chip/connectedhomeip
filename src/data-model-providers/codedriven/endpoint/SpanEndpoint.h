@@ -17,7 +17,6 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/server-cluster/ServerClusterInterface.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
@@ -56,7 +55,6 @@ public:
 
         Builder & SetComposition(DataModel::EndpointCompositionPattern composition);
         Builder & SetParentId(EndpointId parentId);
-        Builder & SetServerClusters(Span<ServerClusterInterface *> serverClusters);
         Builder & SetClientClusters(Span<const ClusterId> clientClusters);
         Builder & SetSemanticTags(Span<const SemanticTag> semanticTags);
         Builder & SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes);
@@ -71,7 +69,6 @@ public:
         EndpointId mEndpointId;
         DataModel::EndpointCompositionPattern mComposition = DataModel::EndpointCompositionPattern::kFullFamily;
         EndpointId mParentId                               = kInvalidEndpointId;
-        Span<ServerClusterInterface *> mServerClusters;
         Span<const ClusterId> mClientClusters;
         Span<const SemanticTag> mSemanticTags;
         Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
@@ -81,11 +78,11 @@ public:
 
     // Delete copy constructor and assignment operator. SpanEndpoint holds non-owning data (Spans).
     // This helps prevent accidental copies that could lead multiple objects pointing to the same external data.
-    SpanEndpoint(const SpanEndpoint &)             = delete;
+    SpanEndpoint(const SpanEndpoint &) = delete;
     SpanEndpoint & operator=(const SpanEndpoint &) = delete;
 
     // Allow move semantics for SpanEndpoint.
-    SpanEndpoint(SpanEndpoint &&)             = default;
+    SpanEndpoint(SpanEndpoint &&) = default;
     SpanEndpoint & operator=(SpanEndpoint &&) = default;
 
     const DataModel::EndpointEntry & GetEndpointEntry() const override { return mEndpointEntry; }
@@ -95,15 +92,11 @@ public:
     CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const override;
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
-    // Getter for ServerClusterInterface, returns nullptr if the cluster is not found.
-    ServerClusterInterface * GetServerCluster(ClusterId clusterId) const override;
-    CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const override;
-
 private:
     // Private constructor for Builder
     SpanEndpoint(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
-                 Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
-                 Span<const SemanticTag> semanticTags, Span<const DataModel::DeviceTypeEntry> deviceTypes);
+                 Span<const ClusterId> clientClusters, Span<const SemanticTag> semanticTags,
+                 Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
     // Iteration methods
     // GetEndpointEntry is already public
@@ -111,7 +104,6 @@ private:
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     Span<const SemanticTag> mSemanticTags;
     Span<const ClusterId> mClientClusters;
-    Span<ServerClusterInterface *> mServerClusters;
 };
 
 } // namespace app

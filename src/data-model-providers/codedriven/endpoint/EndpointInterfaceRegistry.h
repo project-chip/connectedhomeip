@@ -37,15 +37,23 @@ namespace app {
 struct EndpointInterfaceRegistration
 {
     EndpointInterface * const endpointInterface;
+    DataModel::EndpointEntry endpointEntry;
     EndpointInterfaceRegistration * next;
 
-    constexpr EndpointInterfaceRegistration(EndpointInterface & interface, EndpointInterfaceRegistration * next_item = nullptr) :
-        endpointInterface(&interface), next(next_item)
+    EndpointInterfaceRegistration(EndpointInterface & interface,
+        DataModel::EndpointEntry entry = {kInvalidEndpointId, kInvalidEndpointId, DataModel::EndpointCompositionPattern::kFullFamily},
+        EndpointInterfaceRegistration * next_item = nullptr) :
+        endpointInterface(&interface), endpointEntry(entry), next(next_item)
     {}
     EndpointInterfaceRegistration(EndpointInterfaceRegistration && other) = default;
 
     EndpointInterfaceRegistration(const EndpointInterfaceRegistration & other)             = delete;
     EndpointInterfaceRegistration & operator=(const EndpointInterfaceRegistration & other) = delete;
+
+    DataModel::EndpointEntry GetEndpointEntry() const
+    {
+        return endpointEntry;
+    }
 };
 
 /**
