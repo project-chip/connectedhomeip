@@ -179,9 +179,6 @@ private:
 
 class Delegate
 {
-protected:
-    Instance * mInstance = nullptr;
-
 public:
     Delegate() = default;
 
@@ -257,6 +254,14 @@ public:
      *
      */
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
+
+private:
+    friend class Instance;
+
+    Instance * mInstance = nullptr;    
+    
+protected:
+    Instance * GetInstance() const { return mInstance; }
 };
 
 // A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
