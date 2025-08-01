@@ -846,6 +846,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2352,7 +2353,7 @@ endpoint 1 {
     persist  attribute maxCoolSetpointLimit default = 3200;
     persist  attribute controlSequenceOfOperation default = 0x04;
     persist  attribute systemMode default = 0x01;
-    persist  attribute ACLouverPosition default = 0;
+    persist  attribute ACLouverPosition default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2367,13 +2368,16 @@ endpoint 1 {
     ram      attribute fanModeSequence default = 2;
     ram      attribute percentSetting default = 0;
     ram      attribute percentCurrent default = 0;
+    ram      attribute speedMax default = 100;
+    ram      attribute speedSetting default = 0;
+    ram      attribute speedCurrent;
     ram      attribute rockSupport default = 0x00;
     ram      attribute rockSetting default = 0x00;
     ram      attribute airflowDirection default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 37;
+    ram      attribute featureMap default = 53;
     ram      attribute clusterRevision default = 1;
 
     handle command Step;

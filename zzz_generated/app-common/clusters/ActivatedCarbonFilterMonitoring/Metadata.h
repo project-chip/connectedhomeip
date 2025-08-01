@@ -55,6 +55,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCondition::
 } // namespace ResetCondition
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ActivatedCarbonFilterMonitoring
 } // namespace Clusters
 } // namespace app

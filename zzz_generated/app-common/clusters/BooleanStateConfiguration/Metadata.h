@@ -66,6 +66,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(EnableDisableAla
 } // namespace EnableDisableAlarm
 
 } // namespace Commands
+
+namespace Events {
+namespace AlarmsStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace AlarmsStateChanged
+namespace SensorFault {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SensorFault
+
+} // namespace Events
 } // namespace BooleanStateConfiguration
 } // namespace Clusters
 } // namespace app

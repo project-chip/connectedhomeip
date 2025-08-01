@@ -7548,6 +7548,7 @@ public class ChipClusters {
     private static final long TC_UPDATE_DEADLINE_ATTRIBUTE_ID = 9L;
     private static final long RECOVERY_IDENTIFIER_ATTRIBUTE_ID = 10L;
     private static final long NETWORK_RECOVERY_REASON_ATTRIBUTE_ID = 11L;
+    private static final long IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID = 12L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -8076,6 +8077,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, NETWORK_RECOVERY_REASON_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readIsCommissioningWithoutPowerAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeIsCommissioningWithoutPowerAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IS_COMMISSIONING_WITHOUT_POWER_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

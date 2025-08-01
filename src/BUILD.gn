@@ -52,9 +52,11 @@ if (chip_build_tests) {
     tests = [
       "${chip_root}/src/access/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -78,6 +80,7 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
       "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
+      "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
       "${chip_root}/src/srp/tests",
     ]
 

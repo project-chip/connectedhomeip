@@ -56,6 +56,12 @@ config("openthread_mcxw71_config") {
     defines += [ "CONFIG_SETTINGS_RUNTIME=1" ]
   }
 
+  # When CLI is enabled, device log is being moved over to UART0 (auxiliary
+  # serial port) so that the CLI can be available on the default UART1
+  if (nxp_enable_matter_cli) {
+    defines += [ "OT_APP_UART_INSTANCE=0" ]
+  }
+
   cflags = [
     "-Wno-shadow",
     "-Wno-sign-compare",

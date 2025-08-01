@@ -237,6 +237,9 @@ class MatterIdlTransformer(Transformer):
     def attr_readonly(self, _):
         return AttributeQuality.READABLE
 
+    def attr_writeonly(self, _):
+        return AttributeQuality.WRITABLE
+
     def attr_nosubscribe(self, _):
         return AttributeQuality.NOSUBSCRIBE
 
@@ -418,10 +421,8 @@ class MatterIdlTransformer(Transformer):
     def attribute(self, qualities, definition_tuple):
         (definition, acl) = definition_tuple
 
-        # until we support write only (and need a bit of a reshuffle)
-        # if the 'attr_readonly == READABLE' is not in the list, we make things
-        # read/write
-        if AttributeQuality.READABLE not in qualities:
+        # If the attribute is neither "readonly" nor "writeonly", then it must be Read/Write
+        if AttributeQuality.READABLE not in qualities and AttributeQuality.WRITABLE not in qualities:
             qualities |= AttributeQuality.READABLE
             qualities |= AttributeQuality.WRITABLE
 

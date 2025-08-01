@@ -6531,6 +6531,7 @@ class GeneralCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="TCUpdateDeadline", Tag=0x00000009, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="recoveryIdentifier", Tag=0x0000000A, Type=typing.Optional[bytes]),
                 ClusterObjectFieldDescriptor(Label="networkRecoveryReason", Tag=0x0000000B, Type=typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum]),
+                ClusterObjectFieldDescriptor(Label="isCommissioningWithoutPower", Tag=0x0000000C, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -6550,6 +6551,7 @@ class GeneralCommissioning(Cluster):
     TCUpdateDeadline: typing.Union[None, Nullable, uint] = None
     recoveryIdentifier: typing.Optional[bytes] = None
     networkRecoveryReason: typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = None
+    isCommissioningWithoutPower: typing.Optional[bool] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -6943,6 +6945,22 @@ class GeneralCommissioning(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum])
 
             value: typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = None
+
+        @dataclass
+        class IsCommissioningWithoutPower(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -51654,8 +51672,11 @@ class JointFabricAdministrator(Cluster):
             kUnknownEnumValue = 3
 
         class StatusCodeEnum(MatterIntEnum):
-            kVIDNotVerified = 0x02
-            kInvalidAdministratorFabricIndex = 0x03
+            kBusy = 0x02
+            kPAKEParameterError = 0x03
+            kWindowNotOpen = 0x04
+            kVIDNotVerified = 0x05
+            kInvalidAdministratorFabricIndex = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
