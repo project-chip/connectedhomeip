@@ -36,7 +36,7 @@ public:
     /// Use the input buffer as a short pascal string.
     ///
     /// The input buffer is assumed to have:
-    ///   - size for a PascalString (i.e. generally pascal string length + prefix == length + 1 given we use
+    ///   - size for a PascalString (i.e. generally pascal string max length + prefix == max length + 1 given we use
     ///     short pascal strings here)
     ///   - an extra +1 bytes for a null terminator so that c_str works.
     ///
