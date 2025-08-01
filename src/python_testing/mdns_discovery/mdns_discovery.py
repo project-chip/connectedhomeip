@@ -523,16 +523,27 @@ class MdnsDiscovery:
         key_count = len(self._discovered_services)
         logger.info(f"Discovered {services_count} mDNS services across {key_count} service types")
 
+        # If service querying is enabled, perform controlled parallel queries to
+        # retrieve service information (TXT, SRV, A/AAAA) for each discovered PTR
+        # record. This is especially helpful when many PTR records are found, as
+        # it prevents system overload by limiting concurrent mDNS queries.
         if query_service:
-            logger.info(f"Querying service information for discovered services...")
-            tasks = []
-            for ptr_list in self._discovered_services.values():
-                for ptr in ptr_list:
-                    tasks.append(self._query_service_info(
+            logger.info("Querying service information for discovered services...")
+            semaphore = asyncio.Semaphore(5)  # Limit to 5 concurrent queries
+
+            async def limited_query(ptr):
+                async with semaphore:
+                    await self._query_service_info(
                         service_type=ptr.service_type,
                         service_name=ptr.service_name,
                         log_output=log_output
-                    ))
+                    )
+
+            tasks = []
+            for ptr_list in self._discovered_services.values():
+                for ptr in ptr_list:
+                    tasks.append(limited_query(ptr))
+
             await asyncio.gather(*tasks)
 
     def _on_service_state_change(
