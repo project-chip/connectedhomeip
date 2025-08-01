@@ -26,7 +26,8 @@ namespace chip {
 namespace Thread {
 
 /**
- * Thread Operational Dataset TLV is defined in Thread Specification as the following format:
+ * The Thread specification defines two TLV element formats: a "base" format and an "extended" format.
+ * The base format is used for TLV elements with a length of 0-254 bytes and is laid out as follows:
  *
  * +---------+---------+-------------------------+
  * | uint8_t | uint8_t | network byte order data |
@@ -35,14 +36,15 @@ namespace Thread {
  * |  Type   | Length  | Value                   |
  * +---------+---------+-------------------------+
  *
+ * A length values of 0xff (255) is an "escape" value and indicates that the element uses the "extended"
+ * format, where a two-byte length field follows the 0xff escape byte.
+ *
+ * Only the base format is allowed in Thread Operational Datasets, so only this format is supported here.
  */
 class ThreadTLV final
 {
 public:
-    static constexpr uint8_t kLengthEscape = 0xff; ///< This length value indicates the actual length is of two-bytes length, which
-                                                   ///< is not allowed in Thread Operational Dataset TLVs.
-    static constexpr uint8_t kHeaderSize = 2;      ///< Size of the TLV header (Type + Length).
-    static constexpr uint8_t kMaxLength  = kSizeOperationalDataset - kHeaderSize;
+    static constexpr uint8_t kLengthEscape = 0xff;
 
     enum : uint8_t
     {
@@ -61,7 +63,7 @@ public:
 
     size_t GetSize() const
     {
-        static_assert(sizeof(*this) == kHeaderSize, "Wrong size for ThreadTLV header");
+        static_assert(sizeof(*this) == 2, "ThreadTLV header should be 2 bytes (type, length)");
         return sizeof(*this) + GetLength();
     }
 
@@ -202,9 +204,9 @@ CHIP_ERROR OperationalDatasetView::GetChannel(uint16_t & aChannel) const
     const ThreadTLV * tlv = Locate(ThreadTLV::kChannel);
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_TLV_TAG_NOT_FOUND);
     VerifyOrReturnError(tlv->GetLength() == 3, CHIP_ERROR_INVALID_TLV_ELEMENT);
-    // Note: The channel page (byte 0) is not returned
     const uint8_t * value = tlv->GetValue();
-    aChannel              = static_cast<uint16_t>((value[1] << 8) | value[2]);
+    VerifyOrReturnError(value[0] == 0, CHIP_ERROR_INVALID_TLV_ELEMENT); // Channel Page must be 0
+    aChannel = Encoding::BigEndian::Get16(value + 1);
     return CHIP_NO_ERROR;
 }
 
@@ -309,6 +311,8 @@ CHIP_ERROR OperationalDatasetView::GetDelayTimer(uint32_t & aDelayMillis) const
 
 /// OperationalDataset
 
+inline constexpr size_t kMaxDatasetElementLength = kSizeOperationalDataset - sizeof(ThreadTLV);
+
 CHIP_ERROR OperationalDataset::Init(ByteSpan aData)
 {
     VerifyOrReturnError(IsValid(aData), CHIP_ERROR_INVALID_ARGUMENT);
@@ -356,6 +360,7 @@ void OperationalDataset::Remove(uint8_t aType)
 // of the same type if one exists. Returns nullptr if there is not enough space.
 ThreadTLV * OperationalDataset::InsertOrReplace(uint8_t aType, size_t aValueSize)
 {
+    assert(aValueSize <= kMaxDatasetElementLength); // callers check this or a tighter limit
     CopyDataIfNecessary();
     ThreadTLV * tlv = const_cast<ThreadTLV *>(Locate(aType));
     if (tlv != nullptr)
@@ -379,6 +384,7 @@ ThreadTLV * OperationalDataset::InsertOrReplace(uint8_t aType, size_t aValueSize
 
 CHIP_ERROR OperationalDataset::SetActiveTimestamp(uint64_t aActiveTimestamp)
 {
+    static_assert(sizeof(aActiveTimestamp) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kActiveTimestamp, sizeof(aActiveTimestamp));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->Set64(aActiveTimestamp);
@@ -387,7 +393,9 @@ CHIP_ERROR OperationalDataset::SetActiveTimestamp(uint64_t aActiveTimestamp)
 
 CHIP_ERROR OperationalDataset::SetChannel(uint16_t aChannel)
 {
-    uint8_t value[] = { 0, static_cast<uint8_t>(aChannel >> 8), static_cast<uint8_t>(aChannel & 0xff) };
+    uint8_t value[3] = { 0 }; // Channel Page is always 0
+    Encoding::BigEndian::Put16(value + 1, aChannel);
+    static_assert(sizeof(value) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kChannel, sizeof(value));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->SetValue(value, sizeof(value));
@@ -396,6 +404,7 @@ CHIP_ERROR OperationalDataset::SetChannel(uint16_t aChannel)
 
 CHIP_ERROR OperationalDataset::SetExtendedPanId(const uint8_t (&aExtendedPanId)[kSizeExtendedPanId])
 {
+    static_assert(sizeof(aExtendedPanId) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kExtendedPanId, sizeof(aExtendedPanId));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->SetValue(aExtendedPanId, sizeof(aExtendedPanId));
@@ -404,14 +413,21 @@ CHIP_ERROR OperationalDataset::SetExtendedPanId(const uint8_t (&aExtendedPanId)[
 
 CHIP_ERROR OperationalDataset::SetMasterKey(const uint8_t (&aMasterKey)[kSizeMasterKey])
 {
+    static_assert(sizeof(aMasterKey) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kMasterKey, sizeof(aMasterKey));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->SetValue(aMasterKey, sizeof(aMasterKey));
     return CHIP_NO_ERROR;
 }
 
+void OperationalDataset::UnsetMasterKey()
+{
+    Remove(ThreadTLV::kMasterKey);
+}
+
 CHIP_ERROR OperationalDataset::SetMeshLocalPrefix(const uint8_t (&aMeshLocalPrefix)[kSizeMeshLocalPrefix])
 {
+    static_assert(sizeof(aMeshLocalPrefix) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kMeshLocalPrefix, sizeof(aMeshLocalPrefix));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->SetValue(aMeshLocalPrefix, sizeof(aMeshLocalPrefix));
@@ -424,6 +440,7 @@ CHIP_ERROR OperationalDataset::SetNetworkName(const char * aNetworkName)
     size_t len = strlen(aNetworkName);
     VerifyOrReturnError(0 < len && len <= kSizeNetworkName, CHIP_ERROR_INVALID_STRING_LENGTH);
 
+    static_assert(kSizeNetworkName <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kNetworkName, len);
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->SetValue(aNetworkName, len);
@@ -432,6 +449,7 @@ CHIP_ERROR OperationalDataset::SetNetworkName(const char * aNetworkName)
 
 CHIP_ERROR OperationalDataset::SetPanId(uint16_t aPanId)
 {
+    static_assert(sizeof(aPanId) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kPanId, sizeof(aPanId));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->Set16(aPanId);
@@ -440,15 +458,21 @@ CHIP_ERROR OperationalDataset::SetPanId(uint16_t aPanId)
 
 CHIP_ERROR OperationalDataset::SetPSKc(const uint8_t (&aPSKc)[kSizePSKc])
 {
+    static_assert(sizeof(aPSKc) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kPSKc, sizeof(aPSKc));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->SetValue(aPSKc, sizeof(aPSKc));
     return CHIP_NO_ERROR;
 }
 
+void OperationalDataset::UnsetPSKc()
+{
+    Remove(ThreadTLV::kPSKc);
+}
+
 CHIP_ERROR OperationalDataset::SetChannelMask(ByteSpan aChannelMask)
 {
-    VerifyOrReturnError(0 < aChannelMask.size() && aChannelMask.size() <= ThreadTLV::kMaxLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(0 < aChannelMask.size() && aChannelMask.size() <= kMaxDatasetElementLength, CHIP_ERROR_INVALID_ARGUMENT);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kChannelMask, aChannelMask.size());
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->SetValue(aChannelMask);
@@ -457,6 +481,7 @@ CHIP_ERROR OperationalDataset::SetChannelMask(ByteSpan aChannelMask)
 
 CHIP_ERROR OperationalDataset::SetSecurityPolicy(uint32_t aSecurityPolicy)
 {
+    static_assert(sizeof(aSecurityPolicy) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kSecurityPolicy, sizeof(aSecurityPolicy));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->Set32(aSecurityPolicy);
@@ -465,20 +490,11 @@ CHIP_ERROR OperationalDataset::SetSecurityPolicy(uint32_t aSecurityPolicy)
 
 CHIP_ERROR OperationalDataset::SetDelayTimer(uint32_t aDelayMillis)
 {
+    static_assert(sizeof(aDelayMillis) <= kMaxDatasetElementLength);
     ThreadTLV * tlv = InsertOrReplace(ThreadTLV::kDelayTimer, sizeof(aDelayMillis));
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
     tlv->Set32(aDelayMillis);
     return CHIP_NO_ERROR;
-}
-
-void OperationalDataset::UnsetMasterKey()
-{
-    Remove(ThreadTLV::kMasterKey);
-}
-
-void OperationalDataset::UnsetPSKc()
-{
-    Remove(ThreadTLV::kPSKc);
 }
 
 } // namespace Thread
