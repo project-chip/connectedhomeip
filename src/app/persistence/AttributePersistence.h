@@ -37,13 +37,13 @@ class AttributePersistence
 public:
     AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
 
-    /// Loads a native-endianness stored value into `T` from the persistence provider.
+    /// Loads a native-endianness stored value of type `T` into `value` from the persistence provider.
     ///
     /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
     ///
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
-    template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
     bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
     {
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
