@@ -39,6 +39,7 @@ bool ShortStringIO::FinalizeRead(MutableByteSpan actuallyRead)
         mValue.SetContent(""_span);
         return false;
     }
+    mValue.NullTerminate();
     return true;
 }
 
