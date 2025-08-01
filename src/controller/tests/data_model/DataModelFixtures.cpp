@@ -40,8 +40,9 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;
 
-// Mock function for linking
+// Mock functions for linking
 void InitDataModelHandler() {}
+void ShutdownDataModelHandler() {}
 
 namespace chip {
 namespace app {

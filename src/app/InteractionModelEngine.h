@@ -340,6 +340,39 @@ public:
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
+    /** Previously, ShutdowActiveReads() was only available in unit test builds via `#if CONFIG_BUILD_FOR_HOST_UNIT_TEST`.
+      * However, we now require proper cleanup of active read handlers during the application's shutdown sequence,
+      * especially before calling SetDataModelProvider(nullptr). This ensures that there are no ongoing IM reads,
+      * which could otherwise result in crashes or undefined behavior.
+
+      * Therefore, this method has been moved out of the CONFIG_BUILD_FOR_HOST_UNIT_TEST block so that it can be
+      * called as part of the normal shutdown flow.
+
+      * Note: This was originally introduced for unit tests to clean up subscriptions created via the high-level
+      * APIs in src/controller/ReadInteraction.h, which did not expose a way to shut down active subscriptions.
+      **/
+
+    void ShutdownActiveReads()
+    {
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+        for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
+        {
+            readClient->mpImEngine = nullptr;
+            auto * tmpClient       = readClient->GetNextClient();
+            readClient->SetNextClient(nullptr);
+            readClient->Close(CHIP_NO_ERROR);
+            readClient = tmpClient;
+        }
+
+        //
+        // After that, we just null out our tracker.
+        //
+        mpActiveReadClientList = nullptr;
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+        mReadHandlers.ReleaseAll();
+    }
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
@@ -391,33 +424,6 @@ public:
         mSubscriptionResumptionRetrySecondsOverride = seconds;
     }
 #endif
-
-    //
-    // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
-    // they don't provide for the ability to shut down those subscriptions after they've been established.
-    //
-    // So for the purposes of unit tests, add a helper here to shut down and clean-up all active handlers.
-    //
-    void ShutdownActiveReads()
-    {
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-        for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
-        {
-            readClient->mpImEngine = nullptr;
-            auto * tmpClient       = readClient->GetNextClient();
-            readClient->SetNextClient(nullptr);
-            readClient->Close(CHIP_NO_ERROR);
-            readClient = tmpClient;
-        }
-
-        //
-        // After that, we just null out our tracker.
-        //
-        mpActiveReadClientList = nullptr;
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
-
-        mReadHandlers.ReleaseAll();
-    }
 #endif
 
     DataModel::Provider * GetDataModelProvider() const;
