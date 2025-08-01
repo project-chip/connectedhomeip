@@ -51,7 +51,7 @@ CHIP_ERROR RvcRunModeDelegate::Init()
 
 void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = mInstance->GetCurrentMode();
+    uint8_t currentMode = GetInstance()->GetCurrentMode();
 
     // Our business logic states that we can only switch into the mapping state from the idle state.
     if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
