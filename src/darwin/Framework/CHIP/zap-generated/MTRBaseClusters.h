@@ -13512,13 +13512,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SelectInput
  *
- * Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List.
+ * Upon receipt, this command SHALL change the media input on the device to the input at a specific index in the Input List.
  */
 - (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command ShowInputStatus
  *
- * Upon receipt, this SHALL display the active status of the input list on screen.
+ * Upon receipt, this command SHALL display the active status of the input list on screen.
  */
 - (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)showInputStatusWithCompletion:(MTRStatusCompletion)completion
@@ -13526,7 +13526,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command HideInputStatus
  *
- * Upon receipt, this SHALL hide the input list from the screen.
+ * Upon receipt, this command SHALL hide the input list from the screen.
  */
 - (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)hideInputStatusWithCompletion:(MTRStatusCompletion)completion
@@ -13534,7 +13534,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command RenameInput
  *
- * Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus.
+ * Upon receipt, this command SHALL rename the input at a specific index in the Input List.
  */
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
