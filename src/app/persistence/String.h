@@ -36,7 +36,7 @@ public:
     /// Use the input buffer as a short pascal string.
     ///
     /// The input buffer is assumed to have:
-    ///   - size for a PascalString (i.e. generally pascal string length + prefix == length + 1 given we use
+    ///   - size for a PascalString (i.e. generally pascal string max length + prefix == max length + 1 given we use
     ///     short pascal strings here)
     ///   - an extra +1 bytes for a null terminator so that c_str works.
     ///
@@ -105,7 +105,7 @@ class String : public Internal::ShortString
 public:
     String() : Internal::ShortString(mBuffer, sizeof(mBuffer)) { SetContent(""_span); }
 
-    // internal shortstring is self-referencing pointers. That cannot be copied, so we assume no copy for now
+    // internal shortstring contains self-referencing pointers. That cannot be copied, so we assume no copy for now
     // These could be implemented, however for now we assume people should just use the underlying Span() to set
     // the values.
     String(String &&)                  = delete;
