@@ -95,8 +95,8 @@ public:
 
     /// Allocates a pascal buffer of the given size.
     ///
-    /// buffer_size includes the prefix.
-    PascalBuffer(T * data, size_t buffer_size) : mData(data), mMaxSize(static_cast<LengthType>(buffer_size - PREFIX_LEN)) {}
+    /// buffer_size includes the prefix and must be at least PREFIX_LEN.
+    PascalBuffer(Span<T> data) : mData(data.data()), mMaxSize(static_cast<LengthType>(data.size() - PREFIX_LEN)) {}
 
     /// Returns the content of the pascal string.
     /// Uses the prefix size information
@@ -163,16 +163,12 @@ public:
 
     /// Checks if the given span is a valid Pascal string: i.e. its size prefix
     /// is either Invalid (i.e. null marker) or it has a size that fits in the buffer
-    static bool IsValid(Span<const T> span)
+    static bool IsValid(ByteSpan span)
     {
         VerifyOrReturnValue(span.size() >= PREFIX_LEN, false);
         LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetContentLength(span.data());
         return len == kInvalidLength || (static_cast<size_t>(len + PREFIX_LEN) <= span.size());
     }
-
-    /// Is the buffer that the pascal string points into a valid
-    /// pascal string (null or valid length?)
-    bool IsValidContent() const { return IsValid({ mData, static_cast<size_t>(mMaxSize) + PREFIX_LEN }); }
 
 private:
     T * mData;

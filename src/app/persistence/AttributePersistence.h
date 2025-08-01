@@ -37,13 +37,13 @@ class AttributePersistence
 public:
     AttributePersistence(AttributePersistenceProvider & provider) : mProvider(provider) {}
 
-    /// Loads a native-endianness stored value into `T` from the persistence provider.
+    /// Loads a native-endianness stored value of type `T` into `value` from the persistence provider.
     ///
     /// If load fails, `false` is returned and data is filled with `valueOnLoadFailure`.
     ///
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
-    template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
     bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
     {
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
@@ -53,7 +53,7 @@ public:
     ///   - decode the given raw data
     ///   - write to storage
     template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
-    CHIP_ERROR StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
+    CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
         ReturnErrorOnFailure(decoder.Decode(value));
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
@@ -61,11 +61,19 @@ public:
 
     /// Load the given string from concrete storage.
     ///
+    /// NOTE: `value` is take as an internal short string to avoid the templates that Storage::String
+    /// imply, however callers are generally expected to pass in a `Storage::String` value and
+    /// not use internal classes directly.
+    ///
     /// Returns true on success, false on failure. On failure the string is reset to empty.
     bool LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
 
     /// Store the given string in persistent storage.
-    CHIP_ERROR StoreString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value);
+    ///
+    /// NOTE: `value` is take as an internal short string to avoid the templates that Storage::String
+    /// imply, however callers are generally expected to pass in a `Storage::String` value and
+    /// not use internal classes directly.
+    CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
 
 private:
     AttributePersistenceProvider & mProvider;
