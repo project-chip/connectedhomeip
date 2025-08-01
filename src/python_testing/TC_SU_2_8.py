@@ -76,7 +76,8 @@ class TC_SU_2_8(MatterBaseTest):
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
         controller = self.default_controller
-        fabric_id_th2 = 2
+        fabric_id_th2 = controller.fabricId + 1
+        # th1_dut_node_id = self.dut_node_id
 
         valid_states = {
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
@@ -87,8 +88,8 @@ class TC_SU_2_8(MatterBaseTest):
         }
 
         provider_th1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=0xDEAD,
-            endpoint=0,
+            providerNodeID=self.dut_node_id,
+            endpoint=endpoint,
             fabricIndex=controller.fabricId
         )
 
@@ -101,6 +102,35 @@ class TC_SU_2_8(MatterBaseTest):
         if fabric_id_th2 == controller.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {controller.fabricId} and TH2: {fabric_id_th2}.")
 
+        logging.info(f"Write ACL")
+
+        acl_admin = Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=controller.fabricId,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],  # Is this ok?
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=endpoint, cluster=Clusters.OtaSoftwareUpdateRequestor.id
+            )]
+        )
+
+        acl_view = Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=controller.fabricId,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[]
+        )
+
+        acl_attr = Clusters.Objects.AccessControl.Attributes.Acl(value=[acl_admin, acl_view])
+
+        resp = await controller.WriteAttribute(
+            self.dut_node_id,  # Is this ok?
+            [(endpoint, acl_attr)]
+        )
+
+        asserts.assert_equal(resp[0].Status, Status.Success, "ACL write failed")
+
         # Commissioning
         self.step(0)
 
@@ -112,6 +142,7 @@ class TC_SU_2_8(MatterBaseTest):
         await self.write_ota_providers(controller=controller, providers=[provider_th1], endpoint=endpoint)
         await self.write_ota_providers(controller=controller, providers=[provider_th2], endpoint=endpoint)  # Is this ok?
 
+        # TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
 
         max_wait = 30
