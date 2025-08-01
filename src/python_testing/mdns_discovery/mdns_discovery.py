@@ -525,8 +525,8 @@ class MdnsDiscovery:
 
         # If service querying is enabled, perform controlled parallel queries to
         # retrieve service information (TXT, SRV, A/AAAA) for each discovered PTR
-        # record. This is especially helpful when many PTR records are found, as
-        # it prevents system overload by limiting concurrent mDNS queries.
+        # record. This is helpful when many PTR records are found, as it prevents
+        # system overload by limiting concurrent mDNS queries.
         if query_service:
             logger.info("Querying service information for discovered services...")
             semaphore = asyncio.Semaphore(5)  # Limit to 5 concurrent queries
