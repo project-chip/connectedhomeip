@@ -109,6 +109,24 @@ protected:
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
 
+    /// Marks that a specific attribute has changed value, if `status` is succes.
+    ///
+    /// Will return `status`
+    DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status)
+    {
+        if (status.IsSuccess())
+        {
+            NotifyAttributeChanged(attributeId);
+        }
+        return status;
+    }
+
+    struct OptionalAttributeEntry
+    {
+        bool enabled;                               // is this optional attribute enabled?
+        const DataModel::AttributeEntry & metadata; // Metadata for the attribute
+    };
+
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec
 };
