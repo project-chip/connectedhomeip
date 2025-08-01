@@ -40,13 +40,13 @@ tests:
                 value: nodeId
 
     - label:
-            "Step 1: TH sends a LaunchApp command to DUT to launch and bring an
-                   application to the foreground"
+          "Step 1: TH sends a LaunchApp command to DUT to launch and bring an
+          application to the foreground"
       command: "LaunchApp"
       arguments:
           values:
               - name: "Data"
-                type:  octstr
+                type: octstr
                 value: "Hello World"
               - name: "Application"
                 value:
@@ -79,7 +79,6 @@ tests:
                 value: 0
               - name: "Data"
                 value: octstr
-
 
     - label: "Step 2b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint

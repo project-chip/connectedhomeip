@@ -45,7 +45,7 @@ tests:
       arguments:
           values:
               - name: "Data"
-                type:  octstr
+                type: octstr
                 value: "Hello World"
               - name: "Application"
                 value:
