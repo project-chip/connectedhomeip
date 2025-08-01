@@ -55,7 +55,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)                                     \
+        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)      \
     } /* cluster revision */                                                                                                       \
     }
 
@@ -65,9 +65,14 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // * Writable attributes must have MATTER_ATTRIBUTE_FLAG_WRITABLE
 // * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
 // * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
+//
+// NOTE: ZAP_ATTRIBUTE_MASK(READABLE) is added by default to ensure backward compatibility, since DECLARE_DYNAMIC_ATTRIBUTE() is a
+// widely used API. If you want to add a write-only dynamic attribute, either expand the macro or contribute a
+// DECLARE_WRITEONLY_DYNAMIC_ATTRIBUTE API.
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType),                                                               \
+            attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                         \
     }
 
 /**
