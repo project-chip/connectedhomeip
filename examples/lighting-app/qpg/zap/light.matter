@@ -2861,7 +2861,8 @@ cluster ColorControl = 768 {
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
-  device type ma_otarequestor = 18, version 3;
+  device type ma_powersource = 17, version 0;
+  device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2879,7 +2880,6 @@ endpoint 0 {
 
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
-    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
@@ -2945,12 +2945,13 @@ endpoint 0 {
     ram      attribute status;
     ram      attribute order;
     ram      attribute description;
+    ram      attribute wiredCurrentType;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster GeneralCommissioning {
@@ -3204,7 +3205,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_extendedcolorlight = 269, version 1;
+  device type ma_extendedcolorlight = 269, version 4;
 
 
   server cluster Identify {
@@ -3359,7 +3360,7 @@ endpoint 1 {
     ram      attribute colorCapabilities default = 0x1F;
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
-    ram      attribute coupleColorTempToLevelMinMireds;
+    ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
