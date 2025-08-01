@@ -372,7 +372,7 @@ TEST_F(AutoCommissionerTest, NextStageConfigureUTCTime_RequiresTimeZone_TimeZone
     // setting up correct structs for condition evaluation
     app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type timeZoneStruct;
 
-    // for Optional<T> and Nullable<T> default-constructd HasValue() return false
+    // for Optional<T> and Nullable<T> default-constructed HasValue() return false
     timeZoneStruct.name.Emplace(chip::CharSpan::fromCharString("")); // evaluates HasValue() to true
     app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> timeZone(&timeZoneStruct,
                                                                                                      1); // size of list = 1
@@ -390,7 +390,7 @@ TEST_F(AutoCommissionerTest, NextStageConfigureUTCTime_DoesNotRequireTimeZone_Ti
     // setting up correct structs for condition evaluation
     app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type timeZoneStruct;
 
-    // for Optional<T> and Nullable<T> default-constructd HasValue() return false
+    // for Optional<T> and Nullable<T> default-constructed HasValue() return false
     timeZoneStruct.name.Emplace(chip::CharSpan::fromCharString("")); // evaluates HasValue() to true
     app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> timeZone(&timeZoneStruct,
                                                                                                      1); // size of list = 1
@@ -480,8 +480,9 @@ TEST_F(AutoCommissionerTest, NextStageConfigureDSTOffset_RequiresDefaultNTP_Defa
 
     privateConfigCommissioner.SetRequiresDefaultNTP(true);
 
+    std::string ntp = "ntp";
     // setting up correct variables for condition evaluation
-    app::DataModel::Nullable<CharSpan> defaultNTP = CharSpan("ntp", strlen("ntp"));
+    app::DataModel::Nullable<CharSpan> defaultNTP = CharSpan(ntp.c_str(), ntp.size());
     privateConfigCommissioner.AccessSetDefaultNTP(defaultNTP);
 
     EXPECT_EQ(privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err), kConfigureDefaultNTP);
@@ -494,8 +495,9 @@ TEST_F(AutoCommissionerTest, NextStageConfigureDSTOffset_DoesNotRequireDefaultNT
 
     privateConfigCommissioner.SetRequiresDefaultNTP(false);
 
+    std::string ntp = "ntp";
     // setting up correct variables for condition evaluation
-    app::DataModel::Nullable<CharSpan> defaultNTP = CharSpan("ntp", strlen("ntp"));
+    app::DataModel::Nullable<CharSpan> defaultNTP = CharSpan(ntp.c_str(), ntp.size());
     privateConfigCommissioner.AccessSetDefaultNTP(defaultNTP);
 
     EXPECT_EQ(privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err),
