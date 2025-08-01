@@ -35,7 +35,12 @@ class ShortString
 public:
     /// Use the input buffer as a short pascal string.
     ///
-    /// The input buffer is assumed to have an extra 1 byte for c_str to work.
+    /// The input buffer is assumed to have:
+    ///   - size for a PascalString (i.e. generally pascal string length + prefix == length + 1 given we use
+    ///     short pascal strings here)
+    ///   - an extra +1 bytes for a null terminator so that c_str works.
+    ///
+    /// This means that buffer_size should be `N+2` where N is the expected maximum string length.
     ///
     /// This class is considered Internal, use chip::app::Storage::String<MAX_LENGTH> in application code.
     ShortString(char * buffer, size_t buffer_size) : mBuffer(buffer), mPascalSize(static_cast<uint8_t>(buffer_size - 1))
@@ -109,8 +114,8 @@ public:
     String & operator=(const String &) = delete;
 
 private:
-    //   - 1 byte to null-terminate to allow for a c_str() implementation
-    //     as that seems very convenient.
+    // +1 byte to null-terminate to allow for a c_str() implementation
+    // as that seems very convenient.
     char mBuffer[ShortPascalString::BufferSizeFor(N) + 1] = { 0 };
 };
 
