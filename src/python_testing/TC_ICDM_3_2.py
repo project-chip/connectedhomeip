@@ -245,7 +245,7 @@ class TC_ICDM_3_2(MatterBaseTest):
             self.step("2d")
             if not is_ci:
                 time.sleep(wait_time_reboot)
-                self.default_controller.ExpireSessions(self.dut_node_id)
+                await self.default_controller.ExpireSessions(self.dut_node_id)
 
             self.step("2e")
             registeredClients = await self._read_icdm_attribute_expect_success(
