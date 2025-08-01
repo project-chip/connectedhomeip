@@ -15,10 +15,10 @@
 #    limitations under the License.
 #
 
+import asyncio
 import json
 import logging
 import time
-import asyncio
 from asyncio import Event, TimeoutError, create_task, ensure_future, sleep, wait_for
 from functools import partial
 from typing import Dict, List, Optional
