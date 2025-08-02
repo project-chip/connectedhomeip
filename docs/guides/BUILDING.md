@@ -333,6 +333,17 @@ ninja -C out/host src/inet/tests:tests_run
 >
 > This means that the tests passed in a previous build.
 
+## Building a single unit test
+
+To run a unit test, pass the target path to ninja in the form:
+"<platform>/<src_path>/<test_file>.run"
+
+```
+# Assuming `gn gen out/host` has been run
+cd out/host
+ninja linux_x64_clang/phony/src/transport/tests/TestSessionManagerDispatch.run
+```
+
 ## Using `build_examples.py`
 
 The script `./scripts/build/build_examples.py` provides a uniform build
