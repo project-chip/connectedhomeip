@@ -32,7 +32,8 @@ enum TransactionType {
 
 message RequestOptions {
   TransactionType transaction_type = 1;
-  uint64 anchor_fabric_id = 2; // required only for CROSS_SIGNED_ICAC_REQUEST
+  uint64 anchor_fabric_id = 2; // required only for CROSS_SIGNED_ICAC
+  bytes request_bytes = 3; // in case of CROSS_SIGNED_ICAC transaction it contains the ICAC CSR
 }
 
 message Response {
@@ -47,6 +48,6 @@ service JointFabric {
   // Server streaming: JFC initiates, JFA is RPC Server-Streaming
   rpc GetStream(pw.protobuf.Empty) returns (stream RequestOptions);
 
-  // JFA uses the above GetStream stream for 
+  // JFA uses GetStream stream for requests
   rpc ResponseStream(Response) returns (pw.protobuf.Empty);
 }

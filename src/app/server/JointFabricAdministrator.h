@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/NodeId.h>
@@ -35,6 +36,7 @@ public:
         virtual ~Delegate() {}
 
         virtual CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) { return CHIP_NO_ERROR; }
+        virtual void OnAddICAC(MutableByteSpan & crossSignedICAC) {}
     };
 
     static JointFabricAdministrator & GetInstance()
@@ -47,6 +49,10 @@ public:
     {
         mPeerJFAdminClusterEndpointId = peerJFAdminClusterEndpointId;
     }
+
+    void SetIcacCsrPubKey(chip::Crypto::P256PublicKey & pubKey) { mIcacCsrPubKey = pubKey; }
+
+    chip::Crypto::P256PublicKey GetIcacCsrPubKey() { return mIcacCsrPubKey; }
 
     CHIP_ERROR SetDelegate(JointFabricAdministrator::Delegate * delegate)
     {
@@ -63,6 +69,7 @@ public:
 private:
     chip::EndpointId mPeerJFAdminClusterEndpointId = chip::kInvalidEndpointId;
     JointFabricAdministrator::Delegate * mDelegate = nullptr;
+    chip::Crypto::P256PublicKey mIcacCsrPubKey;
 };
 
 } // namespace app

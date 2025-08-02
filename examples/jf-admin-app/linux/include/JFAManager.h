@@ -38,15 +38,19 @@ public:
     JFAManager() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     CHIP_ERROR Init(Server & server);
-    void HandleCommissioningCompleteEvent();
+    void HandleCommissioningCompleteEvent(FabricIndex fabricIndex);
+    void HandleFailsafeTimerExpired();
     CHIP_ERROR FinalizeCommissioning(NodeId nodeId, bool isJCM, chip::Crypto::P256PublicKey & trustedIcacPublicKeyB,
                                      uint16_t peerAdminJFAdminClusterEndpointId);
 
     void SetJFARpc(JFARpc & aJFARpc);
     JFARpc * GetJFARpc();
 
+    CHIP_ERROR GetCrossSignedIcac(uint64_t anchorFabricId, ByteSpan & icacCSR, MutableByteSpan & crossSignedICAC);
+
     /* app::JointFabricAdministrator::Delegate */
     CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) override;
+    void OnAddICAC(MutableByteSpan & crossSignedICAC) override;
 
     CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode);
 
@@ -76,14 +80,19 @@ private:
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     OnConnectedAction mOnConnectedAction         = kStandardCommissioningComplete;
-    FabricId jfFabricIndex                       = kUndefinedFabricId;
+    FabricIndex jfFabricIndex                    = kUndefinedFabricIndex;
+    FabricId jfFabricId                          = kUndefinedFabricId;
     EndpointId peerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
     Crypto::P256PublicKey peerAdminICACPubKey;
+    uint8_t crossSignedICACChipCertBuf[chip::Credentials::kMaxCHIPCertLength] = { 0 };
+    MutableByteSpan crossSignedICACChipCert;
+    bool pendingCrossSignedICAC = false;
 
     void ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction);
     CHIP_ERROR SendCommissioningComplete();
     CHIP_ERROR AnnounceJointFabricAdministrator();
     CHIP_ERROR SendICACSRRequest();
+    CHIP_ERROR SendAddICAC(ByteSpan & crossSignedICAC);
 
     static void OnCommissioningCompleteResponse(
         void * context, const app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
@@ -94,6 +103,9 @@ private:
     OnSendICACSRRequestResponse(void * context,
                                 const app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr);
     static void OnSendICACSRRequestFailure(void * context, CHIP_ERROR error);
+    static void OnSendAddICACResponse(void * context,
+                                      const chip::app::Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType &);
+    static void OnSendAddICACFailure(void * context, CHIP_ERROR error);
 
     void ReleaseSession();
 };

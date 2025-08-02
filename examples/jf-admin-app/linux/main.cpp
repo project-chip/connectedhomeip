@@ -85,7 +85,11 @@ void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
     if (event->Type == DeviceEventType::kCommissioningComplete)
     {
-        JFAMgr().HandleCommissioningCompleteEvent();
+        JFAMgr().HandleCommissioningCompleteEvent(event->CommissioningComplete.fabricIndex);
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        JFAMgr().HandleFailsafeTimerExpired();
     }
 }
 
