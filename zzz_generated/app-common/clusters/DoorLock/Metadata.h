@@ -16,7 +16,7 @@ namespace app {
 namespace Clusters {
 namespace DoorLock {
 
-inline constexpr uint32_t kRevision = 7;
+inline constexpr uint32_t kRevision = 9;
 
 namespace Attributes {
 namespace LockState {
@@ -239,6 +239,33 @@ inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(UnlockWithTimeout::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
                    Access::Privilege::kOperate);
 } // namespace UnlockWithTimeout
+namespace SetPINCode {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(SetPINCode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kAdminister);
+} // namespace SetPINCode
+namespace GetPINCode {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetPINCode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
+} // namespace GetPINCode
+namespace ClearPINCode {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ClearPINCode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kAdminister);
+} // namespace ClearPINCode
+namespace ClearAllPINCodes {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ClearAllPINCodes::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kAdminister);
+} // namespace ClearAllPINCodes
+namespace SetUserStatus {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetUserStatus::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
+} // namespace SetUserStatus
+namespace GetUserStatus {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetUserStatus::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
+} // namespace GetUserStatus
 namespace SetWeekDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetWeekDaySchedule::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);
@@ -275,6 +302,33 @@ namespace ClearHolidaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ClearHolidaySchedule::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kAdminister);
 } // namespace ClearHolidaySchedule
+namespace SetUserType {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetUserType::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
+} // namespace SetUserType
+namespace GetUserType {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetUserType::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
+} // namespace GetUserType
+namespace SetRFIDCode {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(SetRFIDCode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kAdminister);
+} // namespace SetRFIDCode
+namespace GetRFIDCode {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetRFIDCode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kAdminister);
+} // namespace GetRFIDCode
+namespace ClearRFIDCode {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ClearRFIDCode::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kAdminister);
+} // namespace ClearRFIDCode
+namespace ClearAllRFIDCodes {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ClearAllRFIDCodes::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kAdminister);
+} // namespace ClearAllRFIDCodes
 namespace SetUser {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(SetUser::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),

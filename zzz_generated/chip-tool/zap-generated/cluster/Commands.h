@@ -7828,6 +7828,12 @@ private:
 | * LockDoor                                                          |   0x00 |
 | * UnlockDoor                                                        |   0x01 |
 | * UnlockWithTimeout                                                 |   0x03 |
+| * SetPINCode                                                        |   0x05 |
+| * GetPINCode                                                        |   0x06 |
+| * ClearPINCode                                                      |   0x07 |
+| * ClearAllPINCodes                                                  |   0x08 |
+| * SetUserStatus                                                     |   0x09 |
+| * GetUserStatus                                                     |   0x0A |
 | * SetWeekDaySchedule                                                |   0x0B |
 | * GetWeekDaySchedule                                                |   0x0C |
 | * ClearWeekDaySchedule                                              |   0x0D |
@@ -7837,6 +7843,12 @@ private:
 | * SetHolidaySchedule                                                |   0x11 |
 | * GetHolidaySchedule                                                |   0x12 |
 | * ClearHolidaySchedule                                              |   0x13 |
+| * SetUserType                                                       |   0x14 |
+| * GetUserType                                                       |   0x15 |
+| * SetRFIDCode                                                       |   0x16 |
+| * GetRFIDCode                                                       |   0x17 |
+| * ClearRFIDCode                                                     |   0x18 |
+| * ClearAllRFIDCodes                                                 |   0x19 |
 | * SetUser                                                           |   0x1A |
 | * GetUser                                                           |   0x1B |
 | * ClearUser                                                         |   0x1D |
@@ -8018,6 +8030,231 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type mRequest;
+};
+
+/*
+ * Command SetPINCode
+ */
+class DoorLockSetPINCode : public ClusterCommand
+{
+public:
+    DoorLockSetPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-pincode", credsIssuerConfig)
+    {
+        AddArgument("UserID", 0, UINT16_MAX, &mRequest.userID);
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
+        AddArgument("Pin", &mRequest.pin);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetPINCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetPINCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetPINCode::Type mRequest;
+};
+
+/*
+ * Command GetPINCode
+ */
+class DoorLockGetPINCode : public ClusterCommand
+{
+public:
+    DoorLockGetPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-pincode", credsIssuerConfig)
+    {
+        AddArgument("UserID", 0, UINT16_MAX, &mRequest.userID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetPINCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetPINCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::GetPINCode::Type mRequest;
+};
+
+/*
+ * Command ClearPINCode
+ */
+class DoorLockClearPINCode : public ClusterCommand
+{
+public:
+    DoorLockClearPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-pincode", credsIssuerConfig)
+    {
+        AddArgument("PINSlotIndex", 0, UINT16_MAX, &mRequest.PINSlotIndex);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearPINCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearPINCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearPINCode::Type mRequest;
+};
+
+/*
+ * Command ClearAllPINCodes
+ */
+class DoorLockClearAllPINCodes : public ClusterCommand
+{
+public:
+    DoorLockClearAllPINCodes(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-all-pincodes", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::Type mRequest;
+};
+
+/*
+ * Command SetUserStatus
+ */
+class DoorLockSetUserStatus : public ClusterCommand
+{
+public:
+    DoorLockSetUserStatus(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-user-status", credsIssuerConfig)
+    {
+        AddArgument("UserID", 0, UINT16_MAX, &mRequest.userID);
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetUserStatus::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetUserStatus::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetUserStatus::Type mRequest;
+};
+
+/*
+ * Command GetUserStatus
+ */
+class DoorLockGetUserStatus : public ClusterCommand
+{
+public:
+    DoorLockGetUserStatus(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-user-status", credsIssuerConfig)
+    {
+        AddArgument("UserID", 0, UINT16_MAX, &mRequest.userID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetUserStatus::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetUserStatus::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::GetUserStatus::Type mRequest;
 };
 
 /*
@@ -8376,6 +8613,232 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type mRequest;
+};
+
+/*
+ * Command SetUserType
+ */
+class DoorLockSetUserType : public ClusterCommand
+{
+public:
+    DoorLockSetUserType(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-user-type", credsIssuerConfig)
+    {
+        AddArgument("UserID", 0, UINT16_MAX, &mRequest.userID);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetUserType::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetUserType::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetUserType::Type mRequest;
+};
+
+/*
+ * Command GetUserType
+ */
+class DoorLockGetUserType : public ClusterCommand
+{
+public:
+    DoorLockGetUserType(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-user-type", credsIssuerConfig)
+    {
+        AddArgument("UserID", 0, UINT16_MAX, &mRequest.userID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetUserType::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetUserType::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::GetUserType::Type mRequest;
+};
+
+/*
+ * Command SetRFIDCode
+ */
+class DoorLockSetRFIDCode : public ClusterCommand
+{
+public:
+    DoorLockSetRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-rfidcode", credsIssuerConfig)
+    {
+        AddArgument("UserID", 0, UINT16_MAX, &mRequest.userID);
+        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
+        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
+        AddArgument("RFIDCode", &mRequest.RFIDCode);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetRFIDCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetRFIDCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetRFIDCode::Type mRequest;
+};
+
+/*
+ * Command GetRFIDCode
+ */
+class DoorLockGetRFIDCode : public ClusterCommand
+{
+public:
+    DoorLockGetRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-rfidcode", credsIssuerConfig)
+    {
+        AddArgument("UserID", 0, UINT16_MAX, &mRequest.userID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetRFIDCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::GetRFIDCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::GetRFIDCode::Type mRequest;
+};
+
+/*
+ * Command ClearRFIDCode
+ */
+class DoorLockClearRFIDCode : public ClusterCommand
+{
+public:
+    DoorLockClearRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-rfidcode", credsIssuerConfig)
+    {
+        AddArgument("RFIDSlotIndex", 0, UINT16_MAX, &mRequest.RFIDSlotIndex);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::Type mRequest;
+};
+
+/*
+ * Command ClearAllRFIDCodes
+ */
+class DoorLockClearAllRFIDCodes : public ClusterCommand
+{
+public:
+    DoorLockClearAllRFIDCodes(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("clear-all-rfidcodes", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::Type mRequest;
 };
 
 /*
@@ -25072,6 +25535,12 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<DoorLockLockDoor>(credsIssuerConfig),               //
         make_unique<DoorLockUnlockDoor>(credsIssuerConfig),             //
         make_unique<DoorLockUnlockWithTimeout>(credsIssuerConfig),      //
+        make_unique<DoorLockSetPINCode>(credsIssuerConfig),             //
+        make_unique<DoorLockGetPINCode>(credsIssuerConfig),             //
+        make_unique<DoorLockClearPINCode>(credsIssuerConfig),           //
+        make_unique<DoorLockClearAllPINCodes>(credsIssuerConfig),       //
+        make_unique<DoorLockSetUserStatus>(credsIssuerConfig),          //
+        make_unique<DoorLockGetUserStatus>(credsIssuerConfig),          //
         make_unique<DoorLockSetWeekDaySchedule>(credsIssuerConfig),     //
         make_unique<DoorLockGetWeekDaySchedule>(credsIssuerConfig),     //
         make_unique<DoorLockClearWeekDaySchedule>(credsIssuerConfig),   //
@@ -25081,6 +25550,12 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<DoorLockSetHolidaySchedule>(credsIssuerConfig),     //
         make_unique<DoorLockGetHolidaySchedule>(credsIssuerConfig),     //
         make_unique<DoorLockClearHolidaySchedule>(credsIssuerConfig),   //
+        make_unique<DoorLockSetUserType>(credsIssuerConfig),            //
+        make_unique<DoorLockGetUserType>(credsIssuerConfig),            //
+        make_unique<DoorLockSetRFIDCode>(credsIssuerConfig),            //
+        make_unique<DoorLockGetRFIDCode>(credsIssuerConfig),            //
+        make_unique<DoorLockClearRFIDCode>(credsIssuerConfig),          //
+        make_unique<DoorLockClearAllRFIDCodes>(credsIssuerConfig),      //
         make_unique<DoorLockSetUser>(credsIssuerConfig),                //
         make_unique<DoorLockGetUser>(credsIssuerConfig),                //
         make_unique<DoorLockClearUser>(credsIssuerConfig),              //

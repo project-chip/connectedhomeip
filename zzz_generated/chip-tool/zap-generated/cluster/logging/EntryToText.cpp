@@ -5693,6 +5693,18 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "UnlockDoor";
         case chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Id:
             return "UnlockWithTimeout";
+        case chip::app::Clusters::DoorLock::Commands::SetPINCode::Id:
+            return "SetPINCode";
+        case chip::app::Clusters::DoorLock::Commands::GetPINCode::Id:
+            return "GetPINCode";
+        case chip::app::Clusters::DoorLock::Commands::ClearPINCode::Id:
+            return "ClearPINCode";
+        case chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::Id:
+            return "ClearAllPINCodes";
+        case chip::app::Clusters::DoorLock::Commands::SetUserStatus::Id:
+            return "SetUserStatus";
+        case chip::app::Clusters::DoorLock::Commands::GetUserStatus::Id:
+            return "GetUserStatus";
         case chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Id:
             return "SetWeekDaySchedule";
         case chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Id:
@@ -5711,6 +5723,18 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "GetHolidaySchedule";
         case chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Id:
             return "ClearHolidaySchedule";
+        case chip::app::Clusters::DoorLock::Commands::SetUserType::Id:
+            return "SetUserType";
+        case chip::app::Clusters::DoorLock::Commands::GetUserType::Id:
+            return "GetUserType";
+        case chip::app::Clusters::DoorLock::Commands::SetRFIDCode::Id:
+            return "SetRFIDCode";
+        case chip::app::Clusters::DoorLock::Commands::GetRFIDCode::Id:
+            return "GetRFIDCode";
+        case chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::Id:
+            return "ClearRFIDCode";
+        case chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::Id:
+            return "ClearAllRFIDCodes";
         case chip::app::Clusters::DoorLock::Commands::SetUser::Id:
             return "SetUser";
         case chip::app::Clusters::DoorLock::Commands::GetUser::Id:
@@ -6715,12 +6739,20 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
     case chip::app::Clusters::DoorLock::Id: {
         switch (id)
         {
+        case chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::Id:
+            return "GetPINCodeResponse";
+        case chip::app::Clusters::DoorLock::Commands::GetUserStatusResponse::Id:
+            return "GetUserStatusResponse";
         case chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::Id:
             return "GetWeekDayScheduleResponse";
         case chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::Id:
             return "GetYearDayScheduleResponse";
         case chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::Id:
             return "GetHolidayScheduleResponse";
+        case chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::Id:
+            return "GetUserTypeResponse";
+        case chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::Id:
+            return "GetRFIDCodeResponse";
         case chip::app::Clusters::DoorLock::Commands::GetUserResponse::Id:
             return "GetUserResponse";
         case chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::Id:

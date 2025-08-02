@@ -26909,6 +26909,16 @@ class DoorLock(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6
 
+        class LEDSettingEnum(MatterIntEnum):
+            kNoLEDSignal = 0x00
+            kNoLEDSignalAccessAllowed = 0x01
+            kLEDSignalAll = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class LockDataTypeEnum(MatterIntEnum):
             kUnspecified = 0x00
             kProgrammingCode = 0x01
@@ -26983,6 +26993,26 @@ class DoorLock(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 11
+
+        class SoundVolumeEnum(MatterIntEnum):
+            kSilent = 0x00
+            kLow = 0x01
+            kHigh = 0x02
+            kMedium = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class StatusCodeEnum(MatterIntEnum):
+            kDuplicate = 0x02
+            kOccupied = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
 
         class UserStatusEnum(MatterIntEnum):
             kAvailable = 0x00
@@ -27216,6 +27246,159 @@ class DoorLock(Cluster):
 
             timeout: uint = 0
             PINCode: typing.Optional[bytes] = None
+
+        @dataclass
+        class SetPINCode(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="userStatus", Tag=1, Type=typing.Union[Nullable, DoorLock.Enums.UserStatusEnum]),
+                        ClusterObjectFieldDescriptor(Label="userType", Tag=2, Type=typing.Union[Nullable, DoorLock.Enums.UserTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="pin", Tag=3, Type=bytes),
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            userID: uint = 0
+            userStatus: typing.Union[Nullable, DoorLock.Enums.UserStatusEnum] = NullValue
+            userType: typing.Union[Nullable, DoorLock.Enums.UserTypeEnum] = NullValue
+            pin: bytes = b""
+
+        @dataclass
+        class GetPINCode(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetPINCodeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                    ])
+
+            userID: uint = 0
+
+        @dataclass
+        class GetPINCodeResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="userStatus", Tag=1, Type=typing.Union[Nullable, DoorLock.Enums.UserStatusEnum]),
+                        ClusterObjectFieldDescriptor(Label="userType", Tag=2, Type=typing.Union[Nullable, DoorLock.Enums.UserTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="PINCode", Tag=3, Type=typing.Union[Nullable, bytes]),
+                    ])
+
+            userID: uint = 0
+            userStatus: typing.Union[Nullable, DoorLock.Enums.UserStatusEnum] = NullValue
+            userType: typing.Union[Nullable, DoorLock.Enums.UserTypeEnum] = NullValue
+            PINCode: typing.Union[Nullable, bytes] = NullValue
+
+        @dataclass
+        class ClearPINCode(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PINSlotIndex", Tag=0, Type=uint),
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            PINSlotIndex: uint = 0
+
+        @dataclass
+        class ClearAllPINCodes(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+        @dataclass
+        class SetUserStatus(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000009
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="userStatus", Tag=1, Type=DoorLock.Enums.UserStatusEnum),
+                    ])
+
+            userID: uint = 0
+            userStatus: DoorLock.Enums.UserStatusEnum = 0
+
+        @dataclass
+        class GetUserStatus(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x0000000A
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetUserStatusResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                    ])
+
+            userID: uint = 0
+
+        @dataclass
+        class GetUserStatusResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x0000000A
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="userStatus", Tag=1, Type=DoorLock.Enums.UserStatusEnum),
+                    ])
+
+            userID: uint = 0
+            userStatus: DoorLock.Enums.UserStatusEnum = 0
 
         @dataclass
         class SetWeekDaySchedule(ClusterCommand):
@@ -27470,6 +27653,159 @@ class DoorLock(Cluster):
                     ])
 
             holidayIndex: uint = 0
+
+        @dataclass
+        class SetUserType(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000014
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="userType", Tag=1, Type=DoorLock.Enums.UserTypeEnum),
+                    ])
+
+            userID: uint = 0
+            userType: DoorLock.Enums.UserTypeEnum = 0
+
+        @dataclass
+        class GetUserType(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000015
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetUserTypeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                    ])
+
+            userID: uint = 0
+
+        @dataclass
+        class GetUserTypeResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000015
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="userType", Tag=1, Type=DoorLock.Enums.UserTypeEnum),
+                    ])
+
+            userID: uint = 0
+            userType: DoorLock.Enums.UserTypeEnum = 0
+
+        @dataclass
+        class SetRFIDCode(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000016
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="userStatus", Tag=1, Type=typing.Union[Nullable, DoorLock.Enums.UserStatusEnum]),
+                        ClusterObjectFieldDescriptor(Label="userType", Tag=2, Type=typing.Union[Nullable, DoorLock.Enums.UserTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="RFIDCode", Tag=3, Type=bytes),
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            userID: uint = 0
+            userStatus: typing.Union[Nullable, DoorLock.Enums.UserStatusEnum] = NullValue
+            userType: typing.Union[Nullable, DoorLock.Enums.UserTypeEnum] = NullValue
+            RFIDCode: bytes = b""
+
+        @dataclass
+        class GetRFIDCode(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000017
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetRFIDCodeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                    ])
+
+            userID: uint = 0
+
+        @dataclass
+        class GetRFIDCodeResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000017
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="userStatus", Tag=1, Type=typing.Union[Nullable, DoorLock.Enums.UserStatusEnum]),
+                        ClusterObjectFieldDescriptor(Label="userType", Tag=2, Type=typing.Union[Nullable, DoorLock.Enums.UserTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="RFIDCode", Tag=3, Type=typing.Union[Nullable, bytes]),
+                    ])
+
+            userID: uint = 0
+            userStatus: typing.Union[Nullable, DoorLock.Enums.UserStatusEnum] = NullValue
+            userType: typing.Union[Nullable, DoorLock.Enums.UserTypeEnum] = NullValue
+            RFIDCode: typing.Union[Nullable, bytes] = NullValue
+
+        @dataclass
+        class ClearRFIDCode(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000018
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="RFIDSlotIndex", Tag=0, Type=uint),
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            RFIDSlotIndex: uint = 0
+
+        @dataclass
+        class ClearAllRFIDCodes(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000019
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
         @dataclass
         class SetUser(ClusterCommand):
