@@ -30483,6 +30483,9 @@ public class ClusterInfoMapping {
     CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportactivationReasonCommandParameterInfo = new CommandParameterInfo("activationReason", Integer.class, Integer.class);
     pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("activationReason",pushAvStreamTransportmanuallyTriggerTransportactivationReasonCommandParameterInfo);
 
+
+    CommandParameterInfo pushAvStreamTransportmanuallyTriggerTransportuserDefinedCommandParameterInfo = new CommandParameterInfo("userDefined", Optional.class, byte[].class);
+    pushAvStreamTransportmanuallyTriggerTransportCommandParams.put("userDefined",pushAvStreamTransportmanuallyTriggerTransportuserDefinedCommandParameterInfo);
     InteractionInfo pushAvStreamTransportmanuallyTriggerTransportInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.PushAvStreamTransportCluster) cluster)
@@ -30493,6 +30496,8 @@ public class ClusterInfoMapping {
         commandArguments.get("activationReason")
         , (Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct>)
         commandArguments.get("timeControl")
+        , (Optional<byte[]>)
+        commandArguments.get("userDefined")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -30502,13 +30507,13 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> pushAvStreamTransportfindTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Optional.class, Integer.class);
+    CommandParameterInfo pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
     pushAvStreamTransportfindTransportCommandParams.put("connectionID",pushAvStreamTransportfindTransportconnectionIDCommandParameterInfo);
     InteractionInfo pushAvStreamTransportfindTransportInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.PushAvStreamTransportCluster) cluster)
           .findTransport((ChipClusters.PushAvStreamTransportCluster.FindTransportResponseCallback) callback
-           , (Optional<Integer>)
+           , (Integer)
              commandArguments.get("connectionID")
 
             );

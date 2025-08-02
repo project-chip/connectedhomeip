@@ -953,11 +953,11 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
 
     Commands::FindTransportResponse::Type response;
 
-    Optional<DataModel::Nullable<uint16_t>> connectionID = commandData.connectionID;
+    DataModel::Nullable<uint16_t> connectionID = commandData.connectionID;
 
     std::vector<Structs::TransportConfigurationStruct::Type> transportConfigurations;
 
-    if (!connectionID.HasValue() || connectionID.Value().IsNull())
+    if (connectionID.IsNull())
     {
         if (mCurrentConnections.size() == 0)
         {
@@ -978,7 +978,7 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     {
         FabricIndex fabricIndex = handler.GetAccessingFabricIndex();
         TransportConfigurationStorage * transportConfiguration =
-            FindStreamTransportConnectionWithinFabric(connectionID.Value().Value(), fabricIndex);
+            FindStreamTransportConnectionWithinFabric(connectionID.Value(), fabricIndex);
         if (transportConfiguration == nullptr)
         {
             ChipLogError(Zcl, "HandleFindTransport[ep=%d]: ConnectionID not found", mEndpointId);
