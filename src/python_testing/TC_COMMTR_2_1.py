@@ -69,7 +69,7 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
     def pics_TC_COMMTR_2_1(self) -> list[str]:
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
 
-        return ["COMMTR.S", "DGGEN.S", "DGGEN.S.A0008", "DGGEN.S.C00.Rsp"]
+        return ["COMMTR.S"]
 
     def steps_TC_COMMTR_2_1(self) -> list[TestStep]:
 
@@ -108,10 +108,6 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
         """Implements test procedure for test case TC_COMMTR_2_1."""
 
         endpoint = self.get_endpoint()
-
-        # If TestEventTriggers is not enabled this TC can't be checked properly.
-        if not self.check_pics("DGGEN.S") or not self.check_pics("DGGEN.S.A0008") or not self.check_pics("DGGEN.S.C00.Rsp"):
-            asserts.skip("PICS DGGEN.S or DGGEN.S.A0008 or DGGEN.S.C00.Rsp is not True")
 
         self.step("1")
         # commissioning
