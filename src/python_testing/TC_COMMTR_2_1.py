@@ -165,7 +165,7 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
         asserts.assert_not_equal(val, NullValue, "TariffUnit must not be NullValue")
         matter_asserts.assert_valid_enum(
-            val, "TariffUnit attribute must return a TariffUnitEnum", cluster.Enums.TariffUnitEnum)
+            val, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
 
         self.step("10")
         # Read MaximumMeteredQuantities attribute, expected to be uint16
