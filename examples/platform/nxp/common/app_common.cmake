@@ -289,3 +289,11 @@ if (CONFIG_CHIP_APP_WIFI_CONNECT)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/wifi_connect/source/WifiConnect.cpp
     )
 endif()
+
+# Use MCUX post-build function to convert the executable to binary format
+mcux_convert_binary(
+    BINARY ${APPLICATION_BINARY_DIR}/app.bin
+    TARGET app
+    TOOLCHAINS ${CONFIG_TOOLCHAIN}
+    EXTRA_ARGS "${CONFIG_REMOVE_SECTIONS_FROM_BIN}"
+)
