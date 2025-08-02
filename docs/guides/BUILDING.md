@@ -346,6 +346,9 @@ To run a unit test, pass the target path to ninja in the form:
 For example:
 ```
 # Assuming `gn gen out/host` has been run
+ninja -C out/debug mac_arm64_gcc/tests/TestSessionManagerDispatch
+
+# OR enter build directory:
 cd out/host
 ninja linux_x64_clang/phony/src/transport/tests/TestSessionManagerDispatch.run
 ```
