@@ -18,9 +18,14 @@ namespace ContentAppObserver {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 5;
+
+} // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace ContentAppMessage {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ContentAppMessage::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

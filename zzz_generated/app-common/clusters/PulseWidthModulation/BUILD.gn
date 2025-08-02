@@ -37,6 +37,7 @@ source_set("headers") {
   public_deps = [
     ":enums",
     ":ids",
+    ":metadata",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app/common:global-ids",
     "${chip_root}/zzz_generated/app-common/clusters/shared:headers",
@@ -74,7 +75,7 @@ source_set("elements") {
 }
 
 source_set("metadata") {
-  sources = [ "Metadata.h" ]
+  sources = [ "Metadata.h", "MetadataProvider.h"]
   public_deps = [
     ":ids",
     "${chip_root}/src/app/data-model-provider:metadata",

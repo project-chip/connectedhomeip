@@ -19,6 +19,8 @@ namespace WiFiNetworkDiagnostics {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 18;
+
 namespace Bssid {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Bssid::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -75,6 +77,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OverrunCount::Id, BitF
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 1;
+
 namespace ResetCounts {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

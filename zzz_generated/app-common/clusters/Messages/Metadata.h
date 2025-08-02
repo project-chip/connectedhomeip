@@ -19,6 +19,8 @@ namespace Messages {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 7;
+
 namespace Messages {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Messages::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -34,6 +36,8 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 2;
+
 namespace PresentMessagesRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(PresentMessagesRequest::Id,

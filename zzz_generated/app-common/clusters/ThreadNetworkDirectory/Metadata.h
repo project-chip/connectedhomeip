@@ -19,6 +19,8 @@ namespace ThreadNetworkDirectory {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+inline constexpr uint32_t kMetadataCount = 8;
+
 namespace PreferredExtendedPanID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PreferredExtendedPanID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
@@ -36,6 +38,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadNetworkTableSize
 } // namespace Attributes
 
 namespace Commands {
+inline constexpr uint32_t kMetadataCount = 3;
+
 namespace AddNetwork {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(AddNetwork::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
