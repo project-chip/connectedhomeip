@@ -35,8 +35,8 @@ static constexpr uint32_t TariffComponents2[] = { 0x5002, 0x5003, 0x5004 };
 
 // Non-constexpr storage for the actual data
 static const Structs::MeteredQuantityStruct::Type Data[] = {
-    { DataModel::List<const uint32_t>(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), 3500 },
-    { DataModel::List<const uint32_t>(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), -2000 }
+    { DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), 3500 },
+    { DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), -2000 }
 };
 } // namespace Sample1
 
@@ -45,8 +45,8 @@ static constexpr uint32_t TariffComponents1[] = { 0x6001 };
 static constexpr uint32_t TariffComponents2[] = { 0x6002, 0x6003 };
 
 static const Structs::MeteredQuantityStruct::Type Data[] = {
-    { DataModel::List<const uint32_t>(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), 4200 },
-    { DataModel::List<const uint32_t>(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), -1500 }
+    { DataModel::List(TariffComponents1, MATTER_ARRAY_SIZE(TariffComponents1)), 4200 },
+    { DataModel::List(TariffComponents2, MATTER_ARRAY_SIZE(TariffComponents2)), -1500 }
 };
 } // namespace Sample2
 } // namespace MeteredQuantitySamples
