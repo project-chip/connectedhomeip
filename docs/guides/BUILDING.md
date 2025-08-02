@@ -338,6 +338,11 @@ ninja -C out/host src/inet/tests:tests_run
 To run a unit test, pass the target path to ninja in the form:
 "<platform>/<src_path>/<test_file>.run"
 
+- `<platform>` is the build configuration directory, such as `linux_x64_clang` for a Linux build using Clang. You can find this by looking at the subdirectories in your `out/host` build output.
+- `<src_path>` is the relative path from the source root to the test file, excluding the platform and file extension. For example, for a test located at `src/transport/tests/TestSessionManagerDispatch.cpp`, the `src_path` would be `src/transport/tests`.
+- `<test_file>` is the name of the test source file (without extension), such as `TestSessionManagerDispatch`.
+
+For example:
 ```
 # Assuming `gn gen out/host` has been run
 cd out/host
