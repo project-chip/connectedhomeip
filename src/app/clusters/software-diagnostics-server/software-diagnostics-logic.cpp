@@ -107,7 +107,9 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
         { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span<const DataModel::AttributeEntry>() /* mandatory */, Span(optionalEntries));
+    size_t spanSize = sizeof(Attributes::kMandatoryMetadata) / sizeof(chip::app::DataModel::AttributeEntry);
+    return listBuilder.Append(Span<const DataModel::AttributeEntry>(SoftwareDiagnostics::Attributes::kMandatoryMetadata, spanSize),
+                              Span(optionalEntries));
 }
 
 } // namespace Clusters

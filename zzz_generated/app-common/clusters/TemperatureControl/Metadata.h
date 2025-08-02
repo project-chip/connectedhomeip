@@ -47,6 +47,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedTemperatureLevels
 
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+
+};
+
 } // namespace Attributes
 
 namespace Commands {

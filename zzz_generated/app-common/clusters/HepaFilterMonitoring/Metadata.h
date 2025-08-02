@@ -46,6 +46,10 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ReplacementProductList
 
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+    ChangeIndication::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

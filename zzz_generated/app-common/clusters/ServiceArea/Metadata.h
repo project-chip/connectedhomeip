@@ -48,6 +48,11 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace Progress
 
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+    SupportedAreas::kMetadataEntry,
+    SelectedAreas::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

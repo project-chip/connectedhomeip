@@ -44,6 +44,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(BoostState::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BoostState
 
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+    HeaterTypes::kMetadataEntry,
+    HeatDemand::kMetadataEntry,
+    BoostState::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

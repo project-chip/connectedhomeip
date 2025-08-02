@@ -38,6 +38,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHeapHighWaterma
                                                           std::nullopt);
 } // namespace CurrentHeapHighWatermark
 
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+
+};
+
 } // namespace Attributes
 
 namespace Commands {

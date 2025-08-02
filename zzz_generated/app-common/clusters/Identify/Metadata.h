@@ -28,6 +28,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(IdentifyType::Id, BitF
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace IdentifyType
 
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+    IdentifyTime::kMetadataEntry,
+    IdentifyType::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {

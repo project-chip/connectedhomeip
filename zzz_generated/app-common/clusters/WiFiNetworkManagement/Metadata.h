@@ -28,6 +28,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PassphraseSurrogate::I
                                                           Access::Privilege::kManage, std::nullopt);
 } // namespace PassphraseSurrogate
 
+constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+    Ssid::kMetadataEntry,
+    PassphraseSurrogate::kMetadataEntry,
+};
+
 } // namespace Attributes
 
 namespace Commands {
