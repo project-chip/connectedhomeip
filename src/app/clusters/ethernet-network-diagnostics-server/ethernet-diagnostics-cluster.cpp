@@ -16,6 +16,7 @@
  */
 #include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-cluster.h>
 
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -30,6 +31,7 @@ namespace app {
 namespace Clusters {
 
 using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
+using namespace chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
 
 namespace {
 
@@ -184,35 +186,22 @@ CHIP_ERROR EthernetDiagnosticsServerCluster::AcceptedCommands(const ConcreteClus
 CHIP_ERROR EthernetDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
                                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    struct Mapping
-    {
-        const bool enable;
-        const DataModel::AttributeEntry & entry;
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { mEnabledAttributes.enableCarrierDetect, CarrierDetect::kMetadataEntry },
+        { mEnabledAttributes.enableErrCount, CollisionCount::kMetadataEntry },
+        { mEnabledAttributes.enableFullDuplex, FullDuplex::kMetadataEntry },
+        { mEnabledAttributes.enableErrCount, OverrunCount::kMetadataEntry },
+        { mEnabledAttributes.enablePacketCount, PacketRxCount::kMetadataEntry },
+        { mEnabledAttributes.enablePacketCount, PacketTxCount::kMetadataEntry },
+        { mEnabledAttributes.enablePHYRate, PHYRate::kMetadataEntry },
+        { mEnabledAttributes.enableTimeSinceReset, TimeSinceReset::kMetadataEntry },
+        { mEnabledAttributes.enableErrCount, TxErrCount::kMetadataEntry },
     };
 
-    const Mapping mappings[] = {
-        { mEnabledAttributes.enableCarrierDetect, EthernetNetworkDiagnostics::Attributes::CarrierDetect::kMetadataEntry },
-        { mEnabledAttributes.enableErrCount, EthernetNetworkDiagnostics::Attributes::CollisionCount::kMetadataEntry },
-        { mEnabledAttributes.enableFullDuplex, EthernetNetworkDiagnostics::Attributes::FullDuplex::kMetadataEntry },
-        { mEnabledAttributes.enableErrCount, EthernetNetworkDiagnostics::Attributes::OverrunCount::kMetadataEntry },
-        { mEnabledAttributes.enablePacketCount, EthernetNetworkDiagnostics::Attributes::PacketRxCount::kMetadataEntry },
-        { mEnabledAttributes.enablePacketCount, EthernetNetworkDiagnostics::Attributes::PacketTxCount::kMetadataEntry },
-        { mEnabledAttributes.enablePHYRate, EthernetNetworkDiagnostics::Attributes::PHYRate::kMetadataEntry },
-        { mEnabledAttributes.enableTimeSinceReset, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::kMetadataEntry },
-        { mEnabledAttributes.enableErrCount, EthernetNetworkDiagnostics::Attributes::TxErrCount::kMetadataEntry },
-    };
+    AttributeListBuilder listBuilder(builder);
 
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(std::size(mappings) + DefaultServerCluster::GlobalAttributes().size()));
-
-    for (const auto & m : mappings)
-    {
-        if (m.enable)
-        {
-            ReturnErrorOnFailure(builder.Append(m.entry));
-        }
-    }
-
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    // Ethernet diagnostics cluster has no mandatory attributes beyond global ones
+    return listBuilder.Append(Span<const DataModel::AttributeEntry>(), Span(optionalAttributes));
 }
 
 } // namespace Clusters
