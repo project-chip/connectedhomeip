@@ -122,6 +122,19 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError
     handle = GetLibraryHandle()
     transaction = AsyncTransferObtainedTransaction(future=future, event_loop=asyncio.get_running_loop(), data=data)
 
+    # Automatically cancel the bdx transfer if the future has been cancelled.
+    def _on_done(fut: Future):
+        if not fut.cancelled():
+            return
+        ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+        res = builtins.chipStack.Call(
+            lambda: handle.pychip_Bdx_StopExpectingBdxTransfer(ctypes.py_object(transaction))
+        )
+        if not res.is_success:
+            ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+        res.raise_on_error()
+    future.add_done_callback(_on_done)
+
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = builtins.chipStack.Call(
         lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
