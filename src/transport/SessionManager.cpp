@@ -33,7 +33,6 @@
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPKeyIds.h>
 #include <lib/core/Global.h>
 #include <lib/support/AutoRelease.h>
@@ -42,7 +41,6 @@
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
-#include <protocols/secure_channel/Constants.h>
 #include <tracing/macros.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
@@ -1113,9 +1111,10 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
+    uint16_t sessionId = partialPacketHeader.GetSessionId();
 
     AutoRelease<Credentials::GroupDataProvider::GroupSessionIterator> iter(
-        groups->IterateGroupSessions(partialPacketHeader.GetSessionId()));
+        groups->IterateGroupSessions(sessionId));
 
     if (iter.IsNull())
     {
@@ -1148,7 +1147,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         uint16_t keySessionId = keyContext->GetKeyHash();
 
         // Only try to decrypt if the session IDs match
-        if (keySessionId != partialPacketHeader.GetSessionId())
+        if (keySessionId != sessionId)
         {
             continue;
         }
