@@ -435,8 +435,8 @@ class DeviceProxyWrapper():
         ).raise_on_error()
 
 
-DiscoveryFilterType = discovery.FilterType
-DiscoveryType = discovery.DiscoveryType
+DiscoveryFilterType: typing.TypeAlias = discovery.FilterType
+DiscoveryType: typing.TypeAlias = discovery.DiscoveryType
 
 
 class ChipDeviceControllerBase():
@@ -1154,6 +1154,31 @@ class ChipDeviceControllerBase():
 
             return await asyncio.futures.wrap_future(ctx.future)
 
+    async def OpenJointCommissioningWindow(self, nodeid: int, endpointId: int, timeout: int, iteration: int,
+                                           discriminator: int) -> CommissioningParameters:
+        '''
+        Opens a joint commissioning window on the device with the given nodeid.
+
+        Args:
+            nodeid (int): Node id of the device.
+            timeout (int): Command timeout
+            iteration (int): The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+                PAKE passcode verifier to be used for this commissioning. Valid range: 1000 - 100000
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095
+
+            Returns:
+                CommissioningParameters
+        '''
+        self.CheckIsActive()
+
+        async with self._open_window_context as ctx:
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow(
+                    self.devCtrl, self.pairingDelegate, nodeid, endpointId, timeout, iteration, discriminator)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
     def GetCompressedFabricId(self):
         '''
         Get compressed fabric Id.
@@ -1743,7 +1768,8 @@ class ChipDeviceControllerBase():
         for v in attributes:
             if len(v) == 2:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    invalid_endpoint, v[0], v[1], 1, v[0].value))   # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
+                    # 'value' added dynamically to ClusterAttributeDescriptor
+                    invalid_endpoint, v[0], v[1], 1, v[0].value))  # type: ignore[attr-defined]
             else:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     invalid_endpoint, v[0], 0, 0, v[0].value))
@@ -1874,16 +1900,15 @@ class ChipDeviceControllerBase():
             # Wildcard
             return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
-            # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
-            # Fixing these typing errors is a high risk to affect existing functionality.
-            # These mismatches are intentional and safe within the current logic.
-            # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
+            # mypy refactor (PR https://github.com/project-chip/connectedhomeip/pull/39827):
+            # instantiate class types before passing to from_cluster/from_event
+            # because these expect instances, not classes.
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[arg-type]
-                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
-            elif issubclass(pathTuple, ClusterObjects.ClusterEvent):  # type: ignore[arg-type]
-                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)  # type: ignore[arg-type]
+            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.Cluster):
+                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
+            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.ClusterEvent):
+                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
             else:
                 raise ValueError("Unsupported Event Path")
         else:
@@ -1895,7 +1920,6 @@ class ChipDeviceControllerBase():
                 # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
                 # Fixing these typing errors is a high risk to affect existing functionality.
                 # These mismatches are intentional and safe within the current logic.
-                # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
                 if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
                     return ClusterAttribute.EventPath.from_cluster(
                         EndpointId=pathTuple[0],    # type: ignore[arg-type]
@@ -2413,6 +2437,10 @@ class ChipDeviceControllerBase():
                 c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.argtypes = [
+                c_void_p, c_void_p, c_uint64, c_uint16, c_uint16, c_uint32, c_uint16]
+            self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.restype = PyChipError
+
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
 
@@ -2506,13 +2534,20 @@ class ChipDeviceControllerBase():
 class ChipDeviceController(ChipDeviceControllerBase):
     ''' 
     The ChipDeviceCommissioner binding, named as ChipDeviceController
-
-    TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
     '''
+    # TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
-    ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
-        assert fabricAdmin is not None  # fabricAdmin must be provided
+    def __init__(self,
+                 opCredsContext: ctypes.c_void_p,
+                 fabricId: int,
+                 nodeId: int,
+                 adminVendorId: int,
+                 fabricAdmin: FabricAdmin.FabricAdmin,
+                 catTags: typing.List[int] = [],
+                 paaTrustStorePath: str = "",
+                 useTestCommissioner: bool = False,
+                 name: str = '',
+                 keypair: typing.Optional[p256keypair.P256Keypair] = None):
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -2836,7 +2871,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._fabricCheckNodeId
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
+                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE,
+                                  filter: typing.Any = None,
                                   discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
@@ -3005,7 +3041,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDACRevocationSetPath(
-                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else ""))
+                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else ""))  # type: ignore[arg-type]
         ).raise_on_error()
 
 
