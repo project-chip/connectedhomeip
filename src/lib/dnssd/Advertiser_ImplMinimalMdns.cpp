@@ -743,7 +743,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
         if (params.GetCommissioningMode() != CommissioningMode::kDisabled)
         {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kCommissioningMode));
+            MakeServiceSubtype(
+                nameBuffer, sizeof(nameBuffer),
+                DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, static_cast<uint64_t>(params.GetCommissioningMode())));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);

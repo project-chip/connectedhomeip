@@ -27,6 +27,7 @@
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/secure_channel/PASESession.h>
 
@@ -468,9 +469,10 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
         filter.code = mDiscoveryFilterCode;
         break;
     case Dnssd::DiscoveryFilterType::kCommissioningMode:
-        if (mExecuteJCM.ValueOr(false))
+        if (mJCM.ValueOr(false))
         {
-            filter.code = 3;
+            // Per spec, CM=3 is for Joint Fabric commissioning.
+            filter.code = static_cast<uint64_t>(Dnssd::CommissioningMode::kEnabledJointFabric);
         }
         break;
     case Dnssd::DiscoveryFilterType::kCommissioner:

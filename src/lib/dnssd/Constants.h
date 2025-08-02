@@ -44,7 +44,7 @@ inline constexpr size_t kSubTypeShortDiscriminatorMaxLength = 4;  // _S<dd>
 inline constexpr size_t kSubTypeLongDiscriminatorMaxLength  = 6;  // _L<dddd>
 inline constexpr size_t kSubTypeVendorIdMaxLength           = 7;  // _V<ddddd>
 inline constexpr size_t kSubTypeDeviceTypeMaxLength         = 12; // _T<dddddddddd>
-inline constexpr size_t kSubTypeCommissioningModeMaxLength  = 3;  // _CM
+inline constexpr size_t kSubTypeCommissioningModeMaxLength  = 4;  // _CM<d>
 inline constexpr size_t kSubTypeCompressedFabricIdMaxLength = 18; // _I<16-hex-digits>
 
 /*

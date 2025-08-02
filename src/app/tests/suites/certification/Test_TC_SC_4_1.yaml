@@ -228,9 +228,17 @@ tests:
     - label:
           "Step 2g: If (CADMIN.S.C01.Rsp) present, check Commissioning Mode
           (_CM) subtype _CM must be present"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
-      PICS: CADMIN.S.C01.Rsp
+      response:
+          values:
+              - name: "commissioningMode"
+                value: commissioningMode
+                constraints:
+                    minValue: 0
+                    maxValue: 3
+
     - label:
           "Step 2h: key D must be present and represents the discriminator which
           must be encoded as a variable-length decimal value with up to 4 digits

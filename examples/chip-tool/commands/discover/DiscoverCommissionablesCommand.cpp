@@ -103,7 +103,7 @@ CHIP_ERROR DiscoverCommissionableByCommissioningModeCommand::RunCommand()
 {
     mCommissioner = &CurrentCommissioner();
     mCommissioner->RegisterDeviceDiscoveryDelegate(this);
-    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kCommissioningMode);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kCommissioningMode, mCommissioningMode);
     return mCommissioner->DiscoverCommissionableNodes(filter);
 }
 

@@ -153,6 +153,10 @@ tests:
     - label: "Check Commissioning Mode (_CM)"
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
+      arguments:
+          values:
+              - name: "value"
+                value: commissioningMode
 
     - label: "Check Vendor ID (_V)"
       PICS: MCORE.SC.VENDOR_SUBTYPE
