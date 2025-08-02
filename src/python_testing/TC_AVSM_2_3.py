@@ -1,3 +1,12 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+from TC_AVSMTestBase import AVSMTestBase
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -35,13 +44,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from mobly import asserts
-from TC_AVSMTestBase import AVSMTestBase
 
 logger = logging.getLogger(__name__)
 
@@ -83,11 +85,11 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             ),
         ]
 
-    @run_if_endpoint_matches(
-        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+    @decorators.run_if_endpoint_matches(
+        decorators.has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
         and (
-            has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kWatermark)
-            or has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kOnScreenDisplay)
+            decorators.has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kWatermark)
+            or decorators.has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kOnScreenDisplay)
         )
     )
     async def test_TC_AVSM_2_3(self):
@@ -133,7 +135,6 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             asserts.fail("Unexpected success when expecting INVALID_COMMAND due to absence of WatermarkEnabled and OSDEnabled)")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected error when expecting INVALID_COMMAND")
-            pass
 
         self.step(4)
         try:
@@ -145,7 +146,6 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(5)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
@@ -161,4 +161,4 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

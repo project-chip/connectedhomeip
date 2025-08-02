@@ -42,9 +42,9 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
+from chip.testing import decorators, runner, timeoperations
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from chip.testing.matter_testing import MatterBaseTest
 from chip.tlv import uint
 from mobly import asserts
 
@@ -63,7 +63,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
     def pics_TC_TIMESYNC_2_10(self) -> list[str]:
         return ["TIMESYNC.S.F00"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TIMESYNC_2_10(self):
 
         self.endpoint = 0
@@ -77,7 +77,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 
@@ -106,20 +106,20 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         cb.wait_for_event_report(event, 5)
 
         self.print_step(7, "Set DSTOffset to expire in 10 seconds")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
-        expiry = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        th_utc = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
+        expiry = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
         dst = [dst_struct(offset=3600, validStarting=0, validUntil=expiry)]
         await self.send_set_dst_cmd(dst)
 
         self.print_step(8, "Wait until th_utc + 15s")
-        time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+        time.sleep(timeoperations.get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(9, "Read LocalTime from the DUT")
         await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization,
                                                        attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(10, "Wait for DSTTableEmpty event")
-        timeout = get_wait_seconds_from_set_time(th_utc, 20)
+        timeout = timeoperations.get_wait_seconds_from_set_time(th_utc, 20)
         cb.wait_for_event_report(event, timeout)
 
         self.print_step(11, "Set time zone back to 0")
@@ -133,4 +133,4 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

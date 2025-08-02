@@ -37,7 +37,8 @@ import random
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 # These below variables are used to test the AccessControl clusters Extension attribute and come from the test plan here:
@@ -373,7 +374,7 @@ class TC_ACL_2_3(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACL_2_3(self):
         await self.internal_test_TC_ACL_2_3(force_legacy_encoding=False)
         self.current_step_index = 0
@@ -381,4 +382,4 @@ class TC_ACL_2_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

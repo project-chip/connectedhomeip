@@ -16,7 +16,8 @@
 #
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -29,7 +30,7 @@ class TC_DGGEN_3_2(MatterBaseTest):
                          "Verify that the FeatureMap value has the DMTEST feature bit (0) set to 1 if `max_path_per_invoke` > 1")
                 ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DGGEN_3_2(self):
         # commissioning - already done
         self.step(0)
@@ -45,4 +46,4 @@ class TC_DGGEN_3_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

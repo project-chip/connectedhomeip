@@ -1,3 +1,9 @@
+import chip.clusters as Clusters
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+from TC_CHIMETestBase import CHIMETestBase
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -35,11 +41,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-from TC_CHIMETestBase import CHIMETestBase
-
 
 class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
 
@@ -62,7 +63,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_cluster(Clusters.Chime))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.Chime))
     async def test_TC_CHIME_2_4(self):
         cluster = Clusters.Objects.Chime
         attributes = cluster.Attributes
@@ -95,4 +96,4 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

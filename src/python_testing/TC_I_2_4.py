@@ -1,3 +1,14 @@
+import logging
+import time
+
+import chip.clusters as Clusters
+import test_plan_support
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -36,16 +47,6 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-import logging
-import time
-
-import chip.clusters as Clusters
-import test_plan_support
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
 
 
 class TC_I_2_4(MatterBaseTest):
@@ -113,7 +114,7 @@ class TC_I_2_4(MatterBaseTest):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_cluster(Clusters.Identify))
+    @decorators.run_if_endpoint_matches(Clusters.Identify)
     async def test_TC_I_2_4(self):
         endpoint = self.get_endpoint(default=1)
 
@@ -200,14 +201,12 @@ class TC_I_2_4(MatterBaseTest):
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(20)
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=10), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(21)
         logging.info("Test waits for 12 seconds")
@@ -239,14 +238,12 @@ class TC_I_2_4(MatterBaseTest):
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(28)
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=0), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(29)
         logging.info("Test waits for 1 seconds")
@@ -266,4 +263,4 @@ class TC_I_2_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

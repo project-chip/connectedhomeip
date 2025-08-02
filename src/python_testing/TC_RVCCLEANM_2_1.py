@@ -42,7 +42,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing import decorators, matchers, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 # This test requires several additional command line arguments
@@ -65,20 +66,20 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
     async def send_clean_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse),
                             "Unexpected return type for RVC Clean Mode ChangeToMode")
         return ret
 
     async def send_run_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse),
                             "Unexpected return type for RVC Run Mode ChangeToMode")
         return ret
 
     def pics_TC_RVCCLEANM_2_1(self) -> list[str]:
         return ["RVCCLEANM.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RVCCLEANM_2_1(self):
 
         asserts.assert_true('PIXIT.RVCCLEANM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
@@ -218,4 +219,4 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

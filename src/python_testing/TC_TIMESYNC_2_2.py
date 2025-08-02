@@ -40,8 +40,8 @@ from datetime import timedelta
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import compare_time, utc_time_in_matter_epoch
+from chip.testing import decorators, runner, timeoperations
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 
@@ -53,7 +53,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
     def pics_TC_TIMESYNC_2_2(self) -> list[str]:
         return ["TIMESYNC.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TIMESYNC_2_2(self):
 
         # Time sync is required to be on endpoint 0 if it is present
@@ -78,7 +78,6 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
             # The python layer discards the cluster specific portion of the status IB, so for now we just expect a generic FAILURE error
             # see #26521
             code = e.status
-            pass
 
         if utc_dut_initial is NullValue:
             asserts.assert_equal(code, 0, "Unexpected error returned for null UTCTime")
@@ -99,7 +98,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
             tolerance = timedelta(minutes=10)
         else:
             tolerance = timedelta(minutes=1)
-        compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
+        timeoperations.compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
 
         self.print_step(5, "Read time source")
         if timesource_attr_id in attribute_list:
@@ -109,4 +108,4 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

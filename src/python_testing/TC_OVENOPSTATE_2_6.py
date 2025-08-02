@@ -40,7 +40,8 @@
 
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 
@@ -61,7 +62,7 @@ class TC_OVENOPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):
     def pics_TC_OVENOPSTATE_2_6(self) -> list[str]:
         return ["OVENOPSTATE.S", "OVENOPSTATE.S.A0002"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OVENOPSTATE_2_6(self):
         # endpoint = self.matter_test_config.endpoint
 
@@ -70,4 +71,4 @@ class TC_OVENOPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -1,3 +1,19 @@
+import asyncio
+import inspect
+import logging
+import queue
+import threading
+import time
+from datetime import datetime, timezone
+from typing import Any, Iterable, Optional
+
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
+from chip.interaction_model import Status
+from chip.testing import decorators
+from chip.testing.matter_testing import AttributeMatcher, AttributeValue
+from mobly import asserts
+
 #
 #    Copyright (c) 2022-2025 Project CHIP Authors
 #    All rights reserved.
@@ -25,21 +41,6 @@ Classes:
 Both classes allow tests to start and manage subscriptions, queue received updates asynchronously and 
 block until epected reports are received or fail on timeouts
 """
-
-import asyncio
-import inspect
-import logging
-import queue
-import threading
-import time
-from datetime import datetime, timezone
-from typing import Any, Iterable, Optional
-
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
-from chip.interaction_model import Status
-from chip.testing.matter_testing import AttributeMatcher, AttributeValue
-from mobly import asserts
 
 
 class EventSubscriptionHandler:

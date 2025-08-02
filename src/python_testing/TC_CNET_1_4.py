@@ -38,7 +38,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 kRootEndpointId = 0
@@ -65,7 +66,7 @@ class TC_CNET_1_4(MatterBaseTest):
     def default_timeout(self) -> int:
         return 200
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CNET_1_4(self):
         # Commissioning is already done
         self.step(1)
@@ -112,4 +113,4 @@ class TC_CNET_1_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -42,7 +42,8 @@
 
 from chip.exceptions import ChipStackError
 from chip.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 CHIP_ERROR_CODES = {
@@ -113,7 +114,7 @@ class TC_SC_3_4(MatterBaseTest):
         asserts.assert_equal(GetFaultCounter(faultID), 1)
         ResetFaultCounters()
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_3_4(self):
 
         self.th = self.default_controller
@@ -241,4 +242,4 @@ class TC_SC_3_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

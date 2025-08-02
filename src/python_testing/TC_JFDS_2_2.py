@@ -43,14 +43,15 @@ import chip.clusters as Clusters
 from chip import CertificateAuthority
 # from chip.interaction_model import InteractionModelError
 from chip.storage import PersistentStorage
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
 class TC_JFDS_2_2(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -168,7 +169,7 @@ class TC_JFDS_2_2(MatterBaseTest):
             #          "Verify that the DUT responds with Status code CONSTRAINT_ERROR")
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_JFDS_2_2(self):
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
@@ -287,4 +288,4 @@ class TC_JFDS_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

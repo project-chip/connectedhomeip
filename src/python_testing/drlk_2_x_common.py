@@ -1,3 +1,14 @@
+import logging
+import random
+import string
+import time
+
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import matchers
+from mobly import asserts
+
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -14,17 +25,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-import logging
-import random
-import string
-import time
-
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import type_matches
-from mobly import asserts
 
 
 class DRLK_COMMON:
@@ -53,7 +53,6 @@ class DRLK_COMMON:
             asserts.assert_true(False, "Unexpected command success, command=%s", command)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")
-            pass
 
     async def send_set_credential_cmd(self, operationType, credential, credentialData, userIndex, userStatus, userType) -> Clusters.Objects.DoorLock.Commands.SetCredentialResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetCredential(operationType=operationType,
@@ -64,7 +63,7 @@ class DRLK_COMMON:
                                                                                               userType=userType),
                                          endpoint=self.endpoint,
                                          timedRequestTimeoutMs=1000)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                             "Unexpected return type for SetCredential")
         asserts.assert_true(ret.status == Status.Success, "Error sending SetCredential command, status={}".format(str(ret.status)))
         return ret
@@ -75,7 +74,7 @@ class DRLK_COMMON:
                                    timedRequestTimeoutMs=1000)
         ret = await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.GetCredentialStatus(credential=credential),
                                          endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.DoorLock.Commands.GetCredentialStatusResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.DoorLock.Commands.GetCredentialStatusResponse),
                             "Unexpected return type for GetCredentialStatus")
         asserts.assert_false(ret.credentialExists, "Error clearing Credential (credentialExists==True)")
 
@@ -203,7 +202,7 @@ class DRLK_COMMON:
                                                                        userType=NullValue
                                                                        )
                 asserts.assert_true(
-                    type_matches(set_cred_response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
+                    matchers.is_type(set_cred_response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                     "Unexpected return type for SetCredential")
             self.print_step("4e", f"TH sends {lockUnlockText} Command to the DUT with PINCode as pin_code.")
             if self.check_pics(lockUnlockCmdRspPICS):

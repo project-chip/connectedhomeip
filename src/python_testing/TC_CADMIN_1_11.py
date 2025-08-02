@@ -42,7 +42,7 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from chip.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
 
@@ -123,7 +123,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
     def pics_TC_CADMIN_1_11(self) -> list[str]:
         return ["CADMIN.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CADMIN_1_11(self):
         self.step(1)
 
@@ -213,4 +213,4 @@ class TC_CADMIN_1_11(CADMINBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

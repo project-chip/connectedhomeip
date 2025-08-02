@@ -45,7 +45,8 @@ from typing import List
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClustersObjects
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 
@@ -106,7 +107,7 @@ class TC_SC_3_6(MatterBaseTest):
         for subscription in self._subscriptions:
             subscription.Shutdown()
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_3_6(self):
         dev_ctrl = self.default_controller
 
@@ -312,4 +313,4 @@ class TC_SC_3_6(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -42,9 +42,9 @@ import re
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import conversions, decorators, matchers, runner
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.conversions import hex_from_bytes
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -183,7 +183,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
                          "Verify that the DUT reports an INVALID_COMMAND error"),
                 ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DA_1_2(self):
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
         post_cert_test = self.user_params.get("post_cert_test", False)
@@ -204,13 +204,13 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
         self.step(2)
         attestation_resp = await self.send_single_cmd(cmd=opcreds.Commands.AttestationRequest(attestationNonce=nonce))
-        asserts.assert_true(type_matches(attestation_resp, opcreds.Commands.AttestationResponse),
+        asserts.assert_true(matchers.is_type(attestation_resp, opcreds.Commands.AttestationResponse),
                             "DUT returned invalid response to AttestationRequest")
 
         self.step("3a")
         type = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
         dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
-        asserts.assert_true(type_matches(dac_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_dac = dac_resp.certificate
         asserts.assert_less_equal(len(der_dac), 600, "Returned DAC is > 600 bytes")
@@ -224,7 +224,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         self.step("3b")
         type = opcreds.Enums.CertificateChainTypeEnum.kPAICertificate
         pai_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
-        asserts.assert_true(type_matches(pai_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(pai_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_pai = pai_resp.certificate
         asserts.assert_less_equal(len(der_pai), 600, "Returned PAI is > 600 bytes")
@@ -398,7 +398,6 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
                     cert = x509.load_der_x509_certificate(f.read())
                 except ValueError:
                     logging.info(f'File {filename} is not a valid certificate, skipping')
-                    pass
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
                 certs[ski] = pub
@@ -434,8 +433,8 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         # signature is a struct of r and s - see 3.5.3
         # Actual curve is secp256r1 / NIST P-256 per 2.7
         baselen = curve_by_name("NIST256p").baselen
-        signature_attestation_raw_r = int(hex_from_bytes(signature_attestation_raw[:baselen]), 16)
-        signature_attestation_raw_s = int(hex_from_bytes(signature_attestation_raw[baselen:]), 16)
+        signature_attestation_raw_r = int(conversions.hex_from_bytes(signature_attestation_raw[:baselen]), 16)
+        signature_attestation_raw_s = int(conversions.hex_from_bytes(signature_attestation_raw[baselen:]), 16)
 
         signature_attestation = utils.encode_dss_signature(signature_attestation_raw_r, signature_attestation_raw_s)
 
@@ -460,4 +459,4 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

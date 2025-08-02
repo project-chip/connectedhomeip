@@ -1,3 +1,12 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.clusters import Globals
+from chip.interaction_model import Status
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -35,13 +44,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +101,7 @@ class TC_AVSM_2_12(MatterBaseTest):
                      "Verify that the value is the same as was written in Step 24."),
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.CameraAvStreamManagement))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_AVSM_2_12(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
@@ -319,4 +321,4 @@ class TC_AVSM_2_12(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

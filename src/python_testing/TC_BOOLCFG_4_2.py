@@ -40,7 +40,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 sensorTrigger = 0x0080_0000_0000_0000
@@ -81,7 +82,7 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_BOOLCFG_4_2(self):
 
         asserts.assert_true('PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
@@ -125,7 +126,6 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
                 await self.send_single_cmd(cmd=Clusters.Objects.BooleanStateConfiguration.Commands.EnableDisableAlarm(alarmsToEnableDisable=enabledAlarms), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
         else:
             logging.info("Test step skipped")
 
@@ -135,7 +135,6 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
                 await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorTrigger), endpoint=0)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
         else:
             logging.info("Test step skipped")
 
@@ -182,7 +181,6 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
                 await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorUntrigger), endpoint=0)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
         else:
             logging.info("Test step skipped")
 
@@ -195,4 +193,4 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

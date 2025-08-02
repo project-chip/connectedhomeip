@@ -69,8 +69,9 @@ import tempfile
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
+from chip.testing import decorators, matchers, runner
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.testing.tasks import Subprocess
 from mobly import asserts
 
@@ -223,7 +224,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
                      " by TH_FSA's Bridged Device Basic Information Cluster."),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_MCORE_FS_1_4(self):
 
         # Commissioning - done
@@ -312,7 +313,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
             node_id=th_fsa_bridge_th_node_id,
             endpoint=th_fsa_bridge_th_server_endpoint)
-        asserts.assert_true(type_matches(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(matchers.is_type(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(th_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
         logging.info("UniqueID generated for TH_SERVER_NO_UID: %s", th_fsa_bridge_th_server_unique_id)
 
@@ -401,7 +402,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             cluster=Clusters.BridgedDeviceBasicInformation,
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
             endpoint=dut_fsa_bridge_th_server_endpoint)
-        asserts.assert_true(type_matches(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(matchers.is_type(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
         logging.info("UniqueID for TH_SERVER_NO_UID on DUT_FSA: %s", th_fsa_bridge_th_server_unique_id)
 
@@ -411,4 +412,4 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -41,7 +41,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 
@@ -83,7 +84,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def TC_RVCOPSTATE_2_1(self) -> list[str]:
         return ["RVCOPSTATE.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RVCOPSTATE_2_1(self):
         if self.matter_test_config.endpoint is None or self.matter_test_config.endpoint == 0:
             asserts.fail("--endpoint must be set and not set to 0 for this test to run correctly.")
@@ -437,4 +438,4 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

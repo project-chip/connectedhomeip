@@ -20,8 +20,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import utc_time_in_matter_epoch
+from chip.testing import decorators, runner, timeoperations
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
@@ -51,7 +51,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
         self.commissioner = None
         self.commissioned = False
 
-    @async_test_body
+    @decorators.async_test_body
     async def teardown_test(self):
         await self.destroy_current_commissioner()
         return super().teardown_test()
@@ -118,7 +118,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
             self.commissioner.SetTimeZone(offset=3600, validAt=0)
         if dst:
             six_months = 1.577e+13  # in us
-            dst_valid_until = utc_time_in_matter_epoch() + int(six_months)
+            dst_valid_until = timeoperations.utc_time_in_matter_epoch() + int(six_months)
             self.commissioner.SetDSTOffset(offset=3600, validStarting=0, validUntil=dst_valid_until)
         if default_ntp:
             self.commissioner.SetDefaultNTP("fe80::1")
@@ -164,7 +164,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
             expected = "fe80::1"
             asserts.assert_equal(received, expected, "Default NTP was not set properly")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_CommissioningAllBasic(self):
         # We want to assess all combos (ie, all flags in the range of 0b0000 to 0b1111)
         for i in range(0, 0xF):
@@ -174,7 +174,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
             trusted_time_source = bool(i & 0x8)
             await self.commission_stages(time_zone, dst, default_ntp, trusted_time_source)
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_CommissioningPreSetValues(self):
 
         await self.create_commissioner()
@@ -196,7 +196,8 @@ class TestCommissioningTimeSync(MatterBaseTest):
 
         self.commissioner.SetTimeZone(offset=3600, validAt=0)
         six_months = 1.577e+13  # in us
-        self.commissioner.SetDSTOffset(offset=3600, validStarting=0, validUntil=utc_time_in_matter_epoch() + int(six_months))
+        self.commissioner.SetDSTOffset(offset=3600, validStarting=0,
+                                       validUntil=timeoperations.utc_time_in_matter_epoch() + int(six_months))
         self.commissioner.SetDefaultNTP("fe80::1")
         self.commissioner.SetTrustedTimeSource(self.commissioner.nodeId, 0)
 
@@ -209,7 +210,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
         asserts.assert_false(self.commissioner.CheckStageSuccessful(
             kConfigureTrustedTimeSource), 'kConfigureTrustedTimeSource incorrectly set')
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_FabricCheckStage(self):
         await self.create_commissioner()
 
@@ -230,7 +231,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
             kCheckForMatchingFabric), "Incorrectly ran check for matching fabric stage")
         asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result incorrectly set")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TimeZoneName(self):
         await self.create_commissioner()
         self.commissioner.SetTimeZone(offset=3600, validAt=0, name="test")
@@ -263,7 +264,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
         expected = [Clusters.TimeSynchronization.Structs.TimeZoneStruct(offset=3600, validAt=0, name=sixty_four_byte_string)]
         asserts.assert_equal(received, expected, "Time zone 64 byte name was not correctly set")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_DefaultNtpSize(self):
         await self.create_commissioner()
         too_long_name = "x." + "x" * 127
@@ -285,4 +286,4 @@ class TestCommissioningTimeSync(MatterBaseTest):
 # TODO(cecille): Test - Add hooks to change the time zone response to indicate no DST is needed
 # TODO(cecille): Test - Set commissioningParameters TimeZone and DST list size to > node list size to ensure they get truncated
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

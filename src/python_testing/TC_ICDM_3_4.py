@@ -40,9 +40,10 @@ import logging
 import time
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.matter_stack_state import MatterStackState
 from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -92,7 +93,7 @@ class TC_ICDM_3_4(MatterBaseTest):
     # ICDM 3.4 Test Body
     #
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ICDM_3_4(self):
         is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
@@ -136,4 +137,4 @@ class TC_ICDM_3_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

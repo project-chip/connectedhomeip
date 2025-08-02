@@ -1,3 +1,10 @@
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.testing import decorators, matter_asserts, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -39,12 +46,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 
 cluster = Clusters.ElectricalGridConditions
 
@@ -73,7 +74,7 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         ]
         return steps
 
-    @run_if_endpoint_matches(has_cluster(Clusters.ElectricalGridConditions))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.ElectricalGridConditions))
     async def test_TC_EGC_2_1(self):
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
@@ -100,4 +101,4 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

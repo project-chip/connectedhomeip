@@ -1,3 +1,11 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -34,13 +42,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-
 
 class TC_SOIL_2_2(MatterBaseTest):
     async def read_soil_attribute_expect_success(self, endpoint, attribute):
@@ -66,7 +67,7 @@ class TC_SOIL_2_2(MatterBaseTest):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_cluster(Clusters.SoilMeasurement))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.SoilMeasurement))
     async def test_TC_SOIL_2_2(self):
 
         endpoint = self.get_endpoint(default=1)
@@ -109,4 +110,4 @@ class TC_SOIL_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

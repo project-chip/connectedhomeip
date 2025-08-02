@@ -43,7 +43,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep, matchers
 from mobly import asserts
 
 
@@ -78,14 +79,14 @@ class TC_WHM_2_1(MatterBaseTest):
 
     async def send_change_to_mode_cmd(self, newMode) -> Clusters.Objects.WaterHeaterMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.WaterHeaterMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.WaterHeaterMode.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.WaterHeaterMode.Commands.ChangeToModeResponse),
                             "Unexpected return type for Water Heater Mode ChangeToMode")
         return ret
 
     def pics_TC_WHM_2_1(self) -> list[str]:
         return ["WHM.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_WHM_2_1(self):
 
         # Valid modes. Only ModeManual referred to in this test
@@ -173,4 +174,4 @@ class TC_WHM_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

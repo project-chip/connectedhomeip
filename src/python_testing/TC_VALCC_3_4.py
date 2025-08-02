@@ -36,7 +36,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -65,7 +66,7 @@ class TC_VALCC_3_4(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_VALCC_3_4(self):
 
         endpoint = self.get_endpoint(default=1)
@@ -108,15 +109,13 @@ class TC_VALCC_3_4(MatterBaseTest):
                                          "Unexpected error returned when an CONSTRAINT_ERROR was expected")
                 else:
                     asserts.fail("Unexpected error returned")
-                pass
 
         self.step(6)
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

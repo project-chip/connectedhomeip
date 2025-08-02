@@ -43,14 +43,17 @@ import chip.clusters as Clusters
 import chip.tlv
 from chip import CertificateAuthority
 from chip.storage import PersistentStorage
+from chip.testing import decorators, runner
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
 class TC_JCM_1_2(MatterBaseTest):
 
-    @async_test_body
+    ANCHOR_CAT = 0xFFFE0001
+
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -226,7 +229,71 @@ class TC_JCM_1_2(MatterBaseTest):
                      "Parse the NOC bytes and Checked that it contains the Administrator CAT")
         ]
 
-    @async_test_body
+    async def _open_commissioning_window_in_EcoB(self, devCtrl, nodeid, discriminator, endpoint):
+        """Open commissioning window on jfa-app in Ecosystem B using Python Controller"""
+
+        # Open enhanced commissioning window using Administrator Commissioning cluster of jfa-app@EcoB
+        # Using devCtrlEcoB Python Controller
+        # Parameters matching: pairing open-commissioning-window 11 0 400 1000 {jfa-app--discriminator@EcoB}
+        _ocw_timeout = 400  # 400 seconds ~ 6.5 minutes
+        _ocw_iteration = 1000
+
+        try:
+            # Open Enhanced Commissioning Window using Administrator Commissioning Cluster
+            params = await devCtrl.OpenCommissioningWindow(
+                nodeid=nodeid,
+                timeout=_ocw_timeout,
+                iteration=_ocw_iteration,
+                discriminator=discriminator,
+                option=1
+            )
+
+            logging.info(f"Successfully opened Enhanced Commissioning Window on node {nodeid}")
+            logging.info(f"Discriminator: {discriminator}, Timeout: {_ocw_timeout}s, setupPinCode: {params.setupPinCode}")
+
+            # Verify commissioning window is open by reading WindowStatus attribute
+            window_status = await devCtrl.ReadAttribute(
+                nodeid=nodeid,
+                attributes=[(endpoint, Clusters.AdministratorCommissioning.Attributes.WindowStatus)]
+            )
+
+            expected_WStatus = Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kEnhancedWindowOpen
+            actual_WStatus_value = window_status[endpoint][Clusters.AdministratorCommissioning][Clusters.AdministratorCommissioning.Attributes.WindowStatus]
+
+            asserts.assert_equal(
+                expected_WStatus,
+                actual_WStatus_value,
+                f"Commissioning window not properly opened. Expected: {expected_WStatus}, Got: {actual_WStatus_value}"
+            )
+
+            return params
+
+        except Exception as e:
+            logging.error(f"Failed to open commissioning window: {e}")
+            asserts.fail(f"Could not open commissioning window on node {nodeid}: {e}")
+
+    async def _joint_commission_EcoB_admin(self, devCtrl, nodeid, passcode, endpoint):
+        """Commission jfa-app from Ecosystem B into Ecosystem A using Joint Commissioning"""
+
+        # Parameters matching: pairing onnetwork {nodeid} {passcode} --execute-jcm true
+
+        try:
+            # Perform Joint Commissioning using Ecosystem A jfc-app
+            logging.info(f"Starting Joint Commissioning of Ecosystem B jfa-app with node ID {nodeid}")
+
+            devCtrl.send(
+                message=f"pairing onnetwork {nodeid} {passcode} --execute-jcm true",
+                expected_output="")
+
+            logging.info(f"Joint Commissioning completed successfully for node {nodeid}")
+
+            return True
+
+        except Exception as e:
+            logging.error(f"Joint Commissioning failed: {e}")
+            asserts.fail(f"Could not perform Joint Commissioning on node {nodeid}: {e}")
+
+    @decorators.async_test_body
     async def test_TC_JCM_1_2(self):
 
         # Creating a Controller for Ecosystem A
@@ -302,4 +369,4 @@ class TC_JCM_1_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()
