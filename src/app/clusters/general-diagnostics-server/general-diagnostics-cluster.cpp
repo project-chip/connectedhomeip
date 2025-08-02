@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
@@ -213,6 +214,14 @@ HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & c
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace {
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
+    GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
+    GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
+    GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
+};
+}
 
 CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 {
@@ -316,45 +325,17 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCo
 CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & path,
                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    using namespace GeneralDiagnostics::Attributes;
+    AttributeListBuilder listBuilder(builder);
 
-    // Ensure we have space for all possible attributes (there will be 5 optional at most, 4 mandatory)
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(9 + DefaultServerCluster::GlobalAttributes().size()));
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+        { mEnabledAttributes.enableTotalOperationalHours, GeneralDiagnostics::Attributes::TotalOperationalHours::kMetadataEntry },
+        { mEnabledAttributes.enableBootReason, GeneralDiagnostics::Attributes::BootReason::kMetadataEntry },
+        { mEnabledAttributes.enableActiveHardwareFaults, GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry },
+        { mEnabledAttributes.enableActiveRadioFaults, GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry },
+        { mEnabledAttributes.enableActiveNetworkFaults, GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry },
+    };
 
-    // Mandatory attributes
-    ReturnErrorOnFailure(builder.AppendElements({
-        NetworkInterfaces::kMetadataEntry,
-        RebootCount::kMetadataEntry,
-        UpTime::kMetadataEntry,
-        TestEventTriggersEnabled::kMetadataEntry,
-    }));
-
-    if (mEnabledAttributes.enableTotalOperationalHours)
-    {
-        ReturnErrorOnFailure(builder.Append(TotalOperationalHours::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableBootReason)
-    {
-        ReturnErrorOnFailure(builder.Append(BootReason::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableActiveHardwareFaults)
-    {
-        ReturnErrorOnFailure(builder.Append(ActiveHardwareFaults::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableActiveRadioFaults)
-    {
-        ReturnErrorOnFailure(builder.Append(ActiveRadioFaults::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableActiveNetworkFaults)
-    {
-        ReturnErrorOnFailure(builder.Append(ActiveNetworkFaults::kMetadataEntry));
-    }
-
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path,

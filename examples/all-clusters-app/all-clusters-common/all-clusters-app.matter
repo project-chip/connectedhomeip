@@ -3480,7 +3480,7 @@ cluster TemperatureControl = 86 {
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
 cluster RefrigeratorAlarm = 87 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
@@ -7119,7 +7119,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute nullable int8s nullableRangeRestrictedInt8s = 16423;
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
-  attribute optional int8u writeOnlyInt8u = 16426;
+  writeonly attribute optional int8u writeOnlyInt8u = 16426;
   attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
   attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -7810,7 +7810,7 @@ endpoint 0 {
     callback attribute currentMaxRate;
     callback attribute overrunCount;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
 
     handle command ResetCounts;
   }

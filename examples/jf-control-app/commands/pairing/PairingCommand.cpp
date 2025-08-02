@@ -468,6 +468,10 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
         filter.code = mDiscoveryFilterCode;
         break;
     case Dnssd::DiscoveryFilterType::kCommissioningMode:
+        if (mExecuteJCM.ValueOr(false))
+        {
+            filter.code = 3;
+        }
         break;
     case Dnssd::DiscoveryFilterType::kCommissioner:
         filter.code = 1;

@@ -474,7 +474,11 @@ DeviceCommissioner::DeviceCommissioner() :
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
-{}
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    (void) mPeerAdminJFAdminClusterEndpointId;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+}
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
@@ -1386,7 +1390,7 @@ void DeviceCommissioner::HandleDeviceAttestationCompleted()
     }
     else
     {
-        ChipLogProgress(Controller, "Device attestation failed and no delegate set, failing commissioning");
+        ChipLogError(Controller, "Need to wait for device attestation delegate, but no delegate available. Failing commissioning");
         CommissioningDelegate::CommissioningReport report;
         report.Set<AttestationErrorInfo>(mAttestationResult);
         CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
