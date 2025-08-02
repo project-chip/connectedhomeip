@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "AccessControl.h"
+#include "WebRTCAccessControl.h"
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Global.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::Access;
@@ -41,47 +42,62 @@ public:
     {}
 };
 
-// TODO: Make the policy more configurable by consumers.
 class AccessControlDelegate : public Access::AccessControl::Delegate
 {
+public:
+    void SetWebRTCEndpointId(EndpointId endpointId) { mWebRtcEndpointId = endpointId; }
+
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        // Check for OTA Software Update Provider endpoint
-        bool isOtaEndpoint =
-            (requestPath.endpoint == kOtaProviderDynamicEndpointId && requestPath.cluster == OtaSoftwareUpdateProvider::Id);
+        // Check for WebRTC Transport Requestor endpoint and cluster
+        bool isWebRtcTransportRequestor =
+            (requestPath.endpoint == mWebRtcEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
 
-        // Only allow these specific endpoints
-        if (!isOtaEndpoint)
+        // If the request is not for WebRTC Transport Requestor, deny access
+        if (!isWebRtcTransportRequestor)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
-        if (requestPrivilege != Privilege::kOperate)
+        // Allow kOperate and below (kView, kProxyView, etc.)
+        // This covers reading attributes (kView) and invoking commands (kOperate)
+        if (requestPrivilege > Privilege::kOperate)
         {
-            // The commands on OtaSoftwareUpdateProvider all require
-            // Operate; we should not be asked for anything else.
             return CHIP_ERROR_ACCESS_DENIED;
         }
-
-        if (subjectDescriptor.authMode != AuthMode::kCase && subjectDescriptor.authMode != AuthMode::kPase &&
-            subjectDescriptor.authMode != AuthMode::kInternalDeviceAccess)
-        {
-            // No idea who is asking; deny for now.
-            return CHIP_ERROR_ACCESS_DENIED;
-        }
-
-        // TODO do we care about the fabric index here?  Probably not.
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    EndpointId mWebRtcEndpointId = kInvalidEndpointId;
 };
 
 struct ControllerAccessControl
 {
     DeviceTypeResolver mDeviceTypeResolver;
     AccessControlDelegate mDelegate;
-    ControllerAccessControl() { GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
+    bool mInitialized = false;
+
+    ControllerAccessControl() = default;
+
+    CHIP_ERROR Init(EndpointId endpointId)
+    {
+        if (mInitialized)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        mDelegate.SetWebRTCEndpointId(endpointId);
+
+        CHIP_ERROR err = GetAccessControl().Init(&mDelegate, mDeviceTypeResolver);
+        if (err == CHIP_NO_ERROR)
+        {
+            mInitialized = true;
+        }
+        return err;
+    }
 };
 
 Global<ControllerAccessControl> gControllerAccessControl;
@@ -89,12 +105,22 @@ Global<ControllerAccessControl> gControllerAccessControl;
 } // anonymous namespace
 
 namespace chip {
-namespace app {
-namespace dynamic_server {
-void InitAccessControl()
+namespace Controller {
+namespace AccessControl {
+
+void InitAccessControl(EndpointId endpointId)
 {
-    gControllerAccessControl.get(); // force initialization
+    CHIP_ERROR err = gControllerAccessControl.get().Init(endpointId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to initialize access control: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Access control initialized successfully for endpoint %u", endpointId);
+    }
 }
-} // namespace dynamic_server
-} // namespace app
+
+} // namespace AccessControl
+} // namespace Controller
 } // namespace chip

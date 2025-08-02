@@ -11,3 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
+static_library("access_control") {
+  sources = [
+    "WebRTCAccessControl.cpp",
+    "WebRTCAccessControl.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/access",
+    "${chip_root}/src/access:provider-impl",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}

@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
 
 #include <lib/core/DataModelTypes.h>
 
-constexpr chip::EndpointId kOtaProviderDynamicEndpointId = 0;
-
 namespace chip {
-namespace app {
-namespace dynamic_server {
+namespace Controller {
+namespace AccessControl {
 
 /**
- * Initialize the access control module. Must be called on the Matter task
- * queue.
+ * Initialize the access control module with the specified WebRTC endpoint ID.
+ * Must be called on the Matter task queue.
+ *
+ * @param endpointId The endpoint ID where the WebRTC Transport Requestor cluster is hosted
  */
-void InitAccessControl();
+void InitAccessControl(chip::EndpointId endpointId);
 
-} // namespace dynamic_server
-} // namespace app
+} // namespace AccessControl
+} // namespace Controller
 } // namespace chip
