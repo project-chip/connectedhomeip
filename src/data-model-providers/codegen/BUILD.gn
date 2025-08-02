@@ -57,3 +57,19 @@ source_set("registry") {
     "${chip_root}/src/lib/support",
   ]
 }
+
+source_set("headers") {
+  sources = [
+    "CodegenDataModelProvider.h",
+    "ServerClusterInterfaceRegistry.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:command-handler-interface",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/util:af-types",
+  ]
+}
