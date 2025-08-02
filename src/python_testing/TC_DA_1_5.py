@@ -41,7 +41,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.conversions import hex_from_bytes
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
@@ -70,7 +70,7 @@ class TC_DA_1_5(MatterBaseTest):
         self.print_step(3, "Send CertificateChainRequest for DAC")
         certtype = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
         dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=certtype))
-        asserts.assert_true(type_matches(dac_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "Certificate request returned incorrect type")
         der_dac = dac_resp.certificate
         # This throws an exception for a non-x509 cert

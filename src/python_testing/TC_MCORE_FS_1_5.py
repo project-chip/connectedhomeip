@@ -69,8 +69,9 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.apps import AppServerSubprocess
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
+                                         matchers)
 from chip.testing.commissioning import SetupParameters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
@@ -205,7 +206,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         parts_list_cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = parts_list_cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
+        asserts.assert_true(matchers.is_type(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
         if not self.is_pics_sdk_ci_only:

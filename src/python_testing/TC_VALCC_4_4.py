@@ -38,7 +38,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import utc_time_in_matter_epoch
+from chip.testing import timeoperations
 from mobly import asserts
 
 
@@ -110,7 +110,7 @@ class TC_VALCC_4_4(MatterBaseTest):
 
         self.step("3b")
         if utcTime is NullValue:
-            th_utc = utc_time_in_matter_epoch()
+            th_utc = timeoperations.utc_time_in_matter_epoch()
 
             try:
                 await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=th_utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity), endpoint=0)
