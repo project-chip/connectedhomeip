@@ -42411,15 +42411,6 @@ public class ChipClusters {
         }, WHITE_POINT_X_ATTRIBUTE_ID, true);
     }
 
-    public void writeWhitePointXAttribute(DefaultClusterCallback callback, Integer value) {
-      writeWhitePointXAttribute(callback, value, 0);
-    }
-
-    public void writeWhitePointXAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), WHITE_POINT_X_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeWhitePointXAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WHITE_POINT_X_ATTRIBUTE_ID);
@@ -42444,15 +42435,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, WHITE_POINT_Y_ATTRIBUTE_ID, true);
-    }
-
-    public void writeWhitePointYAttribute(DefaultClusterCallback callback, Integer value) {
-      writeWhitePointYAttribute(callback, value, 0);
-    }
-
-    public void writeWhitePointYAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), WHITE_POINT_Y_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeWhitePointYAttribute(
@@ -42481,15 +42463,6 @@ public class ChipClusters {
         }, COLOR_POINT_RX_ATTRIBUTE_ID, true);
     }
 
-    public void writeColorPointRXAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointRXAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointRXAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_RX_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeColorPointRXAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_RX_ATTRIBUTE_ID);
@@ -42514,15 +42487,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, COLOR_POINT_RY_ATTRIBUTE_ID, true);
-    }
-
-    public void writeColorPointRYAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointRYAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointRYAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_RY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointRYAttribute(
@@ -42551,15 +42515,6 @@ public class ChipClusters {
         }, COLOR_POINT_R_INTENSITY_ATTRIBUTE_ID, true);
     }
 
-    public void writeColorPointRIntensityAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointRIntensityAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointRIntensityAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_R_INTENSITY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeColorPointRIntensityAttribute(
         ColorPointRIntensityAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_R_INTENSITY_ATTRIBUTE_ID);
@@ -42584,15 +42539,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, COLOR_POINT_GX_ATTRIBUTE_ID, true);
-    }
-
-    public void writeColorPointGXAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointGXAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointGXAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_GX_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointGXAttribute(
@@ -42621,15 +42567,6 @@ public class ChipClusters {
         }, COLOR_POINT_GY_ATTRIBUTE_ID, true);
     }
 
-    public void writeColorPointGYAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointGYAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointGYAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_GY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeColorPointGYAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_GY_ATTRIBUTE_ID);
@@ -42654,15 +42591,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, COLOR_POINT_G_INTENSITY_ATTRIBUTE_ID, true);
-    }
-
-    public void writeColorPointGIntensityAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointGIntensityAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointGIntensityAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_G_INTENSITY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointGIntensityAttribute(
@@ -42691,15 +42619,6 @@ public class ChipClusters {
         }, COLOR_POINT_BX_ATTRIBUTE_ID, true);
     }
 
-    public void writeColorPointBXAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointBXAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointBXAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_BX_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeColorPointBXAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_BX_ATTRIBUTE_ID);
@@ -42726,15 +42645,6 @@ public class ChipClusters {
         }, COLOR_POINT_BY_ATTRIBUTE_ID, true);
     }
 
-    public void writeColorPointBYAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointBYAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointBYAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_BY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeColorPointBYAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COLOR_POINT_BY_ATTRIBUTE_ID);
@@ -42759,15 +42669,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, COLOR_POINT_B_INTENSITY_ATTRIBUTE_ID, true);
-    }
-
-    public void writeColorPointBIntensityAttribute(DefaultClusterCallback callback, Integer value) {
-      writeColorPointBIntensityAttribute(callback, value, 0);
-    }
-
-    public void writeColorPointBIntensityAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COLOR_POINT_B_INTENSITY_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeColorPointBIntensityAttribute(
@@ -65422,7 +65323,7 @@ public class ChipClusters {
 
     private static final long METERED_QUANTITY_ATTRIBUTE_ID = 0L;
     private static final long METERED_QUANTITY_TIMESTAMP_ATTRIBUTE_ID = 1L;
-    private static final long MEASUREMENT_TYPE_ATTRIBUTE_ID = 2L;
+    private static final long TARIFF_UNIT_ATTRIBUTE_ID = 2L;
     private static final long MAXIMUM_METERED_QUANTITIES_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -65448,7 +65349,7 @@ public class ChipClusters {
       void onSuccess(@Nullable Long value);
     }
 
-    public interface MeasurementTypeAttributeCallback extends BaseAttributeCallback {
+    public interface TariffUnitAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
     }
 
@@ -65520,9 +65421,9 @@ public class ChipClusters {
         }, METERED_QUANTITY_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readMeasurementTypeAttribute(
-        MeasurementTypeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASUREMENT_TYPE_ATTRIBUTE_ID);
+    public void readTariffUnitAttribute(
+        TariffUnitAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TARIFF_UNIT_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -65530,12 +65431,12 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASUREMENT_TYPE_ATTRIBUTE_ID, true);
+        }, TARIFF_UNIT_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeMeasurementTypeAttribute(
-        MeasurementTypeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASUREMENT_TYPE_ATTRIBUTE_ID);
+    public void subscribeTariffUnitAttribute(
+        TariffUnitAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TARIFF_UNIT_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -65543,7 +65444,7 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MEASUREMENT_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, TARIFF_UNIT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMaximumMeteredQuantitiesAttribute(
