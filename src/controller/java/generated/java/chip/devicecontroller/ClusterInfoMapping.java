@@ -20858,7 +20858,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCommodityMeteringClusterMeasurementTypeAttributeCallback implements ChipClusters.CommodityMeteringCluster.MeasurementTypeAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCommodityMeteringClusterTariffUnitAttributeCallback implements ChipClusters.CommodityMeteringCluster.TariffUnitAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
