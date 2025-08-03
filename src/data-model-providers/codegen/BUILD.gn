@@ -44,15 +44,17 @@ source_set("instance-header") {
   sources = [ "Instance.h" ]
 }
 
-source_set("registry") {
-  sources = [
-    "ServerClusterInterfaceRegistry.cpp",
-    "ServerClusterInterfaceRegistry.h",
-  ]
+source_set("headers") {
+  sources = [ "CodegenDataModelProvider.h" ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:command-handler-interface",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/server-cluster:registry",
+    "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
   ]
