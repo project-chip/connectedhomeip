@@ -551,7 +551,7 @@
 #define GENERATED_DEFAULTS_COUNT (28)
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 54
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 46
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
                                                                                                                                    \
@@ -615,14 +615,6 @@
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* ScheduleProgrammingVisibility */                                    \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Color Control (server) */                                                                         \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* WhitePointX */                                                  \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* WhitePointY */                                                  \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointRX */                                                 \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointRY */                                                 \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointGX */                                                 \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointGY */                                                 \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointBX */                                                 \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointBY */                                                 \
         { (uint16_t) 0xFA, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* StartUpColorTemperatureMireds */                                \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Ballast Configuration (server) */                                                                 \
@@ -2007,29 +1999,21 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000028, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Primary6X */                    \
         { ZAP_EMPTY_DEFAULT(), 0x00000029, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Primary6Y */                    \
         { ZAP_EMPTY_DEFAULT(), 0x0000002A, 1, ZAP_TYPE(INT8U),                                                                     \
-          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Primary6Intensity */                                   \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(31), 0x00000030, 2, ZAP_TYPE(INT16U),                                                         \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* WhitePointX */           \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(32), 0x00000031, 2, ZAP_TYPE(INT16U),                                                         \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* WhitePointY */           \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(33), 0x00000032, 2, ZAP_TYPE(INT16U),                                                         \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointRX */          \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(34), 0x00000033, 2, ZAP_TYPE(INT16U),                                                         \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointRY */          \
+          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) },                        /* Primary6Intensity */            \
+        { ZAP_EMPTY_DEFAULT(), 0x00000030, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* WhitePointX */                  \
+        { ZAP_EMPTY_DEFAULT(), 0x00000031, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* WhitePointY */                  \
+        { ZAP_EMPTY_DEFAULT(), 0x00000032, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointRX */                 \
+        { ZAP_EMPTY_DEFAULT(), 0x00000033, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointRY */                 \
         { ZAP_EMPTY_DEFAULT(), 0x00000034, 1, ZAP_TYPE(INT8U),                                                                     \
-          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ColorPointRIntensity */ \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(35), 0x00000036, 2, ZAP_TYPE(INT16U),                                                         \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointGX */          \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(36), 0x00000037, 2, ZAP_TYPE(INT16U),                                                         \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointGY */          \
+          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) },                        /* ColorPointRIntensity */         \
+        { ZAP_EMPTY_DEFAULT(), 0x00000036, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointGX */                 \
+        { ZAP_EMPTY_DEFAULT(), 0x00000037, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointGY */                 \
         { ZAP_EMPTY_DEFAULT(), 0x00000038, 1, ZAP_TYPE(INT8U),                                                                     \
-          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ColorPointGIntensity */ \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(37), 0x0000003A, 2, ZAP_TYPE(INT16U),                                                         \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointBX */          \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(38), 0x0000003B, 2, ZAP_TYPE(INT16U),                                                         \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointBY */          \
+          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) },                        /* ColorPointGIntensity */         \
+        { ZAP_EMPTY_DEFAULT(), 0x0000003A, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointBX */                 \
+        { ZAP_EMPTY_DEFAULT(), 0x0000003B, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorPointBY */                 \
         { ZAP_EMPTY_DEFAULT(), 0x0000003C, 1, ZAP_TYPE(INT8U),                                                                     \
-          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ColorPointBIntensity */ \
+          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ColorPointBIntensity */                                \
         { ZAP_SIMPLE_DEFAULT(0x0000), 0x00004000, 2, ZAP_TYPE(INT16U),                                                             \
           ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* EnhancedCurrentHue */                                  \
         { ZAP_SIMPLE_DEFAULT(0x01), 0x00004001, 1, ZAP_TYPE(ENUM8),                                                                \
@@ -2051,7 +2035,7 @@
           ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorTempPhysicalMaxMireds */                                                         \
         { ZAP_EMPTY_DEFAULT(), 0x0000400D, 2, ZAP_TYPE(INT16U),                                                                    \
           ZAP_ATTRIBUTE_MASK(READABLE) }, /* CoupleColorTempToLevelMinMireds */                                                    \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(39), 0x00004010, 2, ZAP_TYPE(INT16U),                                                         \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(31), 0x00004010, 2, ZAP_TYPE(INT16U),                                                         \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                              \
               ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* StartUpColorTemperatureMireds */                   \
         { ZAP_SIMPLE_DEFAULT(0x1F), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */            \
@@ -2061,14 +2045,14 @@
         { ZAP_SIMPLE_DEFAULT(0x01), 0x00000000, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* PhysicalMinLevel */       \
         { ZAP_SIMPLE_DEFAULT(0xFE), 0x00000001, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* PhysicalMaxLevel */       \
         { ZAP_SIMPLE_DEFAULT(0x00), 0x00000002, 1, ZAP_TYPE(BITMAP8), ZAP_ATTRIBUTE_MASK(READABLE) }, /* BallastStatus */          \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(40), 0x00000010, 1, ZAP_TYPE(INT8U),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(32), 0x00000010, 1, ZAP_TYPE(INT8U),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* MinLevel */              \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(41), 0x00000011, 1, ZAP_TYPE(INT8U),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(33), 0x00000011, 1, ZAP_TYPE(INT8U),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* MaxLevel */              \
         { ZAP_EMPTY_DEFAULT(), 0x00000014, 1, ZAP_TYPE(INT8U),                                                                     \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                            \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* IntrinsicBallastFactor */                                                         \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(42), 0x00000015, 1, ZAP_TYPE(INT8U),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(34), 0x00000015, 1, ZAP_TYPE(INT8U),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                              \
               ZAP_ATTRIBUTE_MASK(NULLABLE) },                                                  /* BallastFactorAdjustment */       \
         { ZAP_EMPTY_DEFAULT(), 0x00000020, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* LampQuantity */                  \
@@ -2080,7 +2064,7 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LampRatedHours */       \
         { ZAP_SIMPLE_DEFAULT(0x000000), 0x00000033, 3, ZAP_TYPE(INT24U),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LampBurnHours */        \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(43), 0x00000034, 1, ZAP_TYPE(BITMAP8),                                                        \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(35), 0x00000034, 1, ZAP_TYPE(BITMAP8),                                                        \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* LampAlarmMode */         \
         { ZAP_SIMPLE_DEFAULT(0xFFFFFF), 0x00000035, 3, ZAP_TYPE(INT24U),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                            \
@@ -2484,7 +2468,7 @@
         /* Endpoint: 1, Cluster: Chime (server) */                                                                                 \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                                                                     \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* InstalledChimeSounds */                        \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(44), 0x00000001, 1, ZAP_TYPE(INT8U),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(36), 0x00000001, 1, ZAP_TYPE(INT8U),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                      \
               ZAP_ATTRIBUTE_MASK(READABLE) }, /* SelectedChime */                                                                  \
         { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BOOLEAN),                                                                   \
@@ -2581,16 +2565,16 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* enum_attr */                                           \
         { ZAP_EMPTY_DEFAULT(), 0x00000025, 0, ZAP_TYPE(STRUCT),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* struct_attr */  \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(45), 0x00000026, 1, ZAP_TYPE(INT8U),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(37), 0x00000026, 1, ZAP_TYPE(INT8U),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                                                             \
               ZAP_ATTRIBUTE_MASK(READABLE) }, /* range_restricted_int8u */                                                         \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(46), 0x00000027, 1, ZAP_TYPE(INT8S),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(38), 0x00000027, 1, ZAP_TYPE(INT8S),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                                                             \
               ZAP_ATTRIBUTE_MASK(READABLE) }, /* range_restricted_int8s */                                                         \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(47), 0x00000028, 2, ZAP_TYPE(INT16U),                                                         \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(39), 0x00000028, 2, ZAP_TYPE(INT16U),                                                         \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                                                             \
               ZAP_ATTRIBUTE_MASK(READABLE) }, /* range_restricted_int16u */                                                        \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(48), 0x00000029, 2, ZAP_TYPE(INT16S),                                                         \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(40), 0x00000029, 2, ZAP_TYPE(INT16S),                                                         \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                                                             \
               ZAP_ATTRIBUTE_MASK(READABLE) }, /* range_restricted_int16s */                                                        \
         { ZAP_EMPTY_DEFAULT(), 0x0000002A, 0, ZAP_TYPE(ARRAY),                                                                     \
@@ -2670,16 +2654,16 @@
         { ZAP_EMPTY_DEFAULT(), 0x00004025, 0, ZAP_TYPE(STRUCT),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                     \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_struct */                                                                \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(49), 0x00004026, 1, ZAP_TYPE(INT8U),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(41), 0x00004026, 1, ZAP_TYPE(INT8U),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                              \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_range_restricted_int8u */                                                \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(50), 0x00004027, 1, ZAP_TYPE(INT8S),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(42), 0x00004027, 1, ZAP_TYPE(INT8S),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                              \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_range_restricted_int8s */                                                \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(51), 0x00004028, 2, ZAP_TYPE(INT16U),                                                         \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(43), 0x00004028, 2, ZAP_TYPE(INT16U),                                                         \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                              \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_range_restricted_int16u */                                               \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(52), 0x00004029, 2, ZAP_TYPE(INT16S),                                                         \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(44), 0x00004029, 2, ZAP_TYPE(INT16S),                                                         \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                              \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_range_restricted_int16s */                                               \
         { ZAP_EMPTY_DEFAULT(), 0x0000402A, 1, ZAP_TYPE(INT8U),                                                                     \
@@ -2708,7 +2692,7 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* OnTime */                                              \
         { ZAP_SIMPLE_DEFAULT(0), 0x00004002, 2, ZAP_TYPE(INT16U),                                                                  \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* OffWaitTime */                                         \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(53), 0x00004003, 1, ZAP_TYPE(ENUM8),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(45), 0x00004003, 1, ZAP_TYPE(ENUM8),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                              \
               ZAP_ATTRIBUTE_MASK(NULLABLE) },                                                            /* StartUpOnOff */        \
         { ZAP_SIMPLE_DEFAULT(0x0001), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */          \
