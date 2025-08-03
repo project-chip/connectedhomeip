@@ -69,7 +69,7 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
     def pics_TC_COMMTR_2_1(self) -> list[str]:
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
 
-        return ["COMMTR.S", "DGGEN.S", "DGGEN.S.A0008", "DGGEN.S.C00.Rsp"]
+        return ["COMMTR.S"]
 
     def steps_TC_COMMTR_2_1(self) -> list[TestStep]:
 
@@ -86,10 +86,10 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
                      - Verify that the TariffComponentIDs field is a list with length less or equal 128;
                      - Verify that the Quantity field has int64 type;"""),
             TestStep("5", "TH reads MeteredQuantityTimestamp attribute", "DUT replies a null value or epoch-s type."),
-            TestStep("6", "TH reads MeasurementType attribute", "DUT replies a a null value or MeasurementTypeEnum type."),
+            TestStep("6", "TH reads TariffUnit attribute", "DUT replies a null value or TariffUnitEnum type."),
             TestStep("7", "TH sends TestEventTrigger command Fake Value Update Test Event", "Status code must be SUCCESS."),
             TestStep("8", "TH reads MeteredQuantityTimestamp attribute", "DUT replies an epoch-s value."),
-            TestStep("9", "TH reads MeasurementType attribute", "DUT replies a MeasurementTypeEnum value."),
+            TestStep("9", "TH reads TariffUnit attribute", "DUT replies a TariffUnitEnum value."),
             TestStep("10", "TH reads MaximumMeteredQuantities attribute", """
                      - DUT replies a uint16 value;
                      - Value saved as MaxMeteredQuantities."""),
@@ -108,10 +108,6 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
         """Implements test procedure for test case TC_COMMTR_2_1."""
 
         endpoint = self.get_endpoint()
-
-        # If TestEventTriggers is not enabled this TC can't be checked properly.
-        if not self.check_pics("DGGEN.S") or not self.check_pics("DGGEN.S.A0008") or not self.check_pics("DGGEN.S.C00.Rsp"):
-            asserts.skip("PICS DGGEN.S or DGGEN.S.A0008 or DGGEN.S.C00.Rsp is not True")
 
         self.step("1")
         # commissioning
@@ -148,11 +144,11 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
             matter_asserts.assert_valid_uint32(val, 'MeteredQuantityTimestamp')
 
         self.step("6")
-        # Read MeasurementType attribute, expected to be Null or MeasurementTypeEnum
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeasurementType)
+        # Read TariffUnit attribute, expected to be Null or TariffUnitEnum
+        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
         if val is not NullValue:
             asserts.assert_is_instance(
-                val, Globals.Enums.MeasurementTypeEnum, "MeasurementType attribute must return a MeasurementTypeEnum")
+                val, Globals.Enums.TariffUnitEnum, "TariffUnit attribute must return a TariffUnitEnum")
 
         self.step("7")
         # TH sends TestEventTrigger command Fake Value Update Test Event, expected SUCCESS
@@ -165,11 +161,11 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
         matter_asserts.assert_valid_uint32(val, 'MeteredQuantityTimestamp must be uint32')
 
         self.step("9")
-        # Read MeasurementType attribute, expected to be MeasurementTypeEnum
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeasurementType)
-        asserts.assert_not_equal(val, NullValue, "MeasurementType must not be NullValue")
+        # Read TariffUnit attribute, expected to be TariffUnitEnum
+        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
+        asserts.assert_not_equal(val, NullValue, "TariffUnit must not be NullValue")
         matter_asserts.assert_valid_enum(
-            val, "MeasurementType attribute must return a MeasurementTypeEnum", cluster.Enums.MeasurementTypeEnum)
+            val, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
 
         self.step("10")
         # Read MaximumMeteredQuantities attribute, expected to be uint16

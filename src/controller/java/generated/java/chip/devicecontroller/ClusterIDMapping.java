@@ -20314,7 +20314,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             MeteredQuantity(0L),
             MeteredQuantityTimestamp(1L),
-            MeasurementType(2L),
+            TariffUnit(2L),
             MaximumMeteredQuantities(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
