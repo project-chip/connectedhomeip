@@ -43,9 +43,9 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
+from chip.testing import timeoperations
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
-from chip.testing import timeoperations
 from mobly import asserts
 
 

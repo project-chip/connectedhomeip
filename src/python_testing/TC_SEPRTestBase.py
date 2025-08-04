@@ -22,8 +22,7 @@ from typing import Optional
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing import timeoperations
+from chip.testing import matter_asserts, timeoperations
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
