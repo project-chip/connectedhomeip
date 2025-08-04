@@ -34,4 +34,6 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.h"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterfaceRegistry.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterfaceRegistry.h"
+  "${BASE_DIR}/../../app/server-cluster/SingleEndpointServerClusterRegistry.cpp"
+  "${BASE_DIR}/../../app/server-cluster/SingleEndpointServerClusterRegistry.h"
 )

@@ -145,7 +145,7 @@ CHIP_ERROR Instance::Init()
 {
     mMeteredQuantity.SetNull();
     mMeteredQuantityTimestamp.SetNull();
-    mMeasurementType.SetNull();
+    mTariffUnit.SetNull();
     mMaximumMeteredQuantities.SetNull();
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
@@ -259,28 +259,27 @@ CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> n
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetMeasurementType(DataModel::Nullable<Globals::MeasurementTypeEnum> newValue)
+CHIP_ERROR Instance::SetTariffUnit(DataModel::Nullable<Globals::TariffUnitEnum> newValue)
 {
-    DataModel::Nullable<Globals::MeasurementTypeEnum> oldValue = mMeasurementType;
+    DataModel::Nullable<Globals::TariffUnitEnum> oldValue = mTariffUnit;
 
     if (oldValue != newValue)
     {
         if (newValue.IsNull())
         {
-            mMeasurementType.SetNull();
+            mTariffUnit.SetNull();
         }
-        else if (EnsureKnownEnumValue(newValue.Value()) != Globals::MeasurementTypeEnum::kUnknownEnumValue)
+        else if (EnsureKnownEnumValue(newValue.Value()) != Globals::TariffUnitEnum::kUnknownEnumValue)
         {
-            mMeasurementType = newValue;
-            ChipLogDetail(AppServer, "Endpoint: %d - mMeasurementType updated to %d", mEndpointId,
-                          to_underlying(mMeasurementType.Value()));
+            mTariffUnit = newValue;
+            ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId, to_underlying(mTariffUnit.Value()));
         }
         else
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
 
-        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeasurementType::Id);
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, TariffUnit::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -348,8 +347,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantityTimestamp()));
         break;
 
-    case MeasurementType::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetMeasurementType()));
+    case TariffUnit::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(GetTariffUnit()));
         break;
 
     case MaximumMeteredQuantities::Id:

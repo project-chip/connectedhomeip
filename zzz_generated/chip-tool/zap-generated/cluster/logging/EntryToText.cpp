@@ -4767,8 +4767,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MeteredQuantity";
         case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantityTimestamp::Id:
             return "MeteredQuantityTimestamp";
-        case chip::app::Clusters::CommodityMetering::Attributes::MeasurementType::Id:
-            return "MeasurementType";
+        case chip::app::Clusters::CommodityMetering::Attributes::TariffUnit::Id:
+            return "TariffUnit";
         case chip::app::Clusters::CommodityMetering::Attributes::MaximumMeteredQuantities::Id:
             return "MaximumMeteredQuantities";
         case chip::app::Clusters::CommodityMetering::Attributes::GeneratedCommandList::Id:
