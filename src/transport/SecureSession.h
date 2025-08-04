@@ -22,7 +22,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/CryptoContext.h>
@@ -156,18 +156,43 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
-    bool AllowsMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+    bool IsCommissioningSession() const override;
+
+    bool AllowsMRP() const override { return (GetPeerAddress().GetTransportType() == Transport::Type::kUdp); }
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
-    System::Clock::Milliseconds32 GetAckTimeout() const override
+    System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp: {
             const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
             return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime);
+                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime,
+                                            isFirstMessageOnExchange);
+        }
+        case Transport::Type::kTcp:
+            return System::Clock::Seconds16(30);
+        case Transport::Type::kBle:
+            return System::Clock::Milliseconds32(BTP_ACK_TIMEOUT_MS);
+        default:
+            break;
+        }
+        return System::Clock::Timeout();
+    }
+
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
+                                                           bool isFirstMessageOnExchange) const override
+    {
+        switch (mPeerAddress.GetTransportType())
+        {
+        case Transport::Type::kUdp: {
+            const auto & maybeLocalMRPConfig = GetLocalMRPConfig();
+            const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
+            const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
+            return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, isFirstMessageOnExchange);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -222,6 +247,12 @@ public:
         {
             MoveToState(State::kActive);
         }
+    }
+
+    void SetCaseCommissioningSessionStatus(bool isCaseCommissioningSession)
+    {
+        VerifyOrDie(GetSecureSessionType() == Type::kCASE);
+        mIsCaseCommissioningSession = isCaseCommissioningSession;
     }
 
     bool IsPeerActive() const
@@ -302,9 +333,10 @@ private:
     SecureSessionTable & mTable;
     State mState;
     const Type mSecureSessionType;
-    NodeId mLocalNodeId = kUndefinedNodeId;
-    NodeId mPeerNodeId  = kUndefinedNodeId;
-    CATValues mPeerCATs = CATValues{};
+    bool mIsCaseCommissioningSession = false;
+    NodeId mLocalNodeId              = kUndefinedNodeId;
+    NodeId mPeerNodeId               = kUndefinedNodeId;
+    CATValues mPeerCATs              = CATValues{};
     const uint16_t mLocalSessionId;
     uint16_t mPeerSessionId = 0;
 

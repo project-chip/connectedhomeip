@@ -44,10 +44,10 @@ struct CASEClientInitParams
     {
         // sessionResumptionStorage can be nullptr when resumption is disabled.
         // certificateValidityPolicy is optional, too.
-        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
     }

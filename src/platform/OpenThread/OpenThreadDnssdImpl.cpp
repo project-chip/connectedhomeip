@@ -24,6 +24,7 @@ namespace Dnssd {
 
 CHIP_ERROR OpenThreadDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ReturnErrorOnFailure(ThreadStackMgr().SetSrpDnsCallbacks(initCallback, errorCallback, context));
 
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
@@ -33,6 +34,9 @@ CHIP_ERROR OpenThreadDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsync
     MakeHostName(hostname, sizeof(hostname), mac);
 
     return ThreadStackMgr().ClearSrpHost(hostname);
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 }
 
 const char * GetProtocolString(DnssdServiceProtocol protocol)
@@ -43,7 +47,7 @@ const char * GetProtocolString(DnssdServiceProtocol protocol)
 CHIP_ERROR OpenThreadDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (strcmp(service->mHostName, "") != 0)
     {
         ReturnErrorOnFailure(ThreadStackMgr().SetupSrpHost(service->mHostName));

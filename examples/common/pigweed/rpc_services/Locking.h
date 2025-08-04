@@ -27,7 +27,7 @@
 namespace chip {
 namespace rpc {
 
-class Locking final : public pw_rpc::nanopb::Locking::Service<Locking>
+class Locking : public pw_rpc::nanopb::Locking::Service<Locking>
 {
 public:
     virtual ~Locking() = default;

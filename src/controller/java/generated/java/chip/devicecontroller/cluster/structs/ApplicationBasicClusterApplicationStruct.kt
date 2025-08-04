@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ApplicationBasicClusterApplicationStruct(
   val catalogVendorID: UInt,
-  val applicationID: String
+  val applicationID: String,
 ) {
   override fun toString(): String = buildString {
     append("ApplicationBasicClusterApplicationStruct {\n")
@@ -36,20 +36,20 @@ class ApplicationBasicClusterApplicationStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D), catalogVendorID)
-      put(ContextSpecificTag(TAG_APPLICATION_I_D), applicationID)
+      put(ContextSpecificTag(TAG_CATALOG_VENDOR_ID), catalogVendorID)
+      put(ContextSpecificTag(TAG_APPLICATION_ID), applicationID)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_CATALOG_VENDOR_I_D = 0
-    private const val TAG_APPLICATION_I_D = 1
+    private const val TAG_CATALOG_VENDOR_ID = 0
+    private const val TAG_APPLICATION_ID = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ApplicationBasicClusterApplicationStruct {
       tlvReader.enterStructure(tlvTag)
-      val catalogVendorID = tlvReader.getUInt(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
-      val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_I_D))
+      val catalogVendorID = tlvReader.getUInt(ContextSpecificTag(TAG_CATALOG_VENDOR_ID))
+      val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_ID))
 
       tlvReader.exitContainer()
 

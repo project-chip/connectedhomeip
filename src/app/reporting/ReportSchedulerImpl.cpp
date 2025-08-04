@@ -92,6 +92,8 @@ void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
 
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
+    // This method is called after the report is sent, so the ReadHandler is no longer reportable, and thus CanBeSynced and
+    // EngineRunScheduled of the node associated with the ReadHandler are set to false here.
     node->SetCanBeSynced(false);
     node->SetIntervalTimeStamps(aReadHandler, now);
     Milliseconds32 newTimeout;

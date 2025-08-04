@@ -19,6 +19,7 @@
 
 #include <lib/address_resolve/TracingStructs.h>
 #include <tracing/macros.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace AddressResolve {
@@ -47,13 +48,16 @@ void NodeLookupHandle::LookupResult(const ResolveResult & result)
     char addr_string[Transport::PeerAddress::kMaxToStringSize];
     result.address.ToString(addr_string);
 
+    const PeerId peerId = GetRequest().GetPeerId();
     if (success)
     {
-        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, to_underlying(score));
+        ChipLogProgress(Discovery, "%s: new best score: %u (for " ChipLogFormatPeerId ")", addr_string, to_underlying(score),
+                        ChipLogValuePeerId(peerId));
     }
     else
     {
-        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, to_underlying(score));
+        ChipLogProgress(Discovery, "%s: score has not improved: %u (for " ChipLogFormatPeerId ")", addr_string,
+                        to_underlying(score), ChipLogValuePeerId(peerId));
     }
 #endif
 }
@@ -97,7 +101,8 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 {
     const System::Clock::Timestamp elapsed = now - mRequestStartTime;
 
-    ChipLogProgress(Discovery, "Checking node lookup status after %lu ms", static_cast<unsigned long>(elapsed.count()));
+    ChipLogProgress(Discovery, "Checking node lookup status for " ChipLogFormatPeerId " after %lu ms",
+                    ChipLogValuePeerId(mRequest.GetPeerId()), static_cast<unsigned long>(elapsed.count()));
 
     // We are still within the minimal search time. Wait for more results.
     if (elapsed < mRequest.GetMinLookupTime())
@@ -124,6 +129,17 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 
 bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd::IPAddressSorter::IpScore newScore)
 {
+    Transport::PeerAddress addressWithAdjustedInterface = result.address;
+    if (!addressWithAdjustedInterface.GetIPAddress().IsIPv6LinkLocal())
+    {
+        // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
+        // For all other addresses, we should rely on the device's routing table to route messages sent.
+        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+        addressWithAdjustedInterface.SetInterface(Inet::InterfaceId::Null());
+        ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
+    }
+
     uint8_t insertAtIndex = 0;
     for (; insertAtIndex < kNodeLookupResultsLen; insertAtIndex++)
     {
@@ -134,7 +150,14 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         }
 
         auto & oldAddress = results[insertAtIndex].address;
-        auto oldScore     = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
+
+        if (oldAddress == addressWithAdjustedInterface)
+        {
+            // this address is already in our list.
+            return false;
+        }
+
+        auto oldScore = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
         if (newScore > oldScore)
         {
             // This is a score update, it will replace a previous entry.
@@ -146,6 +169,10 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
     {
         return false;
     }
+
+    // we are guaranteed no duplicates here:
+    // - insertAtIndex MUST be with some score that is `< newScore`, so all
+    //   addresses with a `newScore` were duplicate-checked
 
     // Move the following valid entries one level down.
     for (auto i = count; i > insertAtIndex; i--)
@@ -164,17 +191,9 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         count++;
     }
 
-    auto & updatedResult = results[insertAtIndex];
-    updatedResult        = result;
-    if (!updatedResult.address.GetIPAddress().IsIPv6LinkLocal())
-    {
-        // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
-        // For all other addresses, we should rely on the device's routing table to route messages sent.
-        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
-        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-        updatedResult.address.SetInterface(Inet::InterfaceId::Null());
-        ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
-    }
+    auto & updatedResult  = results[insertAtIndex];
+    updatedResult         = result;
+    updatedResult.address = addressWithAdjustedInterface;
 
     return true;
 }
@@ -186,9 +205,11 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     handle.ResetForLookup(mTimeSource.GetMonotonicTimestamp(), request);
-    ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId()));
+    auto & peerId = request.GetPeerId();
+    ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(peerId));
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
+    ChipLogProgress(Discovery, "Lookup started for " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
     return CHIP_NO_ERROR;
 }
 
@@ -242,6 +263,10 @@ CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
 
 void Resolver::Shutdown()
 {
+    // mSystemLayer is set in ::Init, so if it's null that means the resolver
+    // has not been initialized or has already been shut down.
+    VerifyOrReturn(mSystemLayer != nullptr);
+
     while (mActiveLookups.begin() != mActiveLookups.end())
     {
         auto current = mActiveLookups.begin();
@@ -284,12 +309,13 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         result.address.SetPort(nodeData.resolutionData.port);
         result.address.SetInterface(nodeData.resolutionData.interfaceId);
-        result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
-        result.supportsTcp     = nodeData.resolutionData.supportsTcp;
+        result.mrpRemoteConfig   = nodeData.resolutionData.GetRemoteMRPConfig();
+        result.supportsTcpClient = nodeData.resolutionData.supportsTcpClient;
+        result.supportsTcpServer = nodeData.resolutionData.supportsTcpServer;
 
-        if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+        if (nodeData.resolutionData.isICDOperatingAsLIT.has_value())
         {
-            result.isICDOperatingAsLIT = nodeData.resolutionData.isICDOperatingAsLIT.Value();
+            result.isICDOperatingAsLIT = *(nodeData.resolutionData.isICDOperatingAsLIT);
         }
 
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)

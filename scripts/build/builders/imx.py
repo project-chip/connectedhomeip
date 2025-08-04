@@ -17,6 +17,7 @@ import re
 import shlex
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -69,11 +70,13 @@ class IMXBuilder(GnBuilder):
                  root,
                  runner,
                  app: IMXApp,
-                 release: bool = False):
+                 release: bool = False,
+                 trusty: bool = False):
         super(IMXBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
         self.release = release
+        self.trusty = trusty
         self.app = app
 
     def GnBuildArgs(self):
@@ -172,6 +175,9 @@ class IMXBuilder(GnBuilder):
         else:
             args.append('optimize_debug=true')
 
+        if self.trusty:
+            args.append('chip_with_trusty_os=true')
+
         return args
 
     def SysRootPath(self, name):
@@ -180,19 +186,13 @@ class IMXBuilder(GnBuilder):
         return os.environ[name]
 
     def build_outputs(self):
-        outputs = {}
-
         for name in self.app.OutputNames():
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
             path = os.path.join(self.output_dir, name)
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                        outputs.update({
-                            file: os.path.join(root, file)
-                        })
+                        yield BuilderOutput(os.path.join(root, file), file)
             else:
-                outputs.update({
-                    name: os.path.join(self.output_dir, name)
-                })
-
-        return outputs
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)

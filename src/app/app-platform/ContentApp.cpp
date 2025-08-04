@@ -64,8 +64,17 @@ Status ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId attribu
     return Status::Failure;
 }
 
-void ContentApp::AddClientNode(NodeId subjectNodeId)
+bool ContentApp::AddClientNode(NodeId subjectNodeId)
 {
+    for (int i = 0; i < kMaxClientNodes; ++i)
+    {
+        if (mClientNodes[i] == subjectNodeId)
+        {
+            // avoid storing duplicate nodes
+            return false;
+        }
+    }
+
     mClientNodes[mNextClientNodeIndex++] = subjectNodeId;
     if (mClientNodeCount < kMaxClientNodes)
     {
@@ -76,6 +85,8 @@ void ContentApp::AddClientNode(NodeId subjectNodeId)
         // if we exceed the max number, then overwrite the oldest entry
         mNextClientNodeIndex = 0;
     }
+
+    return true;
 }
 
 void ContentApp::SendAppObserverCommand(chip::Controller::DeviceCommissioner * commissioner, NodeId clientNodeId, char * data,
@@ -92,6 +103,18 @@ void ContentApp::SendAppObserverCommand(chip::Controller::DeviceCommissioner * c
                                                          encodingHint);
 
     ChipLogProgress(Controller, "Completed send of AppObserver command");
+}
+
+bool ContentApp::HasSupportedCluster(chip::ClusterId clusterId) const
+{
+    for (const auto & supportedCluster : mSupportedClusters)
+    {
+        if (clusterId == supportedCluster.mClusterIdentifier)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 CHIP_ERROR ContentAppClientCommandSender::SendContentAppMessage(chip::Controller::DeviceCommissioner * commissioner,
@@ -136,7 +159,7 @@ CHIP_ERROR ContentAppClientCommandSender::SendMessage(chip::Messaging::ExchangeM
     CHIP_ERROR err       = cluster.InvokeCommand(request, nullptr, OnCommandResponse, OnCommandFailure);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Controller, "ContentAppClientCommandSender SendMessage error err %s", ErrorStr(err));
+        ChipLogDetail(Controller, "ContentAppClientCommandSender SendMessage error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     mIsBusy = false;
@@ -147,7 +170,7 @@ CHIP_ERROR ContentAppClientCommandSender::SendMessage(chip::Messaging::ExchangeM
 
 void ContentAppClientCommandSender::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR err)
 {
-    ChipLogProgress(Controller, "ContentAppClientCommandSender::OnDeviceConnectedFn error err %s", ErrorStr(err));
+    ChipLogProgress(Controller, "ContentAppClientCommandSender::OnDeviceConnectedFn error: %" CHIP_ERROR_FORMAT, err.Format());
 
     ContentAppClientCommandSender * sender = reinterpret_cast<ContentAppClientCommandSender *>(context);
     VerifyOrReturn(sender != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
@@ -168,7 +191,7 @@ void ContentAppClientCommandSender::OnCommandResponse(void * context, const Cont
 
 void ContentAppClientCommandSender::OnCommandFailure(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "ContentAppClientCommandSender::OnCommandFailure error err %s", ErrorStr(error));
+    ChipLogProgress(Controller, "ContentAppClientCommandSender::OnCommandFailure error: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
 } // namespace AppPlatform

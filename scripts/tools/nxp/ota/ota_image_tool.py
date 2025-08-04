@@ -24,9 +24,6 @@ The format of the custom payload is the following:
 The OTA payload can then be used to generate an OTA image file, which
 will be parsed by the OTA image processor. The total size of TLVs is
 needed as input for a TLVReader.
-
-Currently, this script only supports Certification Declaration update,
-but it could be modified to support all factory data fields.
 '''
 
 import argparse
@@ -63,6 +60,9 @@ class TAG:
     APPLICATION = 1
     BOOTLOADER = 2
     FACTORY_DATA = 3
+    # Reserving 99 tags (highly unlikely this number will be reached) for NXP use.
+    # Custom TLVs should set its tag values to a number greater than LAST_RESERVED.
+    LAST_RESERVED = 99
 
 
 def write_to_temp(path: str, payload: bytearray):
@@ -211,6 +211,12 @@ def generate_custom_tlvs(data):
                 elif isinstance(field["value"], int):
                     descriptor += bytearray(field["value"].to_bytes(field["length"], "little"))
         file_size = os.path.getsize(entry["path"])
+
+        if entry["tag"] <= TAG.LAST_RESERVED:
+            print(
+                f"There is a custom TLV with a reserved tag {entry['tag']}. Please ensure all tags are greater than {TAG.LAST_RESERVED}")
+            sys.exit(1)
+
         payload = generate_header(entry["tag"], len(descriptor) + file_size) + descriptor
 
         temp_output = os.path.join(os.path.dirname(__file__), "ota_temp_custom_tlv_" + str(iteration) + ".bin")

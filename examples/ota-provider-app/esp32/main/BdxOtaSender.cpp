@@ -174,7 +174,6 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         {
             ChipLogError(BDX, "onTransferComplete Callback not set");
         }
-        mStopPolling = true; // Stop polling the TransferSession only after receiving BlockAckEOF
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
@@ -228,7 +227,7 @@ void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
-    mTransfer.Reset();
+    ResetTransfer();
     if (mExchangeCtx != nullptr)
     {
         mExchangeCtx->Close();

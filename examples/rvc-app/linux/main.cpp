@@ -19,6 +19,8 @@
 #include "rvc-device.h"
 #include <AppMain.h>
 
+#include <string>
+
 #define RVC_ENDPOINT 1
 
 using namespace chip;
@@ -26,7 +28,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_rvc_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 RvcAppCommandDelegate sRvcAppCommandDelegate;
 } // namespace
@@ -35,9 +36,9 @@ RvcDevice * gRvcDevice = nullptr;
 
 void ApplicationInit()
 {
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR)
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();

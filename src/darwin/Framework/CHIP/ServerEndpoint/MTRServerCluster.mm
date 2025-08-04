@@ -27,15 +27,17 @@
 #import <Matter/MTRServerCluster.h>
 
 #include <app/AttributeAccessInterface.h>
-#include <app/clusters/descriptor/descriptor.h>
 #include <app/data-model/PreEncodedValue.h>
+#include <clusters/Descriptor/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#import <os/lock.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-// TODO: These attribute-*.h bits are a hack that should eventually go away.
+// TODO: These attribute-*.h and AttributeAccessInterfaceRegistry.h bits are a hack that should eventually go away.
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 
@@ -124,7 +126,7 @@ MTR_DIRECT_MEMBERS
 
 + (MTRServerCluster *)newDescriptorCluster
 {
-    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kClusterRevision) accessGrants:[NSSet set] attributes:@[]];
+    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kRevision) accessGrants:[NSSet set] attributes:@[]];
 }
 
 - (instancetype)initInternalWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision accessGrants:(NSSet *)accessGrants attributes:(NSArray *)attributes
@@ -250,12 +252,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
         MTR_LOG_ERROR("Cannot associate MTRServerCluster with controller %@; already associated with controller %@",
             controller.uniqueIdentifier, existingController.uniqueIdentifier);
-#else
-        MTR_LOG_ERROR("Cannot associate MTRServerCluster with controller; already associated with a different controller");
-#endif
         return NO;
     }
 
@@ -289,7 +287,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     }
 
     if (needsDescriptorAttributes) {
-        attributeCount += ArraySize(sDescriptorAttributesMetadata);
+        attributeCount += MATTER_ARRAY_SIZE(sDescriptorAttributesMetadata);
     }
 
     // And add one for ClusterRevision
@@ -314,7 +312,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
             // Size in bytes does not matter, since we plan to
             // handle this entirely via AttributeAccessInterface.
             0,
-            // ATTRIBUTE_MASK_NULLABLE is not relevant because we
+            // MATTER_ATTRIBUTE_FLAG_NULLABLE is not relevant because we
             // are handling this all via AttributeAccessInterface.
             0)));
     }
@@ -348,8 +346,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
-    MTR_LOG_DEFAULT("Associated %@, attribute count %llu, with controller", [self _descriptionWhileLocked],
-        static_cast<unsigned long long>(attributeCount));
+    MTR_LOG("Associated %@, attribute count %llu, with controller %@", [self _descriptionWhileLocked],
+        static_cast<unsigned long long>(attributeCount), controller);
 
     return YES;
 }
@@ -381,7 +379,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     std::lock_guard lock(_lock);
 
-    if (!registerAttributeAccessOverride(_attributeAccessInterface.get())) {
+    if (!AttributeAccessInterfaceRegistry::Instance().Register(_attributeAccessInterface.get())) {
         // This should only happen if we somehow managed to register an
         // AttributeAccessInterface for the same (endpoint, cluster) pair.
         MTR_LOG_ERROR("Could not register AttributeAccessInterface for endpoint %u, cluster 0x%llx",
@@ -396,7 +394,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     std::lock_guard lock(_lock);
 
     if (_attributeAccessInterface != nullptr) {
-        unregisterAttributeAccessOverride(_attributeAccessInterface.get());
+        AttributeAccessInterfaceRegistry::Instance().Unregister(_attributeAccessInterface.get());
     }
 }
 

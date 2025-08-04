@@ -21,7 +21,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
-#include <lib/support/CommonIterator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -29,17 +28,12 @@ namespace app {
 namespace Clusters {
 namespace ElectricalPowerMeasurement {
 
-using namespace chip::app::Clusters::ElectricalPowerMeasurement::Attributes;
-using namespace chip::app::Clusters::ElectricalPowerMeasurement::Structs;
-
 class Delegate
 {
 public:
     virtual ~Delegate() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
-
-    using HarmonicMeasurementIterator = CommonIterator<Structs::HarmonicMeasurementStruct::Type>;
 
     virtual PowerModeEnum GetPowerMode()          = 0;
     virtual uint8_t GetNumberOfMeasurementTypes() = 0;

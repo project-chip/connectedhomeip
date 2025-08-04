@@ -29,7 +29,7 @@ class UnitTestingClusterTestEventEvent(
   val arg3: Boolean,
   val arg4: chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct,
   val arg5: List<chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct>,
-  val arg6: List<UInt>
+  val arg6: List<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestEventEvent {\n")
@@ -79,7 +79,7 @@ class UnitTestingClusterTestEventEvent(
       val arg4 =
         chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
           ContextSpecificTag(TAG_ARG4),
-          tlvReader
+          tlvReader,
         )
       val arg5 =
         buildList<chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct> {
@@ -88,7 +88,7 @@ class UnitTestingClusterTestEventEvent(
             this.add(
               chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
                 AnonymousTag,
-                tlvReader
+                tlvReader,
               )
             )
           }

@@ -86,8 +86,7 @@ def main():
         with open(path, 'r') as f:
             j = json.loads(f.read())
             success_expected = j['is_success_case'].lower() == 'true'
-            pid = 177 if 'fallback_encoding' in p else 32768
-            desc = TestInfo(desc=j['description'], dir=p, pid=pid)
+            desc = TestInfo(desc=j['description'], dir=p, pid=int(j['basic_info_pid']))
             if success_expected:
                 success_cases.append(desc)
             else:

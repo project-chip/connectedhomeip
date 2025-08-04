@@ -15,10 +15,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-executable("network-manager-app") {
+executable("matter-network-manager-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
+    "tbrm.cpp",
   ]
 
   deps = [
@@ -32,7 +33,7 @@ executable("network-manager-app") {
 }
 
 group("linux") {
-  deps = [ ":network-manager-app" ]
+  deps = [ ":matter-network-manager-app" ]
 }
 
 group("default") {

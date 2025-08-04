@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Darwin/DispatchQueueNames.h>
 #include <pthread.h>
 
 namespace dft {
@@ -56,9 +57,17 @@ namespace logging {
         int pid = [[NSProcessInfo processInfo] processIdentifier];
 
         auto tid = pthread_mach_thread_np(pthread_self());
+        const char * label = chip::darwin::queues::CurrentLabel();
 
-        fprintf(stdout, "%s%s [%d:%u] [%s]: %s%s\n", loggingColor.UTF8String, formattedDate.UTF8String, pid, tid,
-            component.UTF8String, message.UTF8String, kLoggingColorEnd.UTF8String);
+        fprintf(stdout, "%s%s [%d:%u:%s] [%s]: %s%s\n",
+            loggingColor.UTF8String,
+            formattedDate.UTF8String,
+            pid,
+            tid,
+            label,
+            component.UTF8String,
+            message.UTF8String,
+            kLoggingColorEnd.UTF8String);
     }
 
     void LogRedirectCallback(const char * moduleName, uint8_t category, const char * format, va_list args)

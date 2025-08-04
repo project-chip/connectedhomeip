@@ -7,8 +7,9 @@ control Matter accessory devices.
 
 -   [Matter Controller Kotlin App Example](#matter-controller-kotlin-app-example)
     -   [Requirements for building](#requirements-for-building)
+        -   [Linux](#linux)
     -   [Preparing for build](#preparing-for-build)
-    -   [Building & Running the app](#building--running-the-app)
+    -   [Building \& Running the app](#building--running-the-app)
 
 <hr>
 
@@ -82,7 +83,7 @@ export PATH="/usr/lib/kotlinc/bin:$PATH"
 ### Linux
 
 ```shell
-export JAVA_PATH=[JDK path]
+export JAVA_HOME=[JDK path]
 ```
 
 <hr>
@@ -109,7 +110,7 @@ the top Matter directory:
 ```
 
 The Java executable file `kotlin-matter-controller` will be generated at
-`out/android-x86-kotlin-matter-controller/bin/`
+`out/linux-x64-kotlin-matter-controller/bin/`
 
 Run the kotlin-matter-controller
 

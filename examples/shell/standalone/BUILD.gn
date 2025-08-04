@@ -28,6 +28,7 @@ executable("chip-shell") {
   deps = [
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${project_dir}/shell_common:shell_common",
   ]
 

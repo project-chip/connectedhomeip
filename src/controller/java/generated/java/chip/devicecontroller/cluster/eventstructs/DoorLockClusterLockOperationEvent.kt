@@ -31,7 +31,7 @@ class DoorLockClusterLockOperationEvent(
   val fabricIndex: UInt?,
   val sourceNode: ULong?,
   val credentials:
-    Optional<List<chip.devicecontroller.cluster.structs.DoorLockClusterCredentialStruct>>?
+    Optional<List<chip.devicecontroller.cluster.structs.DoorLockClusterCredentialStruct>>?,
 ) {
   override fun toString(): String = buildString {
     append("DoorLockClusterLockOperationEvent {\n")
@@ -123,7 +123,7 @@ class DoorLockClusterLockOperationEvent(
                   this.add(
                     chip.devicecontroller.cluster.structs.DoorLockClusterCredentialStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader
+                      tlvReader,
                     )
                   )
                 }
@@ -146,7 +146,7 @@ class DoorLockClusterLockOperationEvent(
         userIndex,
         fabricIndex,
         sourceNode,
-        credentials
+        credentials,
       )
     }
   }

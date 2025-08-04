@@ -18,8 +18,6 @@
 
 #import "MTRTestPerControllerStorage.h"
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 @interface MTRTestPerControllerStorage ()
 @property (nonatomic, readonly) NSMutableDictionary<NSString *, NSData *> * storage;
 @end
@@ -42,19 +40,21 @@
                             securityLevel:(MTRStorageSecurityLevel)securityLevel
                               sharingType:(MTRStorageSharingType)sharingType
 {
-    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
+    @synchronized(self) {
+        XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
 
-    __auto_type * data = self.storage[key];
-    if (data == nil) {
-        return data;
+        __auto_type * data = self.storage[key];
+        if (data == nil) {
+            return data;
+        }
+
+        NSError * error;
+        id value = [NSKeyedUnarchiver unarchivedObjectOfClasses:MTRDeviceControllerStorageClasses() fromData:data error:&error];
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+
+        return value;
     }
-
-    NSError * error;
-    id value = [NSKeyedUnarchiver unarchivedObjectOfClasses:MTRDeviceControllerStorageClasses() fromData:data error:&error];
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
-
-    return value;
 }
 
 - (BOOL)controller:(MTRDeviceController *)controller
@@ -63,15 +63,17 @@
      securityLevel:(MTRStorageSecurityLevel)securityLevel
        sharingType:(MTRStorageSharingType)sharingType
 {
-    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
+    @synchronized(self) {
+        XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
 
-    NSError * error;
-    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:&error];
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
+        NSError * error;
+        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:&error];
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
 
-    self.storage[key] = data;
-    return YES;
+        self.storage[key] = data;
+        return YES;
+    }
 }
 
 - (BOOL)controller:(MTRDeviceController *)controller
@@ -79,11 +81,53 @@
         securityLevel:(MTRStorageSecurityLevel)securityLevel
           sharingType:(MTRStorageSharingType)sharingType
 {
-    XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
-    self.storage[key] = nil;
-    return YES;
+    @synchronized(self) {
+        XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
+        self.storage[key] = nil;
+        return YES;
+    }
+}
+
+- (NSUInteger)count
+{
+    @synchronized(self) {
+        return self.storage.count;
+    }
 }
 
 @end
 
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+@implementation MTRTestPerControllerStorageWithBulkReadWrite
+
+- (NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
+{
+    @synchronized(self) {
+        XCTAssertEqualObjects(self.controllerID, controller.uniqueIdentifier);
+
+        if (!self.storage.count) {
+            return nil;
+        }
+
+        NSMutableDictionary * valuesToReturn = [NSMutableDictionary dictionary];
+        for (NSString * key in self.storage) {
+            valuesToReturn[key] = [self controller:controller valueForKey:key securityLevel:securityLevel sharingType:sharingType];
+        }
+
+        return valuesToReturn;
+    }
+}
+
+- (BOOL)controller:(MTRDeviceController *)controller storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
+{
+    @synchronized(self) {
+        XCTAssertEqualObjects(self.controllerID, controller.uniqueIdentifier);
+
+        for (NSString * key in values) {
+            [self controller:controller storeValue:values[key] forKey:key securityLevel:securityLevel sharingType:sharingType];
+        }
+
+        return YES;
+    }
+}
+
+@end

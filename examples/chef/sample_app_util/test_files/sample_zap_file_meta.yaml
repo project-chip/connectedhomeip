@@ -22,9 +22,6 @@
             EthernetNetworkDiagnostics/55:
                 attributes:
                     FeatureMap/65532: '3'
-            FixedLabel/64:
-                attributes:
-                    FeatureMap/65532: '0'
             GeneralCommissioning/48:
                 attributes:
                     FeatureMap/65532: '6'
@@ -35,9 +32,6 @@
                 attributes:
                     FeatureMap/65532: ''
             Groups/4:
-                attributes:
-                    FeatureMap/65532: '0'
-            LocalizationConfiguration/43:
                 attributes:
                     FeatureMap/65532: '0'
             OperationalCredentials/62:
@@ -55,9 +49,6 @@
             ThreadNetworkDiagnostics/53:
                 attributes:
                     FeatureMap/65532: '15'
-            TimeFormatLocalization/44:
-                attributes:
-                    FeatureMap/65532: '0'
             UserLabel/65:
                 attributes:
                     FeatureMap/65532: '0'

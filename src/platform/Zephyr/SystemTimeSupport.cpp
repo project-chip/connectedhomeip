@@ -63,7 +63,7 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
     // The real time can be configured by an application if it has access to a reliable time source.
     // Otherwise, just return an error so that Matter stack can fallback to Last Known UTC Time.
-    ReturnErrorCodeIf(gBootRealTime == kUnknownRealTime, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gBootRealTime != kUnknownRealTime, CHIP_ERROR_INCORRECT_STATE);
 
     aCurTime = gBootRealTime + GetMonotonicMicroseconds64();
 

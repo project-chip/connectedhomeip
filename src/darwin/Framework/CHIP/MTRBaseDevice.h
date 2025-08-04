@@ -19,6 +19,7 @@
 
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 
 @class MTRSetupPayload;
 @class MTRDeviceController;
@@ -163,8 +164,9 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * nil is used to represent wildcards.
  */
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@interface MTRAttributeRequestPath : NSObject <NSCopying>
+@interface MTRAttributeRequestPath : NSObject <NSCopying, NSSecureCoding>
 @property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable)
@@ -181,8 +183,9 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  *
  * nil is used to represent wildcards.
  */
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-@interface MTREventRequestPath : NSObject <NSCopying>
+@interface MTREventRequestPath : NSObject <NSCopying, NSSecureCoding>
 @property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * event MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
@@ -542,12 +545,36 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                           reportHandler:(MTRDeviceResponseHandler)reportHandler
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Download log of the desired type from the device.
+ *
+ * Note: The consumer of this API should move the file that the url points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ *
+ * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
+ *                   has been retrieved by that point (which might be none or a partial log).
+ *                   If the timeout is set to 0, the request will not expire and completion will not be called until
+ *                   the log is fully retrieved or an error occurs.
+ * @param queue      The queue on which completion will be called.
+ * @param completion The completion handler that is called after attempting to retrieve the requested log.
+ *                     - In case of success, the completion handler is called with a non-nil URL and a nil error.
+ *                     - If there is an error, a non-nil error is used and the url can be non-nil too if some logs have already been downloaded.
+ */
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+    MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
 @end
 
 /**
  * A path indicating a specific cluster on a device (i.e. without any
  * wildcards).
  */
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRClusterPath : NSObject <NSCopying, NSSecureCoding>
 
@@ -564,6 +591,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * A path indicating a specific attribute on a device (i.e. without any
  * wildcards).
  */
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAttributePath : MTRClusterPath <NSSecureCoding>
 
@@ -580,6 +608,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * (i.e. without any wildcards).  There can be multiple instances of actual
  * events for a given event path.
  */
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTREventPath : MTRClusterPath
 
@@ -594,6 +623,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * A path indicating a specific command on a device (i.e. without any
  * wildcards).
  */
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRCommandPath : MTRClusterPath
 
@@ -604,6 +634,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                     commandID:(NSNumber *)commandID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAttributeReport : NSObject
 
@@ -616,7 +647,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * * The attribute is nullable and the value of the attribute is null.
  *
  * If value is not nil, the actual type of value will depend on the
- * schema-defined (typically defiend in the Matter specification) type of the
+ * schema-defined (typically defined in the Matter specification) type of the
  * attribute as follows:
  *
  * * list: NSArray of whatever type the list entries are.
@@ -673,6 +704,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
     MTREventPriorityCritical = 2
 } MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
+NS_SWIFT_SENDABLE
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTREventReport : NSObject
 

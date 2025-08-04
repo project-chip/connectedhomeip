@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <lib/dnssd/Constants.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
@@ -87,6 +88,15 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_ENABLE_OPENTHREAD
+    Inet::InterfaceId GetExternalInterface();
+    Inet::InterfaceId GetThreadInterface();
+    const char * GetHostName() { return sInstance.mHostname; }
+#endif
+
 #endif
 
 private:
@@ -109,7 +119,9 @@ private:
 
     bool _IsWiFiStationEnabled();
     bool _IsWiFiStationConnected();
+    bool _IsWiFiStationProvisioned();
     bool _IsWiFiStationApplicationControlled();
+    CHIP_ERROR _DisconnectNetwork(void);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
     // ===== Members for internal use by the following friends.
@@ -120,26 +132,56 @@ private:
     static ConnectivityManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
+    bool mBorderRouterInit = false;
+
+#if CONFIG_CHIP_ETHERNET && !CHIP_DEVICE_CONFIG_ENABLE_WPA
+    enum class ConnectivityFlags : uint16_t{
+        kHaveIPv4InternetConnectivity = 0x0001,
+        kHaveIPv6InternetConnectivity = 0x0002,
+        kAwaitingConnectivity         = 0x0010,
+    };
+    BitFlags<ConnectivityFlags> mFlags;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
+    void UpdateInternetConnectivityState(void);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiStationState mWiFiStationState;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     uint32_t mWiFiStationReconnectIntervalMS;
+    bool mWifiManagerInit   = false;
+    bool mWifiIsProvisioned = false;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     enum WiFiEventGroup{
         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
     };
 
     BitFlags<GenericConnectivityManagerImpl_WiFi::ConnectivityFlags> mFlags;
     static netif_ext_callback_t sNetifCallback;
+    static constexpr uint32_t kWlanInitWaitMs = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
+
+#if CHIP_ENABLE_OPENTHREAD
+    Inet::InterfaceId mThreadNetIf;
+    Inet::InterfaceId mExternalNetIf;
+
+    char mHostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
+#endif
 
     static int _WlanEventCallback(enum wlan_event_reason event, void * data);
     static void _NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args);
 
     void OnStationConnected(void);
     void OnStationDisconnected(void);
-    void UpdateInternetConnectivityState(void);
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
+#if CHIP_ENABLE_OPENTHREAD
+    void BrHandleStateChange();
+    static void LockThreadStack();
+    static void UnlockThreadStack();
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
+#endif
+    /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
@@ -177,7 +219,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * Chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
+ * that are specific to the NXP platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {

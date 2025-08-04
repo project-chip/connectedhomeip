@@ -19,9 +19,12 @@
 package com.google.chip.chiptool.setuppayloadscanner
 
 import android.os.Parcelable
+import android.util.Log
 import kotlinx.parcelize.Parcelize
 import matter.onboardingpayload.DiscoveryCapability
 import matter.onboardingpayload.OnboardingPayload
+import matter.onboardingpayload.OnboardingPayloadException
+import matter.onboardingpayload.OptionalQRCodeInfoType
 
 /** Class to hold the CHIP device information. */
 @Parcelize
@@ -35,12 +38,47 @@ data class CHIPDeviceInfo(
   val optionalQrCodeInfoMap: Map<Int, QrCodeInfo> = mapOf(),
   val discoveryCapabilities: MutableSet<DiscoveryCapability> = mutableSetOf(),
   val isShortDiscriminator: Boolean = false,
+  val serialNumber: String = "",
   val ipAddress: String? = null,
   val port: Int = 5540
 ) : Parcelable {
 
+  fun toSetupPayload(): OnboardingPayload {
+    val onboardingPayload =
+      OnboardingPayload(
+        version,
+        vendorId,
+        productId,
+        commissioningFlow,
+        discoveryCapabilities,
+        discriminator,
+        isShortDiscriminator,
+        setupPinCode
+      )
+    if (serialNumber.isNotEmpty()) {
+      onboardingPayload.addSerialNumber(serialNumber)
+    }
+    optionalQrCodeInfoMap.forEach { (_, info) ->
+      if (info.type == OptionalQRCodeInfoType.TYPE_STRING && info.data != null) {
+        onboardingPayload.addOptionalVendorData(info.tag, info.data)
+      } else {
+        onboardingPayload.addOptionalVendorData(info.tag, info.intDataValue)
+      }
+    }
+    return onboardingPayload
+  }
+
   companion object {
+    private const val TAG = "CHIPDeviceInfo"
+
     fun fromSetupPayload(setupPayload: OnboardingPayload): CHIPDeviceInfo {
+      val serialNumber =
+        try {
+          setupPayload.getSerialNumber()
+        } catch (e: OnboardingPayloadException) {
+          Log.d(TAG, "serialNumber Exception", e)
+          ""
+        }
       return CHIPDeviceInfo(
         setupPayload.version,
         setupPayload.vendorId,
@@ -48,11 +86,12 @@ data class CHIPDeviceInfo(
         setupPayload.getLongDiscriminatorValue(),
         setupPayload.setupPinCode,
         setupPayload.commissioningFlow,
-        setupPayload.optionalQRCodeInfo.mapValues { (_, info) ->
-          QrCodeInfo(info.tag, info.type, info.data, info.int32)
+        setupPayload.getAllOptionalVendorData().associate { info ->
+          info.tag to QrCodeInfo(info.tag, info.type, info.data, info.int32)
         },
         setupPayload.discoveryCapabilities,
-        setupPayload.hasShortDiscriminator
+        setupPayload.hasShortDiscriminator,
+        serialNumber
       )
     }
   }

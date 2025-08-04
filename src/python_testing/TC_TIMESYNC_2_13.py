@@ -15,27 +15,61 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import queue
 import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main, type_matches
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
 class TC_TIMESYNC_2_13(MatterBaseTest):
-    def wait_for_trusted_time_souce_event(self, timeout):
+    def wait_for_trusted_time_souce_event(self, timeout, cb):
+        """
+        Waits for the MissingTrustedTimeSource event and validates its type.
+
+        This function blocks for up to timeout seconds, waiting for the MissingTrustedTimeSource event to be received.
+
+        Parameters:
+            timeout (float): Seconds to wait for the event.
+            cb (EventSubscriptionHandler): The event callback object from which the event is pulled.
+
+        Raises:
+            AssertionError: If no event is received before timeout or if the event type is incorrect.
+        """
+
         try:
-            ret = self.q.get(block=True, timeout=timeout)
+            ret = cb.get_event_from_queue(block=True, timeout=timeout)
             asserts.assert_true(type_matches(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.MissingTrustedTimeSource), "Incorrect type received for event")
         except queue.Empty:
             asserts.fail("Did not receive MissingTrustedTimeSouce event")
 
     def pics_TC_TIMESYNC_2_13(self) -> list[str]:
-        return ["TIMESYNC.S.F01"]
+        return ["TIMESYNC.S.F03"]
 
     @async_test_body
     async def test_TC_TIMESYNC_2_13(self):
@@ -45,7 +79,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         self.print_step(0, "Commissioning, already done")
 
         self.print_step(1, "TH1 opens a commissioning window")
-        params = self.default_controller.OpenCommissioningWindow(
+        params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         self.print_step(2, "Commission to TH2")
@@ -53,10 +87,9 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         TH2 = new_fabric_admin.NewController(nodeId=112233)
 
-        errcode = TH2.CommissionOnNetwork(
+        await TH2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
-        asserts.assert_true(errcode.is_success, 'Commissioning on TH2 did not complete successfully')
 
         self.print_step(3, "TH2 reads the current fabric")
         th2_fabric_idx = await self.read_single_attribute_check_success(
@@ -68,8 +101,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         self.print_step(5, "TH1 subscribeds to the MissingTrustedTimeSource event")
         event = Clusters.TimeSynchronization.Events.MissingTrustedTimeSource
-        self.q = queue.Queue()
-        cb = SimpleEventCallback("MissingTrustedTimeSource", event.cluster_id, event.event_id, self.q)
+        cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
@@ -78,7 +110,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2_fabric_idx))
 
         self.print_step(7, "TH1 waits for the MissingTrustedTimeSource event with a timeout of 5 seconds")
-        self.wait_for_trusted_time_souce_event(5)
+        self.wait_for_trusted_time_souce_event(5, cb)
 
         self.print_step(8, "TH1 sends a SetTrusteTimeSource command")
         tts = Clusters.TimeSynchronization.Structs.FabricScopedTrustedTimeSourceStruct(
@@ -92,7 +124,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(NullValue))
 
         self.print_step(11, "TH1 waits for the MissingTrustedTimeSource event with a timeout of 5 seconds")
-        self.wait_for_trusted_time_souce_event(5)
+        self.wait_for_trusted_time_souce_event(5, cb)
 
 
 if __name__ == "__main__":

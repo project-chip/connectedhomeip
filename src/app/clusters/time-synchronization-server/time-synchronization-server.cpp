@@ -24,12 +24,12 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SortUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/RuntimeOptionsProvider.h>
@@ -215,6 +215,7 @@ static bool emitTimeFailureEvent(EndpointId ep)
     // TODO: re-schedule event for after min 1hr if no time is still available
     // https://github.com/project-chip/connectedhomeip/issues/27200
     ChipLogProgress(Zcl, "Emit TimeFailure event [ep=%d]", ep);
+    GetDelegate()->NotifyTimeFailure();
     return true;
 }
 
@@ -356,6 +357,7 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
             SetUTCTime(kRootEndpointId, mTimeReadInfo->utcTime.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
         if (err == CHIP_NO_ERROR)
         {
+            mTimeReadInfo = nullptr;
             return;
         }
     }
@@ -460,7 +462,7 @@ void TimeSynchronizationServer::Init()
 
     // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
     // want time sync even if we can't register the deletgate here.
-    CHIP_ERROR err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    CHIP_ERROR err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync");
@@ -471,6 +473,7 @@ void TimeSynchronizationServer::Init()
 void TimeSynchronizationServer::Shutdown()
 {
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
 }
 
 void TimeSynchronizationServer::OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event)
@@ -504,6 +507,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(const DataModel::Null
     {
         AttemptToGetTime();
     }
+    GetDelegate()->TrustedTimeSourceAvailabilityChanged(!mTrustedTimeSource.IsNull(), mGranularity);
     return err;
 }
 
@@ -906,7 +910,7 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
         int32_t previousOffset         = dstList[activeDstIndex].offset;
         dstList[activeDstIndex].offset = 0; // not using dst and last DST item in the list is not active yet
         // TODO: This enum mixes state and transitions in a way that's very confusing. This should return either an active, an
-        // inactive or an invalid and the caller should make the judgement about whether that has changed OR this function should
+        // inactive or an invalid and the caller should make the judgment about whether that has changed OR this function should
         // just return a bool indicating whether a change happened
         return previousOffset == 0 ? TimeState::kStopped : TimeState::kChanged;
     }
@@ -1287,5 +1291,11 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
 void MatterTimeSynchronizationPluginServerInitCallback()
 {
     TimeSynchronizationServer::Instance().Init();
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterTimeSynchronizationPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    TimeSynchronizationServer::Instance().Shutdown();
 }

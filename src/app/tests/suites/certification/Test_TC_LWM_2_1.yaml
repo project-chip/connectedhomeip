@@ -101,7 +101,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-          saveAs: Step6_current_mode_dut
           constraints:
               type: int8u
               minValue: 0

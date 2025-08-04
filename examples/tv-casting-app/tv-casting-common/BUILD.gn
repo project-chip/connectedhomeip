@@ -50,6 +50,7 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/EntryToText.cpp",
     "clusters/content-app-observer/ContentAppObserver.cpp",
     "clusters/content-app-observer/ContentAppObserver.h",
     "commands/clusters/ModelCommand.cpp",
@@ -106,6 +107,9 @@ chip_data_model("tv-casting-common") {
     "core/CastingPlayerDiscovery.cpp",
     "core/CastingPlayerDiscovery.h",
     "core/Command.h",
+    "core/CommissionerDeclarationHandler.cpp",
+    "core/CommissionerDeclarationHandler.h",
+    "core/ConnectionCallbacks.h",
     "core/Endpoint.cpp",
     "core/Endpoint.h",
     "core/Types.h",
@@ -150,6 +154,7 @@ static_library("tvCastingCommon") {
   public_deps = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
     "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/platform/logging:default",
   ]
 
   cflags = [ "-Wconversion" ]

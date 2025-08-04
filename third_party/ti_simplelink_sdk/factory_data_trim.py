@@ -16,7 +16,7 @@
 
 """Script to extract the factory data content from the matter application + factory data image 
 
-This script will trim the factory data content out of the matter application image. It will also get the length of the factory data from the matter application map file. The output is the Matter image without the dummy factory d.
+This script will trim the factory data content out of the matter application image. It will also get the length of the factory data from the matter application map file. The output is the Matter image without the dummy factory data.
 
 Run with:
     python factory_data_trim.py <matter image> <matter image map file> <factory data image> <device family>
@@ -35,10 +35,7 @@ device_family = sys.argv[4]
 
 # extract factory data length from map file
 with open(matter_app_map_file, "r") as map_file:
-    if device_family == 'cc13x2_26x2':
-        pattern = ".factory_data   0x000ac000"
-    else:
-        pattern = ".factory_data   0x000fe800"
+    pattern = ".factory_data   0x000fe800"
     for line in map_file:
         if re.search(pattern, line):
             factory_data_num_bytes = line
@@ -52,12 +49,8 @@ matter_image = intelhex.IntelHex()
 matter_image.fromfile(matter_app_file, format='hex')
 matter_image_dict = matter_image.todict()
 
-if device_family == 'cc13x2_26x2':
-    # 704512 is 0xAC000 - start of factory data
-    start_index = list(matter_image_dict.keys()).index(704512)
-else:
-    # 1042432 is 0xFE800 - start of factory data
-    start_index = list(matter_image_dict.keys()).index(1042432)
+# 1042432 is 0xFE800 - start of factory data
+start_index = list(matter_image_dict.keys()).index(1042432)
 # convert length of factory data into a decimal value
 end_index = start_index + int(factory_data_num_bytes, 16)
 

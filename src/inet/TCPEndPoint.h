@@ -38,10 +38,6 @@
 
 namespace chip {
 
-namespace Transport {
-class TCPTest;
-};
-
 namespace Inet {
 
 class TCPTest;
@@ -274,7 +270,7 @@ public:
      *  received. The operational semantics are undefined if \c len is larger
      *  than the total outstanding unacknowledged received data.
      */
-    virtual CHIP_ERROR AckReceive(uint16_t len) = 0;
+    virtual CHIP_ERROR AckReceive(size_t len) = 0;
 
     /**
      * @brief   Set the receive queue, for testing.
@@ -295,7 +291,7 @@ public:
      *
      * @return  Number of untransmitted bytes in the transmit queue.
      */
-    uint32_t PendingSendLength();
+    size_t PendingSendLength();
 
     /**
      * @brief   Extract the length of the unacknowledged receive data.
@@ -303,7 +299,7 @@ public:
      * @return  Number of bytes in the receive queue that have not yet been
      *      acknowledged with <tt>AckReceive(uint16_t len)</tt>.
      */
-    uint32_t PendingReceiveLength();
+    size_t PendingReceiveLength();
 
     /**
      * @brief   Initiate TCP half close, in other words, finished with sending.
@@ -447,7 +443,7 @@ public:
      *  is the length of the message text added to the TCP transmit window,
      *  which are eligible for sending by the underlying network stack.
      */
-    typedef void (*OnDataSentFunct)(TCPEndPoint * endPoint, uint16_t len);
+    typedef void (*OnDataSentFunct)(TCPEndPoint * endPoint, size_t len);
 
     /**
      * The endpoint's message text transmission event handling function
@@ -526,10 +522,9 @@ public:
     /**
      * Size of the largest TCP packet that can be received.
      */
-    constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
+    constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxAllocSize;
 
 protected:
-    friend class ::chip::Transport::TCPTest;
     friend class TCPTest;
 
     TCPEndPoint(EndPointManager<TCPEndPoint> & endPointManager) :

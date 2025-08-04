@@ -154,16 +154,34 @@ tests:
     - label:
           "Step 0d: Precondition 4: TH sends a RemoveAllGroups command to DUT."
       verification: |
-          Please execute the below commands before starting the test case :
-
           ./chip-tool groups remove-all-groups 1 1
 
-          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
+          Verify the RemoveAllGroups attribute On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
 
-          [1653485455.344097][11508:11513] CHIP:DMG:                              StatusIB =
-          [1653485455.344141][11508:11513] CHIP:DMG:                              {
-          [1653485455.344190][11508:11513] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1653485455.344236][11508:11513] CHIP:DMG:                              },
+          [1707992121.754676][18074:18074] CHIP:DMG: InvokeRequestMessage =
+          [1707992121.754689][18074:18074] CHIP:DMG: {
+          [1707992121.754697][18074:18074] CHIP:DMG:         suppressResponse = false,
+          [1707992121.754707][18074:18074] CHIP:DMG:         timedRequest = false,
+          [1707992121.754714][18074:18074] CHIP:DMG:         InvokeRequests =
+          [1707992121.754730][18074:18074] CHIP:DMG:         [
+          [1707992121.754744][18074:18074] CHIP:DMG:                 CommandDataIB =
+          [1707992121.754756][18074:18074] CHIP:DMG:                 {
+          [1707992121.754766][18074:18074] CHIP:DMG:                         CommandPathIB =
+          [1707992121.754776][18074:18074] CHIP:DMG:                         {
+          [1707992121.754788][18074:18074] CHIP:DMG:                                 EndpointId = 0x1,
+          [1707992121.754801][18074:18074] CHIP:DMG:                                 ClusterId = 0x4,
+          [1707992121.754810][18074:18074] CHIP:DMG:                                 CommandId = 0x4,
+          [1707992121.754827][18074:18074] CHIP:DMG:                         },
+          [1707992121.754841][18074:18074] CHIP:DMG:
+          [1707992121.754852][18074:18074] CHIP:DMG:                         CommandFields =
+          [1707992121.754863][18074:18074] CHIP:DMG:                         {
+          [1707992121.754874][18074:18074] CHIP:DMG:                         },
+          [1707992121.754883][18074:18074] CHIP:DMG:                 },
+          [1707992121.754899][18074:18074] CHIP:DMG:
+          [1707992121.754907][18074:18074] CHIP:DMG:         ],
+          [1707992121.754924][18074:18074] CHIP:DMG:
+          [1707992121.754934][18074:18074] CHIP:DMG:         InteractionModelRevision = 11
+          [1707992121.754943][18074:18074] CHIP:DMG: },
       disabled: true
 
     - label:
@@ -207,7 +225,7 @@ tests:
     - label: "Step 1: DUT issues a C_ADD_SCENE command to the Test Harness."
       PICS: S.C.C00.Tx
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0001 0x01 20 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4001", "attributeValue": "0x01"}]}]' 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 20 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4000", "valueUnsigned16": "0x01"}]}]' 1 1
 
           Verify  TH recieves "AddScene(0x0)" command with following parameters:
           - ID 0 (GroupID): the type is a group-id.

@@ -31,6 +31,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/IniEscaping.h>
+#include <lib/support/TemporaryFileStream.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/CHIPLinuxStorageIni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -91,38 +92,23 @@ CHIP_ERROR ChipLinuxStorageIni::AddConfig(const std::string & configFile)
 // 3. Using rename() to overwrite the existing file
 CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
 {
-    CHIP_ERROR retval   = CHIP_NO_ERROR;
-    std::string tmpPath = configFile + "-XXXXXX";
+    TemporaryFileStream tmpFile(configFile + "-XXXXXX");
+    VerifyOrReturnError(
+        tmpFile.IsOpen(), CHIP_ERROR_OPEN_FAILED,
+        ChipLogError(DeviceLayer, "Failed to create temp file %s: %s", tmpFile.GetFileName().c_str(), strerror(errno)));
 
-    int fd = mkstemp(&tmpPath[0]);
-    if (fd != -1)
-    {
-        std::ofstream ofs;
+    mConfigStore.generate(tmpFile);
+    VerifyOrReturnError(
+        tmpFile.DataSync(), CHIP_ERROR_WRITE_FAILED,
+        ChipLogError(DeviceLayer, "Failed to sync temp file %s: %s", tmpFile.GetFileName().c_str(), strerror(errno)));
 
-        ChipLogProgress(DeviceLayer, "writing settings to file (%s)", tmpPath.c_str());
+    int rv = rename(tmpFile.GetFileName().c_str(), configFile.c_str());
+    VerifyOrReturnError(rv == 0, CHIP_ERROR_WRITE_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to rename %s to %s: %s", tmpFile.GetFileName().c_str(),
+                                     configFile.c_str(), strerror(errno)));
 
-        ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
-        mConfigStore.generate(ofs);
-
-        close(fd);
-
-        if (rename(tmpPath.c_str(), configFile.c_str()) == 0)
-        {
-            ChipLogProgress(DeviceLayer, "renamed tmp file to file (%s)", configFile.c_str());
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "failed to rename (%s), %s (%d)", tmpPath.c_str(), strerror(errno), errno);
-            retval = CHIP_ERROR_WRITE_FAILED;
-        }
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "failed to open file (%s) for writing", tmpPath.c_str());
-        retval = CHIP_ERROR_OPEN_FAILED;
-    }
-
-    return retval;
+    ChipLogDetail(DeviceLayer, "Wrote settings to %s", configFile.c_str());
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipLinuxStorageIni::GetUInt16Value(const char * key, uint16_t & val)

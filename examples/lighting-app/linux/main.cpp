@@ -26,12 +26,14 @@
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <string>
+
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
+#include <imgui_ui/windows/connectivity.h>
 #include <imgui_ui/windows/light.h>
 #include <imgui_ui/windows/occupancy_sensing.h>
 #include <imgui_ui/windows/qrcode.h>
-
 #endif
 
 using namespace chip;
@@ -40,7 +42,6 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_lighting_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 LightingAppCommandDelegate sLightingAppCommandDelegate;
 } // namespace
@@ -76,9 +77,9 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
 void ApplicationInit()
 {
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR)
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
@@ -92,6 +93,13 @@ void ApplicationShutdown()
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
     }
 }
+
+#ifdef __NuttX__
+// NuttX requires the main function to be defined with C-linkage. However, marking
+// the main as extern "C" is not strictly conformant with the C++ standard. Since
+// clang >= 20 such code triggers -Wmain warning.
+extern "C" {
+#endif
 
 int main(int argc, char * argv[])
 {
@@ -112,6 +120,7 @@ int main(int argc, char * argv[])
     example::Ui::ImguiUi ui;
 
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
     ui.AddWindow(std::make_unique<example::Ui::Windows::OccupancySensing>(chip::EndpointId(1), "Occupancy"));
     ui.AddWindow(std::make_unique<example::Ui::Windows::Light>(chip::EndpointId(1)));
 
@@ -122,3 +131,7 @@ int main(int argc, char * argv[])
 
     return 0;
 }
+
+#ifdef __NuttX__
+}
+#endif

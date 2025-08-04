@@ -147,6 +147,32 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+ *
+ * The maximum value of time in milliseconds that the sleepy end device can use as an idle interval in the SIT mode.
+ * The Matter spec does not allow this value to exceed 15s (spec 9.16.1.5).
+ * For the SIT device, the usability of this value is arguable, as slow poll interval can be configured using
+ * CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL. This value can be used for the LIT device, to limit the slow poll interval used while
+ * temporarily working in the SIT mode.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+#define CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT System::Clock::Milliseconds32(15000)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+ *
+ * The SIT slow polling interval (in milliseconds) is a configuration that allows LIT capable devices
+ * operating in SIT mode to use a shorter slow polling interval than their typical
+ * Slow polling interval.
+ *
+ * The SIT slow polling interval cannot be set to a value greater than CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+ */
+#ifndef CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+#endif // CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+
+/**
  * CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
  *
  * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
@@ -256,6 +282,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+ *
+ * A monothonic number identifying the configuration version running on the device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION 1
 #endif
 
 /**
@@ -425,6 +460,78 @@
 #define CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME "wlan0"
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+ *
+ * Enable support for commissioning using Wi-Fi Public Action Frame as the transport.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+ *
+ * Enable support for Joint Fabric in core SDK.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#define CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
+ *
+ * The min amount of time (in seconds) after which the chip platform will stop PAF advertisement
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS (3 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS
+ *
+ * The max amount of time (in seconds) after which the chip platform will stop PAF advertisement
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS (15 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
+ *
+ * The max amount of time (in seconds) the chip controller will discovery Wi-Fi PAF
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS (15 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 2.4G band (channel#6)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL 2437
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 5G lower band (channel#44)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL 5220
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_5G_HI_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 5G upper band (channel#149)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL 5745
+#endif
+
 // -------------------- WiFi AP Configuration --------------------
 
 /**
@@ -490,6 +597,17 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME "ap"
+#endif
+
+// -------------------- NFC/CHIPoNFC Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+ *
+ * Enable support for NFC Commissioning (chip-over-NFC).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING 0
 #endif
 
 // -------------------- BLE/CHIPoBLE Configuration --------------------
@@ -618,18 +736,18 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+ * CHIP_DEVICE_CONFIG_EXT_ADVERTISING
  *
  * Optional configuration to enable Extended Announcement Duration up to 48h.
  * Should be used together with extending CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS past 15 minutes.
  * Disabled by default.
  */
 
-#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING 0
+#ifndef CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+#define CHIP_DEVICE_CONFIG_EXT_ADVERTISING 0
 #endif
 
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
 
 /**
  * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS
@@ -713,18 +831,18 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
  * Time in seconds that a factory new device will advertise commissionable node discovery.
  */
 #ifndef CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
 /**
  * By default, the extended announcement, when enabled, starts its extended advertising 15 mins
  * after the standard slow advertisement. Time at which the default discovery time would close the
  * commissioning window and stop the BLE.
- * Therefore, when CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING is enabled bump the default Discovery timeout
+ * Therefore, when CHIP_DEVICE_CONFIG_EXT_ADVERTISING is enabled bump the default Discovery timeout
  * to the maximum allowed by the spec. 48h.
  */
 #define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (60 * 60 * 48)
 #else
 #define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (15 * 60)
-#endif // CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#endif // CHIP_DEVICE_CONFIG_EXT_ADVERTISING
 #endif // CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
 
 /**
@@ -747,6 +865,19 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS
+ *
+ * The number of target apps that a client can include in a UDC message.
+ *
+ * Depends upon CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY set to 1
+ *
+ * For Video Players, this value should be set to 10
+ */
+#ifndef CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS
+#define CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS 3
 #endif
 
 /**
@@ -1086,6 +1217,15 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+ *
+ * Enable starting provisioned Thread network automatically after device power-up.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART 1
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------
@@ -1535,10 +1675,10 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_NFC enables NFC communication for commissioning.
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD enables configuration of NFC onboarding payload.
  */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC
-#define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD 0
 #endif
 
 /**

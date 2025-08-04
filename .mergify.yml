@@ -1,20 +1,29 @@
 pull_request_rules:
+  - name: Label conflicting pull requests
+    description: Add a label to a pull request with conflict to spot it easily
+    conditions:
+      - conflict
+      - '-closed'
+    actions:
+      label:
+        toggle:
+          - conflict
   - name: Automatic merge on PullApprove
     conditions:
       - or:
-        - "check-success=pullapprove"
-        - label="fast track"
-      - "#approved-reviews-by>=1"
-      - "#review-threads-unresolved=0"
-      - "-draft"
-      - "label!=docker"            # Don't auto merge docker images
-      - "#check-failure=0"         # Don't auto merge with a failure
-      - "#check-pending=0"         # Don't auto merge with anything pending
-      - "check-success~=Build"     # Don't auto merge unless a build has succeeded, needed because above is true on a fresh PR before builds
+          - check-success=pullapprove
+          - label="fast track"
+      - '#approved-reviews-by>=1'
+      - '#review-threads-unresolved=0'
+      - '-draft'
+      - label!=docker
+      - '#check-failure=0'
+      - '#check-pending=0'
+      - check-success~=Build
       - or:
-        - "check-success=pullapprove"
-        - "check-skipped=pullapprove"
-        - "check-neutral=pullapprove"
+          - check-success=pullapprove
+          - check-skipped=pullapprove
+          - check-neutral=pullapprove
     actions:
       merge:
         method: squash

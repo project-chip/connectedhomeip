@@ -34,7 +34,10 @@
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 #include <app/util/attribute-storage.h>
 #include <controller/CHIPDeviceController.h>
+#include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <string>
 
 namespace chip {
 namespace AppPlatform {
@@ -92,10 +95,31 @@ private:
 class DLL_EXPORT ContentApp
 {
 public:
+    struct SupportedCluster
+    {
+        chip::ClusterId mClusterIdentifier{ kInvalidClusterId };
+        uint32_t mFeatures{ 0 };
+        std::vector<CommandId> mOptionalCommandIdentifiers;
+        std::vector<AttributeId> mOptionalAttributesIdentifiers;
+
+        SupportedCluster(ClusterId clusterId, uint32_t features, const std::vector<CommandId> & commandIds,
+                         const std::vector<AttributeId> & attributeIds) :
+            mClusterIdentifier{ clusterId },
+            mFeatures{ features }, mOptionalCommandIdentifiers{ commandIds }, mOptionalAttributesIdentifiers{ attributeIds }
+        {}
+
+        SupportedCluster(ClusterId clusterId) : mClusterIdentifier{ clusterId } {}
+    };
+
+    ContentApp(std::vector<SupportedCluster> supportedClusters) : mSupportedClusters{ supportedClusters } {}
+
     virtual ~ContentApp() = default;
 
     inline void SetEndpointId(EndpointId id) { mEndpointId = id; };
     inline EndpointId GetEndpointId() { return mEndpointId; };
+
+    const std::vector<SupportedCluster> & GetSupportedClusters() const { return mSupportedClusters; };
+    bool HasSupportedCluster(ClusterId clusterId) const;
 
     virtual AccountLoginDelegate * GetAccountLoginDelegate()               = 0;
     virtual ApplicationBasicDelegate * GetApplicationBasicDelegate()       = 0;
@@ -111,7 +135,8 @@ public:
                                                             uint16_t maxReadLength);
     Protocols::InteractionModel::Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
 
-    void AddClientNode(NodeId clientNodeId);
+    // returns true only if new node is added. If node was added previously, then false is returned.
+    bool AddClientNode(NodeId clientNodeId);
     uint8_t GetClientNodeCount() const { return mClientNodeCount; }
     NodeId GetClientNode(uint8_t index) const { return mClientNodes[index]; }
 
@@ -120,6 +145,7 @@ public:
 
 protected:
     EndpointId mEndpointId = 0;
+    std::vector<SupportedCluster> mSupportedClusters;
 
     uint8_t mClientNodeCount     = 0;
     uint8_t mNextClientNodeIndex = 0;

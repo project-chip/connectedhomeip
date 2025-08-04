@@ -18,7 +18,7 @@
 # Generally thread credentials are assumed to be binary objects, however for
 # testing purposes, we expose the internal structure here.
 
-from construct import Byte, Bytes, Int16ul, Int64ul, PaddedString, Struct
+from construct import Byte, Bytes, Int16ul, Int64ul, PaddedString, Struct  # type: ignore
 
 ThreadNetworkInfo = Struct(
     "ActiveTimestamp" / Int64ul,

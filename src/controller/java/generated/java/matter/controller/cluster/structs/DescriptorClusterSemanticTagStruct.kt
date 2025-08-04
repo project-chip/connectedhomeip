@@ -27,7 +27,7 @@ class DescriptorClusterSemanticTagStruct(
   val mfgCode: UShort?,
   val namespaceID: UByte,
   val tag: UByte,
-  val label: Optional<String>?
+  val label: Optional<String>?,
 ) {
   override fun toString(): String = buildString {
     append("DescriptorClusterSemanticTagStruct {\n")
@@ -46,7 +46,7 @@ class DescriptorClusterSemanticTagStruct(
       } else {
         putNull(ContextSpecificTag(TAG_MFG_CODE))
       }
-      put(ContextSpecificTag(TAG_NAMESPACE_I_D), namespaceID)
+      put(ContextSpecificTag(TAG_NAMESPACE_ID), namespaceID)
       put(ContextSpecificTag(TAG_TAG), tag)
       if (label != null) {
         if (label.isPresent) {
@@ -62,7 +62,7 @@ class DescriptorClusterSemanticTagStruct(
 
   companion object {
     private const val TAG_MFG_CODE = 0
-    private const val TAG_NAMESPACE_I_D = 1
+    private const val TAG_NAMESPACE_ID = 1
     private const val TAG_TAG = 2
     private const val TAG_LABEL = 3
 
@@ -75,7 +75,7 @@ class DescriptorClusterSemanticTagStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
           null
         }
-      val namespaceID = tlvReader.getUByte(ContextSpecificTag(TAG_NAMESPACE_I_D))
+      val namespaceID = tlvReader.getUByte(ContextSpecificTag(TAG_NAMESPACE_ID))
       val tag = tlvReader.getUByte(ContextSpecificTag(TAG_TAG))
       val label =
         if (!tlvReader.isNull()) {

@@ -24,6 +24,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ObjectDump.h>
 #include <system/SystemConfig.h>
 
 #include <lib/support/Iterators.h>
@@ -263,7 +264,7 @@ class BitMapObjectPool : public internal::StaticAllocatorBitmap
 {
 public:
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
-    ~BitMapObjectPool() { VerifyOrDie(Allocated() == 0); }
+    ~BitMapObjectPool() { VerifyOrDieWithObject(Allocated() == 0, this); }
 
     BitmapActiveObjectIterator<T> begin() { return BitmapActiveObjectIterator<T>(this, FirstActiveIndex()); }
     BitmapActiveObjectIterator<T> end() { return BitmapActiveObjectIterator<T>(this, N); }
@@ -321,6 +322,18 @@ public:
                       "The function must take const T* and return Loop");
         internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
         return ForEachActiveObjectInner(&proxy, &internal::LambdaProxy<T, Function>::ConstCall);
+    }
+
+    void DumpToLog() const
+    {
+        ChipLogError(Support, "BitMapObjectPool: %lu allocated", static_cast<unsigned long>(Allocated()));
+        if constexpr (IsDumpable<T>::value)
+        {
+            ForEachActiveObject([](const T * object) {
+                object->DumpToLog();
+                return Loop::Continue;
+            });
+        }
     }
 
 private:
@@ -389,7 +402,7 @@ public:
         if (!sIgnoringLeaksOnExit)
         {
             // Verify that no live objects remain, to prevent potential use-after-free.
-            VerifyOrDie(Allocated() == 0);
+            VerifyOrDieWithObject(Allocated() == 0, this);
         }
 #endif // __SANITIZE_ADDRESS__
     }
@@ -570,6 +583,18 @@ public:
         return mObjects.ForEachNode(&proxy, &internal::LambdaProxy<const T, Function>::ConstCall);
     }
 
+    void DumpToLog() const
+    {
+        ChipLogError(Support, "HeapObjectPool: %lu allocated", static_cast<unsigned long>(Allocated()));
+        if constexpr (IsDumpable<T>::value)
+        {
+            ForEachActiveObject([](const T * object) {
+                object->DumpToLog();
+                return Loop::Continue;
+            });
+        }
+    }
+
 private:
     static Loop ReleaseObject(void * context, void * object)
     {
@@ -634,5 +659,40 @@ class ObjectPool<T, N, ObjectPoolMem::kHeap> : public HeapObjectPool<T>
 {
 };
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+/// RAII class for pool allocation that guarantees that ReleaseObject() will be called.
+/// This is effectively a simple unique_ptr, except calling pool.ReleaseObject instead of delete
+template <typename T, typename PoolT>
+class PoolAutoRelease
+{
+public:
+    PoolAutoRelease(PoolT & pool, T * releasable) : mReleasable(releasable), mPool(pool) {}
+    ~PoolAutoRelease() { Release(); }
+
+    // Not copyable or movable
+    PoolAutoRelease(const PoolAutoRelease &)             = delete;
+    PoolAutoRelease(const PoolAutoRelease &&)            = delete;
+    PoolAutoRelease & operator=(const PoolAutoRelease &) = delete;
+
+    inline T * operator->() { return mReleasable; }
+    inline const T * operator->() const { return mReleasable; }
+    inline const T & operator*() const { return *mReleasable; }
+    inline T & operator*() { return *mReleasable; }
+    inline operator const T *() const { return mReleasable; }
+    inline operator T *() { return mReleasable; }
+
+    inline bool IsNull() const { return mReleasable == nullptr; }
+
+    void Release()
+    {
+        VerifyOrReturn(mReleasable != nullptr);
+        mPool.ReleaseObject(mReleasable);
+        mReleasable = nullptr;
+    }
+
+private:
+    T * mReleasable;
+    PoolT & mPool;
+};
 
 } // namespace chip

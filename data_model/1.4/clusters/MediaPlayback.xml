@@ -1,0 +1,525 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0506" name="Media Playback Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Text/Audio tracks support, Audio-while-advancing (AA) feature, StateChanged event"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0506" name="Media Playback"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="MEDIAPLAYBACK" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="AS" name="AdvancedSeek" summary="Advanced media seeking">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="VS" name="VariableSpeed" summary="Variable speed playback">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="TT" name="TextTracks" summary="Text Tracks">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="AT" name="AudioTracks" summary="Audio Tracks">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="AA" name="AudioAdvance" summary="Can play audio during fast and slow playback speeds">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="CharacteristicEnum">
+      <item value="0" name="ForcedSubtitles" summary="Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="DescribesVideo" summary="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="EasyToRead" summary="Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)].">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="FrameBased" summary="A media characteristic that indicates that a track selection option includes frame-based content.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="MainProgram" summary="Main media component(s) which is/are intended for presentation if no other information is provided">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="OriginalContent" summary="A media characteristic that indicates that a track or media selection option contains original content.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="VoiceOverTranslation" summary="A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog.">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="Caption" summary="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="Subtitle" summary="Textual transcriptions of spoken dialog.">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="Alternate" summary="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="Supplementary" summary="Media content component that is supplementary to a media content component of a different media component type.">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="Commentary" summary="Experience that contains a commentary (e.g. director’s commentary) (typically audio)">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="DubbedTranslation" summary="Experience that contains an element that is presented in a different language from the original (e.g. dubbed audio, translated captions)">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="Description" summary="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="Metadata" summary="Media component containing information intended to be processed by application specific elements.">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="EnhancedAudioIntelligibility" summary="Experience containing an element for improved intelligibility of the dialogue.">
+        <mandatoryConform/>
+      </item>
+      <item value="16" name="Emergency" summary="Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency.">
+        <mandatoryConform/>
+      </item>
+      <item value="17" name="Karaoke" summary="Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2].">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="PlaybackStateEnum">
+      <item value="0" name="Playing" summary="Media is currently playing (includes FF and REW)">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Paused" summary="Media is currently paused">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="NotPlaying" summary="Media is not currently playing">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Buffering" summary="Media is not currently buffering and playback will start when buffer has been filled">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StatusEnum">
+      <item value="0" name="Success" summary="Succeeded">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="InvalidStateForCommand" summary="Requested playback command is invalid in the current playback state.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="NotAllowed" summary="Requested playback command is not allowed in the current playback state. For example, attempting to fast-forward during a commercial might return NotAllowed.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="NotActive" summary="This endpoint is not active for playback.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="SpeedOutOfRange" summary="The FastForward or Rewind Command was issued but the media is already playing back at the fastest speed supported by the server in the respective direction.">
+        <mandatoryConform>
+          <feature name="VS"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="SeekOutOfRange" summary="The Seek Command was issued with a value of position outside of the allowed seek range of the media.">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <struct name="PlaybackPositionStruct">
+      <field id="0" name="UpdatedAt" type="epoch-us">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Position" type="uint64">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="TrackAttributesStruct">
+      <field id="0" name="LanguageCode" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="1" name="Characteristics" type="list" default="null">
+        <entry type="CharacteristicEnum"/>
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="2" name="DisplayName" type="string" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="TrackStruct">
+      <field id="0" name="ID" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="1" name="TrackAttributes" type="TrackAttributesStruct">
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="CurrentState" type="PlaybackStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="StartTime" type="epoch-us" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="Duration" type="uint64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="SampledPosition" type="PlaybackPositionStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="PlaybackSpeed" type="single" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="SeekRangeEnd" type="uint64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="SeekRangeStart" type="uint64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="ActiveAudioTrack" type="TrackStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="AvailableAudioTracks" type="list" default="null">
+      <entry type="TrackStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="ActiveTextTrack" type="TrackStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000A" name="AvailableTextTracks" type="list" default="null">
+      <entry type="TrackStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="Play" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x01" name="Pause" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x02" name="Stop" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x03" name="StartOver" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+    <command id="0x04" name="Previous" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+    <command id="0x05" name="Next" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+    <command id="0x06" name="Rewind" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="VS"/>
+      </mandatoryConform>
+      <field id="0" name="AudioAdvanceUnmuted" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="AA"/>
+        </mandatoryConform>
+      </field>
+    </command>
+    <command id="0x07" name="FastForward" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="VS"/>
+      </mandatoryConform>
+      <field id="0" name="AudioAdvanceUnmuted" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="AA"/>
+        </mandatoryConform>
+      </field>
+    </command>
+    <command id="0x08" name="SkipForward" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+      <field id="0" name="DeltaPositionMilliseconds" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x09" name="SkipBackward" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+      <field id="0" name="DeltaPositionMilliseconds" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0A" name="PlaybackResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="StatusEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="Data" type="string">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x0B" name="Seek" direction="commandToServer" response="PlaybackResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="AS"/>
+      </mandatoryConform>
+      <field id="0" name="Position" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0C" name="ActivateAudioTrack" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
+      <field id="0" name="TrackID" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="1" name="AudioOutputIndex" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
+      </field>
+    </command>
+    <command id="0x0D" name="ActivateTextTrack" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+      <field id="0" name="TrackID" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0E" name="DeactivateTextTrack" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="StateChanged" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="CurrentState" type="PlaybackStateEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="StartTime" type="epoch-us">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="Duration" type="uint64">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="SampledPosition" type="PlaybackPositionStruct">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="PlaybackSpeed" type="single">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="5" name="SeekRangeEnd" type="uint64">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="6" name="SeekRangeStart" type="uint64">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="7" name="Data" type="octstr">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="900"/>
+        </constraint>
+      </field>
+      <field id="8" name="AudioAdvanceUnmuted" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="AA"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </event>
+  </events>
+</cluster>

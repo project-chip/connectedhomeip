@@ -18,11 +18,12 @@
 import typing
 from dataclasses import dataclass
 
-from chip.clusters.enum import MatterIntEnum
-from chip.clusters.Types import Nullable, NullValue
-from chip.tlv import float32, uint
-from chip.yaml.errors import ValidationError
-from matter_idl import matter_idl_types
+from matter.idl import matter_idl_types
+
+from ..clusters.enum import MatterIntEnum
+from ..clusters.Types import Nullable, NullValue
+from ..tlv import float32, uint
+from .errors import ValidationError
 
 
 @dataclass
@@ -198,10 +199,11 @@ def convert_to_data_model_type(field_value, field_type):
         return field_value
     # YAML conversion treats all numbers as ints. Convert to a uint type if the schema
     # type indicates so.
-    elif (field_type == uint):
+    elif (type(field_value) is str and field_type == uint):
         # Longer number are stored as strings. Need to make this conversion first.
-        value = int(field_value)
-        return field_type(value)
+        # The value can be represented in binary, octal, decimal or hexadecimal
+        # format.
+        return field_type(int(field_value, 0))
     # YAML treats enums as ints. Convert to the typed enum class.
     elif (issubclass(field_type, MatterIntEnum)):
         return field_type.extend_enum_if_value_doesnt_exist(field_value)

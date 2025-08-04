@@ -24,7 +24,7 @@
  */
 
 #pragma once
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_USE_ZEPHYR_BLE
 #include <sys/atomic.h>
 #include <toolchain.h>
 #include <zephyr/bluetooth/bluetooth.h>
@@ -69,11 +69,13 @@ enum InternalPlatformSpecificEventTypes
     kPlatformNxpWlanEvent,
     kPlatformNxpIpChangeEvent,
     kPlatformNxpStartWlanConnectEvent,
+    kPlatformNxpScanWiFiNetworkDoneEvent,
+    kPlatformNxpStartWlanInitWaitTimerEvent,
 };
 
 } // namespace DeviceEventType
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_USE_ZEPHYR_BLE
 struct BleConnEventType
 {
     bt_conn * BtConn;
@@ -107,7 +109,7 @@ struct ChipDevicePlatformEvent final
 {
     union
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_USE_ZEPHYR_BLE
         BleConnEventType BleConnEvent;
         BleCCCWriteEventType BleCCCWriteEvent;
         BleC1WriteEventType BleC1WriteEvent;
@@ -116,6 +118,7 @@ struct ChipDevicePlatformEvent final
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
         enum wlan_event_reason WlanEventReason;
         struct wlan_network * pNetworkDataEvent;
+        unsigned int ScanWiFiNetworkCount;
 #endif
     };
 };

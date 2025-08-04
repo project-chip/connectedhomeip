@@ -18,28 +18,30 @@
 
 #include "ConversionUtils.h"
 
-CHIP_ERROR ConvertToDiscoveredNodeData(TargetVideoPlayerInfo * inPlayer, chip::Dnssd::DiscoveredNodeData & outNodeData)
+CHIP_ERROR ConvertToDiscoveredNodeData(TargetVideoPlayerInfo * inPlayer, chip::Dnssd::DiscoveredNodeData & outDiscNodeData)
 {
     if (inPlayer == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    outNodeData.commissionData.vendorId   = inPlayer->GetVendorId();
-    outNodeData.commissionData.productId  = static_cast<uint16_t>(inPlayer->GetProductId());
-    outNodeData.commissionData.deviceType = inPlayer->GetDeviceType();
-    outNodeData.resolutionData.numIPs     = inPlayer->GetNumIPs();
+    outDiscNodeData.Set<chip::Dnssd::CommissionNodeData>();
+    auto & outNodeData = outDiscNodeData.Get<chip::Dnssd::CommissionNodeData>();
+
+    outNodeData.vendorId   = inPlayer->GetVendorId();
+    outNodeData.productId  = static_cast<uint16_t>(inPlayer->GetProductId());
+    outNodeData.deviceType = inPlayer->GetDeviceType();
+    outNodeData.numIPs     = inPlayer->GetNumIPs();
 
     const chip::Inet::IPAddress * ipAddresses = inPlayer->GetIpAddresses();
     if (ipAddresses != nullptr)
     {
-        for (size_t i = 0; i < outNodeData.resolutionData.numIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+        for (size_t i = 0; i < outNodeData.numIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
         {
-            outNodeData.resolutionData.ipAddress[i] = ipAddresses[i];
+            outNodeData.ipAddress[i] = ipAddresses[i];
         }
     }
 
-    chip::Platform::CopyString(outNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
-                               inPlayer->GetDeviceName());
-    chip::Platform::CopyString(outNodeData.resolutionData.hostName, chip::Dnssd::kHostNameMaxLength + 1, inPlayer->GetHostName());
+    chip::Platform::CopyString(outNodeData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1, inPlayer->GetDeviceName());
+    chip::Platform::CopyString(outNodeData.hostName, chip::Dnssd::kHostNameMaxLength + 1, inPlayer->GetHostName());
 
     return CHIP_NO_ERROR;
 }

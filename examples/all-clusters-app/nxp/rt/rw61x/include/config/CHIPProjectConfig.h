@@ -50,8 +50,13 @@
 
 #if !CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 // Use a default pairing code if one hasn't been provisioned in flash.
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
@@ -164,15 +169,6 @@
 // #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
- * CHIP_CONFIG_MAX_BINDINGS
- *
- * Maximum number of simultaneously active bindings per ChipExchangeManager
- * 1 (Time Sync) + 2 (Two 1-way subscriptions) + 1 (Software Update) = 4
- * in the worst case. Keeping another 4 as buffer.
- */
-#define CHIP_CONFIG_MAX_BINDINGS 6
-
-/**
  * CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD
  *
  * Select the ability to offload event logs to any interested subscribers using WDM.
@@ -210,3 +206,5 @@
 #ifndef CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
 #endif
+
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

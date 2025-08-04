@@ -25,7 +25,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # ------------------------------------------------------------------------------
 # Install Python modules
 RUN set -x \
-    && pip3 install --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
+    && pip3 install --break-system-packages --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
     && : # last line
 
 # ------------------------------------------------------------------------------

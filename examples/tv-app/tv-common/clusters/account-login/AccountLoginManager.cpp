@@ -19,9 +19,8 @@
 #include "AccountLoginManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
-#include <app/util/af.h>
+#include <app/util/config.h>
 
-using namespace std;
 using namespace chip::app::Clusters::AccountLogin;
 
 AccountLoginManager::AccountLoginManager(const char * setupPin)
@@ -32,8 +31,8 @@ AccountLoginManager::AccountLoginManager(const char * setupPin)
 bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin,
                                       const chip::Optional<chip::NodeId> & nodeId)
 {
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
-    string setupPinString(setupPin.data(), setupPin.size());
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string setupPinString(setupPin.data(), setupPin.size());
     ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
     ChipLogProgress(Zcl, "setup pin %s", setupPinString.c_str());
 
@@ -57,7 +56,7 @@ bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & node
 void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                                             const CharSpan & tempAccountIdentifier)
 {
-    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    std::string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
     GetSetupPINResponse response;
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);

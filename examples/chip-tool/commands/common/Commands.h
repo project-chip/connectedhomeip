@@ -24,11 +24,12 @@
 
 #include "Command.h"
 #include <map>
+#include <string>
 
 class Commands
 {
 public:
-    using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
+    using CommandsVector = std::vector<std::unique_ptr<Command>>;
 
     void RegisterCluster(const char * clusterName, commands_list commandsList)
     {

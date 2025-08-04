@@ -31,6 +31,12 @@
     return (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation([self publicKey], nil);
 }
 
+- (SecKeyRef)copyPublicKey
+{
+    CFRetain(_publicKey);
+    return _publicKey;
+}
+
 - (instancetype)init
 {
     if (!(self = [super init])) {
@@ -54,7 +60,6 @@
 
     // Generate a keypair.  For now harcoded to 256 bits until the framework exposes this constant.
     const size_t keySizeInBits = 256;
-    CFErrorRef error = NULL;
     const NSDictionary * keygenParams = @{
         (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassPrivate,
         (__bridge NSString *) kSecAttrKeyType : (__bridge NSString *) kSecAttrKeyTypeECSECPrimeRandom,
@@ -62,11 +67,16 @@
         (__bridge NSString *) kSecAttrIsPermanent : @(NO)
     };
 
-    _privateKey = SecKeyCreateRandomKey((__bridge CFDictionaryRef) keygenParams, &error);
-    if (error) {
-        NSLog(@"Failed to generate private key");
+    CFErrorRef cfError = NULL;
+    _privateKey = SecKeyCreateRandomKey(
+        (__bridge CFDictionaryRef) keygenParams,
+        &cfError);
+
+    if (!_privateKey) {
+        NSLog(@"Failed to generate private key: %@", (__bridge_transfer NSError *) cfError);
         return nil;
     }
+
     _publicKey = SecKeyCopyPublicKey(_privateKey);
 
     _signatureCount = 0;
@@ -78,14 +88,19 @@
 {
     ++_signatureCount;
 
-    CFErrorRef error = NULL;
-    CFDataRef outData
-        = SecKeyCreateSignature(_privateKey, kSecKeyAlgorithmECDSASignatureMessageX962SHA256, (__bridge CFDataRef) message, &error);
+    CFErrorRef cfError = NULL;
+    CFDataRef cfData = SecKeyCreateSignature(
+        _privateKey,
+        kSecKeyAlgorithmECDSASignatureMessageX962SHA256,
+        (__bridge CFDataRef) message,
+        &cfError);
 
-    if (error != noErr) {
-        NSLog(@"Failed to sign cert: %@", (__bridge NSError *) error);
+    if (!cfData) {
+        NSLog(@"Failed to sign cert: %@", (__bridge_transfer NSError *) cfError);
+        return nil;
     }
-    return (__bridge_transfer NSData *) outData;
+
+    return (__bridge_transfer NSData *) cfData;
 }
 
 - (void)dealloc

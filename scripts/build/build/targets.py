@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabMfd
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabThreadType
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
@@ -24,12 +24,13 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.k32w import K32WApp, K32WBoard, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
-from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
+from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
+from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.realtek import RealtekApp, RealtekBoard, RealtekBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
@@ -76,8 +77,9 @@ def BuildHostFakeTarget():
         "-clang").ExceptIfRe('-ossfuzz')
     target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(
         "-clang").ExceptIfRe('-libfuzzer')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters)')
+    target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
+        "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
 
@@ -109,25 +111,28 @@ def BuildHostTarget():
         TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
-        TargetPart('java-matter-controller',
-                   app=HostApp.JAVA_MATTER_CONTROLLER),
-        TargetPart('kotlin-matter-controller',
-                   app=HostApp.KOTLIN_MATTER_CONTROLLER),
+        # TODO: controllers depending on a datamodel is odd. For now fix compile dependencies on ember.
+        TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER),
+        TargetPart('kotlin-matter-controller', app=HostApp.KOTLIN_MATTER_CONTROLLER),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
+        TargetPart('light-data-model-no-unique-id', app=HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID),
         TargetPart('lock', app=HostApp.LOCK),
         TargetPart('shell', app=HostApp.SHELL),
         TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
         TargetPart('ota-requestor', app=HostApp.OTA_REQUESTOR,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('simulated-app1', app=HostApp.SIMULATED_APP1,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('simulated-app2', app=HostApp.SIMULATED_APP2,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),
+        TargetPart('fabric-admin', app=HostApp.FABRIC_ADMIN).OnlyIfRe("-rpc"),
+        TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE).OnlyIfRe("-rpc"),
+        TargetPart('fabric-sync', app=HostApp.FABRIC_SYNC),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
@@ -140,7 +145,15 @@ def BuildHostTarget():
         TargetPart('lit-icd', app=HostApp.LIT_ICD),
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
+        TargetPart('energy-gateway', app=HostApp.ENERGY_GATEWAY),
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
+        TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
+        TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
+        TargetPart('camera', app=HostApp.CAMERA),
+        TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
+        TargetPart('jf-control-app', app=HostApp.JF_CONTROL),
+        TargetPart('jf-admin-app', app=HostApp.JF_ADMIN),
+        TargetPart('closure', app=HostApp.CLOSURE),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -162,8 +175,11 @@ def BuildHostTarget():
         'no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
     target.AppendModifier("no-ble", enable_ble=False)
+    target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
+    target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
+    target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
         "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
     target.AppendModifier(
@@ -175,14 +191,21 @@ def BuildHostTarget():
         "-clang").ExceptIfRe('-ossfuzz')
     target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(
         "-clang").ExceptIfRe('-libfuzzer')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters)')
+    target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
+        "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ui', imgui_ui=True)
     target.AppendModifier('evse-test-event', enable_test_event_triggers=['EVSE']).OnlyIfRe('-energy-management')
+    target.AppendModifier('enable-dnssd-tests', enable_dnssd_tests=True).OnlyIfRe('-tests')
+    target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
+    target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
+    target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
+    target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
+    target.AppendModifier('webrtc', enable_webrtc=True)
 
     return target
 
@@ -202,6 +225,7 @@ def BuildEsp32Target():
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=Esp32App.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL),
+        TargetPart('energy-gateway', app=Esp32App.ENERGY_GATEWAY),
         TargetPart('energy-management', app=Esp32App.ENERGY_MANAGEMENT),
         TargetPart('ota-provider', app=Esp32App.OTA_PROVIDER),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
@@ -227,17 +251,23 @@ def BuildEfr32Target():
 
     # board
     target.AppendFixedTargets([
-        TargetPart('brd4161a', board=Efr32Board.BRD4161A),
-        TargetPart('brd4187c', board=Efr32Board.BRD4187C),
-        TargetPart('brd4186c', board=Efr32Board.BRD4186C),
-        TargetPart('brd4163a', board=Efr32Board.BRD4163A),
-        TargetPart('brd4164a', board=Efr32Board.BRD4164A),
-        TargetPart('brd4166a', board=Efr32Board.BRD4166A),
-        TargetPart('brd4170a', board=Efr32Board.BRD4170A),
+        TargetPart('brd2704b', board=Efr32Board.BRD2704B),
+        TargetPart('brd4316a', board=Efr32Board.BRD4316A),
+        TargetPart('brd4317a', board=Efr32Board.BRD4317A),
+        TargetPart('brd4318a', board=Efr32Board.BRD4318A),
+        TargetPart('brd4319a', board=Efr32Board.BRD4319A),
         TargetPart('brd4186a', board=Efr32Board.BRD4186A),
         TargetPart('brd4187a', board=Efr32Board.BRD4187A),
-        TargetPart('brd4304a', board=Efr32Board.BRD4304A),
-        TargetPart('brd4338a', board=Efr32Board.BRD4338A),
+        TargetPart('brd2601b', board=Efr32Board.BRD2601B),
+        TargetPart('brd4187c', board=Efr32Board.BRD4187C),
+        TargetPart('brd4186c', board=Efr32Board.BRD4186C),
+        TargetPart('brd2703a', board=Efr32Board.BRD2703A),
+        TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4342a', board=Efr32Board.BRD4342A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd2708a', board=Efr32Board.BRD2708A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd2911a', board=Efr32Board.BRD2911A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -248,7 +278,9 @@ def BuildEfr32Target():
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
-        TargetPart('pump', app=Efr32App.PUMP)
+        TargetPart('pump', app=Efr32App.PUMP),
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('closure', app=Efr32App.CLOSURE)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -256,26 +288,26 @@ def BuildEfr32Target():
     target.AppendModifier('icd', enable_icd=True)
     target.AppendModifier('low-power', enable_low_power=True).OnlyIfRe('-icd')
     target.AppendModifier('shell', chip_build_libshell=True)
-    target.AppendModifier('no_logging', chip_logging=False)
-    target.AppendModifier('openthread_mtd', chip_openthread_ftd=False)
-    target.AppendModifier('enable_heap_monitoring',
+    target.AppendModifier('no-logging', chip_logging=False)
+    target.AppendModifier('openthread-mtd', chip_openthread_ftd=False)
+    target.AppendModifier('heap-monitoring',
                           enable_heap_monitoring=True)
-    target.AppendModifier('no_openthread_cli', enable_openthread_cli=False)
+    target.AppendModifier('no-openthread-cli', enable_openthread_cli=False)
     target.AppendModifier(
-        'show_qr_code', show_qr_code=True).ExceptIfRe('-low-power')
+        'show-qr-code', show_qr_code=True).ExceptIfRe('-low-power')
     target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('rs911x', enable_rs911x=True).OnlyIfRe('-wifi')
+    target.AppendModifier('rs9116', enable_rs9116=True).OnlyIfRe('-wifi')
     target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
-    target.AppendModifier('wifi_ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
-    target.AppendModifier('917_soc', enable_917_soc=True).OnlyIfRe('-wifi')
-    target.AppendModifier('additional_data_advertising',
+    target.AppendModifier('siwx917', enable_917_ncp=True).OnlyIfRe('-wifi')
+    target.AppendModifier('ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
+    target.AppendModifier('additional-data-advertising',
                           enable_additional_data_advertising=True)
-    target.AppendModifier('use_ot_lib', enable_ot_lib=True).ExceptIfRe(
-        '-(wifi|use_ot_coap_lib)')
-    target.AppendModifier('use_ot_coap_lib', enable_ot_coap_lib=True).ExceptIfRe(
-        '-(wifi|use_ot_lib)')
+    target.AppendModifier('use-ot-lib', enable_ot_lib=True).ExceptIfRe(
+        '-(wifi|use-ot-coap-lib)')
+    target.AppendModifier('use-ot-coap-lib', enable_ot_coap_lib=True).ExceptIfRe(
+        '-(wifi|use-ot-lib)')
     target.AppendModifier('no-version', no_version=True)
-    target.AppendModifier('skip_rps_generation', use_rps_extension=False).OnlyIfRe('-wifi')
+    target.AppendModifier('skip-rps-generation', use_rps_extension=False)
 
     return target
 
@@ -284,8 +316,8 @@ def BuildNrfNativeTarget():
     target = BuildTarget('nrf', NrfConnectBuilder)
 
     target.AppendFixedTargets([
-        TargetPart('native-posix-64-tests',
-                   board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS),
+        TargetPart('native-sim-tests',
+                   board=NrfBoard.NATIVE_SIM, app=NrfApp.UNIT_TESTS),
     ])
 
     return target
@@ -315,6 +347,22 @@ def BuildNrfTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
+
+    return target
+
+
+def BuildNuttXTarget():
+    target = BuildTarget('nuttx', NuttXBuilder)
+
+    # Boards
+    target.AppendFixedTargets([
+        TargetPart('x64', board=NuttXBoard.SIM),
+    ])
+
+    # Apps
+    target.AppendFixedTargets([
+        TargetPart('light', app=NuttXApp.LIGHT),
+    ])
 
     return target
 
@@ -408,6 +456,7 @@ def BuildInfineonTarget():
     # modifiers
     target.AppendModifier('ota', enable_ota_requestor=True)
     target.AppendModifier('updateimage', update_image=True)
+    target.AppendModifier('trustm', enable_trustm=True)
 
     return target
 
@@ -468,51 +517,60 @@ def BuildASRTarget():
     return target
 
 
-def BuildK32WTarget():
-    target = BuildTarget('k32w', K32WBuilder)
+def BuildNxpTarget():
+    target = BuildTarget('nxp', NxpBuilder)
 
     # boards
     target.AppendFixedTargets([
-        TargetPart('k32w0', board=K32WBoard.K32W0),
-        TargetPart('k32w1', board=K32WBoard.K32W1)
+        TargetPart('rt1060', board=NxpBoard.RT1060),
+        TargetPart('rt1170', board=NxpBoard.RT1170),
+        TargetPart('rw61x', board=NxpBoard.RW61X),
+        TargetPart('mcxw71', board=NxpBoard.MCXW71)
+    ])
+
+    # OS
+    target.AppendFixedTargets([
+        TargetPart('zephyr', os_env=NxpOsUsed.ZEPHYR).OnlyIfRe('rw61x'),
+        TargetPart('freertos', os_env=NxpOsUsed.FREERTOS),
     ])
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('light', app=K32WApp.LIGHT, release=True),
-        TargetPart('shell', app=K32WApp.SHELL, release=True),
-        TargetPart('lock', app=K32WApp.LOCK, release=True),
-        TargetPart('contact', app=K32WApp.CONTACT, release=True)
+        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('mcxw71'),
+        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('mcxw71'),
+        TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('mcxw71'),
+        TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rt1060|rt1170|rw61x'),
+        TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rt1060|rt1170|rw61x'),
+        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x')
     ])
 
-    target.AppendModifier(name="se05x", se05x=True)
+    target.AppendModifier(name="factory", enable_factory_data=True)
+    target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
+    target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
+    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('mcxw71-freertos-lighting')
+    target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('rw61x')
+    target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
+    target.AppendModifier(name="sw-v2", has_sw_version_2=True)
+    target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
+    target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
+    target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
+    target.AppendModifier(name="matter-shell", enable_shell=True)
+    target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
+    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71')
+    target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).ExceptIfRe(
+        'laundry-washer|lock-app').OnlyIfRe('rt1060|rt1170|rw61x|mcxw71')
+    target.AppendModifier(name="evkc", board_variant=NxpBoardVariant.EVKC).OnlyIfRe('rt1060')
+    target.AppendModifier(name="iw416", iw416_transceiver=True).OnlyIfRe('rt1060')
+    target.AppendModifier(name="w8801", w8801_transceiver=True).OnlyIfRe('rt1060')
+    target.AppendModifier(name="iwx12", iwx12_transceiver=True).OnlyIfRe('rt1060|rt1170')
+    target.AppendModifier(name="log-all", log_level=NxpLogLevel.ALL).ExceptIfRe("-log-(progress|error|none)")
+    target.AppendModifier(name="log-progress", log_level=NxpLogLevel.PROGRESS).ExceptIfRe("-log-(all|error|none)")
+    target.AppendModifier(name="log-error", log_level=NxpLogLevel.ERROR).ExceptIfRe("-log-(progress|all|none)")
+    target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
+    target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw71")
     target.AppendModifier(name="no-ble", disable_ble=True)
-    target.AppendModifier(name="no-ota", disable_ota=True)
-    target.AppendModifier(name="low-power", low_power=True).OnlyIfRe("-nologs")
-    target.AppendModifier(name="nologs", disable_logs=True)
-    target.AppendModifier(name="crypto-platform", crypto_platform=True)
-    target.AppendModifier(
-        name="tokenizer", tokenizer=True).ExceptIfRe("-nologs")
-    target.AppendModifier(name="openthread-ftd", openthread_ftd=True)
-
-    return target
-
-
-def BuildCC13x2x7Target():
-    target = BuildTarget('ti', TIBuilder)
-
-    # board
-    target.AppendFixedTargets([
-        TargetPart('cc13x2x7_26x2x7', board=TIBoard.LP_CC2652R7),
-    ])
-
-    target.AppendFixedTargets([
-        TargetPart('lighting', app=TIApp.LIGHTING),
-        TargetPart('lock', app=TIApp.LOCK),
-        TargetPart('pump', app=TIApp.PUMP),
-        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER),
-    ])
-    target.AppendModifier(name="mtd", openthread_ftd=False)
+    target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
 
     return target
 
@@ -526,7 +584,6 @@ def BuildCC13x4Target():
     ])
 
     target.AppendFixedTargets([
-        TargetPart('all-clusters', app=TIApp.ALL_CLUSTERS),
         TargetPart('lighting', app=TIApp.LIGHTING),
         TargetPart('lock', app=TIApp.LOCK, openthread_ftd=True),
         TargetPart('pump', app=TIApp.PUMP, openthread_ftd=False),
@@ -557,15 +614,19 @@ def BuildCyw30739Target():
     target = BuildTarget('cyw30739', Cyw30739Builder)
     # board
     target.AppendFixedTargets([
+        TargetPart('cyw30739b2_p5_evk_01', board=Cyw30739Board.CYW30739B2_P5_EVK_01),
+        TargetPart('cyw30739b2_p5_evk_02', board=Cyw30739Board.CYW30739B2_P5_EVK_02),
+        TargetPart('cyw30739b2_p5_evk_03', board=Cyw30739Board.CYW30739B2_P5_EVK_03),
         TargetPart('cyw930739m2evb_01', board=Cyw30739Board.CYW930739M2EVB_01),
+        TargetPart('cyw930739m2evb_02', board=Cyw30739Board.CYW930739M2EVB_02),
     ])
 
     # apps
     target.AppendFixedTargets([
         TargetPart('light', app=Cyw30739App.LIGHT),
+        TargetPart('light-switch', app=Cyw30739App.LIGHT_SWITCH),
         TargetPart('lock', app=Cyw30739App.LOCK),
-        TargetPart('ota-requestor', app=Cyw30739App.OTA_REQUESTOR),
-        TargetPart('switch', app=Cyw30739App.SWITCH),
+        TargetPart('thermostat', app=Cyw30739App.THERMOSTAT),
     ])
 
     return target
@@ -576,7 +637,7 @@ def BuildQorvoTarget():
 
     # board
     target.AppendFixedTargets([
-        TargetPart('qpg6105', board=QpgBoard.QPG6105),
+        TargetPart('qpg6200', board=QpgBoard.QPG6200),
     ])
 
     # apps
@@ -616,12 +677,12 @@ def BuildTizenTarget():
     # board
     target.AppendFixedTargets([
         TargetPart('arm', board=TizenBoard.ARM),
+        TargetPart('arm64', board=TizenBoard.ARM64),
     ])
 
     # apps
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TizenApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
         TargetPart('tests', app=TizenApp.TESTS),
@@ -632,6 +693,8 @@ def BuildTizenTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("asan", use_asan=True)
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
+        '-tests')
     target.AppendModifier('with-ui', with_ui=True)
 
     return target
@@ -642,38 +705,48 @@ def BuildBouffalolabTarget():
 
     # Boards
     target.AppendFixedTargets([
-        TargetPart('BL602-IoT-Matter-V1',
-                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('BL602-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
-                   module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
+        TargetPart('BL602DK',
+                   board=BouffalolabBoard.BL602DK, module_type="BL602"),
+        TargetPart('BL616DK', board=BouffalolabBoard.BL616DK, module_type="BL616"),
+        TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
         TargetPart('BL706DK',
                    board=BouffalolabBoard.BL706DK, module_type="BL706C-22"),
-        TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
+        TargetPart('BL602-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602", enable_resetCnt=True),
+        TargetPart('BL706-NIGHT-LIGHT',
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22", enable_resetCnt=True),
+        TargetPart('BL602-IoT-Matter-V1',
+                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
+        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
+                   module_type="BL706C-22"),
     ])
 
-    # Apps
     target.AppendFixedTargets([
         TargetPart('light', app=BouffalolabApp.LIGHT),
+        TargetPart('contact-sensor', app=BouffalolabApp.CONTACT, enable_pds=True).OnlyIfRe('-(bl704l)'),
+    ])
+
+    target.AppendFixedTargets([
+        TargetPart('ethernet', enable_ethernet=True),
+        TargetPart('wifi', enable_wifi=True),
+        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
+        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
+        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD),
+    ])
+
+    target.AppendFixedTargets([
+        TargetPart('easyflash', enable_easyflash=True),
+        TargetPart('littlefs', enable_littlefs=True),
     ])
 
     target.AppendModifier('shell', enable_shell=True)
-    target.AppendModifier('115200', baudrate=115200)
-    target.AppendModifier('rpc', enable_rpcs=True)
-    target.AppendModifier('cdc', enable_cdc=True)
-    target.AppendModifier('resetCnt', enable_resetCnt=True)
+    target.AppendModifier('mfd', enable_mfd=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
-    target.AppendModifier('mfd', function_mfd=BouffalolabMfd.MFD_RELEASE)
-    target.AppendModifier('mfdtest', function_mfd=BouffalolabMfd.MFD_TEST)
-    target.AppendModifier('ethernet', enable_ethernet=True)
-    target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('thread', enable_thread=True)
-    target.AppendModifier('fp', enable_frame_ptr=True)
+    target.AppendModifier('rpc', enable_rpcs=True, baudrate=115200).OnlyIfRe('-(bl602dk|bl704ldk|bl706dk)')
+    target.AppendModifier('cdc', enable_cdc=True).OnlyIfRe('-(bl706dk)')
+    target.AppendModifier('mot', use_matter_openthread=True).OnlyIfRe('-(thread)')
     target.AppendModifier('memmonitor', enable_heap_monitoring=True)
-    target.AppendModifier('mot', use_matter_openthread=True)
+    target.AppendModifier('coredump', enable_debug_coredump=True)
 
     return target
 
@@ -692,14 +765,8 @@ def BuildIMXTarget():
     ])
 
     target.AppendModifier('release', release=True)
+    target.AppendModifier('trusty', trusty=True)
 
-    return target
-
-
-def BuildMW320Target():
-    target = BuildTarget('mw320', MW320Builder)
-    target.AppendFixedTargets(
-        [TargetPart('all-clusters-app', app=MW320App.ALL_CLUSTERS)])
     return target
 
 
@@ -713,11 +780,17 @@ def BuildTelinkTarget():
     target = BuildTarget('telink', TelinkBuilder)
 
     target.AppendFixedTargets([
+        TargetPart('tlsr9118bdk40d', board=TelinkBoard.TLRS9118BDK40D),
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
-        TargetPart('tlsr9258a', board=TelinkBoard.TLSR9258A),
-        TargetPart('tlsr9258a_retention', board=TelinkBoard.TLSR9258A_RETENTION),
+        TargetPart('tl3218x', board=TelinkBoard.TL3218X),
+        TargetPart('tl3218x_ml3m', board=TelinkBoard.TL3218X_ML3M),
+        TargetPart('tl3218x_retention', board=TelinkBoard.TL3218X_RETENTION),
+        TargetPart('tl7218x', board=TelinkBoard.TL7218X),
+        TargetPart('tl7218x_ml7g', board=TelinkBoard.TL7218X_ML7G),
+        TargetPart('tl7218x_ml7m', board=TelinkBoard.TL7218X_ML7M),
+        TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])
 
     target.AppendFixedTargets([
@@ -747,6 +820,33 @@ def BuildTelinkTarget():
     target.AppendModifier('factory-data', enable_factory_data=True)
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
+    target.AppendModifier('usb', usb_board_config=True)
+    target.AppendModifier('compress-lzma', compress_lzma_config=True)
+    target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
+    target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
+    target.AppendModifier('tflm', tflm_config=True)
+
+    return target
+
+
+def BuildRealtekTarget():
+    target = BuildTarget('realtek', RealtekBuilder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('rtl8777g', board=RealtekBoard.RTL8777G),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lighting', app=RealtekApp.LIGHT),
+        TargetPart('light-switch', app=RealtekApp.LIGHT_SWITCH),
+        TargetPart('lock', app=RealtekApp.LOCK),
+        TargetPart('window', app=RealtekApp.WINDOW),
+        TargetPart('all-clusters', app=RealtekApp.ALL_CLUSTERS),
+        TargetPart('ota-requestor', app=RealtekApp.OTA_REQUESTOR),
+        TargetPart('thermostat', app=RealtekApp.THERMOSTAT),
+    ])
 
     return target
 
@@ -772,7 +872,6 @@ BUILD_TARGETS = [
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
     Buildcc32xxTarget(),
-    BuildCC13x2x7Target(),
     BuildCC13x4Target(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
@@ -783,12 +882,13 @@ BUILD_TARGETS = [
     BuildHostTestRunnerTarget(),
     BuildIMXTarget(),
     BuildInfineonTarget(),
-    BuildK32WTarget(),
+    BuildNxpTarget(),
     BuildMbedTarget(),
-    BuildMW320Target(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
+    BuildNuttXTarget(),
     BuildQorvoTarget(),
+    BuildRealtekTarget(),
     BuildStm32Target(),
     BuildTizenTarget(),
     BuildTelinkTarget(),

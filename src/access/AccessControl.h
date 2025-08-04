@@ -18,6 +18,12 @@
 
 #pragma once
 
+#include <access/AccessConfig.h>
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "AccessRestrictionProvider.h"
+#endif
+
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
@@ -226,6 +232,13 @@ public:
             mDelegate->Release();
             mDelegate = &mDefaultDelegate.get();
         }
+
+        /**
+         * Validate whether an ACL Entry is valid and complies with all defined constraints.
+         *
+         * @retval true if all the fields within the Entry are valid and compliant.
+         */
+        bool IsValid() const;
 
     private:
         static Global<Delegate> mDefaultDelegate;
@@ -495,7 +508,7 @@ public:
      */
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
-        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->CreateEntry(index, entry, fabricIndex);
     }
@@ -545,7 +558,7 @@ public:
      */
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
     {
-        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->UpdateEntry(index, entry, fabricIndex);
     }
@@ -627,9 +640,28 @@ public:
     // Removes a listener from the listener list, if in the list.
     void RemoveEntryListener(EntryListener & listener);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    // Set an optional AcceessRestriction object for MNGD feature.
+    void SetAccessRestrictionProvider(AccessRestrictionProvider * accessRestrictionProvider)
+    {
+        mAccessRestrictionProvider = accessRestrictionProvider;
+    }
+
+    AccessRestrictionProvider * GetAccessRestrictionProvider() { return mAccessRestrictionProvider; }
+#endif
+
+    /**
+     * Check whether or not Access Restriction List is supported.
+     *
+     * @retval true if Access Restriction List is supported.
+     */
+    bool IsAccessRestrictionListSupported() const;
+
     /**
      * Check whether access (by a subject descriptor, to a request path,
      * requiring a privilege) should be allowed or denied.
+     *
+     * If an AccessRestrictionProvider object is set, it will be checked for additional access restrictions.
      *
      * @retval #CHIP_ERROR_ACCESS_DENIED if denied.
      * @retval other errors should also be treated as denied.
@@ -644,10 +676,21 @@ public:
 private:
     bool IsInitialized() const { return (mDelegate != nullptr); }
 
-    bool IsValid(const Entry & entry);
-
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);
+
+    /**
+     * Check ACL for whether access (by a subject descriptor, to a request path,
+     * requiring a privilege) should be allowed or denied.
+     */
+    CHIP_ERROR CheckACL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
+
+    /**
+     * Check CommissioningARL or ARL (as appropriate) for whether access (by a
+     * subject descriptor, to a request path, requiring a privilege) should
+     * be allowed or denied.
+     */
+    CHIP_ERROR CheckARL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
 private:
     Delegate * mDelegate = nullptr;
@@ -655,6 +698,10 @@ private:
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 
     EntryListener * mEntryListener = nullptr;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    AccessRestrictionProvider * mAccessRestrictionProvider;
+#endif
 };
 
 /**

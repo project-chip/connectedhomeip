@@ -28,7 +28,9 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
   val startTimestamp: Optional<ULong>,
   val endTimestamp: Optional<ULong>,
   val startSystime: Optional<ULong>,
-  val endSystime: Optional<ULong>
+  val endSystime: Optional<ULong>,
+  val apparentEnergy: Optional<Long>,
+  val reactiveEnergy: Optional<Long>,
 ) {
   override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {\n")
@@ -37,6 +39,8 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
     append("\tendTimestamp : $endTimestamp\n")
     append("\tstartSystime : $startSystime\n")
     append("\tendSystime : $endSystime\n")
+    append("\tapparentEnergy : $apparentEnergy\n")
+    append("\treactiveEnergy : $reactiveEnergy\n")
     append("}\n")
   }
 
@@ -60,6 +64,14 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
         val optendSystime = endSystime.get()
         put(ContextSpecificTag(TAG_END_SYSTIME), optendSystime)
       }
+      if (apparentEnergy.isPresent) {
+        val optapparentEnergy = apparentEnergy.get()
+        put(ContextSpecificTag(TAG_APPARENT_ENERGY), optapparentEnergy)
+      }
+      if (reactiveEnergy.isPresent) {
+        val optreactiveEnergy = reactiveEnergy.get()
+        put(ContextSpecificTag(TAG_REACTIVE_ENERGY), optreactiveEnergy)
+      }
       endStructure()
     }
   }
@@ -70,10 +82,12 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
     private const val TAG_END_TIMESTAMP = 2
     private const val TAG_START_SYSTIME = 3
     private const val TAG_END_SYSTIME = 4
+    private const val TAG_APPARENT_ENERGY = 5
+    private const val TAG_REACTIVE_ENERGY = 6
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
       tlvReader.enterStructure(tlvTag)
       val energy = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY))
@@ -101,6 +115,18 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
         } else {
           Optional.empty()
         }
+      val apparentEnergy =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_APPARENT_ENERGY))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_APPARENT_ENERGY)))
+        } else {
+          Optional.empty()
+        }
+      val reactiveEnergy =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_REACTIVE_ENERGY))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_REACTIVE_ENERGY)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -109,7 +135,9 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
         startTimestamp,
         endTimestamp,
         startSystime,
-        endSystime
+        endSystime,
+        apparentEnergy,
+        reactiveEnergy,
       )
     }
   }

@@ -78,11 +78,7 @@ public:
     const char * GetInstanceName() const { return mInstanceName; }
     void SetInstanceName(const char * instanceName) { Platform::CopyString(mInstanceName, instanceName); }
 
-    bool HasDiscoveryInfo()
-    {
-        return mVendorId != 0 || mProductId != 0 || mCdPort != 0 || strlen(mDeviceName) > 0 || GetRotatingIdLength() > 0 ||
-            mNumTargetAppInfos > 0 || mNoPasscode || mCdUponPasscodeDialog || mCommissionerPasscode || mCommissionerPasscodeReady;
-    }
+    bool HasDiscoveryInfo() { return mVendorId != 0 && mProductId != 0 && mCdPort != 0 && strlen(mDeviceName) > 0; }
 
     const char * GetDeviceName() const { return mDeviceName; }
     void SetDeviceName(const char * deviceName) { Platform::CopyString(mDeviceName, deviceName); }
@@ -100,7 +96,7 @@ public:
     size_t GetRotatingIdLength() const { return mRotatingIdLen; }
     void SetRotatingId(const uint8_t * rotatingId, size_t rotatingIdLen)
     {
-        size_t maxSize = ArraySize(mRotatingId);
+        size_t maxSize = MATTER_ARRAY_SIZE(mRotatingId);
         mRotatingIdLen = (maxSize < rotatingIdLen) ? maxSize : rotatingIdLen;
         memcpy(mRotatingId, rotatingId, mRotatingIdLen);
     }
@@ -231,7 +227,6 @@ public:
         {
             ChipLogDetail(AppServer, "\tpairing hint: %d", mPairingHint);
         }
-
         if (mNoPasscode)
         {
             ChipLogDetail(AppServer, "\tno passcode: true");
@@ -353,6 +348,9 @@ public:
     void SetQRCodeDisplayed(bool newValue) { mQRCodeDisplayed = newValue; };
     bool GetQRCodeDisplayed() const { return mQRCodeDisplayed; };
 
+    void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
+    bool GetCancelPasscode() const { return mCancelPasscode; };
+
     /**
      *  Writes the CommissionerDeclaration message to the given buffer.
      *
@@ -394,6 +392,10 @@ public:
         {
             ChipLogDetail(AppServer, "\tQR code displayed: true");
         }
+        if (mCancelPasscode)
+        {
+            ChipLogDetail(AppServer, "\tPasscode cancelled: true");
+        }
         ChipLogDetail(AppServer, "---- Commissioner Declaration End ----");
     }
 
@@ -407,6 +409,7 @@ private:
         kPasscodeDialogDisplayedTag,
         kCommissionerPasscodeTag,
         kQRCodeDisplayedTag,
+        kCancelPasscodeTag,
 
         kMaxNum = UINT8_MAX
     };
@@ -417,6 +420,7 @@ private:
     bool mPasscodeDialogDisplayed = false;
     bool mCommissionerPasscode    = false;
     bool mQRCodeDisplayed         = false;
+    bool mCancelPasscode          = false;
 };
 
 class DLL_EXPORT InstanceNameResolver
@@ -451,6 +455,30 @@ public:
      *
      */
     virtual void OnUserDirectedCommissioningRequest(UDCClientState state) = 0;
+
+    /**
+     * @brief
+     *   Called when an Identification Declaration UDC message has been received
+     * with the cancel flag set.
+     * It is expected that the implementer will tear down any dialog prompts for the
+     * commissionee instance (identified in the UDC client state argument).
+     *
+     *  @param[in]    state           The state for the UDC Client.
+     *
+     */
+    virtual void OnCancel(UDCClientState state) = 0;
+
+    /**
+     * @brief
+     *   Called when an Identification Declaration UDC message has been received
+     * with the commissioner passcode ready flag set.
+     * It is expected that the implementer will invoke commissioning on the
+     * commissionee instance (identified in the UDC client state argument).
+     *
+     *  @param[in]    state           The state for the UDC Client.
+     *
+     */
+    virtual void OnCommissionerPasscodeReady(UDCClientState state) = 0;
 
     virtual ~UserConfirmationProvider() = default;
 };
@@ -515,11 +543,13 @@ public:
      */
     void SetCommissionerDeclarationHandler(CommissionerDeclarationHandler * commissionerDeclarationHandler)
     {
+        ChipLogProgress(AppServer, "UserDirectedCommissioningClient::SetCommissionerDeclarationHandler()");
         mCommissionerDeclarationHandler = commissionerDeclarationHandler;
     }
 
 private:
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * ctxt = nullptr) override;
 
     CommissionerDeclarationHandler * mCommissionerDeclarationHandler = nullptr;
 };
@@ -629,7 +659,11 @@ private:
     InstanceNameResolver * mInstanceNameResolver         = nullptr;
     UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void HandleNewUDC(const Transport::PeerAddress & source, IdentificationDeclaration & id);
+    void HandleUDCCancel(IdentificationDeclaration & id);
+    void HandleUDCCommissionerPasscodeReady(IdentificationDeclaration & id);
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * ctxt = nullptr) override;
 
     UDCClients<kMaxUDCClients> mUdcClients; // < Active UDC clients
 

@@ -24,8 +24,7 @@
 
 namespace Insights {
 
-/*
- *
+/**
  * This class is used to monotonically increment the counters as per the label of the counter macro
  * 'MATTER_TRACE_COUNTER(label)' and report the metrics to esp-insights.
  * As per the label of the counter macro, it adds the counter in the linked list with the name label if not
@@ -37,7 +36,7 @@ class ESPInsightsCounter
 {
 private:
     static ESPInsightsCounter * mHead; // head of the counter list
-    const char * label;                // unique key
+    const char * label;                // unique key ,it is used as a static string.
     int instanceCount;
     ESPInsightsCounter * mNext; // pointer to point to the next entry in the list
     bool registered = false;

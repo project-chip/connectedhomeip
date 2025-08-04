@@ -23,12 +23,14 @@
 #import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 
+#import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRServerAttribute.h>
 
 #include <app/reporting/reporting.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/SafeInt.h>
+#import <os/lock.h>
 
 using namespace chip;
 
@@ -56,6 +58,20 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
+    if (attrId == MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
+        // Some sanity checks: value should be an unsigned-integer NSNumber, and
+        // requiredReadPrivilege should be View.
+        if (requiredReadPrivilege != MTRAccessControlEntryPrivilegeView) {
+            MTR_LOG_ERROR("MTRServerAttribute for FeatureMap provided with invalid read privilege %d", requiredReadPrivilege);
+            return nil;
+        }
+
+        if (![MTRUnsignedIntegerValueType isEqual:value[MTRTypeKey]]) {
+            MTR_LOG_ERROR("MTRServerAttribute for FeatureMap provided with value that is not an unsigned integer: %@", value);
+            return nil;
+        }
+    }
+
     return [self initWithAttributeID:[attributeID copy] value:[value copy] requiredReadPrivilege:requiredReadPrivilege writable:writable];
 }
 
@@ -79,7 +95,8 @@ MTR_DIRECT_MEMBERS
     _writable = writable;
     _parentCluster = app::ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 
-    // Now call setValue to store the value and its serialization.
+    // Now store the value and its serialization. This will also check that the
+    // value is serializable to TLV.
     if ([self setValueInternal:value logIfNotAssociated:NO] == NO) {
         return nil;
     }
@@ -92,10 +109,21 @@ MTR_DIRECT_MEMBERS
     return [self setValueInternal:value logIfNotAssociated:YES];
 }
 
++ (MTRServerAttribute *)newFeatureMapAttributeWithInitialValue:(NSNumber *)value
+{
+    return [[MTRServerAttribute alloc] initReadonlyAttributeWithID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)
+                                                      initialValue:@{
+                                                          MTRTypeKey : MTRUnsignedIntegerValueType,
+                                                          MTRValueKey : value,
+                                                      }
+                                                 requiredPrivilege:MTRAccessControlEntryPrivilegeView];
+}
+
 - (BOOL)setValueInternal:(NSDictionary<NSString *, id> *)value logIfNotAssociated:(BOOL)logIfNotAssociated
 {
     id serializedValue;
     id dataType = value[MTRTypeKey];
+    NSUInteger maxChunkLength = 0;
     if ([MTRArrayValueType isEqual:dataType]) {
         id dataValue = value[MTRValueKey];
         if (![dataValue isKindOfClass:NSArray.class]) {
@@ -118,6 +146,7 @@ MTR_DIRECT_MEMBERS
             if (encodedItem == nil) {
                 return NO;
             }
+            maxChunkLength = std::max(maxChunkLength, encodedItem.length);
             [listValue addObject:encodedItem];
         }
         serializedValue = listValue;
@@ -127,6 +156,7 @@ MTR_DIRECT_MEMBERS
         if (serializedValue == nil) {
             return NO;
         }
+        maxChunkLength = [serializedValue length];
     }
 
     // We serialized properly, so should be good to go on the value.  Lock
@@ -135,14 +165,14 @@ MTR_DIRECT_MEMBERS
 
     _value = [value copy];
 
-    MTR_LOG_DEFAULT("Attribute value updated: %@", [self _descriptionWhileLocked]); // Logs new value as part of our description.
+    MTR_LOG("Attribute value updated (max chunk length %lu bytes): %@", static_cast<unsigned long>(maxChunkLength), [self _descriptionWhileLocked]); // Logs new value as part of our description.
 
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {
         // We're not bound to a controller, so safe to directly update
         // _serializedValue.
         if (logIfNotAssociated) {
-            MTR_LOG_DEFAULT("Not publishing value for attribute " ChipLogFormatMEI "; not bound to a controller",
+            MTR_LOG("Not publishing value for attribute " ChipLogFormatMEI "; not bound to a controller",
                 ChipLogValueMEI(static_cast<AttributeId>(_attributeID.unsignedLongLongValue)));
         }
         _serializedValue = serializedValue;
@@ -173,18 +203,14 @@ MTR_DIRECT_MEMBERS
 
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
         MTR_LOG_ERROR("Cannot associate MTRServerAttribute with controller %@; already associated with controller %@",
             controller.uniqueIdentifier, existingController.uniqueIdentifier);
-#else
-        MTR_LOG_ERROR("Cannot associate MTRServerAttribute with controller; already associated with a different controller");
-#endif
         return NO;
     }
 
     _deviceController = controller;
 
-    MTR_LOG_DEFAULT("Associated %@ with controller", [self _descriptionWhileLocked]);
+    MTR_LOG("Associated %@ with controller", [self _descriptionWhileLocked]);
 
     return YES;
 }

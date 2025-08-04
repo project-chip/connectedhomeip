@@ -62,7 +62,8 @@ private:
     uint16_t mLevelRemainingTime10sOfSec = 0;
 
     // Color control
-    uint8_t mColorMode               = kColorModeCurrentHueAndCurrentSaturation;
+    chip::app::Clusters::ColorControl::ColorModeEnum mColorMode =
+        chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation;
     uint8_t mColorHue                = 0;
     uint8_t mColorSaturation         = 0;
     uint16_t mColorX                 = 0;

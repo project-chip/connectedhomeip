@@ -2,9 +2,9 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
-ENV TIZEN_IOT_QEMU_KERNEL $TIZEN_SDK_ROOT/iot-qemu-virt-zImage
-ENV TIZEN_IOT_IMAGE_ROOT $TIZEN_SDK_ROOT/iot-rootfs.img
-ENV TIZEN_IOT_IMAGE_DATA $TIZEN_SDK_ROOT/iot-sysdata.img
+ENV TIZEN_IOT_QEMU_KERNEL=$TIZEN_SDK_ROOT/iot-qemu-virt-zImage
+ENV TIZEN_IOT_IMAGE_ROOT=$TIZEN_SDK_ROOT/iot-rootfs.img
+ENV TIZEN_IOT_IMAGE_DATA=$TIZEN_SDK_ROOT/iot-sysdata.img
 
 # ------------------------------------------------------------------------------
 # Switch to the root user so we could install things
@@ -16,10 +16,12 @@ RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     bc \
-    genisoimage \
     libgmp-dev \
     libmpc-dev \
+    patch \
     qemu-system-arm \
+    xz-utils \
+    gdb-multiarch \
     # Cleanup
     && apt-get clean \
     && rm -rf /var/lib/apt/lists \
@@ -38,27 +40,33 @@ RUN set -x \
     && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'rpi4-linux-kernel-*.src.rpm' \
     http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/source/ \
     # Prepare kernel source (Linux kernel + Tizen patchset)
-    && unrpm rpi4-linux-kernel-*.src.rpm \
+    && 7z x -so rpi4-linux-kernel-*.src.rpm | cpio -idmv \
     && rm rpi4-linux-kernel-*.src.rpm \
     && tar -xJf linux-kernel-*.tar.xz \
     && rm linux-kernel-*.tar.xz \
     && cd *linux-kernel-* \
     && zcat ../*-to-*.diff.gz | patch -p1 \
     && patch -p1 < $TIZEN_SDK_ROOT/files/0001-smack-add-permissive-mode.patch \
-    # Compile
+    # Configure
     && export MAKEFLAGS=-j$(nproc) \
     && export ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- \
     && make tizen_bcm2711_defconfig \
-    && ./scripts/config -e ARCH_VIRT \
-    && ./scripts/config -e VIRTIO_MMIO -e HW_RANDOM_VIRTIO \
+    # Add support for QEMU VirtIO devices
+    && ./scripts/config -e ARCH_VIRT -e VIRTIO_MMIO \
     && ./scripts/config -e VIRTIO_PCI -e VIRTIO_BLK \
     && ./scripts/config -e VIRTIO_NET -e VETH \
-    && ./scripts/config -e IKCONFIG -e IKCONFIG_PROC \
+    && ./scripts/config -e HW_RANDOM_VIRTIO \
+    # Use ARM PL031 RTC and synchronize time during boot
+    && ./scripts/config -e RTC_DRV_PL031 -e RTC_HCTOSYS \
+    # Enable vHCI driver to add support for Bluetooth virtualization
     && ./scripts/config -e BT_HCIVHCI -e CRYPTO_USER_API_HASH -e CRYPTO_USER_API_SKCIPHER \
-    && ./scripts/config -e OVERLAY_FS -e ISO9660_FS \
-    && ./scripts/config -e SECURITY_SMACK_PERMISSIVE_MODE \
+    # Enable overlay FS and disable SMACK to workaround permission issues
+    && ./scripts/config -e OVERLAY_FS -e SECURITY_SMACK_PERMISSIVE_MODE \
+    # Enable 9P filesystem support to share files between host and guest
+    && ./scripts/config -e INET -e PCI_HOST_GENERIC -e NET_9P -e NET_9P_VIRTIO -e 9P_FS \
     && make olddefconfig \
-    && make zImage \
+    # Compile
+    && make -j$(nproc) zImage \
     && mv arch/arm/boot/zImage $TIZEN_IOT_QEMU_KERNEL \
     # Cleanup
     && rm -rf /tmp/workdir \
@@ -84,6 +92,7 @@ RUN set -x \
     # Add extra libraries to the root image
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda copy-in \
     $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libasan.so.* \
+    $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libatomic.so.* \
     $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libubsan.so.* \
     $TIZEN_SDK_SYSROOT/usr/lib/libbluetooth-api.so.* \
     $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-bluetooth.so.* \
@@ -92,13 +101,13 @@ RUN set -x \
     /usr/lib/ \
     # Disable failing systemd services
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \
-    glob rm $SYSTEMD_SYSTEM/clone_partitions.service : \
-    glob rm $SYSTEMD_SYSTEM/deviced.service : \
-    glob rm $SYSTEMD_SYSTEM/mm-resource-managerd.service : \
-    glob rm $SYSTEMD_SYSTEM/mnt-inform.mount : \
-    glob rm $SYSTEMD_SYSTEM/muse-server.* : \
-    glob rm $SYSTEMD_SYSTEM/murphyd.service : \
-    glob rm $SYSTEMD_SYSTEM/pulseaudio.service \
+    rm-f $SYSTEMD_SYSTEM/clone_partitions.service : \
+    rm-f $SYSTEMD_SYSTEM/deviced.service : \
+    rm-f $SYSTEMD_SYSTEM/mm-resource-managerd.service : \
+    rm-f $SYSTEMD_SYSTEM/mnt-inform.mount : \
+    glob rm-f $SYSTEMD_SYSTEM/muse-server.* : \
+    rm-f $SYSTEMD_SYSTEM/murphyd.service : \
+    rm-f $SYSTEMD_SYSTEM/pulseaudio.service \
     # Mount Tizen system partition on /opt-ro instead of /opt
     && SYSTEMD_UNIT_OPT_RO_MOUNT=$SYSTEMD_SYSTEM/opt\\x2dro.mount \
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \
@@ -144,18 +153,23 @@ RUN set -x \
     "RemainAfterExit=yes\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_POST_MOUNT : \
     ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS \
-    # Mount Matter ISO image on startup
-    && SYSTEMD_UNIT_CHIP_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
+    # Mount using 9P at /mnt/chip
+    && SYSTEMD_UNIT_9P_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
     && echo -n \
     "[Unit]\n" \
-    "ConditionPathIsMountPoint=!/mnt/chip\n" \
+    "After=network.target\n" \
     "[Mount]\n" \
-    "What=/dev/disk/by-label/CHIP\n" \
+    "What=host0\n" \
     "Where=/mnt/chip\n" \
-    "Options=nofail\n" \
-    | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_CHIP_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_CHIP_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
+    "Type=9p\n" \
+    "Options=nofail,trans=virtio\n" \
+    | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_9P_MOUNT : \
+    ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
     mkdir /mnt/chip \
+    # Setup crash manager
+    && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda download /etc/crash-manager.conf crash-manager.conf \
+    && sed -i 's|# CrashRootPath=/usr/opt/share/crash/|CrashRootPath=/mnt/chip/|g' crash-manager.conf \
+    && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload crash-manager.conf /etc/crash-manager.conf \
     # Setup auto-login for root user
     && SYSTEMD_UNIT_SERIAL_GETTY=$SYSTEMD_SYSTEM/serial-getty@.service \
     && virt-edit $TIZEN_IOT_IMAGE_ROOT -e \
@@ -173,9 +187,13 @@ RUN set -x \
     && echo -n \
     "#!/bin/bash\n" \
     "grep -q 'rootshell' /proc/cmdline && exit\n" \
-    "if [[ -x /mnt/chip/runner.sh ]]; then\n" \
+    "runner=\$(grep -o 'runner=[^ ]*' /proc/cmdline | sed 's/runner=//')\n" \
+    "if [[ -z \"\$runner\" ]]; then\n" \
+    "  runner='/mnt/chip/runner.sh' \n" \
+    "fi\n" \
+    "if [[ -x \"\$runner\" ]]; then\n" \
     "  echo '### RUNNER START ###'\n" \
-    "  /mnt/chip/runner.sh\n" \
+    "  \"\$runner\"\n" \
     "  echo '### RUNNER STOP:' \$?\n" \
     "else\n" \
     "  read -r -t 5 -p 'Press ENTER to access root shell...' && exit || echo ' timeout.'\n" \
@@ -193,5 +211,5 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Switch back to the non-root user
-USER $USER_NAME
-WORKDIR $USER_HOME
+USER ubuntu
+WORKDIR /home/ubuntu

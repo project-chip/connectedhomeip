@@ -20,11 +20,10 @@
 
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
+#include <app/icd/client/RefreshKeySender.h>
 
 namespace chip {
 namespace app {
-
-using namespace std;
 
 class InteractionModelEngine;
 
@@ -35,6 +34,17 @@ public:
     virtual ~DefaultCheckInDelegate() {}
     CHIP_ERROR Init(ICDClientStorage * storage, InteractionModelEngine * engine);
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
+
+    /**
+     * @brief Callback used to let the application generate the new ICD symmetric key
+     *
+     * If this calback is not overridden, Crypto::DRBG_get_bytes will be used to generated the key.
+     *
+     * @param[inout] newKey sensitive data buffer with type Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length>
+     * @param[out] CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT
+     *                        CHIP_ERROR_INTERNAL
+     */
+    virtual CHIP_ERROR GenerateRefreshKey(RefreshKeySender::RefreshKeyBuffer & newKey);
     RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 

@@ -22,6 +22,7 @@
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/EventHeader.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/ReadClient.h>
@@ -58,6 +59,7 @@ typedef void (^OnDoneHandler)(void);
 typedef void (^UnsolicitedMessageFromPublisherHandler)(void);
 typedef void (^ReportBeginHandler)(void);
 typedef void (^ReportEndHandler)(void);
+typedef void (^CASESessionEstablishedHandler)(const chip::SessionHandle & session);
 
 class MTRBaseSubscriptionCallback : public chip::app::ClusterStateCache::Callback {
 public:
@@ -65,7 +67,8 @@ public:
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionCallback,
         SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler,
         UnsolicitedMessageFromPublisherHandler _Nullable unsolicitedMessageFromPublisherHandler = nil,
-        ReportBeginHandler _Nullable reportBeginHandler = nil, ReportEndHandler _Nullable reportEndHandler = nil)
+        ReportBeginHandler _Nullable reportBeginHandler = nil, ReportEndHandler _Nullable reportEndHandler = nil,
+        CASESessionEstablishedHandler _Nullable caseSessionEstablishedHandler = nil)
         : mAttributeReportCallback(attributeReportCallback)
         , mEventReportCallback(eventReportCallback)
         , mErrorCallback(errorCallback)
@@ -76,6 +79,7 @@ public:
         , mUnsolicitedMessageFromPublisherHandler(unsolicitedMessageFromPublisherHandler)
         , mReportBeginHandler(reportBeginHandler)
         , mReportEndHandler(reportEndHandler)
+        , mCASESessionEstablishedHandler(caseSessionEstablishedHandler)
     {
     }
 
@@ -93,15 +97,18 @@ public:
 
     chip::app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
+    // Methods to clear state from our cluster state cache.  Must be called on
+    // the Matter queue.
+    void ClearCachedAttributeState(chip::EndpointId aEndpoint);
+    void ClearCachedAttributeState(const chip::app::ConcreteClusterPath & aCluster);
+    void ClearCachedAttributeState(const chip::app::ConcreteAttributePath & aAttribute);
+
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
     void AdoptReadClient(std::unique_ptr<chip::app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
     void AdoptClusterStateCache(std::unique_ptr<chip::app::ClusterStateCache> aClusterStateCache)
     {
         mClusterStateCache = std::move(aClusterStateCache);
     }
-
-    // Used to reset Resubscription backoff on events that indicate likely availability of device to come back online
-    void ResetResubscriptionBackoff() { mResubscriptionNumRetries = 0; }
 
 protected:
     // Report an error, which may be due to issues in our own internal state or
@@ -135,17 +142,21 @@ private:
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override;
 
-    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
-
     CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
     void OnUnsolicitedMessageFromPublisher(chip::app::ReadClient * apReadClient) override;
+
+    void OnCASESessionEstablished(const chip::SessionHandle & aSession, chip::app::ReadPrepareParams & aSubscriptionParams) override;
 
     void ReportData();
 
 protected:
     NSMutableArray * _Nullable mAttributeReports = nil;
     NSMutableArray * _Nullable mEventReports = nil;
+
+    void CallResubscriptionScheduledHandler(NSError * error, NSNumber * resubscriptionDelay);
+
+    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
 
 private:
     DataReportCallback _Nullable mAttributeReportCallback = nil;
@@ -158,6 +169,8 @@ private:
     UnsolicitedMessageFromPublisherHandler _Nullable mUnsolicitedMessageFromPublisherHandler = nil;
     ReportBeginHandler _Nullable mReportBeginHandler = nil;
     ReportEndHandler _Nullable mReportEndHandler = nil;
+    CASESessionEstablishedHandler _Nullable mCASESessionEstablishedHandler = nil;
+
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 
     // Our lifetime management is a little complicated.  On errors that don't
@@ -181,10 +194,6 @@ private:
     bool mHaveQueuedDeletion = false;
     OnDoneHandler _Nullable mOnDoneHandler = nil;
     dispatch_block_t mInterimReportBlock = nil;
-
-    // Copied from ReadClient and customized for
-    uint32_t ComputeTimeTillNextSubscription();
-    uint32_t mResubscriptionNumRetries = 0;
 };
 
 NS_ASSUME_NONNULL_END

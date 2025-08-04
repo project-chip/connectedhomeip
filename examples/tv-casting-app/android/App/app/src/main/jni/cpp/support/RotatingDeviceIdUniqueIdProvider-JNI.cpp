@@ -82,7 +82,7 @@ MutableByteSpan * RotatingDeviceIdUniqueIdProviderJNI::Get()
     ChipLogProgress(AppServer, "RotatingDeviceIdUniqueIdProviderJNI.Get() called");
     mRotatingDeviceIdUniqueIdSpan = MutableByteSpan(mRotatingDeviceIdUniqueId);
     CHIP_ERROR err                = GetJavaByteByMethod(mGetMethod, mRotatingDeviceIdUniqueIdSpan);
-    VerifyOrReturnValue(err != CHIP_NO_ERROR, nullptr,
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                         ChipLogError(AppServer, "Error calling GetJavaByteByMethod %" CHIP_ERROR_FORMAT, err.Format()));
     return &mRotatingDeviceIdUniqueIdSpan;
 }

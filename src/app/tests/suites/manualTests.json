@@ -64,7 +64,6 @@
         "Test_TC_DA_1_8"
     ],
     "DishwasherAlarm": [
-        "Test_TC_DISHALM_1_1",
         "Test_TC_DISHALM_2_1",
         "Test_TC_DISHALM_3_1",
         "Test_TC_DISHALM_3_2",
@@ -74,7 +73,6 @@
         "Test_TC_DISHALM_3_6"
     ],
     "DishwasherMode": [
-        "Test_TC_DISHM_1_1",
         "Test_TC_DISHM_1_2",
         "Test_TC_DISHM_2_1",
         "Test_TC_DISHM_3_1",
@@ -84,28 +82,22 @@
     "DeviceManagement": [
         "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
-        "Test_TC_OPCREDS_3_2",
         "Test_TC_OPCREDS_3_3",
         "Test_TC_OPCREDS_3_4",
-        "Test_TC_OPCREDS_3_5",
         "Test_TC_OPCREDS_3_6",
         "Test_TC_CNET_4_1",
         "Test_TC_CNET_4_2",
         "Test_TC_CNET_4_3",
-        "Test_TC_CNET_4_4",
         "Test_TC_CNET_4_5",
         "Test_TC_CNET_4_6",
         "Test_TC_CNET_4_9",
         "Test_TC_CNET_4_10",
         "Test_TC_CNET_4_11",
-        "Test_TC_CNET_4_12",
         "Test_TC_CNET_4_13",
         "Test_TC_CNET_4_14",
-        "Test_TC_CNET_4_15",
         "Test_TC_CNET_4_16",
         "Test_TC_CNET_4_20",
-        "Test_TC_CNET_4_21",
-        "Test_TC_CNET_4_22"
+        "Test_TC_CNET_4_21"
     ],
     "DiagnosticsLogs": [
         "Test_TC_DLOG_2_1",
@@ -119,14 +111,7 @@
     "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_2_2"],
     "Identify": ["Test_TC_I_3_2"],
-    "IcdManagement": [
-        "Test_TC_ICDM_2_2",
-        "Test_TC_ICDM_3_1",
-        "Test_TC_ICDM_3_2",
-        "Test_TC_ICDM_3_3",
-        "Test_TC_ICDM_4_1",
-        "Test_TC_ICDM_5_1"
-    ],
+    "IcdManagement": [],
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
@@ -135,7 +120,6 @@
         "Test_TC_IDM_3_1",
         "Test_TC_IDM_3_2",
         "Test_TC_IDM_4_1",
-        "Test_TC_IDM_4_2",
         "Test_TC_IDM_4_3",
         "Test_TC_IDM_4_4",
         "Test_TC_IDM_5_1",
@@ -172,38 +156,23 @@
         "Test_TC_MC_11_2",
         "Test_TC_ALOGIN_12_2",
         "Test_TC_TGTNAV_8_2",
-        "Test_TC_APPOBSERVER_1_13",
         "Test_TC_APPOBSERVER_13_1",
-        "Test_TC_APPOBSERVER_13_2",
-        "Test_TC_CONCON_1_14"
+        "Test_TC_APPOBSERVER_13_2"
     ],
     "MultipleFabrics": [
         "Test_TC_CADMIN_1_1",
         "Test_TC_CADMIN_1_2",
         "Test_TC_CADMIN_1_7",
         "Test_TC_CADMIN_1_8",
-        "Test_TC_CADMIN_1_11",
         "Test_TC_CADMIN_1_12",
         "Test_TC_CADMIN_1_14",
-        "Test_TC_CADMIN_1_15",
         "Test_TC_CADMIN_1_16",
         "Test_TC_CADMIN_1_17",
         "Test_TC_CADMIN_1_18",
-        "Test_TC_CADMIN_1_19",
-        "Test_TC_CADMIN_1_20",
-        "Test_TC_CADMIN_1_21",
-        "Test_TC_CADMIN_1_22",
-        "Test_TC_CADMIN_1_3",
-        "Test_TC_CADMIN_1_4",
-        "Test_TC_CADMIN_1_5",
         "Test_TC_CADMIN_1_6",
-        "Test_TC_CADMIN_1_9",
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
-        "Test_TC_CADMIN_1_23",
-        "Test_TC_CADMIN_1_24",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26"
+        "Test_TC_CADMIN_1_25"
     ],
     "ModeSelect": ["Test_TC_MOD_1_2", "Test_TC_MOD_1_3", "Test_TC_MOD_2_2"],
     "OTASoftwareUpdate": [
@@ -240,7 +209,6 @@
         "Test_TC_SC_3_4",
         "Test_TC_SC_4_1",
         "Test_TC_SC_4_2",
-        "Test_TC_SC_4_3",
         "Test_TC_SC_4_4",
         "Test_TC_SC_4_5",
         "Test_TC_SC_4_6",
@@ -287,7 +255,7 @@
         "Test_TC_TCCM_1_2",
         "Test_TC_TCCM_2_1"
     ],
-    "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
+    "Switch": ["Test_TC_SWTCH_3_2"],
     "TemperatureControl": [],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_2"],

@@ -18,13 +18,6 @@
 #      Some useful defaults for the demo app configuration.
 #
 
-# Default to 921600 baud when flashing and monitoring device
-CONFIG_ESPTOOLPY_BAUD_921600B=y
-CONFIG_ESPTOOLPY_BAUD=921600
-CONFIG_ESPTOOLPY_COMPRESSED=y
-CONFIG_ESPTOOLPY_MONITOR_BAUD_115200B=y
-CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
-
 #enable BT
 CONFIG_BT_ENABLED=y
 CONFIG_BT_NIMBLE_ENABLED=y
@@ -64,3 +57,27 @@ CONFIG_DISABLE_READ_CLIENT=y
 
 # Increase LwIP IPv6 address number
 CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
+
+# Enable sntp time sync
+CONFIG_ENABLE_SNTP_TIME_SYNC=y
+
+# Enable EVSE device on EP1
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_EVSE=y
+
+# Enable test triggers used by the Device Energy Management tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=y
+
+# Enable test triggers used by the Evse tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=y
+
+# Enable test triggers used by the Water Heater Management tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=y
+
+# Enable test triggers used by the Electrical Reporting tests
+CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=y
+
+# Ensure kPowerForecastReporting (PFR) is set in the DeviceEnergyManagement::Feature attribute. Note cannot set PFR and SFR.
+CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING=y
+
+# Enable OTA Requestor
+CONFIG_ENABLE_OTA_REQUESTOR=y

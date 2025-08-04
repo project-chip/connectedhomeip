@@ -36,16 +36,16 @@ CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryF
     mDNSResolver.Shutdown(); // reset if already inited
     ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
 #endif
-    mDNSResolver.SetCommissioningDelegate(this);
+    mDNSResolver.SetDiscoveryDelegate(this);
     return mDNSResolver.DiscoverCommissioners(discoveryFilter);
 }
 
 CommissionableNodeController::~CommissionableNodeController()
 {
-    mDNSResolver.SetCommissioningDelegate(nullptr);
+    mDNSResolver.SetDiscoveryDelegate(nullptr);
 }
 
-const Dnssd::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
+const Dnssd::CommissionNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
 {
     return GetDiscoveredNode(idx);
 }

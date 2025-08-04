@@ -16,6 +16,9 @@ name: Full builds - Android
 
 on:
     push:
+        branches:
+            - master
+            - 'v*-branch'
     workflow_dispatch:
 
 concurrency:
@@ -24,19 +27,19 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     full_android:
         name: Run
 
         env:
-            JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
+            JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64/
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:35
+            image: ghcr.io/project-chip/chip-build-android:153
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -107,7 +110,9 @@ jobs:
                     "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
             - name: Clean out build output
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
-            # - name: Build Android Studio build (arm64 only)
-            #   run: |
-            #     ./scripts/run_in_build_env.sh \
-            #       "./scripts/build/build_examples.py --target android-androidstudio-arm64-chip-tool  build"
+            - name: Build Android arm64-chip-test
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm64-chip-test build"
+            - name: Clean out build output
+              run: rm -rf ./out examples/android/CHIPTest/app/libs/jniLibs/* examples/android/CHIPTest/app/libs/*.jar

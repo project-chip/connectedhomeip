@@ -36,6 +36,7 @@
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <platform/ConnectivityManager.h>
+#include <tracing/metric_event.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck
@@ -46,6 +47,8 @@ using namespace chip::System::Clock::Literals;
 
 namespace chip {
 namespace Messaging {
+
+System::Clock::Timeout ReliableMessageMgr::sAdditionalMRPBackoffTime = CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
 
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext * rc) :
     ec(*rc->GetExchangeContext()), nextRetransTime(0), sendCount(0)
@@ -98,6 +101,46 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 #endif
 }
 
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & entry, const SessionHandle & sessionHandle,
+                                                    const ReliableMessageAnalyticsDelegate::EventType & eventType)
+{
+    // For now we only support sending analytics for messages being sent over an established CASE session.
+    if (!mAnalyticsDelegate || !sessionHandle->IsSecureSession())
+    {
+        return;
+    }
+
+    auto secureSession = sessionHandle->AsSecureSession();
+    if (!secureSession->IsCASESession())
+    {
+        return;
+    }
+
+    uint32_t messageCounter                               = entry.retainedBuf.GetMessageCounter();
+    auto fabricIndex                                      = sessionHandle->GetFabricIndex();
+    auto destination                                      = secureSession->GetPeerNodeId();
+    ReliableMessageAnalyticsDelegate::TransmitEvent event = { .nodeId      = destination,
+                                                              .fabricIndex = fabricIndex,
+                                                              .sessionType =
+                                                                  ReliableMessageAnalyticsDelegate::SessionType::kEstablishedCase,
+                                                              .eventType      = eventType,
+                                                              .messageCounter = messageCounter };
+
+    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kRetransmission)
+    {
+        event.retransmissionCount = entry.sendCount;
+    }
+    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kAcknowledged)
+    {
+        auto now           = System::SystemClock().GetMonotonicTimestamp();
+        event.ackLatencyMs = now - entry.initialSentTime;
+    }
+
+    mAnalyticsDelegate->OnTransmitEvent(event);
+}
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
 void ReliableMessageMgr::ExecuteActions()
 {
     System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
@@ -126,9 +169,18 @@ void ReliableMessageMgr::ExecuteActions()
 
         VerifyOrDie(!entry->retainedBuf.IsNull());
 
+        // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
+        // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
+        auto session      = entry->ec->GetSessionHandle();
         uint8_t sendCount = entry->sendCount;
-#if CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
+#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING
         uint32_t messageCounter = entry->retainedBuf.GetMessageCounter();
+        auto fabricIndex        = session->GetFabricIndex();
+        auto destination        = kUndefinedNodeId;
+        if (session->IsSecureSession())
+        {
+            destination = session->AsSecureSession()->GetPeerNodeId();
+        }
 #endif // CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
 
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
@@ -137,13 +189,15 @@ void ReliableMessageMgr::ExecuteActions()
             ExchangeHandle ec(entry->ec);
 
             ChipLogError(ExchangeManager,
-                         "Failed to Send CHIP MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
-                         " sendCount: %u max retries: %d",
-                         messageCounter, ChipLogValueExchange(&ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+                         "<<%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                         "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " failure (max retries:%d)",
+                         sendCount + 1, ChipLogValueExchange(&entry->ec.Get()), session->SessionIdForLogging(), messageCounter,
+                         Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination),
+                         CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
-            // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
-            // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
-            SessionHandle session = ec->GetSessionHandle();
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+            NotifyMessageSendAnalytics(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kFailed);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
             // If the exchange is expecting a response, it will handle sending
             // this notification once it detects that it has not gotten a
@@ -154,7 +208,7 @@ void ReliableMessageMgr::ExecuteActions()
                 {
                     session->AsSecureSession()->MarkAsDefunct();
                 }
-                session->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+                session->NotifySessionHang();
             }
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
@@ -164,12 +218,14 @@ void ReliableMessageMgr::ExecuteActions()
         }
 
         entry->sendCount++;
-        ChipLogProgress(ExchangeManager,
-                        "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
-                        " Send Cnt %d",
-                        messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
 
-        CalculateNextRetransTime(*entry);
+        ChipLogProgress(ExchangeManager,
+                        "<<%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                        "] (%s) Msg Retransmission to %u:" ChipLogFormatX64,
+                        entry->sendCount, ChipLogValueExchange(&entry->ec.Get()), session->SessionIdForLogging(), messageCounter,
+                        Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination));
+        MATTER_LOG_METRIC(Tracing::kMetricDeviceRMPRetryCount, entry->sendCount);
+
         SendFromRetransTable(entry);
 
         return Loop::Continue;
@@ -197,7 +253,7 @@ void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
 
 CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry)
 {
-    VerifyOrDie(!rc->IsWaitingForAck());
+    VerifyOrReturnError(!rc->IsWaitingForAck(), CHIP_ERROR_INCORRECT_STATE);
 
     *rEntry = mRetransTable.CreateObject(rc);
     if (*rEntry == nullptr)
@@ -209,8 +265,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     return CHIP_NO_ERROR;
 }
 
-System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount,
-                                                        bool computeMaxPossible)
+System::Clock::Timeout ReliableMessageMgr::GetBackoff(System::Clock::Timeout baseInterval, uint8_t sendCount,
+                                                      bool computeMaxPossible)
 {
     // See section "4.11.8. Parameters and Constants" for the parameters below:
     // MRP_BACKOFF_JITTER = 0.25
@@ -223,14 +279,16 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     constexpr uint32_t MRP_BACKOFF_BASE_DENOMINATOR = 10;
     constexpr int MRP_BACKOFF_THRESHOLD             = 1;
 
-    // Implement `i = MRP_BACKOFF_MARGIN * i` from section "4.11.2.1. Retransmissions", where:
-    //   i == baseInterval
-    baseInterval = baseInterval * MRP_BACKOFF_MARGIN_NUMERATOR / MRP_BACKOFF_MARGIN_DENOMINATOR;
+    // Implement `i = MRP_BACKOFF_MARGIN * i` from section "4.12.2.1. Retransmissions", where:
+    //   i == interval
+    System::Clock::Milliseconds64 interval = baseInterval;
+    interval *= MRP_BACKOFF_MARGIN_NUMERATOR;
+    interval /= MRP_BACKOFF_MARGIN_DENOMINATOR;
 
     // Implement:
     //   mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD)) * (1.0 + random(0,1) * MRP_BACKOFF_JITTER)
-    // from section "4.11.2.1. Retransmissions", where:
-    //   i == baseInterval
+    // from section "4.12.2.1. Retransmissions", where:
+    //   i == interval
     //   n == sendCount
 
     // 1. Calculate exponent `max(0,n−MRP_BACKOFF_THRESHOLD)`
@@ -250,7 +308,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
         backoffDenom *= MRP_BACKOFF_BASE_DENOMINATOR;
     }
 
-    System::Clock::Timestamp mrpBackoffTime = baseInterval * backoffNum / backoffDenom;
+    System::Clock::Milliseconds64 mrpBackoffTime = interval * backoffNum / backoffDenom;
 
     // 3. Calculate `mrpBackoffTime *= (1.0 + random(0,1) * MRP_BACKOFF_JITTER)`
     uint32_t jitter = MRP_BACKOFF_JITTER_BASE + (computeMaxPossible ? UINT8_MAX : Crypto::GetRandU8());
@@ -263,14 +321,18 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     mrpBackoffTime += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
 
-    mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+    mrpBackoffTime += sAdditionalMRPBackoffTime;
 
-    return mrpBackoffTime;
+    return std::chrono::duration_cast<System::Clock::Timeout>(mrpBackoffTime);
 }
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     CalculateNextRetransTime(*entry);
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    entry->initialSentTime = System::SystemClock().GetMonotonicTimestamp();
+    NotifyMessageSendAnalytics(*entry, entry->ec->GetSessionHandle(), ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     StartTimer();
 }
 
@@ -280,6 +342,11 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, ui
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         if (entry->ec->GetReliableMessageContext() == rc && entry->retainedBuf.GetMessageCounter() == ackMessageCounter)
         {
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+            auto session = entry->ec->GetSessionHandle();
+            NotifyMessageSendAnalytics(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
             // Clear the entry from the retransmision table.
             ClearRetransTable(*entry);
 
@@ -316,9 +383,15 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
+        CalculateNextRetransTime(*entry);
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+        NotifyMessageSendAnalytics(*entry, entry->ec->GetSessionHandle(),
+                                   ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange
@@ -425,6 +498,13 @@ void ReliableMessageMgr::RegisterSessionUpdateDelegate(SessionUpdateDelegate * s
     mSessionUpdateDelegate = sessionUpdateDelegate;
 }
 
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+void ReliableMessageMgr::RegisterAnalyticsDelegate(ReliableMessageAnalyticsDelegate * analyticsDelegate)
+{
+    mAnalyticsDelegate = analyticsDelegate;
+}
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
 CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeId, bool isInitiator)
 {
     if (
@@ -453,25 +533,58 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
     return error;
 }
 
+void ReliableMessageMgr::SetAdditionalMRPBackoffTime(const Optional<System::Clock::Timeout> & additionalTime)
+{
+    sAdditionalMRPBackoffTime = additionalTime.ValueOr(CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST);
+}
+
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
-    System::Clock::Timestamp baseTimeout = System::Clock::Milliseconds64(0);
+    System::Clock::Timeout baseTimeout = System::Clock::Timeout(0);
+    const auto sessionHandle           = entry.ec->GetSessionHandle();
 
     // Check if we have received at least one application-level message
     if (entry.ec->HasReceivedAtLeastOneMessage())
     {
         // If we have received at least one message, assume peer is active and use ActiveRetransTimeout
-        baseTimeout = entry.ec->GetSessionHandle()->GetRemoteMRPConfig().mActiveRetransTimeout;
+        baseTimeout = sessionHandle->GetRemoteMRPConfig().mActiveRetransTimeout;
     }
     else
     {
         // If we haven't received at least one message
         // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
-        baseTimeout = entry.ec->GetSessionHandle()->GetMRPBaseTimeout();
+        baseTimeout = sessionHandle->GetMRPBaseTimeout();
     }
 
-    System::Clock::Timestamp backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
-    entry.nextRetransTime            = System::SystemClock().GetMonotonicTimestamp() + backoff;
+    System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
+    entry.nextRetransTime          = System::SystemClock().GetMonotonicTimestamp() + backoff;
+
+#if CHIP_PROGRESS_LOGGING
+    const auto config       = sessionHandle->GetRemoteMRPConfig();
+    uint32_t messageCounter = entry.retainedBuf.GetMessageCounter();
+    auto fabricIndex        = sessionHandle->GetFabricIndex();
+    auto destination        = kUndefinedNodeId;
+    bool peerIsActive       = false;
+
+    if (sessionHandle->IsSecureSession())
+    {
+        peerIsActive = sessionHandle->AsSecureSession()->IsPeerActive();
+        destination  = sessionHandle->AsSecureSession()->GetPeerNodeId();
+    }
+    else if (sessionHandle->IsUnauthenticatedSession())
+    {
+        peerIsActive = sessionHandle->AsUnauthenticatedSession()->IsPeerActive();
+    }
+
+    ChipLogProgress(ExchangeManager,
+                    "??%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                    "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " scheduled for %" PRIu32
+                    "ms from now [State:%s II:%" PRIu32 " AI:%" PRIu32 " AT:%u]",
+                    entry.sendCount + 1, ChipLogValueExchange(&entry.ec.Get()), sessionHandle->SessionIdForLogging(),
+                    messageCounter, Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
+                    backoff.count(), peerIsActive ? "Active" : "Idle", config.mIdleRetransTimeout.count(),
+                    config.mActiveRetransTimeout.count(), config.mActiveThresholdTime.count());
+#endif // CHIP_PROGRESS_LOGGING
 }
 
 #if CHIP_CONFIG_TEST

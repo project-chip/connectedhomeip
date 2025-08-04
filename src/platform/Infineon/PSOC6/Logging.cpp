@@ -25,7 +25,7 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-#if P6_LOG_ENABLED && _CHIP_USE_LOGGING
+#if PSOC6_LOG_ENABLED && _CHIP_USE_LOGGING
     printf("CHIP:%s: ", module);
     vprintf(msg, v);
     printf("\n");
@@ -34,11 +34,11 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 #endif
 }
 
-extern "C" void P6Log(const char * aFormat, ...)
+extern "C" void PSOC6Log(const char * aFormat, ...)
 {
     va_list v;
     va_start(v, aFormat);
-    LogV("P6", chip::Logging::kLogCategory_Progress, aFormat, v);
+    LogV("PSOC6", chip::Logging::kLogCategory_Progress, aFormat, v);
     va_end(v);
 }
 

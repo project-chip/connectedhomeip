@@ -14,15 +14,7 @@
 
 import("ti_simplelink_board.gni")
 
-if (ti_simplelink_device_family == "cc13x2_26x2" ||
-    ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-  arm_arch = "armv7e-m"
-  arm_abi = "aapcs"
-  arm_cpu = "cortex-m4"
-  arm_float_abi = "hard"
-  arm_fpu = "fpv5-sp-d16"
-  arm_use_thumb = true
-} else if (ti_simplelink_device_family == "cc13x4_26x4") {
+if (ti_simplelink_device_family == "cc13x4_26x4") {
   arm_arch = ""
   arm_abi = ""
   arm_cpu = "cortex-m33"

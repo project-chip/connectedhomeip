@@ -17,8 +17,6 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRTestPerControllerStorage : NSObject <MTRDeviceControllerStorageDelegate>
@@ -40,8 +38,20 @@ NS_ASSUME_NONNULL_BEGIN
     removeValueForKey:(NSString *)key
         securityLevel:(MTRStorageSecurityLevel)securityLevel
           sharingType:(MTRStorageSharingType)sharingType;
+
+// For testing - direct access to the current count of keys in storage
+@property (nonatomic, readonly) NSUInteger count;
+@end
+
+@interface MTRTestPerControllerStorageWithBulkReadWrite : MTRTestPerControllerStorage
+- (nullable NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller
+                                                                 securityLevel:(MTRStorageSecurityLevel)securityLevel
+                                                                   sharingType:(MTRStorageSharingType)sharingType;
+- (BOOL)controller:(MTRDeviceController *)controller
+       storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values
+     securityLevel:(MTRStorageSecurityLevel)securityLevel
+       sharingType:(MTRStorageSharingType)sharingType;
+
 @end
 
 NS_ASSUME_NONNULL_END
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED

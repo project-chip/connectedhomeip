@@ -27,13 +27,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
 
@@ -78,8 +71,13 @@ using namespace chip::Inet;
 
 System::LayerImpl gSystemLayer;
 
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
 Inet::UDPEndPointManagerImpl gUDP;
+#endif
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 Inet::TCPEndPointManagerImpl gTCP;
+#endif
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static sys_mbox_t * sLwIPEventQueue   = NULL;
@@ -181,7 +179,7 @@ void ShutdownSystemLayer()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static void PrintNetworkState()
 {
-    char intfName[chip::Inet::InterfaceId::kMaxIfNameLength];
+    char intfName[InterfaceId::kMaxIfNameLength];
 
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
@@ -336,9 +334,12 @@ void InitNetwork()
     AcquireLwIP();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
-
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     gTCP.Init(gSystemLayer);
+#endif
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
     gUDP.Init(gSystemLayer);
+#endif
 }
 
 void ServiceEvents(uint32_t aSleepTimeMilliseconds)
@@ -357,24 +358,30 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         }
     }
 
+#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
     // Start a timer (with a no-op callback) to ensure that WaitForEvents() does not block longer than aSleepTimeMilliseconds.
     gSystemLayer.StartTimer(
         System::Clock::Milliseconds32(aSleepTimeMilliseconds), [](System::Layer *, void *) -> void {}, nullptr);
+#endif
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
     gSystemLayer.PrepareEvents();
     gSystemLayer.WaitForEvents();
     gSystemLayer.HandleEvents();
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    gSystemLayer.HandleDispatchQueueEvents(System::Clock::Milliseconds32(aSleepTimeMilliseconds));
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (gSystemLayer.IsInitialized())
     {
         static uint32_t sRemainingSystemLayerEventDelay = 0;
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
-#if CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
+#if CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
             // We need to terminate event loop after performance single step.
             // Event loop processing work items until StopEventLoopTask is called.
             // Scheduling StopEventLoop task guarantees correct operation of the loop.
@@ -389,7 +396,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         gSystemLayer.HandlePlatformTimer();
     }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
@@ -420,17 +427,21 @@ static void OnLwIPInitComplete(void * arg)
 
 void ShutdownNetwork()
 {
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     gTCP.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> Loop {
         gTCP.ReleaseEndPoint(lEndPoint);
         return Loop::Continue;
     });
     gTCP.Shutdown();
-
+#endif
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
     gUDP.ForEachEndPoint([](UDPEndPoint * lEndPoint) -> Loop {
         gUDP.ReleaseEndPoint(lEndPoint);
         return Loop::Continue;
     });
     gUDP.Shutdown();
+#endif
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
     ReleaseLwIP();
 #endif

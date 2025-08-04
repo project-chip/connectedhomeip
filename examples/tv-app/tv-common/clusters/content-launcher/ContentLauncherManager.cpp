@@ -20,13 +20,15 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 
-using namespace std;
+#include <list>
+#include <string>
+
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 
-ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
+ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
 {
     mAcceptHeaderList            = acceptHeaderList;
     mSupportedStreamingProtocols = supportedStreamingProtocols;
@@ -100,7 +102,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
                                                  bool useCurrentContext)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
-    string dataString(data.data(), data.size());
+    std::string dataString(data.data(), data.size());
 
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent TEST CASE autoplay=%d data=%s ", (autoplay ? 1 : 0),
                     dataString.c_str());
@@ -119,8 +121,8 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
             {
                 if (parameter.type == parameterType.type)
                 {
-                    string val1(parameter.value.data(), parameter.value.size());
-                    string val2(parameterType.value.data(), parameterType.value.size());
+                    std::string val1(parameter.value.data(), parameter.value.size());
+                    std::string val2(parameterType.value.data(), parameterType.value.size());
                     if (strcmp(val1.c_str(), val2.c_str()) == 0)
                     {
                         ChipLogProgress(Zcl, " TEST CASE found match=%s type=%d", contentEntry.mName.c_str(),
@@ -149,9 +151,9 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
-    string contentUrlString(contentUrl.data(), contentUrl.size());
-    string displayStringString(displayString.data(), displayString.size());
-    string providerNameString(brandingInformation.providerName.data(), brandingInformation.providerName.size());
+    std::string contentUrlString(contentUrl.data(), contentUrl.size());
+    std::string displayStringString(displayString.data(), displayString.size());
+    std::string providerNameString(brandingInformation.providerName.data(), brandingInformation.providerName.size());
 
     ChipLogProgress(
         Zcl, "ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=%s DisplayString=%s BrandingInformation.ProviderName=%s",

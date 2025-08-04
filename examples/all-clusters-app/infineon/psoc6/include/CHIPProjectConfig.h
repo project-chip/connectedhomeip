@@ -42,10 +42,10 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8003
 
 /* The ProductName attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "P6-CYW43012 All Clusters"
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "PSOC6-CYW43012 All Clusters"
 
 /* The HardwareVersionString attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "P6-43012"
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "PSOC6-43012"
 
 /* The HardwareVersion attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION 43012
@@ -108,3 +108,8 @@
 // All clusters app has 3 group endpoints. This needs to defined here so that
 // CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
+
+// Enable `Extension` attribute of ACL Cluster
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+#endif

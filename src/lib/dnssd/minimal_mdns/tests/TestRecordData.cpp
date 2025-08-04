@@ -14,22 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 
 #include <string>
 #include <vector>
 
-#include <lib/support/UnitTestRegistration.h>
+#include <pw_unit_test/framework.h>
 
-#include <nlunit-test.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 namespace {
 
-using namespace std;
 using namespace chip;
 using namespace mdns::Minimal;
 
-void SrvRecordSimpleParsing(nlTestSuite * inSuite, void * inContext)
+TEST(TestRecordData, SrvRecordSimpleParsing)
 {
     const uint8_t record[] = {
         0,    12,                       // Priority
@@ -46,27 +46,27 @@ void SrvRecordSimpleParsing(nlTestSuite * inSuite, void * inContext)
 
     SrvRecord srv;
 
-    NL_TEST_ASSERT(inSuite, srv.Parse(data, packet));
-    NL_TEST_ASSERT(inSuite, srv.GetPriority() == 12);
-    NL_TEST_ASSERT(inSuite, srv.GetWeight() == 3);
-    NL_TEST_ASSERT(inSuite, srv.GetPort() == 0x1234);
+    EXPECT_TRUE(srv.Parse(data, packet));
+    EXPECT_EQ(srv.GetPriority(), 12);
+    EXPECT_EQ(srv.GetWeight(), 3);
+    EXPECT_EQ(srv.GetPort(), 0x1234);
 
     // name can be read several times
     for (int i = 0; i < 3; i++)
     {
         SerializedQNameIterator name = srv.GetName();
 
-        NL_TEST_ASSERT(inSuite, name.Next());
-        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
-        NL_TEST_ASSERT(inSuite, name.Next());
-        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
-        NL_TEST_ASSERT(inSuite, name.Next());
-        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "local") == 0);
-        NL_TEST_ASSERT(inSuite, name.Next() == false);
+        EXPECT_TRUE(name.Next());
+        EXPECT_STREQ(name.Value(), "some");
+        EXPECT_TRUE(name.Next());
+        EXPECT_STREQ(name.Value(), "test");
+        EXPECT_TRUE(name.Next());
+        EXPECT_STREQ(name.Value(), "local");
+        EXPECT_EQ(name.Next(), false);
     }
 }
 
-void SrvWithPtrRecord(nlTestSuite * inSuite, void * inContext)
+TEST(TestRecordData, SrvWithPtrRecord)
 {
     const uint8_t record[] = {
         'x',  'y',  'z',           // dummy data (3 bytes)
@@ -86,27 +86,27 @@ void SrvWithPtrRecord(nlTestSuite * inSuite, void * inContext)
 
     SrvRecord srv;
 
-    NL_TEST_ASSERT(inSuite, srv.Parse(data, packet));
-    NL_TEST_ASSERT(inSuite, srv.GetPriority() == 12);
-    NL_TEST_ASSERT(inSuite, srv.GetWeight() == 3);
-    NL_TEST_ASSERT(inSuite, srv.GetPort() == 0x1234);
+    EXPECT_TRUE(srv.Parse(data, packet));
+    EXPECT_EQ(srv.GetPriority(), 12);
+    EXPECT_EQ(srv.GetWeight(), 3);
+    EXPECT_EQ(srv.GetPort(), 0x1234);
 
     // name can be read several times
     for (int i = 0; i < 3; i++)
     {
         SerializedQNameIterator name = srv.GetName();
 
-        NL_TEST_ASSERT(inSuite, name.Next());
-        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "foo") == 0);
-        NL_TEST_ASSERT(inSuite, name.Next());
-        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
-        NL_TEST_ASSERT(inSuite, name.Next());
-        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
-        NL_TEST_ASSERT(inSuite, name.Next() == false);
+        EXPECT_TRUE(name.Next());
+        EXPECT_STREQ(name.Value(), "foo");
+        EXPECT_TRUE(name.Next());
+        EXPECT_STREQ(name.Value(), "some");
+        EXPECT_TRUE(name.Next());
+        EXPECT_STREQ(name.Value(), "test");
+        EXPECT_EQ(name.Next(), false);
     }
 }
 
-void ARecordParsing(nlTestSuite * inSuite, void * inContext)
+TEST(TestRecordData, ARecordParsing)
 {
     const uint8_t record[] = {
         10,
@@ -120,15 +120,15 @@ void ARecordParsing(nlTestSuite * inSuite, void * inContext)
 #if INET_CONFIG_ENABLE_IPV4
     Inet::IPAddress expected;
 
-    NL_TEST_ASSERT(inSuite, ParseARecord(BytesRange(record, record + sizeof(record)), &addr));
-    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("10.11.12.13", expected));
-    NL_TEST_ASSERT(inSuite, addr == expected);
+    EXPECT_TRUE(ParseARecord(BytesRange(record, record + sizeof(record)), &addr));
+    EXPECT_TRUE(Inet::IPAddress::FromString("10.11.12.13", expected));
+    EXPECT_EQ(addr, expected);
 #else
-    NL_TEST_ASSERT(inSuite, !ParseARecord(BytesRange(record, record + sizeof(record)), &addr));
+    EXPECT_FALSE(ParseARecord(BytesRange(record, record + sizeof(record)), &addr));
 #endif // INET_CONFIG_ENABLE_IPV4
 }
 
-void AAAARecordParsing(nlTestSuite * inSuite, void * inContext)
+TEST(TestRecordData, AAAARecordParsing)
 {
     const uint8_t record[] = {
         0x12, 0x23, 0x00, 0x00, //
@@ -140,12 +140,12 @@ void AAAARecordParsing(nlTestSuite * inSuite, void * inContext)
     Inet::IPAddress addr;
     Inet::IPAddress expected;
 
-    NL_TEST_ASSERT(inSuite, ParseAAAARecord(BytesRange(record, record + sizeof(record)), &addr));
-    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("1223::3456:789A", expected));
-    NL_TEST_ASSERT(inSuite, addr == expected);
+    EXPECT_TRUE(ParseAAAARecord(BytesRange(record, record + sizeof(record)), &addr));
+    EXPECT_TRUE(Inet::IPAddress::FromString("1223::3456:789A", expected));
+    EXPECT_EQ(addr, expected);
 }
 
-void PtrRecordSimpleParsing(nlTestSuite * inSuite, void * inContext)
+TEST(TestRecordData, PtrRecordSimpleParsing)
 {
     const uint8_t record[] = {
         4, 's', 'o', 'm', 'e',      // QNAME part: some
@@ -159,17 +159,17 @@ void PtrRecordSimpleParsing(nlTestSuite * inSuite, void * inContext)
 
     SerializedQNameIterator name;
 
-    NL_TEST_ASSERT(inSuite, ParsePtrRecord(data, packet, &name));
-    NL_TEST_ASSERT(inSuite, name.Next());
-    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
-    NL_TEST_ASSERT(inSuite, name.Next());
-    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
-    NL_TEST_ASSERT(inSuite, name.Next());
-    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "local") == 0);
-    NL_TEST_ASSERT(inSuite, name.Next() == false);
+    EXPECT_TRUE(ParsePtrRecord(data, packet, &name));
+    EXPECT_TRUE(name.Next());
+    EXPECT_STREQ(name.Value(), "some");
+    EXPECT_TRUE(name.Next());
+    EXPECT_STREQ(name.Value(), "test");
+    EXPECT_TRUE(name.Next());
+    EXPECT_STREQ(name.Value(), "local");
+    EXPECT_EQ(name.Next(), false);
 }
 
-void PtrRecordComplexParsing(nlTestSuite * inSuite, void * inContext)
+TEST(TestRecordData, PtrRecordComplexParsing)
 {
     const uint8_t record[] = {
         'x',  'y',  'z',           // dummy data (3 bytes)
@@ -187,28 +187,28 @@ void PtrRecordComplexParsing(nlTestSuite * inSuite, void * inContext)
     BytesRange data(record + 24, record + sizeof(record));
     SerializedQNameIterator name;
 
-    NL_TEST_ASSERT(inSuite, ParsePtrRecord(data, packet, &name));
-    NL_TEST_ASSERT(inSuite, name.Next());
-    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "foo") == 0);
-    NL_TEST_ASSERT(inSuite, name.Next());
-    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "bar") == 0);
-    NL_TEST_ASSERT(inSuite, name.Next());
-    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "baz") == 0);
-    NL_TEST_ASSERT(inSuite, name.Next());
-    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
-    NL_TEST_ASSERT(inSuite, name.Next());
-    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
-    NL_TEST_ASSERT(inSuite, name.Next() == false);
+    EXPECT_TRUE(ParsePtrRecord(data, packet, &name));
+    EXPECT_TRUE(name.Next());
+    EXPECT_STREQ(name.Value(), "foo");
+    EXPECT_TRUE(name.Next());
+    EXPECT_STREQ(name.Value(), "bar");
+    EXPECT_TRUE(name.Next());
+    EXPECT_STREQ(name.Value(), "baz");
+    EXPECT_TRUE(name.Next());
+    EXPECT_STREQ(name.Value(), "some");
+    EXPECT_TRUE(name.Next());
+    EXPECT_STREQ(name.Value(), "test");
+    EXPECT_EQ(name.Next(), false);
 }
 
 class TxtRecordAccumulator : public TxtRecordDelegate
 {
 public:
-    using DataType = vector<pair<string, string>>;
+    using DataType = std::vector<std::pair<std::string, std::string>>;
 
     void OnRecord(const BytesRange & name, const BytesRange & value) override
     {
-        mData.push_back(make_pair(AsString(name), AsString(value)));
+        mData.push_back(std::make_pair(AsString(name), AsString(value)));
     }
 
     DataType & Data() { return mData; }
@@ -217,13 +217,13 @@ public:
 private:
     DataType mData;
 
-    static string AsString(const BytesRange & range)
+    static std::string AsString(const BytesRange & range)
     {
-        return string(reinterpret_cast<const char *>(range.Start()), reinterpret_cast<const char *>(range.End()));
+        return std::string(reinterpret_cast<const char *>(range.Start()), reinterpret_cast<const char *>(range.End()));
     }
 };
 
-void TxtRecord(nlTestSuite * inSuite, void * inContext)
+TEST(TestRecordData, TxtRecord)
 {
     const uint8_t record[] = {
         4, 's', 'o', 'm', 'e',                // some
@@ -234,32 +234,11 @@ void TxtRecord(nlTestSuite * inSuite, void * inContext)
 
     TxtRecordAccumulator accumulator;
 
-    NL_TEST_ASSERT(inSuite, ParseTxtRecord(BytesRange(record, record + sizeof(record)), &accumulator));
-    NL_TEST_ASSERT(inSuite, accumulator.Data().size() == 4);
-    NL_TEST_ASSERT(inSuite, (accumulator.Data()[0] == make_pair<std::string, std::string>("some", "")));
-    NL_TEST_ASSERT(inSuite, (accumulator.Data()[1] == make_pair<std::string, std::string>("foo", "bar")));
-    NL_TEST_ASSERT(inSuite, (accumulator.Data()[2] == make_pair<std::string, std::string>("x", "y=z")));
-    NL_TEST_ASSERT(inSuite, (accumulator.Data()[3] == make_pair<std::string, std::string>("a", "")));
+    EXPECT_TRUE(ParseTxtRecord(BytesRange(record, record + sizeof(record)), &accumulator));
+    EXPECT_EQ(accumulator.Data().size(), 4u);
+    EXPECT_EQ(accumulator.Data()[0], (std::make_pair<std::string, std::string>("some", "")));
+    EXPECT_EQ(accumulator.Data()[1], (std::make_pair<std::string, std::string>("foo", "bar")));
+    EXPECT_EQ(accumulator.Data()[2], (std::make_pair<std::string, std::string>("x", "y=z")));
+    EXPECT_EQ(accumulator.Data()[3], (std::make_pair<std::string, std::string>("a", "")));
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing),   //
-    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),               //
-    NL_TEST_DEF("ARecordParsing", ARecordParsing),                   //
-    NL_TEST_DEF("AAAARecordParsing", AAAARecordParsing),             //
-    NL_TEST_DEF("PtrRecordSimpleParsing", PtrRecordSimpleParsing),   //
-    NL_TEST_DEF("PtrRecordComplexParsing", PtrRecordComplexParsing), //
-    NL_TEST_DEF("TxtRecord", TxtRecord),                             //
-    NL_TEST_SENTINEL()                                               //
-};
-
 } // namespace
-
-int TestRecordData()
-{
-    nlTestSuite theSuite = { "RecordData", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestRecordData)

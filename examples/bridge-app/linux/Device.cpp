@@ -19,17 +19,24 @@
 
 #include "Device.h"
 
+#include <crypto/RandUtils.h>
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <string>
+#include <sys/types.h>
+
+using namespace chip;
 using namespace chip::app::Clusters::Actions;
 
 Device::Device(const char * szDeviceName, std::string szLocation)
 {
     chip::Platform::CopyString(mName, szDeviceName);
-    mLocation   = szLocation;
-    mReachable  = false;
-    mEndpointId = 0;
+    chip::Platform::CopyString(mUniqueId, "");
+    mLocation             = szLocation;
+    mReachable            = false;
+    mConfigurationVersion = 1;
+    mEndpointId           = 0;
 }
 
 bool Device::IsReachable()
@@ -72,6 +79,12 @@ void Device::SetName(const char * szName)
     }
 }
 
+void Device::SetUniqueId(const char * szDeviceUniqueId)
+{
+    chip::Platform::CopyString(mUniqueId, szDeviceUniqueId);
+    ChipLogProgress(DeviceLayer, "Device[%s]: New UniqueId=\"%s\"", mName, mUniqueId);
+}
+
 void Device::SetLocation(std::string szLocation)
 {
     bool changed = (mLocation.compare(szLocation) != 0);
@@ -83,6 +96,42 @@ void Device::SetLocation(std::string szLocation)
     if (changed)
     {
         HandleDeviceChange(this, kChanged_Location);
+    }
+}
+
+void Device::GenerateUniqueId()
+{
+    // Ensure the buffer is zeroed out
+    memset(mUniqueId, 0, kDeviceUniqueIdSize + 1);
+
+    static const char kRandCharChoices[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    // Prefix the generated value with "GEN-"
+    memcpy(mUniqueId, "GEN-", 4);
+    for (unsigned idx = 4; idx < kDeviceUniqueIdSize; idx++)
+    {
+        mUniqueId[idx] = kRandCharChoices[Crypto::GetRandU8() % (sizeof(kRandCharChoices) - 1)];
+    }
+
+    mUniqueId[kDeviceUniqueIdSize] = '\0'; // Ensure null-termination
+}
+
+uint32_t Device::GetConfigurationVersion()
+{
+    return mConfigurationVersion;
+}
+
+void Device::SetConfigurationVersion(uint32_t configurationVersion)
+{
+    bool changed = (mConfigurationVersion != configurationVersion);
+
+    mConfigurationVersion = configurationVersion;
+
+    ChipLogProgress(DeviceLayer, "Device[%s]: New Configuration Version=\"%d\"", mName, mConfigurationVersion);
+
+    if (changed)
+    {
+        HandleDeviceChange(this, kChanged_ConfigurationVersion);
     }
 }
 

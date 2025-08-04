@@ -1,10 +1,10 @@
-FROM ubuntu:focal
+FROM ubuntu:24.04
 
 ARG OT_BR_POSIX_CHECKOUT=main
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV PLATFORM ubuntu
-ENV DOCKER 1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PLATFORM=ubuntu
+ENV DOCKER=1
 ENV OT_BR_POSIX_CHECKOUT=${OT_BR_POSIX_CHECKOUT}
 
 RUN mkdir /app
@@ -14,6 +14,8 @@ WORKDIR /app
 RUN apt-cache policy
 
 # TODO: Use multi stage build for smaller image size.
+# leaseweb seems to be more stable, update it here
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://mirror.us.leaseweb.net/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
   avahi-daemon \
@@ -56,7 +58,7 @@ RUN apt-get update \
   && echo "ctrl_interface=/run/wpa_supplicant" >> /etc/wpa_supplicant/wpa_supplicant.conf \
   && echo "update_config=1" >> /etc/wpa_supplicant/wpa_supplicant.conf \
   && rm -rf /var/lib/apt/lists/* \
-  && pip3 install --no-cache-dir click==8.0.3 paramiko \
+  && pip3 install --break-system-packages --no-cache-dir click==8.0.3 paramiko \
   && mkdir /var/run/sshd \
   && echo 'root:admin' | chpasswd \
   && sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config \

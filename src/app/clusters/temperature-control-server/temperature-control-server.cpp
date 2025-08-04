@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/attribute-storage.h>
@@ -155,6 +156,9 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
                     goto exit;
                 }
 
+                // Step is min 1 in spec, to avoid divide by zero.
+                step = (step < 1) ? 1 : step;
+
                 if ((targetTemperature.Value() - minTemperature) % step != 0)
                 {
                     status = Status::ConstraintError;
@@ -227,5 +231,10 @@ void emberAfTemperatureControlClusterServerInitCallback(EndpointId endpoint) {}
 
 void MatterTemperatureControlPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterTemperatureControlPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }

@@ -45,10 +45,36 @@ struct ChipDeviceEvent;
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
 #define CHIP_SYSTEM_CONFIG_USE_LWIP 0
-#define CHIP_SYSTEM_CONFIG_USE_SOCKETS 1
 
 #ifndef CONFIG_ARCH_POSIX
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE CONFIG_CHIP_SYSTEM_PACKETBUFFER_POOL_SIZE
 #endif
 
+#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
+#ifdef CONFIG_WIFI_NRF70
+// Minimal mDNS uses Matter packet buffers, so as long as minimal mDNS is used
+// in Nordic's Wi-Fi solution, the packet buffers must be a bit bigger than what
+// is required by Matter.
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX CONFIG_NRF_WIFI_IFACE_MTU
+#else
+// Matter specification requires that Matter messages fit in IPV6 MTU of 1280B
+// unless for large messages that can be sent over BTP or TCP. But those will
+// likely require a separate buffer pool or employ chained buffers.
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX 1280
+#endif // CONFIG_WIFI_NRF70
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
+
 // ========== Platform-specific Configuration Overrides =========
+
+// Disable Thread Local Storage (TLS) since nRF Connect SDK does not support it.
+#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 0
+// Disable Zephyr Socket extensions module, as the Zephyr RTOS now implements recvmsg()
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
+
+#ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 1
+#else
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 0
+#endif // !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF

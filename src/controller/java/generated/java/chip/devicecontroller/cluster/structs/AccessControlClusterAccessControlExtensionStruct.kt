@@ -45,7 +45,7 @@ class AccessControlClusterAccessControlExtensionStruct(val data: ByteArray, val 
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): AccessControlClusterAccessControlExtensionStruct {
       tlvReader.enterStructure(tlvTag)
       val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))

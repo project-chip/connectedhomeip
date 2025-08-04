@@ -18,22 +18,29 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <inet/BasicPacketFilters.h>
 #include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <nlunit-test.h>
 
 namespace {
 
 using namespace chip;
 using namespace chip::Inet;
+
+class TestBasicPacketFilters : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
 
 class DropIfTooManyQueuedPacketsHarness : public DropIfTooManyQueuedPacketsFilter
 {
@@ -67,7 +74,6 @@ public:
     }
 
     // Public bits to make testing easier
-    nlTestSuite * mTestSuite          = nullptr;
     int mNumOnDroppedCalled           = 0;
     int mNumOnLastMatchDequeuedCalled = 0;
     bool mHitCeilingWantFloor;
@@ -118,23 +124,19 @@ protected:
 DropIfTooManyQueuedPacketsHarness gFilter(0);
 int gFakeEndpointForPointer = 0;
 
-void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestBasicPacketFilters, TestBasicPacketFilter)
 {
     constexpr uint16_t kMdnsPort = 5353u;
-
-    gFilter.mTestSuite = inSuite;
 
     // Predicate for test is filter that destination port is 5353 (mDNS).
     // NOTE: A non-capturing lambda is used, but a plain function could have been used as well...
     auto predicate = [](void * context, const void * endpoint, const chip::Inet::IPPacketInfo & pktInfo,
                         const chip::System::PacketBufferHandle & pktPayload) -> bool {
-        auto filter           = reinterpret_cast<DropIfTooManyQueuedPacketsHarness *>(context);
-        auto testSuite        = filter->mTestSuite;
         auto expectedEndpoint = &gFakeEndpointForPointer;
 
         // Ensure we get called with context and expected endpoint pointer
-        NL_TEST_ASSERT(testSuite, context == &gFilter);
-        NL_TEST_ASSERT(testSuite, endpoint == expectedEndpoint);
+        EXPECT_EQ(context, &gFilter);
+        EXPECT_EQ(endpoint, expectedEndpoint);
 
         // Predicate filters destination port being 5353
         return (pktInfo.DestPort == kMdnsPort);
@@ -150,9 +152,9 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
     const uint8_t kFakePayloadData[] = { 1, 2, 3 };
     const ByteSpan kFakePayload{ kFakePayloadData };
 
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("fe80::aaaa:bbbb:cccc:dddd", fakeSrc));
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("fe80::0000:1111:2222:3333", fakeDest));
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("ff02::fb", fakeMdnsDest));
+    EXPECT_TRUE(IPAddress::FromString("fe80::aaaa:bbbb:cccc:dddd", fakeSrc));
+    EXPECT_TRUE(IPAddress::FromString("fe80::0000:1111:2222:3333", fakeDest));
+    EXPECT_TRUE(IPAddress::FromString("ff02::fb", fakeMdnsDest));
 
     // Shorthands for simplifying asserts
     constexpr EndpointQueueFilter::FilterOutcome kAllowPacket = EndpointQueueFilter::FilterOutcome::kAllowPacket;
@@ -165,131 +167,116 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // Enqueue some packets that don't match filter, all allowed, never hit the drop
         for (int numPkt = 0; numPkt < (kMaxQueuedPacketsLimit + 1); ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket == fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
         }
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 0u);
 
         // Dequeue all packets
         for (int numPkt = 0; numPkt < (kMaxQueuedPacketsLimit + 1); ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket == fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
         }
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 0u);
 
         // OnDroped/OnLastMatchDequeued only ever called for matching packets, never for non-matching
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 0);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
     }
 
     {
         // Enqueue packets that match filter, up to watermark. None dropped
         for (int numPkt = 0; numPkt < kMaxQueuedPacketsLimit; ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket ==
-                               fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 0u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 0);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Enqueue packets that match filter, beyond watermark: all dropped.
         for (int numPkt = 0; numPkt < 2; ++numPkt)
         {
-            NL_TEST_ASSERT(
-                inSuite, kDropPacket == fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kDropPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 2u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 2);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Dequeue 2 packets that were enqueued, matching filter
         for (int numPkt = 0; numPkt < 2; ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket ==
-                               fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
         // Number of dropped packets didn't change
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 2u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 2);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Enqueue packets that match filter, up to watermark again. None dropped.
         for (int numPkt = 0; numPkt < 2; ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket ==
-                               fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
 
         // No change from prior state
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 2u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 2);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Enqueue two more packets, expect drop
         for (int numPkt = 0; numPkt < 2; ++numPkt)
         {
-            NL_TEST_ASSERT(
-                inSuite, kDropPacket == fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kDropPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
 
         // Expect two more dropped total
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 4u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 4);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Enqueue non-matching packet, expect allowed.
         for (int numPkt = 0; numPkt < kMaxQueuedPacketsLimit; ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket == fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
         }
 
         // Expect no more dropepd
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 4u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 4);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Dequeue non-matching packet, expect allowed.
         for (int numPkt = 0; numPkt < kMaxQueuedPacketsLimit; ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket == fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
         }
 
         // Expect no change
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 4u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 4);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Dequeue all matching packets, expect allowed and one OnLastMatchDequeued on last one.
         for (int numPkt = 0; numPkt < (kMaxQueuedPacketsLimit - 1); ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket ==
-                               fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
 
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 4u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 4);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
-        NL_TEST_ASSERT(inSuite,
-                       kAllowPacket == fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+        EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
 
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 1);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 4u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 4);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 1);
     }
 
     // Validate that clearing drop count works
     {
         gFilter.ClearNumDroppedPackets();
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 0u);
 
         gFilter.mNumOnDroppedCalled           = 0;
         gFilter.mNumOnLastMatchDequeuedCalled = 0;
@@ -302,13 +289,11 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // Enqueue packets up to twice the watermark. None dropped.
         for (int numPkt = 0; numPkt < (2 * kMaxQueuedPacketsLimit); ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket ==
-                               fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 0u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 0);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Works even if max number of packets allowed is zero
         gFilter.SetMaxQueuedPacketsLimit(0);
@@ -316,13 +301,11 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // Enqueue packets up to twice the watermark. None dropped.
         for (int numPkt = 0; numPkt < (2 * kMaxQueuedPacketsLimit); ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket ==
-                               fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 0u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 0);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
     }
 
     // Validate that setting max packets to zero, with a matching predicate, drops all matching packets, none of the non-matching.
@@ -333,53 +316,23 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // Enqueue packets that match filter, up to watermark. All dropped
         for (int numPkt = 0; numPkt < kMaxQueuedPacketsLimit; ++numPkt)
         {
-            NL_TEST_ASSERT(
-                inSuite, kDropPacket == fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
+            EXPECT_EQ(kDropPacket, fakeUdpEndpoint.ProcessEnqueue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
         }
 
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 3);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 3);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 3u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 3);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
 
         // Enqueue non-filter-matching, none dropped
         for (int numPkt = 0; numPkt < kMaxQueuedPacketsLimit; ++numPkt)
         {
-            NL_TEST_ASSERT(inSuite,
-                           kAllowPacket == fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
+            EXPECT_EQ(kAllowPacket, fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeDest, kOtherPort, kFakePayload));
         }
 
-        NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 3);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 3);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
+        EXPECT_EQ(gFilter.GetNumDroppedPackets(), 3u);
+        EXPECT_EQ(gFilter.mNumOnDroppedCalled, 3);
+        EXPECT_EQ(gFilter.mNumOnLastMatchDequeuedCalled, 0);
     }
 }
 
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestBasicPacketFilter", TestBasicPacketFilter), //
-    NL_TEST_SENTINEL()                                           //
-};
-
-int TestSuiteSetup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return FAILURE;
-    return SUCCESS;
-}
-
-int TestSuiteTeardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
 } // namespace
-
-int TestBasicPacketFilters()
-{
-    nlTestSuite theSuite = { "TestBasicPacketFilters", sTests, &TestSuiteSetup, &TestSuiteTeardown };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestBasicPacketFilters)

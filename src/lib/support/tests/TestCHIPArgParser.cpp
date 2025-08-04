@@ -22,16 +22,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/Constants.h>
-
-#if CHIP_CONFIG_ENABLE_ARG_PARSER
 
 using namespace chip::ArgParser;
 
@@ -40,71 +40,68 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * const ar
 static void HandleArgError(const char * msg, ...);
 static void ClearCallbackRecords();
 
+class TestCHIPArgParser : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite()
+    {
+        ClearCallbackRecords();
+        chip::Platform::MemoryShutdown();
+    }
+};
+
 #define DEBUG_TESTS 0
-
-#define QuitWithError(MSG)                                                                                                         \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        fprintf(stderr, "%s FAILED (line %d): ", __FUNCTION__, __LINE__);                                                          \
-        fputs(MSG, stderr);                                                                                                        \
-        fputs("\n", stderr);                                                                                                       \
-        exit(EXIT_FAILURE);                                                                                                        \
-    } while (0)
-
-#define VerifyOrQuit(TST, MSG)                                                                                                     \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (!(TST))                                                                                                                \
-        {                                                                                                                          \
-            QuitWithError(MSG);                                                                                                    \
-        }                                                                                                                          \
-    } while (0)
 
 #define VerifyHandleOptionCallback(INDEX, EXPECT_PROG_NAME, EXPECT_OPTSET, EXPECT_ID, EXPECT_NAME, EXPECT_ARG)                     \
     do                                                                                                                             \
     {                                                                                                                              \
         CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
         const char * arg     = EXPECT_ARG;                                                                                         \
-        VerifyOrQuit(rec.Type == CallbackRecord::kHandleOption, "Invalid callback type (expected HandleOption)");                  \
-        VerifyOrQuit(strcmp(rec.ProgName, EXPECT_PROG_NAME) == 0, "Invalid value for HandleOption argument: progName");            \
-        VerifyOrQuit(rec.OptSet == EXPECT_OPTSET, "Invalid value for HandleOption argument: optSet");                              \
-        VerifyOrQuit(rec.Id == EXPECT_ID, "Invalid value for HandleOption argument: id");                                          \
-        VerifyOrQuit(strcmp(rec.Name, EXPECT_NAME) == 0, "Invalid value for HandleOption argument: name");                         \
+        ASSERT_EQ(rec.Type, CallbackRecord::kHandleOption) << "Invalid callback type (expected HandleOption)";                     \
+        ASSERT_STREQ(rec.ProgName, EXPECT_PROG_NAME) << "Invalid value for HandleOption argument: progName";                       \
+        ASSERT_EQ(rec.OptSet, EXPECT_OPTSET) << "Invalid value for HandleOption argument: optSet";                                 \
+        ASSERT_EQ(rec.Id, EXPECT_ID) << "Invalid value for HandleOption argument: id";                                             \
+        ASSERT_STREQ(rec.Name, EXPECT_NAME) << "Invalid value for HandleOption argument: name";                                    \
         if (arg != NULL)                                                                                                           \
-            VerifyOrQuit(strcmp(rec.Arg, arg) == 0, "Invalid value for HandleOption argument: arg");                               \
+        {                                                                                                                          \
+            ASSERT_STREQ(rec.Arg, arg) << "Invalid value for HandleOption argument: arg";                                          \
+        }                                                                                                                          \
         else                                                                                                                       \
-            VerifyOrQuit(rec.Arg == NULL, "Invalid value for HandleOption argument: arg");                                         \
+        {                                                                                                                          \
+            ASSERT_EQ(rec.Arg, nullptr) << "Invalid value for HandleOption argument: arg";                                         \
+        }                                                                                                                          \
     } while (0)
 
 #define VerifyHandleNonOptionArgsCallback(INDEX, EXPECT_PROG_NAME, EXPECT_ARGC)                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
         CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
-        VerifyOrQuit(rec.Type == CallbackRecord::kHandleNonOptionArgs, "Invalid callback type (expected HandleNonOptionArgs)");    \
-        VerifyOrQuit(strcmp(rec.ProgName, EXPECT_PROG_NAME) == 0, "Invalid value for HandleNonOptionArgs argument: progName");     \
-        VerifyOrQuit(rec.Argc == EXPECT_ARGC, "Invalid value for HandleNonOptionArgs argument: argc");                             \
+        ASSERT_EQ(rec.Type, CallbackRecord::kHandleNonOptionArgs) << "Invalid callback type (expected HandleNonOptionArgs)";       \
+        ASSERT_STREQ(rec.ProgName, EXPECT_PROG_NAME) << "Invalid value for HandleNonOptionArgs argument: progName";                \
+        ASSERT_EQ(rec.Argc, EXPECT_ARGC) << "Invalid value for HandleNonOptionArgs argument: argc";                                \
     } while (0)
 
 #define VerifyNonOptionArg(INDEX, EXPECT_ARG)                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
         CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
-        VerifyOrQuit(rec.Type == CallbackRecord::kNonOptionArg, "Invalid callback type (expected NonOptionArg)");                  \
-        VerifyOrQuit(strcmp(rec.Arg, EXPECT_ARG) == 0, "Invalid value for NonOptionArg");                                          \
+        ASSERT_EQ(rec.Type, CallbackRecord::kNonOptionArg) << "Invalid callback type (expected NonOptionArg)";                     \
+        ASSERT_STREQ(rec.Arg, EXPECT_ARG) << "Invalid value for NonOptionArg";                                                     \
     } while (0)
 
 #define VerifyPrintArgErrorCallback(INDEX)                                                                                         \
     do                                                                                                                             \
     {                                                                                                                              \
         CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
-        VerifyOrQuit(rec.Type == CallbackRecord::kArgError, "Invalid callback type (expected ArgError)");                          \
+        ASSERT_EQ(rec.Type, CallbackRecord::kArgError) << "Invalid callback type (expected ArgError)";                             \
     } while (0)
 
 #define VerifyArgErrorContains(INDEX, EXPECT_TEXT)                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
         CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
-        VerifyOrQuit(strstr(rec.Error, EXPECT_TEXT) != NULL, "Expected text not found in error output");                           \
+        ASSERT_NE(strstr(rec.Error, EXPECT_TEXT), nullptr) << "Expected text not found in error output";                           \
     } while (0)
 
 struct CallbackRecord
@@ -212,7 +209,7 @@ TestArgv DupeArgs(const char * argv[], int argc_as_int)
 
 } // namespace
 
-static void SimpleParseTest_SingleLongOption()
+TEST_F(TestCHIPArgParser, SimpleParseTest_SingleLongOption)
 {
     bool res;
 
@@ -232,13 +229,13 @@ static void SimpleParseTest_SingleLongOption()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == true, "ParseArgs() returned false");
-    VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
+    ASSERT_EQ(sCallbackRecordCount, 2u) << "Invalid value returned for sCallbackRecordCount";
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
     VerifyHandleNonOptionArgsCallback(1, __FUNCTION__, 0);
 }
 
-static void SimpleParseTest_SingleShortOption()
+TEST_F(TestCHIPArgParser, SimpleParseTest_SingleShortOption)
 {
     bool res;
 
@@ -258,13 +255,13 @@ static void SimpleParseTest_SingleShortOption()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == true, "ParseArgs() returned false");
-    VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
+    ASSERT_EQ(sCallbackRecordCount, 2u) << "Invalid value returned for sCallbackRecordCount";
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
     VerifyHandleNonOptionArgsCallback(1, __FUNCTION__, 0);
 }
 
-static void SimpleParseTest_SingleLongOptionWithValue()
+TEST_F(TestCHIPArgParser, SimpleParseTest_SingleLongOptionWithValue)
 {
     bool res;
 
@@ -284,13 +281,13 @@ static void SimpleParseTest_SingleLongOptionWithValue()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == true, "ParseArgs() returned false");
-    VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
+    ASSERT_EQ(sCallbackRecordCount, 2u) << "Invalid value returned for sCallbackRecordCount";
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
     VerifyHandleNonOptionArgsCallback(1, __FUNCTION__, 0);
 }
 
-static void SimpleParseTest_SingleShortOptionWithValue()
+TEST_F(TestCHIPArgParser, SimpleParseTest_SingleShortOptionWithValue)
 {
     bool res;
 
@@ -310,13 +307,13 @@ static void SimpleParseTest_SingleShortOptionWithValue()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == true, "ParseArgs() returned false");
-    VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
+    ASSERT_EQ(sCallbackRecordCount, 2u) << "Invalid value returned for sCallbackRecordCount";
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
     VerifyHandleNonOptionArgsCallback(1, __FUNCTION__, 0);
 }
 
-static void SimpleParseTest_VariousShortAndLongWithArgs()
+TEST_F(TestCHIPArgParser, SimpleParseTest_VariousShortAndLongWithArgs)
 {
     bool res;
 
@@ -345,8 +342,8 @@ static void SimpleParseTest_VariousShortAndLongWithArgs()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == true, "ParseArgs() returned false");
-    VerifyOrQuit(sCallbackRecordCount == 12, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
+    ASSERT_EQ(sCallbackRecordCount, 12u) << "Invalid value returned for sCallbackRecordCount";
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
     VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
@@ -361,7 +358,7 @@ static void SimpleParseTest_VariousShortAndLongWithArgs()
     VerifyNonOptionArg(11, "non-opt-arg-4");
 }
 
-static void UnknownOptionTest_UnknownShortOption()
+TEST_F(TestCHIPArgParser, UnknownOptionTest_UnknownShortOption)
 {
     bool res;
 
@@ -385,8 +382,8 @@ static void UnknownOptionTest_UnknownShortOption()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == false, "ParseArgs() returned true");
-    VerifyOrQuit(sCallbackRecordCount == 3, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_FALSE(res) << "ParseArgs() returned true";
+    ASSERT_EQ(sCallbackRecordCount, 3u) << "Invalid value returned for sCallbackRecordCount";
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
     VerifyPrintArgErrorCallback(2);
@@ -394,7 +391,7 @@ static void UnknownOptionTest_UnknownShortOption()
     VerifyArgErrorContains(2, "-q");
 }
 
-static void UnknownOptionTest_UnknownLongOption()
+TEST_F(TestCHIPArgParser, UnknownOptionTest_UnknownLongOption)
 {
     bool res;
 
@@ -418,8 +415,8 @@ static void UnknownOptionTest_UnknownLongOption()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == false, "ParseArgs() returned true");
-    VerifyOrQuit(sCallbackRecordCount == 3, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_FALSE(res) << "ParseArgs() returned true";
+    ASSERT_EQ(sCallbackRecordCount, 3u) << "Invalid value returned for sCallbackRecordCount";
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
     VerifyPrintArgErrorCallback(2);
@@ -427,7 +424,7 @@ static void UnknownOptionTest_UnknownLongOption()
     VerifyArgErrorContains(2, "--bad");
 }
 
-static void UnknownOptionTest_UnknownShortOptionAfterKnown()
+TEST_F(TestCHIPArgParser, UnknownOptionTest_UnknownShortOptionAfterKnown)
 {
     bool res;
 
@@ -451,8 +448,8 @@ static void UnknownOptionTest_UnknownShortOptionAfterKnown()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == false, "ParseArgs() returned true");
-    VerifyOrQuit(sCallbackRecordCount == 4, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_FALSE(res) << "ParseArgs() returned true";
+    ASSERT_EQ(sCallbackRecordCount, 4u) << "Invalid value returned for sCallbackRecordCount";
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
     VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetA, '1', "-1", nullptr);
@@ -461,7 +458,7 @@ static void UnknownOptionTest_UnknownShortOptionAfterKnown()
     VerifyArgErrorContains(3, "-Q");
 }
 
-static void UnknownOptionTest_UnknownShortOptionBeforeKnown()
+TEST_F(TestCHIPArgParser, UnknownOptionTest_UnknownShortOptionBeforeKnown)
 {
     bool res;
 
@@ -481,14 +478,14 @@ static void UnknownOptionTest_UnknownShortOptionBeforeKnown()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == false, "ParseArgs() returned true");
-    VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_FALSE(res) << "ParseArgs() returned true";
+    ASSERT_EQ(sCallbackRecordCount, 1u) << "Invalid value returned for sCallbackRecordCount";
     VerifyPrintArgErrorCallback(0);
     VerifyArgErrorContains(0, "Unknown");
     VerifyArgErrorContains(0, "-Q");
 }
 
-static void UnknownOptionTest_UnknownShortOptionAfterArgs()
+TEST_F(TestCHIPArgParser, UnknownOptionTest_UnknownShortOptionAfterArgs)
 {
     bool res;
 
@@ -510,14 +507,14 @@ static void UnknownOptionTest_UnknownShortOptionAfterArgs()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == false, "ParseArgs() returned true");
-    VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_FALSE(res) << "ParseArgs() returned true";
+    ASSERT_EQ(sCallbackRecordCount, 1u) << "Invalid value returned for sCallbackRecordCount";
     VerifyPrintArgErrorCallback(0);
     VerifyArgErrorContains(0, "Unknown");
     VerifyArgErrorContains(0, "-Q");
 }
 
-static void UnknownOptionTest_UnknownLongOptionAfterArgs()
+TEST_F(TestCHIPArgParser, UnknownOptionTest_UnknownLongOptionAfterArgs)
 {
     bool res;
 
@@ -539,15 +536,14 @@ static void UnknownOptionTest_UnknownLongOptionAfterArgs()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
-    VerifyOrQuit(res == false, "ParseArgs() returned true");
-    VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_FALSE(res) << "ParseArgs() returned true";
+    ASSERT_EQ(sCallbackRecordCount, 1u) << "Invalid value returned for sCallbackRecordCount";
     VerifyPrintArgErrorCallback(0);
     VerifyArgErrorContains(0, "Unknown");
     VerifyArgErrorContains(0, "--barf");
 }
 
-#ifndef CHIP_CONFIG_NON_POSIX_LONG_OPT
-static void UnknownOptionTest_IgnoreUnknownLongOption()
+TEST_F(TestCHIPArgParser, UnknownOptionTest_IgnoreUnknownLongOption)
 {
     bool res;
 
@@ -570,18 +566,17 @@ static void UnknownOptionTest_IgnoreUnknownLongOption()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
-    VerifyOrQuit(res == true, "ParseArgs() returned false");
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
 
-    VerifyOrQuit(sCallbackRecordCount == 4, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_EQ(sCallbackRecordCount, 4u) << "Invalid value returned for sCallbackRecordCount";
 
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
     VerifyHandleNonOptionArgsCallback(1, __FUNCTION__, 2);
     VerifyNonOptionArg(2, "non-opt-arg-1");
     VerifyNonOptionArg(3, "non-opt-arg-2");
 }
-#endif // !CHIP_CONFIG_NON_POSIX_LONG_OPT
 
-static void UnknownOptionTest_IgnoreUnknownShortOption()
+TEST_F(TestCHIPArgParser, UnknownOptionTest_IgnoreUnknownShortOption)
 {
     bool res;
 
@@ -604,9 +599,9 @@ static void UnknownOptionTest_IgnoreUnknownShortOption()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
-    VerifyOrQuit(res == true, "ParseArgs() returned false");
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
 
-    VerifyOrQuit(sCallbackRecordCount == 5, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_EQ(sCallbackRecordCount, 5u) << "Invalid value returned for sCallbackRecordCount";
 
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "-1", nullptr);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
@@ -615,7 +610,7 @@ static void UnknownOptionTest_IgnoreUnknownShortOption()
     VerifyNonOptionArg(4, "non-opt-arg-2");
 }
 
-static void MissingValueTest_MissingShortOptionValue()
+TEST_F(TestCHIPArgParser, MissingValueTest_MissingShortOptionValue)
 {
     bool res;
 
@@ -635,14 +630,14 @@ static void MissingValueTest_MissingShortOptionValue()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
-    VerifyOrQuit(res == false, "ParseArgs() returned true");
-    VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_FALSE(res) << "ParseArgs() returned true";
+    ASSERT_EQ(sCallbackRecordCount, 1u) << "Invalid value returned for sCallbackRecordCount";
     VerifyPrintArgErrorCallback(0);
     VerifyArgErrorContains(0, "Missing");
     VerifyArgErrorContains(0, "-Z");
 }
 
-static void MissingValueTest_MissingLongOptionValue()
+TEST_F(TestCHIPArgParser, MissingValueTest_MissingLongOptionValue)
 {
     bool res;
 
@@ -662,8 +657,8 @@ static void MissingValueTest_MissingLongOptionValue()
 
     TestArgv argsDup = DupeArgs(argv, argc);
     res              = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs, true);
-    VerifyOrQuit(res == false, "ParseArgs() returned true");
-    VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
+    ASSERT_FALSE(res) << "ParseArgs() returned true";
+    ASSERT_EQ(sCallbackRecordCount, 1u) << "Invalid value returned for sCallbackRecordCount";
     VerifyPrintArgErrorCallback(0);
     VerifyArgErrorContains(0, "Missing");
     VerifyArgErrorContains(0, "--run");
@@ -692,7 +687,7 @@ static bool HandleOption(const char * progName, OptionSet * optSet, int id, cons
     printf("HandleOption called: progName:%s optSet:%08lX id:%d name:%s arg:%s\n", progName, (intptr_t) optSet, id, name, arg);
 #endif
 
-    VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
+    EXPECT_LT(sCallbackRecordCount, kMaxCallbackRecords) << "Out of callback records";
     sCallbackRecords[sCallbackRecordCount].Type     = CallbackRecord::kHandleOption;
     sCallbackRecords[sCallbackRecordCount].ProgName = chip::Platform::MemoryAllocString(progName, strlen(progName));
     sCallbackRecords[sCallbackRecordCount].OptSet   = optSet;
@@ -717,7 +712,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * const ar
     // clang-format on
 #endif
 
-    VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
+    EXPECT_LT(sCallbackRecordCount, kMaxCallbackRecords) << "Out of callback records";
     sCallbackRecords[sCallbackRecordCount].Type     = CallbackRecord::kHandleNonOptionArgs;
     sCallbackRecords[sCallbackRecordCount].ProgName = chip::Platform::MemoryAllocString(progName, strlen(progName));
     sCallbackRecords[sCallbackRecordCount].Argc     = argc;
@@ -725,7 +720,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * const ar
 
     for (int i = 0; i < argc; i++)
     {
-        VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
+        EXPECT_LT(sCallbackRecordCount, kMaxCallbackRecords) << "Out of callback records";
         sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kNonOptionArg;
         sCallbackRecords[sCallbackRecordCount].Arg  = chip::Platform::MemoryAllocString(argv[i], strlen(argv[i]));
         sCallbackRecordCount++;
@@ -740,7 +735,7 @@ static void ENFORCE_FORMAT(1, 2) HandleArgError(const char * msg, ...)
     int status;
     va_list ap;
 
-    VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
+    ASSERT_LT(sCallbackRecordCount, kMaxCallbackRecords) << "Out of callback records";
 
     sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kArgError;
 
@@ -760,51 +755,3 @@ static void ENFORCE_FORMAT(1, 2) HandleArgError(const char * msg, ...)
 
     sCallbackRecordCount++;
 }
-
-int TestCHIPArgParser()
-{
-    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
-    {
-        return EXIT_FAILURE;
-    }
-
-    SimpleParseTest_SingleLongOption();
-    SimpleParseTest_SingleShortOption();
-    SimpleParseTest_SingleLongOptionWithValue();
-    SimpleParseTest_SingleShortOptionWithValue();
-    SimpleParseTest_VariousShortAndLongWithArgs();
-
-    UnknownOptionTest_UnknownShortOption();
-    UnknownOptionTest_UnknownLongOption();
-    UnknownOptionTest_UnknownShortOptionAfterArgs();
-    UnknownOptionTest_UnknownShortOptionAfterKnown();
-    UnknownOptionTest_UnknownShortOptionBeforeKnown();
-    UnknownOptionTest_UnknownLongOptionAfterArgs();
-    UnknownOptionTest_IgnoreUnknownShortOption();
-
-    /* Skip this test because the parser successfully captures all the options
-       but the error reporting is incorrect in this case due to long_opt limitations */
-#ifndef CHIP_CONFIG_NON_POSIX_LONG_OPT
-    UnknownOptionTest_IgnoreUnknownLongOption();
-#endif // !CHIP_CONFIG_NON_POSIX_LONG_OPT
-
-    MissingValueTest_MissingShortOptionValue();
-    MissingValueTest_MissingLongOptionValue();
-
-    ClearCallbackRecords();
-
-    printf("All tests succeeded\n");
-
-    chip::Platform::MemoryShutdown();
-
-    return (EXIT_SUCCESS);
-}
-#else  // CHIP_CONFIG_ENABLE_ARG_PARSER
-int TestCHIPArgParser(void)
-{
-    printf("No tests were run\n");
-    return (EXIT_SUCCESS);
-}
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER
-
-CHIP_REGISTER_TEST_SUITE(TestCHIPArgParser);

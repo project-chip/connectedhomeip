@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class BridgedDeviceBasicInformationClusterProductAppearanceStruct(
   val finish: UInt,
-  val primaryColor: UInt?
+  val primaryColor: UInt?,
 ) {
   override fun toString(): String = buildString {
     append("BridgedDeviceBasicInformationClusterProductAppearanceStruct {\n")
@@ -52,7 +52,7 @@ class BridgedDeviceBasicInformationClusterProductAppearanceStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): BridgedDeviceBasicInformationClusterProductAppearanceStruct {
       tlvReader.enterStructure(tlvTag)
       val finish = tlvReader.getUInt(ContextSpecificTag(TAG_FINISH))

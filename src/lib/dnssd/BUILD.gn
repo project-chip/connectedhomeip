@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("constants") {
@@ -68,9 +67,11 @@ static_library("dnssd") {
   ]
 
   sources = [
+    "Advertiser.cpp",
     "Advertiser.h",
     "IPAddressSorter.cpp",
     "IPAddressSorter.h",
+    "Resolver.cpp",
     "Resolver.h",
     "ResolverProxy.cpp",
     "ResolverProxy.h",
@@ -78,12 +79,18 @@ static_library("dnssd") {
     "TxtFields.h",
   ]
 
+  assert(
+      chip_mdns == "none" || chip_mdns == "minimal" || chip_mdns == "platform",
+      "Please select a valid value for chip_mdns")
+
   if (chip_mdns == "none") {
     sources += [
       "Advertiser_ImplNone.cpp",
       "Resolver_ImplNone.cpp",
     ]
-  } else if (chip_mdns == "minimal") {
+  }
+
+  if (chip_mdns_minimal) {
     sources += [
       "ActiveResolveAttempts.cpp",
       "ActiveResolveAttempts.h",
@@ -100,15 +107,25 @@ static_library("dnssd") {
       "${chip_root}/src/tracing",
       "${chip_root}/src/tracing:macros",
     ]
-  } else if (chip_mdns == "platform") {
+  }
+
+  if (chip_mdns_platform) {
     sources += [
       "Discovery_ImplPlatform.cpp",
       "Discovery_ImplPlatform.h",
     ]
     public_deps += [ "${chip_root}/src/platform" ]
-  } else {
-    assert(false, "Unknown Dnssd advertiser implementation.")
   }
+
+  _chip_dnssd_default_none = chip_mdns == "none"
+  _chip_dnssd_default_minimal = chip_mdns == "minimal"
+  _chip_dnssd_default_platform = chip_mdns == "platform"
+
+  defines = [
+    "CHIP_DNSSD_DEFAULT_NONE=${_chip_dnssd_default_none}",
+    "CHIP_DNSSD_DEFAULT_MINIMAL=${_chip_dnssd_default_minimal}",
+    "CHIP_DNSSD_DEFAULT_PLATFORM=${_chip_dnssd_default_platform}",
+  ]
 
   cflags = [ "-Wconversion" ]
 }

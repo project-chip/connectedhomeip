@@ -1,1 +1,4 @@
+ecdsa
+intelhex
 leb128
+zcbor

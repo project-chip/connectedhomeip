@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ContentLauncherClusterDimensionStruct(
   val width: Double,
   val height: Double,
-  val metric: UByte
+  val metric: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterDimensionStruct {\n")

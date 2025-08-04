@@ -31,5 +31,6 @@ public interface DeviceAttestationDelegate {
    * @param attestationInfo Attestation information for the device, null is errorCode is 0.
    * @param errorCode Error code on attestation failure. 0 if succeed.
    */
-  void onDeviceAttestationCompleted(long devicePtr, AttestationInfo attestationInfo, int errorCode);
+  void onDeviceAttestationCompleted(
+      long devicePtr, AttestationInfo attestationInfo, long errorCode);
 }

@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class SoftwareDiagnosticsClusterSoftwareFaultEvent(
   val id: ULong,
   val name: Optional<String>,
-  val faultRecording: Optional<ByteArray>
+  val faultRecording: Optional<ByteArray>,
 ) {
   override fun toString(): String = buildString {
     append("SoftwareDiagnosticsClusterSoftwareFaultEvent {\n")

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,37 @@
 
 #include "AppTask.h"
 #include "Device.h"
+#include "PWMManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
+#include <app/util/endpoint-config-api.h>
+#include <bridged-actions-stub.h>
 #include <lib/support/ZclString.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
-const struct pwm_dt_spec sPwmRgbSpecBlueLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
+bool sTurnedOn;
+uint8_t sLevel;
+
+std::unique_ptr<chip::app::Clusters::Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<chip::app::Clusters::Actions::ActionsServer> sActionsServer;
 } // namespace
+
+void emberAfActionsClusterInitCallback(chip::EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, chip::app::Clusters::Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<chip::app::Clusters::Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<chip::app::Clusters::Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
+    sActionsServer->Init();
+}
 
 AppTask AppTask::sAppTask;
 #include <app/InteractionModelEngine.h>
@@ -160,16 +181,16 @@ DECLARE_DYNAMIC_CLUSTER(Clusters::TemperatureMeasurement::Id, tempSensorAttrs, Z
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
-DataVersion gTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 
-DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
-// DataVersion gThermostatDataVersions[ArraySize(thermostatAttrs)];
+DataVersion gLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight3DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+// DataVersion gThermostatDataVersions[MATTER_ARRAY_SIZE(thermostatAttrs)];
 
 const EmberAfDeviceType gRootDeviceTypes[]          = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT } };
 const EmberAfDeviceType gAggregateNodeDeviceTypes[] = { { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
@@ -295,8 +316,8 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(Device * dev, chip
 {
     ChipLogProgress(DeviceLayer, "HandleWriteOnOffAttribute: attrId=%" PRIu32, attributeId);
 
-    ReturnErrorCodeIf((attributeId != Clusters::OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()),
-                      Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnError((attributeId == Clusters::OnOff::Attributes::OnOff::Id) && dev->IsReachable(),
+                        Protocols::InteractionModel::Status::Failure);
     dev->SetOnOff(*buffer == 1);
     return Protocols::InteractionModel::Status::Success;
 }
@@ -384,39 +405,34 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     }
 }
 
-bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Clusters::Actions::Commands::InstantAction::DecodableType & commandData)
-{
-    // No actions are implemented, just return status NotFound.
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
-    return true;
-}
-
 CHIP_ERROR AppTask::Init(void)
 {
-    // Init lighting manager
-    uint8_t minLightLevel = kDefaultMinLevel;
-    Clusters::LevelControl::Attributes::MinLevel::Get(kExampleEndpointId, &minLightLevel);
-
-    uint8_t maxLightLevel = kDefaultMaxLevel;
-    Clusters::LevelControl::Attributes::MaxLevel::Get(kExampleEndpointId, &maxLightLevel);
-
-    // Initialize PWM LED
-    CHIP_ERROR err = sAppTask.mPwmRgbBlueLed.Init(&sPwmRgbSpecBlueLed, minLightLevel, maxLightLevel, maxLightLevel);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Blue RGB PWM Device Init fail");
-        return err;
-    }
-
-    sAppTask.mPwmRgbBlueLed.SetCallbacks(ActionInitiated, ActionCompleted, nullptr);
-
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(LightingActionEventHandler);
-#endif
     InitCommonParts();
 
-    memset(gDevices, 0, sizeof(gDevices));
+    Protocols::InteractionModel::Status status;
+
+    app::DataModel::Nullable<uint8_t> level;
+    // Read brightness value
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(kExampleEndpointId, level);
+    if (status == Protocols::InteractionModel::Status::Success && !level.IsNull())
+    {
+        sLevel = level.Value();
+    }
+
+    bool isOn;
+    // Read storedValue on/off value
+    status = Clusters::OnOff::Attributes::OnOff::Get(1, &isOn);
+    if (status == Protocols::InteractionModel::Status::Success)
+    {
+        sTurnedOn = isOn;
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, sTurnedOn);
+    }
+
+    for (size_t i = 0; i < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; i++)
+    {
+        gDevices[i] = nullptr;
+    }
 
     gLight1.SetReachable(true);
     gLight2.SetReachable(true);
@@ -530,66 +546,26 @@ Protocols::InteractionModel::Status HandleReadTempMeasurementAttribute(DeviceTem
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
-    PWMDevice::Action_t action = PWMDevice::INVALID_ACTION;
-    int32_t actor              = 0;
+    Action_t action = INVALID_ACTION;
+    int32_t actor   = 0;
 
-    if (aEvent->Type == AppEvent::kEventType_Lighting)
+    if (aEvent->Type == AppEvent::kEventType_DeviceAction)
     {
-        action = static_cast<PWMDevice::Action_t>(aEvent->LightingEvent.Action);
-        actor  = aEvent->LightingEvent.Actor;
+        action = static_cast<Action_t>(aEvent->DeviceEvent.Action);
+        actor  = aEvent->DeviceEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = sAppTask.mPwmRgbBlueLed.IsTurnedOn() ? PWMDevice::OFF_ACTION : PWMDevice::ON_ACTION;
-        actor  = AppEvent::kEventType_Button;
-    }
+        sTurnedOn = !sTurnedOn;
 
-    if (action != PWMDevice::INVALID_ACTION && (!sAppTask.mPwmRgbBlueLed.InitiateAction(action, actor, NULL)))
-    {
-        LOG_INF("Action is in progress or active");
-    }
-}
-
-void AppTask::ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor)
-{
-    if (aAction == PWMDevice::ON_ACTION)
-    {
-        LOG_DBG("ON_ACTION initiated");
-    }
-    else if (aAction == PWMDevice::OFF_ACTION)
-    {
-        LOG_DBG("OFF_ACTION initiated");
-    }
-    else if (aAction == PWMDevice::LEVEL_ACTION)
-    {
-        LOG_DBG("LEVEL_ACTION initiated");
-    }
-}
-
-void AppTask::ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor)
-{
-    if (aAction == PWMDevice::ON_ACTION)
-    {
-        LOG_DBG("ON_ACTION completed");
-    }
-    else if (aAction == PWMDevice::OFF_ACTION)
-    {
-        LOG_DBG("OFF_ACTION completed");
-    }
-    else if (aAction == PWMDevice::LEVEL_ACTION)
-    {
-        LOG_DBG("LEVEL_ACTION completed");
-    }
-
-    if (aActor == AppEvent::kEventType_Button)
-    {
-        sAppTask.UpdateClusterState();
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, sTurnedOn);
+        GetAppTask().UpdateClusterState();
     }
 }
 
 void AppTask::UpdateClusterState(void)
 {
-    bool isTurnedOn = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
+    bool isTurnedOn = sTurnedOn;
 
     // write the new on/off value
     Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);
@@ -598,7 +574,7 @@ void AppTask::UpdateClusterState(void)
     {
         LOG_ERR("Update OnOff fail: %x", to_underlying(status));
     }
-    uint8_t setLevel = sAppTask.mPwmRgbBlueLed.GetLevel();
+    uint8_t setLevel = sLevel;
     status           = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
     if (status != Protocols::InteractionModel::Status::Success)
     {

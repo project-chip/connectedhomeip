@@ -1,0 +1,395 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050A" name="Content Launcher Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Add Seasons, Episode, Any and CurrentContext to search, Added Text/Audio tracks support with PlaybackPreferences field"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x050A" name="Content Launcher"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="CONTENTLAUNCHER" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="CS" name="ContentSearch" summary="Device supports content search (non-app specific)">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="UP" name="URLPlayback" summary="Device supports basic URL-based file playback">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="AS" name="AdvancedSeek" summary="Enables clients to implement more advanced media seeking behavior in their user interface, such as for example a &quot;seek bar&quot;.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="TT" name="TextTracks" summary="Device or app supports Text Tracks.">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="AT" name="AudioTracks" summary="Device or app supports Audio Tracks.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="MetricTypeEnum">
+      <item value="0" name="Pixels" summary="Dimensions defined in a number of Pixels">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Percentage" summary="Dimensions defined as a percentage">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ParameterEnum">
+      <item value="0" name="Actor" summary="Actor represents an actor credited in video media content; for example, “Gaby Hoffman”">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Channel" summary="Channel represents the identifying data for a television channel; for example, &quot;PBS&quot;">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Character" summary="A character represented in video media content; for example, “Snow White”">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Director" summary="A director of the video media content; for example, “Spike Lee”">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Event" summary="An event is a reference to a type of event; examples would include sports, music, or other types of events. For example, searching for &quot;Football games&quot; would search for a &apos;game&apos; event entity and a &apos;football&apos; sport entity.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Franchise" summary="A franchise is a video entity which can represent a number of video entities, like movies or TV shows. For example, take the fictional franchise &quot;Intergalactic Wars&quot; which represents a collection of movie trilogies, as well as animated and live action TV shows. This entity type was introduced to account for requests by customers such as &quot;Find Intergalactic Wars movies&quot;, which would search for all &apos;Intergalactic Wars&apos; programs of the MOVIE MediaType, rather than attempting to match to a single title.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="Genre" summary="Genre represents the genre of video media content such as action, drama or comedy.">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="League" summary="League represents the categorical information for a sporting league; for example, &quot;NCAA&quot;">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="Popularity" summary="Popularity indicates whether the user asks for popular content.">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="Provider" summary="The provider (MSP) the user wants this media to be played on; for example, &quot;Netflix&quot;.">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="Sport" summary="Sport represents the categorical information of a sport; for example, football">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="SportsTeam" summary="SportsTeam represents the categorical information of a professional sports team; for example, &quot;University of Washington Huskies&quot;">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="Type" summary="The type of content requested. Supported types are &quot;Movie&quot;, &quot;MovieSeries&quot;, &quot;TVSeries&quot;, &quot;TVSeason&quot;, &quot;TVEpisode&quot;, &quot;Trailer&quot;, &quot;SportsEvent&quot;, &quot;LiveEvent&quot;, and &quot;Video&quot;">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="Video" summary="Video represents the identifying data for a specific piece of video content; for example, &quot;Manchester by the Sea&quot;.">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="Season" summary="Season represents the specific season number within a TV series.">
+        <optionalConform/>
+      </item>
+      <item value="15" name="Episode" summary="Episode represents a specific episode number within a Season in a TV series.">
+        <optionalConform/>
+      </item>
+      <item value="16" name="Any" summary="Represents a search text input across many parameter types or even outside of the defined param types.">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="StatusEnum">
+      <item value="0" name="Success" summary="Command succeeded">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="URLNotAvailable" summary="Requested URL could not be reached by device.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="AuthFailed" summary="Requested URL returned 401 error code.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="TextTrackNotAvailable" summary="Requested Text Track (in PlaybackPreferences) not available">
+        <mandatoryConform>
+          <feature name="TT"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="AudioTrackNotAvailable" summary="Requested Audio Track (in PlaybackPreferences) not available">
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <bitmap name="SupportedProtocolsBitmap">
+      <bitfield name="DASH" bit="0" summary="Device supports Dynamic Adaptive Streaming over HTTP (DASH)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="HLS" bit="1" summary="Device supports HTTP Live Streaming (HLS)">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="AdditionalInfoStruct">
+      <field id="0" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="1" name="Value" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="BrandingInformationStruct">
+      <field id="0" name="ProviderName" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+      <field id="1" name="Background" type="StyleInformationStruct" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="2" name="Logo" type="StyleInformationStruct" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="3" name="ProgressBar" type="StyleInformationStruct" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="4" name="Splash" type="StyleInformationStruct" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="5" name="WaterMark" type="StyleInformationStruct" default="MS">
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="ContentSearchStruct">
+      <field id="0" name="ParameterList" type="list" default="0">
+        <entry type="ParameterStruct"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="DimensionStruct">
+      <field id="0" name="Width" type="double" default="MS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Height" type="double" default="MS">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Metric" type="MetricTypeEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="ParameterStruct">
+      <field id="0" name="Type" type="ParameterEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Value" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
+      </field>
+      <field id="2" name="ExternalIDList" type="list" default="empty">
+        <entry type="AdditionalInfoStruct"/>
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="PlaybackPreferencesStruct">
+      <field id="0" name="PlaybackPosition" type="uint64">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+      </field>
+      <field id="1" name="TextTrack" type="TrackPreferenceStruct">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="TT"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="AudioTracks" type="list">
+        <entry type="TrackPreferenceStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
+      </field>
+    </struct>
+    <struct name="StyleInformationStruct">
+      <field id="0" name="ImageURL" type="string" default="MS">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
+      </field>
+      <field id="1" name="Color" type="string" default="MS">
+        <optionalConform/>
+        <constraint>
+          <allowed value="7"/>
+        </constraint>
+        <constraint>
+          <allowed value="9"/>
+        </constraint>
+      </field>
+      <field id="2" name="Size" type="DimensionStruct" default="MS">
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="TrackPreferenceStruct">
+      <field id="0" name="LanguageCode" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="1" name="Characteristics" type="list" default="null">
+        <entry type="CharacteristicEnum"/>
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="2" name="AudioOutputIndex" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="AcceptHeader" type="list" default="empty">
+      <entry type="string">
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
+      </entry>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
+      <constraint>
+        <maxCount value="100"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="SupportedStreamingProtocols" type="SupportedProtocolsBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="LaunchContent" direction="commandToServer" response="LauncherResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="CS"/>
+      </mandatoryConform>
+      <field id="0" name="Search" type="ContentSearchStruct">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="AutoPlay" type="bool">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="Data" type="string" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="4" name="UseCurrentContext" type="bool" default="true">
+        <optionalConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="LaunchURL" direction="commandToServer" response="LauncherResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="UP"/>
+      </mandatoryConform>
+      <field id="0" name="ContentURL" type="string">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DisplayString" type="string" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="2" name="BrandingInformation" type="BrandingInformationStruct" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x02" name="LauncherResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CS"/>
+          <feature name="UP"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="Status" type="StatusEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Data" type="string" default="MS">
+        <optionalConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>

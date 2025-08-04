@@ -21,8 +21,6 @@ get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
-get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
-
 set(CONF_FILE prj.conf)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -30,10 +28,6 @@ message(STATUS "Vendor ID " ${CONFIG_CHIP_DEVICE_VENDOR_ID})
 message(STATUS "Product ID " ${CONFIG_CHIP_DEVICE_PRODUCT_ID})
 message(STATUS "Product Name " ${CONFIG_CHIP_DEVICE_PRODUCT_NAME})
 message(STATUS "SW Version String" ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING})
-
-# Set Kconfig root files that will be processed as a first Kconfig for used child images.
-set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
-set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
 
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 
@@ -43,8 +37,11 @@ endif()
 
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
+get_filename_component(GEN_DIR ${CHEF}/out/${CONFIG_CHEF_DEVICE_TYPE}/zap-generated REALPATH)
+
 project(chip-nrfconnect-chef-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/check-sysbuild-use.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
@@ -61,6 +58,7 @@ target_include_directories(app PRIVATE
                            ${CHEF}
                            ${CHEF}/common
                            ${CHEF}/common/clusters/
+                           ${CHEF}/nrfconnect/include/
                            ${GEN_DIR}/../
                            ${CHIP_ROOT}/src
                            ${CHIP_ROOT}/examples/shell/shell_common/include
@@ -81,28 +79,48 @@ if (CONFIG_CHIP_LIB_SHELL)
 endif()
 
 target_sources(app PRIVATE
+    ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
+    ${CHEF}/common/DeviceTypes.cpp
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
     ${CHEF}/common/chef-fan-control-manager.cpp
-    ${CHEF}/common/chef-resource-monitoring-delegates.cpp
+    ${CHEF}/common/chef-laundry-washer-controls-delegate-impl.cpp
+    ${CHEF}/common/chef-laundry-washer-mode.cpp
+    ${CHEF}/common/chef-dishwasher-alarm-delegate-impl.cpp
+    ${CHEF}/common/chef-dishwasher-mode-delegate-impl.cpp
+    ${CHEF}/common/chef-operational-state-delegate-impl.cpp
+    ${CHEF}/common/chef-pump.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
-    ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
+    ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
+    ${CHEF}/common/clusters/channel/ChannelManager.cpp
+    ${CHEF}/common/clusters/door-lock/chef-doorlock-stubs.cpp
+    ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp
+    ${CHEF}/common/clusters/door-lock/chef-lock-manager.cpp
+    ${CHEF}/common/clusters/keypad-input/KeypadInputManager.cpp
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
+    ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
+    ${CHEF}/common/clusters/oven-cavity-operational-state/chef-oven-cavity-operational-state.cpp
+    ${CHEF}/common/clusters/oven-mode/chef-oven-mode.cpp
+    ${CHEF}/common/clusters/microwave-oven-mode/chef-microwave-oven-mode.cpp
+    ${CHEF}/common/clusters/microwave-oven-control/chef-microwave-oven-control.cpp
+    ${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp
+    ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
+    ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
+    ${CHEF}/common/clusters/switch/SwitchManager.cpp
+    ${CHEF}/common/clusters/temperature-control/static-supported-temperature-levels.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
-    ${CHEF}/common/clusters/channel/ChannelManager.cpp
-    ${CHEF}/common/clusters/keypad-input/KeypadInputManager.cpp
-    ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
+    ${CHEF}/common/clusters/window-covering/chef-window-covering.cpp
     ${CHEF}/common/stubs.cpp
+    ${CHEF}/nrfconnect/AppTask.cpp
     ${CHEF}/nrfconnect/main.cpp
 )
 
-message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
+message(STATUS ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap)
 chip_configure_data_model(app
-    INCLUDE_SERVER
-    ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
+    ZAP_FILE ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap
 )
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
@@ -127,6 +145,19 @@ set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRIN
 add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+
+pw_proto_library(actions_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/actions_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/actions_service.options
+  PREFIX
+  actions_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -203,6 +234,7 @@ pw_proto_library(thread_service
 )
 
 target_sources(app PRIVATE
+  ${CHEF}/common/chef-rpc-actions-worker.cpp
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
   ${NRFCONNECT_COMMON}/Rpc.cpp
@@ -220,14 +252,17 @@ target_include_directories(app PRIVATE
   ../../common/pigweed/nrfconnect)
 
 target_compile_options(app PRIVATE
+                       "-DPW_RPC_ACTIONS_SERVICE=1"
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
+                       "-DCONFIG_ENABLE_PW_RPC=1"
 )
 
 target_link_libraries(app PRIVATE
+  actions_service.nanopb_rpc
   attributes_service.nanopb_rpc
   boolean_state_service.nanopb_rpc
   descriptor_service.nanopb_rpc

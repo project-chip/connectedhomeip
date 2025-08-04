@@ -38,10 +38,10 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
 
 /* The ProductName attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "P6-CYW43012 Lock"
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "PSOC6-CYW43012 Lock"
 
 /* The HardwareVersionString attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "P6-43012"
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "PSOC6-43012"
 
 /* The HardwareVersion attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION 43012
@@ -111,3 +111,6 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+// Enable `Extension` attribute of ACL Cluster as required by door locks
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

@@ -19,93 +19,91 @@
 #include "MemMonitoring.h"
 
 #include "AppConfig.h"
-#include "FreeRTOS.h"
+#include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <sl_cmsis_os2_common.h>
 
-#define BLE_STACK_TASK_NAME "Bluetooth stack"
-#define BLE_LINK_TASK_NAME "Bluetooth linklayer"
+namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
 
-static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte / sizeof(StackType_t)];
-static StaticTask_t monitoringTaskStruct;
+static osThreadId_t sMonitorThreadHandle;
+constexpr uint32_t kMonitorTaskSize = 1024;
+static uint8_t monitorStack[kMonitorTaskSize];
+static osThread_t sMonitorTaskControlBlock;
+constexpr osThreadAttr_t kMonitorTaskAttr = { .name       = "MemMonitor",
+                                              .attr_bits  = osThreadDetached,
+                                              .cb_mem     = &sMonitorTaskControlBlock,
+                                              .cb_size    = osThreadCbSize,
+                                              .stack_mem  = monitorStack,
+                                              .stack_size = kMonitorTaskSize,
+                                              .priority   = osPriorityLow };
 
 size_t nbAllocSuccess        = 0;
 size_t nbFreeSuccess         = 0;
 size_t largestBlockAllocated = 0;
 
-void MemMonitoring::startHeapMonitoring()
+void MemMonitoring::StartMonitor()
 {
-    xTaskCreateStatic(HeapMonitoring, "Monitoring", MONITORING_STACK_SIZE_byte / sizeof(StackType_t), NULL, 1, monitoringStack,
-                      &monitoringTaskStruct);
+    sMonitorThreadHandle = osThreadNew(MonitorTask, nullptr, &kMonitorTaskAttr);
 }
 
-void MemMonitoring::HeapMonitoring(void * pvParameter)
+void MemMonitoring::MonitorTask(void * pvParameter)
 {
+    uint32_t threadCount = osThreadGetCount();
 
-    UBaseType_t appTaskValue;
-    UBaseType_t bleEventTaskValue;
-    UBaseType_t bleTaskValue;
-    UBaseType_t linkLayerTaskValue;
-    UBaseType_t openThreadTaskValue;
-    UBaseType_t eventLoopTaskValue;
-
-    TaskHandle_t eventLoopHandleStruct = xTaskGetHandle(CHIP_DEVICE_CONFIG_CHIP_TASK_NAME);
-    TaskHandle_t otTaskHandle          = xTaskGetHandle(CHIP_DEVICE_CONFIG_THREAD_TASK_NAME);
-    TaskHandle_t appTaskHandle         = xTaskGetHandle(APP_TASK_NAME);
-    TaskHandle_t bleStackTaskHandle    = xTaskGetHandle(BLE_STACK_TASK_NAME);
-    TaskHandle_t bleLinkTaskHandle     = xTaskGetHandle(BLE_LINK_TASK_NAME);
-    TaskHandle_t bleEventTaskHandle    = xTaskGetHandle(CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    UBaseType_t lwipTaskValue;
-    TaskHandle_t lwipHandle = xTaskGetHandle(TCPIP_THREAD_NAME);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    osThreadId_t * threadIdTable = new osThreadId_t[threadCount];
+    //  Forms a table of the active thread ids
+    osThreadEnumerate(threadIdTable, threadCount);
 
     while (true)
     {
-        appTaskValue        = uxTaskGetStackHighWaterMark(appTaskHandle);
-        bleEventTaskValue   = uxTaskGetStackHighWaterMark(bleEventTaskHandle);
-        bleTaskValue        = uxTaskGetStackHighWaterMark(bleStackTaskHandle);
-        linkLayerTaskValue  = uxTaskGetStackHighWaterMark(bleLinkTaskHandle);
-        openThreadTaskValue = uxTaskGetStackHighWaterMark(otTaskHandle);
-        eventLoopTaskValue  = uxTaskGetStackHighWaterMark(eventLoopHandleStruct);
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-        lwipTaskValue = uxTaskGetStackHighWaterMark(lwipHandle);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
         SILABS_LOG("=============================");
-        SILABS_LOG("     ");
-        SILABS_LOG("Largest Block allocated              0x%x", largestBlockAllocated);
-        SILABS_LOG("Number Of Successful Alloc           0x%x", nbAllocSuccess);
-        SILABS_LOG("Number Of Successful Frees           0x%x", nbFreeSuccess);
-        SILABS_LOG("     ");
-        SILABS_LOG("App Task most bytes ever Free         0x%x", (appTaskValue * 4));
-        SILABS_LOG("BLE Event most bytes ever Free        0x%x", (bleEventTaskValue * 4));
-        SILABS_LOG("BLE Stack most bytes ever Free        0x%x", (bleTaskValue * 4));
-        SILABS_LOG("Link Layer Task most bytes ever Free  0x%x", (linkLayerTaskValue * 4));
-        SILABS_LOG("OpenThread Task most bytes ever Free  0x%x", (openThreadTaskValue * 4));
-        SILABS_LOG("Event Loop Task most bytes ever Free  0x%x", (eventLoopTaskValue * 4));
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-        SILABS_LOG("LWIP Task most bytes ever Free        0x%x", (lwipTaskValue * 4));
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-        SILABS_LOG("     ");
+        SILABS_LOG(" ");
+        SILABS_LOG("Largest Block allocated     %lu B", largestBlockAllocated);
+        SILABS_LOG("Number Of Successful Alloc  %lu", nbAllocSuccess);
+        SILABS_LOG("Number Of Successful Frees  %lu", nbFreeSuccess);
+        SILABS_LOG(" ");
+
+        SILABS_LOG("Thread stack highwatermark ");
+        for (uint8_t tIdIndex = 0; tIdIndex < threadCount; tIdIndex++)
+        {
+            osThreadId_t tId = threadIdTable[tIdIndex];
+            if (tId != sMonitorThreadHandle) // don't print stats for this current debug thread.
+            {
+                // The smallest amount of free stack space there has been since the thread creation
+                SILABS_LOG("\t%-10s : %6lu B", osThreadGetName(tId), osThreadGetStackSpace(tId));
+            }
+        }
+
+        SILABS_LOG(" ");
         SILABS_LOG("=============================");
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        // run loop every 5 seconds
+        osDelay(osKernelGetTickFreq() * 5);
     }
+
+    // will never get here. Still, free allocated memory before exiting
+    delete threadIdTable;
 }
+
+} // namespace Silabs
+} // namespace DeviceLayer
+} // namespace chip
 
 extern "C" void memMonitoringTrackAlloc(void * ptr, size_t size)
 {
     if (ptr != NULL)
     {
-        nbAllocSuccess++;
-        if (largestBlockAllocated < size)
+        chip::DeviceLayer::Silabs::nbAllocSuccess++;
+        if (chip::DeviceLayer::Silabs::largestBlockAllocated < size)
         {
-            largestBlockAllocated = size;
+            chip::DeviceLayer::Silabs::largestBlockAllocated = size;
         }
     }
 }
 
 extern "C" void memMonitoringTrackFree(void * ptr, size_t size)
 {
-    nbFreeSuccess++;
+    chip::DeviceLayer::Silabs::nbFreeSuccess++;
 }

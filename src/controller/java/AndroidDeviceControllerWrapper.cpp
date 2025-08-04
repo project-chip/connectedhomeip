@@ -20,27 +20,28 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <string.h>
 
+#include <app/server/Dnssd.h>
+#include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/java/AndroidICDClient.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <lib/core/TLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
-#ifndef JAVA_MATTER_CONTROLLER_TEST
-#include <platform/android/CHIPP256KeypairBridge.h>
-#endif // JAVA_MATTER_CONTROLLER_TEST
+
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;
@@ -48,33 +49,7 @@ using namespace TLV;
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
-    mController->Shutdown();
-
-#ifndef JAVA_MATTER_CONTROLLER_TEST
-    if (mKeypairBridge != nullptr)
-    {
-        chip::Platform::Delete(mKeypairBridge);
-        mKeypairBridge = nullptr;
-    }
-#endif // JAVA_MATTER_CONTROLLER_TEST
-
-    if (mDeviceAttestationDelegateBridge != nullptr)
-    {
-        delete mDeviceAttestationDelegateBridge;
-        mDeviceAttestationDelegateBridge = nullptr;
-    }
-
-    if (mDeviceAttestationVerifier != nullptr)
-    {
-        delete mDeviceAttestationVerifier;
-        mDeviceAttestationVerifier = nullptr;
-    }
-
-    if (mAttestationTrustStoreBridge != nullptr)
-    {
-        delete mAttestationTrustStoreBridge;
-        mAttestationTrustStoreBridge = nullptr;
-    }
+    Shutdown();
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -86,10 +61,16 @@ void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
     }
 }
 
-void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
+void AndroidDeviceControllerWrapper::CallJavaIntMethod(const char * methodName, jint argument)
 {
     JniReferences::GetInstance().CallVoidInt(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef.ObjectRef(),
                                              methodName, argument);
+}
+
+void AndroidDeviceControllerWrapper::CallJavaLongMethod(const char * methodName, jlong argument)
+{
+    JniReferences::GetInstance().CallVoidLong(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef.ObjectRef(),
+                                              methodName, argument);
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
@@ -104,7 +85,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
     bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
-    bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure)
+    bool skipAttestationCertificateValidation, jstring countryCode, bool enableServerInteractions, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -175,10 +156,16 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     else
     {
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+        // TODO: Ensure that attestation revocation data is actually provided.
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        chip::Credentials::SetDeviceAttestationVerifier(
+            GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked));
     }
 
-    *errInfoOnFailure = wrapper->mICDClientStorage.Init(wrapperStorage, &wrapper->mSessionKeystore);
+    // Because garbage collection may delay the removal of old controller instances, two instances could temporarily exist.
+    // To avoid issues with the shared ICD client storage, reset the storage before creating a new controller.
+    getICDClientStorage()->Shutdown();
+    *errInfoOnFailure = getICDClientStorage()->Init(wrapperStorage, &wrapper->mSessionKeystore);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "ICD Client Storage failure");
@@ -203,15 +190,35 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
     initParams.sessionKeystore                 = &wrapper->mSessionKeystore;
+    initParams.dataModelProvider               = app::CodegenDataModelProviderInstance(wrapperStorage);
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
 
-    CommissioningParameters params = wrapper->mAutoCommissioner.GetCommissioningParameters();
+    CommissioningParameters params = wrapper->GetCommissioningParameters();
     params.SetFailsafeTimerSeconds(failsafeTimerSeconds);
     params.SetAttemptWiFiNetworkScan(attemptNetworkScanWiFi);
     params.SetAttemptThreadNetworkScan(attemptNetworkScanThread);
     params.SetSkipCommissioningComplete(skipCommissioningComplete);
+
+    if (countryCode != nullptr)
+    {
+        JniUtfString countryCodeJniString(env, countryCode);
+        if (countryCodeJniString.size() != kCountryCodeBufferLen)
+        {
+            *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+            return nullptr;
+        }
+
+        MutableCharSpan copiedCode(wrapper->mCountryCode);
+        if (CopyCharSpanToMutableCharSpan(countryCodeJniString.charSpan(), copiedCode) != CHIP_NO_ERROR)
+        {
+            *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+            return nullptr;
+        }
+        params.SetCountryCode(copiedCode);
+    }
+
     wrapper->UpdateCommissioningParameters(params);
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
@@ -269,7 +276,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
     Crypto::P256Keypair ephemeralKey;
-#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
     {
         CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
@@ -306,7 +312,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerNOC  = chip::ByteSpan(wrapper->mNocCertificate.data(), wrapper->mNocCertificate.size());
     }
     else
-#endif // JAVA_MATTER_CONTROLLER_TEST
     {
         ChipLogProgress(Controller,
                         "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");
@@ -331,6 +336,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerICAC = icacSpan;
         setupParams.controllerNOC  = nocSpan;
     }
+
+    initParams.enableServerInteractions  = enableServerInteractions;
+    setupParams.enableServerInteractions = enableServerInteractions;
 
     *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -372,7 +380,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(
         &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
 
-    wrapper->getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
+    getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
+
+    auto engine       = chip::app::InteractionModelEngine::GetInstance();
+    *errInfoOnFailure = wrapper->mCheckInDelegate.Init(getICDClientStorage(), engine);
+    *errInfoOnFailure = wrapper->mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
+                                                      getICDClientStorage(), &wrapper->mCheckInDelegate, engine);
 
     memset(ipkBuffer.data(), 0, ipkBuffer.size());
 
@@ -380,14 +393,41 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         return nullptr;
     }
-
+    wrapper->mIsInitialized = true;
     return wrapper.release();
 }
 
 void AndroidDeviceControllerWrapper::Shutdown()
 {
+    VerifyOrReturn(mIsInitialized);
+    getICDClientStorage()->Shutdown();
     mController->Shutdown();
     DeviceControllerFactory::GetInstance().Shutdown();
+
+    if (mKeypairBridge != nullptr)
+    {
+        chip::Platform::Delete(mKeypairBridge);
+        mKeypairBridge = nullptr;
+    }
+
+    if (mDeviceAttestationDelegateBridge != nullptr)
+    {
+        delete mDeviceAttestationDelegateBridge;
+        mDeviceAttestationDelegateBridge = nullptr;
+    }
+
+    if (mDeviceAttestationVerifier != nullptr)
+    {
+        delete mDeviceAttestationVerifier;
+        mDeviceAttestationVerifier = nullptr;
+    }
+
+    if (mAttestationTrustStoreBridge != nullptr)
+    {
+        delete mAttestationTrustStoreBridge;
+        mAttestationTrustStoreBridge = nullptr;
+    }
+    mIsInitialized = false;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
@@ -471,23 +511,51 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     VerifyOrReturnError(icdRegistrationInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Controller, "Failed to retrieve JNIEnv in %s.", __func__);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    jmethodID getICDStayActiveDurationMsecMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getICDStayActiveDurationMsec",
+                                                        "()Ljava/lang/Long;", &getICDStayActiveDurationMsecMethod);
+    ReturnErrorOnFailure(err);
+    jobject jStayActiveMsec = env->CallObjectMethod(icdRegistrationInfo, getICDStayActiveDurationMsecMethod);
+    if (jStayActiveMsec != nullptr)
+    {
+        jlong stayActiveMsec = chip::JniReferences::GetInstance().LongToPrimitive(jStayActiveMsec);
+        if (!chip::CanCastTo<uint32_t>(stayActiveMsec))
+        {
+            ChipLogError(Controller, "Failed to process stayActiveMsec in %s since this is not a valid 32-bit integer.", __func__);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        params.SetICDStayActiveDurationMsec(static_cast<uint32_t>(stayActiveMsec));
+    }
+
     jmethodID getCheckInNodeIdMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getCheckInNodeId", "()Ljava/lang/Long;",
                                                         &getCheckInNodeIdMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
     jobject jCheckInNodeId = env->CallObjectMethod(icdRegistrationInfo, getCheckInNodeIdMethod);
 
     jmethodID getMonitoredSubjectMethod;
     err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getMonitoredSubject", "()Ljava/lang/Long;",
                                                         &getMonitoredSubjectMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
     jobject jMonitoredSubject = env->CallObjectMethod(icdRegistrationInfo, getMonitoredSubjectMethod);
 
     jmethodID getSymmetricKeyMethod;
     err =
         chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getSymmetricKey", "()[B", &getSymmetricKeyMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
     jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
+
+    jmethodID getClientTypeMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getClientType", "()Ljava/lang/Integer;",
+                                                        &getClientTypeMethod);
+    ReturnErrorOnFailure(err);
+    jobject jClientType = env->CallObjectMethod(icdRegistrationInfo, getClientTypeMethod);
 
     chip::NodeId checkInNodeId = chip::kUndefinedNodeId;
     if (jCheckInNodeId != nullptr)
@@ -519,6 +587,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     }
     params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
 
+    chip::app::Clusters::IcdManagement::ClientTypeEnum clientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
+    if (jClientType != nullptr)
+    {
+        clientType = static_cast<chip::app::Clusters::IcdManagement::ClientTypeEnum>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(jClientType));
+    }
+    params.SetICDClientType(clientType);
+
     return err;
 }
 
@@ -526,6 +602,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateCommissioningParameters(const c
 {
     // this will wipe out any custom attestationNonce and csrNonce that was being used.
     // however, Android APIs don't allow these to be set to custom values today.
+    mCommissioningParameter = params;
     return mAutoCommissioner.SetCommissioningParameters(params);
 }
 
@@ -561,6 +638,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(job
 
     deviceAttestationVerifier = new Credentials::DefaultDACVerifier(attestationTrustStoreBridge);
     VerifyOrExit(deviceAttestationVerifier != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    deviceAttestationVerifier->EnableVerboseLogs(true);
 
     if (mAttestationTrustStoreBridge != nullptr)
     {
@@ -661,22 +739,27 @@ CHIP_ERROR AndroidDeviceControllerWrapper::FinishOTAProvider()
 #endif
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::SetICDCheckInDelegate(jobject checkInDelegate)
+{
+    return mCheckInDelegate.SetDelegate(checkInDelegate);
+}
+
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    CallJavaMethod("onStatusUpdate", static_cast<jint>(status));
+    CallJavaIntMethod("onStatusUpdate", static_cast<jint>(status));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    CallJavaMethod("onPairingComplete", static_cast<jint>(error.AsInteger()));
+    CallJavaLongMethod("onPairingComplete", static_cast<jlong>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    CallJavaMethod("onPairingDeleted", static_cast<jint>(error.AsInteger()));
+    CallJavaLongMethod("onPairingDeleted", static_cast<jlong>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
@@ -685,7 +768,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
 
     if (error != CHIP_NO_ERROR && mDeviceIsICD)
     {
-        CHIP_ERROR deleteEntryError = mICDClientStorage.DeleteEntry(ScopedNodeId(deviceId, Controller()->GetFabricIndex()));
+        CHIP_ERROR deleteEntryError = getICDClientStorage()->DeleteEntry(ScopedNodeId(deviceId, Controller()->GetFabricIndex()));
         if (deleteEntryError != CHIP_NO_ERROR)
         {
             ChipLogError(chipTool, "Failed to delete ICD entry: %" CHIP_ERROR_FORMAT, deleteEntryError.Format());
@@ -694,11 +777,11 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningCompleteMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningComplete", "(JI)V",
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningComplete", "(JJ)V",
                                                              &onCommissioningCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningCompleteMethod, static_cast<jlong>(deviceId),
-                        static_cast<jint>(error.AsInteger()));
+                        static_cast<jlong>(error.AsInteger()));
 
     if (ssidStr != nullptr)
     {
@@ -729,12 +812,12 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
     JniLocalReferenceScope scope(env);
     jmethodID onCommissioningStatusUpdateMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningStatusUpdate",
-                                                             "(JLjava/lang/String;I)V", &onCommissioningStatusUpdateMethod);
+                                                             "(JLjava/lang/String;J)V", &onCommissioningStatusUpdateMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
     UtfString jStageCompleted(env, StageToString(stageCompleted));
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningStatusUpdateMethod, static_cast<jlong>(peerId.GetNodeId()),
-                        jStageCompleted.jniValue(), static_cast<jint>(error.AsInteger()));
+                        jStageCompleted.jniValue(), static_cast<jlong>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
@@ -749,7 +832,11 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
 
     // For ICD
     mUserActiveModeTriggerHint = info.icd.userActiveModeTriggerHint;
+    memset(mUserActiveModeTriggerInstructionBuffer, 0x00, kUserActiveModeTriggerInstructionBufferLen);
     CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
+
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
+                    info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
 
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),
                         static_cast<jint>(info.basic.productId), static_cast<jint>(info.network.wifi.endpoint),
@@ -766,12 +853,13 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Error invoking Java callback: no JNIEnv"));
 
     err = JniReferences::GetInstance().FindMethod(
         env, mJavaObjectRef.ObjectRef(), "onScanNetworksSuccess",
         "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format()));
 
     jobject NetworkingStatus;
     std::string NetworkingStatusClassName     = "java/lang/Integer";
@@ -903,7 +991,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                                                                       threadInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ThreadScanResult");
+                ChipLogError(Controller, "Could not find class ThreadScanResult");
                 return;
             }
             jmethodID threadInterfaceScanResultStructCtor =
@@ -912,7 +1000,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                                  "Integer;[BLjava/lang/Integer;Ljava/lang/Integer;)V");
             if (threadInterfaceScanResultStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ThreadScanResult constructor");
+                ChipLogError(Controller, "Could not find ThreadScanResult constructor");
                 return;
             }
 
@@ -932,7 +1020,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksFailure(CHIP_ERROR error)
 {
     chip::DeviceLayer::StackUnlock unlock;
 
-    CallJavaMethod("onScanNetworksFailure", static_cast<jint>(error.AsInteger()));
+    CallJavaLongMethod("onScanNetworksFailure", static_cast<jlong>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnICDRegistrationInfoRequired()
@@ -947,33 +1035,35 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationInfoRequired()
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationInfoRequiredMethod);
 }
 
-void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter)
+void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeId icdNodeId, uint32_t icdCounter)
 {
     chip::DeviceLayer::StackUnlock unlock;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = ScopedNodeId(icdNodeId, Controller()->GetFabricIndex());
+    clientInfo.peer_node         = icdNodeId;
+    clientInfo.check_in_node     = chip::ScopedNodeId(mAutoCommissioner.GetCommissioningParameters().GetICDCheckInNodeId().Value(),
+                                                      icdNodeId.GetFabricIndex());
     clientInfo.monitored_subject = mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value();
     clientInfo.start_icd_counter = icdCounter;
 
     ByteSpan symmetricKey = mAutoCommissioner.GetCommissioningParameters().GetICDSymmetricKey().Value();
 
-    err = mICDClientStorage.SetKey(clientInfo, symmetricKey);
+    err = getICDClientStorage()->SetKey(clientInfo, symmetricKey);
     if (err == CHIP_NO_ERROR)
     {
-        err = mICDClientStorage.StoreEntry(clientInfo);
+        err = getICDClientStorage()->StoreEntry(clientInfo);
     }
 
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(icdNodeId));
+        ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(icdNodeId.GetNodeId()));
     }
     else
     {
-        mICDClientStorage.RemoveKey(clientInfo);
-        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(icdNodeId),
-                     err.AsString());
+        getICDClientStorage()->RemoveKey(clientInfo);
+        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s",
+                     ChipLogValueX64(icdNodeId.GetNodeId()), err.AsString());
     }
 
     mDeviceIsICD = true;
@@ -988,14 +1078,14 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     jbyteArray jSymmetricKey          = nullptr;
     CHIP_ERROR methodErr =
         JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onICDRegistrationComplete",
-                                                "(ILchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
+                                                "(JLchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
 
     methodErr = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
 
-    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJJJI)V");
+    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJIJJJJJI)V");
     VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
 
     methodErr =
@@ -1007,17 +1097,20 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     icdDeviceInfoObj = env->NewObject(
         icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
-        jUserActiveModeTriggerInstruction, static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
+        jUserActiveModeTriggerInstruction, static_cast<jlong>(mIdleModeDuration), static_cast<jlong>(mActiveModeDuration),
+        static_cast<jint>(mActiveModeThreshold), static_cast<jlong>(icdNodeId.GetNodeId()),
+        static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDCheckInNodeId().Value()),
+        static_cast<jlong>(icdCounter),
         static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
         static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
 
-    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()),
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationCompleteMethod, static_cast<jlong>(err.AsInteger()),
                         icdDeviceInfoObj);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    ChipLogProgress(chipTool, "KVS: Getting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Getting key %s", StringOrNullMarker(key));
 
     size_t read_size = 0;
 
@@ -1030,12 +1123,25 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, voi
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    ChipLogProgress(chipTool, "KVS: Setting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Setting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
 {
-    ChipLogProgress(chipTool, "KVS: Deleting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Deleting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+}
+
+void AndroidDeviceControllerWrapper::StartDnssd()
+{
+    FabricTable * fabricTable = DeviceControllerFactory::GetInstance().GetSystemState()->Fabrics();
+    VerifyOrReturn(fabricTable != nullptr, ChipLogError(Controller, "Fail to get fabricTable in StartDnssd"));
+    chip::app::DnssdServer::Instance().SetFabricTable(fabricTable);
+    chip::app::DnssdServer::Instance().StartServer();
+}
+
+void AndroidDeviceControllerWrapper::StopDnssd()
+{
+    chip::app::DnssdServer::Instance().StopServer();
 }

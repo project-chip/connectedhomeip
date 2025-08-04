@@ -32,14 +32,10 @@ static_library("Beken") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-
-    #"DeviceInfoProviderImpl.cpp",
-    #"DeviceInfoProviderImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "LwIPCoreLock.cpp",
     "NetworkCommissioningWiFiDriver.cpp",
     "OTAImageProcessorImpl.cpp",
@@ -51,6 +47,8 @@ static_library("Beken") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
@@ -60,4 +58,12 @@ static_library("Beken") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
 }

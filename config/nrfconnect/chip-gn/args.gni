@@ -19,6 +19,7 @@ import("${chip_root}/src/crypto/crypto.gni")
 chip_device_platform = "nrfconnect"
 
 chip_build_tests = false
+chip_build_tools = false
 
 chip_project_config_include = ""
 chip_system_project_config_include = ""

@@ -46,12 +46,16 @@ private:
 /// Allows a scoped mutation to occur on a variable.
 ///
 /// When an instance of this class goes out of scope, the variable
-/// will be reset to the default.
+/// will be reset to the value id had before the scoped change came
+/// into effect.
 ///
-/// Example usage
+/// While the ScopedChange is in scope it can be used to make changes
+/// to the underlying value using the assignment operator.
 ///
-/// int              a = 123;
-/// ScopedChangeOnly b(234);
+/// Example usage:
+///
+/// int a = 123;
+/// ScopedChangeOnly<int> b(234);
 ///
 /// /* a == 123, b == 234 */
 /// {
@@ -62,6 +66,8 @@ private:
 ///       /* a == 321, b == 10 */
 ///    }
 ///    /* a == 321, b == 234 */
+///    changeA = 333; // assignments within the ScopedChange are allowed
+///    /* a == 333, b == 234 */
 /// }
 /// /* a == 123, b == 234 */
 ///
@@ -69,9 +75,21 @@ template <typename T>
 class ScopedChange
 {
 public:
-    ScopedChange(ScopedChangeOnly<T> & what, T value) : mValue(what.InternalMutableValue()), mOriginal(what) { mValue = value; }
-    ScopedChange(T & what, T value) : mValue(what), mOriginal(what) { mValue = value; }
+    ScopedChange(ScopedChangeOnly<T> & what) : mValue(what.InternalMutableValue()), mOriginal(what) {}
+    ScopedChange(ScopedChangeOnly<T> & what, T value) : ScopedChange(what) { mValue = value; }
+
+    ScopedChange(T & what) : mValue(what), mOriginal(what) {}
+    ScopedChange(T & what, T value) : ScopedChange(what) { mValue = value; }
+
     ~ScopedChange() { mValue = mOriginal; }
+
+    ScopedChange & operator=(T const & value)
+    {
+        mValue = value;
+        return *this;
+    }
+
+    operator T() const { return mValue; }
 
 private:
     T & mValue;

@@ -202,18 +202,61 @@ tests:
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
+                        },
+                        {
+                            ClusterID: 0x0300,
+                            AttributeValueList:
+                                [
+                                    {
+                                        AttributeID: 0x0001,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0003,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0004,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0007,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4000,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4001,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4002,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4003,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                ],
+                        },
+                        {
+                            ClusterID: 0x0050,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0003, ValueUnsigned8: 0x01 }],
                         },
                     ]
       response:
@@ -260,18 +303,61 @@ tests:
                 value: 0x01
               - name: "TransitionTime"
                 value: 1000
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
+                        },
+                        {
+                            ClusterID: 0x0300,
+                            AttributeValueList:
+                                [
+                                    {
+                                        AttributeID: 0x0001,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0003,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0004,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x0007,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4000,
+                                        ValueUnsigned16: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4001,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4002,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                    {
+                                        AttributeID: 0x4003,
+                                        ValueUnsigned8: 0x64,
+                                    },
+                                ],
+                        },
+                        {
+                            ClusterID: 0x0050,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0003, ValueUnsigned8: 0x01 }],
                         },
                     ]
 
@@ -328,18 +414,18 @@ tests:
                 value: 2000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x00 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x00 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0xFA }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0xFA }],
                         },
                     ]
 
@@ -361,18 +447,18 @@ tests:
                 value: 0x01
               - name: "TransitionTime"
                 value: 2000
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x00 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x00 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0xFA }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0xFA }],
                         },
                     ]
 

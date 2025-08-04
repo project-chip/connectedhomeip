@@ -1,0 +1,762 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0035" name="Thread Network Diagnostics Cluster" revision="3">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Remove optionality from FrameErrorRate and MessageErrorRate"/>
+    <revision revision="3" summary="Add ExtAddress and Rloc16 attributes"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0035" name="Thread Network Diagnostics"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="DGTHREAD" scope="Node">
+    <quality diagnostics="true"/>
+  </classification>
+  <features>
+    <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Server supports the counts for the number of received and transmitted packets on the Thread interface.">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Server supports the counts for the number of errors that have occurred during the reception and transmission of packets on the Thread interface.">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="MLECNT" name="MLECounts" summary="Server supports the counts for various MLE layer happenings.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="MACCNT" name="MACCounts" summary="Server supports the counts for various MAC layer happenings.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="ConnectionStatusEnum">
+      <item value="0" name="Connected" summary="Node is connected">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="NotConnected" summary="Node is not connected">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="NetworkFaultEnum">
+      <item value="0" name="Unspecified" summary="Indicates an unspecified fault.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="LinkDown" summary="Indicates the Thread link is down.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="HardwareFailure" summary="Indicates there has been Thread hardware failure.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="NetworkJammed" summary="Indicates the Thread network is jammed.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="RoutingRoleEnum">
+      <item value="0" name="Unspecified" summary="Unspecified routing role.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Unassigned" summary="The Node does not currently have a role as a result of the Thread interface not currently being configured or operational.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="SleepyEndDevice" summary="The Node acts as a Sleepy End Device with RX-off-when-idle sleepy radio behavior.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="EndDevice" summary="The Node acts as an End Device without RX-off-when-idle sleepy radio behavior.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="REED" summary="The Node acts as an Router Eligible End Device.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Router" summary="The Node acts as a Router Device.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="Leader" summary="The Node acts as a Leader Device.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="NeighborTableStruct">
+      <field id="0" name="ExtAddress" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Age" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Rloc16" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="LinkFrameCounter" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="MleFrameCounter" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="LQI" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="255"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="6" name="AverageRssi" type="int8" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-128"/>
+            <to value="0"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="7" name="LastRssi" type="int8" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-128"/>
+            <to value="0"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="8" name="FrameErrorRate" type="uint8" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="100"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="9" name="MessageErrorRate" type="uint8" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="100"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="10" name="RxOnWhenIdle" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="11" name="FullThreadDevice" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="12" name="FullNetworkData" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="13" name="IsChild" type="bool">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="OperationalDatasetComponents">
+      <field id="0" name="ActiveTimestampPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PendingTimestampPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MasterKeyPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="NetworkNamePresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="ExtendedPanIdPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="MeshLocalPrefixPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="DelayPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="PanIdPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="8" name="ChannelPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="9" name="PskcPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="10" name="SecurityPolicyPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="11" name="ChannelMaskPresent" type="bool">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="RouteTableStruct">
+      <field id="0" name="ExtAddress" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Rloc16" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="RouterId" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="NextHop" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="PathCost" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="LQIIn" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="LQIOut" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="Age" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="8" name="Allocated" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="9" name="LinkEstablished" type="bool">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="SecurityPolicy">
+      <field id="0" name="RotationTime" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Flags" type="uint16">
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="Channel" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="RoutingRole" type="RoutingRoleEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="NetworkName" type="string">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxLength value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="PanId" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="ExtendedPanId" type="uint64">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="MeshLocalPrefix" type="ipv6pre">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0006" name="OverrunCount" type="uint64" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <mandatoryConform>
+        <feature name="ERRCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="NeighborTable" type="list" default="empty">
+      <entry type="NeighborTableStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0008" name="RouteTable" type="list" default="empty">
+      <entry type="RouteTableStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0009" name="PartitionId" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000A" name="Weighting" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="255"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="DataVersion" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="255"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="StableDataVersion" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="255"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000D" name="LeaderRouterId" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="62"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="DetachedRoleCount" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MLECNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x000F" name="ChildRoleCount" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MLECNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0010" name="RouterRoleCount" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MLECNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0011" name="LeaderRoleCount" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MLECNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0012" name="AttachAttemptCount" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MLECNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0013" name="PartitionIdChangeCount" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MLECNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0014" name="BetterPartitionAttachAttemptCount" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MLECNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0015" name="ParentChangeCount" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MLECNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0016" name="TxTotalCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0017" name="TxUnicastCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0018" name="TxBroadcastCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0019" name="TxAckRequestedCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x001A" name="TxAckedCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x001B" name="TxNoAckRequestedCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x001C" name="TxDataCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x001D" name="TxDataPollCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x001E" name="TxBeaconCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x001F" name="TxBeaconRequestCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0020" name="TxOtherCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0021" name="TxRetryCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0022" name="TxDirectMaxRetryExpiryCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0023" name="TxIndirectMaxRetryExpiryCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0024" name="TxErrCcaCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0025" name="TxErrAbortCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0026" name="TxErrBusyChannelCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0027" name="RxTotalCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0028" name="RxUnicastCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0029" name="RxBroadcastCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x002A" name="RxDataCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x002B" name="RxDataPollCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x002C" name="RxBeaconCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x002D" name="RxBeaconRequestCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x002E" name="RxOtherCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x002F" name="RxAddressFilteredCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0030" name="RxDestAddrFilteredCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0031" name="RxDuplicatedCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0032" name="RxErrNoFrameCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0033" name="RxErrUnknownNeighborCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0034" name="RxErrInvalidSrcAddrCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0035" name="RxErrSecCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0036" name="RxErrFcsCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0037" name="RxErrOtherCount" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <optionalConform>
+        <feature name="MACCNT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0038" name="ActiveTimestamp" type="uint64" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0039" name="PendingTimestamp" type="uint64" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x003A" name="Delay" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x003B" name="SecurityPolicy" type="SecurityPolicy">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x003C" name="ChannelPage0Mask" type="octstr">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <allowed value="4"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x003D" name="OperationalDatasetComponents" type="OperationalDatasetComponents">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x003E" name="ActiveNetworkFaultsList" type="list">
+      <entry type="NetworkFaultEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="4"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x003F" name="ExtAddress" type="uint64">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0040" name="Rloc16" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="ResetCounts" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="ERRCNT"/>
+      </mandatoryConform>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="ConnectionStatus" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="ConnectionStatus" type="ConnectionStatusEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="NetworkFaultChange" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="Current" type="list">
+        <entry type="NetworkFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
+      </field>
+      <field id="1" name="Previous" type="list">
+        <entry type="NetworkFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
+      </field>
+    </event>
+  </events>
+</cluster>

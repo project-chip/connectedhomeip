@@ -20,15 +20,14 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerParameters.h>
-#else
-#import "MTRDeviceControllerParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+
+// MTRDeviceController_Concrete.h imports this header, so we can't import it.
+@class MTRDeviceController_Concrete;
 
 namespace chip {
 class FabricTable;
@@ -88,6 +87,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
 @property (nonatomic, strong, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
+
++ (nullable NSNumber *)nodeIDFromNOC:(MTRCertificateDERBytes)noc;
++ (nullable NSNumber *)fabricIDFromNOC:(MTRCertificateDERBytes)noc;
++ (nullable NSData *)publicKeyFromCertificate:(MTRCertificateDERBytes)certificate;
 
 @end
 
@@ -157,7 +160,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initialize for controller bringup with per-controller storage.
  */
-- (instancetype)initForNewController:(MTRDeviceController *)controller
+- (instancetype)initForNewController:(MTRDeviceController_Concrete *)controller
                          fabricTable:(chip::FabricTable *)fabricTable
                             keystore:(chip::Crypto::OperationalKeystore *)keystore
                 advertiseOperational:(BOOL)advertiseOperational

@@ -57,6 +57,7 @@
 #include <glib-object.h>
 #include <glib.h>
 
+#include <ble/Ble.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -65,7 +66,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
@@ -73,6 +74,10 @@
 
 #include "BluezConnection.h"
 #include "Types.h"
+
+#if !GLIB_CHECK_VERSION(2, 68, 0)
+#define g_memdup2(mem, size) g_memdup(mem, static_cast<unsigned int>(size))
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -89,44 +94,32 @@ gboolean BluezEndpoint::BluezCharacteristicReadValue(BluezGattCharacteristic1 * 
     return TRUE;
 }
 
-static void Bluez_gatt_characteristic1_complete_acquire_write_with_fd(GDBusMethodInvocation * invocation, int fd, guint16 mtu)
-{
-    GUnixFDList * fd_list = g_unix_fd_list_new();
-    int index             = g_unix_fd_list_append(fd_list, fd, nullptr);
-    g_dbus_method_invocation_return_value_with_unix_fd_list(invocation, g_variant_new("(@hq)", g_variant_new_handle(index), mtu),
-                                                            fd_list);
-    g_object_unref(fd_list);
-}
-
 gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                        GVariant * aOptions)
+                                                        GUnixFDList * aFDList, GVariant * aOptions)
 {
-    int fds[2] = { -1, -1 };
-#if CHIP_ERROR_LOGGING
-    char * errStr;
-#endif // CHIP_ERROR_LOGGING
+    int fds[2]             = { -1, -1 };
     BluezConnection * conn = nullptr;
-    GAutoPtr<GVariant> option_mtu;
+    const char * deviceObjectPath;
     uint16_t mtu;
 
-    conn = GetBluezConnectionViaDevice();
     VerifyOrReturnValue(
-        conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection"));
-
-    ChipLogDetail(DeviceLayer, "BluezCharacteristicAcquireWrite is called, conn: %p", conn);
-
+        g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), FALSE,
+        ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path"));
     VerifyOrReturnValue(
         g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value"));
+
+    conn = GetBluezConnection(deviceObjectPath);
+    VerifyOrReturnValue(
+        conn != nullptr, FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device"));
+
     conn->SetMTU(mtu);
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
-#if CHIP_ERROR_LOGGING
-        errStr = strerror(errno);
-#endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(strerror(errno)), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         return FALSE;
     }
@@ -134,14 +127,15 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1
     conn->SetupWriteHandler(fds[0]);
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
 
-    Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->GetMTU());
-    close(fds[1]);
+    GUnixFDList * fdList = g_unix_fd_list_new_from_array(&fds[1], 1);
+    bluez_gatt_characteristic1_complete_acquire_write(aChar, aInvocation, fdList, g_variant_new_handle(0), conn->GetMTU());
+    g_object_unref(fdList);
 
     return TRUE;
 }
 
 static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                     GVariant * aOptions)
+                                                     GUnixFDList * aFDList, GVariant * aOptions)
 {
     ChipLogDetail(DeviceLayer, "Received %s", __func__);
     g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotSupported",
@@ -150,43 +144,39 @@ static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * 
 }
 
 gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                         GVariant * aOptions)
+                                                         GUnixFDList * aFDList, GVariant * aOptions)
 {
-    int fds[2] = { -1, -1 };
-#if CHIP_ERROR_LOGGING
-    char * errStr;
-#endif // CHIP_ERROR_LOGGING
+    int fds[2]                   = { -1, -1 };
     BluezConnection * conn       = nullptr;
     bool isAdditionalAdvertising = false;
-    GAutoPtr<GVariant> option_mtu;
+    const char * deviceObjectPath;
     uint16_t mtu;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    isAdditionalAdvertising = (aChar == mpC3);
+    isAdditionalAdvertising = (aChar == mC3.get());
 #endif
 
-    if (bluez_gatt_characteristic1_get_notifying(aChar))
-    {
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying");
-        return FALSE;
-    }
-
-    conn = GetBluezConnectionViaDevice();
     VerifyOrReturnValue(
-        conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection"));
-
+        !bluez_gatt_characteristic1_get_notifying(aChar), FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying"));
+    VerifyOrReturnValue(
+        g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), FALSE,
+        ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path"));
     VerifyOrReturnValue(
         g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"););
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value"));
+
+    conn = GetBluezConnection(deviceObjectPath);
+    VerifyOrReturnValue(
+        conn != nullptr, FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device"));
+
     conn->SetMTU(mtu);
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
-#if CHIP_ERROR_LOGGING
-        errStr = strerror(errno);
-#endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(strerror(errno)), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         return FALSE;
     }
@@ -195,9 +185,9 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
     conn->SetNotifyAcquired(true);
 
-    // same reply as for AcquireWrite
-    Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->GetMTU());
-    close(fds[1]);
+    GUnixFDList * fdList = g_unix_fd_list_new_from_array(&fds[1], 1);
+    bluez_gatt_characteristic1_complete_acquire_notify(aChar, aInvocation, fdList, g_variant_new_handle(0), conn->GetMTU());
+    g_object_unref(fdList);
 
     BLEManagerImpl::HandleTXCharCCCDWrite(conn);
 
@@ -213,10 +203,14 @@ static gboolean BluezCharacteristicAcquireNotifyError(BluezGattCharacteristic1 *
     return TRUE;
 }
 
+// NOTE: When using with BlueZ >= 5.80, this method can be removed. Also, the GetBluezConnectionViaDevice
+//       method will no longer be needed, since every callback will have the device object path available
+//       in the options parameter.
 gboolean BluezEndpoint::BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation)
 {
     BluezConnection * conn = GetBluezConnectionViaDevice();
-    ChipLogDetail(Ble, "Indication confirmation, %p", conn);
+    ChipLogDetail(DeviceLayer, "Indication confirmation: conn=%p", conn);
+    bluez_gatt_characteristic1_complete_confirm(aChar, aInvocation);
     BLEManagerImpl::HandleTXComplete(conn);
     return TRUE;
 }
@@ -225,11 +219,6 @@ static gboolean BluezCharacteristicConfirmError(BluezGattCharacteristic1 * aChar
 {
     g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "Confirm from characteristic is unsupported");
     return TRUE;
-}
-
-static gboolean BluezIsDeviceOnAdapter(BluezDevice1 * aDevice, BluezAdapter1 * aAdapter)
-{
-    return strcmp(bluez_device1_get_adapter(aDevice), g_dbus_proxy_get_object_path(G_DBUS_PROXY(aAdapter))) == 0 ? TRUE : FALSE;
 }
 
 BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName,
@@ -253,7 +242,7 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
     bluez_gatt_characteristic1_set_value(characteristic, value);
 
     bluez_object_skeleton_set_gatt_characteristic1(object, characteristic);
-    g_dbus_object_manager_server_export(mpRoot, G_DBUS_OBJECT_SKELETON(object));
+    g_dbus_object_manager_server_export(mRoot.get(), G_DBUS_OBJECT_SKELETON(object));
     g_object_unref(object);
 
     return characteristic;
@@ -262,141 +251,119 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
 void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
-    BluezGattManager1 * gattMgr = BLUEZ_GATT_MANAGER1(aObject);
+    if (!bluez_gatt_manager1_call_register_application_finish(reinterpret_cast<BluezGattManager1 *>(aObject), aResult,
+                                                              &error.GetReceiver()))
+    {
+        ChipLogError(DeviceLayer, "FAIL: RegisterGattApplication: %s", error->message);
+        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(BluezCallToChipError(error.get()));
+        return;
+    }
 
-    gboolean success = bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &error.GetReceiver());
-
-    VerifyOrReturn(success == TRUE, {
-        ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
-        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false);
-    });
-
-    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(true);
-    ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
+    ChipLogDetail(DeviceLayer, "GATT application registered successfully");
+    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 {
-    GDBusObject * adapterObject;
-    GAutoPtr<BluezGattManager1> gattMgr;
+    VerifyOrReturnError(mAdapter, CHIP_ERROR_UNINITIALIZED);
+
+    // If the adapter configured in the Init() was unplugged, the g_dbus_interface_get_object()
+    // or bluez_object_get_gatt_manager1() might return nullptr (depending on the timing, since
+    // the D-Bus communication is handled on a separate thread). In such case, we should not
+    // report internal error, but adapter unavailable, so the application can handle the situation
+    // properly.
+
+    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
+    VerifyOrReturnError(adapterObject != nullptr, BLE_ERROR_ADAPTER_UNAVAILABLE);
+    GAutoPtr<BluezGattManager1> gattMgr(bluez_object_get_gatt_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
+    VerifyOrReturnError(gattMgr, BLE_ERROR_ADAPTER_UNAVAILABLE);
+
     GVariantBuilder optionsBuilder;
-    GVariant * options;
-
-    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
-
-    adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
-    VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
-
-    gattMgr.reset(bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapterObject)));
-    VerifyOrExit(gattMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
-
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
-    options = g_variant_builder_end(&optionsBuilder);
+    GVariant * options = g_variant_builder_end(&optionsBuilder);
 
     bluez_gatt_manager1_call_register_application(
-        gattMgr.get(), mpRootPath, options, nullptr,
+        gattMgr.get(), mRootPath.get(), options, nullptr,
         +[](GObject * aObj, GAsyncResult * aResult, void * self) {
             reinterpret_cast<BluezEndpoint *>(self)->RegisterGattApplicationDone(aObj, aResult);
         },
         this);
 
-exit:
     return CHIP_NO_ERROR;
 }
 
 /// Update the table of open BLE connections whenever a new device is spotted or its attributes have changed.
-void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
+void BluezEndpoint::UpdateConnectionTable(BluezDevice1 & aDevice)
 {
-    const char * objectPath      = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
-    BluezConnection * connection = GetBluezConnection(objectPath);
+    const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
+    BluezConnection * conn  = GetBluezConnection(objectPath);
 
-    if (connection != nullptr && !bluez_device1_get_connected(apDevice))
+    if (conn != nullptr && !bluez_device1_get_connected(&aDevice))
     {
-        ChipLogDetail(DeviceLayer, "Bluez disconnected");
-        BLEManagerImpl::CHIPoBluez_ConnectionClosed(connection);
+        ChipLogDetail(DeviceLayer, "BLE connection closed: conn=%p", conn);
+        // Drop the closed connection from the map.
         mConnMap.erase(objectPath);
-        // TODO: the connection object should be released after BLEManagerImpl finishes cleaning up its resources
-        // after the disconnection. Releasing it here doesn't cause any issues, but it's error-prone.
-        chip::Platform::Delete(connection);
-        return;
+        // Notify the BLE layer that the connection was closed.
+        BLEManagerImpl::HandleConnectionClosed(conn);
+        // The BLE layer notification above is done asynchronously (it will be processed
+        // in the next event loop iteration). So, we can not delete the connection object
+        // immediately, because the BLE layer might still use it. Instead, we will also
+        // schedule the deletion of the connection object, so it will happen after the
+        // BLE layer has processed the disconnection event.
+        DeviceLayer::SystemLayer().ScheduleLambda([conn] {
+            ChipLogDetail(DeviceLayer, "Freeing BLE connection: conn=%p", conn);
+            chip::Platform::Delete(conn);
+        });
     }
-
-    if (connection == nullptr && !bluez_device1_get_connected(apDevice) && mIsCentral)
+    else if (conn == nullptr)
     {
-        return;
-    }
-
-    if (connection == nullptr && bluez_device1_get_connected(apDevice) &&
-        (!mIsCentral || bluez_device1_get_services_resolved(apDevice)))
-    {
-        connection                 = chip::Platform::New<BluezConnection>(*this, apDevice);
-        mpPeerDevicePath           = g_strdup(objectPath);
-        mConnMap[mpPeerDevicePath] = connection;
-
-        ChipLogDetail(DeviceLayer, "New BLE connection: conn %p, device %s, path %s", connection, connection->GetPeerAddress(),
-                      mpPeerDevicePath);
-
-        BLEManagerImpl::HandleNewConnection(connection);
+        HandleNewDevice(aDevice);
     }
 }
 
-void BluezEndpoint::BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
-                                                          GDBusProxy * aInterface, GVariant * aChangedProperties,
-                                                          const char * const * aInvalidatedProps)
+void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
 {
-    VerifyOrReturn(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
-    VerifyOrReturn(strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0, );
+    VerifyOrReturn(bluez_device1_get_connected(&aDevice));
+    VerifyOrReturn(!mIsCentral || bluez_device1_get_services_resolved(&aDevice));
+    CHIP_ERROR err;
 
-    BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
-    VerifyOrReturn(BluezIsDeviceOnAdapter(device, mAdapter.get()));
+    const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
+    BluezConnection * conn  = GetBluezConnection(objectPath);
+    VerifyOrReturn(conn == nullptr,
+                   ChipLogError(DeviceLayer, "FAIL: Connection already tracked: conn=%p device=%s path=%s", conn,
+                                conn->GetPeerAddress(), objectPath));
 
+    conn = chip::Platform::New<BluezConnection>(aDevice);
+    VerifyOrExit(conn != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    SuccessOrExit(err = conn->Init(*this));
+
+    mPeerDevicePath.reset(g_strdup(objectPath));
+    mConnMap[mPeerDevicePath.get()] = conn;
+
+    ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
+
+    BLEManagerImpl::HandleNewConnection(conn);
+    return;
+
+exit:
+    chip::Platform::Delete(conn);
+    BLEManagerImpl::HandleConnectFailed(err);
+}
+
+void BluezEndpoint::OnDeviceAdded(BluezDevice1 & device)
+{
+    HandleNewDevice(device);
+}
+
+void BluezEndpoint::OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps)
+{
     UpdateConnectionTable(device);
 }
 
-void BluezEndpoint::HandleNewDevice(BluezDevice1 * device)
+void BluezEndpoint::OnDeviceRemoved(BluezDevice1 & device)
 {
-    VerifyOrReturn(!mIsCentral);
-
-    // We need to handle device connection both this function and BluezSignalInterfacePropertiesChanged
-    // When a device is connected for first time, this function will be triggered.
-    // The future connections for the same device will trigger ``Connect'' property change.
-    // TODO: Factor common code in the two function.
-    BluezConnection * conn;
-    VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
-
-    conn = GetBluezConnection(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
-    VerifyOrExit(conn == nullptr,
-                 ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %p new device: %s", conn,
-                              g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
-
-    conn                       = chip::Platform::New<BluezConnection>(*this, device);
-    mpPeerDevicePath           = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
-    mConnMap[mpPeerDevicePath] = conn;
-
-    ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->GetPeerAddress(), mpPeerDevicePath);
-
-exit:
-    return;
-}
-
-void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject)
-{
-    // TODO: right now we do not handle addition/removal of adapters
-    // Primary focus here is to handle addition of a device
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(aObject)));
-    VerifyOrReturn(device.get() != nullptr);
-
-    if (BluezIsDeviceOnAdapter(device.get(), mAdapter.get()) == TRUE)
-    {
-        HandleNewDevice(device.get());
-    }
-}
-
-void BluezEndpoint::BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject)
-{
-    // TODO: for Device1, lookup connection, and call otPlatTobleHandleDisconnected
-    // for Adapter1: unclear, crash if this pertains to our adapter? at least null out the self->mAdapter.
-    // for Characteristic1, or GattService -- handle here via calling otPlatTobleHandleDisconnected, or ignore.
+    // Handling device removal is not necessary because disconnection is already handled
+    // in the OnDevicePropertyChanged() - we are checking for the "Connected" property.
 }
 
 BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
@@ -404,9 +371,9 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
     BluezObjectSkeleton * object;
     BluezGattService1 * service;
 
-    mpServicePath = g_strdup_printf("%s/service", mpRootPath);
-    ChipLogDetail(DeviceLayer, "CREATE service object at %s", mpServicePath);
-    object = bluez_object_skeleton_new(mpServicePath);
+    mServicePath.reset(g_strdup_printf("%s/service", mRootPath.get()));
+    ChipLogDetail(DeviceLayer, "CREATE service object at %s", mServicePath.get());
+    object = bluez_object_skeleton_new(mServicePath.get());
 
     service = bluez_gatt_service1_skeleton_new();
     bluez_gatt_service1_set_uuid(service, aUUID);
@@ -415,53 +382,10 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
 
     // includes -- unclear whether required.  Might be filled in later
     bluez_object_skeleton_set_gatt_service1(object, service);
-    g_dbus_object_manager_server_export(mpRoot, G_DBUS_OBJECT_SKELETON(object));
+    g_dbus_object_manager_server_export(mRoot.get(), G_DBUS_OBJECT_SKELETON(object));
     g_object_unref(object);
 
     return service;
-}
-
-void BluezEndpoint::SetupAdapter()
-{
-    char expectedPath[32];
-    snprintf(expectedPath, sizeof(expectedPath), BLUEZ_PATH "/hci%u", mAdapterId);
-
-    GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
-    for (auto l = objects; l != nullptr && mAdapter.get() == nullptr; l = l->next)
-    {
-        GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(BLUEZ_OBJECT(l->data)));
-        if (adapter.get() != nullptr)
-        {
-            if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
-            {
-                if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter.get())), expectedPath) == 0)
-                {
-                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter.get())));
-                    break;
-                }
-            }
-            else
-            {
-                if (strcmp(bluez_adapter1_get_address(adapter.get()), mpAdapterAddr) == 0)
-                {
-                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter.get())));
-                    break;
-                }
-            }
-        }
-    }
-
-    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
-
-    bluez_adapter1_set_powered(mAdapter.get(), TRUE);
-
-    // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
-    // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
-    // and the flag is necessary to force using LE transport.
-    bluez_adapter1_set_discoverable(mAdapter.get(), FALSE);
-
-exit:
-    g_list_free_full(objects, g_object_unref);
 }
 
 BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)
@@ -472,7 +396,7 @@ BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)
 
 BluezConnection * BluezEndpoint::GetBluezConnectionViaDevice()
 {
-    return GetBluezConnection(mpPeerDevicePath);
+    return GetBluezConnection(mPeerDevicePath.get());
 }
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -504,7 +428,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
                                                                          additionalDataFields);
     SuccessOrExit(err);
 
-    data = g_memdup(bufferHandle->Start(), bufferHandle->DataLength());
+    data = g_memdup2(bufferHandle->Start(), bufferHandle->DataLength());
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), data, bufferHandle->DataLength(), TRUE, g_free, data);
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
@@ -524,68 +448,71 @@ void BluezEndpoint::SetupGattService()
 {
 
     static const char * const c1_flags[] = { "write", nullptr };
-    static const char * const c2_flags[] = { "read", "indicate", nullptr };
+    static const char * const c2_flags[] = { "indicate", nullptr };
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static const char * const c3_flags[] = { "read", nullptr };
 #endif
 
-    mpService = CreateGattService(CHIP_BLE_UUID_SERVICE_SHORT_STRING);
+    mService.reset(CreateGattService(Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR));
 
     // C1 characteristic
-    mpC1 = CreateGattCharacteristic(mpService, "c1", CHIP_PLAT_BLE_UUID_C1_STRING, c1_flags);
-    g_signal_connect(mpC1, "handle-read-value",
+    mC1.reset(CreateGattCharacteristic(mService.get(), "c1", Ble::CHIP_BLE_CHAR_1_UUID_STR, c1_flags));
+    g_signal_connect(mC1.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
                      this);
-    g_signal_connect(mpC1, "handle-acquire-write",
-                     G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
-                                    BluezEndpoint * self) { return self->BluezCharacteristicAcquireWrite(aChar, aInv, aOpt); }),
-                     this);
-    g_signal_connect(mpC1, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotifyError), nullptr);
-    g_signal_connect(mpC1, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirmError), nullptr);
+    g_signal_connect(
+        mC1.get(), "handle-acquire-write",
+        G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList, GVariant * aOpt,
+                       BluezEndpoint * self) { return self->BluezCharacteristicAcquireWrite(aChar, aInv, aFDList, aOpt); }),
+        this);
+    g_signal_connect(mC1.get(), "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotifyError), nullptr);
+    g_signal_connect(mC1.get(), "handle-confirm", G_CALLBACK(BluezCharacteristicConfirmError), nullptr);
 
     // C2 characteristic
-    mpC2 = CreateGattCharacteristic(mpService, "c2", CHIP_PLAT_BLE_UUID_C2_STRING, c2_flags);
-    g_signal_connect(mpC2, "handle-read-value",
+    mC2.reset(CreateGattCharacteristic(mService.get(), "c2", Ble::CHIP_BLE_CHAR_2_UUID_STR, c2_flags));
+    g_signal_connect(mC2.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
                      this);
-    g_signal_connect(mpC2, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), nullptr);
-    g_signal_connect(mpC2, "handle-acquire-notify",
-                     G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
-                                    BluezEndpoint * self) { return self->BluezCharacteristicAcquireNotify(aChar, aInv, aOpt); }),
-                     this);
-    g_signal_connect(mpC2, "handle-confirm",
+    g_signal_connect(mC2.get(), "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), nullptr);
+    g_signal_connect(
+        mC2.get(), "handle-acquire-notify",
+        G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList, GVariant * aOpt,
+                       BluezEndpoint * self) { return self->BluezCharacteristicAcquireNotify(aChar, aInv, aFDList, aOpt); }),
+        this);
+    g_signal_connect(mC2.get(), "handle-confirm",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, BluezEndpoint * self) {
                          return self->BluezCharacteristicConfirm(aChar, aInv);
                      }),
                      this);
 
-    ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(mpC1));
-    ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(mpC2));
+    ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(mC1.get()));
+    ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(mC2.get()));
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is TRUE");
     // Additional data characteristics
-    mpC3 = CreateGattCharacteristic(mpService, "c3", CHIP_PLAT_BLE_UUID_C3_STRING, c3_flags);
-    g_signal_connect(mpC3, "handle-read-value",
+    mC3.reset(CreateGattCharacteristic(mService.get(), "c3", Ble::CHIP_BLE_CHAR_3_UUID_STR, c3_flags));
+    g_signal_connect(mC3.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
                      this);
-    g_signal_connect(mpC3, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), nullptr);
-    g_signal_connect(mpC3, "handle-acquire-notify",
-                     G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
-                                    BluezEndpoint * self) { return self->BluezCharacteristicAcquireNotify(aChar, aInv, aOpt); }),
-                     this);
-    g_signal_connect(mpC3, "handle-confirm",
+    g_signal_connect(mC3.get(), "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), nullptr);
+    g_signal_connect(
+        mC3.get(), "handle-acquire-notify",
+        G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList, GVariant * aOpt,
+                       BluezEndpoint * self) { return self->BluezCharacteristicAcquireNotify(aChar, aInv, aFDList, aOpt); }),
+        this);
+    g_signal_connect(mC3.get(), "handle-confirm",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, BluezEndpoint * self) {
                          return self->BluezCharacteristicConfirm(aChar, aInv);
                      }),
                      this);
 
     // update the characteristic value
-    UpdateAdditionalDataCharacteristic(mpC3);
-    ChipLogDetail(DeviceLayer, "CHIP BTP C3 %s", bluez_gatt_characteristic1_get_service(mpC3));
+    UpdateAdditionalDataCharacteristic(mC3.get());
+    ChipLogDetail(DeviceLayer, "CHIP BTP C3 %s", bluez_gatt_characteristic1_get_service(mC3.get()));
 #else
     ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is FALSE");
 #endif
@@ -595,84 +522,48 @@ void BluezEndpoint::SetupGattServer(GDBusConnection * aConn)
 {
     VerifyOrReturn(!mIsCentral);
 
-    mpRootPath = g_strdup_printf("/chipoble/%04x", getpid() & 0xffff);
-    mpRoot     = g_dbus_object_manager_server_new(mpRootPath);
+    mRootPath.reset(g_strdup_printf("/chipoble/%04x", getpid() & 0xffff));
+    mRoot.reset(g_dbus_object_manager_server_new(mRootPath.get()));
 
     SetupGattService();
 
     // Set connection after the service is set up in order to reduce the number
     // of signals sent on the bus.
-    g_dbus_object_manager_server_set_connection(mpRoot, aConn);
+    g_dbus_object_manager_server_set_connection(mRoot.get(), aConn);
 }
 
-CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
+CHIP_ERROR BluezEndpoint::SetupEndpointBindings()
 {
-    GAutoPtr<GError> err;
-    GAutoPtr<GDBusConnection> conn(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &err.GetReceiver()));
-    VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
-
-    SetupGattServer(conn.get());
-
-    mpObjMgr = g_dbus_object_manager_client_new_sync(conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
-                                                     bluez_object_manager_client_get_proxy_type,
-                                                     nullptr /* unused user data in the Proxy Type Func */,
-                                                     nullptr /*destroy notify */, nullptr /* cancellable */, &err.GetReceiver());
-    VerifyOrReturnError(mpObjMgr != nullptr, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", err->message));
-
-    g_signal_connect(mpObjMgr, "object-added", G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, BluezEndpoint * self) {
-                         return self->BluezSignalOnObjectAdded(aMgr, aObj);
-                     }),
-                     this);
-    g_signal_connect(mpObjMgr, "object-removed",
-                     G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, BluezEndpoint * self) {
-                         return self->BluezSignalOnObjectRemoved(aMgr, aObj);
-                     }),
-                     this);
-    g_signal_connect(mpObjMgr, "interface-proxy-properties-changed",
-                     G_CALLBACK(+[](GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface,
-                                    GVariant * aChangedProps, const char * const * aInvalidatedProps, BluezEndpoint * self) {
-                         return self->BluezSignalInterfacePropertiesChanged(aMgr, aObj, aIface, aChangedProps, aInvalidatedProps);
-                     }),
-                     this);
-
-    SetupAdapter();
-
+    SetupGattServer(mObjectManager.GetConnection());
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplication()
 {
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) { return self->RegisterGattApplicationImpl(); }, this);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(Ble, "Failed to schedule RegisterGattApplication() on CHIPoBluez thread"));
-    return err;
 }
 
-CHIP_ERROR BluezEndpoint::Init(bool aIsCentral, uint32_t aAdapterId)
+CHIP_ERROR BluezEndpoint::Init(BluezAdapter1 * apAdapter, bool aIsCentral)
 {
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(apAdapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mAdapterId = aAdapterId;
+    mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(apAdapter)));
     mIsCentral = aIsCentral;
 
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
+    CHIP_ERROR err = mObjectManager.SubscribeDeviceNotifications(mAdapter.get(), this);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to subscribe for notifications: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    ChipLogDetail(DeviceLayer, "BlueZ integration init success");
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization: %" CHIP_ERROR_FORMAT, err.Format()));
+
     mIsInitialized = true;
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BluezEndpoint::Init(bool aIsCentral, const char * apBleAddr)
-{
-    VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    mpAdapterAddr = g_strdup(apBleAddr);
-    return Init(aIsCentral, mAdapterId);
 }
 
 void BluezEndpoint::Shutdown()
@@ -685,27 +576,17 @@ void BluezEndpoint::Shutdown()
     // the middle of being processed when the cleanup function is called.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) {
-            if (self->mpObjMgr != nullptr)
-                g_object_unref(self->mpObjMgr);
             self->mAdapter.reset();
-            if (self->mpRoot != nullptr)
-                g_object_unref(self->mpRoot);
-            if (self->mpService != nullptr)
-                g_object_unref(self->mpService);
-            if (self->mpC1 != nullptr)
-                g_object_unref(self->mpC1);
-            if (self->mpC2 != nullptr)
-                g_object_unref(self->mpC2);
-            if (self->mpC3 != nullptr)
-                g_object_unref(self->mpC3);
+            self->mRoot.reset();
+            self->mService.reset();
+            self->mC1.reset();
+            self->mC2.reset();
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+            self->mC3.reset();
+#endif
             return CHIP_NO_ERROR;
         },
         this);
-
-    g_free(mpAdapterAddr);
-    g_free(mpRootPath);
-    g_free(mpServicePath);
-    g_free(mpPeerDevicePath);
 
     mIsInitialized = false;
 }
@@ -747,7 +628,7 @@ CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
     auto params = std::make_pair(this, &aDevice);
     mConnectCancellable.reset(g_cancellable_new());
     return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](typeof(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
+        +[](decltype(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
 }
 
 void BluezEndpoint::CancelConnect()

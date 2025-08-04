@@ -70,8 +70,8 @@ public:
      * @brief Callback used to let the application know that the re-registration process is done. This callback will be called for
      * both success and failure cases. On failure, the callee should take appropriate corrective action based on the error.
      *
-     * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. The caller
-     *                               will NOT use this pointer any more.
+     * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. It will NOT
+     *                               be null regardless the key refresh status. The caller will NOT use this pointer any more.
      * @param[in] error - CHIP_NO_ERROR indicates successful re-registration using the new key
      *                     Other errors indicate the failure reason.
      */

@@ -17,10 +17,10 @@
 
 from dataclasses import dataclass, field
 
+from chip.testing.conformance import ConformanceDecision
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import uint
-from conformance_support import ConformanceDecision
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from TC_DeviceConformance import DeviceConformanceTests
 
 
@@ -129,8 +129,7 @@ class MinimalRunner(MatterBaseTest, MinimalRepresentationChecker):
         # Before we can generate a minimal representation, we need to make sure that the device is conformant.
         # Otherwise, the values we extract aren't fully informative.
         ignore_in_progress = self.user_params.get("ignore_in_progress", False)
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        representation = self.GenerateMinimals(ignore_in_progress, is_ci)
+        representation = self.GenerateMinimals(ignore_in_progress, self.is_pics_sdk_ci_only)
         print(type(representation[0]))
         self.PrettyPrintRepresentation(representation)
 

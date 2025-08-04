@@ -46,6 +46,7 @@ constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kClusterIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kAttributeIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventIdTag;
 constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kEventPathTypeTag;
+constexpr TLV::Tag SimpleSubscriptionResumptionStorage::kResumptionRetriesTag;
 
 SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::SimpleSubscriptionInfoIterator(
     SimpleSubscriptionResumptionStorage & storage) :
@@ -142,7 +143,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
 {
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     backingBuffer.Calloc(MaxSubscriptionSize());
-    ReturnErrorCodeIf(backingBuffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
     uint16_t len = static_cast<uint16_t>(MaxSubscriptionSize());
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumption(subscriptionIndex).KeyName(),
@@ -192,7 +193,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     if (pathCount)
     {
         subscriptionInfo.mAttributePaths.Calloc(pathCount);
-        ReturnErrorCodeIf(subscriptionInfo.mAttributePaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(subscriptionInfo.mAttributePaths.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
         for (size_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
         {
             ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, kAttributePathTag));
@@ -225,7 +226,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
     if (pathCount)
     {
         subscriptionInfo.mEventPaths.Calloc(pathCount);
-        ReturnErrorCodeIf(subscriptionInfo.mEventPaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(subscriptionInfo.mEventPaths.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
         for (size_t pathIndex = 0; pathIndex < pathCount; pathIndex++)
         {
             ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, kEventPathTag));
@@ -251,6 +252,18 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
         }
     }
     ReturnErrorOnFailure(reader.ExitContainer(eventsListType));
+
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    // If the reader cannot get resumption retries, set it to 0 for subscriptionInfo
+    if (reader.Next(kResumptionRetriesTag) == CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(reader.Get(subscriptionInfo.mResumptionRetries));
+    }
+    else
+    {
+        subscriptionInfo.mResumptionRetries = 0;
+    }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
     ReturnErrorOnFailure(reader.ExitContainer(subscriptionContainerType));
 
@@ -307,6 +320,9 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(TLV::TLVWriter & writer, Su
         ReturnErrorOnFailure(writer.EndContainer(eventContainerType));
     }
     ReturnErrorOnFailure(writer.EndContainer(eventsListType));
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    ReturnErrorOnFailure(writer.Put(kResumptionRetriesTag, subscriptionInfo.mResumptionRetries));
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
     ReturnErrorOnFailure(writer.EndContainer(subscriptionContainerType));
 
@@ -355,7 +371,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(SubscriptionInfo & subscrip
     // Now construct subscription state and save
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     backingBuffer.Calloc(MaxSubscriptionSize());
-    ReturnErrorCodeIf(backingBuffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
     TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), MaxSubscriptionSize());
 

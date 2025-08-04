@@ -22,9 +22,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 #include "Base64.h"
 
 #include <ctype.h>

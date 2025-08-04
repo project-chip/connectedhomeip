@@ -216,6 +216,22 @@ void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * metho
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
+void JniReferences::CallVoidLong(JNIEnv * env, jobject object, const char * methodName, jlong argument)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jmethodID method;
+
+    err = JniReferences::FindMethod(env, object, methodName, "(J)V", &method);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Support, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(object, method, argument);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
 void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
 {
     if (cbErr == CHIP_JNI_ERROR_EXCEPTION_THROWN)
@@ -294,8 +310,8 @@ CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & option
 {
     JNIEnv * env = GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-    jclass optionalCls = nullptr;
-    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/Optional", optionalCls));
+    VerifyOrReturnError(optionalObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    jclass optionalCls        = env->GetObjectClass(optionalObj);
     jmethodID isPresentMethod = env->GetMethodID(optionalCls, "isPresent", "()Z");
     VerifyOrReturnError(isPresentMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
     jboolean isPresent = optionalObj && env->CallBooleanMethod(optionalObj, isPresentMethod);
@@ -374,6 +390,19 @@ jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
 
     jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "doubleValue", "()D");
     return env->CallDoubleMethod(boxedDouble, valueMethod);
+}
+
+jshort JniReferences::ShortToPrimitive(jobject boxedShort)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Support, "env cannot be nullptr"));
+    jclass boxedTypeCls = nullptr;
+    CHIP_ERROR err      = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/lang/Short", boxedTypeCls);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(Support, "ShortToPrimitive failed due to %" CHIP_ERROR_FORMAT, err.Format()));
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "shortValue", "()S");
+    return env->CallShortMethod(boxedShort, valueMethod);
 }
 
 CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback, long subscriptionId)

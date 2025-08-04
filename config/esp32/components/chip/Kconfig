@@ -32,20 +32,10 @@ menu "CHIP Core"
             default 8
             help
                 The maximum number of simultaneously active CHIP exchange contexts.
-
+                                           
                 An exchange context object is used to track the state of an ongoing CHIP message
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
                 another device.
-
-        config MAX_BINDINGS
-            int "Max Bindings"
-            range 0 65535
-            default 8
-            help
-                The maximum number of simultaneously active CHIP Binding objects.
-
-                A Binding object is used to configure how the local device communicates with
-                a remote entity, be it a cloud service, a mobile application, or another device.
 
         config MAX_FABRICS
             int "Max Fabrics"
@@ -56,15 +46,6 @@ menu "CHIP Core"
 
                 Each fabric can provision the device with its unique operational credentials and
                 manage its own access control lists.
-
-        config MAX_PEER_NODES
-            int "Max Peer Nodes"
-            range 0 65535
-            default 16
-            help
-                The maximum number of peer nodes that the local node can communicate with using
-                connectionless communication (e.g. UDP).  This value sizes a table that tracks
-                communication state with peer nodes by their CHIP node id.
 
         config MAX_UNSOLICITED_MESSAGE_HANDLERS
             int "Max Unsolicited Message Handlers"
@@ -157,6 +138,74 @@ menu "CHIP Core"
             help
                 Option to enable/disable CHIP log level filtering APIs.
 
+        config CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+            bool "Use heap memory to allocate object pools"
+            default n
+            help
+                This option enables the use of heap memory to allocate object pools.
+                When enabled, object pools are not pre-allocated.
+                Additionally, the maximum number of entries that can be allocated is
+                only limited by the available heap memory.
+
+                This option can be useful if you encounter static DRAM overflow.
+
+                NOTE: Since there is no cap on pool sizes, this may lead to issues
+                where embedded code assumes the pool size is limited, and no other
+                mechanisms are in place to restrict the size of allocations.
+
+                NOTE: If enabled and the free heap is exhausted, this may result in
+                undefined behavior, potential non-compliance with specifications,
+                or failure during certification tests. Even if it passes, it may fail
+                to function properly with actual controllers.
+
+        config MAX_GROUP_ENDPOINTS_PER_FABRIC
+            int "Maximum Group Endpoints per Fabric"
+            default 1
+            help
+                Specifies the maximum number of group endpoints supported per fabric.
+
+        config MAX_GROUPS_PER_FABRIC_PER_ENDPOINT
+            int "Maximum Groups per Fabric per Endpoint"
+            default 4
+            help
+                Specifies the maximum number of groups per fabric for each endpoint.
+                The value of CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is calculated as:
+                (MAX_GROUP_ENDPOINTS_PER_FABRIC * MAX_GROUPS_PER_FABRIC_PER_ENDPOINT)
+
+        config MAX_GROUP_KEYS_PER_FABRIC
+            int "Maximum Number of Group Key Sets per Fabric"
+            default 3
+            help
+                Specifies the maximum number of group key sets supported per fabric.
+
+        config CHIP_DEVICE_ENABLE_DYNAMIC_SERVER
+            bool "Enable dynamic server"
+            default n
+            help
+                Enable dynamic server to handle a different interaction model dispatch.
+                Can be implied when users do not want to use the same server clusters.
+
+        choice CHIP_MEM_ALLOC_MODE
+            prompt "Memory allocation strategy"
+            default CHIP_MEM_ALLOC_MODE_DEFAULT
+            help
+                Strategy for Matter memory management
+                - Internal DRAM memory only
+                - External SPIRAM memory only
+                - Either internal or external memory based on default malloc() behavior in ESP-IDF
+
+            config CHIP_MEM_ALLOC_MODE_INTERNAL
+                bool "Internal memory"
+
+            config CHIP_MEM_ALLOC_MODE_EXTERNAL
+                bool "External SPIRAM"
+                depends on SPIRAM_USE_CAPS_ALLOC || SPIRAM_USE_MALLOC
+
+            config CHIP_MEM_ALLOC_MODE_DEFAULT
+                bool "Default alloc mode"
+
+        endchoice # CHIP_MEM_ALLOC_MODE
+
     endmenu # "General Options"
 
     menu "Networking Options"
@@ -180,28 +229,6 @@ menu "CHIP Core"
                 CHIP generally needs one UDP EndPoint object for each local network
                 interface, plus 2 additional EndPoints for general UDP communcation.
 
-        config MAX_CONNECTIONS
-            int "Max CHIP Connections"
-            range 0 65535
-            default 8
-            help
-                The maximum number of simultaneously active CHIP connections, either locally
-                or remotely initiated.  This limit covers both CHIP TCP connections, and
-                CHIP-over-BLE (WoBLE) connections.
-
-        config DEFAULT_INCOMING_CONNECTION_IDLE_TIMEOUT
-            int "Default Incoming Connection Idle Timeout (ms)"
-            range 0 1000000
-            default 15000
-            help
-                The maximum amount of time, in milliseconds, that an idle inbound
-                CHIP connection will be allowed to exist before being closed.
-
-                This is a default value that can be overridden at runtime by the
-                application.
-
-                A value of 0 disables automatic closing of idle connections.
-
         config ENABLE_ROUTE_HOOK
             bool "Enable route hook"
             depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT
@@ -216,14 +243,15 @@ menu "CHIP Core"
             help
                 Enable this option to start a UDP Endpoint queue filter for mDNS Broadcast packets
 
-        config ENABLE_LWIP_THREAD_SAFETY
-            bool "Enable LwIP Thread safety options"
+        config USE_TCPIP_CORE_LOCK_FOR_THREAD_SAFETY
+            bool "Use TCPIP core locking for LwIP thread safety"
             default y
             select LWIP_TCPIP_CORE_LOCKING
             select LWIP_CHECK_THREAD_SAFETY
             help
                 CHIP SDK performs LwIP core locking before calling an LwIP API.
                 To make the calls thread safe we have to enable LWIP_TCPIP_CORE_LOCKING.
+                Otherwise CHIP SDK will post LwIP APIs to TCPIP task to ensure thread safety.
                 Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
 
@@ -250,6 +278,15 @@ menu "CHIP Core"
             help
                 Enable this option to use the pre encrypted OTA image
 
+        config ENABLE_DELTA_OTA
+            bool "Enable delta OTA"
+            depends on ENABLE_OTA_REQUESTOR
+            default n
+            help
+                Enable this option for delta OTA image updates. 
+                Delta OTA updates allow for smaller, more efficient updates by only 
+                sending the changes between the current and new firmware versions.
+
         config OTA_AUTO_REBOOT_ON_APPLY
             bool "Reboot the device after applying the OTA image"
             depends on ENABLE_OTA_REQUESTOR
@@ -270,6 +307,12 @@ menu "CHIP Core"
             help
                 Opens the commissioning window automatically at application boot time if
                 the node is not yet commissioned.
+
+        config ENABLE_SNTP_TIME_SYNC
+            bool "Enable SNTP time synchronization"
+            default n
+            help
+                Enable this option to enable SNTP time synchronization
 
     endmenu # "System Options"
 
@@ -324,9 +367,11 @@ menu "CHIP Device Layer"
         config MAX_EVENT_QUEUE_SIZE
             int "Max Event Queue Size"
             range 0 65535
-            default 25
+            default 40
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
+                Should be set greater than CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM. For SoCs other than
+                ESP32-C2, where the Wi-Fi buffer number is 8, recommended to use the default value.
 
         config ENABLE_EXTENDED_DISCOVERY
             bool "Enable Extended discovery Support"
@@ -346,13 +391,6 @@ menu "CHIP Device Layer"
             default n
             help
                 Enables or Disables ICD server
-
-        config ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-            bool "Enforce SIT Slow Polling Max value to 15 seconds"
-            depends on ENABLE_ICD_SERVER
-            default n
-            help
-                Set to true to enforce SIT Slow Polling Max value to 15seconds
 
         config ICD_REPORT_ON_ACTIVE_MODE
             bool "Emit a report on entering active mode"
@@ -590,58 +628,6 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "WiFi AP Options"
-
-        config ENABLE_WIFI_AP
-            depends on ESP_WIFI_SOFTAP_SUPPORT
-            bool "Enable CHIP WIFI AP"
-            default y
-            help
-                Enables WiFi AP for CHIP.
-
-        config WIFI_AP_SSID_PREFIX
-            string "WiFi AP SSID Prefix"
-            default "MATTER-"
-            depends on ENABLE_WIFI_AP
-            help
-                A prefix string used in forming the WiFi soft-AP SSID.  The remainder of the SSID
-                consists of the final two bytes of the device's primary WiFi MAC address in hex.
-
-        config WIFI_AP_CHANNEL
-            int "WiFi AP Channel"
-            range 1 14
-            default 1
-            depends on ENABLE_WIFI_AP
-            help
-                The WiFi channel number to be used by the soft-AP.
-
-        config WIFI_AP_MAX_STATIONS
-            int "WiFi AP Max Allowed Stations"
-            range 1 10
-            default 4
-            depends on ENABLE_WIFI_AP
-            help
-                The maximum number of stations allowed to connect to the soft-AP.
-
-        config WIFI_AP_BEACON_INTERVAL
-            int "WiFi AP Beacon Interval (ms)"
-            range 100 60000
-            default 100
-            depends on ENABLE_WIFI_AP
-            help
-                The beacon interval (in milliseconds) for the WiFi soft-AP.
-
-        config WIFI_AP_IDLE_TIMEOUT
-            int "WiFi AP Idle Timeout (ms)"
-            range 0 600000
-            default 120000
-            depends on ENABLE_WIFI_AP
-            help
-                The amount of time (in milliseconds) after which the CHIP platform will deactivate the soft-AP
-                if it has been idle.
-
-    endmenu
-
     menu "BLE Options"
         visible if BT_ENABLED
 
@@ -720,12 +706,13 @@ menu "CHIP Device Layer"
                 should not start advertising automatically after power-up.
 
         config USE_BLE_ONLY_FOR_COMMISSIONING
-	    bool "Use BLE only for commissioning"
-	    default y
-	    help
-            Disable this flag if BLE is used for any other purpose than commissioning.
-            When enabled, it deinitialized the BLE on successful commissioning, and on
-            bootup do not initialize the BLE if device is already provisioned with Wi-Fi/Thread credentials.
+            depends on ENABLE_CHIPOBLE
+            bool "Use BLE only for commissioning"
+            default y
+            help
+                Disable this flag if BLE is used for any other purpose than commissioning.
+                When enabled, it deinitialized the BLE on successful commissioning, and on
+                bootup do not initialize the BLE if device is already provisioned with Wi-Fi/Thread credentials.
 
     endmenu
 
@@ -799,85 +786,7 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "Time Sync Options"
-
-        config ENABLE_SERVICE_DIRECTORY_TIME_SYNC
-            bool "Enable Service Directory Time Sync"
-            default y
-            help
-                Enables synchronizing the device real-time clock using information returned during
-                a CHIP service directory query.  For any device that uses the CHIP service directory
-                to lookup a tunnel server, enabling this option will result in the real time clock being
-                synchronized every time the service tunnel is established.
-
-        config ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
-            bool "Enable Time Service Time Sync"
-            default n
-            help
-                Enables synchronizing the device's real time clock with a remote CHIP Time service
-                using the CHIP Time Sync protocol.
-
-        config CHIP_TIME_SERVICE_ENDPOINT_ID
-            hex "CHIP Time Service Endpoint Id"
-            default 18B4300200000005
-            depends on ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
-            help
-                Specifies the service endpoint id of the CHIP Time Sync service to be used to synchronize time.
-
-        config DEFAULT_TIME_SYNC_INTERVAL
-            int "Time Sync Interval (seconds)"
-            default 60
-            depends on ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
-            help
-                Specifies the minimum interval (in seconds) at which the device should synchronize its real time
-                clock with the configured CHIP Time Sync server.
-
-        config TIME_SYNC_TIMEOUT
-            int "Time Sync Timeout (ms)"
-            default 10000
-            depends on ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
-            help
-                Specifies the maximum amount of time (in milliseconds) to wait for a response from a
-                CHIP Time Sync server.
-
-    endmenu
-
-    menu "Service Provisioning Options"
-
-        config SERVICE_PROVISIONING_ENDPOINT_ID
-            hex "CHIP Service Provisioning Endpoint Id"
-            default 18B4300200000010
-            help
-                Specifies the service endpoint id of the CHIP Service Provisioning service.  When a device
-                undergoes service provisioning, this is the endpoint to which it will send its Pair Device
-                to Account request.
-
-        config SERVICE_PROVISIONING_CONNECTIVITY_TIMEOUT
-            int "Service Provisioning Connectivity Timeout (ms)"
-            default 10000
-            help
-                The maximum amount of time (in milliseconds) to wait for service connectivity during the device
-                service provisioning step.  More specifically, this is the maximum amount of time the device will
-                wait for connectivity to be established with the service at the point where the device waiting
-                to send a Pair Device to Account request to the Service Provisioning service.
-
-        config SERVICE_PROVISIONING_REQUEST_TIMEOUT
-            int "Service Provisioning Request Timeout (ms)"
-            default 10000
-            help
-                Specifies the maximum amount of time (in milliseconds) to wait for a response from the Service
-                Provisioning service.
-
-    endmenu
-
     menu "Commissioning options"
-        config RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE
-            int "Use full IP-based commissioning (expect cluster commands)"
-            default 0
-            help
-                Setting this to y will cause the commissioner to send commissioning commands to the
-                various clusters after establishing a PASE session.
-
         config ENABLE_ROTATING_DEVICE_ID
             depends on ENABLE_CHIPOBLE
             bool "Enable Rotating Device Identifier Support"
@@ -945,6 +854,13 @@ menu "CHIP Device Layer"
                 NVS namespace. If this option is enabled, the application can use an API to set a CD,
                 the configured CD will be used for subsequent CD reads.
 
+        config ENABLE_ESP_DIAGNOSTICS_TRACE
+            bool "Enable ESP Platform Diagnostics for Matter"
+            default n
+            help
+                Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
+                This feature helps monitor system health and performance by providing insights through diagnostics logs.
+
        config ENABLE_ESP_INSIGHTS_TRACE
            bool "Enable Matter ESP Insights"
            depends on ESP_INSIGHTS_ENABLED
@@ -960,6 +876,15 @@ menu "CHIP Device Layer"
            default n
            help
                This option enables the system statistics to be sent to the insights cloud.
+
+        config MAX_PERMIT_LIST_SIZE
+            int "Set permit list size for Insights traces"
+            range 5 30
+            depends on ESP_INSIGHTS_ENABLED || ENABLE_ESP_DIAGNOSTICS_TRACE
+            default 20
+            help
+                Set the maximum number of group entries that can be included in the permit list for reporting
+                traces to Insights or diagnostics. This ensures proper management of trace reporting capacity.
     endmenu
 
 
@@ -1000,24 +925,6 @@ menu "CHIP Device Layer"
             help
                 The EnableKey in hex string format used by TestEventTrigger command in GeneralDiagnostics
                 cluster. The length of the string should be 32.
-
-        config ENABLE_FIXED_TUNNEL_SERVER
-            bool "Use Fixed Tunnel Server"
-            default n
-            help
-                Forces the use of a service tunnel server at a fixed IP address and port.  This
-                bypasses the need for a directory query to the service directory endpoint to
-                determine the tunnel server address.  When enabled, this option allows devices
-                that haven't been service provisioned to establish a service tunnel.
-
-        config TUNNEL_SERVER_ADDRESS
-            string "Tunnel Server Address"
-            default ""
-            depends on ENABLE_FIXED_TUNNEL_SERVER
-            help
-                The IP address and port of the server to which the device should establish a service tunnel.
-                The supplied address must be a dot-notation IP address--not a host name.  The port number is
-                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
 
     endmenu
 
@@ -1098,6 +1005,36 @@ menu "CHIP Device Layer"
 	     To see detailed logging please set default log level to Debug.
 	     (Component config --> Log output --> Default log verbosity --> Debug)
 
+    choice CHIP_LOG_DEFAULT_LEVEL
+        bool "CHIP default log verbosity"
+        default CHIP_LOG_DEFAULT_LEVEL_EQUALS_LOG_DEFAULT_LEVEL
+        help
+            Default log level for CHIP logs. Note that CHIP_LOG_DEFAULT_LEVEL can only be less than or equal to LOG_DEFAULT_LEVEL.
+
+        config CHIP_LOG_DEFAULT_LEVEL_EQUALS_LOG_DEFAULT_LEVEL
+            bool "Same as default log level"
+        config CHIP_LOG_DEFAULT_LEVEL_NONE
+            bool "CHIP logging disabled"
+        config CHIP_LOG_DEFAULT_LEVEL_ERROR
+            bool "Enable Error Logs"
+        config CHIP_LOG_DEFAULT_LEVEL_PROGRESS
+            bool "Enable Progress Logs"
+        config CHIP_LOG_DEFAULT_LEVEL_DETAIL
+            bool "Enable Detail Logs"
+        config CHIP_LOG_DEFAULT_LEVEL_AUTOMATION
+            bool "Enable Automation Logs"
+    endchoice
+
+    config CHIP_LOG_DEFAULT_LEVEL
+        int
+        range 0 LOG_DEFAULT_LEVEL
+        default LOG_DEFAULT_LEVEL if CHIP_LOG_DEFAULT_LEVEL_EQUALS_LOG_DEFAULT_LEVEL
+        default 0 if CHIP_LOG_DEFAULT_LEVEL_NONE
+        default 1 if CHIP_LOG_DEFAULT_LEVEL_ERROR
+        default 3 if CHIP_LOG_DEFAULT_LEVEL_PROGRESS
+        default 4 if CHIP_LOG_DEFAULT_LEVEL_DETAIL
+        default 5 if CHIP_LOG_DEFAULT_LEVEL_AUTOMATION
+
     endmenu
 
     config CHIP_ENABLE_BDX_LOG_TRANSFER
@@ -1176,8 +1113,11 @@ menu "CHIP Device Layer"
     menu "Commissioning Window Options"
         config CHIP_DISCOVERY_TIMEOUT_SECS
             int "Commissioning Window Timeout in seconds"
-            range 180 900 
-            default 900 
+            range 180 900 if !ENABLE_BLE_EXT_ANNOUNCEMENT
+            range 901 172800 if ENABLE_BLE_EXT_ANNOUNCEMENT
+            default 900 if !ENABLE_BLE_EXT_ANNOUNCEMENT
+            default 172800 if ENABLE_BLE_EXT_ANNOUNCEMENT
+
             help
                 The amount of time (in seconds) after which the CHIP platform will close the Commissioning Window
     endmenu
@@ -1191,13 +1131,127 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "Enable Matter Event List"
-        config ENABLE_MATTER_EVENT_LIST
-            bool "Enable Matter support Event List attribute"
+    menu "Enable BLE Extended Announcement"
+        config ENABLE_BLE_EXT_ANNOUNCEMENT
+            bool "Enable BLE Extended Announcement"
             default n
             help
-                Enable Matter support Event List attribute.
+                Enable BLE Extended Announcement.To be used with CHIP_DISCOVERY_TIMEOUT_SECS for extended announcement duration.
 
     endmenu
 
+    menu "Message Reliable Protocol Options"
+        config MRP_LOCAL_ACTIVE_RETRY_INTERVAL_FOR_THREAD
+            int "MRP local active retry interval for Thread network in milliseconds"
+            depends on ENABLE_MATTER_OVER_THREAD
+            range 0 3600000
+            default 800
+            help
+                Base retry interval of the present Thread node when it is in the active state.
+
+        config MRP_LOCAL_ACTIVE_RETRY_INTERVAL_FOR_WIFI_ETHERNET
+            int "MRP local active retry interval for WIFI or ETHERNET network in milliseconds"
+            depends on !ENABLE_MATTER_OVER_THREAD
+            range 0 3600000
+            default 300
+            help
+                Base retry interval of the present node (WIFI or ETHERNET) when it is in the active state.
+
+        config MRP_LOCAL_IDLE_RETRY_INTERVAL_FOR_THREAD
+            int "MRP local idle retry interval for Thread network in milliseconds"
+            depends on ENABLE_MATTER_OVER_THREAD
+            range 0 3600000
+            default 800
+            help
+                Base retry interval of the present Thread node when it is in the idle state.
+
+        config MRP_LOCAL_IDLE_RETRY_INTERVAL_FOR_WIFI_ETHERNET
+            int "MRP local idle retry interval for WIFI or ETHERNET network in milliseconds"
+            depends on !ENABLE_MATTER_OVER_THREAD
+            range 0 3600000
+            default 500
+            help
+                Base retry interval of the present node (WIFI or ETHERNET) when it is in the idle state.
+
+        config MRP_RETRY_INTERVAL_SENDER_BOOST_FOR_THREAD
+            int "MRP retransmission delta timeout for Thread network in milliseconds"
+            depends on ENABLE_MATTER_OVER_THREAD
+            range 0 3600000
+            default 500
+            help
+                A constant value added to the calculated retransmission timeout.
+
+        config MRP_RETRY_INTERVAL_SENDER_BOOST_FOR_WIFI_ETHERNET
+            int "MRP retransmission delta timeout for WIFI or ETHERNET network in milliseconds"
+            depends on !ENABLE_MATTER_OVER_THREAD
+            range 0 3600000
+            default 0
+            help
+                A constant value added to the calculated retransmission timeout.
+
+        config MRP_MAX_RETRANS
+            int "MRP retransmission maximum count"
+            range 1 10
+            default 4
+            help
+                The maximum number of retransmissions before giving up.
+
+    endmenu
+
+    menu "Network Commissioning Driver Endpoint Id"
+        config THREAD_NETWORK_COMMISSIONING_DRIVER
+            bool "Use the generic Thread network commissioning driver"
+            depends on ENABLE_MATTER_OVER_THREAD
+            default y
+            help
+                Option to enable/disable the use of generic Thread network commissioning driver.
+
+        config THREAD_NETWORK_ENDPOINT_ID
+            int "Endpoint Id for Thread network"
+            depends on THREAD_NETWORK_COMMISSIONING_DRIVER
+            range 0 65534
+            default 0
+            help
+                The endpoint id for the generic Thread network commissioning driver.
+
+        config WIFI_NETWORK_COMMISSIONING_DRIVER
+            bool "Use ESP Wi-Fi network commissioning driver"
+            depends on (ENABLE_WIFI_STATION || ENABLE_WIFI_AP)
+            default y
+            help
+                Option to enable/disable the use of ESP Wi-Fi network commissioning driver.
+
+        config WIFI_NETWORK_ENDPOINT_ID
+            int "Endpoint Id for Wi-Fi network"
+            depends on WIFI_NETWORK_COMMISSIONING_DRIVER
+            range 0 65534
+            default 0
+            help
+                The endpoint id for the ESP Wi-Fi network commissioning driver.
+
+        config ETHERNET_NETWORK_COMMISSIONING_DRIVER
+            bool "Use ESP Ethernet network commissioning driver"
+            depends on ENABLE_ETHERNET_TELEMETRY
+            default y
+            help
+                Option to enable/disable the use of ESP Ethernet network commissioning driver.
+
+        config ETHERNET_NETWORK_ENDPOINT_ID
+            int "Endpoint Id for Ethernet network"
+            depends on ETHERNET_NETWORK_COMMISSIONING_DRIVER
+            range 0 65534
+            default 0
+            help
+                The endpoint id for the ESP Ethernet network commissioning driver.
+
+    endmenu
+
+    menu "Cluster Configuration Options"
+        config ENABLE_ACCESS_RESTRICTIONS
+            bool "Enable Access Restrictions of Access Control Cluster"
+            default n
+            help
+                Enable this option to enable Access Restrictions on the device.
+
+    endmenu
 endmenu

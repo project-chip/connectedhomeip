@@ -21,7 +21,9 @@
         "vadimcn.vscode-lldb",
         "xaver.clang-format",
         "yuichinukiyama.vscode-preview-server",
-        "yzhang.markdown-all-in-one"
+        "yzhang.markdown-all-in-one",
+        "ms-python.autopep8",
+        "ms-python.isort"
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []

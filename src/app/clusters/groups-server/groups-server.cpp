@@ -21,9 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
-#include <app/att-storage.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 #include <inttypes.h>
@@ -39,6 +37,18 @@ using namespace app::Clusters;
 using namespace app::Clusters::Groups;
 using namespace chip::Credentials;
 using Protocols::InteractionModel::Status;
+
+// Is the device identifying?
+static bool emberAfIsDeviceIdentifying(EndpointId endpoint)
+{
+#ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
+    uint16_t identifyTime;
+    Status status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
+    return (status == Status::Success && 0 < identifyTime);
+#else
+    return false;
+#endif
+}
 
 /**
  * @brief Checks if group-endpoint association exist for the given fabric
@@ -188,6 +198,7 @@ struct GroupMembershipResponse
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     GroupMembershipResponse(const Commands::GetGroupMembership::DecodableType & data, chip::EndpointId endpoint,
                             GroupDataProvider::EndpointIterator * iter) :
@@ -328,7 +339,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
         }
         iter->Release();
         ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId,
-                                                                      ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+                                                                      ScenesManagement::ScenesServer::kGlobalSceneGroupId);
     }
 #endif
 
@@ -377,3 +388,4 @@ bool emberAfGroupsClusterEndpointInGroupCallback(chip::FabricIndex fabricIndex, 
 void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}
 
 void MatterGroupsPluginServerInitCallback() {}
+void MatterGroupsPluginServerShutdownCallback() {}

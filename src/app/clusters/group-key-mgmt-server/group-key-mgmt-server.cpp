@@ -18,11 +18,10 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/att-storage.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/CodeUtils.h>
@@ -84,7 +83,7 @@ struct GroupTableCodec
         TLV::TLVType inner;
         ReturnErrorOnFailure(writer.StartContainer(TagEndpoints(), TLV::kTLVType_Array, inner));
         GroupDataProvider::GroupEndpoint mapping;
-        auto iter = mProvider->IterateEndpoints(mFabric, MakeOptional(mInfo.group_id));
+        auto iter = mProvider->IterateEndpoints(mFabric, std::make_optional(mInfo.group_id));
         if (nullptr != iter)
         {
             while (iter->Next(mapping))
@@ -167,6 +166,8 @@ private:
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
         CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+            CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
+
             for (auto & fabric : Server::GetInstance().GetFabricTable())
             {
                 auto fabric_index = fabric.GetFabricIndex();
@@ -181,11 +182,19 @@ private:
                         .groupKeySetID = mapping.keyset_id,
                         .fabricIndex   = fabric_index,
                     };
-                    encoder.Encode(key);
+                    encodeStatus = encoder.Encode(key);
+                    if (encodeStatus != CHIP_NO_ERROR)
+                    {
+                        break;
+                    }
                 }
                 iter->Release();
+                if (encodeStatus != CHIP_NO_ERROR)
+                {
+                    break;
+                }
             }
-            return CHIP_NO_ERROR;
+            return encodeStatus;
         });
         return err;
     }
@@ -255,6 +264,8 @@ private:
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
         CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+            CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
+
             for (auto & fabric : Server::GetInstance().GetFabricTable())
             {
                 auto fabric_index = fabric.GetFabricIndex();
@@ -264,11 +275,19 @@ private:
                 GroupDataProvider::GroupInfo info;
                 while (iter->Next(info))
                 {
-                    encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                    encodeStatus = encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                    if (encodeStatus != CHIP_NO_ERROR)
+                    {
+                        break;
+                    }
                 }
                 iter->Release();
+                if (encodeStatus != CHIP_NO_ERROR)
+                {
+                    break;
+                }
             }
-            return CHIP_NO_ERROR;
+            return encodeStatus;
         });
         return err;
     }
@@ -436,9 +455,13 @@ GroupKeyManagementAttributeAccess gAttribute;
 
 void MatterGroupKeyManagementPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttribute);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttribute);
 }
 
+void MatterGroupKeyManagementPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttribute);
+}
 //
 // Commands
 //
@@ -655,6 +678,7 @@ struct KeySetReadAllIndicesResponse
 {
     static constexpr CommandId GetCommandId() { return GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id; }
     static constexpr ClusterId GetClusterId() { return GroupKeyManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     GroupDataProvider::KeySetIterator * mIterator = nullptr;
 

@@ -73,7 +73,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *    treated as if a default-initialized object was passed in.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRWriteParams : NSObject <NSCopying>
+@interface MTRWriteParams : NSObject <NSCopying, NSSecureCoding>
 
 /**
  * Controls whether the write is a timed write.
@@ -109,7 +109,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *    treated as if a default-initialized object was passed in.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRReadParams : NSObject <NSCopying>
+@interface MTRReadParams : NSObject <NSCopying, NSSecureCoding>
 
 /**
  * Whether the read/subscribe is fabric-filtered. The default is YES.
@@ -132,6 +132,17 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 @property (nonatomic, copy, nullable) NSNumber * minEventNumber MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * Controls whether attributes without known schema (e.g. vendor-specific
+ * attributes) should be assumed to be reportable normally via subscriptions.
+ * The default is YES.
+ *
+ * This setting is only relevant to some consumers of MTRReadParams.  One of
+ * those consumers is readAttributeWithEndpointID:clusterID:attributeID:params:
+ * on MTRDevice.
+ */
+@property (nonatomic, assign, getter=shouldAssumeUnknownAttributesReportable) BOOL assumeUnknownAttributesReportable MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
 @end
 
 /**
@@ -141,7 +152,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *    treated as if a default-initialized object was passed in.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRSubscribeParams : MTRReadParams
+@interface MTRSubscribeParams : MTRReadParams <NSCopying, NSSecureCoding>
 
 /**
  * Whether the subscribe should replace already-existing

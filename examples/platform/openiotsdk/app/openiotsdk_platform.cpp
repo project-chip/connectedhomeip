@@ -32,20 +32,21 @@
 #endif
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/openiotsdk/Logging.h>
+#include <lib/support/logging/Constants.h>
 #include <platform/openiotsdk/OpenIoTSDKArchUtils.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef USE_CHIP_DATA_MODEL
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #endif // USE_CHIP_DATA_MODEL
 
 #ifdef CHIP_OPEN_IOT_SDK_OTA_ENABLE
@@ -59,7 +60,7 @@
 using namespace ::chip;
 using namespace ::chip::Platform;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::Logging::Platform;
+using namespace ::chip::Logging;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -109,7 +110,7 @@ static void post_network_connect()
     // Iterate on the network interface to see if we already have beed assigned addresses.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
+        char ifName[Inet::InterfaceId::kMaxIfNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)))
         {
             chip::Inet::IPAddress addr;
@@ -172,7 +173,9 @@ int openiotsdk_platform_init(void)
 {
     int ret;
 
-    ois_logging_init();
+#if defined(NDEBUG) && CHIP_CONFIG_TEST == 0
+    SetLogFilter(LogCategory::kLogCategory_Progress);
+#endif
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)
@@ -272,6 +275,7 @@ int openiotsdk_chip_run(void)
         ChipLogError(NotSpecified, "Initialize static resources before server init failed: %s", err.AsString());
         return EXIT_FAILURE;
     }
+    initParams.dataModelProvider             = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 

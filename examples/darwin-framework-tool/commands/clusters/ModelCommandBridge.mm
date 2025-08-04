@@ -25,10 +25,19 @@ using namespace ::chip;
 
 CHIP_ERROR ModelCommand::RunCommand()
 {
-    MTRDeviceController * commissioner = CurrentCommissioner();
     ChipLogProgress(chipTool, "Sending command to node 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
-    auto * device = [MTRBaseDevice deviceWithNodeID:@(mNodeId) controller:commissioner];
-    CHIP_ERROR err = SendCommand(device, mEndPointId);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mUseMTRDevice.ValueOr(false)) {
+        auto * device = DeviceWithNodeId(mNodeId);
+        VerifyOrReturnError(device != nil, CHIP_ERROR_INCORRECT_STATE);
+        err = SendCommand(device, mEndPointId);
+    } else {
+        auto * device = BaseDeviceWithNodeId(mNodeId);
+        VerifyOrReturnError(device != nil, CHIP_ERROR_INCORRECT_STATE);
+        err = SendCommand(device, mEndPointId);
+    }
 
     if (err != CHIP_NO_ERROR) {
         ChipLogError(chipTool, "Error: %s", chip::ErrorStr(err));

@@ -21,11 +21,25 @@
 
 using namespace ::chip::DeviceLayer;
 
+bool AmebaHandleGlobalTestEventTrigger(uint64_t eventTrigger)
+{
+    // Customer can trigger action on the Ameba layer based on the eventTrigger
+    ChipLogProgress(Support, "[AmebaHandleGlobalTestEventTrigger] Received Event Trigger: 0x%016llx", eventTrigger);
+    return false;
+}
+
 namespace chip {
 
 bool AmebaTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKey) const
 {
     return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
+}
+
+CHIP_ERROR AmebaTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
+{
+    eventTrigger = clearEndpointInEventTrigger(eventTrigger);
+    // WARNING: LEGACY SUPPORT ONLY, DO NOT EXTEND FOR STANDARD CLUSTERS
+    return (AmebaHandleGlobalTestEventTrigger(eventTrigger)) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 } // namespace chip

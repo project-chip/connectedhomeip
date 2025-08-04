@@ -33,6 +33,7 @@ namespace Test {
 inline constexpr EndpointId kMockEndpoint1   = 0xFFFE;
 inline constexpr EndpointId kMockEndpoint2   = 0xFFFD;
 inline constexpr EndpointId kMockEndpoint3   = 0xFFFC;
+inline constexpr EndpointId kMockEndpoint4   = 0xFFFB;
 inline constexpr EndpointId kMockEndpointMin = 0xFFF1;
 
 constexpr AttributeId MockAttributeId(const uint16_t & id)
@@ -50,5 +51,24 @@ constexpr EventId MockEventId(const uint16_t & id)
 {
     return (0xFFF1'0000 | id);
 }
+
+// Cluster Revision value returned by mock clusters
+extern const uint16_t mockClusterRevision;
+
+// Feature Map value returned by mock clusters
+extern const uint32_t mockFeatureMap;
+
+// Scalar value returned by mock clusters for MockAttributeId(1)
+extern const bool mockAttribute1;
+
+// Scalar value returned by mock clusters for MockAttributeId(2)
+extern const int16_t mockAttribute2;
+
+// Scalar value returned by mock clusters for MockAttributeId(3)
+extern const uint64_t mockAttribute3;
+
+// MockAttributeId(4) returns a list of octstr with this value
+extern const uint8_t mockAttribute4[256];
+
 } // namespace Test
 } // namespace chip

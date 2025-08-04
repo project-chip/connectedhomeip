@@ -19,6 +19,7 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/build/chip/fuzz_test.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 if (chip_enable_pw_rpc) {
@@ -33,40 +34,41 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/camera-av-settings-user-level-management-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/camera-av-stream-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/chime-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-alarm-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-energy-measurement-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-power-measurement-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/occupancy-sensing-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/power-topology-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/push-av-stream-transport-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/software-diagnostics-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/soil-measurement-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tls-client-management-instance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/wifi-diagnostics-stub.cpp",
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
     "AllClustersCommandDelegate.cpp",
+    "AllClustersCommandDelegate.h",
     "AppOptions.cpp",
+    "ButtonEventsSimulator.cpp",
+    "ButtonEventsSimulator.h",
     "ValveControlDelegate.cpp",
     "WindowCoveringManager.cpp",
     "include/tv-callbacks.cpp",
@@ -77,14 +79,17 @@ source_set("chip-all-clusters-common") {
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+    "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
+    "${chip_root}/src/app/clusters/wifi-network-diagnostics-server:wifi-network-diagnostics-server",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]
 
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/thermostat/thermostat-common/include",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -181,4 +186,14 @@ group("linux") {
 
 group("default") {
   deps = [ ":linux" ]
+}
+
+if (enable_fuzz_test_targets) {
+  chip_fuzz_target("fuzz-chip-all-clusters-app") {
+    sources = [ "fuzzing-main.cpp" ]
+    public_deps = [
+      ":chip-all-clusters-common",
+      "${chip_root}/examples/platform/linux:app-main",
+    ]
+  }
 }

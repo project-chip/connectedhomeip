@@ -28,6 +28,8 @@
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
+
 #include "platform/internal/GenericConnectivityManagerImpl.h"
 #include "platform/internal/GenericConnectivityManagerImpl_UDP.h"
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -110,7 +112,6 @@ private:
     bool _IsWiFiStationApplicationControlled(void);
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
-    bool _CanStartWiFiScan(void);
 
     WiFiAPMode _GetWiFiAPMode(void);
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
@@ -132,7 +133,7 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    char mEthIfName[IFNAMSIZ];
+    char mEthIfName[Inet::InterfaceId::kMaxIfNameLength];
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
@@ -141,7 +142,7 @@ private:
     System::Clock::Timestamp mLastAPDemandTime;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
-    static char sWiFiIfName[IFNAMSIZ];
+    static char sWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
 #endif
 };
 

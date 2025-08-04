@@ -15,16 +15,19 @@
  *    limitations under the License.
  */
 
+#include <string>
+
+#include <pw_unit_test/framework.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVReader.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
-#include <nlunit-test.h>
 
 namespace {
 
@@ -38,7 +41,13 @@ uint8_t gBuf1[1024];
 uint8_t gBuf2[1024];
 TLV::TLVWriter gWriter1;
 TLV::TLVWriter gWriter2;
-nlTestSuite * gSuite;
+
+class TestJsonToTlv : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
 
 void SetupWriters()
 {
@@ -85,28 +94,26 @@ void ConvertJsonToTlvAndValidate(T val, const std::string & jsonString)
     SetupWriters();
 
     err = gWriter1.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = DataModel::Encode(gWriter1, TLV::ContextTag(1), val);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = gWriter1.EndContainer(container);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = gWriter1.Finalize();
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = JsonToTlv(jsonString, gWriter2);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(gSuite, MatchWriter1and2());
+    EXPECT_TRUE(MatchWriter1and2());
 }
 
-void TestConverter(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlv, TestConverter)
 {
     std::string jsonString;
-
-    gSuite = inSuite;
 
     jsonString = "{\n"
                  "   \"1:UINT\" : 30\n"
@@ -237,7 +244,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     ConvertJsonToTlvAndValidate(structList, jsonString);
 }
 
-void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlv, Test32BitConvert)
 {
     // JSON TLV format explicitly wants to support 32-bit integer preservation.
     //
@@ -256,69 +263,69 @@ void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
     {
         SetupWriters();
         JsonToTlv("{\"1:INT\": 321}", gWriter1);
-        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+        EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
         reader.ImplicitProfileId = kImplicitProfileId;
 
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
-        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ContextTag(1)) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
-        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, value == 321);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
-        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.Next(TLV::AnonymousTag()), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_Structure);
+        EXPECT_EQ(reader.EnterContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(TLV::ContextTag(1)), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_SignedInteger);
+        EXPECT_EQ(reader.Get(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 321);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
     }
 
     // convert a single value that is larger than 8 bit
     {
         SetupWriters();
         JsonToTlv("{\"1234:INT\": 321}", gWriter1);
-        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+        EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
         reader.ImplicitProfileId = kImplicitProfileId;
 
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
-        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(kImplicitProfileId, 1234)) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
-        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, value == 321);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
-        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.Next(TLV::AnonymousTag()), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_Structure);
+        EXPECT_EQ(reader.EnterContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(TLV::ProfileTag(kImplicitProfileId, 1234)), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_SignedInteger);
+        EXPECT_EQ(reader.Get(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 321);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
     }
 
     // Convert to a full 32-bit value, unsigned
     {
         SetupWriters();
         JsonToTlv("{\"4275878552:INT\": 321}", gWriter1);
-        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+        EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
         reader.ImplicitProfileId = kImplicitProfileId;
 
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
-        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag((4275878552 >> 16) & 0xFFFF, 0, 4275878552 & 0xFFFF)) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
-        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, value == 321);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
-        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.Next(TLV::AnonymousTag()), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_Structure);
+        EXPECT_EQ(reader.EnterContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(TLV::ProfileTag((4275878552 >> 16) & 0xFFFF, 0, 4275878552 & 0xFFFF)), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_SignedInteger);
+        EXPECT_EQ(reader.Get(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 321);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
     }
 
     // FIXME: implement
 }
 
-void TestMEIConvert(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlv, TestMEIConvert)
 {
     TLV::TLVReader reader;
     TLV::TLVType tlvType;
@@ -328,95 +335,63 @@ void TestMEIConvert(nlTestSuite * inSuite, void * inContext)
     {
         SetupWriters();
         JsonToTlv("{\"65536:INT\": 321}", gWriter1);
-        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+        EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
         reader.ImplicitProfileId = kImplicitProfileId;
 
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
-        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(1, 0, 0)) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
-        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, value == 321);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
-        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.Next(TLV::AnonymousTag()), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_Structure);
+        EXPECT_EQ(reader.EnterContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(TLV::ProfileTag(1, 0, 0)), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_SignedInteger);
+        EXPECT_EQ(reader.Get(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 321);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
     }
 
     // Vendor ID = 0xFFFF, Tag ID = 0
     {
         SetupWriters();
         JsonToTlv("{\"4294901760:INT\": 123}", gWriter1);
-        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+        EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
         reader.ImplicitProfileId = kImplicitProfileId;
 
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
-        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(0xFFFF, 0, 0)) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
-        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, value == 123);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
-        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.Next(TLV::AnonymousTag()), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_Structure);
+        EXPECT_EQ(reader.EnterContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(TLV::ProfileTag(0xFFFF, 0, 0)), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_SignedInteger);
+        EXPECT_EQ(reader.Get(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 123);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
     }
 
     // Vendor ID = 0xFFFF, Tag ID = 0xFFFF
     {
         SetupWriters();
         JsonToTlv("{\"4294967295:INT\": 123}", gWriter1);
-        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+        EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
         reader.ImplicitProfileId = kImplicitProfileId;
 
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
-        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(0xFFFF, 0, 0xFFFF)) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
-        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, value == 123);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
-        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.Next(TLV::AnonymousTag()), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_Structure);
+        EXPECT_EQ(reader.EnterContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(TLV::ProfileTag(0xFFFF, 0, 0xFFFF)), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_SignedInteger);
+        EXPECT_EQ(reader.Get(value), CHIP_NO_ERROR);
+        EXPECT_EQ(value, 123);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(tlvType), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
     }
 }
-
-int Initialize(void * apSuite)
-{
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-int Finalize(void * aContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestConverter", TestConverter),
-    NL_TEST_DEF("Test32BitConvert", Test32BitConvert),
-    NL_TEST_DEF("TestMEIConvert", TestMEIConvert),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
 } // namespace
-
-int TestJsonToTlv()
-{
-    nlTestSuite theSuite = { "JsonToTlv", sTests, Initialize, Finalize };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestJsonToTlv)

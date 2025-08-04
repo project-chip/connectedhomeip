@@ -46,13 +46,13 @@ import matter.tlv.TlvWriter
 
 class NetworkCommissioningCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class ScanNetworksResponse(
     val networkingStatus: UByte,
     val debugText: String?,
     val wiFiScanResults: List<NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?,
-    val threadScanResults: List<NetworkCommissioningClusterThreadInterfaceScanResultStruct>?
+    val threadScanResults: List<NetworkCommissioningClusterThreadInterfaceScanResultStruct>?,
   )
 
   class NetworkConfigResponse(
@@ -60,13 +60,13 @@ class NetworkCommissioningCluster(
     val debugText: String?,
     val networkIndex: UByte?,
     val clientIdentity: ByteArray?,
-    val possessionSignature: ByteArray?
+    val possessionSignature: ByteArray?,
   )
 
   class ConnectNetworkResponse(
     val networkingStatus: UByte,
     val debugText: String?,
-    val errorValue: Int?
+    val errorValue: Int?,
   )
 
   class QueryIdentityResponse(val identity: ByteArray, val possessionSignature: ByteArray?)
@@ -142,16 +142,6 @@ class NetworkCommissioningCluster(
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
 
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
-  }
-
   class AttributeListAttribute(val value: List<UInt>)
 
   sealed class AttributeListAttributeSubscriptionState {
@@ -165,7 +155,7 @@ class NetworkCommissioningCluster(
   suspend fun scanNetworks(
     ssid: ByteArray?,
     breadcrumb: ULong?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): ScanNetworksResponse {
     val commandId: UInt = 0u
 
@@ -183,7 +173,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -240,7 +230,7 @@ class NetworkCommissioningCluster(
                   add(
                     NetworkCommissioningClusterWiFiInterfaceScanResultStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader
+                      tlvReader,
                     )
                   )
                 }
@@ -265,7 +255,7 @@ class NetworkCommissioningCluster(
                   add(
                     NetworkCommissioningClusterThreadInterfaceScanResultStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader
+                      tlvReader,
                     )
                   )
                 }
@@ -290,7 +280,7 @@ class NetworkCommissioningCluster(
       networkingStatus_decoded,
       debugText_decoded,
       wiFiScanResults_decoded,
-      threadScanResults_decoded
+      threadScanResults_decoded,
     )
   }
 
@@ -301,7 +291,7 @@ class NetworkCommissioningCluster(
     networkIdentity: ByteArray?,
     clientIdentifier: ByteArray?,
     possessionNonce: ByteArray?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): NetworkConfigResponse {
     val commandId: UInt = 2u
 
@@ -337,7 +327,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -437,14 +427,14 @@ class NetworkCommissioningCluster(
       debugText_decoded,
       networkIndex_decoded,
       clientIdentity_decoded,
-      possessionSignature_decoded
+      possessionSignature_decoded,
     )
   }
 
   suspend fun addOrUpdateThreadNetwork(
     operationalDataset: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): NetworkConfigResponse {
     val commandId: UInt = 3u
 
@@ -462,7 +452,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -562,22 +552,22 @@ class NetworkCommissioningCluster(
       debugText_decoded,
       networkIndex_decoded,
       clientIdentity_decoded,
-      possessionSignature_decoded
+      possessionSignature_decoded,
     )
   }
 
   suspend fun removeNetwork(
     networkID: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): NetworkConfigResponse {
     val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_NETWORK_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+    val TAG_NETWORK_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_ID_REQ), networkID)
 
     val TAG_BREADCRUMB_REQ: Int = 1
     breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
@@ -587,7 +577,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -687,22 +677,22 @@ class NetworkCommissioningCluster(
       debugText_decoded,
       networkIndex_decoded,
       clientIdentity_decoded,
-      possessionSignature_decoded
+      possessionSignature_decoded,
     )
   }
 
   suspend fun connectNetwork(
     networkID: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): ConnectNetworkResponse {
     val commandId: UInt = 6u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_NETWORK_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+    val TAG_NETWORK_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_ID_REQ), networkID)
 
     val TAG_BREADCRUMB_REQ: Int = 1
     breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
@@ -712,7 +702,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -781,15 +771,15 @@ class NetworkCommissioningCluster(
     networkID: ByteArray,
     networkIndex: UByte,
     breadcrumb: ULong?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): NetworkConfigResponse {
     val commandId: UInt = 8u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_NETWORK_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+    val TAG_NETWORK_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_ID_REQ), networkID)
 
     val TAG_NETWORK_INDEX_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_NETWORK_INDEX_REQ), networkIndex)
@@ -802,7 +792,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -902,14 +892,14 @@ class NetworkCommissioningCluster(
       debugText_decoded,
       networkIndex_decoded,
       clientIdentity_decoded,
-      possessionSignature_decoded
+      possessionSignature_decoded,
     )
   }
 
   suspend fun queryIdentity(
     keyIdentifier: ByteArray,
     possessionNonce: ByteArray?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): QueryIdentityResponse {
     val commandId: UInt = 9u
 
@@ -929,7 +919,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1009,7 +999,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeMaxNetworksAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -1022,7 +1012,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1097,7 +1087,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeNetworksAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NetworksAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -1110,7 +1100,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1190,7 +1180,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeScanMaxTimeSecondsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -1203,7 +1193,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1283,7 +1273,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeConnectMaxTimeSecondsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -1296,7 +1286,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1382,10 +1372,10 @@ class NetworkCommissioningCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1411,7 +1401,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeInterfaceEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -1424,7 +1414,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1500,7 +1490,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeLastNetworkingStatusAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LastNetworkingStatusAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -1513,7 +1503,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1595,7 +1585,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeLastNetworkIDAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LastNetworkIDAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -1608,7 +1598,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1688,7 +1678,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeLastConnectErrorValueAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LastConnectErrorValueAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -1701,7 +1691,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1788,7 +1778,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeSupportedWiFiBandsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SupportedWiFiBandsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1801,7 +1791,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1887,7 +1877,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeSupportedThreadFeaturesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -1900,7 +1890,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1980,7 +1970,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeThreadVersionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
@@ -1993,7 +1983,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2073,7 +2063,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -2086,7 +2076,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2170,7 +2160,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -2183,7 +2173,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2222,101 +2212,6 @@ class NetworkCommissioningCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -2362,7 +2257,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -2375,7 +2270,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2450,7 +2345,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -2463,7 +2358,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2531,7 +2426,7 @@ class NetworkCommissioningCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -2544,7 +2439,7 @@ class NetworkCommissioningCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

@@ -16,18 +16,13 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for CommandPathParams
- *
- */
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueDecoder.h>
 #include <app/MessageDef/AttributeDataIB.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -62,7 +57,7 @@ struct TestSetup
     TLVWriter writer;
 };
 
-void TestOverwriteFabricIndexInStruct(nlTestSuite * aSuite, void * aContext)
+TEST(TestAttributeValueDecoder, TestOverwriteFabricIndexInStruct)
 {
     TestSetup setup;
     CHIP_ERROR err;
@@ -73,29 +68,29 @@ void TestOverwriteFabricIndexInStruct(nlTestSuite * aSuite, void * aContext)
     item.fabricIndex = 0;
 
     err = setup.Encode(item);
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
     TLVType ignored;
     reader.Init(setup.buf, setup.writer.GetLengthWritten());
 
     err = reader.Next();
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = reader.EnterContainer(ignored);
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = reader.Next();
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     AttributeValueDecoder decoder(reader, subjectDescriptor);
     err = decoder.Decode(decodeItem);
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, decodeItem.fabricIndex == kTestFabricIndex);
+    EXPECT_EQ(decodeItem.fabricIndex, kTestFabricIndex);
 }
 
-void TestOverwriteFabricIndexInListOfStructs(nlTestSuite * aSuite, void * aContext)
+TEST(TestAttributeValueDecoder, TestOverwriteFabricIndexInListOfStructs)
 {
     TestSetup setup;
     CHIP_ERROR err;
@@ -109,7 +104,7 @@ void TestOverwriteFabricIndexInListOfStructs(nlTestSuite * aSuite, void * aConte
     }
 
     err = setup.Encode(DataModel::List<Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type>(items));
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
     TLVType ignored;
@@ -118,44 +113,27 @@ void TestOverwriteFabricIndexInListOfStructs(nlTestSuite * aSuite, void * aConte
     reader.Init(setup.buf, setup.writer.GetLengthWritten());
 
     err = reader.Next();
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = reader.EnterContainer(ignored);
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = reader.Next();
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     AttributeValueDecoder decoder(reader, subjectDescriptor);
     err = decoder.Decode(decodeItems);
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = decodeItems.ComputeSize(&decodeCount);
-    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, decodeCount == kTestListElements);
+    EXPECT_EQ(decodeCount, kTestListElements);
     for (auto iter = decodeItems.begin(); iter.Next();)
     {
         const auto & entry = iter.GetValue();
-        NL_TEST_ASSERT(aSuite, entry.fabricIndex == kTestFabricIndex);
+        EXPECT_EQ(entry.fabricIndex, kTestFabricIndex);
     }
 }
 
 } // anonymous namespace
-
-namespace {
-const nlTest sTests[] = { NL_TEST_DEF("TestOverwriteFabricIndexInStruct", TestOverwriteFabricIndexInStruct),
-                          NL_TEST_DEF("TestOverwriteFabricIndexInListOfStructs", TestOverwriteFabricIndexInListOfStructs),
-                          NL_TEST_SENTINEL() };
-}
-
-int TestAttributeValueDecoder()
-{
-    nlTestSuite theSuite = { "AttributeValueDecoder", &sTests[0], nullptr, nullptr };
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestAttributeValueDecoder)

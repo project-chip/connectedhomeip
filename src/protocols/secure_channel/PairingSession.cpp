@@ -22,6 +22,10 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/PlatformManager.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -56,8 +60,20 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
 
 void PairingSession::Finish()
 {
-    Transport::PeerAddress address = mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
+    Transport::PeerAddress address = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (address.GetTransportType() == Transport::Type::kTcp)
+    {
+        // Fetch the connection for the unauthenticated session used to set up
+        // the secure session.
+        Transport::ActiveTCPConnectionState * conn =
+            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetTCPConnection();
+
+        // Associate the connection with the secure session being activated.
+        mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn);
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
     DiscardExchange();
 
@@ -65,6 +81,17 @@ void PairingSession::Finish()
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrDie(mSecureSessionHolder);
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kSecureSessionEstablished };
+        event.SecureSessionEstablished.TransportType = to_underlying(address.GetTransportType());
+        event.SecureSessionEstablished.SecureSessionType =
+            to_underlying(mSecureSessionHolder->AsSecureSession()->GetSecureSessionType());
+        event.SecureSessionEstablished.LocalSessionId = mSecureSessionHolder->AsSecureSession()->GetLocalSessionId();
+        event.SecureSessionEstablished.PeerNodeId     = mSecureSessionHolder->GetPeer().GetNodeId();
+        event.SecureSessionEstablished.FabricIndex    = mSecureSessionHolder->GetPeer().GetFabricIndex();
+        if (DeviceLayer::PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Failed to post Secure Session established event");
+        }
         // Make sure to null out mDelegate so we don't send it any other
         // notifications.
         auto * delegate = mDelegate;
@@ -79,14 +106,15 @@ void PairingSession::Finish()
 
 void PairingSession::DiscardExchange()
 {
-    if (mExchangeCtxt != nullptr)
+    if (mExchangeCtxt.HasValue())
     {
         // Make sure the exchange doesn't try to notify us when it closes,
         // since we might be dead by then.
-        mExchangeCtxt->SetDelegate(nullptr);
+        mExchangeCtxt.Value()->SetDelegate(nullptr);
+
         // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
         // exchange will handle that.
-        mExchangeCtxt = nullptr;
+        mExchangeCtxt.ClearValue();
     }
 }
 
@@ -116,7 +144,8 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableM
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
-CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader)
+CHIP_ERROR PairingSession::DecodeSessionParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader,
+                                                            SessionParameters & outSessionParameters)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -139,7 +168,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint32_t idleRetransTimeout;
         ReturnErrorOnFailure(tlvReader.Get(idleRetransTimeout));
-        mRemoteSessionParams.SetMRPIdleRetransTimeout(System::Clock::Milliseconds32(idleRetransTimeout));
+        outSessionParameters.SetMRPIdleRetransTimeout(System::Clock::Milliseconds32(idleRetransTimeout));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -149,7 +178,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint32_t activeRetransTimeout;
         ReturnErrorOnFailure(tlvReader.Get(activeRetransTimeout));
-        mRemoteSessionParams.SetMRPActiveRetransTimeout(System::Clock::Milliseconds32(activeRetransTimeout));
+        outSessionParameters.SetMRPActiveRetransTimeout(System::Clock::Milliseconds32(activeRetransTimeout));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -159,7 +188,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint16_t activeThresholdTime;
         ReturnErrorOnFailure(tlvReader.Get(activeThresholdTime));
-        mRemoteSessionParams.SetMRPActiveThresholdTime(System::Clock::Milliseconds16(activeThresholdTime));
+        outSessionParameters.SetMRPActiveThresholdTime(System::Clock::Milliseconds16(activeThresholdTime));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -169,7 +198,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint16_t dataModelRevision;
         ReturnErrorOnFailure(tlvReader.Get(dataModelRevision));
-        mRemoteSessionParams.SetDataModelRevision(dataModelRevision);
+        outSessionParameters.SetDataModelRevision(dataModelRevision);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -179,7 +208,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint16_t interactionModelRevision;
         ReturnErrorOnFailure(tlvReader.Get(interactionModelRevision));
-        mRemoteSessionParams.SetInteractionModelRevision(interactionModelRevision);
+        outSessionParameters.SetInteractionModelRevision(interactionModelRevision);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -189,7 +218,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint32_t specificationVersion;
         ReturnErrorOnFailure(tlvReader.Get(specificationVersion));
-        mRemoteSessionParams.SetSpecificationVersion(specificationVersion);
+        outSessionParameters.SetSpecificationVersion(specificationVersion);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -199,7 +228,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     {
         uint16_t maxPathsPerInvoke;
         ReturnErrorOnFailure(tlvReader.Get(maxPathsPerInvoke));
-        mRemoteSessionParams.SetMaxPathsPerInvoke(maxPathsPerInvoke);
+        outSessionParameters.SetMaxPathsPerInvoke(maxPathsPerInvoke);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -207,7 +236,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
     // Future proofing - Don't error out if there are other tags
 exit:
-    if (err == CHIP_END_OF_TLV)
+    if (err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR)
     {
         return tlvReader.ExitContainer(containerType);
     }
@@ -227,19 +256,18 @@ bool PairingSession::IsSessionEstablishmentInProgress()
 
 void PairingSession::Clear()
 {
-    // Clear acts like the destructor if PairingSession, if it is call during
-    // middle of a pairing, means we should terminate the exchange. For normal
-    // path, the exchange should already be discarded before calling Clear.
-    if (mExchangeCtxt != nullptr)
+    // Clear acts like the destructor of PairingSession. If it is called during
+    // the middle of pairing, that means we should terminate the exchange. For the
+    // normal path, the exchange should already be discarded before calling Clear.
+    if (mExchangeCtxt.HasValue())
     {
-        // The only time we reach this is if we are getting destroyed in the
-        // middle of our handshake.  In that case, there is no point trying to
-        // do MRP resends of the last message we sent, so abort the exchange
+        // The only time we reach this is when we are getting destroyed in the
+        // middle of our handshake. In that case, there is no point in trying to
+        // do MRP resends of the last message we sent. So, abort the exchange
         // instead of just closing it.
-        mExchangeCtxt->Abort();
-        mExchangeCtxt = nullptr;
+        mExchangeCtxt.Value()->Abort();
+        mExchangeCtxt.ClearValue();
     }
-
     mSecureSessionHolder.Release();
     mPeerSessionId.ClearValue();
     mSessionManager = nullptr;

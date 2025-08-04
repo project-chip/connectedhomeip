@@ -32,6 +32,10 @@
 
 #include <stdlib.h>
 
+#if (SL_MATTER_GN_BUILD == 0)
+#include "sl_matter_wifi_config.h"
+#endif // SL_MATTER_GN_BUILD
+
 #define NO_SYS 0
 #define MEM_ALIGNMENT (4)
 #define MEMP_NUM_TCP_SEG (TCP_SND_QUEUELEN + 1)
@@ -90,6 +94,12 @@
 
 #define MEMP_NUM_NETCONN (0)
 
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+#define LWIP_IPV4 1
+#else
+#define LWIP_IPV4 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
 #ifndef LWIP_ARP
 #define LWIP_ARP (LWIP_IPV4)
 #endif /* LWIP_ARP */
@@ -105,6 +115,10 @@
 #ifndef LWIP_DHCP
 #define LWIP_DHCP (LWIP_IPV4)
 #endif /* LWIP_DHCP */
+
+// IPv6 should be enabled by default
+#define LWIP_IPV6 1
+#define LWIP_NETIF_API 1
 
 #define LWIP_ETHERNET (LWIP_IPV6) // Required for IPV6 only mode
 #define LWIP_IPV6_MLD (LWIP_IPV6)
@@ -157,6 +171,10 @@
 #define DEFAULT_RAW_RECVMBOX_SIZE 6
 #define DEFAULT_UDP_RECVMBOX_SIZE 6
 #define DEFAULT_TCP_RECVMBOX_SIZE 6
+
+#if SL_ICD_ENABLED
+#define SL_LWIP_MLD6_TIMERS_ONDEMAND 1
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #ifdef LWIP_DEBUG
 

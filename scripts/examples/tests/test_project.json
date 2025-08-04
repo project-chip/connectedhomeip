@@ -88,8 +88,7 @@
                 "//config/standalone/",
                 "//third_party/nlassert/repo/include/",
                 "//third_party/nlio/repo/include/",
-                "//third_party/nlfaultinjection/include/",
-                "//third_party/nlunit-test/repo/src/"
+                "//third_party/nlfaultinjection/include/"
             ],
             "ldflags": ["-march=armv8-a", "-O0"],
             "libs": ["log"],

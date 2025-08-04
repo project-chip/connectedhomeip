@@ -27,7 +27,9 @@
 
 #pragma once
 
-//  Switching from Thread child to router may cause a few second packet stall.
-//  Until this is improved in OpenThread we need to increase the retransmission
-//  interval to survive the stall.
-#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (1000_ms32)
+#define CHIP_CONFIG_LOG_MODULE_Zcl_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_InteractionModel_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_InteractionModel_DETAIL 0
+#define CHIP_CONFIG_LOG_MODULE_DataManagement_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_FabricProvisioning_PROGRESS 0
+#define CHIP_CONFIG_LOG_MODULE_SecureChannel_PROGRESS 0

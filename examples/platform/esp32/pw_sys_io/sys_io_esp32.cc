@@ -29,13 +29,14 @@
 #include <cinttypes>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #define ECHO_TEST_TXD (CONFIG_EXAMPLE_UART_TXD)
 #define ECHO_TEST_RXD (CONFIG_EXAMPLE_UART_RXD)
 #define ECHO_TEST_RTS (UART_PIN_NO_CHANGE)
 #define ECHO_TEST_CTS (UART_PIN_NO_CHANGE)
 
-#define ECHO_UART_PORT_NUM (CONFIG_EXAMPLE_UART_PORT_NUM)
+#define ECHO_UART_PORT_NUM (static_cast<uart_port_t>(CONFIG_EXAMPLE_UART_PORT_NUM))
 #define ECHO_UART_BAUD_RATE (CONFIG_EXAMPLE_UART_BAUD_RATE)
 
 int console_getchar(uint8_t * chr)
@@ -92,7 +93,7 @@ Status WriteByte(std::byte b)
 }
 
 // Writes a string using pw::sys_io, and add newline characters at the end.
-StatusWithSize WriteLine(const std::string_view & s)
+StatusWithSize WriteLine(std::string_view s)
 {
     size_t chars_written  = 0;
     StatusWithSize result = WriteBytes(pw::as_bytes(pw::span(s)));

@@ -34,7 +34,7 @@ chip::Tracing::Perfetto::PerfettoBackend gPerfettoBackend;
 
 } // namespace
 
-extern "C" void pychip_tracing_start_json_log(const char * file_name)
+extern "C" void pychip_tracing_start_json_log()
 {
     chip::MainLoopWork::ExecuteInMainLoop([] {
         gJsonBackend.CloseFile(); // just in case, ensure no file output

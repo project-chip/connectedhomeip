@@ -28,10 +28,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
-#include <nlunit-test.h>
 #include <system/SystemClock.h>
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -41,14 +42,19 @@ using namespace chip::Logging;
 using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 
+#ifdef CONFIG_WIDER_SLEEP_MARGIN
+// SleepMillis can undersleep by as much as 10ms on esp32-qemu.
+constexpr Clock::Milliseconds64 kTestTimeMarginMs = 10_ms64;
+#else
 constexpr Clock::Milliseconds64 kTestTimeMarginMs = 2_ms64;
+#endif
 constexpr Clock::Microseconds64 kTestTimeMarginUs = 500_us64;
 
 // =================================
 //      Unit tests
 // =================================
 
-static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * inContext)
+TEST(TestDevice, GetMonotonicMicroseconds)
 {
     static const Clock::Microseconds64 kTestVectorSystemTimeUs[] = {
         600_us64,
@@ -74,15 +80,15 @@ static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * in
                         ChipLogValueX64(Tdelay.count()));
 
         // verify that timers don't fire early
-        NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
+        EXPECT_GT(Tdelta, (Tdelay - margin));
         // verify they're not too late
-        //        NL_TEST_ASSERT(inSuite, Tdelta < (Tdelay + margin));
+        //        EXPECT_LT(Tdelta, (Tdelay + margin));
         numOfTestsRan++;
     }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+    EXPECT_GT(numOfTestsRan, 0);
 }
 
-static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * inContext)
+TEST(TestDevice, GetMonotonicMilliseconds)
 {
     static const System::Clock::Milliseconds64 kTestVectorSystemTimeMs[] = {
         10_ms64,
@@ -108,32 +114,10 @@ static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * in
                         ChipLogValueX64(Tdelay.count()));
 
         // verify that timers don't fire early
-        NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
+        EXPECT_GT(Tdelta, (Tdelay - margin));
         // verify they're not too late
-        //        NL_TEST_ASSERT(inSuite, Tdelta < (Tdelay + margin));
+        //        EXPECT_LT(Tdelta, (Tdelay + margin));
         numOfTestsRan++;
     }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+    EXPECT_GT(numOfTestsRan, 0);
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = {
-
-    NL_TEST_DEF("Test DeviceLayer::GetMonotonicMicroseconds", TestDevice_GetMonotonicMicroseconds),
-    NL_TEST_DEF("Test DeviceLayer::GetMonotonicMilliseconds", TestDevice_GetMonotonicMilliseconds),
-
-    NL_TEST_SENTINEL()
-};
-
-int TestPlatformTime()
-{
-    nlTestSuite theSuite = { "PlatformTime tests", &sTests[0], nullptr, nullptr };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestPlatformTime)

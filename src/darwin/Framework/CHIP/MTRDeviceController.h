@@ -22,11 +22,10 @@
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
+@class MTRDevice;
 @class MTRServerEndpoint; // Defined in MTRServerEndpoint.h, which imports MTRAccessGrant.h, which imports MTRBaseClusters.h, which imports this file, so we can't import it.
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 @class MTRDeviceControllerAbstractParameters;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,7 +48,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 /**
  * Initialize a device controller with the provided parameters.  This will:
  *
@@ -57,24 +55,26 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *    if it has not already been started.
  * 2) Return nil or a running controller.
  *
- * Once this returns non-nil, it's the caller's resposibility to call shutdown
+ * Once this returns non-nil, it's the caller's responsibility to call shutdown
  * on the controller to avoid leaking it.
  */
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                      error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+- (nullable MTRDeviceController *)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                               error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * If true, the controller has not been shut down yet.
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+/**
+ * If true, the controller has been suspended via `suspend` and not resumed yet.
+ */
+@property (readonly, nonatomic, getter=isSuspended) BOOL suspended MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
 /**
  * The ID assigned to this controller at creation time.
  */
-@property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+@property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Return the Node ID assigned to the controller.  Will return nil if the
@@ -82,6 +82,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 @property (readonly, nonatomic, nullable)
     NSNumber * controllerNodeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Returns the list of MTRDevice instances that this controller has loaded
+ * into memory. Returns an empty array if no devices are in memory.
+ */
+@property (readonly, nonatomic) NSArray<MTRDevice *> * devices MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Set up a commissioning session for a device, using the provided setup payload
@@ -99,12 +105,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Then a PASE session will be established with the device, unless an error
  * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Discovery fails: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Discovery fails: controller:statusUpdate: with MTRCommissioningStatusFailed.
  *
- * * Discovery succeeds but commissioning session setup fails: onPairingComplete
- *   with an error.
+ * * Commissioning session setup fails:
+ *   controller:commissioningSessionEstablishmentDone: with non-nil error.
  *
- * * Commissioning session setup succeeds: onPairingComplete with no error.
+ * * Commissioning session setup succeeds:
+ *   controller:commissioningSessionEstablishmentDone: with nil error.
  *
  * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network
@@ -133,11 +140,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Then a PASE session will be established with the device, unless an error
  * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Invalid connection information: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Invalid connection information: controller:statusUpdate: with MTRCommissioningStatusFailed.
  *
- * * Commissioning session setup fails: onPairingComplete with an error.
+ * * Commissioning session setup fails:
+ *   controller:commissioningSessionEstablishmentDone: with non-nil error.
  *
- * * Commissioning session setup succeeds: onPairingComplete with no error.
+ * * Commissioning session setup succeeds:
+ *   controller:commissioningSessionEstablishmentDone: with nil error.
  *
  * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network
@@ -184,19 +193,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                         error:(NSError * __autoreleasing *)error
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-/**
- * Optionally pre-warm the controller for setting up a commissioning session.
- * This may be called before setupCommissioningSessionWithPayload if it's known
- * that a commissioning attempt will soon take place but the commissioning
- * payload is not known yet.
- *
- * For example this may do a BLE scan in advance so results are ready earlier
- * once the discriminator is known.
- */
-- (void)preWarmCommissioningSession MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)preWarmCommissioningSession MTR_DEPRECATED("-[MTRDeviceControllerFactory preWarmCommissioningSession]", ios(16.4, 17.6), macos(13.3, 14.6), watchos(9.4, 10.6), tvos(16.4, 17.6));
 
 /**
- * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
+ * Set the Delegate for the device controller as well as the Queue on which the Delegate callbacks will be triggered
  *
  * @param[in] delegate The delegate the commissioning process should use
  *
@@ -204,6 +204,30 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
                               queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Adds a Delegate to the device controller as well as the Queue on which the Delegate callbacks will be triggered
+ *
+ * Multiple delegates can be added to monitor MTRDeviceController state changes. Note that there should only
+ * be one delegate that responds to pairing related callbacks.
+ *
+ * If a delegate is added a second time, the call would be ignored.
+ *
+ * All delegates are held by weak references, and so if a delegate object goes away, it will be automatically removed.
+ *
+ * @param[in] delegate The delegate the commissioning process should use
+ *
+ * @param[in] queue The queue on which the callbacks will be delivered
+ */
+- (void)addDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
+                              queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Removes a Delegate from the device controller
+ *
+ * @param[in] delegate The delegate to be removed
+ */
+- (void)removeDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
  * Start scanning for commissionable devices.
@@ -237,20 +261,26 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * 1) There is already an endpoint defined with the given endpoint id.
  * 2) There are too many endpoints defined already.
  */
-- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint MTR_NEWLY_AVAILABLE;
+- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Remove the given server endpoint from this controller.  If the endpoint is
  * not attached to this controller, will just call the completion and do nothing
  * else.
  */
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_NEWLY_AVAILABLE;
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Remove the given server endpoint without being notified when the removal
  * completes.
  */
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_NEWLY_AVAILABLE;
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Forget any information we have about the device with the given node ID.  That
+ * includes clearing any information we have stored about it.
+ */
+- (void)forgetDeviceWithNodeID:(NSNumber *)nodeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Compute a PASE verifier for the desired setup passcode.
@@ -267,6 +297,31 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                     salt:(NSData *)salt
                                                    error:(NSError * __autoreleasing *)error
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Suspend the controller.  This will attempt to stop all network traffic associated
+ * with the controller.  The controller will remain suspended until it is
+ * resumed.
+ *
+ * Suspending an already-suspended controller has no effect.
+ */
+- (void)suspend MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Resume the controller.  This has no effect if the controller is not
+ * suspended.
+ *
+ * A resume following any number of suspend calls will resume the controller;
+ * there does not need to be a resume call to match every suspend call.
+ */
+- (void)resume MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
+
+/**
+ * Returns the list of node IDs for which this controller has stored
+ * information.  Returns empty list if the controller does not have any
+ * information stored.
+ */
+@property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.

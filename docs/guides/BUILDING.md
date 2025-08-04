@@ -25,11 +25,52 @@ The Matter build system has the following features:
 
 ## Checking out the Matter code
 
-To check out the Matter repository, run the following command:
+To check out the Matter code, there are two options: one is to check out all
+platforms together, which is recommended; the other is to check out with support
+for specific platforms, which can obviously reduce the project size.
+
+### Checking out All Platforms
+
+To check out the Matter repository with all platforms, run the following
+command:
 
 ```
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
+
 ```
+
+### Specific platforms Checking out
+
+-   first step, checking out matter top level repo with command below:
+
+```
+  git clone --depth=1 git@github.com:project-chip/connectedhomeip.git
+
+```
+
+-   Second step, check out third-party platform support repos as follows:
+
+```
+  python3 scripts/checkout_submodules.py --shallow --platform platform1,platform2...
+
+```
+
+For Linux host example:
+
+```
+ ./scripts/checkout_submodules.py --shallow --platform  linux
+
+```
+
+For Darwin host example:
+
+```
+ ./scripts/checkout_submodules.py --shallow --platform  darwin
+
+```
+
+Please note that in the above commands, you should replace platform1,platform2
+with the specific platform names you wish to check out.
 
 ## Updating Matter code
 
@@ -51,9 +92,10 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following command:
 
 ```
-sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+sudo apt-get install git gcc g++ pkg-config cmake libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
+     default-jre
 ```
 
 #### UI builds
@@ -89,17 +131,24 @@ Complete the following steps:
 1. Install some Raspberry Pi specific dependencies:
 
     ```
-    sudo apt-get install pi-bluetooth avahi-utils
+    sudo apt-get install bluez pi-bluetooth avahi-utils
     ```
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
 
-#### Enable experimental Bluetooth support in BlueZ
+#### Enable experimental Bluetooth support and disable battery plugin in BlueZ
 
 The Matter application on Linux uses BlueZ to communicate with the Bluetooth
 controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
 the features required by the Matter application by default. To enable these
 features, you need to enable experimental Bluetooth support in BlueZ.
+
+Also disable the battery plugin from BlueZ, because iOS devices advertises a
+battery service via BLE, which requires pairing if accessed. BlueZ includes a
+battery plugin by default which tries to connect to the battery service. The
+authentication fails, because in this case no BLE pairing has been done. If the
+BlueZ battery plugin is not disabled, the BLE connection will be terminated
+during the Matter commissioning process.
 
 1. Edit the `bluetooth.service` unit by running the following command:
 
@@ -112,7 +161,7 @@ features, you need to enable experimental Bluetooth support in BlueZ.
     ```ini
     [Service]
     ExecStart=
-    ExecStart=/usr/lib/bluetooth/bluetoothd -E
+    ExecStart=/usr/libexec/bluetooth/bluetoothd -E -P battery
     ```
 
 1. Restart the Bluetooth service by running the following command:
@@ -158,22 +207,27 @@ permanently, you need to make the following changes:
 
 ## Installing ZAP tool
 
-`bootstrap.sh` will download a compatible ZAP tool version and set it up in
-`$PATH`. If you want to install or use a different version of the tool, you may
-download one from the ZAP project's
-[Releases](https://github.com/project-chip/zap/releases) page.
+For platforms defined in [`scripts/setup/zap.json`](/scripts/setup/zap.json),
+`bootstrap.sh` will download a compatible ZAP tool version from CIPD and set it
+up in `$PATH`.
 
-### Linux ARM
+ZAP releases are copied to CIPD by an automated bot. You can check if a release
+was copied by looking at tags created for
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/3pp/zap)
+in various platforms.
 
-Zap does not provide binary releases for arm. Rosetta solves this for Darwin,
-however for linux arm you will have to use a local ZAP, generally through
-setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
+### Custom ZAP
+
+If you want to install or use a different version of the tool, you may download
+one from the [ZAP releases](https://github.com/project-chip/zap/releases) or
+build it from source.
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
-so you can download a compatible version from the zap project
-[Releases](https://github.com/project-chip/zap/releases). To checkout as source
-code the corresponding tag should exist in the zap
-[repository tags](https://github.com/project-chip/zap/tags) list.
+so you can refer to it to find a compatible version. The version is also
+maintained at [`scripts/setup/zap.version`](/scripts/setup/zap.version).
+
+To check out as source code, the corresponding tag should exist in the
+[ZAP repository tags](https://github.com/project-chip/zap/tags) list.
 
 Example commands:
 
@@ -329,6 +383,39 @@ They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
 
 You likely want `libfuzzer` + `asan` builds instead for local testing.
 
+### `pw_fuzzer` `FuzzTests`
+
+An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
+framework, integrated through `pw_fuzzer`. The Tests will have to be built and
+executed manually.
+
+```
+./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
+```
+
+> [!NOTE]  
+> `asan` is enabled by default in FuzzTest, so please do not add it in
+> `build_examples.py` invocation.
+
+> [!TIP]
+>
+> -   It is possible to build `FuzzTests` with Coverage instrumentation, by
+>     appending `-coverage` to the target, e.g.
+>     `linux-x64-tests-clang-pw-fuzztest-coverage`
+> -   Details:
+>     [Coverage Report Generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#coverage-report-generation)
+
+Tests will be located in:
+`out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
+`chip_pw_fuzztest` is the name of the toolchain used.
+
+-   Details on How To Run Fuzz Tests in
+    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
+
+-   FAQ: In the event of a build failure related to missing files or
+    dependencies for pw_fuzzer, check the
+    [FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
+
 ## Build custom configuration
 
 The build is configured by setting build arguments. These you can set in one of
@@ -429,7 +516,7 @@ gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 > **Note:** Some platforms that can be built as part of the unified build
 > require downloading additional tools. To add these to the build, the location
 > must be provided as a build argument. For example, to add the Simplelink
-> cc13x2_26x2 examples to the unified build, install
+> cc13xx_26xx examples to the unified build, install
 > [SysConfig](https://www.ti.com/tool/SYSCONFIG) and add the following build
 > arguments:
 >
@@ -511,30 +598,77 @@ SDK source code has been executed. It also provides information on how often the
 Matter SDK executes segments of the code and produces a copy of the source file,
 annotated with execution frequencies.
 
-Run the following command to initiate the script:
+### How to Run
+
+```
+./scripts/build_coverage.sh [OPTIONS]
+```
+
+By default, the script
+
+Builds the Matter SDK with coverage instrumentation (unless you specify a custom
+--output_root). Runs the unit tests to generate coverage data. Produces an HTML
+coverage report located at:
+
+```
+out/coverage/coverage/html/index.html
+```
+
+You can extend the coverage scope and test types with the following options:
+
+Option Description -c, --code=<scope> Specify the scope to collect coverage
+data. - core (default): Coverage from the core Matter SDK stack - clusters:
+Coverage from cluster implementations - all: Coverage from the entire Matter SDK
+
+--yaml Also run YAML-based tests, in addition to unit tests.
+
+--python Also run Python-based tests, in addition to unit tests.
+
+-o, --output_root=DIR If specified, skip the build phase and only run coverage
+on the provided build output directory. This directory must have been built with
+use_coverage=true and have had tests run already.
+
+--target=<testname> When running unit tests, specifies a particular test target
+to run (e.g., TestEmberAttributeBuffer.run).
+
+-h, --help Print script usage and exit.
+
+### Examples
+
+Run coverage with the default scope (core) and only unit tests:
 
 ```
 ./scripts/build_coverage.sh
 ```
 
-By default, the code coverage script is performed at the unit testing level.
-Unit tests are created by developers, thus giving them the best overview of what
-tests to include in unit testing. You can extend the coverage test by scope and
-ways of execution with the following parameters:
+Run coverage including YAML tests (plus the always-enabled unit tests):
 
 ```
-  -c, --code                Specify which scope to collect coverage data.
-                            'core': collect coverage data from core stack in Matter SDK. --default
-                            'clusters': collect coverage data from clusters implementation in Matter SDK.
-                            'all': collect coverage data from Matter SDK.
-  -t, --tests               Specify which tools to run the coverage check.
-                            'unit': Run unit test to drive the coverage check. --default
-                            'yaml': Run yaml test to drive the coverage check.
-                            'all': Run unit & yaml test to drive the coverage check.
+./scripts/build_coverage.sh --yaml
 ```
 
-Also, see the up-to-date unit testing coverage report of the Matter SDK
-(collected daily) at:
+Run coverage including Python tests (plus the always-enabled unit tests):
+
+```
+./scripts/build_coverage.sh --python
+```
+
+Run coverage including both YAML and Python tests:
+
+```
+./scripts/build_coverage.sh --yaml --python
+```
+
+Change coverage scope to all (core + clusters) and run YAML tests:
+
+```
+./scripts/build_coverage.sh --code=all --yaml
+```
+
+### Viewing Coverage Results
+
+After the script completes, open the following file in your web browser to view
+the HTML coverage report:
 [matter coverage](https://matter-build-automation.ue.r.appspot.com).
 
 ## Maintaining Matter

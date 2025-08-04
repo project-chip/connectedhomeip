@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message ScopedNode {
+  uint64 node_id = 1;
+  uint32 fabric_index = 2;
+}

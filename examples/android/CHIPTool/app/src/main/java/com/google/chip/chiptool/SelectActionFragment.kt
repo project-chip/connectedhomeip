@@ -72,9 +72,11 @@ class SelectActionFragment : Fragment() {
     binding.provisionCustomFlowBtn.setOnClickListener { handleProvisionCustomFlowClicked() }
     binding.wildcardBtn.setOnClickListener { handleWildcardClicked() }
     binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
+    binding.diagnosticLogBtn.setOnClickListener { handleDiagnosticLogClicked() }
     binding.groupSettingBtn.setOnClickListener { handleGroupSettingClicked() }
     binding.otaProviderBtn.setOnClickListener { handleOTAProviderClicked() }
     binding.icdBtn.setOnClickListener { handleICDClicked() }
+    binding.modeSelectBtn.setOnClickListener { handleModeSelectClicked() }
 
     return binding.root
   }
@@ -154,7 +156,7 @@ class SelectActionFragment : Fragment() {
     /** Notifies listener of a click to manually input the CHIP device address. */
     fun onShowDeviceAddressInput()
 
-    fun SetNetworkType(type: ProvisionNetworkType)
+    fun setNetworkType(type: ProvisionNetworkType?)
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
@@ -172,6 +174,7 @@ class SelectActionFragment : Fragment() {
 
   /** Notifies listener of Scan QR code button click. */
   private fun handleScanQrCodeClicked() {
+    getCallback()?.setNetworkType(null)
     showFragment(BarcodeFragment.newInstance())
   }
 
@@ -224,15 +227,19 @@ class SelectActionFragment : Fragment() {
     showFragment(OtaProviderClientFragment.newInstance())
   }
 
+  private fun handleDiagnosticLogClicked() {
+    showFragment(DiagnosticLogFragment.newInstance())
+  }
+
   /** Notifies listener of provision-WiFi-credentials button click. */
   private fun handleProvisionWiFiCredentialsClicked() {
-    getCallback()?.SetNetworkType(ProvisionNetworkType.WIFI)
+    getCallback()?.setNetworkType(ProvisionNetworkType.WIFI)
     showFragment(BarcodeFragment.newInstance())
   }
 
   /** Notifies listener of provision-Thread-credentials button click. */
   private fun handleProvisionThreadCredentialsClicked() {
-    getCallback()?.SetNetworkType(ProvisionNetworkType.THREAD)
+    getCallback()?.setNetworkType(ProvisionNetworkType.THREAD)
     showFragment(BarcodeFragment.newInstance())
   }
 
@@ -247,6 +254,10 @@ class SelectActionFragment : Fragment() {
 
   private fun handleICDClicked() {
     showFragment(ICDFragment.newInstance())
+  }
+
+  private fun handleModeSelectClicked() {
+    showFragment(ModeSelectClientFragment.newInstance())
   }
 
   companion object {

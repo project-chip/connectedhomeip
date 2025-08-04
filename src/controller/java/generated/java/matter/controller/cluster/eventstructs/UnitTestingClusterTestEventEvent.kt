@@ -29,7 +29,7 @@ class UnitTestingClusterTestEventEvent(
   val arg3: Boolean,
   val arg4: matter.controller.cluster.structs.UnitTestingClusterSimpleStruct,
   val arg5: List<matter.controller.cluster.structs.UnitTestingClusterSimpleStruct>,
-  val arg6: List<UByte>
+  val arg6: List<UByte>,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestEventEvent {\n")
@@ -79,7 +79,7 @@ class UnitTestingClusterTestEventEvent(
       val arg4 =
         matter.controller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
           ContextSpecificTag(TAG_ARG4),
-          tlvReader
+          tlvReader,
         )
       val arg5 =
         buildList<matter.controller.cluster.structs.UnitTestingClusterSimpleStruct> {
@@ -88,7 +88,7 @@ class UnitTestingClusterTestEventEvent(
             this.add(
               matter.controller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
                 AnonymousTag,
-                tlvReader
+                tlvReader,
               )
             )
           }

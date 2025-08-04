@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <stdio.h>
-
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/logging/LogV.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <CHIPDevicePlatformConfig.h>
 #include <lib/core/CHIPConfig.h>
@@ -64,13 +64,25 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     switch (category)
     {
     case kLogCategory_Error:
-        __utils_printf("[%10u][%s][ERROR] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#if CHIP_DEVICE_LAYER_TARGET_BL602 || CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
+        __utils_printf("[%10lu][%s][ERROR] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#else
+        printf("[%10lu][%s][ERROR] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#endif
         break;
     case kLogCategory_Progress:
-        __utils_printf("[%10u][%s][PROGR] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#if CHIP_DEVICE_LAYER_TARGET_BL602 || CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
+        __utils_printf("[%10lu][%s][PROGR] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#else
+        printf("[%10lu][%s][PROGR] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#endif
         break;
     case kLogCategory_Detail:
-        __utils_printf("[%10u][%s][DETAIL] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#if CHIP_DEVICE_LAYER_TARGET_BL602 || CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
+        __utils_printf("[%10lu][%s][DETAIL] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#else
+        printf("[%10lu][%s][DETAIL] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
+#endif
         break;
     }
 #else

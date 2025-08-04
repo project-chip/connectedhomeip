@@ -232,6 +232,39 @@
 #endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
 
 /**
+ * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+ *
+ * @brief
+ *   Base of the PSA key identifier range used by Matter.
+ *
+ * Cryptographic keys stored in the PSA Internal Trusted Storage must have
+ * a user-assigned identifer from the range PSA_KEY_ID_USER_MIN to
+ * PSA_KEY_ID_USER_MAX. This option allows to override the base used to derive
+ * key identifiers used by Matter to avoid overlapping with other firmware
+ * components that also use PSA crypto API. The default value was selected
+ * not to interfere with OpenThread's default base that is 0x20000.
+ *
+ * Note that volatile keys like ephemeral keys used for ECDH have identifiers
+ * auto-assigned by the PSA backend.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE 0x30000
+#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+
+/**
+ * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+ *
+ * @brief
+ *   End of the PSA key identifier range used by Matter.
+ *
+ * This setting establishes the maximum limit for the key range specific to Matter, in order to
+ * prevent any overlap with other firmware components that also employ the PSA crypto API.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END 0x3FFFF
+#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+
+/**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
  *
  *  @brief
@@ -483,14 +516,27 @@
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
+ *  @def CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then CHIP_ERROR will store the error location
+ *  using the std::source_location (requires at least C++20) instead of keeping raw __FILE__ and __LINE__.
+ *  This feature comes with FLASH and RAM overhead, so it is disabled by default.
+ */
+#ifndef CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+#define CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION 0
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+
+/**
  *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
  *
  *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
  *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ *  Since CHIP_NO_ERROR is used in many places and tracking it adds marginal debugging value, it is
+ *  disabled by default.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 0
+#endif // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -499,7 +545,6 @@
  *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
  *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
  */
-
 #ifndef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
 #endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -618,13 +663,13 @@
 #define _CHIP_CONFIG_IsPlatformLwIPErrorNonCritical(CODE) 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE)                                                                         \
     ((CODE) == CHIP_ERROR_POSIX(EHOSTUNREACH) || (CODE) == CHIP_ERROR_POSIX(ENETUNREACH) ||                                        \
      (CODE) == CHIP_ERROR_POSIX(EADDRNOTAVAIL) || (CODE) == CHIP_ERROR_POSIX(EPIPE))
-#else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#else // !(CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) 0
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // !(CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
 #define CHIP_CONFIG_IsPlatformErrorNonCritical(CODE)                                                                               \
     (_CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) || _CHIP_CONFIG_IsPlatformLwIPErrorNonCritical(CODE))
@@ -1015,6 +1060,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+ *
+ * @brief If true, VerifyOrDie() built with @c CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *        generates a short message that includes only the source code location,
+ *        without the condition that fails.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND 0
+#endif
+
+/**
  * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
  *
  * @brief Number of devices a controller can be simultaneously connected to
@@ -1082,7 +1138,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ * @def CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
  *
  * @brief Defines the number of groups key sets supported per fabric, see Group Key Management Cluster in specification.
  *
@@ -1188,6 +1244,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+ *
+ * If set to 1, the `Extension` attribute of the ACL Cluster will be enabled
+ * and supported. This attribute is optional and costly to implement. It is required by
+ * some device types, so some applications must enable it in their CHIPProjectConfig.h
+ * as an override.
+ */
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 0
+#endif
+
+/**
  * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
  *
  * Support flexible copy in the example access control implementation.
@@ -1204,6 +1272,27 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #if !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT && !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
 #error                                                                                                                             \
     "Please enable at least one of CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT or CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT"
+#endif
+
+/**
+ * @def CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC
+ *
+ * Defines the maximum number of access restriction list entries per
+ * fabric in the access control code's ARL attribute.
+ */
+#ifndef CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_ACCESS_RESTRICTION_MAX_ENTRIES_PER_FABRIC 10
+#endif
+
+/**
+ * @def CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY
+ *
+ * Defines the maximum number of access restrictions for each entry
+ * in the ARL attribute (each entry is for a specific cluster on an
+ * endpoint on a fabric).
+ */
+#ifndef CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY
+#define CHIP_CONFIG_ACCESS_RESTRICTION_MAX_RESTRICTIONS_PER_ENTRY 10
 #endif
 
 /**
@@ -1370,6 +1459,28 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 1
 #endif // CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
 
+/**
+ * @def CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+ *
+ * @brief Default minimum lookup time to wait during address resolve for
+ *        additional DNSSD queries even if a reply has already been received, or
+ *        to allow for additional heuristics regarding node choice to succeed, in
+ *        milliseconds
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS 200
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS
+
+/**
+ * @def CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+ *
+ * @brief Default maximum lookup time to wait during address resolve before
+ *        a TIMEOUT error, in milliseconds
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS 45000
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS
+
 /*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
  *
@@ -1442,11 +1553,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @brief The maximum number of clusters per scene, defaults to 3 for a typical usecase (onOff + level control + color control
- * cluster). Needs to be changed in case a greater number of clusters is chosen.
+ * @brief The maximum number of clusters per scene, we recommend using 4 for a typical use case (onOff + level control + color
+ * control cluster + mode selec cluster). Needs to be changed in case a greater number of clusters is chosen. In the event the
+ * device does not need to support the mode select cluster, the maximum number of clusters per scene should be set to 3.
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE
-#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 3
+#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 4
 #endif
 
 /**
@@ -1625,6 +1737,31 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS
+ *
+ * @brief
+ *   Maximum number of ICD clients. Based on this number, platforms that utilize the
+ *   PSA Crypto API should reserve key slot range.
+ *
+ * @note
+ *   For platforms that utilize the PSA Crypto API, this configuration is used to
+ *   compute the number of PSA key slots. It should remain unchanged during the device's lifetime,
+ *   as alterations may lead to issues with backwards compatibility.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS
+#define CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS 256
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF
+ *
+ * @brief Default value for the ICD Management cluster MaximumCheckInBackoff attribute, in seconds
+ */
+#ifndef CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC
+#define CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#endif
+
+/**
  *  @name Configuation for resuming subscriptions that timed out
  *
  *  @brief
@@ -1703,6 +1840,24 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+ *
+ * Defines the number of networks the default ThreadNetworkDirectoryStorage implementation will store.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY (CHIP_CONFIG_MAX_FABRICS * 2)
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+ *
+ * Defines the number of ThreadNetworkDirectoryStorage iterators that can be allocated at any one time.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
  * @def CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
  *
  * @brief CommandSender will use built-in support to enable sending batch commands in a single Invoke Request Message.
@@ -1758,6 +1913,86 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
+/**
+ *  @def CHIP_CONFIG_TEST_GOOGLETEST
+ *
+ *  @brief
+ *    If asserted (1), enable APIs that support unit tests built with the GoogleTest framework
+ *
+ */
+#ifndef CHIP_CONFIG_TEST_GOOGLETEST
+#define CHIP_CONFIG_TEST_GOOGLETEST 0
+#endif // CHIP_CONFIG_TEST_GOOGLETEST
+
+/**
+ *  @def CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+ *
+ *  @brief
+ *    Enables code for collecting and sending analytic related events for MRP
+ *
+ * The purpose of this macro is to prevent compiling code related to MRP analytics
+ * for devices that are not interested interested to save on flash.
+ */
+
+#ifndef CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+#define CHIP_CONFIG_MRP_ANALYTICS_ENABLED 0
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
+/**
+ *  @def CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+ *
+ *  @brief
+ *    Enables EndpointUniqueId attribute for the endpoint in descriptor cluster
+ *
+ * The purpose of this macro is to prevent compiling code related to EndpointUniqueId
+ * for devices that are not interested to support this optional attribute in descriptor cluster by
+ * overriding this macro in project specific configuration.
+ */
+#ifndef CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+#define CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID 0
+#endif // CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS root certificate in persistent storage. This needs
+ * to be increased if the size of TLSCertStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES 3200
+#endif // CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS client certificate in persistent storage. This needs
+ * to be increased if the size of TLSClientCertificateDetailStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES 31000
+#endif // CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+ *
+ * @brief The maximum number of client certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+ *
+ * @brief The maximum number of root certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 /**
  * @}
  */

@@ -14,15 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVWriter.h>
 #include <lib/format/protocol_decoder.h>
 #include <lib/support/StringBuilder.h>
-#include <lib/support/UnitTestRegistration.h>
-
 #include <tlv/meta/clusters_meta.h>
 #include <tlv/meta/protocols_meta.h>
-
-#include <nlunit-test.h>
 
 #include "sample_data.h"
 
@@ -57,8 +57,7 @@ const std::array<const Node<ItemInfo>, 53 + 2> fake_protocols_meta = { {
     { 2, _FakeProtocolData },
 } };
 
-void TestSampleData(nlTestSuite * inSuite, const PayloadDecoderInitParams & params, const SamplePayload & data,
-                    const char * expectation)
+void TestSampleData(const PayloadDecoderInitParams & params, const SamplePayload & data, const char * expectation)
 {
     chip::Decoders::PayloadDecoder<64, 128> decoder(
         PayloadDecoderInitParams(params).SetProtocol(data.protocolId).SetMessageType(data.messageType));
@@ -130,23 +129,23 @@ void TestSampleData(nlTestSuite * inSuite, const PayloadDecoderInitParams & para
         printf("ACTUAL: '%s'\n", partial.Reset().Add(output_builder.c_str() + idx).AddMarkerIfOverflow().c_str());
     }
 
-    NL_TEST_ASSERT(inSuite, strcmp(output_builder.c_str(), expectation) == 0);
+    EXPECT_STREQ(output_builder.c_str(), expectation);
 }
 
-void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
+TEST(TestDecoding, TestFullDataDecoding)
 {
     PayloadDecoderInitParams params;
 
     params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta).SetClusterDecodeTree(chip::TLVMeta::clusters_meta);
 
-    TestSampleData(inSuite, params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
-    TestSampleData(inSuite, params, secure_channel_pkbdf_param_request,
+    TestSampleData(params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
+    TestSampleData(params, secure_channel_pkbdf_param_request,
                    "pbkdf_param_request\n"
                    "  initiator_random: hex:7C8698755B8E9866BB4FFDC27B733F3B6EF7F83D43FBE0CA6AD2B8C52C8F4236\n"
                    "  initiator_session_id: 37677\n"
                    "  passcode_id: 0\n"
                    "  has_pbkdf_parameters: false\n");
-    TestSampleData(inSuite, params, secure_channel_pkbdf_param_response,
+    TestSampleData(params, secure_channel_pkbdf_param_response,
                    "pbkdf_param_response\n"
                    "  initiator_random: hex:7C8698755B8E9866BB4FFDC27B733F3B6EF7F83D43FBE0CA6AD2B8C52C8F4236\n"
                    "  responder_random: hex:A44EB3E1A751A88A32BAB59EF16EB9764C20E1A9DDBEF6EFE3F588C943C58424\n"
@@ -154,24 +153,24 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "  pbkdf_parameters\n"
                    "    iterations: 1000\n"
                    "    salt: hex:E8FC1E6FD0023422B3CA7ECEDD344444551C814D3D0B0EB9C096F00E8A8051B2\n");
-    TestSampleData(inSuite, params, secure_channel_pase_pake1,
+    TestSampleData(params, secure_channel_pase_pake1,
                    // clang-format off
                    "pase_pake1\n"
                    "  pA: hex:0422ABC7A84352850456BD4A510905FE6BB782A0863A9382550E1228020801B22EEC4102C60F80082842B9739705FCD37F134651442A41E3723DFFE0...\n"
                    // clang-format on
     );
-    TestSampleData(inSuite, params, secure_channel_pase_pake2,
+    TestSampleData(params, secure_channel_pase_pake2,
                    // clang-format off
                    "pase_pake2\n"
                    "  pB: hex:04B6A44A3347C6B77900A3674CA19F40F25F056F8CB344EC1B4FA7888B9E6B570B7010431C5D0BE4021FE74A96C40721765FDA6802BE8DFDF5624332...\n"
                    "  cB: hex:40E7452275E38AEBAF0E0F6FAB33A1B0CB5AEB5E824230DD40D0071DC7E55C87\n"
                    // clang-format on
     );
-    TestSampleData(inSuite, params, secure_channel_pase_pake3,
+    TestSampleData(params, secure_channel_pase_pake3,
                    "pase_pake3\n"
                    "  cA: hex:6008C72EDEC9D25D4A36522F0BF23058F9378EFE38CBBCCE8C6853900169BC38\n");
-    TestSampleData(inSuite, params, secure_channel_status_report, "status_report: BINARY DATA\n");
-    TestSampleData(inSuite, params, im_protocol_read_request,
+    TestSampleData(params, secure_channel_status_report, "status_report: BINARY DATA\n");
+    TestSampleData(params, im_protocol_read_request,
                    "read_request\n"
                    "  attribute_requests\n"
                    "    Anonymous<>\n"
@@ -206,7 +205,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "      attribute_id: 3 == 'connectMaxTimeSeconds'\n"
                    "  fabric_filtered: false\n"
                    "  interaction_model_revison: 1\n");
-    TestSampleData(inSuite, params, im_protocol_report_data,
+    TestSampleData(params, im_protocol_report_data,
                    "report_data\n"
                    "  attribute_reports\n"
                    "    Anonymous<>\n"
@@ -279,7 +278,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 
     // Different content
-    TestSampleData(inSuite, params, im_protocol_report_data_acl,
+    TestSampleData(params, im_protocol_report_data_acl,
                    "report_data\n"
                    "  attribute_reports\n"
                    "    Anonymous<>\n"
@@ -301,7 +300,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 
     TestSampleData(
-        inSuite, params, im_protocol_report_data_window_covering,
+        params, im_protocol_report_data_window_covering,
         "report_data\n"
         "  attribute_reports\n"
         "    Anonymous<>\n"
@@ -315,7 +314,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
         "  suppress_response: true\n"
         "  interaction_model_revison: 1\n");
 
-    TestSampleData(inSuite, params, im_protocol_invoke_request,
+    TestSampleData(params, im_protocol_invoke_request,
                    "invoke_request\n"
                    "  suppress_response: false\n"
                    "  timed_request: false\n"
@@ -328,7 +327,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "      OnOff::Toggle\n"
                    "  interaction_model_revison: 1\n");
 
-    TestSampleData(inSuite, params, im_protocol_invoke_response,
+    TestSampleData(params, im_protocol_invoke_response,
                    "invoke_response\n"
                    "  suppress_response: false\n"
                    "  invoke_responses\n"
@@ -342,7 +341,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "          status: 0 == kSuccess\n"
                    "  interaction_model_revison: 1\n");
 
-    TestSampleData(inSuite, params, im_protocol_invoke_request_change_channel,
+    TestSampleData(params, im_protocol_invoke_request_change_channel,
                    "invoke_request\n"
                    "  suppress_response: false\n"
                    "  timed_request: false\n"
@@ -356,7 +355,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "        match: \"channel name\"\n"
                    "  interaction_model_revison: 1\n");
 
-    TestSampleData(inSuite, params, im_protocol_event_software_fault,
+    TestSampleData(params, im_protocol_event_software_fault,
                    "report_data\n"
                    "  event_reports\n"
                    "    Anonymous<>\n"
@@ -375,7 +374,7 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "  suppress_response: true\n"
                    "  interaction_model_revison: 1\n");
 
-    TestSampleData(inSuite, params, im_protocol_event_multipress,
+    TestSampleData(params, im_protocol_event_multipress,
                    "report_data\n"
                    "  event_reports\n"
                    "    Anonymous<>\n"
@@ -394,22 +393,22 @@ void TestFullDataDecoding(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 }
 
-void TestMetaDataOnlyDecoding(nlTestSuite * inSuite, void * inContext)
+TEST(TestDecoding, TestMetaDataOnlyDecoding)
 {
     PayloadDecoderInitParams params;
 
     // NO CLUSTER DECODE TREE
     params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta);
 
-    TestSampleData(inSuite, params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
-    TestSampleData(inSuite, params, secure_channel_pkbdf_param_request,
+    TestSampleData(params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
+    TestSampleData(params, secure_channel_pkbdf_param_request,
                    "pbkdf_param_request\n"
                    "  initiator_random: hex:7C8698755B8E9866BB4FFDC27B733F3B6EF7F83D43FBE0CA6AD2B8C52C8F4236\n"
                    "  initiator_session_id: 37677\n"
                    "  passcode_id: 0\n"
                    "  has_pbkdf_parameters: false\n");
 
-    TestSampleData(inSuite, params, im_protocol_read_request,
+    TestSampleData(params, im_protocol_read_request,
                    "read_request\n"
                    "  attribute_requests\n"
                    "    Anonymous<>\n"
@@ -444,7 +443,7 @@ void TestMetaDataOnlyDecoding(nlTestSuite * inSuite, void * inContext)
                    "      attribute_id: 3\n"
                    "  fabric_filtered: false\n"
                    "  interaction_model_revison: 1\n");
-    TestSampleData(inSuite, params, im_protocol_report_data,
+    TestSampleData(params, im_protocol_report_data,
                    "report_data\n"
                    "  attribute_reports\n"
                    "    Anonymous<>\n"
@@ -515,7 +514,7 @@ void TestMetaDataOnlyDecoding(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 
     // Different content
-    TestSampleData(inSuite, params, im_protocol_report_data_acl,
+    TestSampleData(params, im_protocol_report_data_acl,
                    "report_data\n"
                    "  attribute_reports\n"
                    "    Anonymous<>\n"
@@ -530,14 +529,14 @@ void TestMetaDataOnlyDecoding(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 }
 
-void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
+TEST(TestDecoding, TestEmptyClusterMetaDataDecode)
 {
     PayloadDecoderInitParams params;
 
     params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta).SetClusterDecodeTree(empty_meta);
 
-    TestSampleData(inSuite, params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
-    TestSampleData(inSuite, params, im_protocol_report_data_acl,
+    TestSampleData(params, secure_channel_mrp_ack, "mrp_ack: EMPTY\n");
+    TestSampleData(params, im_protocol_report_data_acl,
                    "report_data\n"
                    "  attribute_reports\n"
                    "    Anonymous<>\n"
@@ -559,24 +558,24 @@ void TestEmptyClusterMetaDataDecode(nlTestSuite * inSuite, void * inContext)
                    "  interaction_model_revison: 1\n");
 }
 
-void TestMissingDecodeData(nlTestSuite * inSuite, void * inContext)
+TEST(TestDecoding, TestMissingDecodeData)
 {
     PayloadDecoderInitParams params;
 
     params.SetProtocolDecodeTree(empty_meta).SetClusterDecodeTree(empty_meta);
 
-    TestSampleData(inSuite, params, secure_channel_mrp_ack, "PROTO(0x0, 0x10): UNKNOWN\n");
-    TestSampleData(inSuite, params, im_protocol_report_data_acl, "PROTO(0x1, 0x5): UNKNOWN\n");
+    TestSampleData(params, secure_channel_mrp_ack, "PROTO(0x0, 0x10): UNKNOWN\n");
+    TestSampleData(params, im_protocol_report_data_acl, "PROTO(0x1, 0x5): UNKNOWN\n");
 }
 
-void TestWrongDecodeData(nlTestSuite * inSuite, void * inContext)
+TEST(TestDecoding, TestWrongDecodeData)
 {
     PayloadDecoderInitParams params;
 
     params.SetProtocolDecodeTree(fake_protocols_meta).SetClusterDecodeTree(empty_meta);
 
-    TestSampleData(inSuite, params, secure_channel_mrp_ack, "proto16: EMPTY\n");
-    TestSampleData(inSuite, params, im_protocol_report_data_acl,
+    TestSampleData(params, secure_channel_mrp_ack, "proto16: EMPTY\n");
+    TestSampleData(params, im_protocol_report_data_acl,
                    "proto5\n"
                    "  ContextTag(0x1)\n"
                    "    AnonymousTag()\n"
@@ -598,7 +597,7 @@ void TestWrongDecodeData(nlTestSuite * inSuite, void * inContext)
                    "  ContextTag(0xFF): 1\n");
 }
 
-void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
+TEST(TestDecoding, TestNestingOverflow)
 {
     PayloadDecoderInitParams params;
     params.SetProtocolDecodeTree(fake_protocols_meta).SetClusterDecodeTree(empty_meta);
@@ -611,65 +610,62 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
     chip::TLV::TLVType unusedType;
 
     // Protocols start with an anonymous tagged structure, after which lists can be of any tags
-    NL_TEST_ASSERT(inSuite, writer.StartContainer(AnonymousTag(), kTLVType_Structure, unusedType) == CHIP_NO_ERROR);
+    EXPECT_EQ(writer.StartContainer(AnonymousTag(), kTLVType_Structure, unusedType), CHIP_NO_ERROR);
 
     // nesting overflow here
     for (uint8_t i = 0; i < 32; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.StartContainer(ContextTag(i), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.StartContainer(ContextTag(i), kTLVType_List, unusedType), CHIP_NO_ERROR);
     }
     // Go back to 24 (still too much nesting)
     for (uint8_t i = 0; i < 8; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(kTLVType_List), CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(
-            inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x10)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x10)), kTLVType_List, unusedType), CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(kTLVType_List), CHIP_NO_ERROR);
     }
     // Go back to 8
     for (uint8_t i = 0; i < 16; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(kTLVType_List), CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(
-            inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x20)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x20)), kTLVType_List, unusedType), CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(kTLVType_List), CHIP_NO_ERROR);
     }
     // Go back to 4
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(kTLVType_List), CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(
-            inSuite, writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x30)), kTLVType_List, unusedType) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.StartContainer(ContextTag(static_cast<uint8_t>(i + 0x30)), kTLVType_List, unusedType), CHIP_NO_ERROR);
     }
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(kTLVType_List), CHIP_NO_ERROR);
     }
     // close everything
     for (uint8_t i = 0; i < 4; i++)
     {
-        NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_List) == CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(kTLVType_List), CHIP_NO_ERROR);
     }
-    NL_TEST_ASSERT(inSuite, writer.EndContainer(kTLVType_Structure) == CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(kTLVType_Structure), CHIP_NO_ERROR);
 
     SamplePayload fake_payload{ chip::Protocols::InteractionModel::Id, 5, chip::ByteSpan(data_buffer, writer.GetLengthWritten()) };
 
-    TestSampleData(inSuite, params, fake_payload,
+    TestSampleData(params, fake_payload,
                    "proto5\n"
                    "  ContextTag(0x0)\n"
                    "    ContextTag(0x1)\n"
@@ -696,24 +692,4 @@ void TestNestingOverflow(nlTestSuite * inSuite, void * inContext)
                    "              ContextTag(0x32)\n"
                    "                ContextTag(0x33)\n");
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestFullDataDecoding", TestFullDataDecoding),                     //
-    NL_TEST_DEF("TestMetaDataOnlyDecoding", TestMetaDataOnlyDecoding),             //
-    NL_TEST_DEF("TestEmptyClusterMetaDataDecode", TestEmptyClusterMetaDataDecode), //
-    NL_TEST_DEF("TestMissingDecodeData", TestMissingDecodeData),                   //
-    NL_TEST_DEF("TestWrongDecodeData", TestWrongDecodeData),                       //
-    NL_TEST_DEF("TestNestingOverflow", TestNestingOverflow),                       //
-    NL_TEST_SENTINEL()                                                             //
-};
-
 } // namespace
-
-int TestDecode()
-{
-    nlTestSuite theSuite = { "TestDecode", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestDecode)

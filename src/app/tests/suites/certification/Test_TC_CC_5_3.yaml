@@ -189,6 +189,25 @@ tests:
               minValue: 0
               maxValue: 3
 
+    - label:
+          "Step 5a: TH sends StepColor command to DUT with StepX = 0, StepY = 0"
+      command: "StepColor"
+      PICS: CC.S.F03 && CC.S.C09.Rsp
+      arguments:
+          values:
+              - name: "StepX"
+                value: 0
+              - name: "StepY"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"

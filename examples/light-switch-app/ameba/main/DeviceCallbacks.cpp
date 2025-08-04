@@ -28,7 +28,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
-#include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
@@ -114,10 +113,6 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 {
     switch (clusterId)
     {
-    case OnOffSwitchConfiguration::Id:
-        OnOffSwitchConfigurationAttributeChangeCallback(endpointId, attributeId, type, value, size);
-        break;
-
     case Identify::Id:
         OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
@@ -156,13 +151,6 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ChipLogProgress(DeviceLayer, "Lost IPv6 connectivity...");
     }
-}
-
-void DeviceCallbacks::OnOffSwitchConfigurationAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t type,
-                                                                      uint8_t * value, uint16_t size)
-{
-    ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                    ChipLogValueMEI(attributeId), type, *value, size);
 }
 
 void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)

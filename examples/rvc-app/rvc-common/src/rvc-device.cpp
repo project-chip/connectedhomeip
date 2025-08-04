@@ -1,9 +1,12 @@
 #include "rvc-device.h"
 
+#include <string>
+
 using namespace chip::app::Clusters;
 
 void RvcDevice::Init()
 {
+    mServiceAreaInstance.Init();
     mRunModeInstance.Init();
     mCleanModeInstance.Init();
     mOperationalStateInstance.Init();
@@ -40,8 +43,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         if (currentMode != RvcRunMode::ModeIdle && newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-            response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
+            response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
             return;
         }
 
@@ -49,6 +51,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         mDocked   = false;
         mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        mServiceAreaDelegate.SetAttributesAtCleanStart();
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
     }
@@ -57,14 +60,15 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         if (newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-            response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
+            response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
             return;
         }
 
         mRunModeInstance.UpdateCurrentMode(newMode);
         mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+
+        UpdateServiceAreaProgressOnExit();
         return;
     }
     break;
@@ -72,7 +76,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
 
     // If we fall through at any point, it's because the change is not supported in the current state.
     response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-    response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time"));
+    response.statusText.SetValue("This change is not allowed at this time"_span);
 }
 
 void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
@@ -82,7 +86,7 @@ void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::
     if (rvcRunCurrentMode != RvcRunMode::ModeIdle)
     {
         response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Change of the cleaning mode is only allowed in Idle."));
+        response.statusText.SetValue("Change of the cleaning mode is only allowed in Idle."_span);
         return;
     }
 
@@ -158,6 +162,55 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     }
 }
 
+bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan & statusText)
+{
+    if (mOperationalStateInstance.GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kRunning))
+    {
+        CopyCharSpanToMutableCharSpanWithTruncation("cannot set the Selected Areas while the device is running"_span, statusText);
+        return false;
+    }
+    return true;
+}
+
+bool RvcDevice::SaHandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText)
+{
+    if (mServiceAreaInstance.GetCurrentArea() != skippedArea)
+    {
+        // This device only supports skipping the current location.
+        CopyCharSpanToMutableCharSpanWithTruncation("the skipped area does not match the current area"_span, skipStatusText);
+        return false;
+    }
+
+    if (mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning))
+    {
+        // This device only accepts the skip are command while in the running state
+        CopyCharSpanToMutableCharSpanWithTruncation("skip area is only accepted when the device is running"_span, skipStatusText);
+        return false;
+    }
+
+    bool finished;
+    mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kSkipped, finished);
+
+    if (finished)
+    {
+        HandleActivityCompleteEvent();
+    }
+
+    return true;
+}
+
+bool RvcDevice::SaIsSupportedAreasChangeAllowed()
+{
+    return mOperationalStateInstance.GetCurrentOperationalState() !=
+        to_underlying(OperationalState::OperationalStateEnum::kRunning);
+}
+
+bool RvcDevice::SaIsSupportedMapChangeAllowed()
+{
+    return mOperationalStateInstance.GetCurrentOperationalState() !=
+        to_underlying(OperationalState::OperationalStateEnum::kRunning);
+}
+
 void RvcDevice::HandleChargedMessage()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() !=
@@ -212,6 +265,26 @@ void RvcDevice::HandleDockedMessage()
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
 }
 
+void RvcDevice::HandleEmptyingDustBinMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin));
+}
+
+void RvcDevice::HandleCleaningMopMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop));
+}
+
+void RvcDevice::HandleFillingWaterTankMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank));
+}
+
+void RvcDevice::HandleUpdatingMapsMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps));
+}
+
 void RvcDevice::HandleChargerFoundMessage()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() !=
@@ -255,6 +328,41 @@ void RvcDevice::HandleActivityCompleteEvent()
     mOperationalStateInstance.OnOperationCompletionDetected(0, a, b);
 
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+
+    mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
+    mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
+    UpdateServiceAreaProgressOnExit();
+}
+
+void RvcDevice::HandleAreaCompletedEvent()
+{
+    bool finished;
+    mServiceAreaDelegate.GoToNextArea(ServiceArea::OperationalStatusEnum::kCompleted, finished);
+
+    if (finished)
+    {
+        HandleActivityCompleteEvent();
+    }
+}
+
+void RvcDevice::HandleAddServiceAreaMap(uint32_t mapId, const CharSpan & mapName)
+{
+    mServiceAreaInstance.AddSupportedMap(mapId, mapName);
+}
+
+void RvcDevice::HandleAddServiceAreaArea(ServiceArea::AreaStructureWrapper & area)
+{
+    mServiceAreaInstance.AddSupportedArea(area);
+}
+
+void RvcDevice::HandleRemoveServiceAreaMap(uint32_t mapId)
+{
+    mServiceAreaInstance.RemoveSupportedMap(mapId);
+}
+
+void RvcDevice::HandleRemoveServiceAreaArea(uint32_t areaId)
+{
+    mServiceAreaInstance.RemoveSupportedArea(areaId);
 }
 
 void RvcDevice::HandleErrorEvent(const std::string & error)
@@ -305,6 +413,34 @@ void RvcDevice::HandleErrorEvent(const std::string & error)
     {
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
     }
+    else if (error == "LowBattery")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kLowBattery);
+    }
+    else if (error == "CannotReachTargetArea")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kCannotReachTargetArea);
+    }
+    else if (error == "DirtyWaterTankFull")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankFull);
+    }
+    else if (error == "DirtyWaterTankMissing")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankMissing);
+    }
+    else if (error == "WheelsJammed")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWheelsJammed);
+    }
+    else if (error == "BrushJammed")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kBrushJammed);
+    }
+    else if (error == "NavigationSensorObscured")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kNavigationSensorObscured);
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command: The 'Error' key of the 'ErrorEvent' message is not valid.");
@@ -331,4 +467,31 @@ void RvcDevice::HandleResetMessage()
     mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
     mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     mCleanModeInstance.UpdateCurrentMode(RvcCleanMode::ModeQuick);
+
+    mServiceAreaInstance.ClearSelectedAreas();
+    mServiceAreaInstance.ClearProgress();
+    mServiceAreaInstance.SetCurrentArea(DataModel::NullNullable);
+    mServiceAreaInstance.SetEstimatedEndTime(DataModel::NullNullable);
+
+    mServiceAreaDelegate.SetMapTopology();
+}
+
+void RvcDevice::UpdateServiceAreaProgressOnExit()
+{
+    if (!mServiceAreaInstance.HasFeature(ServiceArea::Feature::kProgressReporting))
+    {
+        return;
+    }
+
+    uint32_t i = 0;
+    ServiceArea::Structs::ProgressStruct::Type progressElement;
+    while (mServiceAreaInstance.GetProgressElementByIndex(i, progressElement))
+    {
+        if (progressElement.status == ServiceArea::OperationalStatusEnum::kOperating ||
+            progressElement.status == ServiceArea::OperationalStatusEnum::kPending)
+        {
+            mServiceAreaInstance.SetProgressStatus(progressElement.areaID, ServiceArea::OperationalStatusEnum::kSkipped);
+        }
+        i++;
+    }
 }

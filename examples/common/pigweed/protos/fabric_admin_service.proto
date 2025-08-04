@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+import 'fabric_sync_common/fabric_sync_common.proto';
+
+package chip.rpc;
+
+// Define the message for a synchronized end device with necessary fields
+message DeviceCommissioningWindowInfo {
+  ScopedNode id = 1;
+  uint32 commissioning_timeout = 2;
+  uint32 discriminator = 3;
+  uint32 iterations = 4;
+  bytes salt = 5;
+  bytes verifier = 6;
+}
+
+// Define the message for commissioning a device with necessary fields
+message DeviceCommissioningInfo {
+  uint32 discriminator = 1;
+  uint32 iterations = 2;
+  uint32 setup_pin = 3;
+  uint32 vendor_id = 4;
+  uint32 product_id = 5;  
+  bytes salt = 6;
+}
+
+message KeepActiveParameters {
+  ScopedNode id = 1;
+  uint32 stay_active_duration_ms = 2;
+  uint32 timeout_ms = 3;
+}
+
+// Define the response message to convey the status of the operation
+message OperationStatus {
+  bool success = 1;
+}
+
+service FabricAdmin {
+  rpc OpenCommissioningWindow(DeviceCommissioningWindowInfo) returns (OperationStatus){}
+  rpc CommissionNode(DeviceCommissioningInfo) returns (pw.protobuf.Empty){}  
+  rpc KeepActive(KeepActiveParameters) returns (pw.protobuf.Empty){}
+}

@@ -18,12 +18,20 @@
 
 #include "BdxTransferDiagnosticLog.h"
 
+#include <protocols/bdx/BdxTransferDiagnosticLogPool.h>
+
 namespace chip {
 namespace bdx {
 
 namespace {
 // Max block size for the BDX transfer.
 constexpr uint32_t kMaxBdxBlockSize = 1024;
+
+// How often we poll our transfer session.  Sadly, we get allocated on
+// unsolicited message, which makes it hard for our clients to configure this.
+// But the default poll interval is 500ms, which makes log downloads extremely
+// slow.
+constexpr System::Clock::Timeout kBdxPollInterval = System::Clock::Milliseconds32(50);
 
 // Timeout for the BDX transfer session..
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
@@ -33,6 +41,16 @@ constexpr TransferRole kBdxRole              = TransferRole::kReceiver;
 void BdxTransferDiagnosticLog::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
+
+    if (event.EventType == TransferSession::OutputEventType::kNone)
+    {
+        // Because we are polling for output every 50ms on our transfer session,
+        // we will get a lot of kNone events coming through here: one for every
+        // time we poll but the other side has not sent anything new yet.  Just
+        // ignore those here, for now, and make sure not to log them, because
+        // that bloats the logs pretty quickly.
+        return;
+    }
 
     ChipLogDetail(BDX, "Got an event %s", event.ToString(event.EventType));
 
@@ -63,7 +81,7 @@ void BdxTransferDiagnosticLog::HandleTransferSessionOutput(TransferSession::Outp
         }
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
-    case TransferSession::OutputEventType::kNone:
+    // case TransferSession::OutputEventType::kNone: handled above.
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
     case TransferSession::OutputEventType::kQueryReceived:
     case TransferSession::OutputEventType::kAckReceived:
@@ -95,7 +113,8 @@ CHIP_ERROR BdxTransferDiagnosticLog::OnMessageReceived(Messaging::ExchangeContex
         mTransferProxy.SetFabricIndex(fabricIndex);
         mTransferProxy.SetPeerNodeId(peerNodeId);
         auto flags(TransferControlFlags::kSenderDrive);
-        ReturnLogErrorOnFailure(Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout));
+        ReturnLogErrorOnFailure(
+            Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
     }
 
     return TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
@@ -192,6 +211,24 @@ void BdxTransferDiagnosticLog::OnExchangeClosing(Messaging::ExchangeContext * ec
     VerifyOrReturn(!mIsExchangeClosing);
     mExchangeCtx = nullptr;
     LogErrorOnFailure(OnTransferSessionEnd(CHIP_ERROR_INTERNAL));
+}
+
+bool BdxTransferDiagnosticLog::IsForFabric(FabricIndex fabricIndex) const
+{
+    if (mExchangeCtx == nullptr || !mExchangeCtx->HasSessionHandle())
+    {
+        return false;
+    }
+
+    auto session = mExchangeCtx->GetSessionHandle();
+    return session->GetFabricIndex() == fabricIndex;
+}
+
+void BdxTransferDiagnosticLog::AbortTransfer()
+{
+    // No need to mTransfer.AbortTransfer() here, since that just tries to async
+    // send a StatusReport to the other side, but we are going away here.
+    Reset();
 }
 
 } // namespace bdx

@@ -19,7 +19,6 @@
 #include <app/util/config.h>
 #include <static-supported-temperature-levels.h>
 
-using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TemperatureControl;
@@ -57,7 +56,7 @@ CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(MutableCharSpan & item)
                 CHIP_ERROR err = CopyCharSpanToMutableCharSpan(endpointPair.mTemperatureLevels[mIndex], item);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Error copying char span to mutable char span %s", ErrorStr(err));
+                    ChipLogError(Zcl, "Error copying char span to mutable char span: %" CHIP_ERROR_FORMAT, err.Format());
                     return err;
                 }
                 mIndex++;

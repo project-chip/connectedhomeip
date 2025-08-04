@@ -46,6 +46,7 @@ shared_library("jni") {
     "${chip_root}/src/app/server/java:jni",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/inipp",
   ]
 
@@ -84,11 +85,11 @@ android_library("java") {
   javac_flags = [ "-Xlint:deprecation" ]
 
   # TODO: add classpath support (we likely need to add something like
-  #  ..../platforms/android-26/android.jar to access BLE items)
+  #  ..../platforms/android-30/android.jar to access BLE items)
 }
 
 java_prebuilt("android") {
-  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-30/android.jar"
 }
 
 group("default") {

@@ -56,7 +56,11 @@ public class ICDDeviceInfo {
   private final byte[] symmetricKey;
   private final Set<UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
   private final String userActiveModeTriggerInstruction;
+  private final long idleModeDuration;
+  private final long activeModeDuration;
+  private final int activeModeThreshold;
   private final long icdNodeId;
+  private final long checkInNodeId;
   private final long icdCounter;
   private final long monitoredSubject;
   private final long fabricId;
@@ -66,7 +70,11 @@ public class ICDDeviceInfo {
       byte[] symmetricKey,
       Set<UserActiveModeTriggerBitmap> userActiveModeTriggerHint,
       String userActiveModeTriggerInstruction,
+      long idleModeDuration,
+      long activeModeDuration,
+      int activeModeThreshold,
       long icdNodeId,
+      long checkInNodeId,
       long icdCounter,
       long monitoredSubject,
       long fabricId,
@@ -74,7 +82,11 @@ public class ICDDeviceInfo {
     this.symmetricKey = symmetricKey;
     this.userActiveModeTriggerHint = userActiveModeTriggerHint;
     this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
+    this.idleModeDuration = idleModeDuration;
+    this.activeModeDuration = activeModeDuration;
+    this.activeModeThreshold = activeModeThreshold;
     this.icdNodeId = icdNodeId;
+    this.checkInNodeId = checkInNodeId;
     this.icdCounter = icdCounter;
     this.monitoredSubject = monitoredSubject;
     this.fabricId = fabricId;
@@ -85,14 +97,22 @@ public class ICDDeviceInfo {
       byte[] symmetricKey,
       int userActiveModeTriggerHintRaw,
       String userActiveModeTriggerInstruction,
+      long idleModeDuration,
+      long activeModeDuration,
+      int activeModeThreshold,
       long icdNodeId,
+      long checkInNodeId,
       long icdCounter,
       long monitoredSubject,
       long fabricId,
       int fabricIndex) {
     this.symmetricKey = symmetricKey;
     this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
+    this.idleModeDuration = idleModeDuration;
+    this.activeModeDuration = activeModeDuration;
+    this.activeModeThreshold = activeModeThreshold;
     this.icdNodeId = icdNodeId;
+    this.checkInNodeId = checkInNodeId;
     this.icdCounter = icdCounter;
     this.monitoredSubject = monitoredSubject;
     this.fabricId = fabricId;
@@ -122,9 +142,29 @@ public class ICDDeviceInfo {
     return userActiveModeTriggerInstruction;
   }
 
-  /** Returns the ICD Node Id. */
+  /** Returns the GetIdleModeDuration. */
+  public long getIdleModeDuration() {
+    return idleModeDuration;
+  }
+
+  /** Returns the GetActiveModeDuration. */
+  public long getActiveModeDuration() {
+    return activeModeDuration;
+  }
+
+  /** Returns the GetActiveModeThreshold. */
+  public int getActiveModeThreshold() {
+    return activeModeThreshold;
+  }
+
+  /** Returns the ICD peer Node Id. */
   public long getIcdNodeId() {
     return icdNodeId;
+  }
+
+  /** Returns the checkIn Node Id. */
+  public long getIcdCheckInNodeId() {
+    return checkInNodeId;
   }
 
   /** Returns the ICD Counter. */
@@ -156,6 +196,8 @@ public class ICDDeviceInfo {
         + userActiveModeTriggerInstruction
         + "\n\ticdNodeId : "
         + icdNodeId
+        + "\n\ticdCheckInNodeId : "
+        + checkInNodeId
         + "\n\ticdCounter : "
         + icdCounter
         + "\n\tmonitoredSubject : "

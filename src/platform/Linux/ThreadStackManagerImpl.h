@@ -20,11 +20,10 @@
 #include <memory>
 #include <vector>
 
-#include <app/AttributeAccessInterface.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/openthread/introspect.h>
+#include <platform/Linux/dbus/openthread/DBusOpenthread.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -32,7 +31,7 @@
 namespace chip {
 
 template <>
-struct GAutoPtrDeleter<OpenthreadIoOpenthreadBorderRouter>
+struct GAutoPtrDeleter<OpenthreadBorderRouter>
 {
     using deleter = GObjectDeleter;
 };
@@ -114,10 +113,8 @@ public:
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
-
+    CHIP_ERROR _GetThreadVersion(uint16_t & version);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
-
-    CHIP_ERROR _JoinerStart();
 
     void _ResetThreadNetworkDiagnosticsCounts();
 
@@ -152,12 +149,12 @@ private:
         uint8_t lqi;
     };
 
-    GAutoPtr<OpenthreadIoOpenthreadBorderRouter> mProxy;
+    GAutoPtr<OpenthreadBorderRouter> mProxy;
 
     static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallScan(ThreadStackManagerImpl * self);
-    static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+    static void OnDbusPropertiesChanged(OpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                         const gchar * const * invalidated_properties, gpointer user_data);
     void ThreadDeviceRoleChangedHandler(const gchar * role);
 
@@ -168,6 +165,7 @@ private:
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     bool mAttached;
+    uint8_t mExtendedAddress[8];
 };
 
 inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)

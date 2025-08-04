@@ -59,6 +59,24 @@ CHIP_ERROR DefaultOTARequestorStorage::StoreDefaultProviders(const ProviderLocat
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
+bool DefaultOTARequestorStorage::ProviderAlreadyInList(ProviderLocationList & listProviders, ProviderLocationType provider)
+{
+    auto iterator = listProviders.Begin();
+
+    while (iterator.Next())
+    {
+        ProviderLocationType pl = iterator.GetValue();
+
+        if ((pl.providerNodeID == provider.providerNodeID) && (pl.fabricIndex == provider.fabricIndex) &&
+            (pl.endpoint == provider.endpoint))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 CHIP_ERROR DefaultOTARequestorStorage::LoadDefaultProviders(ProviderLocationList & providers)
 {
     uint8_t buffer[kProviderListMaxSerializedSize];
@@ -77,7 +95,10 @@ CHIP_ERROR DefaultOTARequestorStorage::LoadDefaultProviders(ProviderLocationList
     {
         ProviderLocationType provider;
         ReturnErrorOnFailure(provider.Decode(reader));
-        providers.Add(provider);
+        if (!ProviderAlreadyInList(providers, provider))
+        {
+            providers.Add(provider);
+        }
     }
 
     ReturnErrorOnFailure(reader.ExitContainer(outerType));

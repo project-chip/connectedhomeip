@@ -1,9 +1,9 @@
 # Matter ESP32 Bridge App Example
 
 Please
-[setup ESP-IDF and Matter Environment](../../../docs/guides/esp32/setup_idf_chip.md)
+[setup ESP-IDF and Matter Environment](../../../docs/platforms/esp32/setup_idf_chip.md)
 and refer
-[building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
+[building and commissioning](../../../docs/platforms/esp32/build_app_and_commission.md)
 guides to get started.
 
 ---
@@ -54,10 +54,10 @@ defined:
     definition.
 
 -   All attributes defined with these macros will be configured as
-    `ATTRIBUTE_MASK_EXTERNAL_STORAGE` in the ZCL database and therefore will
-    rely on the application to maintain storage for the attribute. Consequently,
-    reads or writes to these attributes must be handled within the application
-    by the `emberAfExternalAttributeWriteCallback` and
+    `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
+    will rely on the application to maintain storage for the attribute.
+    Consequently, reads or writes to these attributes must be handled within the
+    application by the `emberAfExternalAttributeWriteCallback` and
     `emberAfExternalAttributeReadCallback` functions. See the bridge
     application's `main.cpp` for an example of this implementation.
 

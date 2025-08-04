@@ -17,76 +17,32 @@
  *    limitations under the License.
  */
 
-#include <AppTask.h>
-
-#include "AppConfig.h"
-
-#include <DeviceInfoProviderImpl.h>
+#include "sl_component_catalog.h"
+// Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+#include "sl_system_init.h"
+#else
+#include "sl_main_init.h"
+#endif
 #include <MatterConfig.h>
-#include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 
-#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+// This is a User definable function in sl_main context, called by sl_main_init before the kernel is started
+void app_init_early(void) {}
 
-#include "FreeRTOS.h"
-#include "FreeRTOSConfig.h"
-#include "event_groups.h"
-#include "task.h"
+// This is a User definable function, in sl_main context, called by start_task_handler once the silabs platform is fully
+// initialized.
+void app_init(void)
+{
+    // Initialize the matter application. For example, create periodic timer(s) or
+    // task(s).
+    SilabsMatterConfig::AppInit();
+}
 
-/**********************************************************
- * Defines
- *********************************************************/
-
-#define MAIN_TASK_STACK_SIZE (1024 * 5)
-#define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
-
-using namespace ::chip;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::Credentials;
-using namespace chip::DeviceLayer::Silabs;
-
-TaskHandle_t main_Task;
-void application_start(void * unused);
-volatile int apperror_cnt;
-static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
-// ================================================================================
-// Main Code
-// ================================================================================
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
 int main(void)
 {
-    GetPlatform().Init();
-
-    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
-
-    SILABS_LOG("Starting scheduler");
-    GetPlatform().StartScheduler();
-
-    // Should never get here.
-    chip::Platform::MemoryShutdown();
-    SILABS_LOG("vTaskStartScheduler() failed");
-    appError(CHIP_ERROR_INTERNAL);
+    app_init_early();
+    sl_system_init();
+    app_init();
 }
-
-void application_start(void * unused)
-{
-    CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
-    if (err != CHIP_NO_ERROR)
-        appError(err);
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Credentials::Silabs::GetSilabsDacProvider());
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    SILABS_LOG("Starting App Task");
-    err = AppTask::GetAppTask().StartAppTask();
-    if (err != CHIP_NO_ERROR)
-        appError(err);
-
-    vTaskDelete(main_Task);
-}
+#endif

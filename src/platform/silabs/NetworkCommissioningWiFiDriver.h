@@ -18,7 +18,7 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/NetworkCommissioning.h>
-#include <wfx_host_events.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -29,6 +29,8 @@ inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
 inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
+
+CHIP_ERROR GetConnectedNetwork(Network & network);
 
 template <typename T>
 class SlScanResponseIterator : public Iterator<T>
@@ -121,20 +123,18 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
     chip::BitFlags<WiFiSecurity> ConvertSecuritytype(wfx_sec_t security);
+    uint32_t GetSupportedWiFiBandsMask() const override;
 
     void OnConnectWiFiNetwork();
     void UpdateNetworkingStatus();
-    static SlWiFiDriver & GetInstance()
-    {
-        static SlWiFiDriver instance;
-        return instance;
-    }
+    static SlWiFiDriver * GetInstance() { return mDriver; }
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     bool StartScanWiFiNetworks(ByteSpan ssid);
     static void OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult);
 
+    static SlWiFiDriver * mDriver;
     WiFiNetwork mSavedNetwork   = {};
     WiFiNetwork mStagingNetwork = {};
     ScanCallback * mpScanCallback;

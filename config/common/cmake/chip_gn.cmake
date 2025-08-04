@@ -36,6 +36,10 @@ if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../.. REALPATH)
 endif()
 
+if (NOT CHIP_APP_ZAP_DIR)
+    get_filename_component(CHIP_APP_ZAP_DIR ${CHIP_ROOT}/zzz_generated/app-common REALPATH)
+endif()
+
 # ==============================================================================
 # Find required programs
 # ==============================================================================
@@ -69,6 +73,7 @@ endif()
 #   DEVICE_INFO_EXAMPLE_PROVIDER Add example device info provider support
 #
 #   GN_DEPENDENCIES List of targets that should be built before Matter GN project
+#   LINK_TARGETS    List of additional libraries that should be linked with target as a single group
 macro(matter_build target)
     set(options)
     set(oneValueArgs
@@ -77,15 +82,23 @@ macro(matter_build target)
         LIB_PW_RPC
         LIB_MBEDTLS
         DEVICE_INFO_EXAMPLE_PROVIDER
+        FORCE_LOGGING_STDIO
     )
-    set(multiValueArgs GN_DEPENDENCIES)
+    set(multiValueArgs
+        GN_DEPENDENCIES
+        LINK_TARGETS
+    )
 
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     set(MATTER_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
     # Prepare Matter libraries that the application should be linked with
-    set(MATTER_LIBRARIES -lCHIP)
+    if (FORCE_LOGGING_STDIO)
+        set(MATTER_LIBRARIES -lCHIPWithStdioLogging)
+    else()
+        set(MATTER_LIBRARIES -lCHIP)
+    endif()
 
     if (ARG_LIB_MBEDTLS)
         list(APPEND MATTER_LIBRARIES -lmbedtls)
@@ -121,14 +134,15 @@ macro(matter_build target)
         BUILD_COMMAND           ${CMAKE_COMMAND} -E echo "Starting Matter library build in ${CMAKE_CURRENT_BINARY_DIR}"
         COMMAND                 ${Python3_EXECUTABLE} ${CHIP_ROOT}/config/common/cmake/make_gn_args.py @args.tmp > args.gn.tmp
         # Replace the config only if it has changed to avoid triggering unnecessary rebuilds
-        COMMAND                 bash -c "(! diff -q args.gn.tmp args.gn && mv args.gn.tmp args.gn) || true"
+        COMMAND                 "${CMAKE_COMMAND}" -E copy_if_different "args.gn.tmp" "args.gn"
         # Regenerate the ninja build system
         COMMAND                 ${GN_EXECUTABLE}
                                     --root=${CHIP_ROOT}
                                     --root-target=${GN_ROOT_TARGET}
                                     --dotfile=${GN_ROOT_TARGET}/.gn
                                     --script-executable=${Python3_EXECUTABLE}
-                                    gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+                                    gen --check --fail-on-unused-args --add-export-compile-commands=*
+                                    ${CMAKE_CURRENT_BINARY_DIR}
         COMMAND                 ninja
         COMMAND                 ${CMAKE_COMMAND} -E echo "Matter library build complete"
         INSTALL_COMMAND         ""
@@ -158,7 +172,8 @@ macro(matter_build target)
         ${CHIP_ROOT}/src/include
         ${CHIP_ROOT}/third_party/nlassert/repo/include
         ${CHIP_ROOT}/third_party/nlio/repo/include
-        ${CHIP_ROOT}/zzz_generated/app-common
+        ${CHIP_ROOT}/third_party/nlfaultinjection/include
+        ${CHIP_APP_ZAP_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}/gen/include
     )
 
@@ -167,6 +182,10 @@ macro(matter_build target)
             ${CHIP_ROOT}/third_party/mbedtls/repo/include
         )
     endif()
+
+    foreach(link_target ${ARG_LINK_TARGETS})
+      list(APPEND MATTER_LIBRARIES $<TARGET_FILE:${link_target}>)
+    endforeach()
 
     # ==============================================================================
     # Link required libraries

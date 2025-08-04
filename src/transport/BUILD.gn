@@ -37,6 +37,7 @@ static_library("transport") {
     "SecureSessionTable.h",
     "Session.cpp",
     "Session.h",
+    "SessionConnectionDelegate.h",
     "SessionDelegate.h",
     "SessionHolder.cpp",
     "SessionHolder.h",

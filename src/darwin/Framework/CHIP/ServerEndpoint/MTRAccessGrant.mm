@@ -112,7 +112,7 @@ MTR_DIRECT_MEMBERS
 
 - (NSUInteger)hash
 {
-    return _subjectID.unsignedLongLongValue ^ _grantedPrivilege ^ _authenticationMode;
+    return _subjectID.unsignedIntegerValue ^ _grantedPrivilege ^ _authenticationMode;
 }
 
 - (NSString *)description

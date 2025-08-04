@@ -1,3 +1,20 @@
+#
+#    Copyright (c) 2021 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
 import argparse
 import atexit
 import builtins
@@ -6,6 +23,7 @@ import os
 import pathlib
 
 import chip.CertificateAuthority
+import chip.clusters as Clusters  # noqa: F401
 import chip.FabricAdmin
 import chip.logging
 import chip.native
@@ -13,8 +31,6 @@ import coloredlogs
 from chip.ChipStack import ChipStack
 from rich import inspect, pretty
 from rich.console import Console
-
-_fabricAdmins = None
 
 
 def ReplInit(debug):
@@ -94,6 +110,10 @@ def main():
         "-d", "--debug", help="Set default logging level to debug.", action="store_true")
     parser.add_argument(
         "-t", "--trust-store", help="Path to the PAA trust store.", action="store", default="./credentials/development/paa-root-certs")
+    parser.add_argument(
+        "-b", "--ble-controller", help="BLE controller selector, see example or platform docs for details", type=int, default=None)
+    parser.add_argument(
+        "-s", "--server-interactions", help="Enable server interactions.", action="store_true")
     args = parser.parse_args()
 
     if not os.path.exists(args.trust_store):
@@ -128,7 +148,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
         # nothing we can do ... things will NOT work
         return
 
-    chip.native.Init()
+    chip.native.Init(bluetoothAdapter=args.ble_controller)
 
     global certificateAuthorityManager
     global chipStack
@@ -137,7 +157,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
 
     ReplInit(args.debug)
 
-    chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=False)
+    chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=args.server_interactions)
     certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()
@@ -159,7 +179,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
     console.print(
         '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
     \t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
-    \t[red]caList[n][m][blue]:\t\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
+    \t[red]caList\[n].adminList\[m][blue]:\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
 
     console.print(
         f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): '

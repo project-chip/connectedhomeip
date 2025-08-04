@@ -37,6 +37,8 @@ private:
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
+    void LinkButtons(ButtonManager & buttonManager);
+    void LinkLeds(LedManager & ledManager);
 
     static void LockActionEventHandler(AppEvent * event);
     static void LockStateChanged(LockManager::State_t state);

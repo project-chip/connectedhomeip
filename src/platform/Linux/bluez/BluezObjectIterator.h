@@ -17,10 +17,12 @@
 
 #pragma once
 
+#include <iterator>
+
 #include <glib.h>
 
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -41,8 +43,8 @@ public:
     BluezObjectIterator() = default;
     explicit BluezObjectIterator(GList * position) : mPosition(position) {}
 
-    reference operator*() const { return *BLUEZ_OBJECT(mPosition->data); }
-    pointer operator->() const { return BLUEZ_OBJECT(mPosition->data); }
+    reference operator*() const { return *reinterpret_cast<BluezObject *>(mPosition->data); }
+    pointer operator->() const { return reinterpret_cast<BluezObject *>(mPosition->data); }
     bool operator==(const BluezObjectIterator & other) const { return mPosition == other.mPosition; }
     bool operator!=(const BluezObjectIterator & other) const { return mPosition != other.mPosition; }
 

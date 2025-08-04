@@ -13,6 +13,41 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/access/access.gni")
+
+buildconfig_header("access_buildconfig") {
+  header = "AccessBuildConfig.h"
+  header_dir = "access"
+
+  defines = [
+    "CHIP_CONFIG_USE_ACCESS_RESTRICTIONS=${chip_enable_access_restrictions}",
+  ]
+
+  visibility = [ ":access_config" ]
+}
+
+source_set("access_config") {
+  sources = [ "AccessConfig.h" ]
+
+  deps = [ ":access_buildconfig" ]
+}
+
+source_set("types") {
+  sources = [
+    "AuthMode.h",
+    "Privilege.h",
+    "RequestPath.h",
+    "SubjectDescriptor.h",
+  ]
+
+  public_deps = [
+    ":access_config",
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
+  ]
+}
 
 static_library("access") {
   output_name = "libaccess"
@@ -20,10 +55,6 @@ static_library("access") {
   sources = [
     "AccessControl.cpp",
     "AccessControl.h",
-    "AuthMode.h",
-    "Privilege.h",
-    "RequestPath.h",
-    "SubjectDescriptor.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",
     "examples/PermissiveAccessControlDelegate.cpp",
@@ -33,9 +64,28 @@ static_library("access") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":access_config",
+    ":types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+  ]
+
+  if (chip_enable_access_restrictions) {
+    sources += [
+      "AccessRestrictionProvider.cpp",
+      "AccessRestrictionProvider.h",
+    ]
+    public_deps += [ "${chip_root}/src/app/common:cluster-objects" ]
+  }
+}
+
+source_set("provider-impl") {
+  sources = [ "ProviderDeviceTypeResolver.h" ]
+
+  public_deps = [
+    ":access",
+    "${chip_root}/src/app/data-model-provider",
   ]
 }

@@ -3,25 +3,30 @@
 -   [CHIP Test Suites](#chip-test-suites)
 -   [Controllers](#controllers)
 -   [Automatic conversion process](#automatic-conversion-process)
--   [List](#list)
-    -   [chip_tests](#list-chiptests)
-        -   [Property: test](#property-test)
-        -   [Property: config](#property-config)
-        -   [Property: {variable_name}](#property-variable_name)
-    -   [chip_tests_items](#list-chip_tests_items)
-        -   [Property: tests](#property-tests)
-        -   [Property: arguments](#property-arguments)
-        -   [Property: values](#property-values)
-        -   [Property: response](#property-response)
-        -   [Property: constraints](#property-constraints)
-    -   [chip_tests_item_parameters](#list-chip_tests_item_parameters)
-    -   [chip_tests_item_response_parameters](#list-chip_tests_item_response_parameters)
-    -   [chip_tests_pics](#list-chip_tests_pics)
+-   [Lists](#lists)
+    -   [List: _chip_tests_](#list-chip_tests)
+        -   [Property: _test_](#property-test)
+        -   [Property: _config_](#property-config)
+            -   [Property: _{variable_name}_](#property-variable_name)
+    -   [List: _chip_tests_items_](#list-chip_tests_items)
+        -   [Property: _tests_](#property-tests)
+            -   [Property: _arguments_](#property-arguments)
+            -   [Property: _values_](#property-values)
+            -   [Property: _response_](#property-response)
+            -   [Property: _constraints_](#property-constraints)
+    -   [List: _chip_tests_item_parameters_](#list-chip_tests_item_parameters)
+    -   [List: _chip_tests_item_response_parameters_](#list-chip_tests_item_response_parameters)
+    -   [List: _chip_tests_pics_](#list-chip_tests_pics)
+    -   [List: _chip_tests_config_](#list-chip_tests_config)
 -   [YAML Test Definition](#yaml-test-definition)
--   [PICS Usage](#pics-usage)
+    -   [Location of Test Definitions](#location-of-test-definitions)
+-   [PICS Usage](#pics-usage) - [Required Files](#required-files) -
+    [Example PICS Command](#example-pics-command)
 -   [Examples](#examples)
     -   [YAML Examples](#yaml-examples)
     -   [ZAP Example](#zap-example)
+        -   [Required Files](#required-files-1)
+        -   [Generate Example Script](#generate-example-script)
 -   [Index](#index)
 
 This directory contains a set of tests describing interactions between nodes,
@@ -48,28 +53,10 @@ supported functionalities in terms of clusters, commands and attributes:
 For more information on the different implementations of the CHIP device
 controller, see [README.md](../../../controller/README.md)
 
-# Automatic conversion process
-
-The process of automatic conversion of test files depends on the
-[ZAP](https://github.com/project-chip/zap) tool.
-
-Each of the CHIP device controller implementations uses a dedicated template
-translating the tests into an appropriate format.
-
-| Controllers | Template                                                                                                                                               |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| POSIX CLI   | [examples/chip-tool/templates/partials/test_cluster.zapt](../../../../examples/chip-tool/templates/partials/test_cluster.zapt)                         |
-| Darwin CLI  | [examples/darwin-framework-tool/templates/partials/test_cluster.zapt](../../../../examples/darwin-framework-tool/templates/partials/test_cluster.zapt) |
-| iOS         | [src/darwin/Framework/CHIP/templates/partials/test_cluster.zapt](../../../../src/darwin/Framework/CHIP/templates/partials/test_cluster.zapt)           |
-| Python      |                                                                                                                                                        |
-| Android     |                                                                                                                                                        |
-
-These dedicated templates share a common
-[script](../../zap-templates/common/ClusterTestGeneration.js) which augments the
-test file with the content of the ZAP database built from the
-[definition files](../../zap-templates/zcl) of the specification.
-
 # Lists
+
+TODO: This documentation needs to be fixed to document the YAML format, instead
+of describing the no-longer-used ZAP generation machinery from YAML.
 
 This common script exposes the result of the analysis in the form of multiple
 lists accessible from the dedicated template files.
@@ -165,19 +152,20 @@ properties:
 
 ##### Property: [_constraints_](../../../../src/app/tests/suites/TestConstraints.yaml)
 
-| Name        | Description                                                 | Required               |
-| ----------- | ----------------------------------------------------------- | ---------------------- |
-| hasValue    | If true, must have value. If false, must not have value.    | No (If other provided) |
-| minValue    | Minimum value to expect from the command response.          | No (If other provided) |
-| maxValue    | Maximum value to expect from the command response.          | No (If other provided) |
-| notValue    | Validate the the value is not what is provided.             | No (If other provided) |
-| minLength   | Minimum length of the response parameter.                   | No (If other provided) |
-| maxLength   | Maximum length of the string parameter.                     | No (If other provided) |
-| startsWith  | Condition is which will validate what a string starts with. | No (If other provided) |
-| endsWith    | Condition is which will validate what a string ends with.   | No (If other provided) |
-| isLowerCase | Validates if the char_string is lower case.                 | No (If other provided) |
-| isUpperCase | Validates if the char_string is upper case.                 | No (If other provided) |
-| isHexString | Checks whether the char_string is a hex string.             | No (If other provided) |
+| Name          | Description                                                 | Required               |
+| ------------- | ----------------------------------------------------------- | ---------------------- |
+| hasValue      | If true, must have value. If false, must not have value.    | No (If other provided) |
+| minValue      | Minimum value to expect from the command response.          | No (If other provided) |
+| maxValue      | Maximum value to expect from the command response.          | No (If other provided) |
+| notValue      | Validate the the value is not what is provided.             | No (If other provided) |
+| minLength     | Minimum length of the response parameter.                   | No (If other provided) |
+| maxLength     | Maximum length of the string parameter.                     | No (If other provided) |
+| startsWith    | Condition is which will validate what a string starts with. | No (If other provided) |
+| endsWith      | Condition is which will validate what a string ends with.   | No (If other provided) |
+| isLowerCase   | Validates if the char_string is lower case.                 | No (If other provided) |
+| isUpperCase   | Validates if the char_string is upper case.                 | No (If other provided) |
+| isHexString   | Checks whether the char_string is a hex string.             | No (If other provided) |
+| isSetOfValues | Uses a order-independent compare on the list contents.      | No (If other provided) |
 
 Note: The hasValue constraint is only applied to optional fields. The other
 constraints are ignored for optional fields that do not have a value.
@@ -373,50 +361,5 @@ src/app/tests/suites/examples/gen_readme_example.sh
 | ipv6pre           |      | IPV6PRE           | 0xFD | IPv6 Prefix              | uint8_t \* |
 | hwadr             |      | HWADR             | 0xFE | Hardware Address         | uint8_t \* |
 | unknown           | 0    | UNKNOWN           | 0xFF | Unknown                  | uint8_t \* |
-
-</details>
-
-<details><summary>Cluster Names</summary><p>
-
-|                                |                                          |                                               |
-| ------------------------------ | ---------------------------------------- | --------------------------------------------- |
-| PowerConfiguration             | AdministratorCommissioning               | DissolvedOxygenConcentrationMeasurement       |
-| DeviceTemperatureConfiguration | OperationalCredentials                   | BromateConcentrationMeasurement               |
-| Identify                       | GroupKeyManagement                       | ChloraminesConcentrationMeasurement           |
-| Groups                         | FixedLabel                               | ChlorineConcentrationMeasurement              |
-| Scenes                         | UserLabel                                | FecalColiformAndEColiConcentrationMeasurement |
-| OnOff                          | ProxyConfiguration                       | FluorideConcentrationMeasurement              |
-| OnOffSwitchConfiguration       | ProxyDiscovery                           | HaloaceticAcidsConcentrationMeasurement       |
-| LevelControl                   | ProxyValid                               | TotalTrihalomethanesConcentrationMeasurement  |
-| Alarms                         | BooleanState                             | TotalColiformBacteriaConcentrationMeasurement |
-| Time                           | ModeSelect                               | TurbidityConcentrationMeasurement             |
-| BinaryInputBasic               | ShadeConfiguration                       | CopperConcentrationMeasurement                |
-| PowerProfile                   | DoorLock                                 | LeadConcentrationMeasurement                  |
-| ApplianceControl               | WindowCovering                           | ManganeseConcentrationMeasurement             |
-| PulseWidthModulation           | BarrierControl                           | SulfateConcentrationMeasurement               |
-| Descriptor                     | PumpConfigurationAndControl              | BromodichloromethaneConcentrationMeasurement  |
-| Binding                        | Thermostat                               | BromoformConcentrationMeasurement             |
-| AccessControl                  | FanControl                               | ChlorodibromomethaneConcentrationMeasurement  |
-| PollControl                    | DehumidificationControl                  | ChloroformConcentrationMeasurement            |
-| Actions                        | ThermostatUserInterfaceConfiguration     | SodiumConcentrationMeasurement                |
-| Basic                          | ColorControl                             | IasZone                                       |
-| OtaSoftwareUpdateProvider      | BallastConfiguration                     | IasAce                                        |
-| OtaSoftwareUpdateRequestor     | IlluminanceMeasurement                   | IasWd                                         |
-| LocalizationConfiguration      | TemperatureMeasurement                   | WakeOnLan                                     |
-| TimeFormatLocalization         | PressureMeasurement                      | Channel                                       |
-| UnitLocalization               | FlowMeasurement                          | TargetNavigator                               |
-| PowerSourceConfiguration       | RelativeHumidityMeasurement              | MediaPlayback                                 |
-| PowerSource                    | OccupancySensing                         | MediaInput                                    |
-| GeneralCommissioning           | CarbonMonoxideConcentrationMeasurement   | LowPower                                      |
-| NetworkCommissioning           | CarbonDioxideConcentrationMeasurement    | KeypadInput                                   |
-| DiagnosticLogs                 | EthyleneConcentrationMeasurement         | ContentLauncher                               |
-| GeneralDiagnostics             | EthyleneOxideConcentrationMeasurement    | AudioOutput                                   |
-| SoftwareDiagnostics            | HydrogenConcentrationMeasurement         | ApplicationLauncher                           |
-| ThreadNetworkDiagnostics       | HydrogenSulphideConcentrationMeasurement | ApplicationBasic                              |
-| WiFiNetworkDiagnostics         | NitricOxideConcentrationMeasurement      | AccountLogin                                  |
-| EthernetNetworkDiagnostics     | NitrogenDioxideConcentrationMeasurement  | TestCluster                                   |
-| TimeSynchronization            | OxygenConcentrationMeasurement           | Messaging                                     |
-| BridgedDeviceBasicInformation  | OzoneConcentrationMeasurement            | ApplianceIdentification                       |
-| Switch                         | SulfurDioxideConcentrationMeasurement    | MeterIdentification                           |
 
 </details>

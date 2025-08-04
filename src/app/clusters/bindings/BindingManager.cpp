@@ -185,7 +185,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
 
     for (auto iter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
     {
-        if (iter->local == endpoint && (!iter->clusterId.HasValue() || iter->clusterId.Value() == cluster))
+        if (iter->local == endpoint && (iter->clusterId.value_or(cluster) == cluster))
         {
             if (iter->type == MATTER_UNICAST_BINDING)
             {

@@ -45,25 +45,50 @@ namespace NetworkCommissioning {
 
 CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
 {
+    ThreadStackMgrImpl().InjectNetworkCommissioningDriver(this);
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(statusChangeCallback);
     ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork);
     ReturnErrorOnFailure(PlatformMgr().AddEventHandler(OnThreadStateChangeHandler, reinterpret_cast<intptr_t>(this)));
 
     // If the network configuration backup exists, it means that the device has been rebooted with
     // the fail-safe armed. Since OpenThread persists all operational dataset changes, the backup
-    // must be restored on the boot. If there's no backup, the below function is a no-op.
-    RevertConfiguration();
+    // must be restored.
+    if (BackupExists())
+    {
+        // Set flag and postpone revert until OpenThread is initialized,
+        // as we need to clear SRP host and services before restoring the backup.
+        mRevertOnServerReady = true;
+    }
+
+    CheckInterfaceEnabled();
 
     return CHIP_NO_ERROR;
 }
 
 void GenericThreadDriver::OnThreadStateChangeHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    if ((event->Type == DeviceEventType::kThreadStateChange) &&
-        (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_PANID))
+    auto & driver = *reinterpret_cast<GenericThreadDriver *>(arg);
+
+    switch (event->Type)
     {
-        // Update the mStagingNetwork when thread panid changed
-        ThreadStackMgrImpl().GetThreadProvision(reinterpret_cast<GenericThreadDriver *>(arg)->mStagingNetwork);
+    case DeviceEventType::kThreadStateChange:
+        if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_PANID)
+        {
+            // Update the mStagingNetwork when thread panid changed
+            ThreadStackMgrImpl().GetThreadProvision(driver.mStagingNetwork);
+        }
+        break;
+
+    case DeviceEventType::kServerReady:
+        if (driver.mRevertOnServerReady)
+        {
+            driver.mRevertOnServerReady = false;
+            driver.RevertConfiguration();
+        }
+        break;
+
+    default:
+        break;
     }
 }
 
@@ -93,7 +118,21 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
 
     // If no backup could be found, it means that the network configuration has not been modified
     // since the fail-safe was armed, so return with no error.
-    ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ThreadStackMgrImpl().ClearAllSrpHostAndServices();
+#endif
+
+    if (!GetEnabled())
+    {
+        // When reverting configuration, set InterfaceEnabled to default value (true).
+        // From the spec:
+        // If InterfaceEnabled is written to false on the same interface as that which is used to write the value, the Administrator
+        // could await the recovery of network configuration to prior safe values, before being able to communicate with the
+        // node again.
+        ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
+    }
 
     ChipLogProgress(NetworkProvisioning, "Reverting Thread operational dataset");
 
@@ -166,10 +205,36 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
 {
     NetworkCommissioning::Status status = MatchesNetworkId(mStagingNetwork, networkId);
 
+    if (!GetEnabled())
+    {
+        // Set InterfaceEnabled to default value (true).
+        ReturnOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
+    }
+
     if (status == Status::kSuccess && BackupConfiguration() != CHIP_NO_ERROR)
     {
         status = Status::kUnknownError;
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    if (status == Status::kSuccess && ThreadStackMgrImpl().IsThreadAttached())
+    {
+        Thread::OperationalDataset currentDataset;
+        if (ThreadStackMgrImpl().GetThreadProvision(currentDataset) == CHIP_NO_ERROR)
+        {
+            // Clear the previous srp host and services
+            if (!currentDataset.AsByteSpan().data_equal(mStagingNetwork.AsByteSpan()) &&
+                ThreadStackMgrImpl().ClearAllSrpHostAndServices() != CHIP_NO_ERROR)
+            {
+                status = Status::kUnknownError;
+            }
+        }
+        else
+        {
+            status = Status::kUnknownError;
+        }
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     if (status == Status::kSuccess &&
         DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) != CHIP_NO_ERROR)
@@ -181,6 +246,30 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
     {
         callback->OnResult(status, CharSpan(), 0);
     }
+}
+
+CHIP_ERROR GenericThreadDriver::SetEnabled(bool enabled)
+{
+    if (enabled == GetEnabled())
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kInterfaceEnabled, &enabled, sizeof(enabled)));
+
+    if ((!enabled && ThreadStackMgrImpl().IsThreadEnabled()) || (enabled && ThreadStackMgrImpl().IsThreadProvisioned()))
+    {
+        ReturnErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(enabled));
+    }
+    return CHIP_NO_ERROR;
+}
+
+bool GenericThreadDriver::GetEnabled()
+{
+    bool value;
+    // InterfaceEnabled default value is true.
+    VerifyOrReturnValue(PersistedStorage::KeyValueStoreMgr().Get(kInterfaceEnabled, &value, sizeof(value)) == CHIP_NO_ERROR, true);
+    return value;
 }
 
 void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
@@ -210,10 +299,11 @@ Status GenericThreadDriver::MatchesNetworkId(const Thread::OperationalDataset & 
 
 CHIP_ERROR GenericThreadDriver::BackupConfiguration()
 {
-    // If configuration is already backed up, return with no error
-    CHIP_ERROR err = KeyValueStoreMgr().Get(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), nullptr, 0);
+    // Abort pending revert
+    mRevertOnServerReady = false;
 
-    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    // If configuration is already backed up, return with no error
+    if (BackupExists())
     {
         return CHIP_NO_ERROR;
     }
@@ -222,6 +312,43 @@ CHIP_ERROR GenericThreadDriver::BackupConfiguration()
 
     return KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), dataset.data(), dataset.size());
 }
+
+bool GenericThreadDriver::BackupExists()
+{
+    CHIP_ERROR err = KeyValueStoreMgr().Get(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), nullptr, 0);
+
+    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void GenericThreadDriver::CheckInterfaceEnabled()
+{
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+    // If the Thread interface is enabled and stack has been provisioned, but is not currently enabled, enable it now.
+    if (GetEnabled() && ThreadStackMgrImpl().IsThreadProvisioned() && !ThreadStackMgrImpl().IsThreadEnabled())
+    {
+        ReturnOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
+        ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
+    }
+#endif
+}
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+CHIP_ERROR GenericThreadDriver::DisconnectFromNetwork()
+{
+    if (ThreadStackMgrImpl().IsThreadProvisioned())
+    {
+        Thread::OperationalDataset emptyNetwork = {};
+        // Attach to an empty network will disconnect the driver.
+        ReturnErrorOnFailure(ThreadStackMgrImpl().AttachToThreadNetwork(emptyNetwork, nullptr));
+    }
+    return CHIP_NO_ERROR;
+}
+#endif
 
 size_t GenericThreadDriver::ThreadNetworkIterator::Count()
 {
@@ -271,7 +398,9 @@ ThreadCapabilities GenericThreadDriver::GetSupportedThreadFeatures()
 
 uint16_t GenericThreadDriver::GetThreadVersion()
 {
-    return otThreadGetVersion();
+    uint16_t version = 0;
+    ThreadStackMgrImpl().GetThreadVersion(version);
+    return version;
 }
 
 } // namespace NetworkCommissioning

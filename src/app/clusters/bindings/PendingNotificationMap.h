@@ -88,9 +88,9 @@ public:
             return *this;
         }
 
-        bool operator!=(const Iterator & rhs) { return mIndex != rhs.mIndex; }
+        bool operator!=(const Iterator & rhs) const { return mIndex != rhs.mIndex; }
 
-        bool operator==(const Iterator & rhs) { return mIndex == rhs.mIndex; }
+        bool operator==(const Iterator & rhs) const { return mIndex == rhs.mIndex; }
 
     private:
         PendingNotificationMap * mMap;

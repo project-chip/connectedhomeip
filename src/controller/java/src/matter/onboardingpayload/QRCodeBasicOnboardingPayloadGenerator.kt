@@ -68,9 +68,6 @@ fun payloadBase38RepresentationWithTLV(
 
     // Copy the subBuffer back to the outBuffer
     subBuffer.copyInto(outBuffer, prefixLen)
-
-    // Reduce output buffer size to be the size of written data
-    outBuffer.copyOf(prefixLen + subBuffer.size)
   }
 }
 
@@ -178,6 +175,6 @@ private fun populateTLVBits(
 
   for (i in 0 until tlvBufSizeInBytes) {
     val value = tlvBuf[i]
-    populateBits(bits, offset, value.toLong(), 8, totalPayloadDataSizeInBits)
+    populateBits(bits, offset, value.toUByte().toLong(), 8, totalPayloadDataSizeInBits)
   }
 }

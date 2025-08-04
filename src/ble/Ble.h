@@ -28,14 +28,22 @@
 
 #include <ble/BleConfig.h>
 
+// Other includes check for the _CHIP_BLE_BLE_H define to ensure that the BLE
+// library is included correctly by others (via Ble.h umbrella header).
+#define _CHIP_BLE_BLE_H
+
 #include <ble/BLEEndPoint.h>
 #include <ble/BleApplicationDelegate.h>
 #include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
+#include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
 #include <ble/BtpEngine.h>
+#include <ble/CHIPBleServiceData.h>
+
+#undef _CHIP_BLE_BLE_H
 
 /**
  *   @namespace Ble

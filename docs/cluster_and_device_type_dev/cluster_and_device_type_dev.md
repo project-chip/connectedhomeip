@@ -1,4 +1,4 @@
-# New Clusters & Device Types
+# Implementing New Clusters & Device Types
 
 The goal of new cluster and device type development is to
 
@@ -36,11 +36,9 @@ types in the SDK.
     -   XML defines conformance
     -   [src/app/zap-templates/zcl/data-model/chip/matter-devices.xml](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/data-model/chip/matter-devices.xml)
 
-The following wiki page has a detailed description of how and where to add
-cluster and device type definitions so they are picked up properly by ZAP/ember
-and the SDK.
-
-[https://groups.csa-iot.org/wg/matter-tsg/wiki/howto-add-a-new-device-type](https://groups.csa-iot.org/wg/matter-tsg/wiki/howto-add-a-new-device-type)
+See [How To Add New Device Types & Clusters](how_to_add_new_dts_and_clusters.md)
+for a detailed description of how and where to add cluster and device type
+definitions so they are picked up properly by ZAP/ember and the SDK.
 
 Note that the output should also be verified against the spec using the
 [.matter parser tools](https://project-chip.github.io/connectedhomeip-doc/guides/matter_idl_tooling.html).
@@ -50,11 +48,11 @@ Note that the output should also be verified against the spec using the
 -   Goal: get zap to understand the new cluster so it can be used on devices
     (XML and glue)
 
-![](../getting_started/img/zap_compiler.png)
+![](../zap_and_codegen/img/zap_compiler.png)
 
 ### Cluster definitions and ZAP
 
-Please see [ZAP](../getting_started/zap.md) for an introduction to ZAP.
+Please see [ZAP](../zap_and_codegen/zap_intro.md) for an introduction to ZAP.
 
 After implementing the changes outlined in the wiki article, your cluster and
 device type should show up in zap. you can check this by running zaptool with
@@ -66,17 +64,17 @@ To ensure the cluster and device type are correctly implemented for ZAP, open
 the endpoint configuration and ensure the device type appears in the device type
 list.
 
-![](../getting_started/img/zap3.png)
+![](../zap_and_codegen/img/zap3.png)
 
 Next, check your cluster. The "domain" parameter in the XML controls which group
 the cluster is in. It should have all the expected attributes, commands and
 events.
 
-![](../getting_started/img/zap4.png)
+![](../zap_and_codegen/img/zap4.png)
 
 Last, ensure that your attributes have the storage option set appropriately.
 
-![](../getting_started/img/zap5.png)
+![](../zap_and_codegen/img/zap5.png)
 
 ### Cluster implementation - Ember and overrides
 
@@ -109,9 +107,9 @@ ending in the cluster initialization code.
 EmberAfInitializeAttributes - ember attribute storage - for all attributes
 marked as “RAM” in the zap, sets defaults in the storage
 Matter<Cluster>PluginServerCallback - .h is a generated file, .cpp impl is done
-in the server cluster code. Use this to setup the cluster and do attribute
-overrides registerAttributeAccessOverride - use this if you want to handle
-attribute reads and writes externally
+in the server cluster code. Use this to setup the cluster and setup overrides in
+chip::app::AttributeAccessInterfaceRegistry::Instance().Register - use this if
+you want to handle attribute reads and writes externally
 
 Blue sections can be overridden.
 

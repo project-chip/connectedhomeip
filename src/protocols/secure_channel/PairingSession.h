@@ -26,6 +26,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/SessionParameters.h>
@@ -95,7 +96,7 @@ public:
      * @param session     Reference to the secure session that will be initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
+    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
     const SessionParameters & GetRemoteSessionParameters() const { return mRemoteSessionParams; }
@@ -128,20 +129,27 @@ protected:
     void DiscardExchange(); // Clear our reference to our exchange context pointer so that it can close itself at some later time.
 
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
+
+    void SetRemoteSessionParameters(const SessionParameters & sessionParams) { mRemoteSessionParams = sessionParams; }
+
     virtual void OnSuccessStatusReport() {}
-    virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
+
+    // Handle a failure StatusReport message from the server.  protocolData will
+    // depend on exactly what the generalCode/protocolCode are.
+    virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                             Optional<uintptr_t> protocolData)
     {
         return CHIP_ERROR_INTERNAL;
     }
 
-    void SendStatusReport(Messaging::ExchangeContext * exchangeCtxt, uint16_t protocolCode)
+    void SendStatusReport(Optional<Messaging::ExchangeHandle> & exchangeCtxt, uint16_t protocolCode)
     {
         Protocols::SecureChannel::GeneralStatusCode generalCode = (protocolCode == Protocols::SecureChannel::kProtocolCodeSuccess)
             ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
             : Protocols::SecureChannel::GeneralStatusCode::kFailure;
 
         ChipLogDetail(SecureChannel, "Sending status report. Protocol code %d, exchange %d", protocolCode,
-                      exchangeCtxt->GetExchangeId());
+                      exchangeCtxt.Value()->GetExchangeId());
 
         Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
@@ -154,7 +162,7 @@ protected:
         System::PacketBufferHandle msg = bbuf.Finalize();
         VerifyOrReturn(!msg.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
 
-        CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
+        CHIP_ERROR err = exchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
@@ -174,43 +182,31 @@ protected:
             return CHIP_NO_ERROR;
         }
 
-        if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
-            report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
+        Optional<uintptr_t> protocolData;
+        if (report.IsBusy() && report.GetMinimumWaitTime().has_value())
         {
-            if (!report.GetProtocolData().IsNull())
-            {
-                Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(), report.GetProtocolData()->DataLength());
-
-                uint16_t minimumWaitTime = 0;
-                CHIP_ERROR waitTimeErr   = reader.Read16(&minimumWaitTime).StatusCode();
-                if (waitTimeErr != CHIP_NO_ERROR)
-                {
-                    ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, waitTimeErr.Format());
-                }
-                else
-                {
-                    // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
-                    ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime);
-                }
-            }
+            System::Clock::Milliseconds16 minimumWaitTime = report.GetMinimumWaitTime().value();
+            ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime.count());
+            protocolData.Emplace(minimumWaitTime.count());
         }
 
         // It's very important that we propagate the return value from
         // OnFailureStatusReport out to the caller.  Make sure we return it directly.
-        return OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
+        return OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode(), protocolData);
     }
 
     /**
-     * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
-     * If the MRP parameters are found, mRemoteSessionParams is updated with the devoded values.
+     * Try to decode the current element (pointed by the TLV reader) as Session parameters (which include MRP parameters).
+     * If the Session parameters are found, outparam sessionParameters is updated with the decoded values.
      *
-     * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
+     * Session parameters are optional. So, if the TLV reader is not pointing to the Session parameters,
      * the function is a noop.
      *
      * If the parameters are present, but TLV reader fails to correctly parse it, the function will
      * return the corresponding error.
      */
-    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader);
+    static CHIP_ERROR DecodeSessionParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader,
+                                                       SessionParameters & sessionParameters);
 
     bool IsSessionEstablishmentInProgress();
 
@@ -232,13 +228,14 @@ protected:
     SessionHolderWithDelegate mSecureSessionHolder;
     // mSessionManager is set if we actually allocate a secure session, so we
     // can clean it up later as needed.
-    SessionManager * mSessionManager           = nullptr;
-    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-    SessionEstablishmentDelegate * mDelegate   = nullptr;
+    SessionManager * mSessionManager                  = nullptr;
+    Optional<Messaging::ExchangeHandle> mExchangeCtxt = NullOptional;
+    SessionEstablishmentDelegate * mDelegate          = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
     // mRemoteSessionParams is received from other end and set to our session.
-    ReliableMessageProtocolConfig mLocalMRPConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+    // It is set the first time that session establishment is initiated.
+    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     SessionParameters mRemoteSessionParams;
 
 private:

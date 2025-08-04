@@ -185,3 +185,56 @@ depends on ENABLE_PW_RPC
             about available pin numbers for UART.
 
 endmenu
+
+
+menu "Energy Management Example App Configuration"
+
+    config ENABLE_EXAMPLE_EVSE_DEVICE
+        bool "Enable EVSE device on EP1"
+        default "y"
+        help
+            To use Energy Management App as EVSE device and compile dependent files.
+
+    config ENABLE_EXAMPLE_WATER_HEATER_DEVICE
+        bool "Enable Water Heater device on EP1"
+        default "n"
+        help
+            To use Energy Management App as Water Heater device and compile dependent files.
+
+    config CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+        bool "Enable DEM triggers"
+        default "n"
+        help
+            Enable test triggers used by the Device Energy Management tests
+
+    config CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+        bool "Enable EVSE triggers"
+        default "n"
+        help
+            Enable test triggers used by the Evse tests
+
+    config CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
+        bool "Enable Water Heater triggers"
+        default "n"
+        help
+            Enable test triggers used by the Water Heater Management tests
+
+    config CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
+        bool "Enable Electrical Power & Energy Measurement triggers"
+        default "n"
+        help
+            Enable test triggers used by the Energy Reporting (EEM / EPM) tests       
+
+    config DEM_SUPPORT_STATE_FORECAST_REPORTING
+        bool "State forecast reporting is supported"
+        default "n"
+        help
+            Ensure kStateForecastReporting (SFR) is set in the DeviceEnergyManagement::Feature attribute. Note cannot set SFR and PFR.
+
+    config DEM_SUPPORT_POWER_FORECAST_REPORTING
+        bool "Power forecast reporting is supported"
+        default "y"
+        help
+            Ensure kPowerForecastReporting (PFR) is set in the DeviceEnergyManagement::Feature attribute. Note cannot set PFR and SFR.
+
+endmenu

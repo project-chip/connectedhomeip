@@ -30,7 +30,6 @@
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
@@ -40,6 +39,8 @@
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+
+#include <string>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <controller/CHIPDeviceController.h>
@@ -52,6 +53,7 @@ extern CommissionerDiscoveryController * GetCommissionerDiscoveryController();
 using namespace chip;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 class MyUserPrompter : public UserPrompter
@@ -102,10 +104,31 @@ MyUserPrompter gMyUserPrompter;
 
 class MyPasscodeService : public PasscodeService
 {
-    bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
-                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) override
+    void LookupTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                                chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info) override
     {
-        return ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+        ChipLogProgress(DeviceLayer,
+                        "LookupTargetContentApp() client vendorID=%d productID=%d; TargetAppInfo vendorID=%d productID=%d",
+                        vendorId, productId, info.vendorId, info.productId);
+        uint32_t passcode = 0;
+        bool foundApp     = ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+        if (!foundApp)
+        {
+            info.checkState = TargetAppCheckState::kAppNotFound;
+        }
+        else if (passcode != 0)
+        {
+            info.checkState = TargetAppCheckState::kAppFoundPasscodeReturned;
+        }
+        else
+        {
+            info.checkState = TargetAppCheckState::kAppFoundNoPasscode;
+        }
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->HandleTargetContentAppCheck(info, passcode);
+        }
     }
 
     uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
@@ -114,28 +137,45 @@ class MyPasscodeService : public PasscodeService
         return 12345678;
     }
 
-    uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
     {
-        return ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
+        uint32_t passcode = ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->HandleContentAppPasscodeResponse(passcode);
+        }
     }
 };
 MyPasscodeService gMyPasscodeService;
 
+class MyAppInstallationService : public AppInstallationService
+{
+    bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) override
+    {
+        return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
+    }
+};
+
+MyAppInstallationService gMyAppInstallationService;
+
 class MyPostCommissioningListener : public PostCommissioningListener
 {
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                                const SessionHandle & sessionHandle) override
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, CharSpan rotatingId, uint32_t passcode,
+                                Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle) override
     {
         // read current binding list
         chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
-        cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+        ContentAppPlatform::GetInstance().StoreNodeIdForContentApp(vendorId, productId, nodeId);
+
+        cacheContext(vendorId, productId, nodeId, rotatingId, passcode, exchangeMgr, sessionHandle);
 
         CHIP_ERROR err =
             cluster.ReadAttribute<Binding::Attributes::Binding::TypeInfo>(this, OnReadSuccessResponse, OnReadFailureResponse);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed in reading binding. Error %s", ErrorStr(err));
+            ChipLogError(Controller, "Failed in reading binding: %" CHIP_ERROR_FORMAT, err.Format());
             clearContext();
         }
     }
@@ -213,17 +253,23 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
+        auto rotatingIdSpan           = CharSpan{ mRotatingId.data(), mRotatingId.size() };
         ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
-                                                             bindings, OnSuccessResponse, OnFailureResponse);
+                                                             rotatingIdSpan, mPasscode, bindings, OnSuccessResponse,
+                                                             OnFailureResponse);
         clearContext();
     }
 
-    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                      const SessionHandle & sessionHandle)
+    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, CharSpan rotatingId, uint32_t passcode,
+                      Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
     {
-        mVendorId    = vendorId;
-        mProductId   = productId;
-        mNodeId      = nodeId;
+        mVendorId   = vendorId;
+        mProductId  = productId;
+        mNodeId     = nodeId;
+        mRotatingId = std::string{
+            rotatingId.data(), rotatingId.size()
+        }; // Allocates and copies to string instead of storing span to make sure lifetime is valid.
+        mPasscode    = passcode;
         mExchangeMgr = &exchangeMgr;
         mSecureSession.ShiftToSession(sessionHandle);
     }
@@ -233,12 +279,17 @@ class MyPostCommissioningListener : public PostCommissioningListener
         mVendorId    = 0;
         mProductId   = 0;
         mNodeId      = 0;
+        mRotatingId  = {};
+        mPasscode    = 0;
         mExchangeMgr = nullptr;
         mSecureSession.SessionReleased();
     }
-    uint16_t mVendorId                        = 0;
-    uint16_t mProductId                       = 0;
-    NodeId mNodeId                            = 0;
+
+    uint16_t mVendorId  = 0;
+    uint16_t mProductId = 0;
+    NodeId mNodeId      = 0;
+    std::string mRotatingId;
+    uint32_t mPasscode                        = 0;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     SessionHolder mSecureSession;
 };
@@ -449,7 +500,7 @@ DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
 
 namespace {
 
-DataVersion gDataVersions[APP_LIBRARY_SIZE][ArraySize(contentAppClusters)];
+DataVersion gDataVersions[APP_LIBRARY_SIZE][MATTER_ARRAY_SIZE(contentAppClusters)];
 
 EmberAfDeviceType gContentAppDeviceType[] = { { DEVICE_TYPE_CONTENT_APP, 1 } };
 
@@ -502,19 +553,23 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 {
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
                     vendorApp.catalogVendorId, vendorApp.applicationId);
+    int index = 0;
 
-    for (size_t i = 0; i < ArraySize(mContentApps); ++i)
+    for (auto & contentApp : mContentApps)
     {
-        auto & app = mContentApps[i];
 
-        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
-        if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
+        if (app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
+            ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[index]),
                                                             Span<const EmberAfDeviceType>(gContentAppDeviceType));
-            return &app;
+            return app;
         }
+        index++;
     }
+
     ChipLogProgress(DeviceLayer, "LoadContentAppByAppId NOT FOUND catalogVendorId=%d applicationId=%s ", vendorApp.catalogVendorId,
                     vendorApp.applicationId);
 
@@ -524,6 +579,186 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
 {
     mAdminVendorIds.push_back(vendorId);
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+class DevicePairedCommand : public Controller::DevicePairingDelegate
+{
+public:
+    struct CallbackContext
+    {
+        uint16_t vendorId;
+        uint16_t productId;
+        chip::NodeId nodeId;
+
+        CallbackContext(uint16_t vId, uint16_t pId, chip::NodeId nId) : vendorId(vId), productId(pId), nodeId(nId) {}
+    };
+    DevicePairedCommand(uint16_t vendorId, uint16_t productId, chip::NodeId nodeId) :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {
+        mContext = std::make_shared<CallbackContext>(vendorId, productId, nodeId);
+    }
+
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    const chip::SessionHandle & sessionHandle)
+    {
+        auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
+        auto cbContext        = pairingCommand->mContext;
+
+        if (pairingCommand)
+        {
+            ChipLogProgress(DeviceLayer,
+                            "OnDeviceConnectedFn - Updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
+                            ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
+
+            GetCommissionerDiscoveryController()->CommissioningSucceeded(cbContext->vendorId, cbContext->productId,
+                                                                         cbContext->nodeId, exchangeMgr, sessionHandle);
+        }
+    }
+
+    static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+    {
+        auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
+        auto cbContext        = pairingCommand->mContext;
+
+        if (pairingCommand)
+        {
+            ChipLogProgress(DeviceLayer,
+                            "OnDeviceConnectionFailureFn - Not updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
+                            ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
+            // TODO: Remove Node Id
+        }
+    }
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    std::shared_ptr<CallbackContext> mContext;
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t productId)
+{
+    auto make_default_supported_clusters = []() {
+        return std::vector<ContentApp::SupportedCluster>{ { Descriptor::Id },      { ApplicationBasic::Id },
+                                                          { KeypadInput::Id },     { ApplicationLauncher::Id },
+                                                          { AccountLogin::Id },    { ContentLauncher::Id },
+                                                          { TargetNavigator::Id }, { Channel::Id } };
+    };
+
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: InstallContentApp vendorId=%d productId=%d ", vendorId, productId);
+    if (vendorId == 1 && productId == 11)
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1", "34567890",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+    else if (vendorId == 65521 && productId == 32769)
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "0",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+    else if (vendorId == 9050 && productId == 22)
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+    else if (vendorId == 1111 && productId == 22)
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+    else
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    // Get the list of node ids
+    std::set<NodeId> nodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForContentApp(vendorId, productId);
+
+    // update ACLs
+    for (auto & contentApp : mContentApps)
+    {
+        auto app = contentApp.get();
+
+        if (app->MatchesPidVid(productId, vendorId))
+        {
+            CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
+
+            GetContentAppFactoryImpl()->LoadContentApp(vendorApp);
+        }
+
+        // update the list of node ids with content apps allowed vendor list
+        for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
+        {
+            std::set<NodeId> tempNodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForAllowedVendorId(allowedVendor);
+
+            nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
+        }
+    }
+
+    // refresh ACLs
+    for (const auto & nodeId : nodeIds)
+    {
+
+        ChipLogProgress(DeviceLayer,
+                        "Creating Pairing Command with node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                        ChipLogValueX64(nodeId), vendorId, productId);
+
+        std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
+
+        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+}
+
+bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
+{
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: UninstallContentApp vendorId=%d productId=%d ", vendorId, productId);
+
+    int index = 0;
+    for (auto & contentApp : mContentApps)
+    {
+
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, "Looking next vid=%d pid=%d", app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                        app->GetApplicationBasicDelegate()->HandleGetProductId());
+
+        if (app->MatchesPidVid(productId, vendorId))
+        {
+            ChipLogProgress(DeviceLayer, "Found an app vid=%d pid=%d. Uninstalling it.",
+                            app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                            app->GetApplicationBasicDelegate()->HandleGetProductId());
+            EndpointId removedEndpointID = ContentAppPlatform::GetInstance().RemoveContentApp(app);
+            ChipLogProgress(DeviceLayer, "Removed content app at endpoint id: %d", removedEndpointID);
+            mContentApps.erase(mContentApps.begin() + index);
+            return true;
+        }
+
+        index++;
+    }
+    return false;
+}
+
+void ContentAppFactoryImpl::LogInstalledApps()
+{
+    for (auto & contentApp : mContentApps)
+    {
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d",
+                        app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                        app->GetApplicationBasicDelegate()->HandleGetProductId(), app->GetEndpointId());
+    }
 }
 
 Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
@@ -598,6 +833,7 @@ CHIP_ERROR AppTvInit()
     if (cdc != nullptr)
     {
         cdc->SetPasscodeService(&gMyPasscodeService);
+        cdc->SetAppInstallationService(&gMyAppInstallationService);
         cdc->SetUserPrompter(&gMyUserPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

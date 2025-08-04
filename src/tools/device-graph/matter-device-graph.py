@@ -23,9 +23,9 @@ import chip.clusters as Clusters
 import graphviz
 from rich.console import Console
 
-# Add the path to python_testing folder, in order to be able to import from matter_testing_support
+# Add the path to python_testing folder, in order to be able to import from chip.testing.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
 
 console = None
 maxClusterNameLength = 30

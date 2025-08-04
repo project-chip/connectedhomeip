@@ -26,6 +26,7 @@
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -35,7 +36,8 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/app-platform/ContentAppPlatform.h>
+#include <app/app-platform/ContentAppPlatform.h> // nogncheck
+
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
@@ -260,5 +262,10 @@ void MatterTargetNavigatorClusterServerAttributeChangedCallback(const chip::app:
 
 void MatterTargetNavigatorPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gTargetNavigatorAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gTargetNavigatorAttrAccess);
+}
+
+void MatterTargetNavigatorPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gTargetNavigatorAttrAccess);
 }

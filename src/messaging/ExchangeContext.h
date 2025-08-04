@@ -86,6 +86,9 @@ public:
     NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
     void OnSessionReleased() override;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void OnSessionConnectionClosed(CHIP_ERROR conErr) override;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**
      *  Send a CHIP message on this exchange.
      *
@@ -155,7 +158,7 @@ public:
 
     SessionHandle GetSessionHandle() const
     {
-        VerifyOrDie(mSession);
+        VerifyOrDieWithObject(mSession, this);
         auto sessionHandle = mSession.Get();
         return std::move(sessionHandle.Value());
     }
@@ -234,6 +237,12 @@ public:
 
     void ClearInjectedFailures() { mInjectedFailures.ClearAll(); }
 #endif
+
+    void DumpToLog() const
+    {
+        ChipLogError(ExchangeManager, "ExchangeContext: " ChipLogFormatExchangeId " delegate=" ChipLogFormatRtti,
+                     ChipLogValueExchangeId(GetExchangeId(), IsInitiator()), ChipLogValueRtti(mDelegate));
+    }
 
 private:
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

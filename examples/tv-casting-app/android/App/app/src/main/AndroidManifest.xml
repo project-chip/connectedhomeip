@@ -18,9 +18,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".chip.casting.app.ChipTvCastingApplication"
+        android:name=".matter.casting.ChipTvCastingApplication"
         android:theme="@style/Theme.CHIPTVCastingApp">
-        <activity android:name=".chip.casting.app.MainActivity"
+        <activity android:name=".matter.casting.MainActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

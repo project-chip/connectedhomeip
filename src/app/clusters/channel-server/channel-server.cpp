@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/channel-server/channel-delegate.h>
@@ -407,5 +408,10 @@ exit:
 
 void MatterChannelPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gChannelAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gChannelAttrAccess);
+}
+
+void MatterChannelPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gChannelAttrAccess);
 }

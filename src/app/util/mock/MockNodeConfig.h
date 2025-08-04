@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <app-common/zap-generated/attribute-type.h>
 #include <app/util/af-types.h>
+#include <app/util/attribute-storage.h>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstddef>
@@ -28,10 +30,44 @@
 namespace chip {
 namespace Test {
 
+namespace internal {
+
+constexpr uint16_t kDefaultStringSize = 16; // note: this is INCLUDING the length byte(s)
+
+// Determine an appropriate size for the given type.
+// NOTE: this is for test only, not all types are included
+uint16_t SizeForType(EmberAfAttributeType type);
+
+constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id)
+{
+    return EmberAfAttributeMetadata{
+        .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(static_cast<uint32_t>(0)),
+        .attributeId   = id,
+        .size          = 4,
+        .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
+        .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE,
+    };
+}
+
+} // namespace internal
+
 struct MockAttributeConfig
 {
-    MockAttributeConfig(AttributeId aId) : id(aId) {}
+    MockAttributeConfig(AttributeId aId) : id(aId), attributeMetaData(internal::DefaultAttributeMetadata(aId)) {}
+    MockAttributeConfig(AttributeId aId, EmberAfAttributeMetadata metadata) : id(aId), attributeMetaData(metadata) {}
+    MockAttributeConfig(AttributeId aId, EmberAfAttributeType type,
+                        EmberAfAttributeMask mask = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE |
+                            MATTER_ATTRIBUTE_FLAG_NULLABLE) :
+        id(aId),
+        attributeMetaData(internal::DefaultAttributeMetadata(aId))
+    {
+        attributeMetaData.attributeType = type;
+        attributeMetaData.mask          = mask;
+        attributeMetaData.size          = internal::SizeForType(type);
+    }
+
     const AttributeId id;
+    EmberAfAttributeMetadata attributeMetaData;
 };
 
 struct MockEventConfig
@@ -40,10 +76,22 @@ struct MockEventConfig
     const EventId id;
 };
 
+enum class MockClusterSide : uint8_t
+{
+    kServer = 0x1,
+    kClient = 0x2,
+};
+
 struct MockClusterConfig
 {
     MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes = {},
-                      std::initializer_list<MockEventConfig> aEvents = {});
+                      std::initializer_list<MockEventConfig> aEvents = {}, std::initializer_list<CommandId> aAcceptedCommands = {},
+                      std::initializer_list<CommandId> aGeneratedCommands = {},
+                      BitMask<MockClusterSide> side = BitMask<MockClusterSide>().Set(MockClusterSide::kServer));
+
+    // Cluster-config is self-referential: mEmberCluster.attributes references  mAttributeMetaData.data()
+    MockClusterConfig(const MockClusterConfig & other);
+    MockClusterConfig & operator=(const MockClusterConfig &) = delete;
 
     const MockAttributeConfig * attributeById(AttributeId attributeId, ptrdiff_t * outIndex = nullptr) const;
     const EmberAfCluster * emberCluster() const { return &mEmberCluster; }
@@ -55,20 +103,45 @@ struct MockClusterConfig
 private:
     EmberAfCluster mEmberCluster;
     std::vector<EventId> mEmberEventList;
+    std::vector<EmberAfAttributeMetadata> mAttributeMetaData;
+    std::vector<CommandId> mAcceptedCommands;
+    std::vector<CommandId> mGeneratedCommands;
 };
 
 struct MockEndpointConfig
 {
-    MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {});
+    MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {},
+                       std::initializer_list<EmberAfDeviceType> aDeviceTypes                                    = {},
+                       std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags = {},
+                       app::EndpointComposition composition = app::EndpointComposition::kFullFamily,
+                       chip::CharSpan aEndpointUniqueID     = chip::CharSpan());
+
+    // Endpoint-config is self-referential: mEmberEndpoint.clusters references  mEmberClusters.data()
+    MockEndpointConfig(const MockEndpointConfig & other);
+    MockEndpointConfig & operator=(const MockEndpointConfig &) = delete;
 
     const MockClusterConfig * clusterById(ClusterId clusterId, ptrdiff_t * outIndex = nullptr) const;
     const EmberAfEndpointType * emberEndpoint() const { return &mEmberEndpoint; }
+    Span<const EmberAfDeviceType> deviceTypes() const
+    {
+        return Span<const EmberAfDeviceType>(mDeviceTypes.data(), mDeviceTypes.size());
+    }
+
+    Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> semanticTags() const
+    {
+        return Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(mSemanticTags.data(), mSemanticTags.size());
+    }
 
     const EndpointId id;
+    const app::EndpointComposition composition;
     const std::vector<MockClusterConfig> clusters;
+    char endpointUniqueIdBuffer[app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    uint8_t endpointUniqueIdSize;
 
 private:
     std::vector<EmberAfCluster> mEmberClusters;
+    std::vector<EmberAfDeviceType> mDeviceTypes;
+    std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> mSemanticTags;
     EmberAfEndpointType mEmberEndpoint;
 };
 

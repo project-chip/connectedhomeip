@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,8 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
+#include <optional>
+
 enum class PairingMode
 {
     None,
@@ -33,10 +35,14 @@ enum class PairingMode
     CodePaseOnly,
     Ble,
     SoftAP,
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF,
+#endif
     AlreadyDiscovered,
     AlreadyDiscoveredByIndex,
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
+    Nfc,
 };
 
 enum class PairingNetworkType
@@ -44,6 +50,7 @@ enum class PairingNetworkType
     None,
     WiFi,
     Thread,
+    WiFiOrThread,
 };
 
 class PairingCommand : public CHIPCommand,
@@ -65,14 +72,17 @@ public:
                     "Bypass the attestation verifier. If not provided or false, the attestation verifier is not bypassed."
                     " If true, the commissioning will continue in case of attestation verification failure.");
         AddArgument("case-auth-tags", 1, UINT32_MAX, &mCASEAuthTags, "The CATs to be encoded in the NOC sent to the commissionee");
-        AddArgument("skip-icd-registration", 0, 1, &mSkipICDRegistration,
-                    "Skip registering for check-ins from ICDs during commissioning. Default: false");
+        AddArgument("icd-registration", 0, 1, &mICDRegistration,
+                    "Whether to register for check-ins from ICDs during commissioning. Default: false");
         AddArgument("icd-check-in-nodeid", 0, UINT64_MAX, &mICDCheckInNodeId,
                     "The check-in node id for the ICD, default: node id of the commissioner.");
         AddArgument("icd-monitored-subject", 0, UINT64_MAX, &mICDMonitoredSubject,
                     "The monitored subject of the ICD, default: The node id used for icd-check-in-nodeid.");
+        AddArgument("icd-client-type", 0, 1, &mICDClientType,
+                    "The ClientType of the client registering, default: Permanent client - 0");
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
-
+        AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
+                    "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -84,6 +94,11 @@ public:
         case PairingNetworkType::Thread:
             AddArgument("operationalDataset", &mOperationalDataset);
             break;
+        case PairingNetworkType::WiFiOrThread:
+            AddArgument("ssid", &mSSID);
+            AddArgument("password", &mPassword);
+            AddArgument("operationalDataset", &mOperationalDataset);
+            break;
         }
 
         switch (mode)
@@ -92,6 +107,10 @@ public:
             break;
         case PairingMode::Code:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("dcl-hostname", &mDCLHostName,
+                        "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
+            AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
+            AddArgument("use-dcl", 0, 1, &mUseDCL, "Use DCL to fetch onboarding information");
             FALLTHROUGH;
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
@@ -100,32 +119,44 @@ public:
             break;
         case PairingMode::Ble:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+        case PairingMode::Nfc:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::SoftAP:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        case PairingMode::WiFiPAF:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+#endif
         case PairingMode::AlreadyDiscovered:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::AlreadyDiscoveredByIndex:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
@@ -181,7 +212,21 @@ public:
             AddArgument("dst-offset", &mComplex_DSTOffsets,
                         "DSTOffset list to use when setting Time Synchronization cluster's DSTOffset attribute",
                         Argument::kOptional);
+
+            AddArgument("tc-acknowledgements", 0, UINT16_MAX, &mTCAcknowledgements,
+                        "Bit-field value indicating which Terms and Conditions have been accepted by the user. This value is sent "
+                        "to the device during commissioning via the General Commissioning cluster");
+
+            AddArgument("tc-acknowledgements-version", 0, UINT16_MAX, &mTCAcknowledgementVersion,
+                        "Version number of the Terms and Conditions that were accepted by the user. This value is sent to the "
+                        "device during commissioning to indicate which T&C version was acknowledged");
         }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        if ((mode == PairingMode::WiFiPAF) || (mode == PairingMode::Code))
+        {
+            AddArgument("freq", &mApFreqStr, "Frequency of the connected AP. It's required if AP is not at chnl#6 of 2.4G");
+        }
+#endif
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
@@ -196,10 +241,11 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-    void OnICDRegistrationComplete(NodeId deviceId, uint32_t icdCounter) override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
+    void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
 
     /////////// DeviceAttestationDelegate /////////
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
@@ -217,12 +263,13 @@ private:
     CHIP_ERROR PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uint16_t index);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
+    CHIP_ERROR MaybeDisplayTermsAndConditions(chip::Controller::CommissioningParameters & params);
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
-    NodeId mNodeId;
+    NodeId mNodeId = chip::kUndefinedNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
@@ -231,29 +278,44 @@ private:
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;
-    chip::Optional<bool> mSkipICDRegistration;
+    chip::Optional<bool> mICDRegistration;
     chip::Optional<NodeId> mICDCheckInNodeId;
     chip::Optional<chip::ByteSpan> mICDSymmetricKey;
     chip::Optional<uint64_t> mICDMonitoredSubject;
+    chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
+    chip::Optional<uint32_t> mICDStayActiveDurationMsec;
+    chip::Optional<uint16_t> mTCAcknowledgements;
+    chip::Optional<uint16_t> mTCAcknowledgementVersion;
+    chip::Optional<char *> mDCLHostName;
+    chip::Optional<uint16_t> mDCLPort;
+    chip::Optional<bool> mUseDCL;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> mDSTOffsetList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
-
-    uint16_t mRemotePort;
-    uint16_t mDiscriminator;
-    uint32_t mSetupPINCode;
-    uint16_t mIndex;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    chip::Optional<char *> mApFreqStr;
+#endif
+    uint16_t mRemotePort = 0;
+    // mDiscriminator is only used for some situations, but in those situations
+    // it's mandatory.  Track whether we're actually using it; the cases that do
+    // will emplace this optional.
+    std::optional<uint16_t> mDiscriminator;
+    // mSetupPINCode is only used for some situations, but in those situations
+    // it's mandatory.  Track whether we're actually using it; the cases that do
+    // will emplace this optional.
+    std::optional<uint32_t> mSetupPINCode;
+    uint16_t mIndex = 0;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
-    char * mOnboardingPayload;
-    uint64_t mDiscoveryFilterCode;
-    char * mDiscoveryFilterInstanceName;
+    char * mOnboardingPayload           = nullptr;
+    uint64_t mDiscoveryFilterCode       = 0;
+    char * mDiscoveryFilterInstanceName = nullptr;
 
-    bool mDeviceIsICD;
+    bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     // For unpair

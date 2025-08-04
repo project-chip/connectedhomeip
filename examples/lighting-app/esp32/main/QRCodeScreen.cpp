@@ -42,6 +42,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
+#include <string>
+
 namespace {
 
 constexpr int kVersion    = 4;

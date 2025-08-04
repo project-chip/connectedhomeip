@@ -7,6 +7,7 @@ Script: generate_yaml_doc_tables.py
 # YAML Schema
 
 YAML schema
+
 |key | type| supports variables
 |:---|:---|:---|
 |name |str||
@@ -54,6 +55,7 @@ YAML schema
 |&emsp; &emsp; &emsp; endsWith |str||
 |&emsp; &emsp; &emsp; isUpperCase |bool||
 |&emsp; &emsp; &emsp; isLowerCase |bool||
+|&emsp; &emsp; &emsp; isSetOfValues |list||
 |&emsp; &emsp; &emsp; minValue |int,float|Y|
 |&emsp; &emsp; &emsp; maxValue |int,float|Y|
 |&emsp; &emsp; &emsp; contains |list||
@@ -62,6 +64,7 @@ YAML schema
 |&emsp; &emsp; &emsp; hasMasksClear |list||
 |&emsp; &emsp; &emsp; notValue |NoneType,bool,int,float,list,dict|Y|
 |&emsp; &emsp; &emsp; anyOf |list||
+|&emsp; &emsp; &emsp; python |str|Y|
 |&emsp; &emsp; saveAs |str||
 |&emsp; &emsp; saveDataVersschemaionAs |str||
 |&emsp; saveResponseAs |str||

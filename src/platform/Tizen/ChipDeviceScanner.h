@@ -28,7 +28,7 @@
 #include <bluetooth.h>
 #include <glib.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemClock.h>
 
@@ -60,16 +60,17 @@ struct ScanFilterData
 class ChipDeviceScannerDelegate
 {
 public:
-    virtual ~ChipDeviceScannerDelegate(void) {}
+    virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
-    virtual void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+    virtual void OnDeviceScanned(const bt_adapter_le_device_scan_result_info_s & scanInfo,
+                                 const Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
-    virtual void OnScanComplete(void) = 0;
+    virtual void OnScanComplete() = 0;
 
     // Called on scan error
-    virtual void OnScanError(CHIP_ERROR err) = 0;
+    virtual void OnScanError(CHIP_ERROR) = 0;
 };
 
 /// Allows scanning for CHIP devices
@@ -78,38 +79,28 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner(void){};
+    ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate){};
+    ~ChipDeviceScanner() { StopScan(); }
 
-    /// NOTE: prefer to use the  ::Create method instead direct constructor calling.
-    ChipDeviceScanner(ChipDeviceScannerDelegate * delegate);
-
-    ~ChipDeviceScanner(void);
-
-    /// Initiate a scan for devices, with the given timeout & scan filter data
-    CHIP_ERROR StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, const ScanFilterData & filterData);
+    /// Initiate a scan for devices, with the given scan filter data
+    CHIP_ERROR StartScan(ScanFilterType filterType, const ScanFilterData & filterData);
 
     /// Stop any currently running scan
-    CHIP_ERROR StopChipScan(void);
-
-    /// Create a new device scanner
-    /// Convenience method to allocate any required variables.
-    static std::unique_ptr<ChipDeviceScanner> Create(ChipDeviceScannerDelegate * delegate);
+    CHIP_ERROR StopScan();
 
 private:
-    static void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData);
-    static gboolean TimerExpiredCb(gpointer user_data);
-    static CHIP_ERROR TriggerScan(ChipDeviceScanner * userData);
+    void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * scanInfo);
+    CHIP_ERROR StartScanImpl();
 
     int CreateLEScanFilter(ScanFilterType filterType);
     int RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
     int SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
     void UnRegisterScanFilter();
 
-    ChipDeviceScannerDelegate * mDelegate = nullptr;
-    bool mIsScanning                      = false;
-    bool mIsStopping                      = false;
-    unsigned int mScanTimeoutMs           = 10000;
-    bt_scan_filter_h mScanFilter          = nullptr;
+    ChipDeviceScannerDelegate * mDelegate;
+    bool mIsScanning             = false;
+    bool mIsStopping             = false;
+    bt_scan_filter_h mScanFilter = nullptr;
 };
 
 } // namespace Internal

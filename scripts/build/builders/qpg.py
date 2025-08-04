@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -42,19 +43,19 @@ class QpgApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def AppNamePrefix(self):
+    def AppNamePrefix(self, board_name):
         if self == QpgApp.LIGHT:
-            return 'chip-qpg6105-lighting-example'
+            return f'chip-{board_name}-lighting-example'
         elif self == QpgApp.LOCK:
-            return 'chip-qpg6105-lock-example'
+            return f'chip-{board_name}-lock-example'
         elif self == QpgApp.SHELL:
-            return 'chip-qpg6105-shell-example'
+            return f'chip-{board_name}-shell-example'
         elif self == QpgApp.PERSISTENT_STORAGE:
-            return 'chip-qpg6105-persistent_storage-example'
+            return f'chip-{board_name}-persistent_storage-example'
         elif self == QpgApp.LIGHT_SWITCH:
-            return 'chip-qpg6105-light-switch-example'
+            return f'chip-{board_name}-light-switch-example'
         elif self == QpgApp.THERMOSTAT:
-            return 'chip-qpg6105-thermostat-example'
+            return f'chip-{board_name}-thermostat-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -79,13 +80,11 @@ class QpgApp(Enum):
 
 
 class QpgBoard(Enum):
-    QPG6105 = 1
+    QPG6200 = 1
 
-    def GnArgName(self):
-        if self == QpgBoard.QPG6105:
-            return 'qpg6105'
-        else:
-            raise Exception('Unknown board #: %r' % self)
+    @property
+    def QpgBoardName(self):
+        return self.name.lower()
 
 
 class QpgBuilder(GnBuilder):
@@ -94,9 +93,10 @@ class QpgBuilder(GnBuilder):
                  root,
                  runner,
                  app: QpgApp = QpgApp.LIGHT,
-                 board: QpgBoard = QpgBoard.QPG6105,
+                 board: QpgBoard = QpgBoard.QPG6200,
                  enable_rpcs: bool = False,
-                 update_image: bool = False):
+                 update_image: bool = False,
+                 ):
         super(QpgBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
@@ -106,24 +106,24 @@ class QpgBuilder(GnBuilder):
         self.update_image = update_image
 
     def GnBuildArgs(self):
-        args = ['qpg_target_ic=\"%s\"' % self.board.GnArgName()]
+        args = ['qpg_target_ic=\"%s\"' % (self.board.QpgBoardName)]
         if self.enable_rpcs:
             args.append('import("//with_pw_rpc.gni")')
         if self.update_image:
-            args.append('matter_device_software_version_string=\"1.1_OTA_TEST\" matter_device_software_version=4')
+            args.append('matter_ota_test_image=true')
         return args
 
     def build_outputs(self):
-        items = {}
-        for extension in ["out", "out.map", "out.hex"]:
-            name = '%s.%s' % (self.app.AppNamePrefix(), extension)
-            items[name] = os.path.join(self.output_dir, name)
+        extensions = ["out", "out.hex"]
+        if self.options.enable_link_map_file:
+            extensions.append("out.map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix(self.board.QpgBoardName)}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
         # Figure out flash bundle files and build accordingly
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
-            for line in f.readlines():
-                name = line.strip()
-                items['flashbundle/%s' %
-                      name] = os.path.join(self.output_dir, name)
-
-        return items
+            for name in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, name),
+                    os.path.join('flashbundle', name))

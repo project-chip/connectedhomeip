@@ -66,6 +66,6 @@ typedef uint8_t appliLogLevel_t;
 void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char * aFormat, ...);
 
 #ifdef __cplusplus
-} /* extern "C" */
+}
 #endif
 #endif /* STM_LOGGING_H_ */

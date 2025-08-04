@@ -66,7 +66,7 @@ CHIP_ERROR ESP32FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     ReturnErrorOnFailure(err);
 
     size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
-    ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(saltLen <= saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(saltBuf.data(), saltB64, saltLen);
     saltBuf.reduce_size(saltLen);
@@ -88,7 +88,7 @@ CHIP_ERROR ESP32FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifi
     ReturnErrorOnFailure(err);
 
     verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
-    ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(verifierLen <= verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(verifierBuf.data(), verifierB64, verifierLen);
     verifierBuf.reduce_size(verifierLen);
@@ -98,11 +98,15 @@ CHIP_ERROR ESP32FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifi
 
 CHIP_ERROR ESP32FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    return CopySpanToMutableSpan(mCD, outBuffer);
+#else
     size_t certSize;
     ReturnErrorOnFailure(
         ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_CertDeclaration, outBuffer.data(), outBuffer.size(), certSize));
     outBuffer.reduce_size(certSize);
     return CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
@@ -123,15 +127,11 @@ CHIP_ERROR ESP32FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & 
 
 CHIP_ERROR ESP32FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
-#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
-    return CopySpanToMutableSpan(mCD, outBuffer);
-#else
     size_t certSize;
     ReturnErrorOnFailure(
         ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_PAICert, outBuffer.data(), outBuffer.size(), certSize));
     outBuffer.reduce_size(certSize);
     return CHIP_NO_ERROR;
-#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
@@ -245,6 +245,32 @@ CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8
     return GenericDeviceInstanceInfoProvider<ESP32Config>::GetManufacturingDate(year, month, day);
 }
 
+CHIP_ERROR ESP32FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    uint32_t productFinish = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductFinish, productFinish);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
+
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t color = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductColor, color);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
+
+    return err;
+}
+
 CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     return GenericDeviceInstanceInfoProvider<ESP32Config>::GetHardwareVersion(hardwareVersion);
@@ -252,7 +278,12 @@ CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersi
 
 CHIP_ERROR ESP32FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
-    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetPartNumber(buf, bufSize);
+    CHIP_ERROR err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_PartNumber, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 

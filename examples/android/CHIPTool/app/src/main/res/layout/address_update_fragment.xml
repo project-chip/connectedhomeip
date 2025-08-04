@@ -9,20 +9,24 @@
         android:id="@+id/fabricIdEd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:hint="@string/enter_fabric_id_hint_text"
-        android:inputType="number"
+        android:digits="0123456789ABCDEF"
+        android:inputType="textCapCharacters"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/deviceIdEd"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/deviceIdEd"/>
 
     <EditText
         android:id="@+id/deviceIdEd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:textSize="20sp"
+        android:digits="0123456789ABCDEF"
+        android:inputType="textCapCharacters"
+        android:textSize="16sp"
         android:hint="@string/enter_device_id_hint_text"
-        app:layout_constraintStart_toEndOf="@+id/fabricIdEd"
+        app:layout_constraintStart_toEndOf="@id/fabricIdEd"
+        app:layout_constraintEnd_toStartOf="@id/epIdEd"
         app:layout_constraintTop_toTopOf="parent"  />
 
   <EditText
@@ -31,25 +35,73 @@
       android:layout_height="wrap_content"
       android:hint="@string/enter_endpoint_id_hint_text"
       android:inputType="number"
-      android:textSize="20sp"
+      android:textSize="16sp"
       android:text ="1"
       app:layout_constraintStart_toEndOf="@+id/deviceIdEd"
+      app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
-  <androidx.constraintlayout.widget.Barrier
-      android:id="@+id/barrier"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      app:barrierDirection="bottom"
-      app:constraint_referenced_ids="fabricIdEd,deviceIdEd,epIdEd" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="fabricIdEd,deviceIdEd,epIdEd" />
+
+    <Switch
+        android:id="@+id/icdInteractionSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:textSize="16sp"
+        android:text="@string/icd_interaction_text"
+        app:layout_constraintTop_toBottomOf="@id/fabricIdEd"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <EditText
+        android:id="@+id/icdActiveDurationEd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/icd_active_duration_hint_text"
+        android:inputType="number"
+        android:textSize="16sp"
+        android:text ="30"
+        app:layout_constraintTop_toBottomOf="@id/fabricIdEd"
+        app:layout_constraintStart_toEndOf="@id/icdInteractionSwitch"
+        app:layout_constraintEnd_toStartOf="@id/icdProgressBar" />
+
+    <ProgressBar
+        android:id="@+id/icdProgressBar"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:progress="0"
+        android:max="100"
+        app:layout_constraintTop_toBottomOf="@id/fabricIdEd"
+        app:layout_constraintStart_toEndOf="@id/icdActiveDurationEd"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="icdInteractionSwitch,icdActiveDurationEd,icdProgressBar" />
 
     <TextView
         android:id="@+id/deviceIdTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:layout_marginTop="6dp"
+        android:textSize="16sp"
         android:text = "@string/commissioned_device_id_text"
-        app:layout_constraintTop_toBottomOf="@id/fabricIdEd"
+        app:layout_constraintTop_toBottomOf="@id/icdInteractionSwitch"
         />
 
     <Spinner
@@ -59,5 +111,7 @@
         android:layout_marginStart="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deviceIdTv" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

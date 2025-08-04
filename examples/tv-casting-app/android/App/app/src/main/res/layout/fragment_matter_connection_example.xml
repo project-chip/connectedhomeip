@@ -6,18 +6,39 @@
     tools:context=".matter.casting.ConnectionExampleFragment"
     android:padding="10sp">
 
-    <TextView
-        android:id="@+id/connectionFragmentStatusText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"/>
-
-    <Button
-        android:enabled="false"
-        android:id="@+id/connectionFragmentNextButton"
-        android:layout_below="@id/connectionFragmentStatusText"
+    <LinearLayout
+        android:id="@+id/connectionFragmentLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/matter_connection_next_button_text" />
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp"
+        android:padding="10sp">
+
+        <TextView
+            android:id="@+id/connectionFragmentStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"/>
+
+        <Button
+            android:enabled="false"
+            android:id="@+id/connectionFragmentNextButton"
+            android:layout_below="@id/connectionFragmentStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_connection_next_button_text" />
+        
+        <TextView
+            android:id="@+id/commissionerDeclarationErrorTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text=""/>
+
+    </LinearLayout>
 
 </RelativeLayout>

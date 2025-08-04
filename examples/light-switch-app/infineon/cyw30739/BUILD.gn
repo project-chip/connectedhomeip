@@ -12,71 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/cyw30739_sdk.gni")
 
-import("${cyw30739_sdk_build_root}/cyw30739_executable.gni")
-import("${cyw30739_sdk_build_root}/cyw30739_sdk.gni")
+import("${chip_root}/examples/platform/infineon/cyw30739/args.gni")
+import("${matter_wpan_sdk_build_root}/matter_wpan_executable.gni")
 
+app_name = "light_switch_app"
 cyw30739_project_dir =
     "${chip_root}/examples/light-switch-app/infineon/cyw30739"
-examples_plat_dir = "${chip_root}/examples/platform/infineon/cyw30739"
 
-declare_args() {
-  setupPinCode = 20202021
-  setupDiscriminator = 3840
-}
-
-cyw30739_sdk("sdk") {
+matter_wpan_example("wpan_example") {
   sources = [ "${cyw30739_project_dir}/include/CHIPProjectConfig.h" ]
 
-  include_dirs = [
-    "${cyw30739_project_dir}/include",
-    "${examples_plat_dir}",
-  ]
-
-  defines = [
-    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
-  ]
+  include_dirs = [ "${cyw30739_project_dir}/include" ]
 }
 
-cyw30739_executable("light_switch_app") {
-  output_name = "chip-cyw30739-light-switch-example.elf"
+template("matter_wpan_app") {
+  forward_variables_from(invoker, [ "board" ])
 
-  sources = [
-    "src/AppShellCommands.cpp",
-    "src/BindingHandler.cpp",
-    "src/ButtonHandler.cpp",
-    "src/LightSwitch.cpp",
-    "src/LightingManager.cpp",
-    "src/ZclCallbacks.cpp",
-    "src/main.cpp",
-  ]
+  import("${matter_wpan_sdk_build_root}/boards/${board}/args.gni")
 
-  deps = [
-    ":sdk",
-    "${chip_root}/examples/light-switch-app/light-switch-common",
-    "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/examples/shell/shell_common:shell_common",
-    "${chip_root}/src/lib",
-  ]
-
-  include_dirs = [ "include" ]
-
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "${examples_plat_dir}/OTAConfig.cpp",
-      "${examples_plat_dir}/OTAConfig.h",
+  matter_wpan_executable(target_name) {
+    sources = [
+      "src/AppShellCommands.cpp",
+      "src/AppTask.cpp",
+      "src/BindingHandler.cpp",
+      "src/ButtonHandler.cpp",
+      "src/LightSwitch.cpp",
+      "src/ZclCallbacks.cpp",
     ]
+
+    deps = [
+      "${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/src/platform/logging:default",
+      app_data_model,
+    ]
+
+    include_dirs = [ "include" ]
   }
 }
 
-group("cyw30739") {
-  deps = [ ":light_switch_app" ]
+foreach(board, matter_wpan_sdk_board_list) {
+  matter_wpan_app("${app_name}-${board}") {
+  }
 }
 
 group("default") {
-  deps = [ ":cyw30739" ]
+  deps = []
+  foreach(board, matter_wpan_sdk_board_list) {
+    deps += [ ":${app_name}-${board}" ]
+  }
 }

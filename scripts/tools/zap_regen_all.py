@@ -20,6 +20,7 @@ import logging
 import multiprocessing
 import os
 import os.path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -32,8 +33,13 @@ from enum import Flag, auto
 from pathlib import Path
 from typing import List
 
+from zap.clang_format import getClangFormatBinary
+
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
+
+# TODO: Can we share this constant definition with generate.py?
+DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
 
 
 class TargetType(Flag):
@@ -108,6 +114,12 @@ class ZapInput:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
+        if self.properties_json == DEFAULT_DATA_MODEL_DESCRIPTION_FILE:
+            # Omit the -z bits because that's the default generate.py
+            # will use anyway, and this leads to nicer-looking command
+            # lines if people need to run the regen manually and get
+            # their command line from our --dry-run.
+            return [script]
         return [script, '-z', self.properties_json]
 
 
@@ -200,7 +212,7 @@ class ZAPGenerateTarget:
         """Runs a ZAP generate command on the configured zap/template/outputs.
         """
         cmd = self.build_cmd()
-        logging.info("Generating target: %s" % " ".join(cmd))
+        logging.info("Generating target: %s" % shlex.join(cmd))
 
         generate_start = time.time()
         subprocess.check_call(cmd)
@@ -275,13 +287,23 @@ class JinjaCodegenTarget():
             for name in paths:
                 logging.info("    %s" % name)
 
-            VERSION = "0.44"
+            VERSION = "0.51"
             JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
             jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
 
             with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
                 path, http_message = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
                 subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
+        except Exception:
+            traceback.print_exc()
+
+    def formatWithClangFormat(self, paths):
+        try:
+            logging.info("Formatting %d cpp files:", len(paths))
+            for name in paths:
+                logging.info("    %s" % name)
+
+            subprocess.check_call([getClangFormatBinary(), "-i"] + paths)
         except Exception:
             traceback.print_exc()
 
@@ -298,6 +320,12 @@ class JinjaCodegenTarget():
 
         if '.kt' in name_dict:
             self.formatKotlinFiles(name_dict['.kt'])
+
+        cpp_files = []
+        for ext in ['.h', '.cpp', '.c', '.hpp']:
+            cpp_files.extend(name_dict.get(ext, []))
+        if cpp_files:
+            self.formatWithClangFormat(cpp_files)
 
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
@@ -341,7 +369,8 @@ def setupArgumentsParser():
 
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.set_defaults(parallel=True)
+    parser.add_argument('--no-rerun-in-env', action='store_false', dest='rerun_in_env')
+    parser.set_defaults(parallel=True, rerun_in_env=True)
 
     args = parser.parse_args()
 
@@ -382,7 +411,7 @@ def getGlobalTemplatesTargets():
 
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json'),
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE),
                    client_side=True, matter_file_name="src/controller/data_model/controller-clusters.matter"))
 
     return targets
@@ -404,7 +433,12 @@ def getCodegenTemplates():
     targets.append(JinjaCodegenTarget(
         generator="summary-markdown",
         idl_path="src/controller/data_model/controller-clusters.matter",
-        output_directory="docs"))
+        output_directory="docs/ids_and_codes"))
+
+    targets.append(JinjaCodegenTarget(
+        generator="cpp-sdk",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="zzz_generated/app-common/clusters"))
 
     return targets
 
@@ -414,7 +448,7 @@ def getGoldenTestImageTargets():
 
 
 def getSpecificTemplatesTargets():
-    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
+    zap_input = ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE)
 
     # Mapping of required template and output directory
     templates = {
@@ -424,6 +458,7 @@ def getSpecificTemplatesTargets():
         'src/controller/python/templates/templates.json': None,
         'src/darwin/Framework/CHIP/templates/templates.json': None,
         'src/controller/java/templates/templates.json': None,
+        'examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/templates/templates.json': None,
     }
 
     targets = []
@@ -485,6 +520,26 @@ def main():
         level=logging.INFO,
         format='%(asctime)s %(name)s %(levelname)-7s %(message)s'
     )
+
+    # The scripts executed by this generally MUST be within a bootstrapped environment because
+    # we need:
+    #    - zap-cli in PATH
+    #    - scripts/codegen.py uses click (can be in current pyenv, but guaranteed in bootstrap)
+    #    - formatting is using bootstrapped clang-format
+    # Figure out if bootstrapped. For now assume `PW_ROOT` is such a marker in the environment
+    if "PW_ROOT" not in os.environ:
+        logging.error("Script MUST be run in a bootstrapped environment.")
+
+        # using the `--no-rerun-in-env` to avoid recursive infinite calls
+        if '--no-rerun-in-env' not in sys.argv:
+            import shlex
+            logging.info("Will re-try running in a build environment....")
+
+            what_to_run = sys.argv + ['--no-rerun-in-env']
+            launcher = os.path.join(CHIP_ROOT_DIR, 'scripts', 'run_in_build_env.sh')
+            os.execv(launcher, [launcher, shlex.join(what_to_run)])
+        sys.exit(1)
+
     checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()

@@ -28,6 +28,7 @@
 #include <app/data-model/DecodableList.h>
 #include <commands/common/RemoteDataModelLogger.h>
 #include <lib/support/BytesToHex.h>
+#include <zap-generated/cluster/logging/EntryToText.h>
 
 class DataModelLogger
 {
@@ -58,27 +59,28 @@ private:
         // buffer.
         char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE / 2];
         size_t prefixSize = ComputePrefixSize(label, indent);
-        if (prefixSize > ArraySize(buffer))
+        if (prefixSize > MATTER_ARRAY_SIZE(buffer))
         {
             DataModelLogger::LogString("", 0, "Prefix is too long to fit in buffer");
             return CHIP_ERROR_INTERNAL;
         }
 
-        const size_t availableSize = ArraySize(buffer) - prefixSize;
+        const size_t availableSize = MATTER_ARRAY_SIZE(buffer) - prefixSize;
         // Each byte ends up as two hex characters.
         const size_t bytesPerLogCall = availableSize / 2;
         std::string labelStr(label);
         while (value.size() > bytesPerLogCall)
         {
             ReturnErrorOnFailure(
-                chip::Encoding::BytesToUppercaseHexString(value.data(), bytesPerLogCall, &buffer[0], ArraySize(buffer)));
+                chip::Encoding::BytesToUppercaseHexString(value.data(), bytesPerLogCall, &buffer[0], MATTER_ARRAY_SIZE(buffer)));
             LogString(labelStr, indent, buffer);
             value = value.SubSpan(bytesPerLogCall);
             // For the second and following lines, make it clear that they are
             // continuation lines by replacing the label with "....".
             labelStr.replace(labelStr.begin(), labelStr.end(), labelStr.size(), '.');
         }
-        ReturnErrorOnFailure(chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], ArraySize(buffer)));
+        ReturnErrorOnFailure(
+            chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], MATTER_ARRAY_SIZE(buffer)));
         LogString(labelStr, indent, buffer);
 
         return CHIP_NO_ERROR;
@@ -155,6 +157,100 @@ private:
         }
 
         return CHIP_NO_ERROR;
+    }
+
+    static CHIP_ERROR LogClusterId(const char * label, size_t indent,
+                                   const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
+    {
+        size_t count = 0;
+        ReturnErrorOnFailure(value.ComputeSize(&count));
+        DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
+
+        auto iter = value.begin();
+        size_t i  = 0;
+        while (iter.Next())
+        {
+            ++i;
+            std::string index = std::string("[") + std::to_string(i) + "]";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + ClusterIdToText(iter.GetValue()) + ")";
+            DataModelLogger::LogString(index, indent + 1, item);
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "List truncated due to invalid value");
+        }
+        return iter.GetStatus();
+    }
+
+    static CHIP_ERROR LogAttributeId(const char * label, size_t indent,
+                                     const chip::app::DataModel::DecodableList<chip::AttributeId> & value, chip::ClusterId cluster)
+    {
+        size_t count = 0;
+        ReturnErrorOnFailure(value.ComputeSize(&count));
+        DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
+
+        auto iter = value.begin();
+        size_t i  = 0;
+        while (iter.Next())
+        {
+            ++i;
+            std::string index = std::string("[") + std::to_string(i) + "]";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + AttributeIdToText(cluster, iter.GetValue()) + ")";
+            DataModelLogger::LogString(index, indent + 1, item);
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "List truncated due to invalid value");
+        }
+        return iter.GetStatus();
+    }
+
+    static CHIP_ERROR LogAcceptedCommandId(const char * label, size_t indent,
+                                           const chip::app::DataModel::DecodableList<chip::CommandId> & value,
+                                           chip::ClusterId cluster)
+    {
+        size_t count = 0;
+        ReturnErrorOnFailure(value.ComputeSize(&count));
+        DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
+
+        auto iter = value.begin();
+        size_t i  = 0;
+        while (iter.Next())
+        {
+            ++i;
+            std::string index = std::string("[") + std::to_string(i) + "]";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + AcceptedCommandIdToText(cluster, iter.GetValue()) + ")";
+            DataModelLogger::LogString(index, indent + 1, item);
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "List truncated due to invalid value");
+        }
+        return iter.GetStatus();
+    }
+
+    static CHIP_ERROR LogGeneratedCommandId(const char * label, size_t indent,
+                                            const chip::app::DataModel::DecodableList<chip::CommandId> & value,
+                                            chip::ClusterId cluster)
+    {
+        size_t count = 0;
+        ReturnErrorOnFailure(value.ComputeSize(&count));
+        DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
+
+        auto iter = value.begin();
+        size_t i  = 0;
+        while (iter.Next())
+        {
+            ++i;
+            std::string index = std::string("[") + std::to_string(i) + "]";
+            std::string item  = std::to_string(iter.GetValue()) + " (" + GeneratedCommandIdToText(cluster, iter.GetValue()) + ")";
+            DataModelLogger::LogString(index, indent + 1, item);
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "List truncated due to invalid value");
+        }
+        return iter.GetStatus();
     }
 
 #include <zap-generated/cluster/logging/DataModelLogger.h>

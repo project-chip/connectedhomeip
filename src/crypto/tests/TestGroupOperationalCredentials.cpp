@@ -18,12 +18,12 @@
 
 #include <inttypes.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -80,59 +80,25 @@ struct GroupKeySetTestEntry theGroupKeySetTestVector[] = {
     },
 };
 
-void TestDeriveGroupOperationalCredentials(nlTestSuite * apSuite, void * apContext)
+struct TestGroupOperationalCredentials : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestGroupOperationalCredentials, TestDeriveGroupOperationalCredentials)
 {
     GroupOperationalCredentials opCreds;
 
     for (const auto & testVector : theGroupKeySetTestVector)
     {
         const ByteSpan epochKey(testVector.epochKey, KEY_LENGTH);
-        NL_TEST_ASSERT(apSuite,
-                       CHIP_NO_ERROR == Crypto::DeriveGroupOperationalCredentials(epochKey, kCompressedFabricId1, opCreds));
+        EXPECT_EQ(CHIP_NO_ERROR, Crypto::DeriveGroupOperationalCredentials(epochKey, kCompressedFabricId1, opCreds));
 
-        NL_TEST_ASSERT(apSuite, opCreds.hash == testVector.groupKeys->hash);
-        NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.encryption_key, testVector.groupKeys->encryption_key, KEY_LENGTH));
-        NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.privacy_key, testVector.groupKeys->privacy_key, KEY_LENGTH));
+        EXPECT_EQ(opCreds.hash, testVector.groupKeys->hash);
+        EXPECT_EQ(0, memcmp(opCreds.encryption_key, testVector.groupKeys->encryption_key, KEY_LENGTH));
+        EXPECT_EQ(0, memcmp(opCreds.privacy_key, testVector.groupKeys->privacy_key, KEY_LENGTH));
     }
 }
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-const nlTest sTests[] = { NL_TEST_DEF("TestDeriveGroupOperationalCredentials", TestDeriveGroupOperationalCredentials),
-                          NL_TEST_SENTINEL() };
-
-/**
- *  Set up the test suite.
- */
-int Test_Setup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int Test_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
 } // namespace
-
-/**
- *  Main
- */
-int TestGroupOperationalCredentials()
-{
-    nlTestSuite theSuite = { "TestGroupOperationalCredentials", &sTests[0], Test_Setup, Test_Teardown };
-
-    // Run test suite againt one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestGroupOperationalCredentials)

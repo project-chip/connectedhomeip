@@ -16,8 +16,9 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class Esp32Board(Enum):
@@ -30,6 +31,7 @@ class Esp32Board(Enum):
 class Esp32App(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ENERGY_GATEWAY = auto()
     ENERGY_MANAGEMENT = auto()
     LIGHT = auto()
     LOCK = auto()
@@ -46,6 +48,8 @@ class Esp32App(Enum):
             return 'examples/all-clusters-app'
         elif self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'examples/all-clusters-minimal-app'
+        elif self == Esp32App.ENERGY_GATEWAY:
+            return 'examples/energy-gateway-app'
         elif self == Esp32App.ENERGY_MANAGEMENT:
             return 'examples/energy-management-app'
         elif self == Esp32App.LIGHT:
@@ -73,6 +77,8 @@ class Esp32App(Enum):
             return 'chip-all-clusters-app'
         elif self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'chip-all-clusters-minimal-app'
+        elif self == Esp32App.ENERGY_GATEWAY:
+            return 'chip-energy-gateway-app'
         elif self == Esp32App.ENERGY_MANAGEMENT:
             return 'chip-energy-management-app'
         elif self == Esp32App.LIGHT:
@@ -123,7 +129,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
-    if board == Esp32Board.DevKitC:
+    if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit:
         return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
@@ -138,8 +144,6 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
             return 'sdkconfig_m5stack{}.defaults'.format(rpc)
         else:
             return 'sdkconfig{}.defaults'.format(rpc)
-    elif board == Esp32Board.C3DevKit:
-        return 'sdkconfig_c3devkit{}.defaults'.format(rpc)
     else:
         raise Exception('Unknown board type')
 
@@ -153,7 +157,7 @@ class Esp32Builder(Builder):
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False,
                  enable_ipv4: bool = True,
-                 enable_insights_trace: bool = False
+                 enable_insights_trace: bool = False,
                  ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board
@@ -171,6 +175,20 @@ class Esp32Builder(Builder):
         self._Execute(
             ['bash', '-c', 'source $IDF_PATH/export.sh; source scripts/activate.sh; %s' % cmd],
             title=title)
+
+    @property
+    def TargetName(self):
+        if self.board == Esp32Board.C3DevKit:
+            return 'esp32c3'
+        else:
+            return 'esp32'
+
+    @property
+    def TargetFileName(self) -> Optional[str]:
+        if self.board == Esp32Board.C3DevKit:
+            return 'sdkconfig.defaults.esp32c3'
+        else:
+            return None
 
     @property
     def ExamplePath(self):
@@ -194,9 +212,16 @@ class Esp32Builder(Builder):
         self._Execute(
             ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
 
+        if self.TargetFileName is not None:
+            target_defaults = os.path.join(self.ExamplePath, self.TargetFileName)
+            if os.path.exists(target_defaults):
+                self._Execute(['cp', target_defaults, os.path.join(self.output_dir, self.TargetFileName)])
+
         if not self.enable_ipv4:
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+            self._Execute(
+                ['bash', '-c', 'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>%s' % shlex.quote(defaults_out)])
 
         if self.enable_insights_trace:
             insights_flag = 'y'
@@ -218,8 +243,9 @@ class Esp32Builder(Builder):
 
         cmake_args = " ".join(cmake_args)
         defaults = shlex.quote(defaults_out)
+        target = shlex.quote(self.TargetName)
 
-        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} reconfigure"
+        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} -DIDF_TARGET={target} reconfigure"
 
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
         self._IdfEnvExecute(cmd)
@@ -248,26 +274,21 @@ class Esp32Builder(Builder):
     def build_outputs(self):
         if self.app == Esp32App.TESTS:
             # Include the runnable image names as artifacts
-            result = dict()
             with open(os.path.join(self.output_dir, 'test_images.txt'), 'rt') as f:
-                for name in f.readlines():
-                    name = name.strip()
-                    result[name] = os.path.join(self.output_dir, name)
+                for name in filter(None, [x.strip() for x in f.readlines()]):
+                    yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            return
 
-            return result
+        extensions = ["elf"]
+        if self.options.enable_link_map_file:
+            extensions.append("map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
-        return {
-            self.app.AppNamePrefix + '.elf':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
-            self.app.AppNamePrefix + '.map':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.map'),
-        }
-
-    def flashbundle(self):
+    def bundle_outputs(self):
         if not self.app.FlashBundleName:
-            return {}
-
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName), 'r') as fp:
-            return {
-                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
-            }
+            return
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+            for line in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(os.path.join(self.output_dir, line), line)

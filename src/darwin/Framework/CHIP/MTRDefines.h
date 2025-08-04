@@ -51,9 +51,9 @@
 #define MTR_EXPORT __attribute__((visibility("default")))
 
 #ifdef __cplusplus
-#define MTR_EXTERN extern "C" MTR_EXPORT
+#define MTR_EXTERN extern "C"
 #else
-#define MTR_EXTERN extern MTR_EXPORT
+#define MTR_EXTERN extern
 #endif
 
 #if __has_attribute(__swift_attr__)
@@ -100,10 +100,6 @@
 #define MTR_UNSTABLE_API MTR_NEWLY_AVAILABLE
 #else
 #define MTR_UNSTABLE_API _MTR_UNAVAILABLE
-#endif
-
-#ifndef MTR_PER_CONTROLLER_STORAGE_ENABLED
-#define MTR_PER_CONTROLLER_STORAGE_ENABLED 1
 #endif
 
 #pragma mark - Types

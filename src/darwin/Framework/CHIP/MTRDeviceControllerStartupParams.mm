@@ -18,16 +18,13 @@
 #import "MTRCertificates.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#else
-#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPCert.h>
@@ -254,9 +251,17 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 @implementation MTRDeviceControllerAbstractParameters
 - (instancetype)_initInternal
 {
-    return [super init];
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _startSuspended = NO;
+
+    return self;
 }
 @end
+
+constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 
 @implementation MTRDeviceControllerParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
@@ -290,6 +295,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _storageDelegateQueue = storageDelegateQueue;
     _uniqueIdentifier = uniqueIdentifier;
 
+    _concurrentSubscriptionEstablishmentsAllowedOnThread = kDefaultConcurrentSubscriptionPoolSize;
+
     return self;
 }
 
@@ -306,9 +313,35 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _otaProviderDelegateQueue = queue;
 }
 
++ (nullable NSNumber *)nodeIDFromNOC:(MTRCertificateDERBytes)noc
+{
+    NSNumber * nodeID = nil;
+    ExtractNodeIDFromNOC(noc, &nodeID);
+    return nodeID;
+}
+
++ (nullable NSNumber *)fabricIDFromNOC:(MTRCertificateDERBytes)noc
+{
+    NSNumber * fabricID = nil;
+    ExtractFabricIDFromNOC(noc, &fabricID);
+    return fabricID;
+}
+
++ (nullable NSData *)publicKeyFromCertificate:(MTRCertificateDERBytes)certificate
+{
+    Crypto::P256PublicKey pubKey;
+    if (ExtractPubkeyFromX509Cert(AsByteSpan(certificate), pubKey) != CHIP_NO_ERROR) {
+        return nil;
+    }
+    return [NSData dataWithBytes:pubKey.Bytes() length:pubKey.Length()];
+}
+
 @end
 
 @implementation MTRDeviceControllerExternalCertificateParameters
+
+@dynamic rootCertificate;
+
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
                        uniqueIdentifier:(NSUUID *)uniqueIdentifier
@@ -329,6 +362,30 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
                   intermediateCertificate:intermediateCertificate
                           rootCertificate:rootCertificate];
 }
+@end
+
+@implementation MTRXPCDeviceControllerParameters
+
+@synthesize uniqueIdentifier = _uniqueIdentifier;
+@synthesize xpcConnectionBlock = _xpcConnectionBlock;
+
+- (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                         uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+{
+    return [self initWithXPCConnectionBlock:xpcConnectionBlock uniqueIdentifier:uniqueIdentifier];
+}
+
+- (instancetype)initWithXPCConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                          uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+{
+    if (self = [super _initInternal]) {
+        _xpcConnectionBlock = [xpcConnectionBlock copy];
+        _uniqueIdentifier = [uniqueIdentifier copy];
+    }
+
+    return self;
+}
+
 @end
 
 @implementation MTRDeviceControllerStartupParamsInternal
@@ -547,7 +604,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     return self;
 }
 
-- (instancetype)initForNewController:(MTRDeviceController *)controller
+- (instancetype)initForNewController:(MTRDeviceController_Concrete *)controller
                          fabricTable:(chip::FabricTable *)fabricTable
                             keystore:(chip::Crypto::OperationalKeystore *)keystore
                 advertiseOperational:(BOOL)advertiseOperational
@@ -614,7 +671,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
             // Our NOC has changed in a way that would affect ACL checks.  Clear
             // out our session resumption storage, because resuming those CASE
             // sessions will end up doing ACL checks against our old NOC.
-            MTR_LOG_DEFAULT("Node ID or CATs changed.  Clearing CASE resumption storage.");
+            MTR_LOG("Node ID or CATs changed.  Clearing CASE resumption storage.");
             [controller.controllerDataStore clearAllResumptionInfo];
         }
     }

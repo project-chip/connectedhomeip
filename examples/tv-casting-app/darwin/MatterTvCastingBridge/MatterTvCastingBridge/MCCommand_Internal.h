@@ -75,6 +75,7 @@ public:
                 *cppRequest, context,
                 [clientQueue, completion, this](void * context, const typename Type::ResponseType & response) {
                     ChipLogProgress(AppServer, "<MCCommandTemplate> converting 'response' from Cpp to ObjC");
+                    // Get cpp response here.
                     id objCResponse = mGetObjCResponseFromCppFn(std::any(std::make_shared<const typename Type::ResponseType>(response)));
                     dispatch_async(clientQueue, ^{
                         completion(context, nil, objCResponse);

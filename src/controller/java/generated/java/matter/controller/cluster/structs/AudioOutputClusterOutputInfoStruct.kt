@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class AudioOutputClusterOutputInfoStruct(
   val index: UByte,
   val outputType: UByte,
-  val name: String
+  val name: String,
 ) {
   override fun toString(): String = buildString {
     append("AudioOutputClusterOutputInfoStruct {\n")

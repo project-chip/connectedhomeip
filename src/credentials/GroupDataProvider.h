@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <algorithm>
+#include <optional>
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -72,7 +72,7 @@ public:
                 Platform::CopyString(name, groupName);
             }
         }
-        bool operator==(const GroupInfo & other)
+        bool operator==(const GroupInfo & other) const
         {
             return (this->group_id == other.group_id) && !strncmp(this->name, other.name, kGroupNameMax);
         }
@@ -151,7 +151,7 @@ public:
         // Number of keys present
         uint8_t num_keys_used = 0;
 
-        bool operator==(const KeySet & other)
+        bool operator==(const KeySet & other) const
         {
             VerifyOrReturnError(this->policy == other.policy && this->num_keys_used == other.num_keys_used, false);
             return !memcmp(this->epoch_keys, other.epoch_keys, this->num_keys_used * sizeof(EpochKey));
@@ -253,7 +253,7 @@ public:
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual EndpointIterator * IterateEndpoints(FabricIndex fabric_index, Optional<GroupId> group_id = NullOptional) = 0;
+    virtual EndpointIterator * IterateEndpoints(FabricIndex fabric_index, std::optional<GroupId> group_id = std::nullopt) = 0;
 
     //
     // Group-Key map

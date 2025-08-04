@@ -53,8 +53,10 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context);
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context);
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context);
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override;
     CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
@@ -83,9 +85,10 @@ private:
                               size_t subTypeSize, const OperationalAdvertisingParameters & params);
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
                               size_t subTypeSize, const CommissionAdvertisingParameters & params);
+    // ipv4Enabled will be ignored if we don't actually support IPv4.
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
-                              DnssdServiceProtocol procotol, PeerId peerId);
+                              DnssdServiceProtocol procotol, PeerId peerId, bool ipv4Enabled);
 
     static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
                                     CHIP_ERROR error);
@@ -94,7 +97,7 @@ private:
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
     OperationalResolveDelegate * mOperationalDelegate = nullptr;
 
-    friend class Global<DiscoveryImplPlatform>;
+    friend Global<DiscoveryImplPlatform>;
     static Global<DiscoveryImplPlatform> sManager;
 };
 

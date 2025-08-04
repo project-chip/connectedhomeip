@@ -28,10 +28,9 @@
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
-#include "FreeRTOS.h"
 #include "LockManager.h"
-#include "timers.h" // provides FreeRTOS timer support
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -90,11 +89,11 @@ private:
     static AppTask sAppTask;
 
     /**
-     * @brief AppTask initialisation function
+     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
      *
      * @return CHIP_ERROR
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR AppInit() override;
 
     /**
      * @brief PB0 Button event processing function
@@ -119,6 +118,13 @@ private:
      * @param context current context
      */
     static void UpdateClusterState(intptr_t context);
+
+    /**
+     * @brief Update Cluster State After Unlatch
+     *
+     * @param context current context
+     */
+    static void UpdateClusterStateAfterUnlatch(intptr_t context);
 
     /**
      * @brief Handle lock update event

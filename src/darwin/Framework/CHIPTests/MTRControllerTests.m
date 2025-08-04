@@ -62,6 +62,10 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
     XCTAssertTrue([factory isRunning]);
 
+    // Starting again with identical params is a no-op
+    __auto_type * factoryParams2 = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startControllerFactory:factoryParams2 error:nil]);
+
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
 
@@ -616,10 +620,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = [intermediateKeys copyPublicKey];
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:intermediatePublicKey
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -856,10 +863,12 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = intermediateKeys.copyPublicKey;
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:intermediatePublicKey
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -918,10 +927,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = [intermediateKeys copyPublicKey];
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:intermediatePublicKey
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -982,10 +994,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys1 = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys1);
+    __auto_type * intermediate1PublicKey = [intermediateKeys1 copyPublicKey];
+    XCTAssert(intermediate1PublicKey != NULL);
+    CFAutorelease(intermediate1PublicKey);
 
     __auto_type * intermediate1 = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                  rootCertificate:root
-                                                           intermediatePublicKey:intermediateKeys1.publicKey
+                                                           intermediatePublicKey:intermediate1PublicKey
                                                                         issuerID:nil
                                                                         fabricID:nil
                                                                            error:nil];
@@ -993,10 +1008,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys2 = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys2);
+    __auto_type * intermediate2PublicKey = [intermediateKeys2 copyPublicKey];
+    XCTAssert(intermediate2PublicKey != NULL);
+    CFAutorelease(intermediate2PublicKey);
 
     __auto_type * intermediate2 = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                  rootCertificate:root
-                                                           intermediatePublicKey:intermediateKeys2.publicKey
+                                                           intermediatePublicKey:intermediate2PublicKey
                                                                         issuerID:nil
                                                                         fabricID:nil
                                                                            error:nil];
@@ -1057,10 +1075,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = [intermediateKeys copyPublicKey];
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:intermediatePublicKey
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -1100,10 +1121,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = [intermediateKeys copyPublicKey];
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:intermediatePublicKey
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -1111,10 +1135,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:intermediateKeys
                                                            signingCertificate:intermediate
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:operationalPublicKey
                                                                      fabricID:@123
                                                                        nodeID:@456
                                                         caseAuthenticatedTags:nil
@@ -1175,10 +1202,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:operationalPublicKey
                                                                      fabricID:@123
                                                                        nodeID:@456
                                                         caseAuthenticatedTags:nil
@@ -1225,10 +1255,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:operationalPublicKey
                                                                      fabricID:@123
                                                                        nodeID:@456
                                                         caseAuthenticatedTags:nil
@@ -1269,10 +1302,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
+    __auto_type * intermediatePublicKey = [intermediateKeys copyPublicKey];
+    XCTAssert(intermediatePublicKey != NULL);
+    CFAutorelease(intermediatePublicKey);
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:intermediatePublicKey
                                                                        issuerID:nil
                                                                        fabricID:@111
                                                                           error:nil];
@@ -1280,10 +1316,13 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
+    __auto_type * operationalPublicKey = [operationalKeys copyPublicKey];
+    XCTAssert(operationalPublicKey != NULL);
+    CFAutorelease(operationalPublicKey);
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:intermediateKeys
                                                            signingCertificate:intermediate
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:operationalPublicKey
                                                                      fabricID:@123
                                                                        nodeID:@456
                                                         caseAuthenticatedTags:nil
@@ -1546,6 +1585,17 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testSetMRPParameters
+{
+    // Can be called before starting the factory
+    XCTAssertFalse(MTRDeviceControllerFactory.sharedInstance.running);
+    MTRSetMessageReliabilityParameters(@2000, @2000, @2000, @2000);
+
+    // Now reset back to the default state, so timings in other tests are not
+    // affected.
+    MTRSetMessageReliabilityParameters(nil, nil, nil, nil);
 }
 
 @end

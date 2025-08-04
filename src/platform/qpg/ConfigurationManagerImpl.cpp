@@ -71,6 +71,12 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
+    if (!QPGConfig::ConfigValueExists(QPGConfig::kCounterKey_TotalOperationalHours))
+    {
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
+    }
+
     qvRebootReason = qvCHIP_GetResetReason();
 
     switch (qvRebootReason)
@@ -121,12 +127,6 @@ CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    if (!QPGConfig::ConfigValueExists(QPGConfig::kCounterKey_TotalOperationalHours))
-    {
-        totalOperationalHours = 0;
-        return CHIP_NO_ERROR;
-    }
-
     return QPGConfig::ReadConfigValue(QPGConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
@@ -261,7 +261,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = QPGConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     qvErr = qvCHIP_KvsErasePartition();

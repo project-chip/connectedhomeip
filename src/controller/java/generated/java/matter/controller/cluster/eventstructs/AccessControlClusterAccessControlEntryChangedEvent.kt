@@ -27,7 +27,7 @@ class AccessControlClusterAccessControlEntryChangedEvent(
   val adminPasscodeID: UShort?,
   val changeType: UByte,
   val latestValue: matter.controller.cluster.structs.AccessControlClusterAccessControlEntryStruct?,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlEntryChangedEvent {\n")
@@ -43,14 +43,14 @@ class AccessControlClusterAccessControlEntryChangedEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (adminNodeID != null) {
-        put(ContextSpecificTag(TAG_ADMIN_NODE_I_D), adminNodeID)
+        put(ContextSpecificTag(TAG_ADMIN_NODE_ID), adminNodeID)
       } else {
-        putNull(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+        putNull(ContextSpecificTag(TAG_ADMIN_NODE_ID))
       }
       if (adminPasscodeID != null) {
-        put(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D), adminPasscodeID)
+        put(ContextSpecificTag(TAG_ADMIN_PASSCODE_ID), adminPasscodeID)
       } else {
-        putNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+        putNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_ID))
       }
       put(ContextSpecificTag(TAG_CHANGE_TYPE), changeType)
       if (latestValue != null) {
@@ -64,29 +64,29 @@ class AccessControlClusterAccessControlEntryChangedEvent(
   }
 
   companion object {
-    private const val TAG_ADMIN_NODE_I_D = 1
-    private const val TAG_ADMIN_PASSCODE_I_D = 2
+    private const val TAG_ADMIN_NODE_ID = 1
+    private const val TAG_ADMIN_PASSCODE_ID = 2
     private const val TAG_CHANGE_TYPE = 3
     private const val TAG_LATEST_VALUE = 4
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): AccessControlClusterAccessControlEntryChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val adminNodeID =
         if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+          tlvReader.getULong(ContextSpecificTag(TAG_ADMIN_NODE_ID))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_NODE_I_D))
+          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_NODE_ID))
           null
         }
       val adminPasscodeID =
         if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+          tlvReader.getUShort(ContextSpecificTag(TAG_ADMIN_PASSCODE_ID))
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
+          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_ID))
           null
         }
       val changeType = tlvReader.getUByte(ContextSpecificTag(TAG_CHANGE_TYPE))
@@ -94,7 +94,7 @@ class AccessControlClusterAccessControlEntryChangedEvent(
         if (!tlvReader.isNull()) {
           matter.controller.cluster.structs.AccessControlClusterAccessControlEntryStruct.fromTlv(
             ContextSpecificTag(TAG_LATEST_VALUE),
-            tlvReader
+            tlvReader,
           )
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_LATEST_VALUE))
@@ -109,7 +109,7 @@ class AccessControlClusterAccessControlEntryChangedEvent(
         adminPasscodeID,
         changeType,
         latestValue,
-        fabricIndex
+        fabricIndex,
       )
     }
   }

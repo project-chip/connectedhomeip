@@ -86,7 +86,6 @@ static_library("webos") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "MainLoop.cpp",
     "MainLoop.h",
     "NetworkCommissioningDriver.h",
@@ -101,6 +100,8 @@ static_library("webos") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
   ]
@@ -134,6 +135,7 @@ static_library("webos") {
       "ThreadStackManagerImpl.h",
     ]
 
+    deps += [ "${chip_root}/src/app:app_config" ]
     public_deps += [ "dbus/openthread" ]
   }
 
@@ -152,4 +154,12 @@ static_library("webos") {
     "pbnjson_c",
     "pbnjson_cpp",
   ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
 }

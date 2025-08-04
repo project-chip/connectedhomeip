@@ -16,14 +16,18 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/src/platform/Infineon/CYW30739/args.gni")
 
-cyw30739_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+app_data_model = "${chip_root}/examples/lock-app/lock-common"
 
 chip_openthread_ftd = false
-enable_sleepy_device = false
-
+chip_enable_icd_server = true
 chip_enable_ota_requestor = true
 
-chip_error_logging = false
-chip_progress_logging = false
-chip_detail_logging = false
-chip_automation_logging = false
+matter_product_id = "0x0002"
+matter_product_name = "CYW30739 Lock App"
+matter_att_cert = "${chip_root}/examples/platform/infineon/credentials/development/attestation/Matter-Development-DAC-1388-0002.p12"
+
+matter_wpan_sdk_board_list = [
+  "CYW30739B2-P5-EVK-01",
+  "CYW30739B2-P5-EVK-02",
+  "CYW30739B2-P5-EVK-03",
+]

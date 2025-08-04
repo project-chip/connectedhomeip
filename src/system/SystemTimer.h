@@ -44,7 +44,6 @@ namespace chip {
 namespace System {
 
 class Layer;
-class TestTimer;
 
 /**
  * Basic Timer information: time and callback.
@@ -92,7 +91,7 @@ private:
     Callback mCallback;
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    friend class LayerImplSelect;
+    friend class LayerImplDispatch;
     dispatch_source_t mTimerSource = nullptr;
 #elif CHIP_SYSTEM_CONFIG_USE_LIBEV
     friend class LayerImplSelect;
@@ -205,7 +204,11 @@ public:
     Timer * Create(Layer & systemLayer, System::Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState)
     {
         Timer * timer = mTimerPool.CreateObject(systemLayer, awakenTime, onComplete, appState);
-        SYSTEM_STATS_INCREMENT(Stats::kSystemLayer_NumTimers);
+        if (timer != nullptr)
+        {
+            SYSTEM_STATS_INCREMENT(Stats::kSystemLayer_NumTimers);
+        }
+
         return timer;
     }
 
@@ -238,7 +241,7 @@ public:
     }
 
 private:
-    friend class TestTimer;
+    friend class TestSystemTimer_CheckTimerPool_Test;
     ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> mTimerPool;
 };
 

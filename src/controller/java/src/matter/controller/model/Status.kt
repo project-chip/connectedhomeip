@@ -57,6 +57,7 @@ data class Status(val status: Int, val clusterStatus: Int?) {
     RESERVED99(0X99),
     RESERVED9A(0X9A),
     BUSY(0X9C),
+    ACCESS_RESTRICTED(0x9D),
     DEPRECATEDC0(0XC0),
     DEPRECATEDC1(0XC1),
     DEPRECATEDC2(0XC2),
@@ -70,6 +71,9 @@ data class Status(val status: Int, val clusterStatus: Int?) {
     FAILSAFE_REQUIRED(0XCA),
     INVALID_IN_STATE(0XCB),
     NO_COMMAND_RESPONSE(0XCC),
+    DYNAMIC_CONSTRAINT_ERROR(0XCF),
+    ALREADY_EXISTS(0XD0),
+    INVALID_TRANSPORT_TYPE(0XD1),
     WRITE_IGNORED(0XF0)
   }
 

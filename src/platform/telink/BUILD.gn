@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Project CHIP Authors
+# Copyright (c) 2021-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,9 +45,9 @@ static_library("telink") {
     "ConnectivityManagerImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
-    "NFCManagerImpl.cpp",
-    "NFCManagerImpl.h",
     "PlatformManagerImpl.h",
+    "Reboot.cpp",
+    "Reboot.h",
     "SystemPlatformConfig.h",
   ]
 
@@ -58,7 +58,11 @@ static_library("telink") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   if (chip_enable_factory_data) {
     sources += [
@@ -69,14 +73,22 @@ static_library("telink") {
     ]
   }
 
+  if (chip_enable_openthread || chip_enable_wifi) {
+    sources += [
+      "../Zephyr/InetUtils.cpp",
+      "../Zephyr/InetUtils.h",
+    ]
+  }
+
   if (chip_enable_openthread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
 
-    if (chip_mdns == "platform") {
+    if (chip_mdns_platform) {
       sources += [
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",
@@ -86,10 +98,38 @@ static_library("telink") {
     }
   }
 
+  if (chip_enable_wifi) {
+    import("$root_build_dir/zephyr_version.gni")
+    sources += [
+      "OTAImageProcessorImplWiFi.h",
+      "wifi/" + ZEPHYR_VERSION_STRING + "/ConnectivityManagerImplWiFi.cpp",
+      "wifi/ConnectivityManagerImplWiFi.h",
+      "wifi/" + ZEPHYR_VERSION_STRING + "/TelinkWiFiDriver.cpp",
+      "wifi/TelinkWiFiDriver.h",
+      "wifi/" + ZEPHYR_VERSION_STRING + "/WiFiManager.cpp",
+      "wifi/" + ZEPHYR_VERSION_STRING + "/WiFiManager.h",
+    ]
+  }
+
+  if (chip_enable_nfc_onboarding_payload) {
+    sources += [
+      "NFCOnboardingPayloadManagerImpl.cpp",
+      "NFCOnboardingPayloadManagerImpl.h",
+    ]
+  }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../Zephyr/Logging.cpp" ]
 }

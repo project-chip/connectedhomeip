@@ -18,7 +18,11 @@ import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
 
+import("${chip_root}/build/chip/python_wheel.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/controller/flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/python.gni")
 import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
@@ -31,14 +35,8 @@ config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
 }
 
-declare_args() {
-  chip_python_version = "0.0"
-  chip_python_package_prefix = "chip"
-  chip_python_supports_stack_locking = chip_system_config_locking != "none"
-}
-
 shared_library("ChipDeviceCtrl") {
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     output_name = "_ChipDeviceCtrl"
   } else {
     output_name = "_ChipServer"
@@ -55,7 +53,7 @@ shared_library("ChipDeviceCtrl") {
 
   defines = []
 
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
       "ChipDeviceController-Discovery.cpp",
@@ -69,6 +67,11 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-StorageDelegate.h",
       "JsonTlvSupport.cpp",
       "OpCredsBinding.cpp",
+      "chip/bdx/bdx-transfer.cpp",
+      "chip/bdx/bdx-transfer.h",
+      "chip/bdx/bdx.cpp",
+      "chip/bdx/test-bdx-transfer-server.cpp",
+      "chip/bdx/test-bdx-transfer-server.h",
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",
       "chip/commissioning/PlaceholderOperationalCredentialsIssuer.h",
@@ -77,6 +80,9 @@ shared_library("ChipDeviceCtrl") {
       "chip/crypto/p256keypair.cpp",
       "chip/crypto/p256keypair.h",
       "chip/discovery/NodeResolution.cpp",
+      "chip/fault_injection/FaultInjection.cpp",
+      "chip/icd/PyChipCheckInDelegate.cpp",
+      "chip/icd/PyChipCheckInDelegate.h",
       "chip/interaction_model/Delegate.cpp",
       "chip/interaction_model/Delegate.h",
       "chip/internal/ChipThreadWork.cpp",
@@ -90,6 +96,14 @@ shared_library("ChipDeviceCtrl") {
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
+    if (chip_support_webrtc_python_bindings) {
+      sources += [
+        "chip/webrtc/RTCClient.cpp",
+        "chip/webrtc/WebRTC.cpp",
+        "chip/webrtc/WebRTC.h",
+        "chip/webrtc/WebRTCTransportCluster.cpp",
+      ]
+    }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
 
@@ -122,21 +136,34 @@ shared_library("ChipDeviceCtrl") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/credentials:test_dac_revocation_delegate",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
 
-  if (chip_controller) {
+  if (chip_support_webrtc_python_bindings) {
     public_deps += [
-      "${chip_root}/src/controller/data_model",
+      "${chip_root}/src/controller/webrtc:chip_webrtc",
+      "${chip_root}/third_party/libdatachannel:libdatachannel",
+    ]
+    include_dirs += [
+      "${chip_root}/src/controller/webrtc/",
+      "${chip_root}/third_party/libdatachannel/repo/include",
+    ]
+  }
+
+  if (chip_support_commissioning_in_controller) {
+    public_deps += [
       "${chip_root}/src/credentials:file_attestation_trust_store",
       "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/tracing/json",
@@ -149,74 +176,28 @@ shared_library("ChipDeviceCtrl") {
       "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
+
+    if (chip_build_controller_dynamic_server) {
+      defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
+
+      deps += [ "${chip_root}/src/controller:nodatamodel" ]
+
+      # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
+      # defined and application is supposed to provide it. This adds the sources
+      # in the same way "data_model" implementations do
+      #
+      # DynamicDispatcher in src/app:interaction-model implements the actual required
+      # ember callbacks in this case...
+      sources += codegen_data_model_SOURCES
+      public_deps += codegen_data_model_PUBLIC_DEPS
+    } else {
+      public_deps += [ "${chip_root}/src/controller/data_model" ]
+    }
   } else {
     public_deps += [ "$chip_data_model" ]
   }
 
   configs += [ ":controller_wno_deprecate" ]
-}
-
-template("chip_python_wheel_action") {
-  _dist_dir = "${root_out_dir}/controller/python"
-
-  _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
-
-  pw_python_action(target_name) {
-    script = "build-chip-wheel.py"
-    forward_variables_from(invoker, "*")
-
-    _py_manifest_files_rebased = []
-    foreach(_manifest_entry, py_manifest_files) {
-      inputs += _manifest_entry.sources
-      _py_manifest_files_rebased += [
-        {
-          src_dir = rebase_path(_manifest_entry.src_dir,
-                                get_path_info(_py_manifest_file, "dir"))
-          sources =
-              rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
-        },
-      ]
-    }
-
-    if (defined(invoker.py_scripts)) {
-      _py_scripts = invoker.py_scripts
-    } else {
-      _py_scripts = []
-    }
-
-    _py_manifest = {
-      files = _py_manifest_files_rebased
-      packages = py_packages
-      scripts = _py_scripts
-      package_reqs = py_package_reqs
-    }
-
-    write_file(_py_manifest_file, _py_manifest, "json")
-
-    args = [
-      "--package_name",
-      py_package_name,
-      "--build_number",
-      chip_python_version,
-      "--build_dir",
-      rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
-      "--dist_dir",
-      rebase_path(_dist_dir, root_build_dir),
-      "--manifest",
-      rebase_path(_py_manifest_file, root_build_dir),
-      "--plat-name",
-      py_platform_tag,
-    ]
-
-    if (defined(invoker.lib_name)) {
-      args += [
-        "--lib-name",
-        lib_name,
-      ]
-    }
-
-    outputs = [ "${_dist_dir}/$output_name" ]
-  }
 }
 
 chip_python_wheel_action("chip-core") {
@@ -232,6 +213,10 @@ chip_python_wheel_action("chip-core") {
         "chip/ChipStack.py",
         "chip/FabricAdmin.py",
         "chip/__init__.py",
+        "chip/bdx/Bdx.py",
+        "chip/bdx/BdxProtocol.py",
+        "chip/bdx/BdxTransfer.py",
+        "chip/bdx/__init__.py",
         "chip/ble/__init__.py",
         "chip/ble/commissioning/__init__.py",
         "chip/ble/get_adapters.py",
@@ -245,13 +230,16 @@ chip_python_wheel_action("chip-core") {
         "chip/commissioning/commissioning_flow_blocks.py",
         "chip/commissioning/pase.py",
         "chip/configuration/__init__.py",
+        "chip/credentials/__init__.py",
         "chip/credentials/cert.py",
+        "chip/crypto/__init__.py",
         "chip/crypto/fabric.py",
         "chip/crypto/p256keypair.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
         "chip/discovery/types.py",
         "chip/exceptions/__init__.py",
+        "chip/fault_injection/__init__.py",
         "chip/interaction_model/__init__.py",
         "chip/interaction_model/delegate.py",
         "chip/internal/__init__.py",
@@ -274,8 +262,20 @@ chip_python_wheel_action("chip-core") {
         "chip/yaml/format_converter.py",
         "chip/yaml/runner.py",
       ]
+      if (chip_support_webrtc_python_bindings) {
+        sources += [
+          "chip/webrtc/__init__.py",
+          "chip/webrtc/command.py",
+          "chip/webrtc/library_handle.py",
+          "chip/webrtc/peer_connection.py",
+          "chip/webrtc/types.py",
+          "chip/webrtc/utils.py",
+          "chip/webrtc/webrtc_client.py",
+          "chip/webrtc/webrtc_manager.py",
+        ]
+      }
 
-      if (chip_controller) {
+      if (chip_support_commissioning_in_controller) {
         sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
         sources += [ "chip/server/__init__.py" ]
@@ -283,7 +283,7 @@ chip_python_wheel_action("chip-core") {
     },
     {
       src_dir = target_out_dir
-      if (chip_controller) {
+      if (chip_support_commissioning_in_controller) {
         sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
       } else {
         sources = [ "${target_out_dir}/chip/_ChipServer.so" ]
@@ -299,6 +299,7 @@ chip_python_wheel_action("chip-core") {
 
   py_packages = [
     "chip",
+    "chip.bdx",
     "chip.ble",
     "chip.ble.commissioning",
     "chip.configuration",
@@ -318,9 +319,13 @@ chip_python_wheel_action("chip-core") {
     "chip.setup_payload",
     "chip.storage",
     "chip.tracing",
+    "chip.fault_injection",
   ]
+  if (chip_support_webrtc_python_bindings) {
+    py_packages += [ "chip.webrtc" ]
+  }
 
-  if (!chip_controller) {
+  if (!chip_support_commissioning_in_controller) {
     py_packages += [ "chip.server" ]
   }
 
@@ -359,7 +364,7 @@ chip_python_wheel_action("chip-core") {
 
   tags = "cp37-abi3-" + py_platform_tag
 
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     lib_name = "_ChipDeviceCtrl.so"
   } else {
     lib_name = "_ChipServer.so"
@@ -416,10 +421,7 @@ chip_python_wheel_action("chip-clusters") {
 }
 
 chip_python_wheel_action("chip-repl") {
-  py_scripts = [
-    "chip-device-ctrl.py",
-    "chip-repl.py",
-  ]
+  py_scripts = [ "chip-repl.py" ]
 
   py_manifest_files = [
     {
@@ -461,7 +463,7 @@ chip_python_wheel_action("chip-repl") {
   } else if (current_os == "linux") {
     py_package_reqs += [
       "dbus-python==1.2.18",
-      "pygobject",
+      "pygobject==3.50.0",
     ]
   }
 

@@ -51,11 +51,9 @@
 #include <lwip/netif.h>
 
 #include <chip_porting.h>
-#include <lwip_netconf.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
-using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
@@ -177,8 +175,9 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        mWiFiStationMode = (wifi_mode == RTW_MODE_STA) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
+        mWiFiStationMode = (matter_wifi_is_station_mode() == RTW_SUCCESS) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
     }
+
     return mWiFiStationMode;
 }
 
@@ -481,8 +480,6 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         err = Internal::AmebaUtils::StartWiFi();
         SuccessOrExit(err);
-        err = Internal::AmebaUtils::EnableStationMode();
-        SuccessOrExit(err);
     }
 
     // Determine if the WiFi layer thinks the station interface is currently connected.
@@ -499,6 +496,10 @@ void ConnectivityManagerImpl::DriveStationState()
             ChipLogProgress(DeviceLayer, "WiFi station interface connected");
             mLastStationConnectFailTime = System::Clock::kZero;
             OnStationConnected();
+        }
+        else
+        {
+            ChangeWiFiStationState(kWiFiStationState_Connecting);
         }
     }
 
@@ -541,7 +542,7 @@ void ConnectivityManagerImpl::DriveStationState()
                 err = Internal::AmebaUtils::WiFiConnectProvisionedNetwork();
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(DeviceLayer, "WiFiConnectProvisionedNetwork() failed: %s", chip::ErrorStr(err));
+                    ChipLogError(DeviceLayer, "WiFiConnectProvisionedNetwork() failed: %" CHIP_ERROR_FORMAT, err.Format());
                 }
                 SuccessOrExit(err);
             }

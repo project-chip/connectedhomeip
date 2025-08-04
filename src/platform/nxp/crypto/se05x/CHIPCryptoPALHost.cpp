@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
  *      mbedTLS based implementation of CHIP crypto primitives
  */
 
-#include "CHIPCryptoPAL.h"
+#include <crypto/CHIPCryptoPAL.h>
 
 #include <type_traits>
 
@@ -41,6 +41,7 @@
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/oid.h>
+#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
@@ -712,7 +713,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -728,7 +729,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     result = mbedtls_ecp_group_load(&curve, MBEDTLS_ECP_DP_SECP256R1);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1in), w1in_len);
+    result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1sin), w1sin_len);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &curve.N);
@@ -910,9 +911,9 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
 
         if (OID_CMP(sOID_Extension_BasicConstraints, extOID))
         {
-            int isCA                 = 0;
-            int pathLen              = -1;
-            unsigned char * seqStart = p;
+            int isCA    = 0;
+            int pathLen = -1;
+            unsigned char * seqStart;
 
             VerifyOrExit(extCritical, error = CHIP_ERROR_INTERNAL);
             extBasicPresent = true;
@@ -921,7 +922,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
             if (len > 0)
             {
-                result = mbedtls_asn1_get_bool(&p, end, &isCA);
+                seqStart = p;
+                result   = mbedtls_asn1_get_bool(&p, end, &isCA);
                 VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
 
                 if (p != seqStart + len)

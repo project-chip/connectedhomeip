@@ -26,7 +26,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/core/CHIPError.h>
 
-#if defined(CONFIG_CHIP_USE_MARS_SENSOR) && defined(CONFIG_WS2812_STRIP) && !defined(CONFIG_PM)
+#if defined(CONFIG_CHIP_USE_MARS_SENSOR) && defined(CONFIG_WS2812_STRIP_GPIO_TELINK) && !defined(CONFIG_PM)
 #define USE_COLOR_TEMPERATURE_LIGHT
 #endif
 
@@ -46,7 +46,6 @@ private:
     static void SensorBanForNextMeasurTimerTimeoutCallback(k_timer * timer);
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
-    WS2812Device mWS2812Device;
     void SetColorTemperatureLight(int8_t temp);
 #endif // USE_COLOR_TEMPERATURE_LIGHT
 

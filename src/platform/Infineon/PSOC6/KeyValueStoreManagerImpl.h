@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *          Platform-specific key value storage implementation for P6.
+ *          Platform-specific key value storage implementation for PSOC6.
  *
  */
 
@@ -71,7 +71,7 @@ inline KeyValueStoreManager & KeyValueStoreMgr(void)
  * Returns the platform-specific implementation of the KeyValueStoreManager singleton object.
  *
  * Chip applications can use this to gain access to features of the KeyValueStoreManager
- * that are specific to the P6 platform.
+ * that are specific to the PSOC6 platform.
  */
 inline KeyValueStoreManagerImpl & KeyValueStoreMgrImpl(void)
 {

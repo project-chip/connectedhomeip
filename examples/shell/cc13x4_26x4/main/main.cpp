@@ -35,6 +35,13 @@
 #include <ti/drivers/ECJPAKE.h>
 #include <ti/drivers/SHA2.h>
 
+extern "C" {
+#include "ti_drivers_config.h"
+#ifdef ti_log_Log_ENABLE
+#include "ti_log_config.h"
+#endif
+}
+
 #include <bget.h>
 #define TOTAL_ICALL_HEAP_SIZE (0xc700)
 
@@ -48,14 +55,6 @@ uint32_t heapSize = TOTAL_ICALL_HEAP_SIZE;
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
-extern "C" void vApplicationStackOverflowHook(void)
-{
-    while (true)
-    {
-        ;
-    }
-}
-
 /* Wrapper functions for using the queue registry regardless of whether it is enabled or disabled */
 extern "C" void vQueueAddToRegistryWrapper(QueueHandle_t xQueue, const char * pcQueueName)
 {
@@ -65,6 +64,16 @@ extern "C" void vQueueAddToRegistryWrapper(QueueHandle_t xQueue, const char * pc
 extern "C" void vQueueUnregisterQueueWrapper(QueueHandle_t xQueue)
 {
     /* This function is intentionally left empty as the Queue Registry is disabled */
+}
+
+/* Idle hook functions */
+extern void LogSinkUART_flush(void);
+
+extern "C" void vApplicationIdleHook(void)
+{
+#ifdef ti_log_Log_ENABLE
+    LogSinkUART_flush();
+#endif
 }
 
 // ================================================================================

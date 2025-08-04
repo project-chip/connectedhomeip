@@ -34,7 +34,7 @@ class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
   val channelPresent: Boolean,
   val pskcPresent: Boolean,
   val securityPolicyPresent: Boolean,
-  val channelMaskPresent: Boolean
+  val channelMaskPresent: Boolean,
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {\n")
@@ -88,7 +88,7 @@ class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {
       tlvReader.enterStructure(tlvTag)
       val activeTimestampPresent =
@@ -123,7 +123,7 @@ class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
         channelPresent,
         pskcPresent,
         securityPolicyPresent,
-        channelMaskPresent
+        channelMaskPresent,
       )
     }
   }

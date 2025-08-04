@@ -97,6 +97,8 @@ private:
         kCastingPlayerEndpointServerListContainerTag,
         kCastingPlayerEndpointServerClusterIdTag,
 
+        kCastingPlayerSupportsCommissionerGeneratedPasscodeTag,
+
         kContextTagMaxNum = UINT8_MAX
     };
 

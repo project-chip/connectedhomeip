@@ -60,6 +60,12 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 #endif
 
+#ifdef CONFIG_CHIP_ETHERNET
+#define CHIP_DEVICE_CONFIG_ENABLE_ETHERNET CONFIG_CHIP_ETHERNET
+#else
+#define CHIP_DEVICE_CONFIG_ENABLE_ETHERNET 0
+#endif
+
 #ifdef CONFIG_BT
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE CONFIG_BT
 #else
@@ -75,11 +81,6 @@
 /// Key for all Matter persistent data stored using the Zephyr Settings API
 #define CHIP_DEVICE_CONFIG_SETTINGS_KEY "mt"
 #endif // CHIP_DEVICE_CONFIG_SETTINGS_KEY
-
-#ifndef CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS
-/// Delay between completing a firmware update download and reboot to apply the update
-#define CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS 1000
-#endif // CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS
 
 #ifndef CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS
 /// Time to sleep after running server shutdown actions to let lower layers complete the actions.

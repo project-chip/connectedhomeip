@@ -25,6 +25,8 @@
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <string>
+
 namespace {
 
 struct Option
@@ -37,7 +39,7 @@ struct Option
 //       from examples/platform/linux/Options.cpp
 static constexpr Option sOptions[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    { "ble-device", false },
+    { "ble-controller", false },
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", true },

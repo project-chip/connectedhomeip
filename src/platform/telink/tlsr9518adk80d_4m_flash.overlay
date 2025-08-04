@@ -1,0 +1,35 @@
+&flash {
+	reg = <0x20000000 0x400000>;
+
+	/delete-node/ partitions;
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x19000>;
+		};
+		slot0_partition: partition@19000 {
+			label = "image-0";
+			reg = <0x19000 0x1ec000>;
+		};
+		factory_partition: partition@205000 {
+			label = "factory-data";
+			reg = <0x205000 0x1000>;
+		};
+		storage_partition: partition@206000 {
+			label = "storage";
+			reg = <0x206000 0xc000>;
+		};
+		slot1_partition: partition@212000 {
+			label = "image-1";
+			reg = <0x212000 0x1ec000>;
+		};
+		vendor_partition: partition@3fe000 {
+			label = "vendor-data";
+			reg = <0x3fe000 0x2000>;
+		};
+	};
+};

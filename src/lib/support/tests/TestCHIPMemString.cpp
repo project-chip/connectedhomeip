@@ -22,12 +22,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Platform;
@@ -35,6 +36,13 @@ using namespace chip::Platform;
 // =================================
 //      Unit tests
 // =================================
+
+class TestCHIPMemString : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
 
 namespace {
 template <size_t kTestBufLen>
@@ -51,28 +59,28 @@ struct TestBuffers
         memset(wayTooSmallBuf, 1, sizeof(wayTooSmallBuf));
         memset(tooBigBuf, 1, sizeof(tooBigBuf));
     }
-    void CheckCorrectness(nlTestSuite * inSuite, const char * testStr)
+    void CheckCorrectness(const char * testStr)
     {
         // correctSizeBuf and tooBigBuf should have the complete string.
-        NL_TEST_ASSERT(inSuite, correctSizeBuf[kTestBufLen - 1] == '\0');
-        NL_TEST_ASSERT(inSuite, tooBigBuf[kTestBufLen - 1] == '\0');
-        NL_TEST_ASSERT(inSuite, strcmp(correctSizeBuf, testStr) == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(tooBigBuf, testStr) == 0);
-        NL_TEST_ASSERT(inSuite, strlen(correctSizeBuf) == strlen(testStr));
-        NL_TEST_ASSERT(inSuite, strlen(tooBigBuf) == strlen(testStr));
+        EXPECT_EQ(correctSizeBuf[kTestBufLen - 1], '\0');
+        EXPECT_EQ(tooBigBuf[kTestBufLen - 1], '\0');
+        EXPECT_STREQ(correctSizeBuf, testStr);
+        EXPECT_STREQ(tooBigBuf, testStr);
+        EXPECT_EQ(strlen(correctSizeBuf), strlen(testStr));
+        EXPECT_EQ(strlen(tooBigBuf), strlen(testStr));
 
         // wayTooSmallBuf is tiny and thus will only have the null terminator
-        NL_TEST_ASSERT(inSuite, wayTooSmallBuf[0] == '\0');
+        EXPECT_EQ(wayTooSmallBuf[0], '\0');
 
         // tooSmallBuf should still have a null terminator on the end
-        NL_TEST_ASSERT(inSuite, tooSmallBuf[kTestBufLen - 2] == '\0');
-        NL_TEST_ASSERT(inSuite, memcmp(tooSmallBuf, testStr, kTestBufLen - 2) == 0);
+        EXPECT_EQ(tooSmallBuf[kTestBufLen - 2], '\0');
+        EXPECT_EQ(memcmp(tooSmallBuf, testStr, kTestBufLen - 2), 0);
     }
 };
 
 } // namespace
 
-static void TestCopyString(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCHIPMemString, TestCopyString)
 {
     static constexpr char testWord[] = "testytest";
     ByteSpan testWordSpan            = ByteSpan(reinterpret_cast<const uint8_t *>(testWord), sizeof(testWord) - 1);
@@ -85,7 +93,7 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
     CopyString(testBuffers.tooSmallBuf, sizeof(testBuffers.tooSmallBuf), testWord);
     CopyString(testBuffers.wayTooSmallBuf, sizeof(testBuffers.wayTooSmallBuf), testWord);
     CopyString(testBuffers.tooBigBuf, sizeof(testBuffers.tooBigBuf), testWord);
-    testBuffers.CheckCorrectness(inSuite, testWord);
+    testBuffers.CheckCorrectness(testWord);
 
     // CopyString with array size
     testBuffers.Reset();
@@ -93,7 +101,7 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
     CopyString(testBuffers.tooSmallBuf, testWord);
     CopyString(testBuffers.wayTooSmallBuf, testWord);
     CopyString(testBuffers.tooBigBuf, testWord);
-    testBuffers.CheckCorrectness(inSuite, testWord);
+    testBuffers.CheckCorrectness(testWord);
 
     // CopyString with explicit size from ByteSpan
     testBuffers.Reset();
@@ -101,7 +109,7 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
     CopyString(testBuffers.tooSmallBuf, sizeof(testBuffers.tooSmallBuf), testWordSpan);
     CopyString(testBuffers.wayTooSmallBuf, sizeof(testBuffers.wayTooSmallBuf), testWordSpan);
     CopyString(testBuffers.tooBigBuf, sizeof(testBuffers.tooBigBuf), testWordSpan);
-    testBuffers.CheckCorrectness(inSuite, testWord);
+    testBuffers.CheckCorrectness(testWord);
 
     // CopyString with array size from ByteSpan
     testBuffers.Reset();
@@ -109,7 +117,7 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
     CopyString(testBuffers.tooSmallBuf, testWordSpan);
     CopyString(testBuffers.wayTooSmallBuf, testWordSpan);
     CopyString(testBuffers.tooBigBuf, testWordSpan);
-    testBuffers.CheckCorrectness(inSuite, testWord);
+    testBuffers.CheckCorrectness(testWord);
 
     // CopyString with explicit size from CharSpan
     testBuffers.Reset();
@@ -117,7 +125,7 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
     CopyString(testBuffers.tooSmallBuf, sizeof(testBuffers.tooSmallBuf), testWordSpan2);
     CopyString(testBuffers.wayTooSmallBuf, sizeof(testBuffers.wayTooSmallBuf), testWordSpan2);
     CopyString(testBuffers.tooBigBuf, sizeof(testBuffers.tooBigBuf), testWordSpan2);
-    testBuffers.CheckCorrectness(inSuite, testWord);
+    testBuffers.CheckCorrectness(testWord);
 
     // CopyString with array size from CharSpan
     testBuffers.Reset();
@@ -125,59 +133,24 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
     CopyString(testBuffers.tooSmallBuf, testWordSpan2);
     CopyString(testBuffers.wayTooSmallBuf, testWordSpan2);
     CopyString(testBuffers.tooBigBuf, testWordSpan2);
-    testBuffers.CheckCorrectness(inSuite, testWord);
+    testBuffers.CheckCorrectness(testWord);
 }
 
-static void TestMemoryAllocString(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCHIPMemString, TestMemoryAllocString)
 {
     static constexpr char testStr[] = "testytestString";
     char * allocatedStr             = MemoryAllocString(testStr, sizeof(testStr));
-    NL_TEST_ASSERT(inSuite, allocatedStr != nullptr);
-    if (allocatedStr == nullptr)
-    {
-        return;
-    }
-    NL_TEST_ASSERT(inSuite, strcmp(testStr, allocatedStr) == 0);
+    ASSERT_NE(allocatedStr, nullptr);
+
+    EXPECT_STREQ(testStr, allocatedStr);
     MemoryFree(allocatedStr);
 }
 
-static void TestScopedBuffer(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCHIPMemString, TestScopedBuffer)
 {
     // Scoped buffer has its own tests that check the memory properly. Here we are just testing that the string is copied in
     // properly.
     static constexpr char testStr[] = "testytestString";
     ScopedMemoryString scopedString = ScopedMemoryString(testStr, sizeof(testStr));
-    NL_TEST_ASSERT(inSuite, strcmp(scopedString.Get(), testStr) == 0);
+    EXPECT_STREQ(scopedString.Get(), testStr);
 }
-
-static const nlTest sTests[] = { NL_TEST_DEF("Test CopyString", TestCopyString),
-                                 NL_TEST_DEF("Test MemoryAllocString", TestMemoryAllocString),
-                                 NL_TEST_DEF("Test ScopedBuffer", TestScopedBuffer), NL_TEST_SENTINEL() };
-
-int TestMemString_Setup(void * inContext)
-{
-    CHIP_ERROR error = MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return (FAILURE);
-    return (SUCCESS);
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestMemString_Teardown(void * inContext)
-{
-    MemoryShutdown();
-    return (SUCCESS);
-}
-
-int TestMemString()
-{
-    nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], TestMemString_Setup, TestMemString_Teardown };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestMemString)

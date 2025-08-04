@@ -24,24 +24,15 @@
  *
  */
 
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 
@@ -79,6 +70,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_UNINITIALIZED,
     CHIP_ERROR_INVALID_STRING_LENGTH,
     CHIP_ERROR_INVALID_LIST_LENGTH,
+    CHIP_ERROR_FAILED_DEVICE_ATTESTATION,
     CHIP_END_OF_TLV,
     CHIP_ERROR_TLV_UNDERRUN,
     CHIP_ERROR_INVALID_TLV_ELEMENT,
@@ -148,6 +140,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_ACCESS_DENIED,
     CHIP_ERROR_UNKNOWN_RESOURCE_ID,
     CHIP_ERROR_VERSION_MISMATCH,
+    CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL,
     CHIP_EVENT_ID_FOUND,
     CHIP_ERROR_INTERNAL,
     CHIP_ERROR_OPEN_FAILED,
@@ -177,7 +170,32 @@ static const CHIP_ERROR kTestElements[] =
 };
 // clang-format on
 
-static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
+void CheckCoreErrorStrHelper(const char * errStr, CHIP_ERROR err)
+{
+    char expectedText[9];
+
+    // Assert that the error string contains the error number in hex.
+    snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
+    EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
+
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    // Assert that the error string contains a description, which is signaled
+    // by a presence of a colon proceeding the description.
+    EXPECT_TRUE((strchr(errStr, ':') != nullptr));
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+
+#if CHIP_CONFIG_ERROR_SOURCE
+    // GetFile() should be relative to ${chip_root}
+    char const * const file = err.GetFile();
+    ASSERT_NE(file, nullptr);
+    EXPECT_EQ(strstr(file, "src/lib/core/"), file);
+
+    // File should be included in the error.
+    EXPECT_NE(strstr(errStr, file), nullptr);
+#endif // CHIP_CONFIG_ERROR_SOURCE
+}
+
+TEST(TestCHIPErrorStr, CheckCoreErrorStr)
 {
     // Register the layer error formatter
 
@@ -186,57 +204,85 @@ static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
     // For each defined error...
     for (const auto & err : kTestElements)
     {
-        const char * errStr = ErrorStr(err);
-        char expectedText[9];
+        // ErrorStr with static char array.
+        CheckCoreErrorStrHelper(ErrorStr(err, /*withSourceLocation=*/true), err);
+    }
 
-        // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
-        NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
+}
+
+TEST(TestCHIPErrorStr, CheckCoreErrorStrStorage)
+{
+    // Register the layer error formatter
+
+    RegisterCHIPLayerErrorFormatter();
+
+    // For each defined error...
+    for (const auto & err : kTestElements)
+    {
+        // ErrorStr with given storage.
+        ErrorStrStorage storage;
+        CheckCoreErrorStrHelper(ErrorStr(err, /*withSourceLocation=*/true, storage), err);
+    }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
+}
+
+void CheckCoreErrorStrWithoutSourceLocationHelper(const char * errStr, CHIP_ERROR err)
+{
+    char expectedText[9];
+
+    // Assert that the error string contains the error number in hex.
+    snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
+    EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-        // Assert that the error string contains a description, which is signaled
-        // by a presence of a colon proceeding the description.
-        NL_TEST_ASSERT(inSuite, (strchr(errStr, ':') != nullptr));
+    // Assert that the error string contains a description, which is signaled
+    // by a presence of a colon proceeding the description.
+    EXPECT_TRUE((strchr(errStr, ':') != nullptr));
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
 #if CHIP_CONFIG_ERROR_SOURCE
-        // GetFile() should be relative to ${chip_root}
-        char const * const file = err.GetFile();
-        NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, file != nullptr);
-        NL_TEST_ASSERT(inSuite, strstr(file, "src/lib/core/") == file);
+    char const * const file = err.GetFile();
+    ASSERT_NE(file, nullptr);
+    // File should not be included in the error.
+    EXPECT_EQ(strstr(errStr, file), nullptr);
 #endif // CHIP_CONFIG_ERROR_SOURCE
+}
+
+TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
+{
+    // Register the layer error formatter
+
+    RegisterCHIPLayerErrorFormatter();
+
+    // For each defined error...
+    for (const auto & err : kTestElements)
+    {
+        // ErrorStr with static char array.
+        CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-static const nlTest sTests[] =
+TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
 {
-    NL_TEST_DEF("CoreErrorStr", CheckCoreErrorStr),
+    // Register the layer error formatter
 
-    NL_TEST_SENTINEL()
-};
-// clang-format on
+    RegisterCHIPLayerErrorFormatter();
 
-int TestCHIPErrorStr()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "Test CHIP_ERROR string conversions",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
+    // For each defined error...
+    for (const auto & err : kTestElements)
+    {
+        // ErrorStr with given storage.
+        ErrorStrStorage storage;
+        CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false, storage), err);
+    }
 
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-
-    return nlTestRunnerStats(&theSuite);
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }
-
-CHIP_REGISTER_TEST_SUITE(TestCHIPErrorStr)

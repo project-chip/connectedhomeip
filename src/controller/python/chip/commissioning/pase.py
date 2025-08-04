@@ -39,17 +39,17 @@ class ContextManager:
             device=self.devCtrl.GetConnectedDeviceSync(self.node_id, allowPASE=True, timeoutMs=1000))
 
     def __exit__(self, type, value, traceback):
-        self.devCtrl.CloseSession(self.node_id)
+        self.devCtrl.MarkSessionDefunct(self.node_id)
         if self.is_ble:
             self.devCtrl.CloseBLEConnection(self.is_ble)
 
 
-def establish_session(devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, parameter: commissioning.PaseParameters) -> ContextManager:
+async def establish_session(devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, parameter: commissioning.PaseParameters) -> ContextManager:
     if isinstance(parameter, commissioning.PaseOverBLEParameters):
-        devCtrl.EstablishPASESessionBLE(parameter.setup_pin, parameter.discriminator, parameter.temporary_nodeid)
+        await devCtrl.EstablishPASESessionBLE(parameter.setup_pin, parameter.discriminator, parameter.temporary_nodeid)
     elif isinstance(parameter, commissioning.PaseOverIPParameters):
-        device = devCtrl.DiscoverCommissionableNodes(filterType=discovery.FilterType.LONG_DISCRIMINATOR,
-                                                     filter=parameter.long_discriminator, stopOnFirst=True)
+        device = await devCtrl.DiscoverCommissionableNodes(filterType=discovery.FilterType.LONG_DISCRIMINATOR,
+                                                           filter=parameter.long_discriminator, stopOnFirst=True)
         if not device:
             raise ValueError("No commissionable device found")
         selected_address = None
@@ -63,7 +63,7 @@ def establish_session(devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, paramete
             break
         if selected_address is None:
             raise ValueError("The node for commissioning does not contains routable ip addresses information")
-        devCtrl.EstablishPASESessionIP(selected_address, parameter.setup_pin, parameter.temporary_nodeid)
+        await devCtrl.EstablishPASESessionIP(selected_address, parameter.setup_pin, parameter.temporary_nodeid)
     else:
         raise TypeError("Expect PaseOverBLEParameters or PaseOverIPParameters for establishing PASE session")
     return ContextManager(

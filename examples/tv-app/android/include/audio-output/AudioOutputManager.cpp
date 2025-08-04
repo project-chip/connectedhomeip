@@ -18,7 +18,6 @@
 
 #include "AudioOutputManager.h"
 
-using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters::AudioOutput;
 

@@ -52,8 +52,30 @@
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/SessionConnectionDelegate.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 namespace chip {
 
+/*
+ * This enum indicates whether a session needs to be established over a
+ * suitable transport that meets certain payload size requirements for
+ * transmitted messages.
+ *
+ */
+enum class TransportPayloadCapability : uint8_t
+{
+    kMRPPayload,               // Transport requires the maximum payload size to fit within a single
+                               // IPv6 packet(1280 bytes).
+    kLargePayload,             // Transport needs to handle payloads larger than the single IPv6
+                               // packet, as supported by MRP. The transport of choice, in this
+                               // case, is TCP.
+    kMRPOrTCPCompatiblePayload // This option provides the ability to use MRP
+                               // as the preferred transport, but use a large
+                               // payload transport if that is already
+                               // available.
+};
 /**
  * @brief
  *  Tracks ownership of a encrypted packet buffer.
@@ -150,6 +172,10 @@ public:
     /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void SetConnectionDelegate(SessionConnectionDelegate * cb) { mConnDelegate = cb; }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     // Test-only: create a session on the fly.
     CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
@@ -319,7 +345,20 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * Expire all sessions for a given peer, as identified by a specific fabric
+     * index and node ID.
+     */
     void ExpireAllSessions(const ScopedNodeId & node);
+
+    /**
+     * Expire all sessions associated with the given fabric index.
+     *
+     * *NOTE* This is generally all sessions for a given fabric _EXCEPT_ if there are multiple
+     *        FabricInfo instances in the FabricTable that collide on the same logical fabric (i.e
+     *        root public key + fabric ID tuple).  This can ONLY happen if multiple controller
+     *        instances on the same fabric is permitted and each is assigned a unique fabric index.
+     */
     void ExpireAllSessionsForFabric(FabricIndex fabricIndex);
 
     /**
@@ -349,6 +388,12 @@ public:
     CHIP_ERROR ExpireAllSessionsOnLogicalFabric(FabricIndex fabricIndex);
 
     void ExpireAllPASESessions();
+
+    /**
+     * Expire all secure sessions.  See documentation for Shutdown on when it's
+     * appropriate to use this.
+     */
+    void ExpireAllSecureSessions();
 
     /**
      * @brief
@@ -396,6 +441,15 @@ public:
      * @brief
      *  Shutdown the Secure Session Manager. This terminates this instance
      *  of the object and reset it's state.
+     *
+     * The proper order of shutdown for SessionManager is as follows:
+     *
+     * 1) Call ExpireAllSecureSessions() on the SessionManager, and ensure that any unauthenticated
+     *    sessions (e.g. CASEServer and CASESessionManager instances, or anything that does PASE
+     *    handshakes) are released.
+     * 2) Shut down the exchange manager, so that it's no longer referencing
+     *    the to-be-shut-down SessionManager.
+     * 3) Shut down the SessionManager.
      */
     void Shutdown();
 
@@ -413,8 +467,34 @@ public:
      *
      * @param source    the source address of the package
      * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
+     * @param ctxt      pointer to additional context on the underlying transport. For TCP, it is a pointer
+     *                  to the underlying connection object.
      */
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * ctxt = nullptr) override;
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
+                          Transport::ActiveTCPConnectionState ** peerConnState);
+
+    CHIP_ERROR TCPDisconnect(const Transport::PeerAddress & peerAddress);
+
+    void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0);
+
+    void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn) override;
+
+    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
+
+    void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
+
+    // Functors for callbacks into higher layers
+    using OnTCPConnectionReceivedCallback = void (*)(Transport::ActiveTCPConnectionState * conn);
+
+    using OnTCPConnectionCompleteCallback = void (*)(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+
+    using OnTCPConnectionClosedCallback = void (*)(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
                                                          const ReliableMessageProtocolConfig & config)
@@ -436,8 +516,9 @@ public:
     // is returned. Otherwise, an Optional<SessionHandle> with no value set is returned.
     //
     //
-    Optional<SessionHandle> FindSecureSessionForNode(ScopedNodeId peerNodeId,
-                                                     const Optional<Transport::SecureSession::Type> & type = NullOptional);
+    Optional<SessionHandle>
+    FindSecureSessionForNode(ScopedNodeId peerNodeId, const Optional<Transport::SecureSession::Type> & type = NullOptional,
+                             TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     using SessionHandleCallback = bool (*)(void * context, SessionHandle & sessionHandle);
     CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);
@@ -477,7 +558,21 @@ private:
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;
+    OnTCPConnectionCompleteCallback mConnCompleteCb = nullptr;
+    OnTCPConnectionClosedCallback mConnClosedCb     = nullptr;
+
+    // Hold the TCPConnection callback context for the receiver application in the SessionManager.
+    // On receipt of a connection from a peer, the SessionManager
+    Transport::AppTCPConnectionCallbackCtxt * mServerTCPConnCbCtxt = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     SessionMessageDelegate * mCB = nullptr;
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    SessionConnectionDelegate * mConnDelegate = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
@@ -491,9 +586,11 @@ private:
      * If the message decrypts successfully, this will be filled with a fully decoded PacketHeader.
      * @param[in] peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
      * @param msg The full message buffer, including header fields.
+     * @param ctxt The pointer to additional context on the underlying transport. For TCP, it is a pointer
+     *             to the underlying connection object.
      */
     void SecureUnicastMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
-                                      System::PacketBufferHandle && msg);
+                                      System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt = nullptr);
 
     /**
      * @brief Parse, decrypt, validate, and dispatch a secure group message.
@@ -511,11 +608,17 @@ private:
      * @param partialPacketHeader The partial PacketHeader of the message after processing with DecodeFixed.
      * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
      * @param msg The full message buffer, including header fields.
+     * @param ctxt The pointer to additional context on the underlying transport. For TCP, it is a pointer
+     *             to the underlying connection object.
      */
     void UnauthenticatedMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
-                                        System::PacketBufferHandle && msg);
+                                        System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt = nullptr);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     static bool IsControlMessage(PayloadHeader & payloadHeader)
     {

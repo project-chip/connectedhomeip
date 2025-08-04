@@ -35,13 +35,16 @@ namespace Clusters {
 namespace EnergyEvse {
 
 // Spec-defined constraints
-constexpr int64_t kMinimumChargeCurrent         = 0;
-constexpr int64_t kMaximumChargeCurrent         = 80000;
+constexpr int64_t kMinimumChargeCurrentLimit    = 0;
 constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
+constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
+constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the EVSE Management Cluster.
  */
+class Instance;
+
 class Delegate
 {
 public:
@@ -49,6 +52,8 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     EndpointId GetEndpointId() { return mEndpointId; }
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+    Instance * GetInstance() { return mInstance; }
 
     /**
      * @brief Delegate should implement a handler to disable the EVSE.
@@ -80,6 +85,36 @@ public:
      * return other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status StartDiagnostics() = 0;
+
+    /**
+     * @brief Delegate should implement a handler for the SetTargets command.
+     * It should report Status::Success if successful and may
+     * return other Status codes if it fails
+     */
+    virtual Protocols::InteractionModel::Status
+    SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules) = 0;
+
+    /**
+     * @brief Delegate should implement a handler for LoadTargets
+     *
+     * This needs to load any stored targets into memory
+     */
+    virtual Protocols::InteractionModel::Status LoadTargets() = 0;
+
+    /**
+     * @brief Delegate should implement a handler for GetTargets
+     *
+     * @param[out]  The full targets structure
+     */
+    virtual Protocols::InteractionModel::Status
+    GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) = 0;
+
+    /**
+     * @brief Delegate should implement a handler for ClearTargets command.
+     * It should report Status::Success if successful and may
+     * return other Status codes if it fails
+     */
+    virtual Protocols::InteractionModel::Status ClearTargets() = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods
@@ -122,6 +157,7 @@ public:
 
 protected:
     EndpointId mEndpointId = 0;
+    Instance * mInstance   = nullptr;
 };
 
 enum class OptionalAttributes : uint32_t
@@ -147,8 +183,13 @@ public:
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
+        mDelegate.SetInstance(this);
     }
-    ~Instance() { Shutdown(); }
+    ~Instance()
+    {
+        mDelegate.SetInstance(nullptr);
+        Shutdown();
+    }
 
     CHIP_ERROR Init();
     void Shutdown();
@@ -178,6 +219,10 @@ private:
     void HandleSetTargets(HandlerContext & ctx, const Commands::SetTargets::DecodableType & commandData);
     void HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData);
     void HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData);
+
+    // Check that the targets are valid
+    Protocols::InteractionModel::Status
+    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 };
 
 } // namespace EnergyEvse

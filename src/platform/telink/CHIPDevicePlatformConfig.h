@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -87,18 +87,31 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING
 #endif
 
+#ifdef CONFIG_NET_L2_OPENTHREAD
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD CONFIG_NET_L2_OPENTHREAD
-
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI 0
+#else
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD 0
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#ifdef CONFIG_WIFI_W91
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI CONFIG_WIFI_W91
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 #else
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
+#endif
+
+// telink platform does not support ethernet yet, but we need this config defined as we share the Zephyr platform
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#define CHIP_DEVICE_CONFIG_ENABLE_ETHERNET 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+
+#if defined(CONFIG_SOC_RISCV_TELINK_TL321X) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE (256)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE (256)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (256)
 #endif
 
 #ifdef CONFIG_BT
@@ -132,6 +145,8 @@
 #if !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 /// Use mallinfo() to obtain the heap usage statistics exposed by SoftwareDiagnostics cluster attributes.
 #define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 1
+#else
+#define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 0
 #endif // !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 #endif // CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
 

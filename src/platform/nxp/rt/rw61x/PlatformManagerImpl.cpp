@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
- *    Copyright 2023 NXP
+ *    Copyright 2023, 2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"
-#include "fsl_adapter_rng.h"
 #include "fsl_os_abstraction.h"
 #include "fwk_platform_coex.h"
 #include <crypto/CHIPCryptoPAL.h>
@@ -38,7 +37,7 @@
 
 #include <lwip/tcpip.h>
 
-#include MBEDTLS_PORT_INCLUDE
+#include "els_pkc_mbedtls.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OtaSupport.h"
@@ -50,6 +49,12 @@
 #endif
 
 extern "C" void BOARD_InitHardware(void);
+extern "C" void otPlatSetResetFunction(void (*fp)(void));
+extern "C" void initiateResetInIdle(void);
+
+extern "C" {
+#include "osa.h"
+}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -73,13 +78,6 @@ extern "C" void vApplicationMallocFailedHook(void)
 {
     ChipLogError(DeviceLayer, "Malloc Failure");
 }
-
-#if !CHIP_DEVICE_CONFIG_ENABLE_WPA
-extern "C" void vApplicationIdleHook(void)
-{
-    chip::DeviceLayer::PlatformManagerImpl::IdleHook();
-}
-#endif
 
 extern "C" void __wrap_exit(int __status)
 {
@@ -110,7 +108,6 @@ void PlatformManagerImpl::HardwareInit(void)
 CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 {
     status_t status;
-    hal_rng_status_t rngStatus;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
     status = CRYPTO_InitHardware();
@@ -194,9 +191,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = ServiceInit();
     SuccessOrExit(err);
 
-#ifdef SPINEL_INTERFACE_RPMSG
-    otPlatRadioInitSpinelInterface();
-#endif /* SPINEL_INTERFACE_RPMSG */
     PLATFORM_InitOt();
     /*
      * Initialize the RCP here: the WiFi initialization requires to enable/disable
@@ -205,10 +199,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
      */
     otPlatLogInit();
     otPlatRadioInit();
+    otPlatSetResetFunction(initiateResetInIdle);
+    otPlatRandomInit();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    osError = os_setup_idle_function(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
+    osError = OSA_SetupIdleFunction(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Failed to setup idle function");
@@ -216,6 +211,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     err = WiFiInterfaceInit();
 
     if (err != CHIP_NO_ERROR)
@@ -232,6 +228,12 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
 #endif
+
+#if CONFIG_CHIP_ETHERNET
+    /* Initialize platform services */
+    err = ServiceInit();
+    SuccessOrExit(err);
+#endif // CONFIG_CHIP_ETHERNET
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -305,6 +307,22 @@ void PlatformManagerImpl::ScheduleResetInIdle(void)
 bool PlatformManagerImpl::GetResetInIdleValue(void)
 {
     return resetInIdle;
+}
+
+extern "C" void initiateResetInIdle(void)
+{
+    PlatformMgr().Shutdown();
+    PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+extern "C" void scheduleResetInIdle(void)
+{
+    PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+extern "C" bool getResetInIdleValue(void)
+{
+    return PlatformMgrImpl().GetResetInIdleValue();
 }
 
 void PlatformManagerImpl::StopBLEConnectivity(void) {}

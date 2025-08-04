@@ -1,6 +1,8 @@
+-r requirements.setuppayload.txt
+
 jsonschema>=4.4.0
 cbor2>=5.4.3
 ecdsa>=0.18.0
 qrcode==7.4.2
-bitarray==2.6.0
 python_stdnum==1.18
+typing-extensions>=4.6.0

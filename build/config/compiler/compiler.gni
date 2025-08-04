@@ -30,11 +30,11 @@ declare_args() {
   symbol_level = 2
 
   # Enable position independent code (-fPIC).
-  enable_pic =
-      current_os == "linux" || current_os == "mac" || current_os == "android"
+  enable_pic = current_os == "linux" || current_os == "mac" ||
+               current_os == "android" || current_os == "tizen"
 
   # Enable position independent executables (-pie).
-  enable_pie = current_os == "linux"
+  enable_pie = current_os == "linux" || current_os == "tizen"
 
   # Remove unwind tables from the binary to save space.
   exclude_unwind_tables = current_os != "android"
@@ -47,6 +47,9 @@ declare_args() {
 
   # enable libfuzzer
   is_libfuzzer = false
+
+  # Remove all symbol table and relocation information from the binary.
+  strip_symbols = false
 
   # Generate code coverage analysis artifacts when enabled.
   use_coverage = false

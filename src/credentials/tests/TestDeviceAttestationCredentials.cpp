@@ -15,6 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <credentials/CHIPCert.h>
@@ -22,19 +25,20 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 #include "CHIPAttCert_test_vectors.h"
+
+#include <fstream>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -48,49 +52,55 @@ static const ByteSpan kExpectedPaiPublicKey = DevelopmentCerts::kPaiPublicKey;
 
 } // namespace
 
-static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inContext)
+struct TestDeviceAttestationCredentials : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Providers)
 {
     uint8_t der_cert_buf[kMaxDERCertLength];
     MutableByteSpan der_cert_span(der_cert_buf);
 
     // Make sure default provider exists and is not implemented on at least one method
     DeviceAttestationCredentialsProvider * default_provider = GetDeviceAttestationCredentialsProvider();
-    NL_TEST_ASSERT(inSuite, default_provider != nullptr);
+    ASSERT_NE(default_provider, nullptr);
 
     CHIP_ERROR err = default_provider->GetDeviceAttestationCert(der_cert_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(err, CHIP_ERROR_NOT_IMPLEMENTED);
 
     // Replace default provider with example provider
     DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
-    NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
-    NL_TEST_ASSERT(inSuite, default_provider != example_dac_provider);
+    ASSERT_NE(example_dac_provider, nullptr);
+    EXPECT_NE(default_provider, example_dac_provider);
 
     SetDeviceAttestationCredentialsProvider(example_dac_provider);
     default_provider = GetDeviceAttestationCredentialsProvider();
-    NL_TEST_ASSERT(inSuite, default_provider == example_dac_provider);
+    EXPECT_EQ(default_provider, example_dac_provider);
 
     // Make sure DAC is what we expect, by validating public key
     memset(der_cert_span.data(), 0, der_cert_span.size());
     err = example_dac_provider->GetDeviceAttestationCert(der_cert_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     P256PublicKey dac_public_key;
     err = ExtractPubkeyFromX509Cert(der_cert_span, dac_public_key);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, dac_public_key.Length() == kExpectedDacPublicKey.size());
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(dac_public_key.Length(), kExpectedDacPublicKey.size());
+    EXPECT_EQ(0, memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
 
     // Make sure PAI is what we expect, by validating public key
     der_cert_span = MutableByteSpan{ der_cert_span };
     memset(der_cert_span.data(), 0, der_cert_span.size());
     err = example_dac_provider->GetProductAttestationIntermediateCert(der_cert_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     P256PublicKey pai_public_key;
     err = ExtractPubkeyFromX509Cert(der_cert_span, pai_public_key);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pai_public_key.Length() == kExpectedPaiPublicKey.size());
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey.data(), kExpectedPaiPublicKey.size()));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(pai_public_key.Length(), kExpectedPaiPublicKey.size());
+    EXPECT_EQ(0, memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey.data(), kExpectedPaiPublicKey.size()));
 
     // Check for CD presence
     uint8_t other_data_buf[kMaxCMSSignedCDMessage];
@@ -98,35 +108,35 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
     memset(other_data_span.data(), 0, other_data_span.size());
 
     err = example_dac_provider->GetCertificationDeclaration(other_data_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, other_data_span.size() > 0);
-    NL_TEST_ASSERT(inSuite, other_data_span.data()[0] != 0);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_GT(other_data_span.size(), 0u);
+    EXPECT_NE(other_data_span.data()[0], 0);
 
     // Check for firmware information presence
     other_data_span = MutableByteSpan{ other_data_buf };
     memset(other_data_span.data(), 0, other_data_span.size());
 
     err = example_dac_provider->GetFirmwareInformation(other_data_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, other_data_span.size() == 0);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(other_data_span.size(), 0u);
 }
 
-static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Signature)
 {
     constexpr uint8_t kExampleMessage[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12,
                                             0x13, 0x14, 0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25,
                                             0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
 
     DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
-    NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
+    ASSERT_NE(example_dac_provider, nullptr);
 
     // Sign using the example attestation private key
     P256ECDSASignature da_signature;
     MutableByteSpan out_sig_span(da_signature.Bytes(), da_signature.Capacity());
     CHIP_ERROR err = example_dac_provider->SignWithDeviceAttestationKey(ByteSpan{ kExampleMessage }, out_sig_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, out_sig_span.size() == kP256_ECDSA_Signature_Length_Raw);
+    EXPECT_EQ(out_sig_span.size(), kP256_ECDSA_Signature_Length_Raw);
     da_signature.SetLength(out_sig_span.size());
 
     // Get DAC from the provider
@@ -135,18 +145,18 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
 
     memset(dac_cert_span.data(), 0, dac_cert_span.size());
     err = example_dac_provider->GetDeviceAttestationCert(dac_cert_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Extract public key from DAC, prior to signature verification
     P256PublicKey dac_public_key;
     err = ExtractPubkeyFromX509Cert(dac_cert_span, dac_public_key);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, dac_public_key.Length() == kExpectedDacPublicKey.size());
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(dac_public_key.Length(), kExpectedDacPublicKey.size());
+    EXPECT_EQ(memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()), 0);
 
     // Verify round trip signature
     err = dac_public_key.ECDSA_validate_msg_signature(&kExampleMessage[0], sizeof(kExampleMessage), da_signature);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
 static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
@@ -156,7 +166,7 @@ static void OnAttestationInformationVerificationCallback(void * context, const D
     *pResult                                = result;
 }
 
-static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_AttestationInfoVerification)
 {
     uint8_t attestationElementsTestVector[] = {
         0x15, 0x30, 0x01, 0xeb, 0x30, 0x81, 0xe8, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x81,
@@ -191,20 +201,32 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
 
     // Make sure default verifier exists and is not implemented on at least one method
     DeviceAttestationVerifier * default_verifier = GetDeviceAttestationVerifier();
-    NL_TEST_ASSERT(inSuite, default_verifier != nullptr);
+    ASSERT_NE(default_verifier, nullptr);
 
     AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
     ByteSpan emptyByteSpan;
     attestationResult = default_verifier->ValidateCertificationDeclarationSignature(ByteSpan(), emptyByteSpan);
-    NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kNotImplemented);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kNotImplemented);
 
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
-    NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
-    NL_TEST_ASSERT(inSuite, default_verifier != example_dac_verifier);
+    DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    DeviceAttestationVerifier * example_dac_verifier =
+        GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
+    ASSERT_NE(example_dac_verifier, nullptr);
+    EXPECT_NE(default_verifier, example_dac_verifier);
+
+    example_dac_verifier->EnableCdTestKeySupport(false);
+    EXPECT_FALSE(example_dac_verifier->AreVerboseLogsEnabled());
+    EXPECT_FALSE(example_dac_verifier->IsCdTestKeySupported());
+
+    example_dac_verifier->EnableCdTestKeySupport(true);
+    EXPECT_TRUE(example_dac_verifier->IsCdTestKeySupported());
+
+    example_dac_verifier->EnableVerboseLogs(true);
+    EXPECT_TRUE(example_dac_verifier->AreVerboseLogsEnabled());
 
     SetDeviceAttestationVerifier(example_dac_verifier);
     default_verifier = GetDeviceAttestationVerifier();
-    NL_TEST_ASSERT(inSuite, default_verifier == example_dac_verifier);
+    EXPECT_EQ(default_verifier, example_dac_verifier);
 
     attestationResult = AttestationVerificationResult::kNotImplemented;
     Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationInformationVerificationCallback(
@@ -216,10 +238,10 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
         static_cast<VendorId>(0xFFF1), 0x8000);
     default_verifier->VerifyAttestationInformation(info, &attestationInformationVerificationCallback);
 
-    NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kSuccess);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 }
 
-static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_CertDeclarationVerification)
 {
     // -> format_version = 1
     // -> vendor_id = 0xFFF1
@@ -257,12 +279,14 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     };
 
     // Replace default verifier with example verifier
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
-    NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
+    DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    DeviceAttestationVerifier * example_dac_verifier =
+        GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
+    ASSERT_NE(example_dac_verifier, nullptr);
 
     SetDeviceAttestationVerifier(example_dac_verifier);
     DeviceAttestationVerifier * default_verifier = GetDeviceAttestationVerifier();
-    NL_TEST_ASSERT(inSuite, default_verifier == example_dac_verifier);
+    EXPECT_EQ(default_verifier, example_dac_verifier);
 
     // Check for CD presence
     uint8_t cd_data_buf[kMaxCMSSignedCDMessage] = { 0 };
@@ -271,9 +295,9 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     ByteSpan cd_payload;
     AttestationVerificationResult attestation_result =
         default_verifier->ValidateCertificationDeclarationSignature(ByteSpan(sTest_CD), cd_payload);
-    NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
+    EXPECT_EQ(attestation_result, AttestationVerificationResult::kSuccess);
 
-    NL_TEST_ASSERT(inSuite, cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));
+    EXPECT_TRUE(cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));
 
     DeviceInfoForAttestation deviceInfo{
         .vendorId     = sTestCMS_CertElements.VendorId,
@@ -285,10 +309,10 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
         .paaVendorId  = sTestCMS_CertElements.VendorId,
     };
     attestation_result = default_verifier->ValidateCertificateDeclarationPayload(cd_payload, ByteSpan(), deviceInfo);
-    NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
+    EXPECT_EQ(attestation_result, AttestationVerificationResult::kSuccess);
 }
 
-static void TestDACVerifierExample_NocsrInformationVerification(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_NocsrInformationVerification)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -334,26 +358,28 @@ static void TestDACVerifierExample_NocsrInformationVerification(nlTestSuite * in
                                                  0xf8, 0x5d, 0xca, 0xb2, 0x01, 0x9a, 0x0a, 0xb6, 0xf5, 0x59, 0x57, 0x75, 0xfe,
                                                  0x8d, 0x85, 0xfb, 0xd7, 0xa0, 0x7c, 0x8e, 0x83, 0x7d, 0xa4, 0xd5, 0xa8, 0xb9 };
 
-    DeviceAttestationVerifier * exampleDacVerifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
-    NL_TEST_ASSERT(inSuite, exampleDacVerifier != nullptr);
+    DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    DeviceAttestationVerifier * exampleDacVerifier =
+        GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
+    ASSERT_NE(exampleDacVerifier, nullptr);
 
     P256PublicKey dacPubkey;
-    NL_TEST_ASSERT(inSuite, sizeof(attestationPublicKey) == dacPubkey.Length());
+    EXPECT_EQ(sizeof(attestationPublicKey), dacPubkey.Length());
     memcpy(dacPubkey.Bytes(), attestationPublicKey, dacPubkey.Length());
 
     err = exampleDacVerifier->VerifyNodeOperationalCSRInformation(
         ByteSpan(nocsrElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
         dacPubkey, ByteSpan(csrNonceTestVector));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // now test with invalid signature
     err = exampleDacVerifier->VerifyNodeOperationalCSRInformation(
         ByteSpan(nocsrElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(wrongAttestationSignatureTestVector),
         dacPubkey, ByteSpan(csrNonceTestVector));
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_SIGNATURE);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_SIGNATURE);
 }
 
-static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestAttestationTrustStore)
 {
     // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
     ByteSpan kPaaFFF1BadSkidSpan1{ TestCerts::sTestCert_PAA_FFF1_Cert.data(), TestCerts::sTestCert_PAA_FFF1_Cert.size() - 1 };
@@ -383,7 +409,7 @@ static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
     };
 
     const AttestationTrustStore * testAttestationTrustStore = GetTestAttestationTrustStore();
-    NL_TEST_ASSERT(inSuite, testAttestationTrustStore != nullptr);
+    ASSERT_NE(testAttestationTrustStore, nullptr);
 
     for (const auto & testCase : kTestCases)
     {
@@ -397,68 +423,232 @@ static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
 
         // Try to obtain cert
         CHIP_ERROR result = testAttestationTrustStore->GetProductAttestationAuthorityCert(testCase.skidSpan, paaCertSpan);
-        NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
+        EXPECT_EQ(result, testCase.expectedResult);
 
         // In success cases, make sure the cert matches expectation.
         if (testCase.expectedResult == CHIP_NO_ERROR)
         {
-            NL_TEST_ASSERT(inSuite, paaCertSpan.data_equal(testCase.expectedCertSpan) == true);
+            EXPECT_TRUE(paaCertSpan.data_equal(testCase.expectedCertSpan));
         }
     }
 }
 
-/**
- *  Set up the test suite.
- */
-int TestDeviceAttestation_Setup(void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
 {
-    CHIP_ERROR error = chip::Platform::MemoryInit();
+    uint8_t attestationElementsTestVector[]  = { 0 };
+    uint8_t attestationChallengeTestVector[] = { 0 };
+    uint8_t attestationSignatureTestVector[] = { 0 };
+    uint8_t attestationNonceTestVector[]     = { 0 };
 
-    if (error != CHIP_NO_ERROR)
+    // Details for TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert
+    //    Issuer: MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw
+    //    AKID: AF42B7094DEBD515EC6ECF33B81115225F325288
+    //    Serial Number: 0C694F7F866067B2
+    //
+    // Details for TestCerts::sTestCert_PAI_FFF1_8000_Cert
+    //    Issuer: MDAxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBQTEUMBIGCisGAQQBgqJ8AgEMBEZGRjE=
+    //    AKID: 6AFD22771F511FECBF1641976710DCDC31A1717E
+    //    Serial Number: 3E6CE6509AD840CD1
+    Credentials::DeviceAttestationVerifier::AttestationInfo info(
+        ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
+        TestCerts::sTestCert_PAI_FFF1_8000_Cert, TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, ByteSpan(attestationNonceTestVector),
+        static_cast<VendorId>(0xFFF1), 0x8000);
+
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kNotImplemented;
+
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationInformationVerificationCallback(
+        OnAttestationInformationVerificationCallback, &attestationResult);
+
+    TestDACRevocationDelegateImpl revocationDelegateImpl;
+
+    // Test without revocation data
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test empty json
+    revocationDelegateImpl.SetDeviceAttestationRevocationData("");
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test DAC is revoked, crl signer is PAI itself
+    const char * jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
+
+    // Test PAI is revoked, crl signer is PAA itself
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "6AFD22771F511FECBF1641976710DCDC31A1717E",
+        "issuer_name": "MDAxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBQTEUMBIGCisGAQQBgqJ8AgEMBEZGRjE=",
+        "crl_signer_cert": "MIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQNUKWDUU/MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNVHSMEGDAWgBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/g8j51RFtlM5CBpHmUkpxyqvChVI1A0DTVFLJd4=",
+        "revoked_serial_numbers": ["3E6CE6509AD840CD"]
+    }]
+    )";
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaiRevoked);
+
+    // Test DAC and PAI both revoked, crl signers are PAI and PAA respectively
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    },
     {
-        return FAILURE;
-    }
+        "type": "revocation_set",
+        "issuer_subject_key_id": "6AFD22771F511FECBF1641976710DCDC31A1717E",
+        "issuer_name": "MDAxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBQTEUMBIGCisGAQQBgqJ8AgEMBEZGRjE=",
+        "crl_signer_cert": "MIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQNUKWDUU/MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNVHSMEGDAWgBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/g8j51RFtlM5CBpHmUkpxyqvChVI1A0DTVFLJd4=",
+        "revoked_serial_numbers": ["3E6CE6509AD840CD"]
+    }]
+    )";
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaiAndDacRevoked);
 
-    return SUCCESS;
+    // Test with another test DAC and PAI
+    Credentials::DeviceAttestationVerifier::AttestationInfo FFF2_8001_info(
+        ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
+        TestCerts::sTestCert_PAI_FFF2_8001_Cert, TestCerts::sTestCert_DAC_FFF2_8001_0008_Cert, ByteSpan(attestationNonceTestVector),
+        static_cast<VendorId>(0xFFF2), 0x8001);
+    revocationDelegateImpl.CheckForRevokedDACChain(FFF2_8001_info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test issuer does not match
+    // crl_signer_cert is not valid and just used for testing
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "BF42B7094DEBD515EC6ECF33B81115225F325289",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQNUKWDUU/MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNVHSMEGDAWgBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/g8j51RFtlM5CBpHmUkpxyqvChVI1A0DTVFLJd4=",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test subject key ID does not match
+    // crl_signer_cert is not valid and just used for testing
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "BF42B7094DEBD515EC6ECF33B81115225F325289",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQNUKWDUU/MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNVHSMEGDAWgBRq/SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/g8j51RFtlM5CBpHmUkpxyqvChVI1A0DTVFLJd4=",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test serial number does not match
+    // crl_signer_cert is not valid and just used for testing
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+        "revoked_serial_numbers": ["3E6CE6509AD840CD1", "BC694F7F866067B1"]
+    }]
+    )";
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test starting serial number bytes match but not all,
+    // crl_signer_cert is not valid and just used for testing
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+        "revoked_serial_numbers": ["0C694F7F866067B21234"]
+    }]
+    )";
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test DAC is revoked, and crl signer delegator is present
+    // crl_signer_cert is not valid and just used for testing
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+        "crl_signer_delegator": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
+
+    // Test with invalid crl signer cert missing begin and end cert markers
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2MjgxNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ=="
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // test with malformed crl signer certificate
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "crl_signer_cert": "MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwPNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3QgUEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7zeO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETETi+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+
+    revocationDelegateImpl.SetDeviceAttestationRevocationData(jsonData);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    revocationDelegateImpl.ClearDeviceAttestationRevocationData();
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 }
 
-/**
- *  Tear down the test suite.
- */
-int TestDeviceAttestation_Teardown(void * inContext)
+TEST(DeviceAttestationVerifier, GetAttestationResultDescriptionWorks)
 {
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
+    ASSERT_STREQ(GetAttestationResultDescription(AttestationVerificationResult::kSuccess), "Success");
+    ASSERT_STREQ(GetAttestationResultDescription(AttestationVerificationResult::kPaiAndDacRevoked), "Both PAI and DAC are revoked");
+    ASSERT_STREQ(GetAttestationResultDescription(static_cast<AttestationVerificationResult>(UINT16_MAX)),
+                 "<AttestationVerificationResult does not have a description!>");
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] = {
-    NL_TEST_DEF("Test Example Device Attestation Credentials Providers", TestDACProvidersExample_Providers),
-    NL_TEST_DEF("Test Example Device Attestation Signature", TestDACProvidersExample_Signature),
-    NL_TEST_DEF("Test the 'for testing' Paa Root Store", TestAttestationTrustStore),
-    NL_TEST_DEF("Test Example Device Attestation Information Verification", TestDACVerifierExample_AttestationInfoVerification),
-    NL_TEST_DEF("Test Example Device Attestation Certification Declaration Verification", TestDACVerifierExample_CertDeclarationVerification),
-    NL_TEST_DEF("Test Example Device Attestation Node Operational CSR Information Verification", TestDACVerifierExample_NocsrInformationVerification),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int TestDeviceAttestation()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "Device Attestation Credentials",
-        &sTests[0],
-        TestDeviceAttestation_Setup,
-        TestDeviceAttestation_Teardown
-    };
-    // clang-format on
-    nlTestRunner(&theSuite, nullptr);
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestDeviceAttestation);

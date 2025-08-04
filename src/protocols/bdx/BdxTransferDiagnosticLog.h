@@ -18,13 +18,16 @@
 
 #pragma once
 
-#include <protocols/bdx/BdxTransferDiagnosticLogPool.h>
+#include <lib/core/DataModelTypes.h>
 #include <protocols/bdx/BdxTransferProxyDiagnosticLog.h>
+#include <protocols/bdx/BdxTransferServerDelegate.h>
 #include <protocols/bdx/TransferFacilitator.h>
 #include <system/SystemLayer.h>
 
 namespace chip {
 namespace bdx {
+
+class BdxTransferDiagnosticLogPoolDelegate;
 
 class BdxTransferDiagnosticLog : public Responder
 {
@@ -44,6 +47,13 @@ public:
     void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override;
 
     void OnExchangeClosing(Messaging::ExchangeContext * ec) override;
+
+    /**
+     * Lifetime management, to allow us to abort transfers when a fabric
+     * identity is being shut down.
+     */
+    bool IsForFabric(FabricIndex fabricIndex) const;
+    void AbortTransfer();
 
 protected:
     /**

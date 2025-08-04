@@ -55,8 +55,8 @@ public:
 
 CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(buf == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(gPrivateHeap != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(gPrivateHeap == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     PrivateHeapInit(buf, bufSize);
     gPrivateHeap = buf;

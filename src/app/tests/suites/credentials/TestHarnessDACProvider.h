@@ -33,6 +33,7 @@ struct TestHarnessDACProviderData
     chip::Optional<ByteSpan> firmwareInformation;
     chip::Optional<CharSpan> description;
     chip::Optional<bool> isSuccessCase;
+    chip::Optional<uint16_t> pid;
 };
 
 class TestHarnessDACProvider : public DeviceAttestationCredentialsProvider
@@ -47,6 +48,7 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override;
     CharSpan GetDescription() { return mDescription; }
     bool IsSuccessCase() { return mIsSuccessCase; }
+    uint16_t GetPid() { return mPid; }
 
     void Init(const char * filepath);
     void Init(const TestHarnessDACProviderData & data);
@@ -60,6 +62,7 @@ private:
     ByteSpan mFirmwareInformation;
     CharSpan mDescription;
     bool mIsSuccessCase;
+    uint16_t mPid;
 };
 
 } // namespace Examples

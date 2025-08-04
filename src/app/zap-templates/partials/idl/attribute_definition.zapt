@@ -1,11 +1,15 @@
-{{#if mustUseTimedWrite~}}
+{{#if apiMaturity~}}
+    {{apiMaturity}} {{!marker to place a space even with whitespace removal~}}
+{{~/if~}}
+{{~#if mustUseTimedWrite~}}
     timedwrite {{!marker to place a space even with whitespace removal~}}
 {{~/if~}}
 {{~#unless isWritableAttribute~}}
   readonly {{!marker to place a space even with whitespace removal~}}
 {{~/unless~}}
-{{~!TODO: write only attributes should also be supported~}}
-{{~#unless isReportableAttribute~}}
+{{~#unless isReadableAttribute~}}
+  writeonly {{!marker to place a space even with whitespace removal~}}
+{{~/unless~}}{{~#unless isReportableAttribute~}}
   nosubscribe {{!marker to place a space even with whitespace removal~}}
 {{~/unless~}}
 {{~!Removes spaces~}} attribute {{!ensure space}}
@@ -35,3 +39,5 @@
         {{~code~}}
      {{/if~}}
   ;
+
+{{~!remove newline at end of file~}}

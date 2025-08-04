@@ -26,7 +26,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/ESP32/SystemTimeSupport.h>
 
 #include <esp_timer.h>
 
@@ -50,10 +49,7 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
-    // TODO(19081): This platform does not properly error out if wall clock has
-    //              not been set.  For now, short circuit this.
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#if 0
+#ifdef CONFIG_ENABLE_SNTP_TIME_SYNC
     struct timeval tv;
     if (gettimeofday(&tv, nullptr) != 0)
     {
@@ -70,7 +66,9 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
     aCurTime = Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
     return CHIP_NO_ERROR;
-#endif
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CONFIG_ENABLE_SNTP_TIME_SYNC
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
@@ -95,24 +93,12 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
         const time_t timep = tv.tv_sec;
         struct tm calendar;
         localtime_r(&timep, &calendar);
-        ChipLogProgress(DeviceLayer, "Real time clock set to %lld (%04d/%02d/%02d %02d:%02d:%02d UTC)",
-                        static_cast<long long>(tv.tv_sec), calendar.tm_year, calendar.tm_mon, calendar.tm_mday, calendar.tm_hour,
-                        calendar.tm_min, calendar.tm_sec);
+        char time_str[64];
+        strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S UTC", &calendar);
+        ChipLogProgress(DeviceLayer, "Real time clock set to %ld (%s)", static_cast<long>(tv.tv_sec), time_str);
     }
 #endif // CHIP_PROGRESS_LOGGING
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR InitClock_RealTime()
-{
-    Clock::Microseconds64 curTime =
-        Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
-    // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
-    // Then the RealTime obtained from GetClock_RealTime will be always valid.
-    //
-    // TODO(19081): This is broken because it causes the platform to report
-    //              that it does have wall clock time when it actually doesn't.
-    return System::SystemClock().SetClock_RealTime(curTime);
 }
 
 } // namespace Clock

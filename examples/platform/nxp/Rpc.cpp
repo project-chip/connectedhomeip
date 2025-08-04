@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "AppTask.h"
+#include "AppRpc.h"
 #include "FreeRTOS.h"
 #include "PigweedLogger.h"
 #include "PigweedLoggerMutex.h"
@@ -43,8 +43,14 @@
 #include "pigweed/rpc_services/Locking.h"
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
+#ifndef RPC_TASK_STACK_SIZE
 #define RPC_TASK_STACK_SIZE 2048
+#endif
+
+#ifndef RPC_TASK_PRIORITY
 #define RPC_TASK_PRIORITY 1
+#endif
+
 TaskHandle_t RpcTaskHandle;
 
 namespace chip {
@@ -56,7 +62,7 @@ class NxpButton final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        GetAppTask().ButtonEventHandler(request.idx, request.idx);
+        chip::NXP::App::Rpc::ButtonHandler(request);
         return pw::OkStatus();
     }
 };
@@ -66,7 +72,7 @@ public:
 class NxpDevice final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
         mRebootTimer = xTimerCreate("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler);
         xTimerStart(mRebootTimer, pdMS_TO_TICKS(0));
@@ -77,7 +83,7 @@ private:
     static constexpr TickType_t kRebootTimerPeriodTicks = 300;
     TimerHandle_t mRebootTimer;
 
-    static void RebootHandler(TimerHandle_t) { NVIC_SystemReset(); }
+    static void RebootHandler(TimerHandle_t) { chip::NXP::App::Rpc::Reboot(); }
 };
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 

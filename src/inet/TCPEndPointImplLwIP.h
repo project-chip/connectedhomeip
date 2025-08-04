@@ -41,7 +41,7 @@ class TCPEndPointImplLwIP : public TCPEndPoint, public EndPointStateLwIP
 {
 public:
     TCPEndPointImplLwIP(EndPointManager<TCPEndPoint> & endPointManager) :
-        TCPEndPoint(endPointManager), mUnackedLength(0), mTCP(nullptr)
+        TCPEndPoint(endPointManager), mUnackedLength(0), mTCP(nullptr), mPreAllocatedConnectEP(nullptr)
     {}
 
     // TCPEndPoint overrides.
@@ -51,7 +51,7 @@ public:
     CHIP_ERROR EnableNoDelay() override;
     CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount) override;
     CHIP_ERROR DisableKeepAlive() override;
-    CHIP_ERROR AckReceive(uint16_t len) override;
+    CHIP_ERROR AckReceive(size_t len) override;
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     void TCPUserTimeoutHandler() override;
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
@@ -82,6 +82,9 @@ private:
     uint16_t mUnackedLength; // Amount sent but awaiting ACK. Used as a form of reference count
                              // to hang-on to backing packet buffers until they are no longer needed.
     tcp_pcb * mTCP;          // LwIP Transmission control protocol (TCP) control block.
+    // For TCP Listen endpoint, we will pre-allocate a connection endpoint to assign the incoming connection to it.
+    // when there is a new TCP connection established.
+    TCPEndPoint * mPreAllocatedConnectEP;
 
     uint16_t RemainingToSend();
     BufferOffset FindStartOfUnsent();

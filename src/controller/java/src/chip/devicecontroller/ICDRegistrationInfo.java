@@ -24,11 +24,20 @@ public class ICDRegistrationInfo {
   @Nullable private final Long checkInNodeId;
   @Nullable private final Long monitoredSubject;
   @Nullable private final byte[] symmetricKey;
+  @Nullable private final Integer clientType;
+  @Nullable private final Long stayActiveDurationMsec;
 
   private ICDRegistrationInfo(Builder builder) {
     this.checkInNodeId = builder.checkInNodeId;
     this.monitoredSubject = builder.monitoredSubject;
     this.symmetricKey = builder.symmetricKey;
+    this.clientType = builder.clientType;
+    this.stayActiveDurationMsec = builder.stayActiveDurationMsec;
+  }
+
+  /** Returns the duration period to stay active. */
+  public Long getICDStayActiveDurationMsec() {
+    return stayActiveDurationMsec;
   }
 
   /** Returns the check in node ID. */
@@ -46,6 +55,10 @@ public class ICDRegistrationInfo {
     return symmetricKey;
   }
 
+  public Integer getClientType() {
+    return clientType;
+  }
+
   public static Builder newBuilder() {
     return new Builder();
   }
@@ -55,6 +68,8 @@ public class ICDRegistrationInfo {
     @Nullable private Long checkInNodeId = null;
     @Nullable private Long monitoredSubject = null;
     @Nullable private byte[] symmetricKey = null;
+    @Nullable private Integer clientType = null;
+    @Nullable private Long stayActiveDurationMsec = null;
 
     private Builder() {}
 
@@ -78,6 +93,20 @@ public class ICDRegistrationInfo {
      */
     public Builder setSymmetricKey(byte[] symmetricKey) {
       this.symmetricKey = symmetricKey;
+      return this;
+    }
+
+    public Builder setClientType(Integer clientType) {
+      this.clientType = clientType;
+      return this;
+    }
+
+    /**
+     * Request LIT device to stay active for specific duration after commission completes, the upper
+     * bound is 30 seconds.
+     */
+    public Builder setICDStayActiveDurationMsec(Long stayActiveDurationMsec) {
+      this.stayActiveDurationMsec = stayActiveDurationMsec;
       return this;
     }
 

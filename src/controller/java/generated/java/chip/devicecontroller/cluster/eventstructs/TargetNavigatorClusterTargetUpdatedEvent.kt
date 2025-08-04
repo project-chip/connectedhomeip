@@ -27,7 +27,7 @@ class TargetNavigatorClusterTargetUpdatedEvent(
   val targetList:
     List<chip.devicecontroller.cluster.structs.TargetNavigatorClusterTargetInfoStruct>,
   val currentTarget: UInt,
-  val data: ByteArray
+  val data: ByteArray,
 ) {
   override fun toString(): String = buildString {
     append("TargetNavigatorClusterTargetUpdatedEvent {\n")
@@ -65,7 +65,7 @@ class TargetNavigatorClusterTargetUpdatedEvent(
             this.add(
               chip.devicecontroller.cluster.structs.TargetNavigatorClusterTargetInfoStruct.fromTlv(
                 AnonymousTag,
-                tlvReader
+                tlvReader,
               )
             )
           }

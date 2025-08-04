@@ -19,10 +19,11 @@
 #pragma once
 
 #include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <utility>
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -41,6 +42,7 @@ private:
     using ModeTagStructType               = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType ModeTagsIdle[1]     = { { .value = to_underlying(ModeTag::kIdle) } };
     ModeTagStructType ModeTagsCleaning[1] = { { .value = to_underlying(ModeTag::kCleaning) } };
+    ModeTagStructType ModeTagsMapping[1]  = { { .value = to_underlying(ModeTag::kMapping) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Idle"),
@@ -51,7 +53,7 @@ private:
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsCleaning) },
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Mapping"),
                                                  .mode     = ModeMapping,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) },
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
     };
 
     CHIP_ERROR Init() override;
@@ -119,3 +121,23 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+chip::app::Clusters::ModeBase::Instance * getRvcRunModeInstance();
+
+chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer);
+chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                     const EmberAfAttributeMetadata * attributeMetadata,
+                                                                     uint8_t * buffer, uint16_t maxReadLength);
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                        const EmberAfAttributeMetadata * attributeMetadata,
+                                                                        uint8_t * buffer);
+chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                       const EmberAfAttributeMetadata * attributeMetadata,
+                                                                       uint8_t * buffer, uint16_t maxReadLength);
+#endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER

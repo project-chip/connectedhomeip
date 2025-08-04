@@ -16,15 +16,17 @@
  */
 
 #include <stdio.h>
+#include <string>
+
+#include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
-#include <nlunit-test.h>
 
 namespace {
 
@@ -34,7 +36,12 @@ using namespace chip::app;
 
 constexpr uint32_t kImplicitProfileId = 0x1122;
 
-nlTestSuite * gSuite;
+class TestJsonToTlvToJson : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
 
 void PrintSpan(const char * prefix, const ByteSpan & span)
 {
@@ -54,10 +61,10 @@ void CheckValidConversion(const std::string & jsonOriginal, const ByteSpan & tlv
     uint8_t buf[256];
     MutableByteSpan tlvEncodingLocal(buf);
     err = JsonToTlv(jsonOriginal, tlvEncodingLocal);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     match = tlvEncodingLocal.data_equal(tlvEncoding);
-    NL_TEST_ASSERT(gSuite, match);
+    EXPECT_TRUE(match);
     if (!match)
     {
         printf("ERROR: TLV Encoding Doesn't Match!\n");
@@ -67,12 +74,12 @@ void CheckValidConversion(const std::string & jsonOriginal, const ByteSpan & tlv
 
     std::string generatedJsonString;
     err = TlvToJson(tlvEncoding, generatedJsonString);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     auto compactExpectedString  = PrettyPrintJsonString(jsonExpected);
     auto compactGeneratedString = PrettyPrintJsonString(generatedJsonString);
     match                       = (compactGeneratedString == compactExpectedString);
-    NL_TEST_ASSERT(gSuite, match);
+    EXPECT_TRUE(match);
     if (!match)
     {
         printf("ERROR: Json String Doesn't Match!\n");
@@ -83,10 +90,10 @@ void CheckValidConversion(const std::string & jsonOriginal, const ByteSpan & tlv
     // Verify that Expected Json String Converts to the Same TLV Encoding
     tlvEncodingLocal = MutableByteSpan(buf);
     err              = JsonToTlv(jsonOriginal, tlvEncodingLocal);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     match = tlvEncodingLocal.data_equal(tlvEncoding);
-    NL_TEST_ASSERT(gSuite, match);
+    EXPECT_TRUE(match);
     if (!match)
     {
         printf("ERROR: TLV Encoding Doesn't Match!\n");
@@ -96,19 +103,18 @@ void CheckValidConversion(const std::string & jsonOriginal, const ByteSpan & tlv
 }
 
 // Boolean true
-void TestConverter_Boolean_True(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Boolean_True)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:BOOL\" : true\n"
@@ -119,19 +125,18 @@ void TestConverter_Boolean_True(nlTestSuite * inSuite, void * inContext)
 }
 
 // Signed Integer 42, 1-octet
-void TestConverter_SignedInt_1BytePositive(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_SignedInt_1BytePositive)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<int8_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), static_cast<int8_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"2:INT\" : 42\n"
@@ -142,19 +147,18 @@ void TestConverter_SignedInt_1BytePositive(nlTestSuite * inSuite, void * inConte
 }
 
 // Signed Integer -17, 1-octet
-void TestConverter_SignedInt_1ByteNegative(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_SignedInt_1ByteNegative)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(3), static_cast<int8_t>(-17)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(3), static_cast<int8_t>(-17)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"3:INT\" : -17\n"
@@ -165,19 +169,18 @@ void TestConverter_SignedInt_1ByteNegative(nlTestSuite * inSuite, void * inConte
 }
 
 // Unsigned Integer 42, 1-octet
-void TestConverter_UnsignedInt_1Byte(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_UnsignedInt_1Byte)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(4), static_cast<uint8_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(4), static_cast<uint8_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"value:4:UINT\" : 42\n"
@@ -192,19 +195,18 @@ void TestConverter_UnsignedInt_1Byte(nlTestSuite * inSuite, void * inContext)
 }
 
 // Signed Integer 4242, 2-octet
-void TestConverter_SignedInt_2Bytes(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_SignedInt_2Bytes)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(7), static_cast<int16_t>(4242)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(7), static_cast<int16_t>(4242)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"7:INT\" : 4242\n"
@@ -215,19 +217,18 @@ void TestConverter_SignedInt_2Bytes(nlTestSuite * inSuite, void * inContext)
 }
 
 // Signed Integer -170000, 4-octet
-void TestConverter_SignedInt_4Bytes(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_SignedInt_4Bytes)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(80), static_cast<int32_t>(-170000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(80), static_cast<int32_t>(-170000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"80:INT\" : -170000\n"
@@ -238,19 +239,18 @@ void TestConverter_SignedInt_4Bytes(nlTestSuite * inSuite, void * inContext)
 }
 
 // Signed Long Integer (int64_t) 40000000000, 8-octet
-void TestConverter_SignedInt_8Bytes(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_SignedInt_8Bytes)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(202), static_cast<int64_t>(40000000000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(202), static_cast<int64_t>(40000000000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"202:INT\" : \"40000000000\"\n"
@@ -261,19 +261,18 @@ void TestConverter_SignedInt_8Bytes(nlTestSuite * inSuite, void * inContext)
 }
 
 // Unsigned Long Integer (uint64_t) 40000000000, 8-octet
-void TestConverter_UnsignedInt_8Bytes(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_UnsignedInt_8Bytes)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(222), static_cast<uint64_t>(40000000000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(222), static_cast<uint64_t>(40000000000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"222:UINT\" : \"40000000000\"\n"
@@ -284,19 +283,18 @@ void TestConverter_UnsignedInt_8Bytes(nlTestSuite * inSuite, void * inContext)
 }
 
 // UTF-8 String, 1-octet length, "Hello!"
-void TestConverter_UTF8String_Hello(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_UTF8String_Hello)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::ContextTag(0), "Hello!"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(0), "Hello!"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"0:STRING\" : \"Hello!\"\n"
@@ -307,9 +305,8 @@ void TestConverter_UTF8String_Hello(nlTestSuite * inSuite, void * inContext)
 }
 
 // Octet String, 1-octet length, octets { 00 01 02 03 04 }
-void TestConverter_OctetString(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_OctetString)
 {
-    gSuite = inSuite;
 
     uint8_t v[] = { 0, 1, 2, 3, 4 };
     uint8_t buf[256];
@@ -317,10 +314,10 @@ void TestConverter_OctetString(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutBytes(TLV::ContextTag(1), v, sizeof(v)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutBytes(TLV::ContextTag(1), v, sizeof(v)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:BYTES\" : \"AAECAwQ=\"\n"
@@ -331,19 +328,18 @@ void TestConverter_OctetString(nlTestSuite * inSuite, void * inContext)
 }
 
 // Octet String, empty
-void TestConverter_OctetString_Empty(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_OctetString_Empty)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutBytes(TLV::ContextTag(1), nullptr, 0));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutBytes(TLV::ContextTag(1), nullptr, 0));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:BYTES\" : \"\"\n"
@@ -354,19 +350,18 @@ void TestConverter_OctetString_Empty(nlTestSuite * inSuite, void * inContext)
 }
 
 // Null
-void TestConverter_Null(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Null)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutNull(TLV::ContextTag(1)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutNull(TLV::ContextTag(1)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:NULL\" : null\n"
@@ -377,19 +372,18 @@ void TestConverter_Null(nlTestSuite * inSuite, void * inContext)
 }
 
 // Single precision floating point 0.0
-void TestConverter_Float_0(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Float_0)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), static_cast<float>(0.0)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), static_cast<float>(0.0)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:FLOAT\" : 0.0\n"
@@ -400,19 +394,18 @@ void TestConverter_Float_0(nlTestSuite * inSuite, void * inContext)
 }
 
 // Single precision floating point (1.0 / 3.0)
-void TestConverter_Float_1third(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Float_1third)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(100), static_cast<float>(1.0 / 3.0)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(100), static_cast<float>(1.0 / 3.0)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString   = "{\n"
                                "   \"100:FLOAT\" : 0.33333334\n"
@@ -426,19 +419,18 @@ void TestConverter_Float_1third(nlTestSuite * inSuite, void * inContext)
 }
 
 // Single precision floating point 17.9
-void TestConverter_Float_17_9(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Float_17_9)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), static_cast<float>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(101), static_cast<float>(17.9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString   = "{\n"
                                "   \"101:FLOAT\" : 17.9\n"
@@ -452,19 +444,18 @@ void TestConverter_Float_17_9(nlTestSuite * inSuite, void * inContext)
 }
 
 // Single precision floating point positive infinity
-void TestConverter_Float_PositiveInfinity(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Float_PositiveInfinity)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), std::numeric_limits<float>::infinity()));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(101), std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"101:FLOAT\" : \"Infinity\"\n"
@@ -475,19 +466,18 @@ void TestConverter_Float_PositiveInfinity(nlTestSuite * inSuite, void * inContex
 }
 
 // Single precision floating point negative infinity
-void TestConverter_Float_NegativeInfinity(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Float_NegativeInfinity)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), -std::numeric_limits<float>::infinity()));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(101), -std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"101:FLOAT\" : \"-Infinity\"\n"
@@ -498,19 +488,18 @@ void TestConverter_Float_NegativeInfinity(nlTestSuite * inSuite, void * inContex
 }
 
 // Double precision floating point 0.0
-void TestConverter_Double_0(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Double_0)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), static_cast<double>(0.0)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), static_cast<double>(0.0)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:DOUBLE\" : 0.0\n"
@@ -521,19 +510,18 @@ void TestConverter_Double_0(nlTestSuite * inSuite, void * inContext)
 }
 
 // Double precision floating point (1.0 / 3.0)
-void TestConverter_Double_1third(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Double_1third)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(100), static_cast<double>(1.0 / 3.0)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(100), static_cast<double>(1.0 / 3.0)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"100:DOUBLE\" : 0.33333333333333331\n"
@@ -544,19 +532,18 @@ void TestConverter_Double_1third(nlTestSuite * inSuite, void * inContext)
 }
 
 // Double precision floating point 17.9
-void TestConverter_Double_17_9(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Double_17_9)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), static_cast<double>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(101), static_cast<double>(17.9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"101:DOUBLE\" : 17.899999999999999\n"
@@ -567,19 +554,18 @@ void TestConverter_Double_17_9(nlTestSuite * inSuite, void * inContext)
 }
 
 // Double precision floating point positive infinity
-void TestConverter_Double_PositiveInfinity(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Double_PositiveInfinity)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), std::numeric_limits<double>::infinity()));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(101), std::numeric_limits<double>::infinity()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"101:DOUBLE\" : \"Infinity\"\n"
@@ -590,19 +576,18 @@ void TestConverter_Double_PositiveInfinity(nlTestSuite * inSuite, void * inConte
 }
 
 // Double precision floating point negative infinity
-void TestConverter_Double_NegativeInfinity(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Double_NegativeInfinity)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(101), -std::numeric_limits<double>::infinity()));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(101), -std::numeric_limits<double>::infinity()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"101:DOUBLE\" : \"-Infinity\"\n"
@@ -613,18 +598,17 @@ void TestConverter_Double_NegativeInfinity(nlTestSuite * inSuite, void * inConte
 }
 
 // Empty Top-Level Structure, {}
-void TestConverter_Structure_TopLevelEmpty(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Structure_TopLevelEmpty)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{ }";
 
@@ -633,9 +617,8 @@ void TestConverter_Structure_TopLevelEmpty(nlTestSuite * inSuite, void * inConte
 }
 
 // Empty Nested Structure, { {} }
-void TestConverter_Structure_NestedEmpty(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Structure_NestedEmpty)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -643,11 +626,11 @@ void TestConverter_Structure_NestedEmpty(nlTestSuite * inSuite, void * inContext
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:STRUCT\" : { }\n"
@@ -658,9 +641,8 @@ void TestConverter_Structure_NestedEmpty(nlTestSuite * inSuite, void * inContext
 }
 
 // Empty Array, { [] }
-void TestConverter_Array_Empty(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Empty)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -668,11 +650,11 @@ void TestConverter_Array_Empty(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:ARRAY-?\" : []\n"
@@ -682,9 +664,8 @@ void TestConverter_Array_Empty(nlTestSuite * inSuite, void * inContext)
     CheckValidConversion(jsonString, tlvSpan, jsonString);
 }
 
-void TestConverter_Array_Empty_ImplicitProfileTag2(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Empty_ImplicitProfileTag2)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -695,13 +676,12 @@ void TestConverter_Array_Empty_ImplicitProfileTag2(nlTestSuite * inSuite, void *
     writer.Init(buf);
     writer.ImplicitProfileId = kImplicitProfileId;
 
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite,
-                   CHIP_NO_ERROR ==
-                       writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 10000), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 10000), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString   = "{\n"
                                "   \"emptyarray:10000:ARRAY-?\" : []\n"
@@ -714,9 +694,8 @@ void TestConverter_Array_Empty_ImplicitProfileTag2(nlTestSuite * inSuite, void *
     CheckValidConversion(jsonString, tlvSpan, jsonExpected);
 }
 
-void TestConverter_Array_Empty_ImplicitProfileTag4(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Empty_ImplicitProfileTag4)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -727,14 +706,13 @@ void TestConverter_Array_Empty_ImplicitProfileTag4(nlTestSuite * inSuite, void *
     writer.Init(buf);
     writer.ImplicitProfileId = kImplicitProfileId;
 
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite,
-                   CHIP_NO_ERROR ==
-                       writer.StartContainer(TLV::ProfileTag((1000000 >> 16) & 0xFFFF, 0, 1000000 & 0xFFFF), TLV::kTLVType_Array,
-                                             containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(
+        CHIP_NO_ERROR,
+        writer.StartContainer(TLV::ProfileTag((1000000 >> 16) & 0xFFFF, 0, 1000000 & 0xFFFF), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1000000:ARRAY-?\" : []\n"
@@ -745,20 +723,19 @@ void TestConverter_Array_Empty_ImplicitProfileTag4(nlTestSuite * inSuite, void *
 }
 
 // Two Signed Integers with context specific tags: {0 = 42, 1 = -17}
-void TestConverter_IntsWithContextTags(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_IntsWithContextTags)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
     TLV::TLVType containerType;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int8_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), static_cast<int8_t>(-17)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), static_cast<int8_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), static_cast<int8_t>(-17)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"0:INT\" : 42,\n"
@@ -770,9 +747,8 @@ void TestConverter_IntsWithContextTags(nlTestSuite * inSuite, void * inContext)
 }
 
 // Structure with Two Signed Integers with context specific tags: { {0 = 42, 1 = -17} }
-void TestConverter_Struct_IntsWithContextTags(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Struct_IntsWithContextTags)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -780,13 +756,13 @@ void TestConverter_Struct_IntsWithContextTags(nlTestSuite * inSuite, void * inCo
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int8_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), static_cast<int8_t>(-17)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), static_cast<int8_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), static_cast<int8_t>(-17)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"0:STRUCT\" : {\n"
@@ -800,9 +776,8 @@ void TestConverter_Struct_IntsWithContextTags(nlTestSuite * inSuite, void * inCo
 }
 
 // Array of Signed Integers: { [0, 1, 2, 3, 4] }
-void TestConverter_Array_Ints(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Ints)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -810,16 +785,16 @@ void TestConverter_Array_Ints(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(0)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(1)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(2)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(3)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(4)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(0)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(1)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(2)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(3)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(4)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"0:ARRAY-INT\" : [\n"
@@ -836,9 +811,8 @@ void TestConverter_Array_Ints(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of Long Signed Integers: { [42, -17, -170000, 40000000000] }
-void TestConverter_Array_Ints2(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Ints2)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -846,15 +820,15 @@ void TestConverter_Array_Ints2(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(-17)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(-170000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(40000000000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(-17)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(-170000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(40000000000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"0:ARRAY-INT\" : [\n"
@@ -870,9 +844,8 @@ void TestConverter_Array_Ints2(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of Signed Integers with MIN/MAX values for each type int8_t/int16_t/int32_t/int64_t
-void TestConverter_Array_IntsMinMax(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_IntsMinMax)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -880,19 +853,19 @@ void TestConverter_Array_IntsMinMax(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT8_MIN)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT8_MAX)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT16_MIN)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT16_MAX)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT32_MIN)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT32_MAX)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT64_MIN)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT64_MAX)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT8_MIN)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT8_MAX)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT16_MIN)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT16_MAX)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT32_MIN)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT32_MAX)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT64_MIN)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(INT64_MAX)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString     = "{\n"
                                  "   \"0:ARRAY-INT\" : [\n"
@@ -924,9 +897,8 @@ void TestConverter_Array_IntsMinMax(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of Long Unsigned Integers: { [42, 170000, 40000000000] }
-void TestConverter_Array_UInts(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_UInts)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -934,14 +906,14 @@ void TestConverter_Array_UInts(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(170000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(40000000000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(170000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(40000000000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"0:ARRAY-UINT\" : [\n"
@@ -957,9 +929,8 @@ void TestConverter_Array_UInts(nlTestSuite * inSuite, void * inContext)
 
 // Array of Unsigned Integers, where each element represents MAX possible value for unsigned
 // integere types uint8_t, uint16_t, uint32_t, uint64_t: [0xFF, 0xFFFF, 0xFFFFFFFF, 0xFFFFFFFF_FFFFFFFF]
-void TestConverter_Array_UIntsMax(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_UIntsMax)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -967,15 +938,15 @@ void TestConverter_Array_UIntsMax(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(UINT8_MAX)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(UINT16_MAX)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint32_t>(UINT32_MAX)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(UINT64_MAX)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(UINT8_MAX)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(UINT16_MAX)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint32_t>(UINT32_MAX)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(UINT64_MAX)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString     = "{\n"
                                  "   \"0:ARRAY-UINT\" : [\n"
@@ -999,9 +970,8 @@ void TestConverter_Array_UIntsMax(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of Doubles: { [1.1, 134.2763, -12345.87] }
-void TestConverter_Array_Doubles(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Doubles)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1009,14 +979,14 @@ void TestConverter_Array_Doubles(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(1.1)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(134.2763)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(-12345.87)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<double>(1.1)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<double>(134.2763)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<double>(-12345.87)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString     = "{\n"
                                  "   \"0:ARRAY-DOUBLE\" : [\n"
@@ -1038,9 +1008,8 @@ void TestConverter_Array_Doubles(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of Floats: { [1.1, 134.2763, -12345.87] }
-void TestConverter_Array_Floats(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Floats)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1050,16 +1019,14 @@ void TestConverter_Array_Floats(nlTestSuite * inSuite, void * inContext)
     writer.Init(buf);
     writer.ImplicitProfileId = kImplicitProfileId;
 
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite,
-                   CHIP_NO_ERROR ==
-                       writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(1.1)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(134.2763)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<float>(-12345.87)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<float>(1.1)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<float>(134.2763)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<float>(-12345.87)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString     = "{\n"
                                  "   \"1000:ARRAY-FLOAT\" : [\n"
@@ -1081,9 +1048,8 @@ void TestConverter_Array_Floats(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of Strings: ["ABC", "Options", "more"]
-void TestConverter_Array_Strings(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Strings)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1093,17 +1059,16 @@ void TestConverter_Array_Strings(nlTestSuite * inSuite, void * inContext)
     writer.Init(buf);
     writer.ImplicitProfileId = kImplicitProfileId;
 
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite,
-                   CHIP_NO_ERROR ==
-                       writer.StartContainer(TLV::ProfileTag((100000 >> 16) & 0xFFFF, 0, 100000 & 0xFFFF), TLV::kTLVType_Array,
-                                             containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "ABC"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "Options"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "more"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(
+        CHIP_NO_ERROR,
+        writer.StartContainer(TLV::ProfileTag((100000 >> 16) & 0xFFFF, 0, 100000 & 0xFFFF), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::AnonymousTag(), "ABC"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::AnonymousTag(), "Options"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::AnonymousTag(), "more"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"100000:ARRAY-STRING\" : [\n"
@@ -1118,9 +1083,8 @@ void TestConverter_Array_Strings(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of Booleans: [true, false, false]
-void TestConverter_Array_Booleans(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Booleans)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1128,14 +1092,14 @@ void TestConverter_Array_Booleans(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(255), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), false));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), false));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(255), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), false));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), false));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"255:ARRAY-BOOL\" : [\n"
@@ -1150,9 +1114,8 @@ void TestConverter_Array_Booleans(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of Nulls: [null, null]
-void TestConverter_Array_Nulls(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Nulls)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1160,13 +1123,13 @@ void TestConverter_Array_Nulls(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutNull(TLV::AnonymousTag()));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutNull(TLV::AnonymousTag()));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutNull(TLV::AnonymousTag()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutNull(TLV::AnonymousTag()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"1:ARRAY-NULL\" : [\n"
@@ -1180,9 +1143,8 @@ void TestConverter_Array_Nulls(nlTestSuite * inSuite, void * inContext)
 }
 
 // Context tag 255 (max), Unsigned Integer, 1-octet value: {255 = 42U}
-void TestConverter_Struct_UInt(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Struct_UInt)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1190,12 +1152,12 @@ void TestConverter_Struct_UInt(nlTestSuite * inSuite, void * inContext)
     TLV::TLVType containerType2;
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(255), static_cast<uint8_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(255), static_cast<uint8_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString   = "{\n"
                                "   \"value:0:STRUCT\" : {\n"
@@ -1214,9 +1176,8 @@ void TestConverter_Struct_UInt(nlTestSuite * inSuite, void * inContext)
 
 // Context and Common Profile tags, Unsigned Integer structure: {255 = 42, 256 = 17000, 65535 =
 // 1, 65536 = 345678, 4294967295 = 500000000000}
-void TestConverter_Struct_MixedTags(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Struct_MixedTags)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1226,16 +1187,16 @@ void TestConverter_Struct_MixedTags(nlTestSuite * inSuite, void * inContext)
     writer.Init(buf);
     writer.ImplicitProfileId = kImplicitProfileId;
 
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(255), static_cast<uint64_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0x0001u, 0, 0), static_cast<uint64_t>(345678)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 256), static_cast<uint64_t>(17000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0xFFFFu, 0, 0xFFFFu), static_cast<uint64_t>(500000000000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(kImplicitProfileId, 65535), static_cast<uint64_t>(1)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(255), static_cast<uint64_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ProfileTag(0x0001u, 0, 0), static_cast<uint64_t>(345678)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ProfileTag(kImplicitProfileId, 256), static_cast<uint64_t>(17000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ProfileTag(0xFFFFu, 0, 0xFFFFu), static_cast<uint64_t>(500000000000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ProfileTag(kImplicitProfileId, 65535), static_cast<uint64_t>(1)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"0:STRUCT\" : {\n"
@@ -1252,9 +1213,8 @@ void TestConverter_Struct_MixedTags(nlTestSuite * inSuite, void * inContext)
 }
 
 // Structure with mixed elements
-void TestConverter_Struct_MixedElements(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Struct_MixedElements)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1263,22 +1223,20 @@ void TestConverter_Struct_MixedElements(nlTestSuite * inSuite, void * inContext)
     char bytes[] = "Test ByteString Value";
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int64_t>(20)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<uint64_t>(0)));
-    NL_TEST_ASSERT(
-        gSuite,
-        CHIP_NO_ERROR ==
-            writer.PutBytes(TLV::ContextTag(3), reinterpret_cast<uint8_t *>(bytes), static_cast<uint32_t>(strlen(bytes))));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::ContextTag(4), "hello"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(5), static_cast<int64_t>(-500000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(6), static_cast<double>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(7), static_cast<float>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), static_cast<int64_t>(20)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), static_cast<uint64_t>(0)));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              writer.PutBytes(TLV::ContextTag(3), reinterpret_cast<uint8_t *>(bytes), static_cast<uint32_t>(strlen(bytes))));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(4), "hello"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(5), static_cast<int64_t>(-500000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(6), static_cast<double>(17.9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(7), static_cast<float>(17.9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString     = "{\n"
                                  "   \"c:0:STRUCT\" : {\n"
@@ -1310,9 +1268,8 @@ void TestConverter_Struct_MixedElements(nlTestSuite * inSuite, void * inContext)
 }
 
 // Array of structures with mixed elements
-void TestConverter_Array_Structures(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Array_Structures)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1325,39 +1282,33 @@ void TestConverter_Array_Structures(nlTestSuite * inSuite, void * inContext)
     writer.Init(buf);
     writer.ImplicitProfileId = kImplicitProfileId;
 
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite,
-                   CHIP_NO_ERROR ==
-                       writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int64_t>(20)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<uint64_t>(0)));
-    NL_TEST_ASSERT(
-        gSuite,
-        CHIP_NO_ERROR ==
-            writer.PutBytes(TLV::ContextTag(3), reinterpret_cast<uint8_t *>(bytes1), static_cast<uint32_t>(strlen(bytes1))));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::ContextTag(4), "hello1"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(5), static_cast<int64_t>(-500000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(6), static_cast<double>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(7), static_cast<float>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int64_t>(-10)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), false));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<uint64_t>(128)));
-    NL_TEST_ASSERT(
-        gSuite,
-        CHIP_NO_ERROR ==
-            writer.PutBytes(TLV::ContextTag(3), reinterpret_cast<uint8_t *>(bytes2), static_cast<uint32_t>(strlen(bytes2))));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::ContextTag(4), "hello2"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(5), static_cast<int64_t>(40000000000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(6), static_cast<double>(-1754.923)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(7), static_cast<float>(97.945)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ProfileTag(kImplicitProfileId, 1000), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), static_cast<int64_t>(20)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), static_cast<uint64_t>(0)));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              writer.PutBytes(TLV::ContextTag(3), reinterpret_cast<uint8_t *>(bytes1), static_cast<uint32_t>(strlen(bytes1))));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(4), "hello1"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(5), static_cast<int64_t>(-500000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(6), static_cast<double>(17.9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(7), static_cast<float>(17.9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), static_cast<int64_t>(-10)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), false));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), static_cast<uint64_t>(128)));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              writer.PutBytes(TLV::ContextTag(3), reinterpret_cast<uint8_t *>(bytes2), static_cast<uint32_t>(strlen(bytes2))));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(4), "hello2"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(5), static_cast<int64_t>(40000000000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(6), static_cast<double>(-1754.923)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(7), static_cast<float>(97.945)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString     = "{\n"
                                  "   \"1000:ARRAY-STRUCT\": [\n"
@@ -1413,9 +1364,8 @@ void TestConverter_Array_Structures(nlTestSuite * inSuite, void * inContext)
 }
 
 // Top level with mixed elements
-void TestConverter_TopLevel_MixedElements(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_TopLevel_MixedElements)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1425,39 +1375,37 @@ void TestConverter_TopLevel_MixedElements(nlTestSuite * inSuite, void * inContex
     char bytes[] = "Test array member 0";
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int64_t>(42)));
-    NL_TEST_ASSERT(
-        gSuite,
-        CHIP_NO_ERROR ==
-            writer.PutBytes(TLV::ContextTag(1), reinterpret_cast<uint8_t *>(bytes), static_cast<uint32_t>(strlen(bytes))));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<double>(156.398)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(3), static_cast<uint64_t>(73709551615)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(4), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutNull(TLV::ContextTag(5)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(6), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::ContextTag(1), "John"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<uint64_t>(34)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(3), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Array, containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(5)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(10)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(5), TLV::kTLVType_Array, containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "Ammy"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "David"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "Larry"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(6), TLV::kTLVType_Array, containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), false));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(7), static_cast<float>(0.0)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), static_cast<int64_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              writer.PutBytes(TLV::ContextTag(1), reinterpret_cast<uint8_t *>(bytes), static_cast<uint32_t>(strlen(bytes))));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), static_cast<double>(156.398)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(3), static_cast<uint64_t>(73709551615)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(4), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutNull(TLV::ContextTag(5)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(6), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(1), "John"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), static_cast<uint64_t>(34)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(3), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Array, containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(5)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(10)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(5), TLV::kTLVType_Array, containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::AnonymousTag(), "Ammy"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::AnonymousTag(), "David"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::AnonymousTag(), "Larry"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(6), TLV::kTLVType_Array, containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), false));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(7), static_cast<float>(0.0)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString   = "{\n"
                                "   \"value:0:INT\": 42,\n"
@@ -1523,9 +1471,8 @@ void TestConverter_TopLevel_MixedElements(nlTestSuite * inSuite, void * inContex
 }
 
 // Complex Structure from README
-void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Structure_FromReadme)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1538,53 +1485,51 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
     char bytes4[]    = "Test Bytes";
 
     writer.Init(buf);
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int8_t>(8)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(0), static_cast<int8_t>(12)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), false));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::ContextTag(2), "example"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<int64_t>(40000000000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(3), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(5), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(1.1)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(134.2763)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(-12345.87)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), std::numeric_limits<double>::infinity()));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(62534)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<double>(-62534)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(6), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutBytes(TLV::AnonymousTag(), bytes1, static_cast<uint32_t>(sizeof(bytes1))));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutBytes(TLV::AnonymousTag(), bytes2, static_cast<uint32_t>(sizeof(bytes2))));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutBytes(TLV::AnonymousTag(), bytes3, static_cast<uint32_t>(sizeof(bytes3))));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(
-        gSuite,
-        CHIP_NO_ERROR ==
-            writer.PutBytes(TLV::ContextTag(7), reinterpret_cast<uint8_t *>(bytes4), static_cast<uint32_t>(strlen(bytes4))));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(8), static_cast<double>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(9), static_cast<float>(17.9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(10), -std::numeric_limits<float>::infinity()));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(11), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::ContextTag(1), "John"));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(2), static_cast<uint32_t>(34)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(3), true));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Array, containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(5)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(9)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(10)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType3));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), static_cast<int8_t>(8)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), static_cast<int8_t>(12)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), false));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(2), "example"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), static_cast<int64_t>(40000000000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(3), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(5), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<double>(1.1)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<double>(134.2763)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<double>(-12345.87)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), std::numeric_limits<double>::infinity()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<double>(62534)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<double>(-62534)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(6), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutBytes(TLV::AnonymousTag(), bytes1, static_cast<uint32_t>(sizeof(bytes1))));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutBytes(TLV::AnonymousTag(), bytes2, static_cast<uint32_t>(sizeof(bytes2))));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutBytes(TLV::AnonymousTag(), bytes3, static_cast<uint32_t>(sizeof(bytes3))));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              writer.PutBytes(TLV::ContextTag(7), reinterpret_cast<uint8_t *>(bytes4), static_cast<uint32_t>(strlen(bytes4))));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(8), static_cast<double>(17.9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(9), static_cast<float>(17.9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(10), -std::numeric_limits<float>::infinity()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(11), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(1), "John"));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), static_cast<uint32_t>(34)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(3), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Array, containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(5)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(9)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int8_t>(10)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType3));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
 
     std::string jsonString   = "{\n"
                                "   \"0:ARRAY-STRUCT\" : [\n"
@@ -1677,7 +1622,7 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
     CheckValidConversion(jsonString, tlvSpan, jsonExpected);
 }
 
-void TestConverter_TlvToJson_ErrorCases(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_TlvToJson_ErrorCases)
 {
     CHIP_ERROR err;
     TLV::TLVWriter writer;
@@ -1693,48 +1638,48 @@ void TestConverter_TlvToJson_ErrorCases(nlTestSuite * inSuite, void * inContext)
 
     uint8_t buf1[32];
     writer.Init(buf1);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::CommonTag(1), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), true));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::CommonTag(1), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
     ByteSpan topLevelStructWithTag(buf1, writer.GetLengthWritten());
 
     uint8_t buf2[32];
     writer.Init(buf2);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), true));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
     ByteSpan topLevelIsArray(buf2, writer.GetLengthWritten());
 
     uint8_t buf3[32];
     writer.Init(buf3);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_List, containerType2));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::ContextTag(1), true));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_List, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(1), true));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
     ByteSpan usingList(buf3, writer.GetLengthWritten());
 
     uint8_t buf8[32];
     writer.Init(buf8);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Array, containerType2));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(42)));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(-170000)));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(42456)));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Array, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<int64_t>(-170000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::AnonymousTag(), static_cast<uint64_t>(42456)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
     ByteSpan arrayWithMixedElements(buf8, writer.GetLengthWritten());
 
     uint8_t buf9[32];
     writer.Init(buf9);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0xFEED, 234), static_cast<uint64_t>(42)));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ProfileTag(0xFEED, 234), static_cast<uint64_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
     ByteSpan useFullyQualifiedTag(buf9, writer.GetLengthWritten());
 
     // clang-format off
@@ -1753,11 +1698,11 @@ void TestConverter_TlvToJson_ErrorCases(nlTestSuite * inSuite, void * inContext)
     {
         std::string jsonString;
         err = TlvToJson(testCase.nEncodedTlv, jsonString);
-        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
+        EXPECT_EQ(err, testCase.mExpectedResult);
     }
 }
 
-void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_JsonToTlv_ErrorCases)
 {
     CHIP_ERROR err;
 
@@ -1871,7 +1816,7 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
         uint8_t buf[256];
         MutableByteSpan tlvSpan(buf);
         err = JsonToTlv(testCase.mJsonString, tlvSpan);
-        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
+        EXPECT_EQ(err, testCase.mExpectedResult);
 #if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
         if (err != testCase.mExpectedResult)
         {
@@ -1886,9 +1831,8 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
 }
 
 // Full Qualified Profile tags, Unsigned Integer structure: {65536 = 42, 4294901760 = 17000, 4294967295 = 500000000000}
-void TestConverter_Struct_MEITags(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestJsonToTlvToJson, TestConverter_Struct_MEITags)
 {
-    gSuite = inSuite;
 
     uint8_t buf[256];
     TLV::TLVWriter writer;
@@ -1898,14 +1842,14 @@ void TestConverter_Struct_MEITags(nlTestSuite * inSuite, void * inContext)
     writer.Init(buf);
     writer.ImplicitProfileId = kImplicitProfileId;
 
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0xFFFFu, 0, 0), static_cast<uint64_t>(17000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0x0001u, 0, 0), static_cast<uint64_t>(42)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0xFFFFu, 0, 0xFFFFu), static_cast<uint64_t>(500000000000)));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
-    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ProfileTag(0xFFFFu, 0, 0), static_cast<uint64_t>(17000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ProfileTag(0x0001u, 0, 0), static_cast<uint64_t>(42)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ProfileTag(0xFFFFu, 0, 0xFFFFu), static_cast<uint64_t>(500000000000)));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType2));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
 
     std::string jsonString = "{\n"
                              "   \"0:STRUCT\" : {\n"
@@ -1918,84 +1862,4 @@ void TestConverter_Struct_MEITags(nlTestSuite * inSuite, void * inContext)
     ByteSpan tlvSpan(buf, writer.GetLengthWritten());
     CheckValidConversion(jsonString, tlvSpan, jsonString);
 }
-
-int Initialize(void * apSuite)
-{
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-int Finalize(void * aContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("Test Json Tlv Converter - Boolean True", TestConverter_Boolean_True),
-    NL_TEST_DEF("Test Json Tlv Converter - Signed Integer 1-Byte Positive", TestConverter_SignedInt_1BytePositive),
-    NL_TEST_DEF("Test Json Tlv Converter - Signed Integer 1-Byte Negative", TestConverter_SignedInt_1ByteNegative),
-    NL_TEST_DEF("Test Json Tlv Converter - Unsigned Integer 1-Byte", TestConverter_UnsignedInt_1Byte),
-    NL_TEST_DEF("Test Json Tlv Converter - Signed Integer 2-Bytes", TestConverter_SignedInt_2Bytes),
-    NL_TEST_DEF("Test Json Tlv Converter - Signed Integer 4-Bytes", TestConverter_SignedInt_4Bytes),
-    NL_TEST_DEF("Test Json Tlv Converter - Signed Integer 8-Bytes", TestConverter_SignedInt_8Bytes),
-    NL_TEST_DEF("Test Json Tlv Converter - Unsigned Integer 8-Bytes", TestConverter_UnsignedInt_8Bytes),
-    NL_TEST_DEF("Test Json Tlv Converter - UTF-8 String Hello!", TestConverter_UTF8String_Hello),
-    NL_TEST_DEF("Test Json Tlv Converter - Octet String", TestConverter_OctetString),
-    NL_TEST_DEF("Test Json Tlv Converter - Empty Octet String", TestConverter_OctetString_Empty),
-    NL_TEST_DEF("Test Json Tlv Converter - Null", TestConverter_Null),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision 0.0", TestConverter_Float_0),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision 1/3", TestConverter_Float_1third),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision 17.9", TestConverter_Float_17_9),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision Positive Infinity",
-                TestConverter_Float_PositiveInfinity),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision Negative Infinity",
-                TestConverter_Float_NegativeInfinity),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision 0.0", TestConverter_Double_0),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision 1/3", TestConverter_Double_1third),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision 17.9", TestConverter_Double_17_9),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision Positive Infinity",
-                TestConverter_Double_PositiveInfinity),
-    NL_TEST_DEF("Test Json Tlv Converter - Floating Point Double Precision Negative Infinity",
-                TestConverter_Double_NegativeInfinity),
-    NL_TEST_DEF("Test Json Tlv Converter - Structure Top-Level Empty", TestConverter_Structure_TopLevelEmpty),
-    NL_TEST_DEF("Test Json Tlv Converter - Structure Nested Empty", TestConverter_Structure_NestedEmpty),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Empty", TestConverter_Array_Empty),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Empty with Implicit Profile Tag (length 2)",
-                TestConverter_Array_Empty_ImplicitProfileTag2),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Empty with Implicit Profile Tag (length 4)",
-                TestConverter_Array_Empty_ImplicitProfileTag4),
-    NL_TEST_DEF("Test Json Tlv Converter - Two Signed Integers", TestConverter_IntsWithContextTags),
-    NL_TEST_DEF("Test Json Tlv Converter - Structure With Two Signed Integers", TestConverter_Struct_IntsWithContextTags),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Signed Integers", TestConverter_Array_Ints),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Long Signed Integers", TestConverter_Array_Ints2),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Min/Max Signed Integers", TestConverter_Array_IntsMinMax),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Long Unsigned Integers", TestConverter_Array_UInts),
-    NL_TEST_DEF("Test Json Tlv Converter - Array of Unsigned Integers with Max values", TestConverter_Array_UIntsMax),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Doubles", TestConverter_Array_Doubles),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Floats", TestConverter_Array_Floats),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Strings", TestConverter_Array_Strings),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Booleans", TestConverter_Array_Booleans),
-    NL_TEST_DEF("Test Json Tlv Converter - Array Of Nulls", TestConverter_Array_Nulls),
-    NL_TEST_DEF("Test Json Tlv Converter - Structure with Unsigned Integer", TestConverter_Struct_UInt),
-    NL_TEST_DEF("Test Json Tlv Converter - Structure Elements with Mixed Tags", TestConverter_Struct_MixedTags),
-    NL_TEST_DEF("Test Json Tlv Converter - Structure with Mixed Elements", TestConverter_Struct_MixedElements),
-    NL_TEST_DEF("Test Json Tlv Converter - Array of Structures with Mixed Elements", TestConverter_Array_Structures),
-    NL_TEST_DEF("Test Json Tlv Converter - Top-Level Structure with Mixed Elements", TestConverter_TopLevel_MixedElements),
-    NL_TEST_DEF("Test Json Tlv Converter - Complex Structure from the README File", TestConverter_Structure_FromReadme),
-    NL_TEST_DEF("Test Json Tlv Converter - Tlv to Json Error Cases", TestConverter_TlvToJson_ErrorCases),
-    NL_TEST_DEF("Test Json Tlv Converter - Json To Tlv Error Cases", TestConverter_JsonToTlv_ErrorCases),
-    NL_TEST_DEF("Test Json Tlv Converter - Structure with MEI Elements", TestConverter_Struct_MEITags),
-    NL_TEST_SENTINEL()
-};
-
 } // namespace
-
-int TestJsonToTlvToJson()
-{
-    nlTestSuite theSuite = { "JsonToTlvToJson", sTests, Initialize, Finalize };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestJsonToTlvToJson)

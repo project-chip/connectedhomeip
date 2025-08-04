@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <app/clusters/door-lock-server/door-lock-delegate.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <vector>
 
 struct LockUserInfo
@@ -38,10 +40,10 @@ struct WeekDaysScheduleInfo;
 struct YearDayScheduleInfo;
 struct HolidayScheduleInfo;
 
-static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
-static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES     = 6;
+static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 65;
+static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES     = 9;
 
-class LockEndpoint
+class LockEndpoint : public chip::app::Clusters::DoorLock::Delegate
 {
 public:
     LockEndpoint(chip::EndpointId endpointId, uint16_t numberOfLockUsersSupported, uint16_t numberOfCredentialsSupported,
@@ -60,6 +62,7 @@ public:
         }
         DoorLockServer::Instance().SetDoorState(endpointId, mDoorState);
         DoorLockServer::Instance().SetLockState(endpointId, mLockState);
+        chip::Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier, sizeof(mAliroReaderGroupSubIdentifier));
     }
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
@@ -100,6 +103,22 @@ public:
     DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
                          OperatingModeEnum operatingMode);
 
+    // DoorLock::Delegate API.
+    CHIP_ERROR GetAliroReaderVerificationKey(chip::MutableByteSpan & verificationKey) override;
+    CHIP_ERROR GetAliroReaderGroupIdentifier(chip::MutableByteSpan & groupIdentifier) override;
+    CHIP_ERROR GetAliroReaderGroupSubIdentifier(chip::MutableByteSpan & groupSubIdentifier) override;
+    CHIP_ERROR GetAliroExpeditedTransactionSupportedProtocolVersionAtIndex(size_t index,
+                                                                           chip::MutableByteSpan & protocolVersion) override;
+    CHIP_ERROR GetAliroGroupResolvingKey(chip::MutableByteSpan & groupResolvingKey) override;
+    CHIP_ERROR GetAliroSupportedBLEUWBProtocolVersionAtIndex(size_t index, chip::MutableByteSpan & protocolVersion) override;
+    uint8_t GetAliroBLEAdvertisingVersion() override;
+    uint16_t GetNumberOfAliroCredentialIssuerKeysSupported() override;
+    uint16_t GetNumberOfAliroEndpointKeysSupported() override;
+    CHIP_ERROR SetAliroReaderConfig(const chip::ByteSpan & signingKey, const chip::ByteSpan & verificationKey,
+                                    const chip::ByteSpan & groupIdentifier,
+                                    const chip::Optional<chip::ByteSpan> & groupResolvingKey) override;
+    CHIP_ERROR ClearAliroReaderConfig() override;
+
 private:
     bool setLockState(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId, DlLockState lockState,
                       const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
@@ -130,6 +149,14 @@ private:
     std::vector<std::vector<WeekDaysScheduleInfo>> mWeekDaySchedules;
     std::vector<std::vector<YearDayScheduleInfo>> mYearDaySchedules;
     std::vector<HolidayScheduleInfo> mHolidaySchedules;
+
+    // Actual Aliro state would presumably be stored somewhere else, and persistently; this
+    // example just stores it in memory for illustration purposes.
+    uint8_t mAliroReaderVerificationKey[chip::app::Clusters::DoorLock::kAliroReaderVerificationKeySize];
+    uint8_t mAliroReaderGroupIdentifier[chip::app::Clusters::DoorLock::kAliroReaderGroupIdentifierSize];
+    uint8_t mAliroReaderGroupSubIdentifier[chip::app::Clusters::DoorLock::kAliroReaderGroupSubIdentifierSize];
+    uint8_t mAliroGroupResolvingKey[chip::app::Clusters::DoorLock::kAliroGroupResolvingKeySize];
+    bool mAliroStateInitialized = false;
 };
 
 struct LockCredentialInfo

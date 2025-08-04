@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
-
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
+#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
+#include <lib/core/ClusterEnums.h>
 
 class ClusterCommand : public InteractionModelCommands, public ModelCommand, public chip::app::CommandSender::Callback
 {
@@ -53,6 +53,28 @@ public:
                            chip::CommandId commandId, const T & value)
     {
         return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value);
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId,
+                           const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Type & value)
+    {
+        ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
+        mPeerNodeId = chip::ScopedNodeId(device->GetDeviceId(), device->GetSecureSession().Value()->GetFabricIndex());
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId,
+                           const chip::app::Clusters::IcdManagement::Commands::RegisterClient::Type & value)
+    {
+        ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
+        mPeerNodeId       = chip::ScopedNodeId(device->GetDeviceId(), device->GetSecureSession().Value()->GetFabricIndex());
+        mCheckInNodeId    = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
+        mMonitoredSubject = value.monitoredSubject;
+        mClientType       = value.clientType;
+        memcpy(mICDSymmetricKey, value.key.data(), value.key.size());
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
@@ -99,15 +121,48 @@ public:
 
         if (data != nullptr)
         {
-            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
-
-            error = DataModelLogger::LogCommand(path, data);
+            {
+                // log a snapshot to not advance the data reader.
+                chip::TLV::TLVReader logTlvReader;
+                logTlvReader.Init(*data);
+                LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, &logTlvReader));
+                error = DataModelLogger::LogCommand(path, &logTlvReader);
+            }
             if (CHIP_NO_ERROR != error)
             {
                 ChipLogError(chipTool, "Response Failure: Can not decode Data");
                 mError = error;
                 return;
             }
+            if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
+                (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::Id))
+            {
+                // log a snapshot to not advance the data reader.
+                chip::TLV::TLVReader counterTlvReader;
+                counterTlvReader.Init(*data);
+                chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType value;
+                CHIP_ERROR err = chip::app::DataModel::Decode(counterTlvReader, value);
+                if (CHIP_NO_ERROR != err)
+                {
+                    ChipLogError(chipTool, "Failed to decode ICD counter: %" CHIP_ERROR_FORMAT, err.Format());
+                    return;
+                }
+                chip::app::ICDClientInfo clientInfo;
+
+                clientInfo.peer_node         = mPeerNodeId;
+                clientInfo.check_in_node     = mCheckInNodeId;
+                clientInfo.monitored_subject = mMonitoredSubject;
+                clientInfo.start_icd_counter = value.ICDCounter;
+                clientInfo.client_type       = mClientType;
+
+                StoreICDEntryWithKey(clientInfo, chip::ByteSpan(mICDSymmetricKey));
+            }
+        }
+
+        if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
+            (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id))
+        {
+            ClearICDEntry(mPeerNodeId);
         }
     }
 
@@ -208,6 +263,22 @@ protected:
 private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
+    // The scoped node ID to which RegisterClient and UnregisterClient command will be sent.  Not set for other commands.
+    chip::ScopedNodeId mPeerNodeId;
+    // The scoped node ID to which a Check-In message will be sent.  Only set for the RegisterClient command.
+    chip::ScopedNodeId mCheckInNodeId;
+
+    // Used to determine if a particular client has an active subscription for the given entry.
+    // The MonitoredSubject, when it is a NodeID, MAY be the same as the CheckInNodeID.
+    // The MonitoredSubject gives the registering client the flexibility of having a different
+    // CheckInNodeID from the MonitoredSubject.
+    uint64_t mMonitoredSubject = static_cast<uint64_t>(0);
+
+    // Client type of the client registering
+    chip::app::Clusters::IcdManagement::ClientTypeEnum mClientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
+
+    // Shared secret between the client and the ICD to encrypt the Check-In message.
+    uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;

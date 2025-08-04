@@ -76,7 +76,7 @@ class OpCredClientFragment : Fragment() {
   inner class ChipControllerCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {}
 
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+    override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
       Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
     }
 

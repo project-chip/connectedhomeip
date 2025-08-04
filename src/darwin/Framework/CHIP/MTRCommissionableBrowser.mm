@@ -20,13 +20,17 @@
 #import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRDeviceController.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
+#include <tracing/metric_macros.h>
 
 #include <controller/CHIPDeviceController.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/Darwin/BleUtils.h>
 
 using namespace chip::Dnssd;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <platform/Darwin/BleScannerDelegate.h>
@@ -34,6 +38,10 @@ using namespace chip::Ble;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 constexpr char kBleKey[] = "BLE";
+
+using namespace chip::Tracing::DarwinFramework;
+
+@class CBPeripheral;
 
 @implementation MTRCommissionableBrowserResultInterfaces
 @end
@@ -44,12 +52,13 @@ constexpr char kBleKey[] = "BLE";
 @property (nonatomic) NSNumber * productID;
 @property (nonatomic) NSNumber * discriminator;
 @property (nonatomic) BOOL commissioningMode;
+@property (nonatomic, strong, nullable) CBPeripheral * peripheral;
 @end
 
 @implementation MTRCommissionableBrowserResult
 @end
 
-class CommissionableBrowserInternal : public CommissioningResolveDelegate,
+class CommissionableBrowserInternal : public DiscoverNodeDelegate,
                                       public DnssdBrowseDelegate
 #if CONFIG_NETWORK_LAYER_BLE
     ,
@@ -57,6 +66,10 @@ class CommissionableBrowserInternal : public CommissioningResolveDelegate,
 #endif // CONFIG_NETWORK_LAYER_BLE
 {
 public:
+#if CONFIG_NETWORK_LAYER_BLE
+    id mBleScannerDelegateOwner;
+#endif // CONFIG_NETWORK_LAYER_BLE
+
     CHIP_ERROR Start(id<MTRCommissionableBrowserDelegate> delegate, MTRDeviceController * controller, dispatch_queue_t queue)
     {
         assertChipStackLockedByCurrentThread();
@@ -66,10 +79,15 @@ public:
         VerifyOrReturnError(mDispatchQueue == nil, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mDiscoveredResults == nil, CHIP_ERROR_INCORRECT_STATE);
 
+        VerifyOrReturnError(delegate != nil, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(queue != nil, CHIP_ERROR_INVALID_ARGUMENT);
+
         mDelegate = delegate;
         mController = controller;
         mDispatchQueue = queue;
         mDiscoveredResults = [[NSMutableDictionary alloc] init];
+        ResetCounters();
 
 #if CONFIG_NETWORK_LAYER_BLE
         ReturnErrorOnFailure(PlatformMgrImpl().StartBleScan(this));
@@ -85,7 +103,7 @@ public:
             chip::Inet::InterfaceId::Null(), this);
     }
 
-    CHIP_ERROR Stop()
+    CHIP_ERROR Stop(id owner)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -100,13 +118,23 @@ public:
 
         ClearBleDiscoveredDevices();
         ClearDnssdDiscoveredDevices();
+        ResetCounters();
         mDiscoveredResults = nil;
 
 #if CONFIG_NETWORK_LAYER_BLE
-        ReturnErrorOnFailure(PlatformMgrImpl().StopBleScan());
+        mBleScannerDelegateOwner = owner; // retain the owner until OnBleScanStopped is called
+        PlatformMgrImpl().StopBleScan(); // doesn't actually fail, and if it did we'd want to carry on regardless
+#else
+        (void) owner;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
         return ChipDnssdStopBrowse(this);
+    }
+
+    void ResetCounters()
+    {
+        mOnNetworkDevicesAdded = mOnNetworkDevicesRemoved = 0;
+        mBLEDevicesAdded = mBLEDevicesRemoved = 0;
     }
 
     void ClearBleDiscoveredDevices()
@@ -144,12 +172,22 @@ public:
         mDiscoveredResults = discoveredResultsCopy;
     }
 
-    /////////// CommissioningResolveDelegate Interface /////////
+    /////////// DiscoverNodeDelegate Interface /////////
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
     {
         assertChipStackLockedByCurrentThread();
 
-        auto & commissionData = nodeData.commissionData;
+        // Copy delegate and controller to the stack to avoid capturing `this` in the dispatch_async
+        id<MTRCommissionableBrowserDelegate> delegate = mDelegate;
+        MTRDeviceController * controller = mController;
+        VerifyOrReturn(delegate != nil && controller != nil);
+
+        if (!nodeData.Is<CommissionNodeData>()) {
+            // not commissionable/commissioners node
+            return;
+        }
+
+        auto & commissionData = nodeData.Get<CommissionNodeData>();
         auto key = [NSString stringWithUTF8String:commissionData.instanceName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
             // It should not happens.
@@ -163,7 +201,7 @@ public:
         result.discriminator = @(commissionData.longDiscriminator);
         result.commissioningMode = commissionData.commissioningMode != 0;
 
-        auto & resolutionData = nodeData.resolutionData;
+        const CommonResolutionData & resolutionData = commissionData;
         auto * interfaces = result.interfaces;
         interfaces[@(resolutionData.interfaceId.GetPlatformInterface())].resolutionData = chip::MakeOptional(resolutionData);
 
@@ -178,13 +216,10 @@ public:
                 break;
             }
         }
-
-        if (!shouldDispatchToDelegate) {
-            return;
-        }
+        VerifyOrReturn(shouldDispatchToDelegate);
 
         dispatch_async(mDispatchQueue, ^{
-            [mDelegate controller:mController didFindCommissionableDevice:result];
+            [delegate controller:controller didFindCommissionableDevice:result];
         });
     }
 
@@ -196,6 +231,8 @@ public:
         VerifyOrReturn(mDelegate != nil);
         VerifyOrReturn(mController != nil);
         VerifyOrReturn(mDispatchQueue != nil);
+
+        MATTER_LOG_METRIC(kMetricOnNetworkDevicesAdded, ++mOnNetworkDevicesAdded);
 
         auto key = [NSString stringWithUTF8String:service.mName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
@@ -214,9 +251,12 @@ public:
     {
         assertChipStackLockedByCurrentThread();
 
-        VerifyOrReturn(mDelegate != nil);
-        VerifyOrReturn(mController != nil);
-        VerifyOrReturn(mDispatchQueue != nil);
+        // Copy delegate and controller to the stack to avoid capturing `this` in the dispatch_async
+        id<MTRCommissionableBrowserDelegate> delegate = mDelegate;
+        MTRDeviceController * controller = mController;
+        VerifyOrReturn(delegate != nil && controller != nil);
+
+        MATTER_LOG_METRIC(kMetricOnNetworkDevicesRemoved, ++mOnNetworkDevicesRemoved);
 
         auto key = [NSString stringWithUTF8String:service.mName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
@@ -240,9 +280,14 @@ public:
         // If there is nothing else to resolve for the given instance name, just remove it
         // too and informs the delegate that it is gone.
         if ([interfaces count] == 0) {
-            dispatch_async(mDispatchQueue, ^{
-                [mDelegate controller:mController didRemoveCommissionableDevice:result];
-            });
+            // If result.instanceName is nil, that means we never notified our
+            // delegate about this result (because we did not get that far in
+            // resolving it), so don't bother notifying about the removal either.
+            if (result.instanceName != nil) {
+                dispatch_async(mDispatchQueue, ^{
+                    [delegate controller:controller didRemoveCommissionableDevice:result];
+                });
+            }
 
             mDiscoveredResults[key] = nil;
         }
@@ -261,6 +306,11 @@ public:
     {
         assertChipStackLockedByCurrentThread();
 
+        // Copy delegate and controller to the stack to avoid capturing `this` in the dispatch_async
+        id<MTRCommissionableBrowserDelegate> delegate = mDelegate;
+        MTRDeviceController * controller = mController;
+        VerifyOrReturn(delegate != nil && controller != nil);
+
         auto result = [[MTRCommissionableBrowserResult alloc] init];
         result.instanceName = [NSString stringWithUTF8String:kBleKey];
         result.vendorID = @(info.GetVendorId());
@@ -268,18 +318,26 @@ public:
         result.discriminator = @(info.GetDeviceDiscriminator());
         result.commissioningMode = YES;
         result.params = chip::MakeOptional(chip::Controller::SetUpCodePairerParameters(connObj, false /* connected */));
+        result.peripheral = CBPeripheralFromBleConnObject(connObj); // avoid params holding a dangling pointer
+
+        MATTER_LOG_METRIC(kMetricBLEDevicesAdded, ++mBLEDevicesAdded);
 
         auto key = [NSString stringWithFormat:@"%@", connObj];
         mDiscoveredResults[key] = result;
 
         dispatch_async(mDispatchQueue, ^{
-            [mDelegate controller:mController didFindCommissionableDevice:result];
+            [delegate controller:controller didFindCommissionableDevice:result];
         });
     }
 
     void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) override
     {
         assertChipStackLockedByCurrentThread();
+
+        // Copy delegate and controller to the stack to avoid capturing `this` in the dispatch_async
+        id<MTRCommissionableBrowserDelegate> delegate = mDelegate;
+        MTRDeviceController * controller = mController;
+        VerifyOrReturn(delegate != nil && controller != nil);
 
         auto key = [NSString stringWithFormat:@"%@", connObj];
         if ([mDiscoveredResults objectForKey:key] == nil) {
@@ -290,27 +348,39 @@ public:
         auto result = mDiscoveredResults[key];
         mDiscoveredResults[key] = nil;
 
+        MATTER_LOG_METRIC(kMetricBLEDevicesRemoved, ++mBLEDevicesRemoved);
+
         dispatch_async(mDispatchQueue, ^{
-            [mDelegate controller:mController didFindCommissionableDevice:result];
+            [delegate controller:controller didRemoveCommissionableDevice:result];
         });
     }
+
+    void OnBleScanStopped() override
+    {
+        assertChipStackLockedByCurrentThread();
+        mBleScannerDelegateOwner = nil;
+    }
+
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
     dispatch_queue_t mDispatchQueue;
     id<MTRCommissionableBrowserDelegate> mDelegate;
-    MTRDeviceController * mController;
+    MTRDeviceController * __weak mController;
     NSMutableDictionary<NSString *, MTRCommissionableBrowserResult *> * mDiscoveredResults;
+    int32_t mOnNetworkDevicesAdded;
+    int32_t mOnNetworkDevicesRemoved;
+    int32_t mBLEDevicesAdded;
+    int32_t mBLEDevicesRemoved;
 };
 
-@interface MTRCommissionableBrowser ()
-@property (strong, nonatomic) dispatch_queue_t queue;
-@property (nonatomic, readonly) id<MTRCommissionableBrowserDelegate> delegate;
-@property (nonatomic, readonly) MTRDeviceController * controller;
-@property (unsafe_unretained, nonatomic) CommissionableBrowserInternal browser;
-@end
+@implementation MTRCommissionableBrowser {
+    id<MTRCommissionableBrowserDelegate> _delegate;
+    dispatch_queue_t _queue;
+    MTRDeviceController * __weak _controller;
+    CommissionableBrowserInternal _browser;
+}
 
-@implementation MTRCommissionableBrowser
 - (instancetype)initWithDelegate:(id<MTRCommissionableBrowserDelegate>)delegate
                       controller:(MTRDeviceController *)controller
                            queue:(dispatch_queue_t)queue
@@ -331,7 +401,7 @@ private:
 
 - (BOOL)stop
 {
-    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Stop(), NO);
+    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Stop(self), NO);
     _delegate = nil;
     _controller = nil;
     _queue = nil;

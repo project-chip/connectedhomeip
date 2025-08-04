@@ -138,6 +138,12 @@ class BluetoothManager : BleCallback {
 
       private val coroutineContinuation = continuation
 
+      private val STATE_INIT = 1
+      private val STATE_DISCOVER_SERVICE = 2
+      private val STATE_REQUEST_MTU = 3
+
+      private var mState = STATE_INIT
+
       override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
         Log.i(
@@ -148,21 +154,31 @@ class BluetoothManager : BleCallback {
 
         if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
           Log.i("$TAG|onConnectionStateChange", "Discovering Services...")
+          mState = STATE_DISCOVER_SERVICE
           gatt?.discoverServices()
         }
       }
 
       override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
         Log.d(TAG, "${gatt?.device?.name}.onServicesDiscovered status = $status")
+        if (mState != STATE_DISCOVER_SERVICE) {
+          Log.d(TAG, "Invalid state : $mState")
+          return
+        }
         wrappedCallback.onServicesDiscovered(gatt, status)
 
         Log.i("$TAG|onServicesDiscovered", "Services Discovered")
+        mState = STATE_REQUEST_MTU
         gatt?.requestMtu(247)
       }
 
       override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
         Log.d(TAG, "${gatt?.device?.name}.onMtuChanged: connecting to CHIP device")
         super.onMtuChanged(gatt, mtu, status)
+        if (mState != STATE_REQUEST_MTU) {
+          Log.d(TAG, "Invalid state : $mState")
+          return
+        }
         wrappedCallback.onMtuChanged(gatt, mtu, status)
         if (coroutineContinuation.isActive) {
           coroutineContinuation.resume(gatt)

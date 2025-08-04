@@ -24,6 +24,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
 
+#include <string>
+
 #include "JsonParser.h"
 
 namespace {
@@ -32,11 +34,11 @@ static constexpr char kPayloadSignedPrefix[]      = "s:";
 static constexpr char kPayloadUnsignedPrefix[]    = "u:";
 static constexpr char kPayloadFloatPrefix[]       = "f:";
 static constexpr char kPayloadDoublePrefix[]      = "d:";
-static constexpr size_t kPayloadHexPrefixLen      = ArraySize(kPayloadHexPrefix) - 1;      // ignore null character
-static constexpr size_t kPayloadSignedPrefixLen   = ArraySize(kPayloadSignedPrefix) - 1;   // ignore null character
-static constexpr size_t kPayloadUnsignedPrefixLen = ArraySize(kPayloadUnsignedPrefix) - 1; // ignore null character
-static constexpr size_t kPayloadFloatPrefixLen    = ArraySize(kPayloadFloatPrefix) - 1;    // ignore null character
-static constexpr size_t kPayloadDoublePrefixLen   = ArraySize(kPayloadDoublePrefix) - 1;   // ignore null character
+static constexpr size_t kPayloadHexPrefixLen      = MATTER_ARRAY_SIZE(kPayloadHexPrefix) - 1;      // ignore null character
+static constexpr size_t kPayloadSignedPrefixLen   = MATTER_ARRAY_SIZE(kPayloadSignedPrefix) - 1;   // ignore null character
+static constexpr size_t kPayloadUnsignedPrefixLen = MATTER_ARRAY_SIZE(kPayloadUnsignedPrefix) - 1; // ignore null character
+static constexpr size_t kPayloadFloatPrefixLen    = MATTER_ARRAY_SIZE(kPayloadFloatPrefix) - 1;    // ignore null character
+static constexpr size_t kPayloadDoublePrefixLen   = MATTER_ARRAY_SIZE(kPayloadDoublePrefix) - 1;   // ignore null character
 } // namespace
 
 class CustomArgumentParser
@@ -228,19 +230,13 @@ private:
 class CustomArgument
 {
 public:
-    ~CustomArgument()
-    {
-        if (mData != nullptr)
-        {
-            chip::Platform::MemoryFree(mData);
-        }
-    }
+    ~CustomArgument() { Reset(); }
 
     CHIP_ERROR Parse(const char * label, const char * json)
     {
         Json::Value value;
         static constexpr char kHexNumPrefix[] = "0x";
-        constexpr size_t kHexNumPrefixLen     = ArraySize(kHexNumPrefix) - 1;
+        constexpr size_t kHexNumPrefixLen     = MATTER_ARRAY_SIZE(kHexNumPrefix) - 1;
         if (strncmp(json, kPayloadHexPrefix, kPayloadHexPrefixLen) == 0 ||
             strncmp(json, kPayloadSignedPrefix, kPayloadSignedPrefixLen) == 0 ||
             strncmp(json, kPayloadUnsignedPrefix, kPayloadUnsignedPrefixLen) == 0 ||
@@ -282,6 +278,15 @@ public:
         ReturnErrorOnFailure(reader.Next());
 
         return writer.CopyElement(tag, reader);
+    }
+
+    void Reset()
+    {
+        if (mData != nullptr)
+        {
+            chip::Platform::MemoryFree(mData);
+            mData = nullptr;
+        }
     }
 
     // We trust our consumers to do the encoding of our data correctly, so don't

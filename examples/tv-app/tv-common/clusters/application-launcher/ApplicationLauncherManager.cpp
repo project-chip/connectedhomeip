@@ -18,7 +18,6 @@
 
 #include "ApplicationLauncherManager.h"
 
-using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;

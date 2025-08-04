@@ -17,17 +17,25 @@
 
 #include <access/AccessControl.h>
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "ArlEncoder.h"
+#include <access/AccessRestrictionProvider.h>
+#endif
+
 #include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/AccessControl/Metadata.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
+#include <app/reporting/reporting.h>
 #include <app/server/AclStorage.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/TypeTraits.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,16 +47,28 @@ using AclEvent       = Clusters::AccessControl::Events::AccessControlEntryChange
 using ChangeTypeEnum = Clusters::AccessControl::ChangeTypeEnum;
 using Entry          = AccessControl::Entry;
 using EntryListener  = AccessControl::EntryListener;
+
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 using ExtensionEvent = Clusters::AccessControl::Events::AccessControlExtensionChanged::Type;
 
 // TODO(#13590): generated code doesn't automatically handle max length so do it manually
 constexpr int kExtensionDataMaxLength = 128;
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 
-constexpr uint16_t kClusterRevision = 1;
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+using ArlReviewEvent = Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type;
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+
+constexpr uint16_t kClusterRevision = chip::app::Clusters::AccessControl::kRevision;
 
 namespace {
 
-class AccessControlAttribute : public AttributeAccessInterface, public EntryListener
+class AccessControlAttribute : public AttributeAccessInterface,
+                               public AccessControl::EntryListener
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    ,
+                               public AccessRestrictionProvider::Listener
+#endif
 {
 public:
     AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), AccessControlCluster::Id) {}
@@ -64,8 +84,17 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 public:
-    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
-                        ChangeType changeType) override;
+    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
+                        const AccessControl::Entry * entry, AccessControl::EntryListener::ChangeType changeType) override;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    void MarkCommissioningRestrictionListChanged() override;
+
+    void MarkRestrictionListChanged(FabricIndex fabricIndex) override;
+
+    void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, Optional<CharSpan> instruction,
+                                         Optional<CharSpan> arlRequestFlowUrl) override;
+#endif
 
 private:
     /// Business logic implementation of write, returns generic CHIP_ERROR.
@@ -75,11 +104,21 @@ private:
     CHIP_ERROR WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
     CHIP_ERROR ReadAcl(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+    CHIP_ERROR IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list);
+
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+    CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    CHIP_ERROR ReadCommissioningArl(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadArl(AttributeValueEncoder & aEncoder);
+#endif
 } sAttribute;
 
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::AccessControlExtensionStruct::Type & item,
                                     const Access::SubjectDescriptor & subjectDescriptor,
                                     AccessControlCluster::ChangeTypeEnum changeType)
@@ -114,8 +153,8 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
     TLV::TLVReader reader;
     reader.Init(data);
 
-    auto containerType = chip::TLV::kTLVType_List;
-    err                = reader.Next(containerType, chip::TLV::AnonymousTag());
+    auto containerType = TLV::kTLVType_List;
+    err                = reader.Next(containerType, TLV::AnonymousTag());
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     err = reader.EnterContainer(containerType);
@@ -123,7 +162,7 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
 
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(chip::TLV::IsProfileTag(reader.GetTag()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(TLV::IsProfileTag(reader.GetTag()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
@@ -135,6 +174,7 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
 
     return CHIP_NO_ERROR;
 }
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 
 CHIP_ERROR AccessControlAttribute::ReadImpl(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -142,8 +182,10 @@ CHIP_ERROR AccessControlAttribute::ReadImpl(const ConcreteReadAttributePath & aP
     {
     case AccessControlCluster::Attributes::Acl::Id:
         return ReadAcl(aEncoder);
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case AccessControlCluster::Attributes::Extension::Id:
         return ReadExtension(aEncoder);
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case AccessControlCluster::Attributes::SubjectsPerAccessControlEntry::Id: {
         size_t value = 0;
         ReturnErrorOnFailure(GetAccessControl().GetMaxSubjectsPerEntry(value));
@@ -158,6 +200,25 @@ CHIP_ERROR AccessControlAttribute::ReadImpl(const ConcreteReadAttributePath & aP
         size_t value = 0;
         ReturnErrorOnFailure(GetAccessControl().GetMaxEntriesPerFabric(value));
         return aEncoder.Encode(static_cast<uint16_t>(value));
+    }
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    case AccessControlCluster::Attributes::CommissioningARL::Id:
+        return ReadCommissioningArl(aEncoder);
+    case AccessControlCluster::Attributes::Arl::Id:
+        return ReadArl(aEncoder);
+#endif
+    case AccessControlCluster::Attributes::FeatureMap::Id: {
+        uint32_t featureMap = 0;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+        featureMap |= to_underlying(AccessControlCluster::Feature::kManagedDevice);
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+        featureMap |= to_underlying(AccessControlCluster::Feature::kExtension);
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+
+        return aEncoder.Encode(featureMap);
     }
     case AccessControlCluster::Attributes::ClusterRevision::Id:
         return aEncoder.Encode(kClusterRevision);
@@ -181,12 +242,13 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
             {
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));
             }
-            ReturnErrorCodeIf(err != CHIP_NO_ERROR && err != CHIP_ERROR_SENTINEL, err);
+            VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_SENTINEL, err);
         }
         return CHIP_NO_ERROR;
     });
 }
 
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncoder)
 {
     auto & storage = Server::GetInstance().GetPersistentStorage();
@@ -199,7 +261,7 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
             uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
             CHIP_ERROR errStorage                   = storage.SyncGetKeyValue(
                 DefaultStorageKeyAllocator::AccessControlExtensionEntry(fabric.GetFabricIndex()).KeyName(), buffer, size);
-            ReturnErrorCodeIf(errStorage == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrReturnError(errStorage != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
             if (errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
                 continue;
@@ -215,6 +277,92 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
     });
 }
 
+CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    auto & storage = Server::GetInstance().GetPersistentStorage();
+
+    FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
+
+    uint8_t buffer[kExtensionDataMaxLength] = { 0 };
+    uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
+    CHIP_ERROR errStorage                   = storage.SyncGetKeyValue(
+        DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(), buffer, size);
+    VerifyOrReturnError(errStorage != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(errStorage == CHIP_NO_ERROR || errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, errStorage);
+
+    if (!aPath.IsListItemOperation())
+    {
+        DataModel::DecodableList<AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType> list;
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+
+        size_t count = 0;
+        ReturnErrorOnFailure(list.ComputeSize(&count));
+
+        if (count == 0)
+        {
+            VerifyOrReturnError(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+            ReturnErrorOnFailure(storage.SyncDeleteKeyValue(
+                DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName()));
+            AccessControlCluster::Structs::AccessControlExtensionStruct::Type item = {
+                .data        = ByteSpan(buffer, size),
+                .fabricIndex = accessingFabricIndex,
+            };
+            ReturnErrorOnFailure(
+                LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
+        }
+        else if (count == 1)
+        {
+            auto iterator = list.begin();
+            if (!iterator.Next())
+            {
+                ReturnErrorOnFailure(iterator.GetStatus());
+                // If counted an item, iterator doesn't return it, iterator has no error, that's bad.
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
+            auto & item = iterator.GetValue();
+            // TODO(#13590): generated code doesn't automatically handle max length so do it manually
+            VerifyOrReturnError(item.data.size() <= kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+            ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
+
+            ReturnErrorOnFailure(
+                storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
+                                        item.data.data(), static_cast<uint16_t>(item.data.size())));
+            ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
+                                                          errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
+                                                              ? AccessControlCluster::ChangeTypeEnum::kAdded
+                                                              : AccessControlCluster::ChangeTypeEnum::kChanged));
+        }
+        else
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    {
+        VerifyOrReturnError(errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType item;
+        ReturnErrorOnFailure(aDecoder.Decode(item));
+        // TODO(#13590): generated code doesn't automatically handle max length so do it manually
+        VerifyOrReturnError(item.data.size() <= kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
+
+        ReturnErrorOnFailure(
+            storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
+                                    item.data.data(), static_cast<uint16_t>(item.data.size())));
+        ReturnErrorOnFailure(
+            LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
+    }
+    else
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+
 CHIP_ERROR AccessControlAttribute::WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     switch (aPath.mAttributeId)
@@ -222,8 +370,24 @@ CHIP_ERROR AccessControlAttribute::WriteImpl(const ConcreteDataAttributePath & a
     case AccessControlCluster::Attributes::Acl::Id:
         return WriteAcl(aPath, aDecoder);
     case AccessControlCluster::Attributes::Extension::Id:
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
         return WriteExtension(aPath, aDecoder);
+#else
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AccessControlAttribute::IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list)
+{
+    auto validationIterator = list.begin();
+    while (validationIterator.Next())
+    {
+        VerifyOrReturnError(validationIterator.GetValue().GetEntry().IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    ReturnErrorOnFailure(validationIterator.GetStatus());
 
     return CHIP_NO_ERROR;
 }
@@ -246,6 +410,10 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
 
         VerifyOrReturnError(newCount <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+
+        // Validating all ACL entries in the ReplaceAll list before Updating or Deleting any entries. If any of the entries has an
+        // invalid field, the whole "ReplaceAll" list will be rejected.
+        ReturnErrorOnFailure(IsValidAclEntryList(list));
 
         auto iterator = list.begin();
         size_t i      = 0;
@@ -289,93 +457,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    auto & storage = Server::GetInstance().GetPersistentStorage();
-
-    FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
-
-    uint8_t buffer[kExtensionDataMaxLength] = { 0 };
-    uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
-    CHIP_ERROR errStorage                   = storage.SyncGetKeyValue(
-        DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(), buffer, size);
-    ReturnErrorCodeIf(errStorage == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(errStorage != CHIP_NO_ERROR && errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, errStorage);
-
-    if (!aPath.IsListItemOperation())
-    {
-        DataModel::DecodableList<AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType> list;
-        ReturnErrorOnFailure(aDecoder.Decode(list));
-
-        size_t count = 0;
-        ReturnErrorOnFailure(list.ComputeSize(&count));
-
-        if (count == 0)
-        {
-            ReturnErrorCodeIf(errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
-            ReturnErrorOnFailure(storage.SyncDeleteKeyValue(
-                DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName()));
-            AccessControlCluster::Structs::AccessControlExtensionStruct::Type item = {
-                .data        = ByteSpan(buffer, size),
-                .fabricIndex = accessingFabricIndex,
-            };
-            ReturnErrorOnFailure(
-                LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
-        }
-        else if (count == 1)
-        {
-            auto iterator = list.begin();
-            if (!iterator.Next())
-            {
-                ReturnErrorOnFailure(iterator.GetStatus());
-                // If counted an item, iterator doesn't return it, iterator has no error, that's bad.
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
-            auto & item = iterator.GetValue();
-            // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-            ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-            ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
-
-            ReturnErrorOnFailure(
-                storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
-                                        item.data.data(), static_cast<uint16_t>(item.data.size())));
-            ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
-                                                          errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
-                                                              ? AccessControlCluster::ChangeTypeEnum::kAdded
-                                                              : AccessControlCluster::ChangeTypeEnum::kChanged));
-        }
-        else
-        {
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-    }
-    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
-    {
-        ReturnErrorCodeIf(errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        AccessControlCluster::Structs::AccessControlExtensionStruct::DecodableType item;
-        ReturnErrorOnFailure(aDecoder.Decode(item));
-        // TODO(#13590): generated code doesn't automatically handle max length so do it manually
-        ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-        ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
-
-        ReturnErrorOnFailure(
-            storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
-                                    item.data.data(), static_cast<uint16_t>(item.data.size())));
-        ReturnErrorOnFailure(
-            LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
-    }
-    else
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
-                                            const Entry * entry, ChangeType changeType)
+                                            const AccessControl::Entry * entry, AccessControl::EntryListener::ChangeType changeType)
 {
     // NOTE: If the entry was changed internally by the system (e.g. creating
     // entries at startup from persistent storage, or deleting entries when a
@@ -389,11 +472,11 @@ void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDes
     CHIP_ERROR err;
     AclEvent event{ .changeType = ChangeTypeEnum::kChanged, .fabricIndex = subjectDescriptor->fabricIndex };
 
-    if (changeType == ChangeType::kAdded)
+    if (changeType == AccessControl::EntryListener::ChangeType::kAdded)
     {
         event.changeType = ChangeTypeEnum::kAdded;
     }
-    else if (changeType == ChangeType::kRemoved)
+    else if (changeType == AccessControl::EntryListener::ChangeType::kRemoved)
     {
         event.changeType = ChangeTypeEnum::kRemoved;
     }
@@ -427,6 +510,79 @@ void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDes
 exit:
     ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
 }
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+CHIP_ERROR AccessControlAttribute::ReadCommissioningArl(AttributeValueEncoder & aEncoder)
+{
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        if (accessRestrictionProvider != nullptr)
+        {
+            auto entries = accessRestrictionProvider->GetCommissioningEntries();
+
+            for (auto & entry : entries)
+            {
+                ArlEncoder::CommissioningEncodableEntry encodableEntry(entry);
+                ReturnErrorOnFailure(encoder.Encode(encodableEntry));
+            }
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR AccessControlAttribute::ReadArl(AttributeValueEncoder & aEncoder)
+{
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        if (accessRestrictionProvider != nullptr)
+        {
+            for (const auto & info : Server::GetInstance().GetFabricTable())
+            {
+                auto fabric = info.GetFabricIndex();
+                // get entries for fabric
+                std::vector<AccessRestrictionProvider::Entry> entries;
+                ReturnErrorOnFailure(accessRestrictionProvider->GetEntries(fabric, entries));
+                for (const auto & entry : entries)
+                {
+                    ArlEncoder::EncodableEntry encodableEntry(entry);
+                    ReturnErrorOnFailure(encoder.Encode(encodableEntry));
+                }
+            }
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+void AccessControlAttribute::MarkCommissioningRestrictionListChanged()
+{
+    MatterReportingAttributeChangeCallback(kRootEndpointId, AccessControlCluster::Id,
+                                           AccessControlCluster::Attributes::CommissioningARL::Id);
+}
+
+void AccessControlAttribute::MarkRestrictionListChanged(FabricIndex fabricIndex)
+{
+    MatterReportingAttributeChangeCallback(kRootEndpointId, AccessControlCluster::Id, AccessControlCluster::Attributes::Arl::Id);
+}
+
+void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token,
+                                                             Optional<CharSpan> instruction, Optional<CharSpan> arlRequestFlowUrl)
+{
+    CHIP_ERROR err;
+    ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
+
+    event.instruction       = instruction;
+    event.ARLRequestFlowUrl = arlRequestFlowUrl;
+
+    EventNumber eventNumber;
+    SuccessOrExit(err = LogEvent(event, kRootEndpointId, eventNumber));
+
+    return;
+
+exit:
+    ChipLogError(DataManagement, "AccessControlCluster: review event failed: %" CHIP_ERROR_FORMAT, err.Format());
+}
+#endif
 
 CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
 {
@@ -479,6 +635,113 @@ void MatterAccessControlPluginServerInitCallback()
 {
     ChipLogProgress(DataManagement, "AccessControlCluster: initializing");
 
-    registerAttributeAccessOverride(&sAttribute);
+    AttributeAccessInterfaceRegistry::Instance().Register(&sAttribute);
     GetAccessControl().AddEntryListener(sAttribute);
+
+    // TODO: Wait for #39036 to merge.
+#if 0
+    // Ensure configuration is valid until this cluster is moved to fully-code-backed.
+    static constexpr bool extension_support_enabled = CHIP_CONFIG_ENABLE_ACL_EXTENSIONS;
+    static_assert(AccessControlCluster::StaticApplicationConfig::IsAttributeEnabledOnSomeEndpoint(AccessControlCluster::Attributes::Extension::Id) == extension_support_enabled, "If Extension attribute is enabled in ZAP, please build with `chip_enable_acl_extensions=true`. If Extension attribute is disabled in ZAP, please build with `chip_enable_acl_extensions=true`.");
+#endif
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider != nullptr)
+    {
+        accessRestrictionProvider->AddListener(sAttribute);
+    }
+#endif
 }
+
+void MatterAccessControlPluginServerShutdownCallback()
+{
+    ChipLogProgress(DataManagement, "AccessControlCluster: shutdown");
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider != nullptr)
+    {
+        accessRestrictionProvider->RemoveListener(sAttribute);
+    }
+#endif
+
+    GetAccessControl().RemoveEntryListener(sAttribute);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&sAttribute);
+}
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
+{
+    if (commandPath.mEndpointId != kRootEndpointId)
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: invalid endpoint in ReviewFabricRestrictions request");
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+
+    uint64_t token;
+    std::vector<AccessRestrictionProvider::Entry> entries;
+    auto entryIter = commandData.arl.begin();
+    while (entryIter.Next())
+    {
+        AccessRestrictionProvider::Entry entry;
+        entry.fabricIndex    = commandObj->GetAccessingFabricIndex();
+        entry.endpointNumber = entryIter.GetValue().endpoint;
+        entry.clusterId      = entryIter.GetValue().cluster;
+
+        auto restrictionIter = entryIter.GetValue().restrictions.begin();
+        while (restrictionIter.Next())
+        {
+            AccessRestrictionProvider::Restriction restriction;
+            if (ArlEncoder::Convert(restrictionIter.GetValue().type, restriction.restrictionType) != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "AccessControlCluster: invalid restriction type conversion");
+                commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+                return true;
+            }
+
+            if (!restrictionIter.GetValue().id.IsNull())
+            {
+                restriction.id.SetValue(restrictionIter.GetValue().id.Value());
+            }
+            entry.restrictions.push_back(restriction);
+        }
+
+        if (restrictionIter.GetStatus() != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
+            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+            return true;
+        }
+
+        entries.push_back(entry);
+    }
+
+    if (entryIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return true;
+    }
+
+    CHIP_ERROR err = GetAccessControl().GetAccessRestrictionProvider()->RequestFabricRestrictionReview(
+        commandObj->GetAccessingFabricIndex(), entries, token);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Type response;
+        response.token = token;
+        commandObj->AddResponse(commandPath, response);
+    }
+    else
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: restriction review failed: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::ClusterStatusCode(err));
+    }
+
+    return true;
+}
+#endif

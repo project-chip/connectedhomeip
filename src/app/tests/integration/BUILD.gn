@@ -38,17 +38,18 @@ source_set("common") {
 executable("chip-im-initiator") {
   sources = [
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
-    "RequiredPrivilegeStubs.cpp",
     "chip_im_initiator.cpp",
   ]
 
   deps = [
     ":common",
     "${chip_root}/src/app",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]
@@ -61,18 +62,19 @@ executable("chip-im-responder") {
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "MockEvents.cpp",
     "MockEvents.h",
-    "RequiredPrivilegeStubs.cpp",
     "chip_im_responder.cpp",
   ]
 
   deps = [
     ":common",
     "${chip_root}/src/app",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]

@@ -61,11 +61,12 @@ class SizeDatabase(memdf.util.sqlite.Database):
             UNIQUE(thing_id, hash, parent, pr, time, artifact)
         )
         """, """
-        -- A ‘size’ entry gives the size of a section for a particular build.
+        -- A ‘size’ entry gives the size of an area for a particular build.
         CREATE TABLE IF NOT EXISTS size (
             build_id    INTEGER REFERENCES build(id),
-            name        TEXT NOT NULL,      -- Section name
-            size        INTEGER NOT NULL,   -- Section size in bytes
+            kind        TEXT NOT NULL,      -- Area kind
+            name        TEXT NOT NULL,      -- Area name
+            size        INTEGER NOT NULL,   -- Size in bytes
             PRIMARY KEY (build_id, name)
         )
         """
@@ -100,16 +101,14 @@ class SizeDatabase(memdf.util.sqlite.Database):
         r = origin.copy()
         r.update(json.loads(s))
         r['sizes'] = []
-        # Add section sizes.
-        for i in r['frames'].get('section', []):
-            r['sizes'].append({'name': i['section'], 'size': i['size']})
-        # Add segment sizes.
-        for i in r['frames'].get('wr', []):
-            r['sizes'].append({
-                'name': ('(read only)', '(read/write)')[int(i['wr'])],
-                'size':
-                i['size']
-            })
+        # Add section and region sizes.
+        for frame in ['section', 'region']:
+            for i in r['frames'].get(frame, []):
+                r['sizes'].append({
+                    'name': i[frame],
+                    'size': i['size'],
+                    'kind': frame
+                })
         self.add_sizes(**r)
 
     def add_sizes_from_zipfile(self, f: Union[IO, Path], origin: Dict):
@@ -176,6 +175,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
             pb.id AS parent_build,
             cb.id AS commit_build,
             t.platform, t.config, t.target,
+            cs.kind AS kind,
             cs.name AS name,
             ps.size AS parent_size,
             cs.size AS commit_size,
@@ -190,7 +190,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
                      cs.name, cb.time DESC, pb.time DESC
         ''', (commit, parent))
 
-        keep = ('platform', 'target', 'config', 'name', 'parent_size',
+        keep = ('platform', 'target', 'config', 'kind', 'name', 'parent_size',
                 'commit_size')
         things: set[int] = set()
         artifacts: set[int] = set()
@@ -223,7 +223,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
                 artifacts.add(row['artifact'])
                 builds.add(row['commit_build'])
 
-        return ChangeInfo(('platform', 'target', 'config', 'section',
+        return ChangeInfo(('platform', 'target', 'config', 'kind', 'section',
                            parent[:8], commit[:8], 'change', '% change'), rows,
                           things, builds, stale_builds, artifacts,
                           stale_artifacts)

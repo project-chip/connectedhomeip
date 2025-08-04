@@ -18,6 +18,7 @@
 import itertools
 import logging
 import os
+import subprocess
 from typing import Iterable, Mapping, Optional
 
 import dateutil  # type: ignore
@@ -173,7 +174,31 @@ class Gh:
         logging.debug('Downloading artifact %d', artifact_id)
         try:
             assert self.ghapi
-            return self.ghapi.actions.download_artifact(artifact_id, 'zip')
+
+            # It seems like github artifact download is at least partially broken
+            # (see https://github.com/project-chip/connectedhomeip/issues/32656)
+            #
+            # This makes `self.ghapi.actions.download_artifact` not work
+            #
+            # Oddly enough downloading via CURL seems ok
+            owner = self.config['github.owner']
+            repo = self.config['github.repo']
+            token = self.config['github.token']
+
+            download_url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
+
+            # Follow https://docs.github.com/en/rest/actions/artifacts?apiVersion=2022-11-28#download-an-artifact
+            return subprocess.check_output(
+                [
+                    'curl',
+                    '-L',
+                    '-H', 'Accept: application/vnd.github+json',
+                    '-H', f'Authorization: Bearer {token}',
+                    '-H', 'X-GitHub-Api-Version: 2022-11-28',
+                    '--output', '-',
+                    download_url
+                ]
+            )
         except Exception as e:
             logging.error('Failed to download artifact %d: %s', artifact_id, e)
         return None

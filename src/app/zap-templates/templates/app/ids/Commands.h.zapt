@@ -1,0 +1,9 @@
+{{> header}}
+// This file is generated from Commands.h.zapt
+
+#pragma once
+
+{{#zcl_clusters}}
+#include <clusters/{{asUpperCamelCase label}}/CommandIds.h>
+{{/zcl_clusters}}
+

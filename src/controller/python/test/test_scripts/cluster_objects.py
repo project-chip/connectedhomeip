@@ -38,6 +38,10 @@ ignoreAttributeDecodeFailureList = [
      Clusters.Objects.UnitTesting.Attributes.GeneralErrorBoolean),
     (1, Clusters.Objects.UnitTesting,
      Clusters.Objects.UnitTesting.Attributes.ClusterErrorBoolean),
+    (1, Clusters.Objects.UnitTesting,
+     Clusters.Objects.UnitTesting.Attributes.FailureInt32U),
+    (1, Clusters.Objects.UnitTesting,
+     Clusters.Objects.UnitTesting.Attributes.WriteOnlyInt8u),
 ]
 
 
@@ -127,11 +131,15 @@ class ClusterObjectTests:
     async def TestReadWriteOnlyAttribute(cls, devCtrl):
         logger.info("Test wildcard read of attributes containing write-only attribute")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(Clusters.UnitTesting)])
-        if Clusters.UnitTesting.Attributes.WriteOnlyInt8u in res[1][Clusters.UnitTesting]:
+
+        actual_status = res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.WriteOnlyInt8u].Reason.status
+        expected_status = chip.interaction_model.Status.UnsupportedRead
+
+        if expected_status != actual_status:
             raise AssertionError("Received un-expected WriteOnlyInt8u attribute in TestCluster")
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestWriteRequest(cls, devCtrl):
         logger.info("1: Trivial writes (multiple attributes)")
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
@@ -164,7 +172,7 @@ class ClusterObjectTests:
             ]
         )
         expectedRes = [
-            AttributeStatus(Path=AttributePath(
+            AttributeStatus(Path=AttributePath.from_attribute(
                 EndpointId=1,
                 Attribute=Clusters.UnitTesting.Attributes.ListLongOctetString), Status=chip.interaction_model.Status.Success),
         ]
@@ -174,8 +182,8 @@ class ClusterObjectTests:
             logger.error(f"Expect {expectedRes} got {res}")
             raise AssertionError("Write returned unexpected result.")
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestSubscribeAttribute(cls, devCtrl):
         logger.info("Test Subscription")
         sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], reportInterval=(3, 10))
@@ -200,8 +208,8 @@ class ClusterObjectTests:
 
         sub.Shutdown()
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestAttributeCacheAttributeView(cls, devCtrl):
         logger.info("Test AttributeCache Attribute-View")
         sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=False, reportInterval=(3, 10))
@@ -214,12 +222,12 @@ class ClusterObjectTests:
         sub.SetAttributeUpdateCallback(subUpdate)
 
         try:
-            data = sub.GetAttributes()
             req = Clusters.OnOff.Commands.On()
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
 
             await asyncio.wait_for(event.wait(), timeout=11)
 
+            data = sub.GetAttributes()
             if (data[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnOff] != 1):
                 raise ValueError("Current On/Off state should be 1")
 
@@ -230,6 +238,7 @@ class ClusterObjectTests:
 
             await asyncio.wait_for(event.wait(), timeout=11)
 
+            data = sub.GetAttributes()
             if (data[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnOff] != 0):
                 raise ValueError("Current On/Off state should be 0")
 
@@ -238,8 +247,8 @@ class ClusterObjectTests:
         finally:
             sub.Shutdown()
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestAttributeCacheClusterView(cls, devCtrl):
         logger.info("Test AttributeCache Cluster-View")
         sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=True, reportInterval=(3, 10))
@@ -252,13 +261,12 @@ class ClusterObjectTests:
         sub.SetAttributeUpdateCallback(subUpdate)
 
         try:
-            data = sub.GetAttributes()
-
             req = Clusters.OnOff.Commands.On()
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
 
             await asyncio.wait_for(event.wait(), timeout=11)
 
+            data = sub.GetAttributes()
             cluster: Clusters.OnOff = data[1][Clusters.OnOff]
             if (not cluster.onOff):
                 raise ValueError("Current On/Off state should be True")
@@ -270,6 +278,7 @@ class ClusterObjectTests:
 
             await asyncio.wait_for(event.wait(), timeout=11)
 
+            data = sub.GetAttributes()
             cluster: Clusters.OnOff = data[1][Clusters.OnOff]
             if (cluster.onOff):
                 raise ValueError("Current On/Off state should be False")
@@ -279,8 +288,8 @@ class ClusterObjectTests:
         finally:
             sub.Shutdown()
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestSubscribeZeroMinInterval(cls, devCtrl):
         '''
         This validates receiving subscription reports for two attributes at a time in quick succession after
@@ -296,7 +305,6 @@ class ClusterObjectTests:
         logger.info("Test Subscription With MinInterval of 0")
         sub = await devCtrl.ReadAttribute(nodeid=NODE_ID,
                                           attributes=[Clusters.OnOff, Clusters.LevelControl], reportInterval=(0, 60))
-        data = sub.GetAttributes()
 
         logger.info("Sending off command")
 
@@ -313,13 +321,14 @@ class ClusterObjectTests:
 
         logger.info("Checking read back value is indeed 254")
 
+        data = sub.GetAttributes()
         if (data[1][Clusters.LevelControl][Clusters.LevelControl.Attributes.CurrentLevel] != 254):
             raise ValueError("Current Level should have been 254")
 
         sub.Shutdown()
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestReadAttributeRequests(cls, devCtrl):
         '''
         Tests out various permutations of endpoint, cluster and attribute ID (with wildcards) to validate
@@ -407,7 +416,7 @@ class ClusterObjectTests:
         #     raise AssertionError(
         #         "Expect the fabric index matches the one current reading")
 
-    @ classmethod
+    @classmethod
     async def _TriggerEvent(cls, devCtrl):
         # We trigger sending an event a couple of times just to be safe.
         await devCtrl.SendCommand(nodeid=NODE_ID,
@@ -417,7 +426,7 @@ class ClusterObjectTests:
         return await devCtrl.SendCommand(nodeid=NODE_ID,
                                          endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
 
-    @ classmethod
+    @classmethod
     async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
         for i in range(retryCount):
             logger.info(f"Attempt {i + 1}/{retryCount}")
@@ -427,12 +436,12 @@ class ClusterObjectTests:
             asyncio.sleep(1)
         raise AssertionError("condition is not met")
 
-    @ classmethod
+    @classmethod
     async def TriggerAndWaitForEvents(cls, devCtrl, req):
         await cls._TriggerEvent(devCtrl)
         await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(nodeid=NODE_ID, events=req), until=lambda res: res != 0)
 
-    @ classmethod
+    @classmethod
     async def TriggerAndWaitForEventsWithFilter(cls, devCtrl, req):
         response = await cls._TriggerEvent(devCtrl)
         current_event_filter = response.value
@@ -462,8 +471,8 @@ class ClusterObjectTests:
             eventNumberFilter=(current_event_filter + 1)
         ), until=validate_got_no_event)
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestGenerateUndefinedFabricScopedEventRequests(cls, devCtrl):
         logger.info("Running TestGenerateUndefinedFabricScopedEventRequests")
         try:
@@ -482,8 +491,8 @@ class ClusterObjectTests:
         else:
             logger.info("TestGenerateUndefinedFabricScopedEventRequests: Success")
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestReadEventRequests(cls, devCtrl, expectEventsNum):
         logger.info("1: Reading Ex Cx Ex")
         req = [
@@ -528,8 +537,8 @@ class ClusterObjectTests:
 
         # TODO: Add more wildcard test for IM events.
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestTimedRequest(cls, devCtrl):
         logger.info("1: Send Timed Command Request")
         req = Clusters.UnitTesting.Commands.TimedInvokeRequest()
@@ -566,8 +575,8 @@ class ClusterObjectTests:
             if ex.status != chip.interaction_model.Status.NeedsTimedInteraction:
                 raise AssertionError("The write attribute was expected to error with NeedsTimedInteraction.")
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestTimedRequestTimeout(cls, devCtrl):
         logger.info("1: Send Timed Command Request -- Timeout")
         try:
@@ -590,8 +599,8 @@ class ClusterObjectTests:
         except chip.exceptions.ChipStackException:
             pass
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestReadWriteAttributeRequestsWithVersion(cls, devCtrl):
         logger.info("TestReadWriteAttributeRequestsWithVersion")
         req = [
@@ -671,8 +680,8 @@ class ClusterObjectTests:
                         f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
             raise AssertionError("Write returned unexpected result.")
 
-    @ classmethod
-    @ base.test_case
+    @classmethod
+    @base.test_case
     async def TestMixedReadAttributeAndEvents(cls, devCtrl):
         def attributePathPossibilities():
             yield ('Ex Cx Ax', [
@@ -704,7 +713,7 @@ class ClusterObjectTests:
                     events=events[1]), until=lambda res: res != 0)
                 VerifyDecodeSuccess(res.attributes)
 
-    @ classmethod
+    @classmethod
     async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()

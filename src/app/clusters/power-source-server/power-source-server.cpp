@@ -23,7 +23,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/util/af.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/support/CodeUtils.h>
@@ -71,14 +71,9 @@ PowerSourceServer gPowerSourceServer;
 
 PowerSourceAttrAccess gAttrAccess;
 
-#ifdef ZCL_USING_POWER_SOURCE_CLUSTER_SERVER
 static constexpr uint16_t kNumStaticEndpoints = MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT;
 #define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS                                                                                       \
     (MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-static constexpr uint16_t kNumStaticEndpoints    = 0;
-#define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
-#endif
 static constexpr size_t kNumSupportedEndpoints = POWER_SERVER_NUM_SUPPORTED_ENDPOINTS;
 
 #if POWER_SERVER_NUM_SUPPORTED_ENDPOINTS > 0
@@ -91,7 +86,12 @@ PowerSourceClusterInfo * sPowerSourceClusterInfo = nullptr;
 
 void MatterPowerSourcePluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterPowerSourcePluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }
 
 namespace chip {

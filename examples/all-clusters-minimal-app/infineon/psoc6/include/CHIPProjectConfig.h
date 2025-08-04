@@ -42,10 +42,10 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8004
 
 /* The ProductName attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "P6-CYW43012 Clusters Minimal"
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "PSOC6-CYW43012 Clusters Minimal"
 
 /* The HardwareVersionString attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "P6-43012"
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "PSOC6-43012"
 
 /* The HardwareVersion attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION 43012
@@ -104,3 +104,5 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

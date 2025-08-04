@@ -140,7 +140,7 @@ class FactoryDataWriter:
 
         assert (bool(arguments.gen_spake2p_path) != bool(arguments.spake2_verifier)
                 ), "Provide either the spake2_verifier string or the path to the spake2 generator"
-        assert not (arguments.passcode in INVALID_PASSCODES), "The provided passcode is invalid"
+        assert arguments.passcode not in INVALID_PASSCODES, "The provided passcode is invalid"
 
         self._args = arguments
 

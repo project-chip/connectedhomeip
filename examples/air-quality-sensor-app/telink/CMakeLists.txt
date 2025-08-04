@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2023-2024 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -13,70 +13,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
 cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
-set(ignoreMe "${TLNK_MARS_BOARD}")
-
-if(${TLNK_MARS_BOARD} MATCHES y)
-  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}_mars.overlay")
-    set(MARS_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}_mars.overlay")
-  else()
-    unset(MARS_DTC_OVERLAY_FILE)
-  endif()
-  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}_mars.conf")
-    set(MARS_CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}_mars.conf")
-  else()
-    unset(MARS_CONF_OVERLAY_FILE)
-  endif()
-else()
-  unset(MARS_CONF_OVERLAY_FILE)
-endif()
-
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
-  set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
-else()
-  unset(LOCAL_DTC_OVERLAY_FILE)
-endif()
-
-if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
-  set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
-else()
-  unset(GLOBAL_DTC_OVERLAY_FILE)
-endif()
-
-if(EXISTS "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
-  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
-  message(STATUS "Flash memory size is set to: " ${FLASH_SIZE} "b")
-else()
-  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/2m_flash.overlay")
-  message(STATUS "Flash memory size is set to: 2mb")
-endif()
-
-if(DTC_OVERLAY_FILE)
-  set(DTC_OVERLAY_FILE
-    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
-    CACHE STRING "" FORCE
-  )
-else()
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
-endif()
-
-set(CONF_FILE ${MARS_CONF_OVERLAY_FILE} prj.conf)
-
-# Load NCS/Zephyr build system
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
-find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
-
-project(chip-telink-air-quality-sensor-example)
-
+include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
-target_compile_options(app PRIVATE -fpermissive)
+project(chip-telink-air-quality-sensor-example)
 
 target_include_directories(app PRIVATE
                            include
@@ -84,7 +32,8 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}/air-quality-sensor-app
                            ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include
-                           ${CHIP_ROOT}/examples/air-quality-sensor-app/air-quality-sensor-common/include)
+                           ${CHIP_ROOT}/examples/air-quality-sensor-app/air-quality-sensor-common/include
+                           ${TELINK_COMMON}/zephyr_ext)
 
 target_sources(app PRIVATE
                src/AppTask.cpp
@@ -92,15 +41,18 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/common/src/SensorManagerCommon.cpp
-               ${TELINK_COMMON}/util/src/LEDWidget.cpp
+               ${TELINK_COMMON}/util/src/LEDManager.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${TELINK_COMMON}/util/src/PWMDevice.cpp
-               ${TELINK_COMMON}/util/src/WS2812Device.cpp
-               ${CHIP_ROOT}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp)
+               ${TELINK_COMMON}/util/src/PWMManager.cpp
+               ${CHIP_ROOT}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp
+               ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../air-quality-sensor-common/air-quality-sensor-app.zap
 )
 

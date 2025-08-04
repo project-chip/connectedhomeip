@@ -31,11 +31,11 @@ enum class AttestationVerificationResult : uint16_t
 {
     kSuccess = 0,
 
-    kPaaUntrusted        = 100,
+    kPaaUntrusted        = 100, // NOTE: Was not used due to kPaaNotFound being the main case.
     kPaaNotFound         = 101,
     kPaaExpired          = 102,
     kPaaSignatureInvalid = 103,
-    kPaaRevoked          = 104,
+    kPaaRevoked          = 104, // NOTE: Likely not used in most cases due to kPaaNotFound being the main case.
     kPaaFormatInvalid    = 105,
     kPaaArgumentInvalid  = 106,
 
@@ -47,6 +47,7 @@ enum class AttestationVerificationResult : uint16_t
     kPaiVendorIdMismatch  = 205,
     kPaiAuthorityNotFound = 206,
     kPaiMissing           = 207,
+    kPaiAndDacRevoked     = 208,
 
     kDacExpired           = 300,
     kDacSignatureInvalid  = 301,
@@ -73,13 +74,10 @@ enum class AttestationVerificationResult : uint16_t
     kCertificationDeclarationInvalidProductId   = 605,
     kCertificationDeclarationInvalidPAA         = 606,
 
-    kNoMemory = 700,
-
-    kInvalidArgument = 800,
-
-    kInternalError = 900,
-
-    kNotImplemented = 0xFFFFU,
+    kNoMemory        = 700,
+    kInvalidArgument = 701,
+    kInternalError   = 702,
+    kNotImplemented  = 703,
 
     // TODO: Add more attestation verification errors
 };
@@ -259,6 +257,9 @@ protected:
     const size_t mNumCerts;
 };
 
+// forward declaration
+class DeviceAttestationRevocationDelegate;
+
 class DeviceAttestationVerifier
 {
 public:
@@ -309,7 +310,7 @@ public:
         {
             if (mCdBuffer.Get())
             {
-                return MakeOptional(ByteSpan(mDacDerBuffer.Get(), mDacDerBuffer.AllocatedSize()));
+                return MakeOptional(ByteSpan(mCdBuffer.Get(), mCdBuffer.AllocatedSize()));
             }
             else
             {
@@ -387,6 +388,16 @@ public:
                                                            const ByteSpan & csrNonce) = 0;
 
     /**
+     * @brief Verify whether or not the given DAC chain is revoked.
+     *
+     * @param[in] info All of the information required to check for revoked DAC chain.
+     * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
+     *                         CheckForRevokedDACChain()
+     */
+    virtual void CheckForRevokedDACChain(const AttestationInfo & info,
+                                         Callback::Callback<OnAttestationInformationVerification> * onCompletion) = 0;
+
+    /**
      * @brief Get the trust store used for the attestation verifier.
      *
      * Returns nullptr if not supported. Be careful not to hold-on to the trust store
@@ -396,8 +407,34 @@ public:
      */
     virtual WellKnownKeysTrustStore * GetCertificationDeclarationTrustStore() { return nullptr; }
 
+    /**
+     * @brief Set whether the test CD keys from SDK are accepted (should be false in production)
+     *
+     * @param enabled - true to trust the SDK's test CD signing key, false otherwise.
+     */
     void EnableCdTestKeySupport(bool enabled) { mEnableCdTestKeySupport = enabled; }
+
+    /**
+     * @brief Set whether extra verbose logging is enabled. The meaning depends on the verifier.
+     *
+     * @param enabled - if true, verbose logs will be enabled, otherwise they will be disabled.
+     */
+    void EnableVerboseLogs(bool enabled) { mEnableVerboseLogs = enabled; }
+
     bool IsCdTestKeySupported() const { return mEnableCdTestKeySupport; }
+    bool AreVerboseLogsEnabled() const { return mEnableVerboseLogs; }
+
+    /**
+     * @brief Try to set the revocation delegate.
+     *
+     * @param[in] revocationDelegate The revocation delegate to set.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_IMPLEMENTED if the revocation delegate is not supported.
+     */
+    virtual CHIP_ERROR SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
 protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
@@ -406,7 +443,38 @@ protected:
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;
+    bool mEnableVerboseLogs      = false;
 };
+
+/**
+ * @brief Interface for checking the device attestation revocation status
+ *
+ */
+class DeviceAttestationRevocationDelegate
+{
+public:
+    DeviceAttestationRevocationDelegate()          = default;
+    virtual ~DeviceAttestationRevocationDelegate() = default;
+
+    /**
+     * @brief Verify whether or not the given DAC chain is revoked.
+     *
+     * @param[in] info All of the information required to check for revoked DAC chain.
+     * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
+     *                         CheckForRevokedDACChain().
+     */
+    virtual void
+    CheckForRevokedDACChain(const DeviceAttestationVerifier::AttestationInfo & info,
+                            Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> * onCompletion) = 0;
+};
+
+/**
+ * @brief Get a brief description of an `AttestationVerificationResult` enum value.
+ *
+ * @param resultCode - The result code to describe
+ * @return a pointer to a static null-terminated string describing the error.
+ */
+const char * GetAttestationResultDescription(AttestationVerificationResult resultCode);
 
 /**
  * Instance getter for the global DeviceAttestationVerifier.

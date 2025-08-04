@@ -252,7 +252,9 @@ protected:
             chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
                                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
             auto commandSender                       = std::make_unique<chip::app::CommandSender>(
-                mCallback, device->GetExchangeManager(), mTimedInteractionTimeoutMs.HasValue(), mSuppressResponse.ValueOr(false));
+                mCallback, device->GetExchangeManager(), mTimedInteractionTimeoutMs.HasValue(), mSuppressResponse.ValueOr(false),
+                device->GetSecureSession().Value()->AllowsLargePayload());
+
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
             chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(mTimedInteractionTimeoutMs);
@@ -405,7 +407,7 @@ protected:
                                                                     mTimedInteractionTimeoutMs, mSuppressResponse.ValueOr(false));
             VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            for (uint8_t i = 0; i < pathsConfig.count; i++)
+            for (size_t i = 0; i < pathsConfig.count; i++)
             {
                 auto & path        = pathsConfig.attributePathParams[i];
                 auto & dataVersion = pathsConfig.dataVersionFilter[i].mDataVersion;

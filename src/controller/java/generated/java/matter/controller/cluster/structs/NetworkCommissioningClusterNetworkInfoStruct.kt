@@ -27,7 +27,7 @@ class NetworkCommissioningClusterNetworkInfoStruct(
   val networkID: ByteArray,
   val connected: Boolean,
   val networkIdentifier: Optional<ByteArray>?,
-  val clientIdentifier: Optional<ByteArray>?
+  val clientIdentifier: Optional<ByteArray>?,
 ) {
   override fun toString(): String = buildString {
     append("NetworkCommissioningClusterNetworkInfoStruct {\n")
@@ -41,7 +41,7 @@ class NetworkCommissioningClusterNetworkInfoStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_NETWORK_I_D), networkID)
+      put(ContextSpecificTag(TAG_NETWORK_ID), networkID)
       put(ContextSpecificTag(TAG_CONNECTED), connected)
       if (networkIdentifier != null) {
         if (networkIdentifier.isPresent) {
@@ -64,14 +64,14 @@ class NetworkCommissioningClusterNetworkInfoStruct(
   }
 
   companion object {
-    private const val TAG_NETWORK_I_D = 0
+    private const val TAG_NETWORK_ID = 0
     private const val TAG_CONNECTED = 1
     private const val TAG_NETWORK_IDENTIFIER = 2
     private const val TAG_CLIENT_IDENTIFIER = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): NetworkCommissioningClusterNetworkInfoStruct {
       tlvReader.enterStructure(tlvTag)
-      val networkID = tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_I_D))
+      val networkID = tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_ID))
       val connected = tlvReader.getBoolean(ContextSpecificTag(TAG_CONNECTED))
       val networkIdentifier =
         if (!tlvReader.isNull()) {
@@ -102,7 +102,7 @@ class NetworkCommissioningClusterNetworkInfoStruct(
         networkID,
         connected,
         networkIdentifier,
-        clientIdentifier
+        clientIdentifier,
       )
     }
   }

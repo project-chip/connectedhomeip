@@ -140,7 +140,7 @@ public:
 /**
  * @brief
  *   This class handles unsolicited messages. The implementation can select an exchange delegate to use based on the payload header
- * of the incoming message.
+ * of the incoming message or its session.
  */
 class DLL_EXPORT UnsolicitedMessageHandler
 {
@@ -158,9 +158,19 @@ public:
      *
      *  @param[in]  payloadHeader A reference to the PayloadHeader object for the unsolicited message.  The protocol and message
      *                            type of this header match the UnsolicitedMessageHandler.
+     *  @param[in]  session       A reference to the session where unsolicited message was received.
      *  @param[out] newDelegate   A new exchange delegate to be used by the new exchange created to handle the message.
      */
-    virtual CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) = 0;
+    virtual CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, const SessionHandle & session,
+                                                    ExchangeDelegate *& newDelegate)
+    {
+        return OnUnsolicitedMessageReceived(payloadHeader, newDelegate);
+    }
+
+    virtual CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      * @brief

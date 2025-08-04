@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class ContentLauncherClusterPlaybackPreferencesStruct(
   val playbackPosition: ULong,
   val textTrack: ContentLauncherClusterTrackPreferenceStruct,
-  val audioTracks: Optional<List<ContentLauncherClusterTrackPreferenceStruct>>
+  val audioTracks: Optional<List<ContentLauncherClusterTrackPreferenceStruct>>,
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterPlaybackPreferencesStruct {\n")
@@ -61,14 +61,14 @@ class ContentLauncherClusterPlaybackPreferencesStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ContentLauncherClusterPlaybackPreferencesStruct {
       tlvReader.enterStructure(tlvTag)
       val playbackPosition = tlvReader.getULong(ContextSpecificTag(TAG_PLAYBACK_POSITION))
       val textTrack =
         ContentLauncherClusterTrackPreferenceStruct.fromTlv(
           ContextSpecificTag(TAG_TEXT_TRACK),
-          tlvReader
+          tlvReader,
         )
       val audioTracks =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_TRACKS))) {
@@ -90,7 +90,7 @@ class ContentLauncherClusterPlaybackPreferencesStruct(
       return ContentLauncherClusterPlaybackPreferencesStruct(
         playbackPosition,
         textTrack,
-        audioTracks
+        audioTracks,
       )
     }
   }

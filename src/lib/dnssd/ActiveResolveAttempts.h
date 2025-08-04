@@ -19,8 +19,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 
-#include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/minimal_mdns/core/HeapQName.h>
@@ -153,23 +153,24 @@ public:
             {
                 return false;
             }
+            auto & nodeData = data.Get<chip::Dnssd::CommissionNodeData>();
 
             switch (browse.filter.type)
             {
             case chip::Dnssd::DiscoveryFilterType::kNone:
                 return true;
             case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
-                return browse.filter.code == static_cast<uint64_t>((data.commissionData.longDiscriminator >> 8) & 0x0F);
+                return browse.filter.code == static_cast<uint64_t>((nodeData.longDiscriminator >> 8) & 0x0F);
             case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
-                return browse.filter.code == data.commissionData.longDiscriminator;
+                return browse.filter.code == nodeData.longDiscriminator;
             case chip::Dnssd::DiscoveryFilterType::kVendorId:
-                return browse.filter.code == data.commissionData.vendorId;
+                return browse.filter.code == nodeData.vendorId;
             case chip::Dnssd::DiscoveryFilterType::kDeviceType:
-                return browse.filter.code == data.commissionData.deviceType;
+                return browse.filter.code == nodeData.deviceType;
             case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
-                return browse.filter.code == data.commissionData.commissioningMode;
+                return browse.filter.code == nodeData.commissioningMode;
             case chip::Dnssd::DiscoveryFilterType::kInstanceName:
-                return strncmp(browse.filter.instanceName, data.commissionData.instanceName,
+                return strncmp(browse.filter.instanceName, nodeData.instanceName,
                                chip::Dnssd::Commission::kInstanceNameMaxLength + 1) == 0;
             case chip::Dnssd::DiscoveryFilterType::kCommissioner:
             case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
@@ -249,8 +250,6 @@ public:
 
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
-    void CompleteCommissioner(const chip::Dnssd::DiscoveredNodeData & data);
-    void CompleteCommissionable(const chip::Dnssd::DiscoveredNodeData & data);
     void CompleteIpResolution(SerializedQNameIterator targetHostName);
 
     /// Mark all browse-type scheduled attemptes as a success, removing them
@@ -272,7 +271,7 @@ public:
     // Get minimum time until the next pending reply is required.
     //
     // Returns missing if no actively tracked elements exist.
-    chip::Optional<chip::System::Clock::Timeout> GetTimeUntilNextExpectedResponse() const;
+    std::optional<chip::System::Clock::Timeout> GetTimeUntilNextExpectedResponse() const;
 
     // Get the peer Id that needs scheduling for a query
     //
@@ -282,11 +281,17 @@ public:
     //    now'
     //  - there is NO sorting implied by this call. Returned value will be
     //    any peer that needs a new request sent
-    chip::Optional<ScheduledAttempt> NextScheduled();
+    std::optional<ScheduledAttempt> NextScheduled();
 
     /// Check if any of the pending queries are for the given host name for
     /// IP resolution.
     bool IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const;
+
+    /// Determines if address resolution for the given peer ID is required
+    ///
+    /// IP Addresses are required for active operational discovery of specific peers
+    /// or if an active browse is being performed.
+    bool ShouldResolveIpAddress(chip::PeerId peerId) const;
 
     /// Check if a browse operation is active for the given discovery type
     bool HasBrowseFor(chip::Dnssd::DiscoveryType type) const;

@@ -61,8 +61,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.imageURI.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  imageURI: %.*s", static_cast<int>(response.imageURI.Value().size()),
-                      response.imageURI.Value().data());
+        ChipLogDetail(SoftwareUpdate, "  imageURI: %s", NullTerminated(response.imageURI.Value()).c_str());
     }
     if (response.softwareVersion.HasValue())
     {
@@ -70,9 +69,8 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.softwareVersionString.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %.*s",
-                      static_cast<int>(response.softwareVersionString.Value().size()),
-                      response.softwareVersionString.Value().data());
+        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s",
+                      NullTerminated(response.softwareVersionString.Value()).c_str());
     }
     if (response.updateToken.HasValue())
     {
@@ -593,7 +591,7 @@ CHIP_ERROR DefaultOTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIn
     CHIP_ERROR error = mDefaultOtaProviderList.Delete(fabricIndex);
 
     // Ignore the error if no entry for the associated fabric index has been found.
-    ReturnErrorCodeIf(error == CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
+    VerifyOrReturnError(error != CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
     ReturnErrorOnFailure(error);
 
     return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);

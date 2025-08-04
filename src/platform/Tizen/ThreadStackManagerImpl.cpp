@@ -39,7 +39,6 @@
 #include <thread.h>
 #include <tizen_error.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -55,8 +54,11 @@
 #include <platform/NetworkCommissioning.h>
 #include <platform/PlatformManager.h>
 
+#include <platform/Tizen/ErrorUtils.h>
 #include <platform/Tizen/ThreadStackManagerImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+using chip::DeviceLayer::Internal::TizenToChipError;
 
 namespace chip {
 namespace DeviceLayer {
@@ -271,7 +273,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
 
     int threadErr = THREAD_ERROR_NONE;
 
-    threadErr = thread_network_set_active_dataset_tlvs(mThreadInstance, netInfo.data(), netInfo.size());
+    VerifyOrReturnError(CanCastTo<int>(netInfo.size()), CHIP_ERROR_INTERNAL);
+    threadErr = thread_network_set_active_dataset_tlvs(mThreadInstance, netInfo.data(), static_cast<int>(netInfo.size()));
     VerifyOrExit(threadErr == THREAD_ERROR_NONE,
                  ChipLogError(DeviceLayer, "FAIL: Thread set active dataset TLVs: %s", get_error_message(threadErr)));
 
@@ -515,13 +518,22 @@ CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
+
+#if defined(TIZEN_NETWORK_THREAD_VERSION) && TIZEN_NETWORK_THREAD_VERSION >= 0x000900
+    int threadErr = thread_get_version(mThreadInstance, &version);
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, TizenToChipError(threadErr),
+                        ChipLogError(DeviceLayer, "FAIL: Get thread version: %s", get_error_message(threadErr)));
+    ChipLogProgress(DeviceLayer, "Thread version [%u]", version);
+    return CHIP_NO_ERROR;
+#else
     return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
+CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
 {
     ChipLogError(DeviceLayer, "Not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;

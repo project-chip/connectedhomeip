@@ -62,6 +62,18 @@ struct Request : public sys_snode_t
 };
 
 /**
+ * @brief Initialize BLE advertising arbiter
+ *
+ * @note This method must be called before trying to insert or cancel any requests.
+ *
+ * @param btId   Local Bluetooth LE identifier to be used for the advertising parameters. Currently Bluetooth LE identifier used in
+ * this method will be used for all advertising requests and changing it dynamically is not supported.
+ * @return error    If the module is already initialized.
+ * @return success  Otherwise.
+ */
+CHIP_ERROR Init(uint8_t btId);
+
+/**
  * @brief Request BLE advertising
  *
  * Add the request to the internal list of competing requests. If the request
@@ -73,6 +85,9 @@ struct Request : public sys_snode_t
  *
  * @note This method does not take ownership of the request object so the object
  *       must not get destroyed before it is cancelled.
+ *
+ * @note The arbiter module has to be initialized using Init() method before
+ *       invoking this method.
  *
  * @param request   Reference to advertising request that contains priority and
  *                  other advertising parameters.
@@ -93,6 +108,9 @@ CHIP_ERROR InsertRequest(Request & request);
  *
  * An attempt to cancel a request that has not been registered at the
  * advertising arbiter is a no-op. That is, it returns immediately.
+ *
+ * @note The arbiter module has to be initialized using Init() method before
+ *       invoking this method.
  *
  * @param request   Reference to advertising request that contains priority and
  *                  other advertising parameters.

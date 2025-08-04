@@ -25,6 +25,7 @@
 #include "ScreenManager.h"
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 class QRCodeScreen : public Screen

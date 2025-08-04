@@ -123,7 +123,10 @@ public:
     // ReadClient::Callback functions
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
     void OnDone(ReadClient * apReadClient) override;
+
 #endif
+
+    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
 
     // Platform event handler functions
     void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);
@@ -166,7 +169,6 @@ private:
 
     // Called when the platform is set up - attempts to get time using the recommended source list in the spec.
     void AttemptToGetTime();
-    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
     // Attempts to get fallback NTP from the delegate (last available source)
     // If successful, the function will set mGranulatiry and the time source
     // If unsuccessful, it will emit a TimeFailure event.

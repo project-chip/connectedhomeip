@@ -1,0 +1,300 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: "[TC-THNETDIR-2.2] Verification for Add/Remove/Get commands"
+
+PICS:
+    - THNETDIR.S
+
+config:
+    nodeId: 0x12344321
+    cluster: Thread Network Directory
+    endpoint: 1
+
+    # Note: TestNetwork* values need to match what's encoded in TestNetworkDataset
+    TestNetworkDataset:
+        type: octet_string
+        defaultValue: "hex:0e0800000000000c0001000300000f350407fff800020839758ec8144b07fb0708fdf1f1add0797dc00510f366cec7a446bab978d90d27abe38f23030f4f70656e5468726561642d353933380102593804103ca67c969efb0d0c74a4d8ee923b576c0c0402a0f7f8"
+    TestNetworkExtendedPanId:
+        type: octet_string
+        defaultValue: "hex:39758ec8144b07fb"
+    TestNetworkName: "OpenThread-5938"
+    TestNetworkChannel: 15
+    TestNetworkActiveTimestamp: 0xc0001
+    TestNetworkUpdatedDataset:
+        type: octet_string
+        defaultValue: "hex:0e0800000000000d0001000300000f350407fff800020839758ec8144b07fb0708fdf1f1add0797dc00510f366cec7a446bab978d90d27abe38f23030f4f70656e5468726561642d353933380102593804103ca67c969efb0d0c74a4d8ee923b576c0c0402a0f7f8"
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: DelayCommands
+      command: WaitForCommissionee
+      arguments:
+          values:
+              - name: nodeId
+                value: nodeId
+
+    - label: "TH reads ThreadNetworks attribute from DUT"
+      command: readAttribute
+      attribute: ThreadNetworks
+      response:
+          saveAs: initialNetworks
+          constraints:
+              type: list
+
+    - label: "TH reads PreferredExtendedPanID attribute from DUT"
+      command: readAttribute
+      attribute: PreferredExtendedPanID
+      response:
+          saveAs: initialPreferredExtendedPanID
+          constraints:
+              type: octet_string
+              minLength: 8
+              maxLength: 8
+              notValue: TestNetworkExtendedPanId
+
+    - label:
+          "TH writes ExtendedPanID from TestNetwork to PreferredExtendedPanID on
+          DUT"
+      command: writeAttribute
+      attribute: PreferredExtendedPanID
+      arguments:
+          value: TestNetworkExtendedPanId
+      response:
+          error: CONSTRAINT_ERROR # TestNetwork is not in ThreadNetworks
+
+    - label:
+          "TH reads PreferredExtendedPanID attribute from DUT, verifying that
+          the value did not change"
+      command: readAttribute
+      attribute: PreferredExtendedPanID
+      response:
+          value: initialPreferredExtendedPanID
+
+    - label:
+          "TH sends GetOperationalDataset command to DUT with ExtendedPanID of
+          TestNetwork"
+      command: GetOperationalDataset
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          error: NOT_FOUND
+
+    # Note: Unsupported with darwin-framework-tool because it automatically performs a timed invoke
+    - label: "TH sends AddNetwork command to DUT without a timed interaction"
+      command: AddNetwork
+      arguments:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+      response:
+          error: NEEDS_TIMED_INTERACTION
+
+    - label: "TH sends AddNetwork command to DUT with TestNetwork dataset"
+      command: AddNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+
+    - label:
+          "TH reads ThreadNetworks attribute from DUT, verifying that the
+          network has been added"
+      command: readAttribute
+      attribute: ThreadNetworks
+      response:
+          constraints:
+              type: list
+              python: |
+                  # Split the list into test (our TestNetwork) and rest (everything else)
+                  test = next((n for n in value if n['ExtendedPanID'] == TestNetworkExtendedPanId), None)
+                  rest = [n for n in value if n != test]
+                  # Check test has the expected values and rest == initialNetworks (ignoring order)
+                  return (test is not None and
+                          test['NetworkName'] == TestNetworkName and
+                          test['Channel'] == TestNetworkChannel and
+                          test['ActiveTimestamp'] == TestNetworkActiveTimestamp and
+                          len(value) == len(initialNetworks) + 1 and
+                          len(rest) == len(initialNetworks) and
+                          all(n in initialNetworks for n in rest))
+
+    - label:
+          "TH sends GetOperationalDataset command to DUT with ExtendedPanID from
+          TestNetwork"
+      command: GetOperationalDataset
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+
+    - label:
+          "TH sends AddNetwork command to DUT with TestNetwork dataset matching
+          existing Active Timestamp"
+      command: AddNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+      response:
+          error: INVALID_IN_STATE
+
+    - label:
+          "TH sends GetOperationalDataset command to DUT with ExtendedPanID from
+          TestNetwork"
+      command: GetOperationalDataset
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+
+    - label:
+          "TH sends AddNetwork command to DUT with updated TestNetwork dataset
+          with larger Active Timestamp"
+      command: AddNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkUpdatedDataset
+
+    - label:
+          "TH sends GetOperationalDataset command to DUT with ExtendedPanID from
+          TestNetwork"
+      command: GetOperationalDataset
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkUpdatedDataset
+
+    - label:
+          "TH sends AddNetwork command to DUT with original TestNetwork dataset"
+      command: AddNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkDataset
+      response:
+          error: INVALID_IN_STATE
+
+    - label:
+          "TH sends GetOperationalDataset command to DUT with ExtendedPanID from
+          TestNetwork"
+      command: GetOperationalDataset
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          values:
+              - name: OperationalDataset
+                value: TestNetworkUpdatedDataset
+
+    - label:
+          "TH writes ExtendedPanID from TestNetwork to PreferredExtendedPanID on
+          DUT"
+      command: writeAttribute
+      attribute: PreferredExtendedPanID
+      arguments:
+          value: TestNetworkExtendedPanId
+
+    - label:
+          "TH reads PreferredExtendedPanID attribute from DUT, verifying that
+          the value was written"
+      command: readAttribute
+      attribute: PreferredExtendedPanID
+      response:
+          value: TestNetworkExtendedPanId
+
+    # Note: Unsupported with darwin-framework-tool because it automatically performs a timed invoke
+    - label: "TH sends RemoveNetwork command to DUT without a timed interaction"
+      command: RemoveNetwork
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          error: NEEDS_TIMED_INTERACTION
+
+    - label:
+          "TH sends RemoveNetwork command to DUT with ExtendedPanID of
+          TestNetwork while it is the preferred network"
+      command: RemoveNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+      response:
+          error: CONSTRAINT_ERROR # Preferred network cannot be removed
+
+    - label: "TH writes null to PreferredExtendedPanID on DUT"
+      command: writeAttribute
+      attribute: PreferredExtendedPanID
+      arguments:
+          value: null
+
+    - label:
+          "TH reads PreferredExtendedPanID attribute from DUT, verifying that
+          the value was cleared"
+      command: readAttribute
+      attribute: PreferredExtendedPanID
+      response:
+          value: null
+
+    - label:
+          "TH sends RemoveNetwork command to DUT with ExtendedPanID of
+          TestNetwork"
+      command: RemoveNetwork
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: ExtendedPanID
+                value: TestNetworkExtendedPanId
+
+    - label:
+          "TH reads ThreadNetworks attribute from DUT, verifying that the
+          network was removed"
+      command: readAttribute
+      attribute: ThreadNetworks
+      response:
+          constraints:
+              type: list
+              python: |
+                  # value == initialNetworks (ignoring order)
+                  return (len(value) == len(initialNetworks) and
+                          all(n in initialNetworks for n in value))
+
+    - label:
+          "TH writes PreferredExtendedPanID to DUT, restoring the initial value"
+      command: writeAttribute
+      attribute: PreferredExtendedPanID
+      arguments:
+          value: initialPreferredExtendedPanID

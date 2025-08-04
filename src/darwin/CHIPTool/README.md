@@ -6,9 +6,11 @@ control.
 ---
 
 -   [CHIP Tool iOS Sample Commissioner App](#chip-tool-ios-sample-commissioner-app)
+    -   [Prerequisites](#prerequisites)
     -   [Building the Application](#building-the-application)
         -   [Compilation Fixes](#compilation-fixes)
     -   [Installing the Application](#installing-the-application)
+    -   [Setting up the iPhone](#setting-up-the-iphone)
     -   [Pairing an Accessory](#pairing-an-accessory)
 
 ---
@@ -79,6 +81,15 @@ run.
 
 Now you can launch the application from the Home screen or from Xcode by hitting
 the run button once more.
+
+## Setting up the iPhone
+
+To use CHIP Tool on iOS or macOS, enable Developer Mode during the development
+phase of your app by following the steps at
+[Enabling Developer Mode on a device](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device).
+On the iOS or macOS device that initiates the pairing,
+[download](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
+the developer profile, then install it.
 
 ## Pairing an Accessory
 

@@ -18,16 +18,18 @@
 #include <assert.h>
 #include <memory>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ThreadOperationalDataset.h>
-#include <lib/support/UnitTestRegistration.h>
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
 #include "platform/PlatformManager.h"
 #include "platform/ThreadStackManager.h"
 
-#if CHIP_DEVICE_LAYER_TARGET == LINUX
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
 #include <dbus/dbus.h>
 #include <thread>
 
@@ -39,20 +41,20 @@ struct DBusConnectionDeleter
 using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
 #endif
 
-void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+static std::atomic_bool eventReceived{ false };
+
+void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t)
 {
-    (void) arg;
     if (event->Type == chip::DeviceLayer::DeviceEventType::kThreadConnectivityChange)
     {
         if (event->ThreadConnectivityChange.Result == chip::DeviceLayer::ConnectivityChange::kConnectivity_Established)
         {
-            chip::Platform::MemoryShutdown();
-            exit(0);
+            eventReceived = true;
         }
     }
 }
 
-int TestThreadStackManager()
+TEST(TestThreadStackManager, TestThreadStackManager)
 {
     chip::DeviceLayer::ThreadStackManagerImpl impl;
     chip::Thread::OperationalDataset dataset{};
@@ -79,7 +81,5 @@ int TestThreadStackManager()
     chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
     chip::Platform::MemoryShutdown();
 
-    return -1;
+    EXPECT_TRUE(eventReceived);
 }
-
-CHIP_REGISTER_TEST_SUITE(TestThreadStackManager);

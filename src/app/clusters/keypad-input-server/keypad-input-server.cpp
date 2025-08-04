@@ -26,16 +26,17 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/app-platform/ContentAppPlatform.h>
+#include <app/app-platform/ContentAppPlatform.h> // nogncheck
+
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
@@ -196,5 +197,10 @@ exit:
 
 void MatterKeypadInputPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gKeypadInputAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gKeypadInputAttrAccess);
+}
+
+void MatterKeypadInputPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gKeypadInputAttrAccess);
 }

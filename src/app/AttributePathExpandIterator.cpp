@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,245 +14,301 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <app/AttributePathExpandIterator.h>
 
-#include <app/AttributePathParams.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/EventManagement.h>
 #include <app/GlobalAttributes.h>
-#include <app/att-storage.h>
-#include <lib/core/CHIPCore.h>
-#include <lib/core/TLVDebug.h>
+#include <app/data-model-provider/MetadataLookup.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/DLLUtil.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
-using namespace chip;
+#include <optional>
 
-// TODO: Need to make it so that declarations of things that don't depend on generated files are not intermixed in af.h with
-// dependencies on generated files, so we don't have to re-declare things here.
-// Note: Some of the generated files that depended by af.h are gen_config.h and gen_tokens.h
-typedef uint8_t EmberAfClusterMask;
-
-extern uint16_t emberAfEndpointCount();
-extern uint16_t emberAfIndexFromEndpoint(EndpointId endpoint);
-extern uint8_t emberAfClusterCount(EndpointId endpoint, bool server);
-extern uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster);
-extern uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                            chip::AttributeId attributeId);
-extern chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
-extern Optional<ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint, uint8_t n, bool server);
-extern Optional<AttributeId> emberAfGetServerAttributeIdByIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                                uint16_t attributeIndex);
-extern uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask);
-extern bool emberAfEndpointIndexIsEnabled(uint16_t index);
+using namespace chip::app::DataModel;
 
 namespace chip {
 namespace app {
 
-AttributePathExpandIterator::AttributePathExpandIterator(SingleLinkedListNode<AttributePathParams> * aAttributePath)
+AttributePathExpandIterator::AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position) :
+    mDataModelProvider(dataModel), mPosition(position)
+{}
+
+bool AttributePathExpandIterator::AdvanceOutputPath(std::optional<DataModel::AttributeEntry> * entry)
 {
-    mpAttributePath = aAttributePath;
-
-    // Reset iterator state
-    mEndpointIndex  = UINT16_MAX;
-    mClusterIndex   = UINT8_MAX;
-    mAttributeIndex = UINT16_MAX;
-
-    static_assert(std::numeric_limits<decltype(mGlobalAttributeIndex)>::max() >= ArraySize(GlobalAttributesNotInMetadata),
-                  "Our index won't be able to hold the value we need to hold.");
-    static_assert(std::is_same<decltype(mGlobalAttributeIndex), uint8_t>::value,
-                  "If this changes audit all uses where we set to UINT8_MAX");
-    mGlobalAttributeIndex = UINT8_MAX;
-
-    // Make the iterator ready to emit the first valid path in the list.
-    Next();
-}
-
-void AttributePathExpandIterator::PrepareEndpointIndexRange(const AttributePathParams & aAttributePath)
-{
-    if (aAttributePath.HasWildcardEndpointId())
+    /// Output path invariants
+    ///    - kInvalid* constants are used to define "no value available (yet)" and
+    ///      iteration loop will fill the first value when such a value is seen (fixed for non-wildcard
+    ///      or iteration-based in case of wildcards).
+    ///    - Iteration of the output path is done in order: first endpoint, then cluster, then attribute.
+    /// Processing works like:
+    ///    - Initial state is kInvalidEndpointId/kInvalidClusterId/kInvalidAttributeId
+    ///    - First loop pass fills-in endpointID, followed by clusterID, followed by attributeID
+    ///    - Whenever one level is done iterating (there is no "next") the following
+    ///      "higher path component" is updated:
+    ///         - once a valid path exists, try to advance attributeID
+    ///         - if attributeID fails to advance, try to advance clusterID (and restart attributeID)
+    ///         - if clusterID fails to advance, try to advance endpointID (and restart clusterID)
+    ///         - if endpointID fails to advance, iteration is done
+    while (true)
     {
-        mEndpointIndex    = 0;
-        mEndEndpointIndex = emberAfEndpointCount();
-    }
-    else
-    {
-        mEndpointIndex = emberAfIndexFromEndpoint(aAttributePath.mEndpointId);
-        // If the given cluster id does not exist on the given endpoint, it will return uint16(0xFFFF), then endEndpointIndex
-        // will be 0, means we should iterate a null endpoint set (skip it).
-        mEndEndpointIndex = static_cast<uint16_t>(mEndpointIndex + 1);
-    }
-}
-
-void AttributePathExpandIterator::PrepareClusterIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId)
-{
-    if (aAttributePath.HasWildcardClusterId())
-    {
-        mClusterIndex    = 0;
-        mEndClusterIndex = emberAfClusterCount(aEndpointId, true /* server */);
-    }
-    else
-    {
-        mClusterIndex = emberAfClusterIndex(aEndpointId, aAttributePath.mClusterId, CLUSTER_MASK_SERVER);
-        // If the given cluster id does not exist on the given endpoint, it will return uint8(0xFF), then endClusterIndex
-        // will be 0, means we should iterate a null cluster set (skip it).
-        mEndClusterIndex = static_cast<uint8_t>(mClusterIndex + 1);
-    }
-}
-
-void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId,
-                                                             ClusterId aClusterId)
-{
-    if (aAttributePath.HasWildcardAttributeId())
-    {
-        mAttributeIndex          = 0;
-        mEndAttributeIndex       = emberAfGetServerAttributeCount(aEndpointId, aClusterId);
-        mGlobalAttributeIndex    = 0;
-        mGlobalAttributeEndIndex = ArraySize(GlobalAttributesNotInMetadata);
-    }
-    else
-    {
-        mAttributeIndex = emberAfGetServerAttributeIndexByAttributeId(aEndpointId, aClusterId, aAttributePath.mAttributeId);
-        // If the given attribute id does not exist on the given endpoint, it will return uint16(0xFFFF), then endAttributeIndex
-        // will be 0, means we should iterate a null attribute set (skip it).
-        mEndAttributeIndex = static_cast<uint16_t>(mAttributeIndex + 1);
-        if (mAttributeIndex == UINT16_MAX)
+        if (mPosition.mOutputPath.mClusterId != kInvalidClusterId)
         {
-            // Check whether this is a non-metadata global attribute.
-            //
-            // Default to the max value, which will correspond (after we add 1
-            // and overflow to 0 for the max index) to us not going through
-            // non-metadata global attributes for this attribute.
-            mGlobalAttributeIndex = UINT8_MAX;
-
-            static_assert(ArraySize(GlobalAttributesNotInMetadata) <= UINT8_MAX, "Iterating over at most 256 array entries");
-
-            const uint8_t arraySize = static_cast<uint8_t>(ArraySize(GlobalAttributesNotInMetadata));
-            for (uint8_t idx = 0; idx < arraySize; ++idx)
+            std::optional<AttributeId> nextAttribute = NextAttribute(entry);
+            if (nextAttribute.has_value())
             {
-                if (GlobalAttributesNotInMetadata[idx] == aAttributePath.mAttributeId)
-                {
-                    mGlobalAttributeIndex = idx;
-                    break;
-                }
-            }
-            mGlobalAttributeEndIndex = static_cast<uint8_t>(mGlobalAttributeIndex + 1);
-        }
-        else
-        {
-            mGlobalAttributeIndex    = UINT8_MAX;
-            mGlobalAttributeEndIndex = 0;
-        }
-    }
-}
-
-void AttributePathExpandIterator::ResetCurrentCluster()
-{
-    // If this is a null iterator, or the attribute id of current cluster info is not a wildcard attribute id, then this function
-    // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster.
-    VerifyOrReturn(mpAttributePath != nullptr && mpAttributePath->mValue.HasWildcardAttributeId());
-
-    // Otherwise, we will reset the index for iterating the attributes, so we report the attributes for this cluster again. This
-    // will ensure that the client sees a coherent view of the cluster from the reports generated by a single (wildcard) attribute
-    // path in the request.
-    //
-    // Note that when Next() returns, we must be in one of the following states:
-    // - This is not a wildcard path
-    // - We just expanded some attribute id field
-    // - We have exhausted all paths
-    // Only the second case will happen here since the above check will fail for 1 and 3, so the following Next() call must result
-    // in a valid path, which is the first attribute id we will emit for the current cluster.
-    mAttributeIndex       = UINT16_MAX;
-    mGlobalAttributeIndex = UINT8_MAX;
-    Next();
-}
-
-bool AttributePathExpandIterator::Next()
-{
-    for (; mpAttributePath != nullptr; (mpAttributePath = mpAttributePath->mpNext, mEndpointIndex = UINT16_MAX))
-    {
-        mOutputPath.mExpanded = mpAttributePath->mValue.IsWildcardPath();
-
-        if (mEndpointIndex == UINT16_MAX)
-        {
-            // Special case: If this is a concrete path, we just return its value as-is.
-            if (!mpAttributePath->mValue.IsWildcardPath())
-            {
-                mOutputPath.mEndpointId  = mpAttributePath->mValue.mEndpointId;
-                mOutputPath.mClusterId   = mpAttributePath->mValue.mClusterId;
-                mOutputPath.mAttributeId = mpAttributePath->mValue.mAttributeId;
-
-                // Prepare for next iteration
-                mEndpointIndex = mEndEndpointIndex = 0;
+                mPosition.mOutputPath.mAttributeId = *nextAttribute;
+                mPosition.mOutputPath.mExpanded    = mPosition.mAttributePath->mValue.IsWildcardPath();
                 return true;
             }
-
-            PrepareEndpointIndexRange(mpAttributePath->mValue);
-            mClusterIndex = UINT8_MAX;
         }
 
-        for (; mEndpointIndex < mEndEndpointIndex;
-             (mEndpointIndex++, mClusterIndex = UINT8_MAX, mAttributeIndex = UINT16_MAX, mGlobalAttributeIndex = UINT8_MAX))
+        // no valid attribute, try to advance the cluster, see if a suitable one exists
+        if (mPosition.mOutputPath.mEndpointId != kInvalidEndpointId)
         {
-            if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
+            std::optional<ClusterId> nextCluster = NextClusterId();
+            if (nextCluster.has_value())
             {
-                // Not an enabled endpoint; skip it.
+                // A new cluster ID is to be processed. This sets the cluster ID to the new value and
+                // ALSO resets the attribute ID to "invalid", to trigger an attribute set/expansion from
+                // the beginning.
+                mPosition.mOutputPath.mClusterId   = *nextCluster;
+                mPosition.mOutputPath.mAttributeId = kInvalidAttributeId;
                 continue;
             }
-
-            EndpointId endpointId = emberAfEndpointFromIndex(mEndpointIndex);
-
-            if (mClusterIndex == UINT8_MAX)
-            {
-                PrepareClusterIndexRange(mpAttributePath->mValue, endpointId);
-                mAttributeIndex       = UINT16_MAX;
-                mGlobalAttributeIndex = UINT8_MAX;
-            }
-
-            for (; mClusterIndex < mEndClusterIndex;
-                 (mClusterIndex++, mAttributeIndex = UINT16_MAX, mGlobalAttributeIndex = UINT8_MAX))
-            {
-                // emberAfGetNthClusterId must return a valid cluster id here since we have verified the mClusterIndex does
-                // not exceed the mEndClusterIndex.
-                ClusterId clusterId = emberAfGetNthClusterId(endpointId, mClusterIndex, true /* server */).Value();
-                if (mAttributeIndex == UINT16_MAX && mGlobalAttributeIndex == UINT8_MAX)
-                {
-                    PrepareAttributeIndexRange(mpAttributePath->mValue, endpointId, clusterId);
-                }
-
-                if (mAttributeIndex < mEndAttributeIndex)
-                {
-                    // GetServerAttributeIdByIdex must return a valid attribute here since we have verified the mAttributeIndex does
-                    // not exceed the mEndAttributeIndex.
-                    mOutputPath.mAttributeId = emberAfGetServerAttributeIdByIndex(endpointId, clusterId, mAttributeIndex).Value();
-                    mOutputPath.mClusterId   = clusterId;
-                    mOutputPath.mEndpointId  = endpointId;
-                    mAttributeIndex++;
-                    // We found a valid attribute path, now return and increase the attribute index for next iteration.
-                    // Return true will skip the increment of mClusterIndex, mEndpointIndex and mpAttributePath.
-                    return true;
-                }
-                if (mGlobalAttributeIndex < mGlobalAttributeEndIndex)
-                {
-                    // Return a path pointing to the next global attribute.
-                    mOutputPath.mAttributeId = GlobalAttributesNotInMetadata[mGlobalAttributeIndex];
-                    mOutputPath.mClusterId   = clusterId;
-                    mOutputPath.mEndpointId  = endpointId;
-                    mGlobalAttributeIndex++;
-                    return true;
-                }
-                // We have exhausted all attributes of this cluster, continue iterating over attributes of next cluster.
-            }
-            // We have exhausted all clusters of this endpoint, continue iterating over clusters of next endpoint.
         }
-        // We have exhausted all endpoints in this cluster info, continue iterating over next cluster info item.
+
+        // No valid cluster, try advance the endpoint, see if a suitable one exists.
+        std::optional<EndpointId> nextEndpoint = NextEndpointId();
+        if (nextEndpoint.has_value())
+        {
+            // A new endpoint ID is to be processed. This sets the endpoint ID to the new value and
+            // ALSO resets the cluster ID to "invalid", to trigger a cluster set/expansion from
+            // the beginning.
+            mPosition.mOutputPath.mEndpointId = *nextEndpoint;
+            mPosition.mOutputPath.mClusterId  = kInvalidClusterId;
+            continue;
+        }
+        return false;
+    }
+}
+
+bool AttributePathExpandIterator::Next(ConcreteAttributePath & path, std::optional<DataModel::AttributeEntry> * entry)
+{
+    while (mPosition.mAttributePath != nullptr)
+    {
+        if (AdvanceOutputPath(entry))
+        {
+            path = mPosition.mOutputPath;
+            return true;
+        }
+        mPosition.mAttributePath = mPosition.mAttributePath->mpNext;
+        mPosition.mOutputPath    = ConcreteReadAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
     }
 
-    // Reset to default, invalid value.
-    mOutputPath = ConcreteReadAttributePath();
     return false;
 }
+
+std::optional<AttributeId> AttributePathExpandIterator::NextAttribute(std::optional<DataModel::AttributeEntry> * entry)
+{
+    if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
+    {
+        // Attribute ID is tied to attribute index. If no attribute id is available yet
+        // this means the index is invalid. Processing logic in output advance only resets
+        // attribute ID to invalid when resetting iteration.
+        mAttributeIndex = kInvalidIndex;
+    }
+
+    if (mAttributeIndex == kInvalidIndex)
+    {
+        // start a new iteration of attributes on the current cluster path.
+        mAttributes = mDataModelProvider->AttributesIgnoreError(mPosition.mOutputPath);
+
+        if (mPosition.mOutputPath.mAttributeId != kInvalidAttributeId)
+        {
+            // Position on the correct attribute if we have a start point
+            mAttributeIndex = 0;
+            while ((mAttributeIndex < mAttributes.size()) &&
+                   (mAttributes[mAttributeIndex].attributeId != mPosition.mOutputPath.mAttributeId))
+            {
+                mAttributeIndex++;
+            }
+        }
+    }
+
+    if (mPosition.mOutputPath.mAttributeId == kInvalidAttributeId)
+    {
+        if (!mPosition.mAttributePath->mValue.HasWildcardAttributeId())
+        {
+            // The attributeID is NOT a wildcard (i.e. it is fixed).
+            //
+            // For wildcard expansion, we validate that this is a valid attribute for the given
+            // cluster on the given endpoint. If not a wildcard expansion, return it as-is.
+            DataModel::AttributeFinder finder(mDataModelProvider);
+
+            const ConcreteAttributePath attributePath(mPosition.mOutputPath.mEndpointId, mPosition.mOutputPath.mClusterId,
+                                                      mPosition.mAttributePath->mValue.mAttributeId);
+            std::optional<DataModel::AttributeEntry> foundEntry = finder.Find(attributePath);
+
+            // if the entry is valid, we can just return it
+            if (foundEntry.has_value())
+            {
+                if (entry)
+                {
+                    entry->emplace(*foundEntry);
+                }
+                return mPosition.mAttributePath->mValue.mAttributeId;
+            }
+
+            // if the entry is invalid and we are wildcard-expanding, this is not a valid value so
+            // return "not valid"
+            if (mPosition.mAttributePath->mValue.IsWildcardPath())
+            {
+                return std::nullopt;
+            }
+
+            // We get here if all the the conditions below are true:
+            //   - entry is NOT valid (this is not a valid attribute)
+            //   - path is NOT a wildcard (i.e. we were asked to explicitly return it)
+            // as a result, we have no way to generate a "REAL" attribute metadata.
+            // So even though we return a valid attribute id, entry will be empty
+            if (entry)
+            {
+                entry->reset();
+            }
+            // forced ID (even if invalid)
+            return mPosition.mAttributePath->mValue.mAttributeId;
+        }
+        mAttributeIndex = 0;
+    }
+    else
+    {
+        mAttributeIndex++;
+    }
+
+    // Advance the existing attribute id if it can be advanced.
+    VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardAttributeId(), std::nullopt);
+
+    if (mAttributeIndex < mAttributes.size())
+    {
+        if (entry != nullptr)
+        {
+            entry->emplace(mAttributes[mAttributeIndex]);
+        }
+        return mAttributes[mAttributeIndex].attributeId;
+    }
+
+    return std::nullopt;
+}
+
+std::optional<ClusterId> AttributePathExpandIterator::NextClusterId()
+{
+    if (mPosition.mOutputPath.mClusterId == kInvalidClusterId)
+    {
+        // Cluster ID is tied to cluster index. If no cluster id available yet
+        // this means index is invalid. Processing logic in output advance only resets
+        // cluster ID to invalid when resetting iteration.
+        mClusterIndex = kInvalidIndex;
+    }
+
+    if (mClusterIndex == kInvalidIndex)
+    {
+        // start a new iteration on the current endpoint
+        mClusters = mDataModelProvider->ServerClustersIgnoreError(mPosition.mOutputPath.mEndpointId);
+
+        if (mPosition.mOutputPath.mClusterId != kInvalidClusterId)
+        {
+            // Position on the correct cluster if we have a start point
+            mClusterIndex = 0;
+            while ((mClusterIndex < mClusters.size()) && (mClusters[mClusterIndex].clusterId != mPosition.mOutputPath.mClusterId))
+            {
+                mClusterIndex++;
+            }
+        }
+    }
+
+    if (mPosition.mOutputPath.mClusterId == kInvalidClusterId)
+    {
+
+        if (!mPosition.mAttributePath->mValue.HasWildcardClusterId())
+        {
+            // The clusterID is NOT a wildcard (i.e. is fixed).
+            //
+            // For wildcard expansion, we validate that this is a valid cluster for the endpoint.
+            // If non-wildcard expansion, we return as-is.
+            if (mPosition.mAttributePath->mValue.IsWildcardPath())
+            {
+                const ClusterId clusterId = mPosition.mAttributePath->mValue.mClusterId;
+
+                bool found = false;
+                for (auto & entry : mClusters)
+                {
+                    if (entry.clusterId == clusterId)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    return std::nullopt;
+                }
+            }
+
+            return mPosition.mAttributePath->mValue.mClusterId;
+        }
+        mClusterIndex = 0;
+    }
+    else
+    {
+        mClusterIndex++;
+    }
+
+    VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardClusterId(), std::nullopt);
+    VerifyOrReturnValue(mClusterIndex < mClusters.size(), std::nullopt);
+
+    return mClusters[mClusterIndex].clusterId;
+}
+
+std::optional<EndpointId> AttributePathExpandIterator::NextEndpointId()
+{
+    if (mEndpointIndex == kInvalidIndex)
+    {
+        // index is missing, have to start a new iteration
+        mEndpoints = mDataModelProvider->EndpointsIgnoreError();
+
+        if (mPosition.mOutputPath.mEndpointId != kInvalidEndpointId)
+        {
+            // Position on the correct endpoint if we have a start point
+            mEndpointIndex = 0;
+            while ((mEndpointIndex < mEndpoints.size()) && (mEndpoints[mEndpointIndex].id != mPosition.mOutputPath.mEndpointId))
+            {
+                mEndpointIndex++;
+            }
+        }
+    }
+
+    if (mPosition.mOutputPath.mEndpointId == kInvalidEndpointId)
+    {
+        if (!mPosition.mAttributePath->mValue.HasWildcardEndpointId())
+        {
+            return mPosition.mAttributePath->mValue.mEndpointId;
+        }
+
+        // start from the beginning
+        mEndpointIndex = 0;
+    }
+    else
+    {
+        mEndpointIndex++;
+    }
+
+    VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardEndpointId(), std::nullopt);
+    VerifyOrReturnValue(mEndpointIndex < mEndpoints.size(), std::nullopt);
+
+    return mEndpoints[mEndpointIndex].id;
+}
+
 } // namespace app
 } // namespace chip

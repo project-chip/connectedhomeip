@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
   val label: String,
   val mode: UInt,
-  val modeTags: List<RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct>
+  val modeTags: List<RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct>,
 ) {
   override fun toString(): String = buildString {
     append("RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct {\n")
@@ -57,7 +57,7 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
@@ -69,7 +69,7 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
             add(
               RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct.fromTlv(
                 AnonymousTag,
-                tlvReader
+                tlvReader,
               )
             )
           }
@@ -81,7 +81,7 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
       return RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
         label,
         mode,
-        modeTags
+        modeTags,
       )
     }
   }

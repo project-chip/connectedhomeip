@@ -15,16 +15,15 @@
  *    limitations under the License.
  */
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #define CHIP_SHELL_MAX_BUFFER_SIZE 128
@@ -129,6 +128,18 @@ static CHIP_ERROR RendezvousStringToFlag(char * str, chip::RendezvousInformation
         *aRendezvousFlags = chip::RendezvousInformationFlag::kOnNetwork;
         return CHIP_NO_ERROR;
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (strcmp(str, "wifipaf") == 0)
+    {
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kWiFiPAF;
+        return CHIP_NO_ERROR;
+    }
+#endif
+    if (strcmp(str, "nfc") == 0)
+    {
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kNFC;
+        return CHIP_NO_ERROR;
+    }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
@@ -170,14 +181,12 @@ static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
 
 void RegisterOnboardingCodesCommands()
 {
-
-    static const shell_command_t sDeviceComand = {
+    static constexpr Command deviceComand = {
         &OnboardingHandler, "onboardingcodes",
         "Dump device onboarding codes. Usage: onboardingcodes none|softap|ble|onnetwork [qrcode|qrcodeurl|manualpairingcode]"
     };
 
-    // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    Engine::Root().RegisterCommands(&deviceComand, 1);
 }
 
 } // namespace Shell

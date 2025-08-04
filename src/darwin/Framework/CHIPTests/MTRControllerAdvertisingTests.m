@@ -24,8 +24,6 @@
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kTimeoutInSeconds = 3;
 
@@ -166,10 +164,13 @@ static const DNSServiceFlags kBrowseFlags = 0;
     __auto_type * root = [MTRCertificates createRootCertificate:rootKeys issuerID:@(1) fabricID:nil error:error];
     XCTAssertNil(*error);
     XCTAssertNotNil(root);
+    __auto_type * publicKey = operationalKeys.copyPublicKey;
+    XCTAssert(publicKey != NULL);
+    CFAutorelease(publicKey);
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:publicKey
                                                                      fabricID:fabricID
                                                                        nodeID:nodeID
                                                         caseAuthenticatedTags:nil
@@ -275,5 +276,3 @@ static const DNSServiceFlags kBrowseFlags = 0;
 }
 
 @end
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED

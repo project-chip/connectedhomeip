@@ -59,6 +59,10 @@ class DefaultDACVerifier : public DeviceAttestationVerifier
 public:
     DefaultDACVerifier(const AttestationTrustStore * paaRootStore) : mAttestationTrustStore(paaRootStore) {}
 
+    DefaultDACVerifier(const AttestationTrustStore * paaRootStore, DeviceAttestationRevocationDelegate * revocationDelegate) :
+        mAttestationTrustStore(paaRootStore), mRevocationDelegate(revocationDelegate)
+    {}
+
     void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
@@ -74,13 +78,23 @@ public:
                                                    const ByteSpan & attestationSignatureBuffer,
                                                    const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce) override;
 
+    void CheckForRevokedDACChain(const AttestationInfo & info,
+                                 Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
+
     CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }
+
+    CHIP_ERROR SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate) override
+    {
+        mRevocationDelegate = revocationDelegate;
+        return CHIP_NO_ERROR;
+    }
 
 protected:
     DefaultDACVerifier() {}
 
     CsaCdKeysTrustStore mCdKeysTrustStore;
     const AttestationTrustStore * mAttestationTrustStore;
+    DeviceAttestationRevocationDelegate * mRevocationDelegate = nullptr;
 };
 
 /**
@@ -103,13 +117,20 @@ const AttestationTrustStore * GetTestAttestationTrustStore();
  * @param[in] paaRootStore Pointer to the AttestationTrustStore instance to be used by implementation
  *                         of default DeviceAttestationVerifier. Caller must ensure storage is
  *                         always available while the DeviceAttestationVerifier could be used.
+ * @param[in] revocationDelegate Pointer to the DeviceAttestationRevocationDelegate instance to be used by
+ *                         the implementation of default DeviceAttestationVerifier to determine revoked entities.
+ *                         If nullptr, all device attestation revocation checks will be disabled.
+ *                         Caller must ensure the revocation delegate is always available while the
+ *                         DeviceAttestationVerifier could be used.
  *
  * @returns a singleton DeviceAttestationVerifier that satisfies basic device attestation procedure requirements.
  *          This has process lifetime, so the paaRootStore must also have
  *          process lifetime.  In particular, after the first call it's not
  *          possible to change which AttestationTrustStore is used by this verifier.
+ *          Same applies to DeviceAttestationRevocationDelegate.
  */
-DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore);
+DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
+                                                  DeviceAttestationRevocationDelegate * revocationDelegate = nullptr);
 
 } // namespace Credentials
 } // namespace chip

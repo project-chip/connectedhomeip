@@ -1,8 +1,19 @@
+#include "DeviceTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/DataModelTypes.h>
+
+using chip::app::DataModel::Nullable;
+
+using namespace chef;
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+
 #ifdef MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
 #include "chef-air-quality.h"
 #endif // MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
@@ -18,12 +29,131 @@
     defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
 #include "chef-concentration-measurement.h"
 #endif
+#if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) || defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
+#include "resource-monitoring/chef-resource-monitoring-delegates.h"
+#endif
 
-using chip::app::DataModel::Nullable;
+#if defined(MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER) || defined(MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER)
+#include "chef-rvc-mode-delegate.h"
+#endif
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
+#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
+#include "refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.h"
+#endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#include "chef-pump.h"
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+
+#if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/identify-server/identify-server.h>
+
+namespace {
+// TODO: Move this to a standalone cluster cpp file.
+
+constexpr size_t kIdentifyTableSize = MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT;
+static_assert(kIdentifyTableSize <= kEmberInvalidEndpointIndex, "Identify table size error");
+std::unique_ptr<struct Identify> gIdentifyInstanceTable[kIdentifyTableSize];
+
+void InitIdentifyCluster()
+{
+    const uint16_t endpointCount = emberAfEndpointCount();
+
+    for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
+    {
+        chip::EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
+        if (endpointId == kInvalidEndpointId)
+        {
+            continue;
+        }
+
+        // Check if endpoint has Identify cluster enabled
+        uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, chip::app::Clusters::Identify::Id,
+                                                                MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT);
+        if (epIndex >= kIdentifyTableSize)
+            continue;
+
+        gIdentifyInstanceTable[epIndex] =
+            std::make_unique<struct Identify>(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
+    }
+}
+} // namespace
+#endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+namespace {
+
+// Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
+constexpr const uint8_t kNamespaceRefrigerator = 0x41;
+// Refrigerator Namespace: 0x41, tag 0x00 (Refrigerator)
+constexpr const uint8_t kTagRefrigerator = 0x00;
+// Refrigerator Namespace: 0x41, tag 0x01 (Freezer)
+constexpr const uint8_t kTagFreezer                                                 = 0x01;
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gRefrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                          .tag         = kTagRefrigerator } };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gFreezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                          .tag         = kTagFreezer } };
+} // namespace
+
+namespace PostionSemanticTag {
+
+constexpr const uint8_t kNamespace                                   = 0x08; // Common Position Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft   = { .namespaceID = kNamespace, .tag = 0x00 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight  = { .namespaceID = kNamespace, .tag = 0x01 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop    = { .namespaceID = kNamespace, .tag = 0x02 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = { .namespaceID = kNamespace, .tag = 0x03 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namespaceID = kNamespace, .tag = 0x04 };
+
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { PostionSemanticTag::kTop };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
+} // namespace PostionSemanticTag
+
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+#include "chef-rvc-operational-state-delegate.h"
+#endif
+
+#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#include "chef-dishwasher-mode-delegate-impl.h"
+#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+#include "chef-laundry-washer-mode.h"
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS_SERVER
+#include "chef-laundry-washer-controls-delegate-impl.h"
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+#include "chef-operational-state-delegate-impl.h"
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#include "chef-fan-control-manager.h"
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
+#include "temperature-control/static-supported-temperature-levels.h"
+#endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
+
+#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+#include "window-covering/chef-window-covering.h"
+#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+#include "oven-mode/chef-oven-mode.h"
+#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+#include "oven-cavity-operational-state/chef-oven-cavity-operational-state.h"
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+#include "microwave-oven-mode/chef-microwave-oven-mode.h"
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+#include "microwave-oven-control/chef-microwave-oven-control.h"
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -57,6 +187,40 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         return chefConcentrationMeasurementReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
+#if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) || defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
+    case chip::app::Clusters::HepaFilterMonitoring::Id:
+    case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
+        return chefResourceMonitoringExternalReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+    case chip::app::Clusters::RvcRunMode::Id:
+        return chefRvcRunModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+    case chip::app::Clusters::RvcCleanMode::Id:
+        return chefRvcCleanModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+    case chip::app::Clusters::RvcOperationalState::Id:
+        return chefRvcOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
+    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
+        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(endpoint, clusterId, attributeMetadata,
+                                                                                       buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+    case chip::app::Clusters::DishwasherMode::Id:
+        return chefDishwasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+    case chip::app::Clusters::LaundryWasherMode::Id:
+        return chefLaundryWasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+#ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+    case chip::app::Clusters::OperationalState::Id:
+        return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     default:
         break;
     }
@@ -105,243 +269,45 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         return chefConcentrationMeasurementWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
+#if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) || defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
+    case chip::app::Clusters::HepaFilterMonitoring::Id:
+    case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
+        return chefResourceMonitoringExternalWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+    case chip::app::Clusters::RvcRunMode::Id:
+        return chefRvcRunModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+    case chip::app::Clusters::RvcCleanMode::Id:
+        return chefRvcCleanModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+    case chip::app::Clusters::RvcOperationalState::Id:
+        return chefRvcOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
+    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
+        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(endpoint, clusterId, attributeMetadata,
+                                                                                        buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+    case chip::app::Clusters::DishwasherMode::Id:
+        return chefDishwasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
+#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+    case chip::app::Clusters::LaundryWasherMode::Id:
+        return chefLaundryWasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
+#ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+    case chip::app::Clusters::OperationalState::Id:
+        return chefOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     default:
         break;
     }
     return Protocols::InteractionModel::Status::Success;
 }
-
-// Include door lock callbacks only when the server is enabled
-#ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
-#include <app/clusters/door-lock-server/door-lock-server.h>
-
-class LockManager
-{
-public:
-    static constexpr uint32_t kNumEndpoints              = 1;
-    static constexpr uint32_t kNumUsersPerEndpoint       = 2;
-    static constexpr uint32_t kNumCredentialsPerEndpoint = 20;
-    static constexpr uint32_t kNumCredentialsPerUser     = 10;
-    static constexpr uint32_t kMaxNameLength             = 32;
-    static constexpr uint32_t kMaxDataLength             = 16;
-
-    struct Credential
-    {
-        bool set(DlCredentialStatus status, CredentialTypeEnum type, chip::ByteSpan newData)
-        {
-            if (newData.size() > kMaxDataLength || type != CredentialTypeEnum::kPin)
-                return false;
-            memcpy(data, newData.data(), newData.size());
-            info = EmberAfPluginDoorLockCredentialInfo{
-                status,
-                type,
-                chip::ByteSpan(data, newData.size()),
-            };
-            return true;
-        }
-
-        EmberAfPluginDoorLockCredentialInfo info = { DlCredentialStatus::kAvailable };
-        uint8_t data[kMaxDataLength];
-    };
-
-    struct User
-    {
-        void set(chip::CharSpan newName, uint32_t userId, UserStatusEnum userStatus, UserTypeEnum type,
-                 CredentialRuleEnum credentialRule)
-        {
-            size_t sz = std::min(sizeof(name), newName.size());
-            memcpy(name, newName.data(), sz);
-            info = EmberAfPluginDoorLockUserInfo{
-                chip::CharSpan(name, sz), chip::Span<const CredentialStruct>(), userId, userStatus, type, credentialRule,
-            };
-        }
-        bool addCredential(CredentialTypeEnum type, uint16_t index)
-        {
-            if (info.credentials.size() == kNumCredentialsPerUser)
-                return false;
-            auto & cr          = credentialMap[info.credentials.size()];
-            cr.credentialType  = type;
-            cr.credentialIndex = index;
-            info.credentials   = chip::Span<const CredentialStruct>(credentialMap, info.credentials.size() + 1);
-            return true;
-        }
-
-        EmberAfPluginDoorLockUserInfo info = { .userStatus = UserStatusEnum::kAvailable };
-        char name[kMaxNameLength];
-        CredentialStruct credentialMap[kNumCredentialsPerUser];
-    };
-
-    struct Endpoint
-    {
-        chip::EndpointId id;
-        User users[kNumUsersPerEndpoint];
-        Credential credentials[kNumCredentialsPerEndpoint];
-    };
-
-    static LockManager & Instance()
-    {
-        static LockManager instance;
-        return instance;
-    }
-
-    LockManager() { defaultInitialize(); }
-
-    bool getUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
-    {
-        auto ep = findEndpoint(endpointId);
-        if (!ep)
-            return false;
-        if (userIndex >= kNumUsersPerEndpoint)
-            return false;
-        user = ep->users[userIndex].info;
-        return true;
-    }
-
-    bool setUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                 const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
-                 CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
-    {
-        auto ep = findEndpoint(endpointId);
-        if (!ep)
-            return false;
-        if (userIndex >= kNumUsersPerEndpoint || totalCredentials > kNumCredentialsPerUser)
-            return false;
-        ep->users[userIndex].set(userName, uniqueId, userStatus, usertype, credentialRule);
-        ep->users[userIndex].info.creationSource     = DlAssetSource::kMatterIM;
-        ep->users[userIndex].info.createdBy          = creator;
-        ep->users[userIndex].info.modificationSource = DlAssetSource::kMatterIM;
-        ep->users[userIndex].info.lastModifiedBy     = modifier;
-        for (size_t i = 0; i < totalCredentials; i++)
-            ep->users[userIndex].addCredential(credentials[i].credentialType, credentials[i].credentialIndex);
-        return true;
-    }
-
-    bool getCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
-                       EmberAfPluginDoorLockCredentialInfo & credential)
-    {
-        auto ep = findEndpoint(endpointId);
-        if (!ep)
-            return false;
-        if (credentialIndex >= kNumCredentialsPerEndpoint)
-            return false;
-        if (credentialType != CredentialTypeEnum::kPin)
-            return false;
-        credential = ep->credentials[credentialIndex].info;
-        return true;
-    }
-
-    bool setCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
-                       const chip::ByteSpan & credentialData)
-    {
-        auto ep = findEndpoint(endpointId);
-        if (!ep)
-            return false;
-        if (credentialIndex >= kNumCredentialsPerEndpoint)
-            return false;
-        if (credentialType != CredentialTypeEnum::kPin)
-            return false;
-        auto & credential = ep->credentials[credentialIndex];
-        if (!credential.set(credentialStatus, credentialType, credentialData))
-            return false;
-        credential.info.creationSource     = DlAssetSource::kMatterIM;
-        credential.info.createdBy          = creator;
-        credential.info.modificationSource = DlAssetSource::kMatterIM;
-        credential.info.lastModifiedBy     = modifier;
-        return true;
-    }
-
-    bool checkPin(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
-                  chip::app::Clusters::DoorLock::OperationErrorEnum & err)
-    {
-        if (!pinCode.HasValue())
-        {
-            err = OperationErrorEnum::kInvalidCredential;
-            return false;
-        }
-        auto ep = findEndpoint(endpointId);
-        if (!ep)
-            return false;
-        for (auto & pin : ep->credentials)
-        {
-            if (pin.info.status == DlCredentialStatus::kOccupied && pin.info.credentialData.data_equal(pinCode.Value()))
-            {
-                return true;
-            }
-        }
-        err = OperationErrorEnum::kInvalidCredential;
-        return false;
-    }
-
-private:
-    Endpoint * findEndpoint(chip::EndpointId endpointId)
-    {
-        for (auto & e : endpoints)
-        {
-            if (e.id == endpointId)
-                return &e;
-        }
-        return nullptr;
-    }
-
-    void defaultInitialize()
-    {
-        endpoints[0].id = 1;
-        uint8_t pin[6]  = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 };
-        endpoints[0].credentials[0].set(DlCredentialStatus::kOccupied, CredentialTypeEnum::kPin, chip::ByteSpan(pin));
-        endpoints[0].users[0].set("default"_span, 1, UserStatusEnum::kOccupiedEnabled, UserTypeEnum::kUnrestrictedUser,
-                                  CredentialRuleEnum::kSingle);
-        endpoints[0].users[0].addCredential(CredentialTypeEnum::kPin, 1);
-    }
-
-    Endpoint endpoints[kNumEndpoints];
-};
-
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                                            const Nullable<chip::NodeId> & nodeId, const chip::Optional<chip::ByteSpan> & pinCode,
-                                            chip::app::Clusters::DoorLock::OperationErrorEnum & err)
-{
-    err = OperationErrorEnum::kUnspecified;
-    return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
-}
-
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                                              const Nullable<chip::NodeId> & nodeId, const chip::Optional<chip::ByteSpan> & pinCode,
-                                              chip::app::Clusters::DoorLock::OperationErrorEnum & err)
-{
-    err = OperationErrorEnum::kUnspecified;
-    return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked);
-}
-
-bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
-{
-    return LockManager::Instance().getUser(endpointId, userIndex - 1, user);
-}
-
-bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
-                                  chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
-                                  UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
-                                  const CredentialStruct * credentials, size_t totalCredentials)
-{
-    return LockManager::Instance().setUser(endpointId, userIndex - 1, creator, modifier, userName, uniqueId, userStatus, usertype,
-                                           credentialRule, credentials, totalCredentials);
-}
-
-bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
-                                        EmberAfPluginDoorLockCredentialInfo & credential)
-{
-    return LockManager::Instance().getCredential(endpointId, credentialIndex - 1, credentialType, credential);
-}
-
-bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
-                                        chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
-                                        CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
-{
-    return LockManager::Instance().setCredential(endpointId, credentialIndex - 1, creator, modifier, credentialStatus,
-                                                 credentialType, credentialData);
-}
-
-#endif /* MATTER_DM_PLUGIN_DOOR_LOCK_SERVER */
 
 void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
 
@@ -356,14 +322,45 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u", ChipLogValueMEI(attributeId),
                         type, *value, size);
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER // Handle OnOff for fan
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+        HandleOnOffAttributeChangeForFan(attributePath.mEndpointId, bool(*value));
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        {
+            chef::pump::postOnOff(attributePath.mEndpointId, bool(*value));
+        }
+#endif // #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
     }
     else if (clusterId == LevelControl::Id)
     {
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        {
+            chef::pump::postMoveToLevel(attributePath.mEndpointId, *value);
+        }
+#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+#endif // #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+
         // WIP Apply attribute change to Light
     }
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+    else if (clusterId == FanControl::Id)
+    {
+        HandleFanControlAttributeChange(attributeId, type, size, value);
+    }
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
 }
 
 /** @brief OnOff Cluster Init
@@ -381,25 +378,19 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
 
-#ifdef MATTER_DM_PLUGIN_AUDIO_OUTPUT_SERVER
-#include "audio-output/AudioOutputManager.h"
-static AudioOutputManager audioOutputManager;
-
-void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
-    AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
-}
-#endif
-
 #ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "channel/ChannelManager.h"
-static ChannelManager channelManager;
+static ChannelManager channelManager[MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
-    Channel::SetDefaultDelegate(endpoint, &channelManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        channelManager[ep].SetEndpoint(endpoint);
+        Channel::SetDefaultDelegate(endpoint, &channelManager[ep]);
+    }
 }
 #endif
 
@@ -425,27 +416,6 @@ void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 }
 #endif
 
-#ifdef MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER
-#include "media-input/MediaInputManager.h"
-static MediaInputManager mediaInputManager;
-void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate");
-    MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
-}
-#endif
-
-#ifdef MATTER_DM_PLUGIN_MEDIA_PLAYBACK_SERVER
-#include "media-playback/MediaPlaybackManager.h"
-static MediaPlaybackManager mediaPlaybackManager;
-
-void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate");
-    MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
-}
-#endif
-
 #ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
 #include "target-navigator/TargetNavigatorManager.h"
 static TargetNavigatorManager targetNavigatorManager;
@@ -467,3 +437,156 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
     WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
 }
 #endif
+
+/**
+ * This initializer is for the application having refrigerator on EP1 and child
+ * temperatureControlledCabinet endpoints on EP2 and EP3.
+ */
+void RefrigeratorTemperatureControlledCabinetInit()
+{
+    EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
+    EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
+    EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
+    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
+    {
+        return;
+    }
+    ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
+    SetTreeCompositionForEndpoint(kRefEndpointId);
+
+    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
+        SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+        SetTagList(kColdCabinetEndpointId,
+                   Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
+    }
+
+    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
+        SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+        SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gFreezerTagList));
+    }
+}
+
+/**
+ * This initializer is for the application having cooktop. The cooktop can be a part of an oven
+ * or standalone cooktop.
+ *     Standalone Cooktop: Cooktop on EP1 and optional CookSurface on EP2.
+ *     Cooktop part of Oven: Oven on EP1, Cooktop on EP3 and optional CookSurface on EP4.
+ */
+void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
+{
+    SetTreeCompositionForEndpoint(kCooktopEpId);
+    switch (kCooktopEpId)
+    {
+    case DeviceTypes::ExpectedEndpointId::kCooktopStandAlone:
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId))
+        {
+            ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
+            EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktop;
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            {
+                ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+                SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+                SetTagList(kCookSurfaceEpId,
+                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kLeftTagList));
+            }
+        }
+        break;
+    case DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven:
+        EndpointId kOvenEpId = DeviceTypes::ExpectedEndpointId::kOven;
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId) &&
+            DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+        {
+            ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
+            SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
+            EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktopOven;
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            {
+                ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+                SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+                SetTagList(kCookSurfaceEpId,
+                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kLeftTagList));
+            }
+        }
+    }
+}
+
+/**
+ * This initializer is for the application having oven on EP1 and child endpoints -
+ * temperatureControlledCabinet on EP2, cooktop on EP3 and cooksurface on EP4.
+ */
+void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
+{
+    EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
+    EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
+    EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
+    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+    {
+        return;
+    }
+
+    ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
+    SetTreeCompositionForEndpoint(kOvenEpId);
+
+    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
+        SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
+        SetTagList(kTemperatureControlledCabinetEpId,
+                   Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+        Clusters::OvenCavityOperationalState::InitChefOvenCavityOperationalStateCluster();
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+    }
+    CooktopCookSurfaceInit(kCooktopEpId);
+}
+
+void ApplicationInit()
+{
+    ChipLogProgress(NotSpecified, "Chef Application Init !!!");
+
+    RefrigeratorTemperatureControlledCabinetInit();
+    OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+    chef::pump::init();
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+
+#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+    ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
+    ChefWindowCovering::InitChefWindowCoveringCluster();
+#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+    ChipLogProgress(NotSpecified, "Initializing OvenMode cluster.");
+    ChefOvenMode::InitChefOvenModeCluster();
+#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenMode cluster.");
+    ChefMicrowaveOvenMode::InitChefMicrowaveOvenModeCluster();
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenControl cluster.");
+    InitChefMicrowaveOvenControlCluster();
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+
+#if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    InitIdentifyCluster();
+#endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
+void ApplicationShutdown()
+{
+    ChipLogProgress(NotSpecified, "Chef Application Down !!!");
+}
+
+// No-op function, used to force linking this file,
+// instead of the weak functions from other files
+extern "C" void chef_include_stubs_impl(void) {}

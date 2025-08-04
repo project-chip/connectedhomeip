@@ -24,7 +24,8 @@ import chip.logging
 import chip.native
 from chip.ChipStack import ChipStack
 from chip.yaml.runner import ReplTestRunner
-from matter_yamltests.runner import TestRunner
+
+from matter.yamltests.runner import TestRunner
 
 
 class Runner(TestRunner):
@@ -59,7 +60,7 @@ class Runner(TestRunner):
         # device with the provided node id.
         if self._node_id_to_commission is not None:
             # Magic value is the defaults expected for YAML tests.
-            dev_ctrl.CommissionWithCode('MT:-24J0AFN00KA0648G00', self._node_id_to_commission)
+            await dev_ctrl.CommissionWithCode('MT:-24J0AFN00KA0648G00', self._node_id_to_commission)
 
         self._chip_stack = chip_stack
         self._certificate_authority_manager = certificate_authority_manager

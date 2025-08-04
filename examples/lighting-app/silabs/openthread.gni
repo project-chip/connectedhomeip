@@ -23,5 +23,8 @@ app_data_model =
 chip_enable_ota_requestor = true
 chip_enable_openthread = true
 
+# Not needed for the Lighting-app
+chip_enable_read_client = false
+
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"

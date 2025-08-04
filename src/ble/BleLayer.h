@@ -22,7 +22,7 @@
  *      platform's Bluetooth Low Energy (BLE) implementation and the CHIP
  *      stack.
  *
- *      The BleLayer obect accepts BLE data and control input from the
+ *      The BleLayer object accepts BLE data and control input from the
  *      application via a functional interface. It performs the fragmentation
  *      and reassembly required to transmit CHIP message via a BLE GATT
  *      characteristic interface, and drives incoming messages up the CHIP
@@ -47,26 +47,34 @@
 
 #pragma once
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
 #endif
-#include <stdint.h>
 
-#include <ble/BleConfig.h>
+#include <cstddef>
+#include <cstdint>
 
+#include <lib/core/CHIPError.h>
+#include <lib/support/DLLUtil.h>
 #include <lib/support/SetupDiscriminator.h>
+#include <lib/support/Span.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include <ble/BleApplicationDelegate.h>
-#include <ble/BleConnectionDelegate.h>
-#include <ble/BleError.h>
-#include <ble/BleLayerDelegate.h>
-#include <ble/BlePlatformDelegate.h>
-#include <ble/BleRole.h>
-#include <ble/BleUUID.h>
+#include "BleApplicationDelegate.h"
+#include "BleConfig.h"
+#include "BleConnectionDelegate.h"
+#include "BleLayerDelegate.h"
+#include "BlePlatformDelegate.h"
+#include "BleRole.h"
+#include "BleUUID.h"
 
 namespace chip {
+
+namespace Test {
+// Forward declaration of BleLayerTestAccess class tests to allow it to be friends with BleLayer
+class BleLayerTestAccess;
+} // namespace Test
 namespace Ble {
 
 /**
@@ -80,10 +88,6 @@ namespace Ble {
 /// Version(s) of the CHIP BLE Transport Protocol that this stack supports.
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
-
-/// Forward declarations.
-class BleLayer;
-class BLEEndPoint;
 
 /// Enum defining versions of CHIP over BLE transport protocol.
 typedef enum
@@ -200,7 +204,7 @@ public:
  *    and hand the platform-specific BLE_CONNECTION_OBJECT that this receipt
  *    generates to BleLayer via the corresponding platform interface function.
  *    This causes BleLayer to wrap the BLE_CONNECTION_OBJECT in a BLEEndPoint,
- *    and notify chipMessageLayer that a new BLE conneciotn has been received.
+ *    and notify chipMessageLayer that a new BLE connection has been received.
  *    The message layer then wraps the new BLEEndPoint object in a
  *    chipConnection, and hands this object to the application via the message
  *    layer's OnConnectionReceived callback.
@@ -217,9 +221,7 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    friend class BtpEngineTest;
-#endif
+    friend class Test::BleLayerTestAccess;
 
 public:
     // Public data members:
@@ -228,14 +230,11 @@ public:
         kState_NotInitialized = 0,
         kState_Initialized    = 1,
         kState_Disconnecting  = 2
-    } mState; ///< [READ-ONLY] Current state
+    } mState; ///< [READ-ONLY] external access is deprecated, use IsInitialized() / IsBleClosing()
 
     // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
     void * mAppState                 = nullptr;
     BleLayerDelegate * mBleTransport = nullptr;
-
-    typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
-    BleConnectionReceivedFunct OnChipBleConnectReceived;
 
     // Public functions:
     BleLayer();
@@ -244,9 +243,16 @@ public:
                     chip::System::Layer * systemLayer);
     CHIP_ERROR Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
                     BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
+    bool IsInitialized() { return mState != kState_NotInitialized; }
     void IndicateBleClosing();
+    bool IsBleClosing() { return mState == kState_Disconnecting; }
     void Shutdown();
 
+    /**
+     * CancelBleIncompleteConnection will ensure that no more success/error
+     * callbacks will happen until the next call to one of the NewBleConnection*
+     * APIs.
+     */
     CHIP_ERROR CancelBleIncompleteConnection();
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
@@ -255,6 +261,26 @@ public:
                                         BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                         BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
+
+    /**
+     * Attempt to create a connection for any of the discriminators in the provided list of
+     * discriminators.
+     *
+     * The implementation is allowed to call onSuccess multiple times if multiple connections are
+     * created.
+     *
+     * A call to onError indicates that no more calls to onSuccess will happen.
+     *
+     * Callers are expected to call CancelBleIncompleteConnection once they no longer want results
+     * reported.
+     *
+     * The implementation must not assume that the memory backing the "discriminators" argument will
+     * outlive this call returning.
+     */
+    CHIP_ERROR NewBleConnectionByDiscriminators(const Span<const SetupDiscriminator> & discriminators, void * appState,
+                                                BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onSuccess,
+                                                BleConnectionDelegate::OnConnectionErrorFunct onError);
+
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
     void CloseAllBleConnections();
@@ -274,7 +300,7 @@ public:
      *     characteristics CHIP cares about.
 
      *     Platform must call this function when a GATT subscription has been established to any CHIP service
-     *     charateristic.
+     *     characteristic.
      *
      *     If this function returns true, CHIP has accepted the BLE connection and wrapped it
      *     in a chipConnection object. If CHIP accepts a BLE connection, the platform MUST
@@ -286,7 +312,7 @@ public:
     bool HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
     /**< Platform must call this function when a GATT unsubscribe is requested on any CHIP
-     *   service charateristic, that is, when an existing GATT subscription on a CHIP service
+     *   service characteristic, that is, when an existing GATT subscription on a CHIP service
      *   characteristic is canceled. */
     bool HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
@@ -307,10 +333,6 @@ public:
     /// Call when an outstanding GATT indication receives a positive receipt confirmation.
     bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
-    /// Call when a GATT read request is received.
-    bool HandleReadReceived(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                            const ChipBleUUID * charId);
-
     /**< Platform must call this function when any previous operation undertaken by the BleLayer via BleAdapter
      *   fails, such as a characteristic write request or subscribe attempt, or when a BLE connection is closed.
      *
@@ -322,19 +344,8 @@ public:
      *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this chipConnection and its end point object. */
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, CHIP_ERROR err);
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    BLEEndPoint * mTestBleEndPoint;
-#endif
-
 private:
     // Private data members:
-
-    // UUID of CHIP service characteristic used for central writes.
-    static const ChipBleUUID CHIP_BLE_CHAR_1_ID;
-    // UUID of CHIP service characteristic used for peripheral indications.
-    static const ChipBleUUID CHIP_BLE_CHAR_2_ID;
-    // UUID of CHIP service characteristic used for additional data
-    static const ChipBleUUID CHIP_BLE_CHAR_3_ID;
 
     BleConnectionDelegate * mConnectionDelegate;
     BlePlatformDelegate * mPlatformDelegate;
@@ -343,7 +354,6 @@ private:
 
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
-    void DriveSending();
     CHIP_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle && pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);
@@ -351,8 +361,5 @@ private:
     static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnConnectionError(void * appState, CHIP_ERROR err);
 };
-
 } /* namespace Ble */
 } /* namespace chip */
-
-#include "BLEEndPoint.h"

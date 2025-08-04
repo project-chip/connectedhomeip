@@ -17,10 +17,13 @@
 
 #include "ZephyrWifiDriver.h"
 
+#include <stdint.h>
+
 #include <platform/KeyValueStoreManager.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
@@ -103,8 +106,9 @@ CHIP_ERROR ZephyrWifiDriver::Init(NetworkStatusChangeCallback * networkStatusCha
 
     if (mStagingNetwork.IsConfigured())
     {
-        WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                                  [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+        WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                     Instance().OnNetworkConnStatusChanged(connStatus);
+                                                 },
                                                   System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
         ReturnErrorOnFailure(
             WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling));
@@ -113,8 +117,11 @@ CHIP_ERROR ZephyrWifiDriver::Init(NetworkStatusChangeCallback * networkStatusCha
     return CHIP_NO_ERROR;
 }
 
-void ZephyrWifiDriver::OnNetworkStatusChanged(Status status)
+void ZephyrWifiDriver::OnNetworkConnStatusChanged(const wifi_conn_status & connStatus)
 {
+    // TODO: check if we can report more accurate errors
+    Status status = connStatus ? Status::kUnknownError : Status::kSuccess;
+
     if (status == Status::kSuccess)
     {
         ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
@@ -122,7 +129,23 @@ void ZephyrWifiDriver::OnNetworkStatusChanged(Status status)
 
     if (mpNetworkStatusChangeCallback)
     {
-        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, NullOptional, NullOptional);
+        const uint8_t * ssid{};
+        size_t ssidLen{};
+        WiFiManager::WiFiInfo wifiInfo;
+
+        if (CHIP_NO_ERROR == WiFiManager::Instance().GetWiFiInfo(wifiInfo))
+        {
+            ssid    = wifiInfo.mSsid;
+            ssidLen = wifiInfo.mSsidLen;
+        }
+        else
+        {
+            ssid    = WiFiManager::Instance().GetWantedNetwork().ssid;
+            ssidLen = WiFiManager::Instance().GetWantedNetwork().ssidLen;
+        }
+        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(ssid, ssidLen)),
+                                                                connStatus ? MakeOptional(static_cast<int32_t>(connStatus))
+                                                                           : NullOptional);
     }
 
     if (mpConnectCallback)
@@ -158,12 +181,15 @@ CHIP_ERROR ZephyrWifiDriver::RevertConfiguration()
             // we are already connected to this network, so return prematurely
             return CHIP_NO_ERROR;
         }
+
+        WiFiManager::Instance().Disconnect();
     }
 
     if (mStagingNetwork.IsConfigured())
     {
-        WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                                  [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+        WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                     Instance().OnNetworkConnStatusChanged(connStatus);
+                                                 },
                                                   System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
         ReturnErrorOnFailure(
             WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling));
@@ -217,8 +243,9 @@ void ZephyrWifiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * call
 {
     Status status = Status::kSuccess;
     WiFiManager::StationStatus stationStatus;
-    WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                              [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+    WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                 Instance().OnNetworkConnStatusChanged(connStatus);
+                                             },
                                               System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
 
     VerifyOrExit(mpConnectCallback == nullptr, status = Status::kUnknownError);
@@ -262,11 +289,10 @@ void ZephyrWifiDriver::LoadFromStorage()
     mStagingNetwork = network;
 }
 
-void ZephyrWifiDriver::OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status)
+void ZephyrWifiDriver::OnScanWiFiNetworkDone(const WiFiManager::ScanDoneStatus & status)
 {
     VerifyOrReturn(mScanCallback != nullptr);
-    mScanCallback->OnFinished(status == WiFiManager::WiFiRequestStatus::SUCCESS ? Status::kSuccess : Status::kUnknownError,
-                              CharSpan(), &mScanResponseIterator);
+    mScanCallback->OnFinished(status ? Status::kUnknownError : Status::kSuccess, CharSpan(), &mScanResponseIterator);
     mScanCallback = nullptr;
 }
 
@@ -280,13 +306,20 @@ void ZephyrWifiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * ca
     mScanCallback    = callback;
     CHIP_ERROR error = WiFiManager::Instance().Scan(
         ssid, [](const WiFiScanResponse & response) { Instance().OnScanWiFiNetworkResult(response); },
-        [](WiFiManager::WiFiRequestStatus status) { Instance().OnScanWiFiNetworkDone(status); });
+        [](const WiFiManager::ScanDoneStatus & status) { Instance().OnScanWiFiNetworkDone(status); });
 
     if (error != CHIP_NO_ERROR)
     {
         mScanCallback = nullptr;
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
     }
+}
+
+uint32_t ZephyrWifiDriver::GetSupportedWiFiBandsMask() const
+{
+    uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+    bands |= static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k5g));
+    return bands;
 }
 
 } // namespace NetworkCommissioning

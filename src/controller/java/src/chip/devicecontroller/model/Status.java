@@ -57,6 +57,7 @@ public final class Status {
     Reserved99(0x99),
     Reserved9a(0x9a),
     Busy(0x9c),
+    AccessRestricted(0x9d),
     Deprecatedc0(0xc0),
     Deprecatedc1(0xc1),
     Deprecatedc2(0xc2),
@@ -70,6 +71,9 @@ public final class Status {
     FailsafeRequired(0xca),
     InvalidInState(0xcb),
     NoCommandResponse(0xcc),
+    DynamicConstraintError(0xcf),
+    AlreadyExists(0xd0),
+    InvalidTransportType(0xd1),
     WriteIgnored(0xf0);
 
     private int id = 0;

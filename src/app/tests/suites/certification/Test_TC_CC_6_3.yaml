@@ -287,6 +287,138 @@ tests:
               minValue: 0
               maxValue: 3
 
+    - label:
+          "Step 5a: TH sends StepColorTemperature command to DUT with
+          StepMode=0x01 (up), StepSize=0"
+      PICS: CC.S.F04 && CC.S.C4c.Rsp
+      command: "StepColorTemperature"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 1
+              - name: "StepSize"
+                value: 0
+              - name: "ColorTemperatureMinimumMireds"
+                value: 0
+              - name: "ColorTemperatureMaximumMireds"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 5b TH sends StepColorTemperature command to DUT with
+          StepMode=0x03 (down), StepSize=0"
+      PICS: CC.S.F04 && CC.S.C4c.Rsp
+      command: "StepColorTemperature"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 3
+              - name: "StepSize"
+                value: 0
+              - name: "ColorTemperatureMinimumMireds"
+                value: 0
+              - name: "ColorTemperatureMaximumMireds"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 6a: TH sends StepColorTemperature command to DUT with StepMode =
+          0x01 (up), StepSize = ColorTempPhysicalMaxMireds and TransitionTime =
+          0 (instant)."
+      PICS: CC.S.F04 && CC.S.C4c.Rsp
+      command: "StepColorTemperature"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 1
+              - name: "StepSize"
+                value: ColorTempPhysicalMaxMiredsValue
+              - name: "ColorTemperatureMinimumMireds"
+                value: ColorTempPhysicalMinMiredsValue
+              - name: "ColorTemperatureMaximumMireds"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      PICS: CC.S.F04
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "Step 6b: TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
+      command: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+      response:
+          value: ColorTempPhysicalMaxMiredsValue
+          constraints:
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
+
+    - label:
+          "Step 7a: TH sends StepColorTemperature command to DUT with StepMode =
+          0x03 (down), StepSize = ColorTempPhysicalMaxMireds and TransitionTime
+          = 0 (instant)."
+      PICS: CC.S.F04 && CC.S.C4c.Rsp
+      command: "StepColorTemperature"
+      arguments:
+          values:
+              - name: "StepMode"
+                value: 3
+              - name: "StepSize"
+                value: ColorTempPhysicalMaxMiredsValue
+              - name: "ColorTemperatureMinimumMireds"
+                value: 0
+              - name: "ColorTemperatureMaximumMireds"
+                value: ColorTempPhysicalMaxMiredsValue
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      PICS: CC.S.F04
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "Step 7b: TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp
+      command: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+      response:
+          value: ColorTempPhysicalMinMiredsValue
+          constraints:
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
+
     - label: "Turn Off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"

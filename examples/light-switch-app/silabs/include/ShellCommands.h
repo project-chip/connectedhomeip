@@ -21,10 +21,10 @@
 
 #if defined(ENABLE_CHIP_SHELL)
 
-namespace LightSwtichCommands {
+namespace LightSwitchCommands {
 
 void RegisterSwitchCommands();
 
-} // namespace LightSwtichCommands
+} // namespace LightSwitchCommands
 
 #endif // defined(ENABLE_CHIP_SHELL)

@@ -16,6 +16,7 @@
 
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
+#import <os/lock.h>
 
 #import "MTRAsyncWorkQueue.h"
 
@@ -489,6 +490,72 @@
     CFRelease(testContext);
     dispatch_semaphore_signal(proceed);
     [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
+- (void)testItemsConcurrently
+{
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:NSNull.null width:3];
+
+    XCTestExpectation * first3WorkItemsExecutedExpectation = [self expectationWithDescription:@"First 3 work items executed"];
+    XCTestExpectation * first3WorkItemsSleptExpectation = [self expectationWithDescription:@"First 3 work items slept"];
+    __block os_unfair_lock counterLock = OS_UNFAIR_LOCK_INIT;
+    __block int beforeSleepCounter = 0;
+    __block int afterSleepCounter = 0;
+    __auto_type sleep1ReadyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        os_unfair_lock_lock(&counterLock);
+        beforeSleepCounter++;
+        if (beforeSleepCounter == 3) {
+            [first3WorkItemsExecutedExpectation fulfill];
+        }
+        os_unfair_lock_unlock(&counterLock);
+        sleep(1);
+        os_unfair_lock_lock(&counterLock);
+        afterSleepCounter++;
+        if (afterSleepCounter == 3) {
+            [first3WorkItemsSleptExpectation fulfill];
+        }
+        os_unfair_lock_unlock(&counterLock);
+        completion(MTRAsyncWorkComplete);
+    };
+
+    MTRAsyncWorkItem * workItem1 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    workItem1.readyHandler = sleep1ReadyHandler;
+    [workQueue enqueueWorkItem:workItem1 descriptionWithFormat:@"work item %d", 1];
+
+    MTRAsyncWorkItem * workItem2 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    workItem2.readyHandler = sleep1ReadyHandler;
+    [workQueue enqueueWorkItem:workItem2 descriptionWithFormat:@"work item %d", 2];
+
+    MTRAsyncWorkItem * workItem3 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    workItem3.readyHandler = sleep1ReadyHandler;
+    [workQueue enqueueWorkItem:workItem3 descriptionWithFormat:@"work item %d", 3];
+
+    // This is the item after the first 3, and should only execute when one of them finished
+    XCTestExpectation * lastWorkItemWaitedExpectation = [self expectationWithDescription:@"Last work item waited properly"];
+    MTRAsyncWorkItem * workItemLast = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    workItemLast.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        // expect this to have waited until at least one of the above items finished after sleep() and incremented counter
+        os_unfair_lock_lock(&counterLock);
+        XCTAssert(afterSleepCounter > 0);
+        [lastWorkItemWaitedExpectation fulfill];
+        os_unfair_lock_unlock(&counterLock);
+        completion(MTRAsyncWorkComplete);
+    };
+    [workQueue enqueueWorkItem:workItemLast description:@"last work item"];
+
+    [self waitForExpectations:@[ first3WorkItemsExecutedExpectation ] timeout:2];
+    // the before-sleep counter should have reached 3 immediately as they all run concurrently.
+    os_unfair_lock_lock(&counterLock);
+    XCTAssertEqual(afterSleepCounter, 0);
+    os_unfair_lock_unlock(&counterLock);
+
+    [self waitForExpectations:@[ lastWorkItemWaitedExpectation, first3WorkItemsSleptExpectation ] timeout:2];
+
+    // see that all 3 first items ran and slept
+    os_unfair_lock_lock(&counterLock);
+    XCTAssertEqual(beforeSleepCounter, 3);
+    XCTAssertEqual(afterSleepCounter, 3);
+    os_unfair_lock_unlock(&counterLock);
 }
 
 @end

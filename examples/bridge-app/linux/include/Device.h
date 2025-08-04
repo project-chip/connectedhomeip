@@ -20,23 +20,28 @@
 
 #include <app/util/attribute-storage.h>
 
+#include <cstdint>
 #include <stdbool.h>
 #include <stdint.h>
 
 #include <functional>
+#include <string>
+#include <sys/types.h>
 #include <vector>
 
 class Device
 {
 public:
-    static const int kDeviceNameSize = 32;
+    static const int kDeviceNameSize     = 32;
+    static const int kDeviceUniqueIdSize = 32;
 
     enum Changed_t
     {
-        kChanged_Reachable = 1u << 0,
-        kChanged_Location  = 1u << 1,
-        kChanged_Name      = 1u << 2,
-        kChanged_Last      = kChanged_Name,
+        kChanged_Reachable            = 1u << 0,
+        kChanged_Location             = 1u << 1,
+        kChanged_Name                 = 1u << 2,
+        kChanged_ConfigurationVersion = 1u << 3,
+        kChanged_Last                 = kChanged_ConfigurationVersion,
     } Changed;
 
     Device(const char * szDeviceName, std::string szLocation);
@@ -45,12 +50,17 @@ public:
     bool IsReachable();
     void SetReachable(bool aReachable);
     void SetName(const char * szDeviceName);
+    void SetUniqueId(const char * szDeviceUniqueId);
     void SetLocation(std::string szLocation);
+    void GenerateUniqueId();
+    uint32_t GetConfigurationVersion();
+    void SetConfigurationVersion(uint32_t configurationVersion);
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
     inline char * GetName() { return mName; };
+    inline char * GetUniqueId() { return mUniqueId; };
     inline std::string GetLocation() { return mLocation; };
     inline std::string GetZone() { return mZone; };
     inline void SetZone(std::string zone) { mZone = zone; };
@@ -59,8 +69,10 @@ private:
     virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
 
 protected:
-    bool mReachable;
-    char mName[kDeviceNameSize];
+    bool mReachable                         = false;
+    char mName[kDeviceNameSize + 1]         = { 0 };
+    char mUniqueId[kDeviceUniqueIdSize + 1] = { 0 };
+    uint32_t mConfigurationVersion;
     std::string mLocation;
     chip::EndpointId mEndpointId;
     chip::EndpointId mParentEndpointId;

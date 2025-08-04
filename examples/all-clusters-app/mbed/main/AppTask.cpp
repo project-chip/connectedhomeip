@@ -19,12 +19,13 @@
 #include "AppTask.h"
 #include "LEDWidget.h"
 #include <DFUManager.h>
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
 #include <lib/support/logging/CHIPLogging.h>
@@ -45,7 +46,8 @@ using namespace ::chip::Credentials;
 
 namespace {
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
-}
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
+} // namespace
 
 AppTask AppTask::sAppTask;
 
@@ -70,7 +72,8 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    error = Server::GetInstance().Init(initParams);
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    error                        = Server::GetInstance().Init(initParams);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Server initialization failed: %s", error.AsString());
@@ -90,6 +93,7 @@ int AppTask::Init()
         return EXIT_FAILURE;
     }
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return 0;
 }
 

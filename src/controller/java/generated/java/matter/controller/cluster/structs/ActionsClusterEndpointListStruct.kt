@@ -27,7 +27,7 @@ class ActionsClusterEndpointListStruct(
   val endpointListID: UShort,
   val name: String,
   val type: UByte,
-  val endpoints: List<UShort>
+  val endpoints: List<UShort>,
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterEndpointListStruct {\n")
@@ -41,7 +41,7 @@ class ActionsClusterEndpointListStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D), endpointListID)
+      put(ContextSpecificTag(TAG_ENDPOINT_LIST_ID), endpointListID)
       put(ContextSpecificTag(TAG_NAME), name)
       put(ContextSpecificTag(TAG_TYPE), type)
       startArray(ContextSpecificTag(TAG_ENDPOINTS))
@@ -54,14 +54,14 @@ class ActionsClusterEndpointListStruct(
   }
 
   companion object {
-    private const val TAG_ENDPOINT_LIST_I_D = 0
+    private const val TAG_ENDPOINT_LIST_ID = 0
     private const val TAG_NAME = 1
     private const val TAG_TYPE = 2
     private const val TAG_ENDPOINTS = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterEndpointListStruct {
       tlvReader.enterStructure(tlvTag)
-      val endpointListID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
+      val endpointListID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_LIST_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
       val endpoints =

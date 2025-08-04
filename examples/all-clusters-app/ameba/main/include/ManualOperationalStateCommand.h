@@ -19,6 +19,7 @@
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include "operational-state-delegate-impl.h"
+#include "oven-operational-state-delegate.h"
 #include "rvc-operational-state-delegate-impl.h"
 
 #if CONFIG_ENABLE_CHIP_SHELL
@@ -39,6 +40,7 @@ using Shell::streamer_printf;
 
 Engine sShellManualOperationalStateSubCommands;
 Engine sShellManualRVCOperationalStateSubCommands;
+Engine sShellManualOvenCavityOperationalStateSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
 #if CONFIG_ENABLE_CHIP_SHELL
@@ -180,6 +182,73 @@ CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** arg
     }
 
     RvcOperationalState::GetRvcOperationalStateInstance()->OnOperationalErrorDetected(err);
+
+    return CHIP_NO_ERROR;
+}
+
+/********************************************************
+ * Oven Cavity Operational State Functions
+ *********************************************************/
+
+CHIP_ERROR ManualOvenCavityOperationalStateCommandHelpHandler(int argc, char ** argv)
+{
+    sShellManualOvenCavityOperationalStateSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ManualOvenCavityOperationalStateCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return ManualOvenCavityOperationalStateCommandHelpHandler(argc, argv);
+    }
+
+    return sShellManualOvenCavityOperationalStateSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR ManualOvenCavityOperationalStateSetStateCommandHandler(int argc, char ** argv)
+{
+    if (argc != 1)
+    {
+        return ManualOvenCavityOperationalStateCommandHelpHandler(argc, argv);
+    }
+    uint32_t state = atoi(argv[0]);
+
+    CHIP_ERROR err;
+    err = OvenCavityOperationalState::GetOperationalStateInstance()->SetOperationalState(state);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ManualOvenCavityOperationalStateSetStateCommandHandler Failed!\r\n");
+    }
+
+    return err;
+}
+
+CHIP_ERROR ManualOvenCavityOperationalStateSetErrorCommandHandler(int argc, char ** argv)
+{
+    if (argc != 1)
+    {
+        return ManualOvenCavityOperationalStateCommandHelpHandler(argc, argv);
+    }
+
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    uint32_t error = atoi(argv[0]);
+
+    switch (error)
+    {
+    case to_underlying(OvenCavityOperationalState::ErrorStateEnum::kNoError):                   // 0x00, 0
+    case to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToStartOrResume):     // 0x01, 1
+    case to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation): // 0x02, 2
+    case to_underlying(OvenCavityOperationalState::ErrorStateEnum::kCommandInvalidInState):     // 0x03, 3
+        err.errorStateID = error;
+        break;
+    default:
+        err.errorStateID = to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnknownEnumValue); // 0x04, 4
+        break;
+    }
+
+    OvenCavityOperationalState::GetOperationalStateInstance()->OnOperationalErrorDetected(err);
 
     return CHIP_NO_ERROR;
 }

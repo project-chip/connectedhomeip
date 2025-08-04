@@ -19,9 +19,11 @@ package chip.platform;
 
 public final class AndroidChipPlatform {
   private BleManager mBleManager = null;
+  private NfcCommissioningManager mNfcCommissioningManager = null;
 
   public AndroidChipPlatform(
       BleManager ble,
+      NfcCommissioningManager nfc,
       KeyValueStoreManager kvm,
       ConfigurationManager cfg,
       ServiceResolver resolver,
@@ -31,12 +33,34 @@ public final class AndroidChipPlatform {
     // Order is important here: initChipStack() initializes the BLEManagerImpl, which depends on the
     // BLEManager being set.
     setBLEManager(ble);
+    // Order is important here: initChipStack() initializes the NFCCommissioningManagerImpl, which
+    // depends on the NFCCommissioningManager being set.
+    setNFCCommissioningManager(nfc);
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
     setDnssdDelegates(resolver, browser, chipMdnsCallback);
     setDiagnosticDataProviderManager(dataProvider);
     initChipStack();
   }
+
+  // for NFCCommissioningManager
+  public NfcCommissioningManager getNFCCommissioningManager() {
+    return mNfcCommissioningManager;
+  }
+
+  private void setNFCCommissioningManager(NfcCommissioningManager manager) {
+    if (manager != null) {
+      mNfcCommissioningManager = manager;
+      manager.setAndroidChipPlatform(this);
+      nativeSetNFCCommissioningManager(manager);
+    }
+  }
+
+  public native void onNfcTagResponse(byte[] response);
+
+  public native void onNfcTagError();
+
+  private native void nativeSetNFCCommissioningManager(NfcCommissioningManager manager);
 
   // for BLEManager
   public BleManager getBLEManager() {
@@ -111,4 +135,16 @@ public final class AndroidChipPlatform {
       int spake2pIterationCount,
       long setupPasscode,
       int discriminator);
+
+  public interface ServiceResolveListener {
+    void onServiceResolve(String instanceName, String serviceType);
+  }
+
+  /**
+   * Set a listener which will be notified a service is resolved. The notification will indicate the
+   * instance name and the service type.
+   *
+   * @param ServiceResolveListener listener to notify (or null to disable the Listener)
+   */
+  public native void setServiceResolveListener(ServiceResolveListener listener);
 }

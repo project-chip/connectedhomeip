@@ -73,13 +73,13 @@
  * Uncomment a macro to enable alternate implementation of specific base
  * platform function
  */
-//#define MBEDTLS_PLATFORM_EXIT_ALT
+// #define MBEDTLS_PLATFORM_EXIT_ALT
 #define MBEDTLS_PLATFORM_TIME_ALT
-//#define MBEDTLS_PLATFORM_FPRINTF_ALT
-//#define MBEDTLS_PLATFORM_PRINTF_ALT
-//#define MBEDTLS_PLATFORM_SNPRINTF_ALT
-//#define MBEDTLS_PLATFORM_NV_SEED_ALT
-//#define MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
+// #define MBEDTLS_PLATFORM_FPRINTF_ALT
+// #define MBEDTLS_PLATFORM_PRINTF_ALT
+// #define MBEDTLS_PLATFORM_SNPRINTF_ALT
+// #define MBEDTLS_PLATFORM_NV_SEED_ALT
+// #define MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
 
 /**
  * \def MBEDTLS_ENTROPY_HARDWARE_ALT
@@ -103,7 +103,7 @@
  */
 #undef MBEDTLS_ECP_DP_SECP192R1_ENABLED
 #undef MBEDTLS_ECP_DP_SECP224R1_ENABLED
-//#define MBEDTLS_ECP_DP_SECP256R1_ENABLED
+// #define MBEDTLS_ECP_DP_SECP256R1_ENABLED
 #undef MBEDTLS_ECP_DP_SECP384R1_ENABLED
 #undef MBEDTLS_ECP_DP_SECP521R1_ENABLED
 #undef MBEDTLS_ECP_DP_SECP192K1_ENABLED
@@ -112,7 +112,7 @@
 #undef MBEDTLS_ECP_DP_BP256R1_ENABLED
 #undef MBEDTLS_ECP_DP_BP384R1_ENABLED
 #undef MBEDTLS_ECP_DP_BP512R1_ENABLED
-//#undef MBEDTLS_ECP_DP_CURVE25519_ENABLED
+// #undef MBEDTLS_ECP_DP_CURVE25519_ENABLED
 #undef MBEDTLS_ECP_DP_CURVE448_ENABLED
 
 /**
@@ -246,7 +246,7 @@
  *
  * Uncomment this macro to enable support for SSLv2 Client Hello messages.
  */
-//#define MBEDTLS_SSL_SRV_SUPPORT_SSLV2_CLIENT_HELLO
+// #define MBEDTLS_SSL_SRV_SUPPORT_SSLV2_CLIENT_HELLO
 
 /**
  * \def MBEDTLS_SSL_PROTO_TLS1
@@ -468,7 +468,7 @@
  *
  * This module is required for X.509 CRL parsing.
  */
-//#undef MBEDTLS_X509_CRL_PARSE_C
+// #undef MBEDTLS_X509_CRL_PARSE_C
 
 /**
  * \def MBEDTLS_X509_CSR_PARSE_C
@@ -482,7 +482,7 @@
  *
  * This module is used for reading X.509 certificate request.
  */
-//#undef MBEDTLS_X509_CSR_PARSE_C
+// #undef MBEDTLS_X509_CSR_PARSE_C
 
 /**
  * \def MBEDTLS_X509_CREATE_C
@@ -495,7 +495,7 @@
  *
  * This module is the basis for creating X.509 certificates and CSRs.
  */
-//#undef MBEDTLS_X509_CREATE_C
+// #undef MBEDTLS_X509_CREATE_C
 
 /**
  * \def MBEDTLS_X509_CSR_WRITE_C
@@ -508,7 +508,7 @@
  *
  * This module is required for X.509 certificate request writing.
  */
-//#undef MBEDTLS_X509_CSR_WRITE_C
+// #undef MBEDTLS_X509_CSR_WRITE_C
 
 /**
  * \def MBEDTLS_X509_CRT_WRITE_C
@@ -521,7 +521,7 @@
  *
  * This module is required for X.509 certificate creation.
  */
-//#undef MBEDTLS_X509_CRT_WRITE_C
+// #undef MBEDTLS_X509_CRT_WRITE_C
 
 /**
  * \def MBEDTLS_CERTS_C
@@ -778,5 +778,11 @@
  * Uncomment to get errors on using deprecated functions and features.
  */
 #define MBEDTLS_DEPRECATED_REMOVED
+
+#define MBEDTLS_ASN1_WRITE_C
+#define MBEDTLS_ECDSA_C
+#define MBEDTLS_PK_WRITE_C
+#define MBEDTLS_X509_CREATE_C
+#define MBEDTLS_X509_CSR_WRITE_C
 
 #endif /* MBEDTLS_USER_CONFIG_HEADER */

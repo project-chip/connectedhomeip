@@ -15,18 +15,40 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import asyncio
+import base64
 import logging
 import math
 import queue
 import random
+import string
 import time
+from dataclasses import dataclass
 from typing import Any, Dict, List, Set
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status as StatusEnum
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.utils import CommissioningBuildingBlocks
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 
@@ -36,8 +58,25 @@ from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 #
 
 
+@dataclass
+class FabricTableEntryToCheck:
+    fabric_id: int
+    node_id: int
+    vid_verifification_statement: bytes
+    root_public_key: bytes
+
+
+def generate_controller_name(fabric_index: int, controller_index: int):
+    return f"RD{fabric_index}{string.ascii_uppercase[controller_index]}"
+
+
+def generate_vid_verification_statement(fabric_index: int) -> bytes:
+    return b"\x01" + (bytes(bytearray([fabric_index] * 84)))
+
+
 class TC_RR_1_1(MatterBaseTest):
     def setup_class(self):
+        super().setup_class()
         self._pseudo_random_generator = random.Random(1234)
         self._subscriptions = []
 
@@ -45,6 +84,7 @@ class TC_RR_1_1(MatterBaseTest):
         logging.info("Teardown: shutting down all subscription to avoid racy callbacks")
         for subscription in self._subscriptions:
             subscription.Shutdown()
+        super().teardown_class()
 
     @async_test_body
     async def test_TC_RR_1_1(self):
@@ -84,8 +124,6 @@ class TC_RR_1_1(MatterBaseTest):
         # Make sure all certificates are installed with maximal size
         dev_ctrl.fabricAdmin.certificateAuthority.maximizeCertChains = True
 
-        # TODO: Do from PICS list. The reflection approach here what a real client would do,
-        #       and it respects what the test says: "TH writes 4 entries per endpoint where LabelList is supported"
         logging.info("Pre-condition: determine whether any endpoints have UserLabel cluster (ULABEL.S.A0000(LabelList))")
         endpoints_with_user_label_list = await dev_ctrl.ReadAttribute(self.dut_node_id, [Clusters.UserLabel.Attributes.LabelList])
         has_user_labels = len(endpoints_with_user_label_list) > 0
@@ -96,30 +134,39 @@ class TC_RR_1_1(MatterBaseTest):
             logging.info("--> User label cluster not present on any endpoitns")
 
         # Generate list of all clients names
-        all_names = []
-        for fabric_idx in range(num_fabrics_to_commission):
-            for controller_idx in range(num_controllers_per_fabric):
-                all_names.append("RD%d%s" % (fabric_idx, chr(ord('A') + controller_idx)))
-        logging.info(f"Client names that will be used: {all_names}")
         client_list = []
 
-        # TODO: Shall we also verify SupportedFabrics attribute, and the CapabilityMinima attribute?
-        logging.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
+        logging.info("Pre-conditions: validate OperationalCredentials.SupportedFabrics >= 5")
+        supported_fabrics = await self.read_single_attribute(dev_ctrl,
+                                                             node_id=self.dut_node_id,
+                                                             endpoint=0,
+                                                             attribute=Clusters.OperationalCredentials.Attributes.SupportedFabrics)
+        asserts.assert_greater_equal(supported_fabrics, 5)
 
+        logging.info("Pre-conditions: validate BasicInformation.CapabilityMinima.CaseSessionsPerFabric >= 3")
         capability_minima = await self.read_single_attribute(dev_ctrl,
                                                              node_id=self.dut_node_id,
                                                              endpoint=0,
                                                              attribute=Clusters.BasicInformation.Attributes.CapabilityMinima)
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
+        fabric_table_entries_to_check: dict[int, FabricTableEntryToCheck] = {}
+        await self._populate_wildcard()
+        supports_vid_verification = Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id in self.stored_global_wildcard.attributes[
+            0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.AcceptedCommandList]
+        logging.info(f"Device supports VID verification: {supports_vid_verification}")
+
         # Step 1: Commission 5 fabrics with maximized NOC chains. 1a and 1b have already been completed at this time.
         logging.info(f"Step 1: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
+
+        logging.info("Step 1a/1b: Setup first fabric")
 
         # Generate Node IDs for subsequent controllers start at 200, follow 200, 300, ...
         node_ids = [200 + (i * 100) for i in range(num_controllers_per_fabric - 1)]
 
         # Prepare clients for first fabric, that includes the default controller
-        dev_ctrl.name = all_names.pop(0)
+        fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex, dev_ctrl=dev_ctrl)
+        dev_ctrl.name = generate_controller_name(fabric_index, 0)
         client_list.append(dev_ctrl)
 
         if num_controllers_per_fabric > 1:
@@ -130,11 +177,10 @@ class TC_RR_1_1(MatterBaseTest):
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                 targetNodeId=self.dut_node_id, catTags=[0x0001_0001]
             )
-            for controller in new_controllers:
-                controller.name = all_names.pop(0)
+            for idx, controller in enumerate(new_controllers):
+                controller.name = generate_controller_name(fabric_index, idx+1)
             client_list.extend(new_controllers)
 
-        # Step 1c - Ensure there are no leftover fabrics from another process.
         commissioned_fabric_count: int = await self.read_single_attribute(
             dev_ctrl, node_id=self.dut_node_id,
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.CommissionedFabrics)
@@ -157,17 +203,33 @@ class TC_RR_1_1(MatterBaseTest):
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.CommissionedFabrics)
         asserts.assert_not_equal(commissioned_fabric_count, 1, "TH Error: failed to add fabric for testing TH.")
 
-        # Step 1c - perform removal.
+        # Step 1c - Set VIDVerificationStatement for initial fabric.
+        current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+        vid_verification_statement = b''
+        if supports_vid_verification:
+            logging.info("Step 1c, Set VIDVerificationStatmeent for initial fabric")
+            vid_verification_statement = generate_vid_verification_statement(current_fabric_index)
+            await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
+        else:
+            logging.info("Skipping VID verification as this is not supported on the device")
+
+        fabric_table_entries_to_check[current_fabric_index] = FabricTableEntryToCheck(
+            fabric_id=dev_ctrl.fabricId, node_id=self.dut_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=dev_ctrl.rootPublicKeyBytes)
+
+        # Step 1d - Ensure there are no leftover fabrics from another process.
+        logging.info("Step 1d: Remove all other fabrics other than the main one used for the test")
         if commissioned_fabric_count > 1:
-            logging.info("Removing extra fabrics from device.")
             fabrics: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
                 dev_ctrl, node_id=self.dut_node_id, endpoint=0,
                 attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
             for fabric in fabrics:
-                if fabric.fabricID == dev_ctrl.fabricId:
+                logging.info(
+                    f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
+                if fabric.fabricIndex == current_fabric_index:
                     continue
 
-                # This is not the initial client's fabric, so remove it.
+                logging.info(f"  -> Removing extra fabric at FabricIndex {fabric.fabricIndex} from device.")
+                # This is not the test client's fabric, so remove it.
                 await dev_ctrl.SendCommand(
                     self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
 
@@ -176,7 +238,8 @@ class TC_RR_1_1(MatterBaseTest):
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.CommissionedFabrics)
         asserts.assert_equal(commissioned_fabric_count, 1, "Failed to remove extra fabrics from DUT.")
 
-        # Prepare clients for subsequent fabrics (step 1d)
+        # Prepare clients for subsequent fabrics (step 1e)
+        logging.info("Step 1e: Commission into all remaining fabric entries.")
         for i in range(num_fabrics_to_commission - 1):
             admin_index = 2 + i
             logging.info("Commissioning fabric %d/%d" % (admin_index, num_fabrics_to_commission))
@@ -184,13 +247,25 @@ class TC_RR_1_1(MatterBaseTest):
             new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=admin_index)
 
             new_admin_ctrl = new_fabric_admin.NewController(nodeId=dev_ctrl.nodeId, catTags=[0x0001_0001])
-            new_admin_ctrl.name = all_names.pop(0)
-            client_list.append(new_admin_ctrl)
+            # Every new node has same ID but fabric ID are differents per fabric.
+            new_node_id = self.dut_node_id
             await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(commissionerDevCtrl=dev_ctrl,
                                                                              newFabricDevCtrl=new_admin_ctrl,
                                                                              existingNodeId=self.dut_node_id,
-                                                                             newNodeId=self.dut_node_id)
+                                                                             newNodeId=new_node_id)
+            fabric_index = await self.read_single_attribute_check_success(dev_ctrl=new_admin_ctrl, node_id=new_node_id, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
 
+            # Set VIDVerification Statement after joining the fabric.
+            vid_verification_statement = b''
+            if supports_vid_verification:
+                vid_verification_statement = generate_vid_verification_statement(fabric_index)
+                await self.send_single_cmd(dev_ctrl=new_admin_ctrl, node_id=new_node_id, cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
+
+            fabric_table_entries_to_check[fabric_index] = FabricTableEntryToCheck(
+                fabric_id=new_admin_ctrl.fabricId, node_id=new_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=new_admin_ctrl.rootPublicKeyBytes)
+
+            new_admin_ctrl.name = generate_controller_name(fabric_index, 0)
+            client_list.append(new_admin_ctrl)
             if num_controllers_per_fabric > 1:
                 new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(
                     fabricAdmin=new_fabric_admin,
@@ -200,22 +275,43 @@ class TC_RR_1_1(MatterBaseTest):
                     targetNodeId=self.dut_node_id,
                     catTags=[0x0001_0001]
                 )
-                for controller in new_controllers:
-                    controller.name = all_names.pop(0)
+                for idx, controller in enumerate(new_controllers):
+                    controller.name = generate_controller_name(fabric_index, idx+1)
 
                 client_list.extend(new_controllers)
 
         asserts.assert_equal(len(client_list), num_fabrics_to_commission *
                              num_controllers_per_fabric, "Must have the right number of clients")
 
+        logging.info("Step 1f: validate fabric table contents for all fabrics so far")
         commissioned_fabric_count = await self.read_single_attribute(
             dev_ctrl, node_id=self.dut_node_id,
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.CommissionedFabrics)
         asserts.assert_equal(commissioned_fabric_count, num_fabrics_to_commission,
                              "Must have the right number of fabrics commissioned.")
+        logging.info("Reading fabric table")
         fabric_table: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
             dev_ctrl, node_id=self.dut_node_id,
             endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
+
+        for fabric in fabric_table:
+            logging.info(
+                f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
+
+        asserts.assert_equal(set([f.fabricIndex for f in fabric_table]), set(fabric_table_entries_to_check.keys(
+        )), "Fabric table read did not have matching fabricIndex entries compared to expected fabrics configured!")
+
+        for fabric in fabric_table:
+            expected_entry = fabric_table_entries_to_check[fabric.fabricIndex]
+            if supports_vid_verification:
+                asserts.assert_equal(fabric.VIDVerificationStatement, expected_entry.vid_verifification_statement,
+                                     f"VID Verification statement for FabricIndex {fabric.fabricIndex} must be correct")
+            asserts.assert_equal(fabric.nodeID, expected_entry.node_id,
+                                 f"Node ID for FabricIndex {fabric.fabricIndex} must be correct")
+            asserts.assert_equal(fabric.fabricID, expected_entry.fabric_id,
+                                 f"Fabric ID for FabricIndex {fabric.fabricIndex} must be correct")
+            asserts.assert_equal(fabric.rootPublicKey, expected_entry.root_public_key,
+                                 f"Root Public Key for FabricIndex {fabric.fabricIndex} must be correct")
 
         client_by_name = {client.name: client for client in client_list}
         local_session_id_by_client_name = {client.name: client.GetConnectedDeviceSync(
@@ -224,10 +320,8 @@ class TC_RR_1_1(MatterBaseTest):
         # Step 2: Set the Label field for each fabric and BasicInformation.NodeLabel to 32 characters
         logging.info("Step 2: Setting the Label field for each fabric and BasicInformation.NodeLabel to 32 characters")
 
-        for table_idx in range(len(fabric_table)):
-            # Client is client A for each fabric to set the Label field
-            fabric = fabric_table[table_idx]
-            client_name = "RD%dA" % table_idx
+        for fabric in fabric_table:
+            client_name = generate_controller_name(fabric.fabricIndex, 0)
             client = client_by_name[client_name]
 
             # Send the UpdateLabel command
@@ -451,10 +545,8 @@ class TC_RR_1_1(MatterBaseTest):
             # Create a list of per-fabric clients to use for filling group resources accross all fabrics.
             fabric_unique_clients: List[Any] = []
 
-            for table_idx in range(len(fabric_table)):
-                # Client is client A for each fabric
-                fabric = fabric_table[table_idx]
-                client_name = "RD%dA" % table_idx
+            for fabric in fabric_table:
+                client_name = generate_controller_name(fabric.fabricIndex, 0)
                 fabric_unique_clients.append(client_by_name[client_name])
 
             # Step 13: Write and verify indicated_max_group_keys_per_fabric group keys to all fabrics.
@@ -696,9 +788,8 @@ class TC_RR_1_1(MatterBaseTest):
                        enable_access_to_group_cluster: bool,
                        fabric_table: List[
                            Clusters.OperationalCredentials.Structs.FabricDescriptorStruct]):
-        for table_idx, fabric in enumerate(fabric_table):
-            # Client is client A for each fabric
-            client_name = "RD%dA" % table_idx
+        for fabric in fabric_table:
+            client_name = generate_controller_name(fabric.fabricIndex, 0)
             client = client_by_name[client_name]
 
             acl = self.build_acl(enable_access_to_group_cluster)
@@ -871,4 +962,4 @@ class TC_RR_1_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main(maximize_cert_chains=True, controller_cat_tags=[0x0001_0001])
+    default_matter_test_main()

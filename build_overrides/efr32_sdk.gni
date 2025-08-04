@@ -14,5 +14,5 @@
 
 declare_args() {
   # Root directory for efr32 SDK build files.
-  efr32_sdk_build_root = "//third_party/silabs"
+  silabs_sdk_build_root = "//third_party/silabs"
 }

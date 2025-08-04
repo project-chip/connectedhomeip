@@ -17,22 +17,34 @@
 
 #import "MTRMetricsCollector.h"
 #import "MTRLogging_Internal.h"
-#include "MTRMetrics_Internal.h"
+#import "MTRMetrics.h"
+#import "MTRMetrics_Internal.h"
 #import <MTRUnfairLock.h>
+#include <controller/CommissioningDelegate.h>
+#import <os/lock.h>
 #include <platform/Darwin/Tracing.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
 #include <tracing/registry.h>
 
+/*
+ * Set this to MTR_LOG_DEBUG(__VA_ARGS__) to enable logging noisy debug logging for metrics events processing
+ */
+#define MTR_METRICS_LOG_DEBUG(...)
+
 using MetricEvent = chip::Tracing::MetricEvent;
 
-static NSString * kMTRMetricDataValueKey = @"value";
-static NSString * kMTRMetricDataTimepointKey = @"time_point";
-static NSString * kMTRMetricDataDurationKey = @"duration_us";
-
-@implementation MTRMetricsData {
+@implementation MTRMetricData {
     chip::System::Clock::Microseconds64 _timePoint;
-    chip::System::Clock::Microseconds64 _duration;
+    MetricEvent::Type _type;
+}
+
+- (instancetype)init
+{
+    // Default is to create data for instant event type.
+    // The key can be anything since it is not really used in this context.
+    MetricEvent event(MetricEvent::Type::kInstantEvent, "");
+    return [self initWithMetricEvent:event];
 }
 
 - (instancetype)initWithMetricEvent:(const MetricEvent &)event
@@ -41,60 +53,52 @@ static NSString * kMTRMetricDataDurationKey = @"duration_us";
         return nil;
     }
 
+    _type = event.type();
+
+    using EventType = MetricEvent::Type;
+    switch (_type) {
+    // Capture timepoint for begin and end to calculate duration
+    case EventType::kBeginEvent:
+    case EventType::kEndEvent:
+        _timePoint = chip::System::SystemClock().GetMonotonicMicroseconds64();
+        break;
+    case EventType::kInstantEvent:
+        _timePoint = chip::System::Clock::Microseconds64(0);
+        break;
+    }
+
     using ValueType = MetricEvent::Value::Type;
     switch (event.ValueType()) {
     case ValueType::kInt32:
         _value = [NSNumber numberWithInteger:event.ValueInt32()];
         break;
     case ValueType::kUInt32:
-        _value = [NSNumber numberWithInteger:event.ValueUInt32()];
+        _value = [NSNumber numberWithUnsignedInteger:event.ValueUInt32()];
         break;
     case ValueType::kChipErrorCode:
-        _value = [NSNumber numberWithInteger:event.ValueErrorCode()];
+        _errorCode = [NSNumber numberWithUnsignedInteger:event.ValueErrorCode()];
         break;
     case ValueType::kUndefined:
-    default:
-        _value = nil;
+        break;
     }
 
-    _timePoint = chip::System::SystemClock().GetMonotonicMicroseconds64();
-    _duration = chip::System::Clock::Microseconds64(0);
+    MTR_METRICS_LOG_DEBUG("Initializing metric event data %s, type: %d, with time point %llu", event.key(), _type, _timePoint.count());
     return self;
 }
 
-- (void)setDurationFromMetricData:(MTRMetricsData *)fromData
+- (void)setDurationFromMetricData:(MTRMetricData *)fromData
 {
-    _duration = _timePoint - fromData->_timePoint;
-}
+    auto duration = _timePoint - fromData->_timePoint;
+    _duration = [NSNumber numberWithDouble:double(duration.count()) / USEC_PER_SEC];
 
-- (NSNumber *)timePointMicroseconds
-{
-    return [NSNumber numberWithUnsignedLongLong:_timePoint.count()];
-}
-
-- (NSNumber *)durationMicroseconds
-{
-    return [NSNumber numberWithUnsignedLongLong:_duration.count()];
+    MTR_METRICS_LOG_DEBUG("Calculating duration for Matter metric with type %d, from type %d, (%llu - %llu) = %llu us (%llu s)",
+        _type, fromData->_type, _timePoint.count(), fromData->_timePoint.count(), duration.count(), [_duration unsignedLongLongValue]);
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"MTRMetricsData: Value = %@, TimePoint = %@, Duration = %@ us", self.value, self.timePointMicroseconds, self.durationMicroseconds];
-}
-
-- (NSDictionary *)toDictionary
-{
-    NSMutableDictionary * dictRepresentation = [NSMutableDictionary dictionary];
-    if (self.value) {
-        [dictRepresentation setValue:self.value forKey:kMTRMetricDataValueKey];
-    }
-    if (auto tmPt = self.timePointMicroseconds) {
-        [dictRepresentation setValue:tmPt forKey:kMTRMetricDataTimepointKey];
-    }
-    if (auto duration = self.durationMicroseconds) {
-        [dictRepresentation setValue:duration forKey:kMTRMetricDataDurationKey];
-    }
-    return dictRepresentation;
+    return [NSString stringWithFormat:@"<MTRMetricData: Type %d, Value = %@, Error Code = %@, Duration = %@ us>",
+                     static_cast<int>(_type), self.value, self.errorCode, self.duration];
 }
 
 @end
@@ -110,7 +114,7 @@ static NSString * kMTRMetricDataDurationKey = @"duration_us";
 void StartupMetricsCollection()
 {
     if ([MTRMetricsCollector sharedInstance]) {
-        MTR_LOG_INFO("Initialized metrics collection backend for Darwin");
+        MTR_LOG("Initialized metrics collection backend for Darwin");
 
         [[MTRMetricsCollector sharedInstance] registerTracingBackend];
     }
@@ -123,8 +127,9 @@ void ShutdownMetricsCollection()
 
 @implementation MTRMetricsCollector {
     os_unfair_lock _lock;
-    NSMutableDictionary<NSString *, MTRMetricsData *> * _metricsDataCollection;
+    NSMutableDictionary<NSString *, MTRMetricData *> * _metricsDataCollection;
     chip::Tracing::signposts::DarwinTracingBackend _tracingBackend;
+    BOOL _tracingBackendRegistered;
 }
 
 + (instancetype)sharedInstance
@@ -152,32 +157,43 @@ void ShutdownMetricsCollection()
     }
     _lock = OS_UNFAIR_LOCK_INIT;
     _metricsDataCollection = [NSMutableDictionary dictionary];
+    _tracingBackendRegistered = FALSE;
     return self;
 }
 
 - (void)registerTracingBackend
 {
     std::lock_guard lock(_lock);
-    chip::Tracing::Register(_tracingBackend);
-    MTR_LOG_INFO("Registered tracing backend with the registry");
+
+    // Register only once
+    if (!_tracingBackendRegistered) {
+        chip::Tracing::Register(_tracingBackend);
+        MTR_LOG("Registered tracing backend with the registry");
+        _tracingBackendRegistered = TRUE;
+    }
 }
 
 - (void)unregisterTracingBackend
 {
     std::lock_guard lock(_lock);
-    chip::Tracing::Unregister(_tracingBackend);
-    MTR_LOG_INFO("Unregistered tracing backend with the registry");
+
+    // Unregister only if registered before
+    if (_tracingBackendRegistered) {
+        chip::Tracing::Unregister(_tracingBackend);
+        MTR_LOG("Unregistered tracing backend with the registry");
+        _tracingBackendRegistered = FALSE;
+    }
 }
 
 static inline NSString * suffixNameForMetricType(MetricEvent::Type type)
 {
     switch (type) {
     case MetricEvent::Type::kBeginEvent:
-        return @"-begin";
+        return @"_begin";
     case MetricEvent::Type::kEndEvent:
-        return @"-end";
+        return @"_end";
     case MetricEvent::Type::kInstantEvent:
-        return @"-instant";
+        return @"_event";
     }
 }
 
@@ -193,30 +209,30 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     using ValueType = MetricEvent::Value::Type;
     switch (event.ValueType()) {
     case ValueType::kInt32:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %d", event.key(), static_cast<int>(event.type()), event.ValueInt32());
+        MTR_METRICS_LOG_DEBUG("Received metric event, key: %s, type: %d, value: %d", event.key(), static_cast<int>(event.type()), event.ValueInt32());
         break;
     case ValueType::kUInt32:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %u", event.key(), static_cast<int>(event.type()), event.ValueUInt32());
+        MTR_METRICS_LOG_DEBUG("Received metric event, key: %s, type: %d, value: %u", event.key(), static_cast<int>(event.type()), event.ValueUInt32());
         break;
     case ValueType::kChipErrorCode:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, error value: %u", event.key(), static_cast<int>(event.type()), event.ValueErrorCode());
+        MTR_METRICS_LOG_DEBUG("Received metric event, key: %s, type: %d, error value: %u", event.key(), static_cast<int>(event.type()), event.ValueErrorCode());
         break;
     case ValueType::kUndefined:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: nil", event.key(), static_cast<int>(event.type()));
+        MTR_METRICS_LOG_DEBUG("Received metric event, key: %s, type: %d, value: nil", event.key(), static_cast<int>(event.type()));
         break;
     default:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, unknown value", event.key(), static_cast<int>(event.type()));
+        MTR_METRICS_LOG_DEBUG("Received metric event, key: %s, type: %d, unknown value", event.key(), static_cast<int>(event.type()));
         return;
     }
 
     // Create the new metric key based event type
     auto metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(event)];
-    MTRMetricsData * data = [[MTRMetricsData alloc] initWithMetricEvent:event];
+    MTRMetricData * data = [[MTRMetricData alloc] initWithMetricEvent:event];
 
     // If End event, compute its duration using the Begin event
     if (event.type() == MetricEvent::Type::kEndEvent) {
         auto metricsBeginKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetricType(MetricEvent::Type::kBeginEvent)];
-        MTRMetricsData * beginMetric = _metricsDataCollection[metricsBeginKey];
+        MTRMetricData * beginMetric = _metricsDataCollection[metricsBeginKey];
         if (beginMetric) {
             [data setDurationFromMetricData:beginMetric];
         } else {
@@ -225,14 +241,13 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
         }
     }
 
-    [_metricsDataCollection setValue:data forKey:metricsKey];
-
-    // If the event is a begin or end event, implicitly emit a corresponding instant event
-    if (event.type() == MetricEvent::Type::kBeginEvent || event.type() == MetricEvent::Type::kEndEvent) {
-        MetricEvent instantEvent(MetricEvent::Type::kInstantEvent, event.key());
-        data = [[MTRMetricsData alloc] initWithMetricEvent:instantEvent];
-        metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(instantEvent)];
-        [_metricsDataCollection setValue:data forKey:metricsKey];
+    // Add to the collection only if it does not exist as yet or pick latest value for instant event
+    if (![_metricsDataCollection valueForKey:metricsKey] || event.type() == MetricEvent::Type::kInstantEvent) {
+        // If this is the commissioning staging event, skip the cleanup to track the last stage completed in case of error
+        // For all other events, just capture the value
+        if (strcmp(event.key(), chip::Tracing::kMetricDeviceCommissionerCommissionStage) != 0 || event.ValueUInt32() != chip::Controller::CommissioningStage::kCleanup) {
+            [_metricsDataCollection setValue:data forKey:metricsKey];
+        }
     }
 }
 
@@ -240,10 +255,9 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
 {
     std::lock_guard lock(_lock);
 
-    // Copy the MTRMetrics as NSDictionary
     MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
     for (NSString * key in _metricsDataCollection) {
-        [metrics setValue:[_metricsDataCollection[key] toDictionary] forKey:key];
+        [metrics setMetricData:_metricsDataCollection[key] forKey:key];
     }
 
     // Clear curent stats, if specified
@@ -251,6 +265,12 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
         [_metricsDataCollection removeAllObjects];
     }
     return metrics;
+}
+
+- (void)resetMetrics
+{
+    std::lock_guard lock(_lock);
+    [_metricsDataCollection removeAllObjects];
 }
 
 @end

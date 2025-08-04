@@ -34,10 +34,14 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
     if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
     {
         SetupPayload ignored;
-        return mWindowOpener->OpenCommissioningWindow(mNodeId, System::Clock::Seconds16(mCommissioningWindowTimeout), mIteration,
-                                                      mDiscriminator, NullOptional, NullOptional,
-                                                      &mOnOpenCommissioningWindowCallback, ignored,
-                                                      /* readVIDPIDAttributes */ true);
+        return mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                          .SetNodeId(mNodeId)
+                                                          .SetTimeout(mCommissioningWindowTimeout)
+                                                          .SetIteration(mIteration)
+                                                          .SetDiscriminator(mDiscriminator)
+                                                          .SetReadVIDPIDAttributes(true)
+                                                          .SetCallback(&mOnOpenCommissioningWindowCallback),
+                                                      ignored);
     }
 
     ChipLogError(chipTool, "Unknown commissioning window option: %d", to_underlying(mCommissioningWindowOption));
@@ -45,7 +49,7 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 }
 
 void OpenCommissioningWindowCommand::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err,
-                                                                       chip::SetupPayload payload)
+                                                                       SetupPayload payload)
 {
     LogErrorOnFailure(err);
 

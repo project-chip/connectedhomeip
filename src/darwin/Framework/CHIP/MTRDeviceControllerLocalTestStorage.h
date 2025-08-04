@@ -18,11 +18,9 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_EXTERN @interface MTRDeviceControllerLocalTestStorage : NSObject<MTRDeviceControllerStorageDelegate>
+MTR_EXTERN MTR_EXPORT @interface MTRDeviceControllerLocalTestStorage : NSObject<MTRDeviceControllerStorageDelegate>
 
 // Setting this variable only affects subsequent MTRDeviceController initializations
 @property (class, nonatomic, assign) BOOL localTestStorageEnabled;
@@ -33,5 +31,3 @@ MTR_EXTERN @interface MTRDeviceControllerLocalTestStorage : NSObject<MTRDeviceCo
 @end
 
 NS_ASSUME_NONNULL_END
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED

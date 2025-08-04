@@ -37,7 +37,7 @@ extern "C" {
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
                                              const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
-                                             uint16_t busyWaitMs, bool suppressResponse);
+                                             uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload);
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                                    uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
@@ -80,7 +80,7 @@ public:
     void OnResponse(CommandSender * apCommandSender, const CommandSender::ResponseData & aResponseData) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+        uint8_t buffer[CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES];
         uint32_t size = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
@@ -131,8 +131,7 @@ public:
 
         gOnCommandSenderResponseCallback(
             mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, index, to_underlying(statusIB.mStatus),
-            statusIB.mClusterStatus.HasValue() ? statusIB.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus, buffer,
-            size);
+            statusIB.mClusterStatus.has_value() ? *statusIB.mClusterStatus : chip::python::kUndefinedClusterStatus, buffer, size);
     }
 
     void OnError(const CommandSender * apCommandSender, const CommandSender::ErrorData & aErrorData) override
@@ -140,7 +139,7 @@ public:
         CHIP_ERROR protocolError = aErrorData.error;
         StatusIB status(protocolError);
         gOnCommandSenderErrorCallback(mAppContext, to_underlying(status.mStatus),
-                                      status.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus),
+                                      status.mClusterStatus.value_or(chip::python::kUndefinedClusterStatus),
                                       // If we have an actual IM status, pass 0
                                       // for the error code, because otherwise
                                       // the callee will think we have a stack
@@ -203,10 +202,13 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     bool testOnlySuppressTimedRequestMessage = false;
-    uint16_t * testOnlyCommandRefsOverride   = nullptr;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    uint16_t * testOnlyCommandRefsOverride = nullptr;
+#endif
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Test only override validation checks and setup
     if (testOnlyOverrides != nullptr)
     {
@@ -228,6 +230,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         config.SetRemoteMaxPathsPerInvoke(testOnlyOverrides->overrideRemoteMaxPathsPerInvoke);
     }
     else
+#endif
     {
         auto remoteSessionParameters = device->GetSecureSession().Value()->GetRemoteSessionParameters();
         config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
@@ -273,6 +276,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         Optional<uint16_t> timedRequestTimeout =
             timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs) : Optional<uint16_t>::Missing();
         CommandSender::FinishCommandParameters finishCommandParams(timedRequestTimeout);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         if (testOnlyCommandRefsOverride != nullptr)
         {
             finishCommandParams.commandRef.SetValue(testOnlyCommandRefsOverride[i]);
@@ -291,6 +295,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
         }
         else
+#endif
         {
             SuccessOrExit(err = callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i));
         }
@@ -300,12 +305,14 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         Optional<System::Clock::Timeout> interactionTimeout = interactionTimeoutMs != 0
             ? MakeOptional(System::Clock::Milliseconds32(interactionTimeoutMs))
             : Optional<System::Clock::Timeout>::Missing();
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         if (testOnlySuppressTimedRequestMessage)
         {
             SuccessOrExit(err = sender->TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(device->GetSecureSession().Value(),
                                                                                                interactionTimeout));
         }
         else
+#endif
         {
             SuccessOrExit(err = sender->SendCommandRequest(device->GetSecureSession().Value(), interactionTimeout));
         }
@@ -345,7 +352,7 @@ void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onComman
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
                                              const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
-                                             uint16_t busyWaitMs, bool suppressResponse)
+                                             uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -357,7 +364,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
         std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
-                                        /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
+                                        /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse, allowLargePayload);
 
     app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                          (app::CommandPathFlags::kEndpointIdValid) };

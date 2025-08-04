@@ -14,8 +14,13 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 
 chip_data_model("light-switch-common") {
-  zap_file = "light-switch-app.zap"
+  if (chip_enable_icd_lit) {
+    zap_file = "icd-lit-light-switch-app.zap"
+  } else {
+    zap_file = "light-switch-app.zap"
+  }
   is_server = true
 }

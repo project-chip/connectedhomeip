@@ -14,11 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
-
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 namespace {
 
@@ -26,7 +26,7 @@ using namespace chip;
 using namespace chip::Encoding;
 using namespace mdns::Minimal;
 
-void TestSrv(nlTestSuite * inSuite, void * inContext)
+TEST(TestResourceRecordSrv, TestSrv)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -45,10 +45,10 @@ void TestSrv(nlTestSuite * inSuite, void * inContext)
 
     header.Clear();
 
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, writer));
-    NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
-    NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
-    NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 1);
+    EXPECT_TRUE(record.Append(header, ResourceType::kAdditional, writer));
+    EXPECT_EQ(header.GetAnswerCount(), 0);
+    EXPECT_EQ(header.GetAuthorityCount(), 0);
+    EXPECT_EQ(header.GetAdditionalCount(), 1);
 
     const uint8_t expectedOutput[] = {
         4,    's',  'o', 'm', 'e',           // QNAME part: some
@@ -68,22 +68,7 @@ void TestSrv(nlTestSuite * inSuite, void * inContext)
         0                                    // QNAME ends
     };
 
-    NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
-    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestSrv", TestSrv), //
-    NL_TEST_SENTINEL()               //
-};
-
 } // namespace
-
-int TestSrv()
-{
-    nlTestSuite theSuite = { "Srv", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSrv)

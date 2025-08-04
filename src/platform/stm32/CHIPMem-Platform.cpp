@@ -67,8 +67,6 @@ extern "C" void memMonitoringTrackFree(void * ptr, size_t size);
 
 #define USE_FREERTOS
 
-using namespace std;
-
 // Define the new operator for C++ to use the freeRTOS memory management
 // functions.
 //
@@ -162,6 +160,20 @@ static void VerifyInitialized(const char * func)
     }
 }
 
+static size_t MemoryBlockSize(void * ptr)
+{
+
+    uint8_t * p = static_cast<uint8_t *>(ptr);
+    // Subtract the size of the header from the pointer
+    p -= sizeof(size_t);
+    // Read the size of the memory block from the header
+    size_t size = *reinterpret_cast<size_t *>(p);
+    // Add the size of the header to the size of the memory block
+    size += sizeof(size_t);
+
+    return size;
+}
+
 CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
     if (memoryInitialized++ > 0)
@@ -211,10 +223,31 @@ void * MemoryCalloc(size_t num, size_t size)
 
 void * MemoryRealloc(void * p, size_t size)
 {
-    VERIFY_INITIALIZED();
+    void * new_ptr;
+    if (size == 0)
+    {
+        MemoryFree(p);
+        return NULL;
+    }
 
-    p = realloc(p, size);
-    return p;
+    new_ptr = MemoryAlloc(size);
+    if (new_ptr == NULL)
+    {
+        return NULL;
+    }
+
+    if (p != NULL)
+    {
+        size_t copy_size = MemoryBlockSize(p);
+        if (copy_size > size)
+        {
+            copy_size = size;
+        }
+        memcpy(new_ptr, p, copy_size);
+        MemoryFree(p);
+    }
+
+    return new_ptr;
 }
 
 void MemoryFree(void * p)

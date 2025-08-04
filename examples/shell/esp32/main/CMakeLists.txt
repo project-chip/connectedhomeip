@@ -22,5 +22,4 @@ set(CHIP_SHELL_DIR "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/she
 idf_component_register(SRCS main.cpp
                       "${CHIP_SHELL_DIR}/shell_common/globals.cpp"
                       PRIV_INCLUDE_DIRS
-                      "${CHIP_SHELL_DIR}/shell_common/include"
-                      PRIV_REQUIRES chip nvs_flash bt)
+                      "${CHIP_SHELL_DIR}/shell_common/include")

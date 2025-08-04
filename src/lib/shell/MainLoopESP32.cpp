@@ -70,7 +70,7 @@ namespace Shell {
 
 void Engine::RunMainLoop()
 {
-    while (true)
+    while (mRunning)
     {
         const char * prompt = LOG_COLOR_I "> " LOG_RESET_COLOR;
         char * line         = linenoise(prompt);

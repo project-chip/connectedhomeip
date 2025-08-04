@@ -5,17 +5,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.matter.virtual.device.app.core.common.Device
 import com.matter.virtual.device.app.feature.main.databinding.ItemMenuBinding
-import com.matter.virtual.device.app.feature.main.model.Menu
 
 internal class MenuAdapter(private val itemHandler: ItemHandler) :
-  ListAdapter<Menu, MenuAdapter.MenuViewHolder>(
-    object : DiffUtil.ItemCallback<Menu>() {
-      override fun areItemsTheSame(oldItem: Menu, newItem: Menu): Boolean {
-        return oldItem.titleResId == newItem.titleResId
+  ListAdapter<Device, MenuAdapter.MenuViewHolder>(
+    object : DiffUtil.ItemCallback<Device>() {
+      override fun areItemsTheSame(oldItem: Device, newItem: Device): Boolean {
+        return oldItem.deviceNameResId == newItem.deviceNameResId
       }
 
-      override fun areContentsTheSame(oldItem: Menu, newItem: Menu): Boolean {
+      override fun areContentsTheSame(oldItem: Device, newItem: Device): Boolean {
         return oldItem == newItem
       }
     }
@@ -23,7 +23,7 @@ internal class MenuAdapter(private val itemHandler: ItemHandler) :
 
   inner class MenuViewHolder(private val binding: ItemMenuBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(item: Menu) {
+    fun bind(item: Device) {
       binding.item = item
       binding.itemHandler = itemHandler
     }
@@ -41,6 +41,6 @@ internal class MenuAdapter(private val itemHandler: ItemHandler) :
   }
 
   interface ItemHandler {
-    fun onClick(item: Menu)
+    fun onClick(item: Device)
   }
 }

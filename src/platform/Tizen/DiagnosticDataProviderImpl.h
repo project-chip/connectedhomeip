@@ -24,6 +24,8 @@
 
 #include <platform/DiagnosticDataProvider.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
+
 namespace chip {
 namespace DeviceLayer {
 

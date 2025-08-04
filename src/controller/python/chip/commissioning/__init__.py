@@ -19,7 +19,7 @@ import abc
 import dataclasses
 import enum
 import os
-from typing import Set, Tuple, Union
+from typing import Optional, Set, Tuple, Union
 
 ROOT_ENDPOINT_ID = 0
 
@@ -73,6 +73,12 @@ class WiFiCredentials:
 
 
 @dataclasses.dataclass
+class TermsAndConditionsParameters:
+    version: int
+    user_response: int
+
+
+@dataclasses.dataclass
 class Parameters:
     pase_param: Union[PaseOverBLEParameters, PaseOverIPParameters]
     regulatory_config: RegulatoryConfig
@@ -80,6 +86,7 @@ class Parameters:
     commissionee_info: CommissioneeInfo
     wifi_credentials: WiFiCredentials
     thread_credentials: bytes
+    tc_acknowledgements: Optional[TermsAndConditionsParameters] = None
     failsafe_expiry_length_seconds: int = 600
 
 
@@ -118,8 +125,8 @@ class GetCommissioneeCredentialsResponse:
     ipk: bytes
     case_admin_node: int
     admin_vendor_id: int
-    node_id: int = None
-    fabric_id: int = None
+    node_id: Optional[int] = None
+    fabric_id: Optional[int] = None
 
 
 class CredentialProvider:
@@ -137,4 +144,4 @@ class CredentialProvider:
 
 class ExampleCredentialProvider:
     async def get_commissionee_credentials(self, request: GetCommissioneeCredentialsRequest) -> GetCommissioneeCredentialsResponse:
-        pass
+        raise NotImplementedError("This method needs to be implemented.")

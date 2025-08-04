@@ -66,10 +66,9 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
                       ChipLogValueX64(now.count()), this, ChipLogValueExchange(aExchangeContext));
         if (now > mTimeLimit)
         {
-            // Time is up.  Spec says to send UNSUPPORTED_ACCESS.
             ChipLogError(DataManagement, "Timeout expired: handler %p exchange " ChipLogFormatExchange, this,
                          ChipLogValueExchange(aExchangeContext));
-            return StatusResponse::Send(Status::UnsupportedAccess, aExchangeContext, /* aExpectResponse = */ false);
+            return StatusResponse::Send(Status::Timeout, aExchangeContext, /* aExpectResponse = */ false);
         }
 
         if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest))
@@ -128,8 +127,9 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     // will send nothing and the other side will have to time out to realize
     // it's missed its window).
     auto delay = System::Clock::Milliseconds32(timeoutMs);
-    aExchangeContext->SetResponseTimeout(
-        std::max(delay, aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
+    aExchangeContext->SetResponseTimeout(std::max(delay,
+                                                  aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(
+                                                      app::kExpectedIMProcessingTime, false /*isFirstMessageOnExchange*/)));
     ReturnErrorOnFailure(StatusResponse::Send(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
 
     // Now just wait for the client.

@@ -20,6 +20,7 @@
 
 #include <protocols/bdx/BdxTransferDiagnosticLogPool.h>
 
+#include <lib/core/DataModelTypes.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/bdx/BdxTransferDiagnosticLog.h>
@@ -41,6 +42,8 @@ public:
     void Shutdown();
 
     void SetDelegate(BDXTransferServerDelegate * delegate) { mDelegate = delegate; }
+
+    void AbortTransfersForFabric(FabricIndex fabricIndex) { mPoolDelegate.AbortTransfersForFabric(fabricIndex); }
 
 protected:
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,

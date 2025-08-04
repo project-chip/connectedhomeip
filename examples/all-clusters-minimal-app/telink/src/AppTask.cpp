@@ -18,10 +18,12 @@
 
 #include "AppTask.h"
 #include "binding-handler.h"
+#include <static-supported-modes-manager.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 AppTask AppTask::sAppTask;
+chip::app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 CHIP_ERROR AppTask::Init()
 {
@@ -35,5 +37,6 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
+    chip::app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return CHIP_NO_ERROR;
 }

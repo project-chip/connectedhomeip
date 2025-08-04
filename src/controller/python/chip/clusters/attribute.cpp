@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "system/SystemClock.h"
 #include <cstdarg>
+#include <cstdio>
 #include <memory>
 #include <type_traits>
 
@@ -29,12 +29,10 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
 #include <controller/python/chip/native/PyChipError.h>
-#include <lib/support/CodeUtils.h>
-
-#include <cstdio>
-#include <lib/support/logging/CHIPLogging.h>
-
 #include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -71,10 +69,10 @@ struct __attribute__((packed)) DataVersionFilter
 using OnReadAttributeDataCallback       = void (*)(PyObject * appContext, chip::DataVersion version, chip::EndpointId endpointId,
                                              chip::ClusterId clusterId, chip::AttributeId attributeId,
                                              std::underlying_type_t<Protocols::InteractionModel::Status> imstatus, uint8_t * data,
-                                             uint32_t dataLen);
+                                             size_t dataLen);
 using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                          chip::EventId eventId, chip::EventNumber eventNumber, uint8_t priority, uint64_t timestamp,
-                                         uint8_t timestampType, uint8_t * data, uint32_t dataLen,
+                                         uint8_t timestampType, uint8_t * data, size_t dataLen,
                                          std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
 using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, SubscriptionId subscriptionId);
 using OnResubscriptionAttemptedCallback = void (*)(PyObject * appContext, PyChipError aTerminationCause,
@@ -112,13 +110,16 @@ public:
         // callback. If we do, that's a bug.
         //
         VerifyOrDie(!aPath.IsListItemOperation());
-        size_t bufferLen                  = (apData == nullptr ? 0 : apData->GetRemainingLength() + apData->GetLengthRead());
-        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(apData == nullptr ? nullptr : new uint8_t[bufferLen]);
-        uint32_t size                     = 0;
+
+        std::unique_ptr<uint8_t[]> buffer;
+        size_t size = 0;
+
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)
         {
+            size_t bufferLen = apData->GetRemainingLength() + apData->GetLengthRead();
+            buffer           = std::make_unique<uint8_t[]>(bufferLen);
             // The TLVReader's read head is not pointing to the first element in the container instead of the container itself, use
             // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with a anonymous tag, no extra "end of container" tag
             // at the end.)
@@ -145,18 +146,20 @@ public:
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
+        // Only enable auto resubscribe if the subscription is established successfully.
+        mAutoResubscribeNeeded = mAutoResubscribe;
         gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId);
     }
 
     CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
-        if (mAutoResubscribe)
+        if (mAutoResubscribeNeeded)
         {
             ReturnErrorOnFailure(ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
         }
         gOnResubscriptionAttemptedCallback(mAppContext, ToPyChipError(aTerminationCause),
                                            apReadClient->ComputeTimeTillNextSubscription());
-        if (mAutoResubscribe)
+        if (mAutoResubscribeNeeded)
         {
             return CHIP_NO_ERROR;
         }
@@ -166,7 +169,7 @@ public:
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
     {
         uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-        uint32_t size  = 0;
+        size_t size    = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         // When the apData is nullptr, means we did not receive a valid event data from server, status will be some error
         // status.
@@ -242,7 +245,8 @@ private:
     PyObject * mAppContext;
 
     std::unique_ptr<ReadClient> mReadClient;
-    bool mAutoResubscribe = true;
+    bool mAutoResubscribe       = true;
+    bool mAutoResubscribeNeeded = false;
 };
 
 extern "C" {
@@ -259,8 +263,8 @@ struct __attribute__((packed)) PyReadAttributeParams
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               chip::python::PyWriteAttributeData * writeAttributesData,
-                                               size_t attributeDataLength);
+                                               chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
+                                               bool forceLegacyListEncoding);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT,
                                                     chip::python::PyWriteAttributeData * writeAttributesData,
@@ -340,7 +344,8 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength)
+                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
+                                               bool forceLegacyListEncoding)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -373,9 +378,13 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
         {
             dataVersion.SetValue(path.dataVersion);
         }
-        SuccessOrExit(
-            err = client->PutPreencodedAttribute(
-                chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
+
+        auto listEncodingOverride = forceLegacyListEncoding ? WriteClient::TestListEncodingOverride::kForceLegacyEncoding
+                                                            : WriteClient::TestListEncodingOverride::kNoOverride;
+
+        SuccessOrExit(err = client->PutPreencodedAttribute(
+                          chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
+                          reader, listEncodingOverride));
     }
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
@@ -450,18 +459,32 @@ exit:
     return ToPyChipError(err);
 }
 
-void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apCallback)
+void pychip_ReadClient_ShutdownSubscription(ReadClient * apReadClient)
 {
-    VerifyOrDie(apReadClient != nullptr);
-    VerifyOrDie(apCallback != nullptr);
+    // If apReadClient is nullptr, it means that its life cycle has ended (such as an error happend), and nothing needs to be done.
+    VerifyOrReturn(apReadClient != nullptr);
+    // If it is not SubscriptionType, this function should not be executed.
+    VerifyOrDie(apReadClient->IsSubscriptionType());
 
-    delete apCallback;
+    Optional<SubscriptionId> subscriptionId = apReadClient->GetSubscriptionId();
+    VerifyOrDie(subscriptionId.HasValue());
+
+    FabricIndex fabricIndex = apReadClient->GetFabricIndex();
+    NodeId nodeId           = apReadClient->GetPeerNodeId();
+
+    InteractionModelEngine::GetInstance()->ShutdownSubscription(ScopedNodeId(nodeId, fabricIndex), subscriptionId.Value());
 }
 
 void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_t livenessTimeoutMs)
 {
     VerifyOrDie(pReadClient != nullptr);
     pReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(livenessTimeoutMs));
+}
+
+void pychip_ReadClient_TriggerResubscribeIfScheduled(ReadClient * pReadClient, const char * reason)
+{
+    VerifyOrDie(pReadClient != nullptr);
+    pReadClient->TriggerResubscribeIfScheduled(reason);
 }
 
 PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, uint16_t * minIntervalSec, uint16_t * maxIntervalSec)
@@ -472,21 +495,36 @@ PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, ui
     return ToPyChipError(err);
 }
 
-PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
-                                   DeviceProxy * device, uint8_t * readParamsBuf, void ** attributePathsFromPython,
-                                   size_t numAttributePaths, void ** dataversionFiltersFromPython, size_t numDataversionFilters,
-                                   void ** eventPathsFromPython, size_t numEventPaths, uint64_t * eventNumberFilter)
+void pychip_ReadClient_GetSubscriptionTimeoutMs(ReadClient * pReadClient, uint32_t * milliSec)
+{
+    VerifyOrDie(pReadClient != nullptr);
+
+    Optional<System::Clock::Timeout> duration = pReadClient->GetSubscriptionTimeout();
+
+    // The return value of GetSubscriptionTimeout cannot be 0
+    // so milliSec=0 can be considered as the subscription has been abnormal.
+    *milliSec = 0;
+    if (duration.HasValue())
+    {
+        System::Clock::Milliseconds32 msec = std::chrono::duration_cast<System::Clock::Milliseconds32>(duration.Value());
+        *milliSec                          = msec.count();
+    }
+}
+
+PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, DeviceProxy * device, uint8_t * readParamsBuf,
+                                   void ** attributePathsFromPython, size_t numAttributePaths, void ** dataversionFiltersFromPython,
+                                   size_t numDataversionFilters, void ** eventPathsFromPython, size_t numEventPaths,
+                                   uint64_t * eventNumberFilter)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     PyReadAttributeParams pyParams = {};
     // The readParamsBuf might be not aligned, using a memcpy to avoid some unexpected behaviors.
     memcpy(&pyParams, readParamsBuf, sizeof(pyParams));
 
-    std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
-
-    std::unique_ptr<AttributePathParams[]> attributePaths(new AttributePathParams[numAttributePaths]);
-    std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[numDataversionFilters]);
-    std::unique_ptr<EventPathParams[]> eventPaths(new EventPathParams[numEventPaths]);
+    auto callback           = std::make_unique<ReadClientCallback>(appContext);
+    auto attributePaths     = std::make_unique<AttributePathParams[]>(numAttributePaths);
+    auto dataVersionFilters = std::make_unique<chip::app::DataVersionFilter[]>(numDataversionFilters);
+    auto eventPaths         = std::make_unique<EventPathParams[]>(numEventPaths);
     std::unique_ptr<ReadClient> readClient;
 
     for (size_t i = 0; i < numAttributePaths; i++)
@@ -561,11 +599,22 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
             params.mKeepSubscriptions         = pyParams.keepSubscriptions;
             callback->SetAutoResubscribe(pyParams.autoResubscribe);
 
-            dataVersionFilters.release();
-            attributePaths.release();
-            eventPaths.release();
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            if (!pyParams.autoResubscribe)
+            {
+                // We want to allow certain kinds of spec-invalid subscriptions so we
+                // can test how the server reacts to them.
+                err = readClient->SendSubscribeRequestWithoutValidation(params);
+            }
+            else
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            {
+                dataVersionFilters.release();
+                attributePaths.release();
+                eventPaths.release();
 
-            err = readClient->SendAutoResubscribeRequest(std::move(params));
+                err = readClient->SendAutoResubscribeRequest(std::move(params));
+            }
             SuccessOrExit(err);
         }
         else
@@ -576,7 +625,6 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
     }
 
     *pReadClient = readClient.get();
-    *pCallback   = callback.get();
 
     callback->AdoptReadClient(std::move(readClient));
 

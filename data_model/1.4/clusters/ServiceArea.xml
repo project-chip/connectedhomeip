@@ -1,0 +1,284 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2024). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0150" name="Service Area Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0150" name="Service Area"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="SEAR" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected areas while running">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="PROG" name="ProgressReporting" summary="The device implements the progress reporting feature">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="MAPS" name="Maps" summary="The device has map support">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="OperationalStatusEnum">
+      <item value="0x00" name="Pending" summary="The device has not yet started operating at the given area, or has not finished operating at that area but it is not currently operating at the area">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="Operating" summary="The device is currently operating at the given area">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="Skipped" summary="The device has skipped the given area, before or during operating at it, due to a SkipArea command, due an out of band command (e.g. from the vendor&apos;s application), due to a vendor specific reason, such as a time limit used by the device, or due the device ending operating unsuccessfully">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="Completed" summary="The device has completed operating at the given area">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="SelectAreasStatus">
+      <item value="0x00" name="Success" summary="Attempting to operate in the areas identified by the entries of the NewAreas field is allowed and possible. The SelectedAreas attribute is set to the value of the NewAreas field.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="UnsupportedArea" summary="The value of at least one of the entries of the NewAreas field doesn&apos;t match any entries in the SupportedAreas attribute.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="InvalidInMode" summary="The received request cannot be handled due to the current mode of the device.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="InvalidSet" summary="The set of values is invalid. For example, areas on different floors, that a robot knows it can&apos;t reach on its own.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="SkipAreaStatus">
+      <item value="0x00" name="Success" summary="Skipping the area is allowed and possible, or the device was operating at the last available area and has stopped.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="InvalidAreaList" summary="The SelectedAreas attribute is empty.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="InvalidInMode" summary="The received request cannot be handled due to the current mode of the device. For example, the CurrentArea attribute is null or the device is not operating.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="InvalidSkippedArea" summary="The SkippedArea field doesn&apos;t match an entry in the SupportedAreas list.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="AreaInfoStruct">
+      <field id="0" name="LocationInfo" type="LocationDescriptorStruct">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="LandmarkInfo" type="LandmarkInfoStruct">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="AreaStruct">
+      <field id="0" name="AreaID" type="uint32" default="MS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MapID" type="uint32" default="MS">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="AreaInfo" type="AreaInfoStruct" default="MS">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="LandmarkInfoStruct">
+      <field id="0" name="LandmarkTag" type="tag">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="RelativePositionTag" type="tag">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="MapStruct">
+      <field id="0" name="MapID" type="uint32" default="MS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Name" type="string" default="MS">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ProgressStruct">
+      <field id="0" name="AreaID" type="uint32" default="MS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Status" type="OperationalStatusEnum" default="MS">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TotalOperationalTime" type="elapsed-s" default="MS">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="3" name="InitialTimeEstimate" type="elapsed-s" default="MS">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="SupportedAreas" type="list" default="MS">
+      <entry type="AreaStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="255"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="SupportedMaps" type="list" default="MS">
+      <entry type="MapStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MAPS"/>
+      </mandatoryConform>
+      <constraint>
+        <maxCount value="255"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="SelectedAreas" type="list" default="empty">
+      <entry type="uint32"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="CurrentArea" type="uint32" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="EstimatedEndTime" type="epoch-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <attribute name="CurrentArea"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0005" name="Progress" type="list" default="empty">
+      <entry type="ProgressStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="PROG"/>
+      </mandatoryConform>
+      <constraint>
+        <maxCount value="255"/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="SelectAreas" direction="commandToServer" response="SelectAreasResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="NewAreas" type="list">
+        <entry type="uint32"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="SelectAreasResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="SelectAreasStatus">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StatusText" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="SkipArea" direction="commandToServer" response="SkipAreaResponse">
+      <access invokePrivilege="operate"/>
+      <field id="0" name="SkippedArea" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="SkipAreaResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <command name="SkipArea"/>
+      </mandatoryConform>
+      <field id="0" name="Status" type="SkipAreaStatus">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StatusText" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

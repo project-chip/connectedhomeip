@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class ContentLauncherClusterTrackPreferenceStruct(
   val languageCode: String,
   val characteristics: Optional<List<UInt>>,
-  val audioOutputIndex: UInt
+  val audioOutputIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterTrackPreferenceStruct {\n")
@@ -83,7 +83,7 @@ class ContentLauncherClusterTrackPreferenceStruct(
       return ContentLauncherClusterTrackPreferenceStruct(
         languageCode,
         characteristics,
-        audioOutputIndex
+        audioOutputIndex,
       )
     }
   }

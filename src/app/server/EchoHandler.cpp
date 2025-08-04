@@ -40,7 +40,8 @@ chip::Protocols::Echo::EchoServer gEchoServer;
  */
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    ChipLogProgress(AppServer, "Echo Request, len=%u ... sending response.\n", payload->DataLength());
+    ChipLogProgress(AppServer, "Echo Request, len=%" PRIu32 "... sending response.\n",
+                    static_cast<uint32_t>(payload->DataLength()));
 }
 
 } // namespace
@@ -58,7 +59,7 @@ CHIP_ERROR InitEchoHandler(chip::Messaging::ExchangeManager * exchangeMgr)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "EchoServer failed, err:%s\n", chip::ErrorStr(err));
+        ChipLogError(AppServer, "EchoServer failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;

@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <string>
+
 using namespace chip;
 
 enum class SetupPayloadCodeType

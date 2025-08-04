@@ -98,6 +98,8 @@ char GetAuthModeStringForLogging(AuthMode authMode)
     {
     case AuthMode::kNone:
         return 'n';
+    case AuthMode::kInternalDeviceAccess:
+        return 'i';
     case AuthMode::kPase:
         return 'p';
     case AuthMode::kCase:
@@ -171,6 +173,23 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     return 'u';
 }
 
+char GetRequestTypeStringForLogging(RequestType requestType)
+{
+    switch (requestType)
+    {
+    case RequestType::kAttributeReadRequest:
+        return 'r';
+    case RequestType::kAttributeWriteRequest:
+        return 'w';
+    case RequestType::kCommandInvokeRequest:
+        return 'i';
+    case RequestType::kEventReadRequest:
+        return 'e';
+    default:
+        return '?';
+    }
+}
+
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 } // namespace
@@ -215,7 +234,7 @@ CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescripto
 
     VerifyOrReturnError((count + 1) <= maxCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t i = 0;
     ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
@@ -233,7 +252,7 @@ CHIP_ERROR AccessControl::UpdateEntry(const SubjectDescriptor * subjectDescripto
                                       const Entry & entry)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(mDelegate->UpdateEntry(index, entry, &fabric));
     NotifyEntryChanged(subjectDescriptor, fabric, index, &entry, EntryListener::ChangeType::kUpdated);
     return CHIP_NO_ERROR;
@@ -306,21 +325,47 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
     }
 }
 
+bool AccessControl::IsAccessRestrictionListSupported() const
+{
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    return mAccessRestrictionProvider != nullptr;
+#else
+    return false;
+#endif
+}
+
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidPrivilege(requestPrivilege), CHIP_ERROR_INVALID_ARGUMENT);
 
+    CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (result == CHIP_NO_ERROR)
+    {
+        result = CheckARL(subjectDescriptor, requestPath, requestPrivilege);
+    }
+#endif
+
+    return result;
+}
+
+CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                   Privilege requestPrivilege)
+{
 #if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     {
         constexpr size_t kMaxCatsToLog = 6;
         char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
         ChipLogProgress(DataManagement,
-                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c",
+                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c r=%c",
                         subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
                         ChipLogValueX64(subjectDescriptor.subject),
                         GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
-                        ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
+                        ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege),
+                        GetRequestTypeStringForLogging(requestPath.requestType));
     }
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
@@ -340,6 +385,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                                 (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
             }
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
+
             return result;
         }
     }
@@ -469,6 +515,40 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     return CHIP_ERROR_ACCESS_DENIED;
 }
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+CHIP_ERROR AccessControl::CheckARL(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                   Privilege requestPrivilege)
+{
+    CHIP_ERROR result = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(requestPath.requestType != RequestType::kRequestTypeUnknown, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (!IsAccessRestrictionListSupported())
+    {
+        // Access Restriction support is compiled in, but not configured/enabled. Nothing to restrict.
+        return CHIP_NO_ERROR;
+    }
+
+    if (subjectDescriptor.isCommissioning)
+    {
+        result = mAccessRestrictionProvider->CheckForCommissioning(subjectDescriptor, requestPath);
+    }
+    else
+    {
+        result = mAccessRestrictionProvider->Check(subjectDescriptor, requestPath);
+    }
+
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DataManagement, "AccessControl: %s",
+                        (result == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL) ? "denied (restricted)" : "denied (restriction error)");
+        return result;
+    }
+
+    return result;
+}
+#endif
+
 #if CHIP_ACCESS_CONTROL_DUMP_ENABLED
 CHIP_ERROR AccessControl::Dump(const Entry & entry)
 {
@@ -547,7 +627,7 @@ exit:
 }
 #endif
 
-bool AccessControl::IsValid(const Entry & entry)
+bool AccessControl::Entry::IsValid() const
 {
     const char * log = "unexpected error";
     IgnoreUnusedVariable(log); // logging may be disabled
@@ -559,11 +639,11 @@ bool AccessControl::IsValid(const Entry & entry)
     size_t targetCount      = 0;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SuccessOrExit(err = entry.GetAuthMode(authMode));
-    SuccessOrExit(err = entry.GetFabricIndex(fabricIndex));
-    SuccessOrExit(err = entry.GetPrivilege(privilege));
-    SuccessOrExit(err = entry.GetSubjectCount(subjectCount));
-    SuccessOrExit(err = entry.GetTargetCount(targetCount));
+    SuccessOrExit(err = GetAuthMode(authMode));
+    SuccessOrExit(err = GetFabricIndex(fabricIndex));
+    SuccessOrExit(err = GetPrivilege(privilege));
+    SuccessOrExit(err = GetSubjectCount(subjectCount));
+    SuccessOrExit(err = GetTargetCount(targetCount));
 
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
@@ -586,7 +666,7 @@ bool AccessControl::IsValid(const Entry & entry)
     for (size_t i = 0; i < subjectCount; ++i)
     {
         NodeId subject;
-        SuccessOrExit(err = entry.GetSubject(i, subject));
+        SuccessOrExit(err = GetSubject(i, subject));
         const bool kIsCase  = authMode == AuthMode::kCase;
         const bool kIsGroup = authMode == AuthMode::kGroup;
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
@@ -598,7 +678,7 @@ bool AccessControl::IsValid(const Entry & entry)
     for (size_t i = 0; i < targetCount; ++i)
     {
         Entry::Target target;
-        SuccessOrExit(err = entry.GetTarget(i, target));
+        SuccessOrExit(err = GetTarget(i, target));
         const bool kHasCluster    = target.flags & Entry::Target::kCluster;
         const bool kHasEndpoint   = target.flags & Entry::Target::kEndpoint;
         const bool kHasDeviceType = target.flags & Entry::Target::kDeviceType;

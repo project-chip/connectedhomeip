@@ -19,9 +19,9 @@
  * @file Contains shell commands for for performing discovery (eg. of commissionable nodes) related to commissioning.
  */
 
-#include <AppMain.h>
-#include <ControllerShellCommands.h>
-#include <inttypes.h>
+#include "ControllerShellCommands.h"
+#include "CommissionerMain.h"
+
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
@@ -32,6 +32,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+
+#include <inttypes.h>
 
 namespace chip {
 namespace Shell {
@@ -116,7 +118,7 @@ static CHIP_ERROR display(bool printHeader)
 
     for (int i = 0; i < 10; i++)
     {
-        const Dnssd::DiscoveredNodeData * next = GetDeviceCommissioner()->GetDiscoveredDevice(i);
+        const Dnssd::CommissionNodeData * next = GetDeviceCommissioner()->GetDiscoveredDevice(i);
         if (next == nullptr)
         {
             streamer_printf(sout, "  Entry %d null\r\n", i);
@@ -124,8 +126,7 @@ static CHIP_ERROR display(bool printHeader)
         else
         {
             streamer_printf(sout, "  Entry %d instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d\r\n", i,
-                            next->commissionData.instanceName, next->resolutionData.hostName,
-                            next->commissionData.longDiscriminator, next->commissionData.vendorId, next->commissionData.productId);
+                            next->instanceName, next->hostName, next->longDiscriminator, next->vendorId, next->productId);
         }
     }
 

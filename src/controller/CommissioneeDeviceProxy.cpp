@@ -66,6 +66,15 @@ void CommissioneeDeviceProxy::CloseSession()
     mPairing.Clear();
 }
 
+chip::Optional<SessionHandle> CommissioneeDeviceProxy::DetachSecureSession()
+{
+    auto session = mSecureSession.Get();
+    mSecureSession.Release();
+    mState = ConnectionState::NotConnected;
+    mPairing.Clear();
+    return session;
+}
+
 CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
                                                      const ReliableMessageProtocolConfig & config)
 {

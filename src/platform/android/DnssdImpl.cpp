@@ -44,6 +44,7 @@ JniGlobalReference sBrowserObject;
 JniGlobalReference sMdnsCallbackObject;
 jmethodID sResolveMethod          = nullptr;
 jmethodID sBrowseMethod           = nullptr;
+jmethodID sStopBrowseMethod       = nullptr;
 jmethodID sGetTextEntryKeysMethod = nullptr;
 jmethodID sGetTextEntryDataMethod = nullptr;
 jclass sMdnsCallbackClass         = nullptr;
@@ -190,6 +191,8 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
 
     std::string serviceType = GetFullTypeWithSubTypes(type, protocol);
     JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV,
+                        ChipLogError(Discovery, "Failed to GetEnvForCurrentThread for ChipDnssdBrowse"));
     UtfString jniServiceType(env, serviceType.c_str());
 
     env->CallVoidMethod(sBrowserObject.ObjectRef(), sBrowseMethod, jniServiceType.jniValue(), reinterpret_cast<jlong>(callback),
@@ -203,23 +206,48 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
-    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    auto sdCtx = chip::Platform::New<BrowseContext>(callback);
+    VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY,
+                        ChipLogError(Discovery, "Failed allocate memory for BrowseContext in ChipDnssdBrowse"));
+    *browseIdentifier = reinterpret_cast<intptr_t>(sdCtx);
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(browseIdentifier != 0, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Discovery, "ChipDnssdStopBrowse Invalid argument browseIdentifier = 0"));
+    VerifyOrReturnError(sBrowserObject.HasValidObjectRef() && sStopBrowseMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV,
+                        ChipLogError(Discovery, "Failed to GetEnvForCurrentThread for ChipDnssdStopBrowse"));
+    auto ctx = reinterpret_cast<BrowseContext *>(browseIdentifier);
+
+    env->CallVoidMethod(sBrowserObject.ObjectRef(), sStopBrowseMethod, reinterpret_cast<jlong>(ctx->callback));
+
+    chip::Platform::Delete(ctx);
+    ctx = nullptr;
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Discovery, "Java exception in ChipDnssdStopBrowse");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_JNI_ERROR_EXCEPTION_THROWN;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 template <size_t N>
 CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], DnssdServiceProtocol & outProtocol)
 {
     const char * dotPos = strrchr(serviceType, '.');
-    ReturnErrorCodeIf(dotPos == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(dotPos != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t lengthWithoutProtocol = static_cast<size_t>(dotPos - serviceType);
-    ReturnErrorCodeIf(lengthWithoutProtocol + 1 > N, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(lengthWithoutProtocol + 1 <= N, CHIP_ERROR_INVALID_ARGUMENT);
 
     memcpy(outServiceName, serviceType, lengthWithoutProtocol);
     outServiceName[lengthWithoutProtocol] = '\0'; // Set a null terminator
@@ -239,7 +267,7 @@ CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ReturnErrorCodeIf(outProtocol == DnssdServiceProtocol::kDnssdProtocolUnknown, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(outProtocol != DnssdServiceProtocol::kDnssdProtocolUnknown, CHIP_ERROR_INVALID_ARGUMENT);
 
     return CHIP_NO_ERROR;
 }
@@ -306,6 +334,8 @@ void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobjec
 
     sBrowseMethod = env->GetMethodID(browserClass, "browse", "(Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
 
+    sStopBrowseMethod = env->GetMethodID(browserClass, "stopDiscover", "(J)V");
+
     if (sResolveMethod == nullptr)
     {
         ChipLogError(Discovery, "Failed to access Resolver 'resolve' method");
@@ -315,6 +345,12 @@ void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobjec
     if (sBrowseMethod == nullptr)
     {
         ChipLogError(Discovery, "Failed to access Discover 'browse' method");
+        env->ExceptionClear();
+    }
+
+    if (sStopBrowseMethod == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to access Discover 'stopDiscover' method");
         env->ExceptionClear();
     }
 

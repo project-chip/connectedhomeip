@@ -25,19 +25,19 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     android:
         name: Smoke Run - Android
 
         env:
-            JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
+            JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64/
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:35
+            image: ghcr.io/project-chip/chip-build-android:153
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -73,7 +73,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
             - name: Clean out build output
-              run: rm -rf ./out examples/tv-casting-app/android/App/app/libs/jniLibs/* examples/tv-casting-app/android/App/app/libs/*.jar                   
+              run: rm -rf ./out examples/tv-casting-app/android/App/app/libs/jniLibs/* examples/tv-casting-app/android/App/app/libs/*.jar
             - name: Build Android arm64-tv-server
               run: |
                   ./scripts/run_in_build_env.sh \

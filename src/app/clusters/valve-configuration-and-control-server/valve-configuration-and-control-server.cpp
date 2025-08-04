@@ -31,6 +31,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -276,8 +277,7 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 
 CHIP_ERROR CloseValve(EndpointId ep)
 {
-    Delegate * delegate = GetDelegate(ep);
-    DataModel::Nullable<uint32_t> rDuration;
+    Delegate * delegate        = GetDelegate(ep);
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     VerifyOrReturnError(Status::Success == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
@@ -308,10 +308,7 @@ CHIP_ERROR CloseValve(EndpointId ep)
 
 CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
 {
-    Delegate * delegate     = GetDelegate(ep);
-    Optional<Status> status = Optional<Status>::Missing();
-    DataModel::Nullable<Percent> openLevel;
-    DataModel::Nullable<uint64_t> autoCloseTime;
+    Delegate * delegate        = GetDelegate(ep);
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
@@ -327,6 +324,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
             VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
 
             uint64_t time = openDuration.Value() * chip::kMicrosecondsPerSecond;
+            DataModel::Nullable<uint64_t> autoCloseTime;
             autoCloseTime.SetNonNull(chipEpochTime + time);
             VerifyOrReturnError(Status::Success == AutoCloseTime::Set(ep, autoCloseTime), attribute_error);
         }
@@ -361,9 +359,9 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
     if (!isDelegateNull(delegate))
     {
         DataModel::Nullable<Percent> cLevel = delegate->HandleOpenValve(level);
-        if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
+        if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel) && !cLevel.IsNull())
         {
-            VerifyOrReturnError(Status::Success == CurrentLevel::Set(ep, cLevel), attribute_error);
+            UpdateCurrentLevel(ep, cLevel.Value());
         }
     }
     // start countdown
@@ -377,14 +375,28 @@ CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
     {
         VerifyOrReturnError(Status::Success == CurrentLevel::Set(ep, currentLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        return CHIP_NO_ERROR;
     }
-    return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    DataModel::Nullable<Percent> targetLevel = DataModel::NullNullable;
+    TargetLevel::Get(ep, targetLevel);
+    if (!targetLevel.IsNull() && currentLevel == targetLevel.Value())
+    {
+        targetLevel = DataModel::NullNullable;
+        TargetLevel::Set(ep, targetLevel);
+        UpdateCurrentState(ep, currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
 {
     VerifyOrReturnError(Status::Success == CurrentState::Set(ep, currentState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    DataModel::Nullable<ValveStateEnum> targetState = DataModel::NullNullable;
+    TargetState::Get(ep, targetState);
+    if (currentState == targetState.ValueOr(ValveStateEnum::kUnknownEnumValue))
+    {
+        targetState = DataModel::NullNullable;
+        TargetState::Set(ep, targetState);
+    }
     emitValveStateChangedEvent(ep, currentState);
     return CHIP_NO_ERROR;
 }
@@ -515,5 +527,10 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
 
 void MatterValveConfigurationAndControlPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterValveConfigurationAndControlPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }

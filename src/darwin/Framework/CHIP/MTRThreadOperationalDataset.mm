@@ -102,7 +102,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
 - (BOOL)_checkDataLength:(NSData *)data expectedLength:(size_t)expectedLength
 {
     if (data.length != expectedLength) {
-        MTR_LOG_ERROR("Length Check Failed. Length:%tu is incorrect, must be %tu", data.length, expectedLength);
+        MTR_LOG_ERROR("Length Check Failed. Length:%lu is incorrect, must be %tu", static_cast<unsigned long>(data.length), expectedLength);
         return NO;
     }
     return YES;

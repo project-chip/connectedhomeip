@@ -1,8 +1,0 @@
-# Commands will be run in CHIP project root.
-cd "{root}"
-
-# Generating efr32-brd4161a-light-rpc-no-version
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/silabs '--args=silabs_board="BRD4161A" is_debug=false import("//with_pw_rpc.gni") efr32_sdk_root="TEST_GSDK_ROOT" openthread_root="TEST_GSDK_ROOT/util/third_party/openthread"' {out}/efr32-brd4161a-light-rpc-no-version
-
-# Building efr32-brd4161a-light-rpc-no-version
-ninja -C {out}/efr32-brd4161a-light-rpc-no-version

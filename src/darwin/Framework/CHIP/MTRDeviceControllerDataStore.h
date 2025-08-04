@@ -17,11 +17,10 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#else
-#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
+#import "MTRDeviceClusterData.h"
+#import "MTRDevice_Internal.h"
 
 #include <lib/core/CHIPError.h>
 
@@ -47,12 +46,22 @@ NS_ASSUME_NONNULL_BEGIN
                             storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                        storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue;
 
+// clusterDataByNode a dictionary: nodeID => cluster data dictionary
+typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNode);
+
+/**
+ * Asks the data store to load cluster data for nodes in bulk. If the storageDelegate supports it, the handler will be called synchronously.
+ * If the storageDelegate does not support it, the handler will not be called at all.
+ */
+- (void)fetchAttributeDataForAllDevices:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler;
+
 /**
  * Resumption info APIs.
  */
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID;
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByResumptionID:(NSData *)resumptionID;
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo;
+- (void)clearResumptionInfoForNodeID:(NSNumber *)nodeID;
 - (void)clearAllResumptionInfo;
 
 /**
@@ -66,10 +75,41 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Storage for MTRDevice attribute read cache. This is local-only storage as an optimization. New controller devices using MTRDevice API can prime their own local cache from devices directly.
  */
-- (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
-- (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)clearAllStoredAttributes;
+- (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
+- (nullable MTRDeviceClusterData *)getStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
+- (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
+- (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
+- (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+- (void)removeAttributes:(NSSet<NSNumber *> *)attributes fromCluster:(MTRClusterPath *)path forNodeID:(NSNumber *)nodeID;
+- (void)clearAllStoredClusterData;
+
+/**
+ * Storage for miscellaneous MTRDevice data that only needs to be stored
+ * locally.
+ *
+ * storeDeviceData uses data and nodeID async without copying, so callers should
+ * not modify the passed-in dictionary or nodeID.
+ */
+- (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
+- (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
+- (void)clearDeviceDataForNodeID:(NSNumber *)nodeID;
+
+/**
+ * Mechanism for an API client to perform a block after previous async operations (writes) on the storage queue have executed.
+ *
+ * This should be used only when something really needs to wait for the asynchronous writes
+ * to complete and can't proceed until they have.
+ *
+ * If no block is passed in, then the method returns after having synchronously flushed the queue.
+ */
+- (void)synchronouslyPerformBlock:(void (^_Nullable)(void))block;
+
+/**
+ * Returns the list of node IDs for which this data store has stored data of
+ * some sort.
+ */
+@property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData;
 
 @end
 

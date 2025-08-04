@@ -17,18 +17,32 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <chef-rvc-mode-delegate.h>
 
+using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-#ifdef ZCL_USING_RVC_RUN_MODE_CLUSTER_SERVER
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 #include <chef-rvc-mode-delegate.h>
+
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+#include <chef-rvc-operational-state-delegate.h>
+#endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+
 using namespace chip::app::Clusters::RvcRunMode;
-static RvcRunModeDelegate * gRvcRunModeDelegate = nullptr;
-static ModeBase::Instance * gRvcRunModeInstance = nullptr;
+
+static std::unique_ptr<RvcRunModeDelegate> gRvcRunModeDelegate;
+static std::unique_ptr<ModeBase::Instance> gRvcRunModeInstance;
+
+chip::app::Clusters::ModeBase::Instance * getRvcRunModeInstance()
+{
+    return gRvcRunModeInstance.get();
+}
 
 CHIP_ERROR RvcRunModeDelegate::Init()
 {
@@ -47,12 +61,40 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
         return;
     }
 
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+    OperationalState::GenericOperationalError err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    if (NewMode == RvcRunMode::ModeIdle)
+    {
+        if (currentMode != RvcRunMode::ModeIdle)
+        { // Stop existing cycle when going from cleaning/mapping to idle.
+            ChipLogProgress(DeviceLayer, "Stopping RVC cycle: %d", currentMode);
+            getRvcOperationalStateDelegate()->HandleStopStateCallback(err);
+        }
+    }
+    else
+    {
+        if (currentMode == RvcRunMode::ModeIdle)
+        { // Start a new cycle when going from idle to clening/mapping.
+            ChipLogProgress(DeviceLayer, "Starting new RVC cycle: %d", NewMode);
+            getRvcOperationalStateDelegate()->HandleStartStateCallback(err);
+        }
+    }
+    if (err.IsEqual(OperationalState::GenericOperationalError(to_underlying(OperationalState::ErrorStateEnum::kNoError))))
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+    }
+    else
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+    }
+#else
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+#endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 }
 
 CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -61,7 +103,7 @@ CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::Muta
 
 CHIP_ERROR RvcRunModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -71,7 +113,7 @@ CHIP_ERROR RvcRunModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & 
 
 CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -87,40 +129,82 @@ CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTa
     return CHIP_NO_ERROR;
 }
 
-ModeBase::Instance * RvcRunMode::Instance()
-{
-    return gRvcRunModeInstance;
-}
-
 void RvcRunMode::Shutdown()
 {
-    if (gRvcRunModeInstance != nullptr)
+    gRvcRunModeInstance.reset();
+    gRvcRunModeDelegate.reset();
+}
+
+chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1
+    VerifyOrDie(gRvcRunModeInstance != nullptr);
+    chip::Protocols::InteractionModel::Status ret;
+    chip::AttributeId attributeId = attributeMetadata->attributeId;
+
+    switch (attributeId)
     {
-        delete gRvcRunModeInstance;
-        gRvcRunModeInstance = nullptr;
+    case chip::app::Clusters::RvcRunMode::Attributes::CurrentMode::Id: {
+        uint8_t m = static_cast<uint8_t>(buffer[0]);
+        ret       = gRvcRunModeInstance->UpdateCurrentMode(m);
+        if (chip::Protocols::InteractionModel::Status::Success != ret)
+        {
+            ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
+        }
     }
-    if (gRvcRunModeDelegate != nullptr)
+    break;
+    default:
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
+        ChipLogError(DeviceLayer, "Unsupported Writng Attribute ID: %d", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
+}
+
+chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                                     const EmberAfAttributeMetadata * attributeMetadata,
+                                                                     uint8_t * buffer, uint16_t maxReadLength)
+{
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
+
+    switch (attributeId)
     {
-        delete gRvcRunModeDelegate;
-        gRvcRunModeDelegate = nullptr;
+    case chip::app::Clusters::RvcRunMode::Attributes::CurrentMode::Id: {
+        *buffer = gRvcRunModeInstance->GetCurrentMode();
+        ChipLogDetail(DeviceLayer, "Reading RunMode CurrentMode : %d", static_cast<int>(attributeId));
     }
+    break;
+    default:
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedRead;
+        ChipLogDetail(DeviceLayer, "Unsupported attributeId %d from reading RvcRunMode", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
 }
 
 void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
-    gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
+    VerifyOrDie(!gRvcRunModeDelegate && !gRvcRunModeInstance);
+
+    gRvcRunModeDelegate = std::make_unique<RvcRunModeDelegate>();
     gRvcRunModeInstance =
-        new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff));
+        std::make_unique<ModeBase::Instance>(gRvcRunModeDelegate.get(), endpointId, RvcRunMode::Id, 0 /* No feature bits */);
     gRvcRunModeInstance->Init();
 }
 
-#ifdef ZCL_USING_RVC_CLEAN_MODE_CLUSTER_SERVER
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
 #include <chef-rvc-mode-delegate.h>
 using namespace chip::app::Clusters::RvcCleanMode;
-static RvcCleanModeDelegate * gRvcCleanModeDelegate = nullptr;
-static ModeBase::Instance * gRvcCleanModeInstance   = nullptr;
+static std::unique_ptr<RvcCleanModeDelegate> gRvcCleanModeDelegate;
+static std::unique_ptr<ModeBase::Instance> gRvcCleanModeInstance;
 
 CHIP_ERROR RvcCleanModeDelegate::Init()
 {
@@ -143,7 +227,7 @@ void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -152,7 +236,7 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::Mu
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -162,7 +246,7 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t 
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -178,33 +262,75 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mode
     return CHIP_NO_ERROR;
 }
 
-ModeBase::Instance * RvcCleanMode::Instance()
-{
-    return gRvcCleanModeInstance;
-}
-
 void RvcCleanMode::Shutdown()
 {
-    if (gRvcCleanModeInstance != nullptr)
+    gRvcCleanModeInstance.reset();
+    gRvcCleanModeDelegate.reset();
+}
+
+chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                                        const EmberAfAttributeMetadata * attributeMetadata,
+                                                                        uint8_t * buffer)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1
+    VerifyOrDie(gRvcCleanModeInstance != nullptr);
+    chip::Protocols::InteractionModel::Status ret;
+    chip::AttributeId attributeId = attributeMetadata->attributeId;
+
+    switch (attributeId)
     {
-        delete gRvcCleanModeInstance;
-        gRvcCleanModeInstance = nullptr;
+    case chip::app::Clusters::RvcCleanMode::Attributes::CurrentMode::Id: {
+        uint8_t m = static_cast<uint8_t>(buffer[0]);
+        ret       = gRvcCleanModeInstance->UpdateCurrentMode(m);
+        if (chip::Protocols::InteractionModel::Status::Success != ret)
+        {
+            ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
+        }
     }
-    if (gRvcCleanModeDelegate != nullptr)
+    break;
+    default:
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
+        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
+}
+
+chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                                       const EmberAfAttributeMetadata * attributeMetadata,
+                                                                       uint8_t * buffer, uint16_t maxReadLength)
+{
+    VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
+    buffer[0] = gRvcCleanModeInstance->GetCurrentMode();
+
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
+
+    switch (attributeId)
     {
-        delete gRvcCleanModeDelegate;
-        gRvcCleanModeDelegate = nullptr;
+    case chip::app::Clusters::RvcCleanMode::Attributes::CurrentMode::Id: {
+        *buffer = gRvcCleanModeInstance->GetCurrentMode();
+        ChipLogDetail(DeviceLayer, "Reading CleanMode CurrentMode : %d", static_cast<int>(attributeId));
     }
+    break;
+    default:
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedRead;
+        ChipLogDetail(DeviceLayer, "Unsupported attributeId %d from reading RvcCleanMode", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
 }
 
 void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
-    gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
+    VerifyOrDie(!gRvcCleanModeDelegate && !gRvcCleanModeInstance);
+
+    gRvcCleanModeDelegate = std::make_unique<RvcCleanModeDelegate>();
     gRvcCleanModeInstance =
-        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff));
+        std::make_unique<ModeBase::Instance>(gRvcCleanModeDelegate.get(), endpointId, RvcCleanMode::Id, 0 /* No feature bits */);
     gRvcCleanModeInstance->Init();
 }
-#endif // ZCL_USING_RVC_CLEAN_MODE_CLUSTER_SERVER
-#endif // ZCL_USING_RVC_RUN_MODE_CLUSTER_SERVER
+#endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER

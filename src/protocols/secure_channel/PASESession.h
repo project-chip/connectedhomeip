@@ -27,6 +27,9 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#if CHIP_CRYPTO_PSA_SPAKE2P
+#include <crypto/PSASpake2p.h>
+#endif
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
@@ -35,29 +38,19 @@
 #include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
-
+namespace Testing {
+class TestPASESession;
+}
 extern const char kSpake2pI2RSessionInfo[];
 extern const char kSpake2pR2ISessionInfo[];
 
 inline constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
-
-using namespace Crypto;
-
-struct PASESessionSerialized;
-
-struct PASESessionSerializable
-{
-    uint16_t mKeLen;
-    uint8_t mKe[kMAX_Hash_Length];
-    uint8_t mPairingComplete;
-    uint16_t mLocalSessionId;
-    uint16_t mPeerSessionId;
-};
 
 class DLL_EXPORT PASESession : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
@@ -94,7 +87,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(SessionManager & sessionManager, const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount,
+    CHIP_ERROR WaitForPairing(SessionManager & sessionManager, const Crypto::Spake2pVerifier & verifier, uint32_t pbkdf2IterCount,
                               const ByteSpan & salt, Optional<ReliableMessageProtocolConfig> mrpLocalConfig,
                               SessionEstablishmentDelegate * delegate);
 
@@ -109,6 +102,8 @@ public:
      *                            ownership of the exchangeCtxt to PASESession object. PASESession
      *                            will close the exchange on (successful/failed) handshake completion.
      * @param delegate            Callback object
+     *                            The delegate will be notified if and only if Pair() returns success. Errors occurring after Pair()
+     *                            returns success will be reported via the delegate.
      *
      * @return CHIP_ERROR      The result of initialization
      */
@@ -128,7 +123,7 @@ public:
      *
      * @return CHIP_ERROR      The result of PASE verifier generation
      */
-    static CHIP_ERROR GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
+    static CHIP_ERROR GeneratePASEVerifier(Crypto::Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                                            bool useRandomPIN, uint32_t & setupPIN);
 
     /**
@@ -138,7 +133,7 @@ public:
      * @param session     Reference to the secure session that will be initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) override;
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
@@ -182,6 +177,7 @@ private:
         kInvalidKeyConfirmation = 0x00,
         kUnexpected             = 0xff,
     };
+    friend class Testing::TestPASESession;
 
     CHIP_ERROR Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
@@ -203,16 +199,29 @@ private:
     CHIP_ERROR HandleMsg3(System::PacketBufferHandle && msg);
 
     void OnSuccessStatusReport() override;
-    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
+    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                     Optional<uintptr_t> protocolData) override;
+
+    /** This function returns the CHIP_ERROR from a call to TLVReader::Next() method.
+     *
+     * @retval #CHIP_END_OF_TLV            If the end of the TLV encoding is reached.
+     * @retval #CHIP_NO_ERROR              If there are additional non-parsed TLV Elements.
+     * @retval other                       See return values of TLVReader::Next()
+     **/
+    CHIP_ERROR ReadSessionParamsIfPresent(const TLV::Tag & SessionParamsTag, System::PacketBufferTLVReader & tlvReader);
 
     void Finish();
 
     // mNextExpectedMsg is set when we are expecting a message.
     Optional<Protocols::SecureChannel::MsgType> mNextExpectedMsg;
 
-    Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
+#if CHIP_CRYPTO_PSA_SPAKE2P
+    Crypto::PSASpake2p_P256_SHA256_HKDF_HMAC mSpake2p;
+#else
+    Crypto::Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
+#endif
 
-    Spake2pVerifier mPASEVerifier;
+    Crypto::Spake2pVerifier mPASEVerifier;
 
     uint32_t mSetupPINCode;
 
@@ -220,7 +229,7 @@ private:
 
     uint8_t mPBKDFLocalRandomData[kPBKDFParamRandomNumberSize];
 
-    Hash_SHA256_stream mCommissioningHash;
+    Crypto::Hash_SHA256_stream mCommissioningHash;
     uint32_t mIterationCount = 0;
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;
@@ -231,7 +240,7 @@ private:
     };
 
 protected:
-    uint8_t mKe[kMAX_Hash_Length];
+    uint8_t mKe[Crypto::kMAX_Hash_Length];
 
     size_t mKeLen = sizeof(mKe);
 

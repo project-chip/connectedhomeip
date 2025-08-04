@@ -17,26 +17,36 @@
  */
 
 #include "SoftwareFaultReports.h"
-#include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
 #include "silabs_utils.h"
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/util/af.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
+#include <app/util/attribute-storage.h>
+#include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <uart.h>
 
-#ifndef BRD4325A
+// Macro to flush UART TX queue if enabled
+#if SILABS_LOG_OUT_UART
+#define SILABS_UART_FLUSH() uartFlushTxQueue()
+#else
+#define SILABS_UART_FLUSH() ((void) 0)
+#endif
+
+#if !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 #include "rail_types.h"
 
 #ifdef RAIL_ASSERT_DEBUG_STRING
 #include "rail_assert_error_codes.h"
 #endif
-#endif // BRD4325A
+#endif // !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 
-#ifdef BRD4325A // For SiWx917 Platform only
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+
 #include "core_cm4.h"
-#endif
+#endif // defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
 
 // Technically FaultRecording is an octstr up to 1024 bytes.
 // We currently only report short strings. 100 char will more than enough for now.
@@ -70,7 +80,12 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     softwareFault.id = taskDetails.xTaskNumber;
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
-    SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    SystemLayer().ScheduleLambda(
+        [&softwareFault] { Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault); });
+    // Allow some time for the Fault event to be sent as the next action after exiting this function
+    // is typically an assert or reboot.
+    // Depending on the task at fault, it is possible the event can't be transmitted.
+    osDelay(pdMS_TO_TICKS(1000));
 #endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 
@@ -78,25 +93,39 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 } // namespace DeviceLayer
 } // namespace chip
 
+// This method is already implemented in the Zigbee stack and is required by the Zigbee
+#ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
+{
+#if SILABS_LOG_ENABLED
+    char faultMessage[kMaxFaultStringLen] = { 0 };
+    snprintf(faultMessage, sizeof faultMessage, "Assert failed: %s:%d", filename, linenumber);
+    ChipLogError(NotSpecified, "%s", faultMessage);
+    SILABS_UART_FLUSH();
+#endif // SILABS_LOG_ENABLED
+    configASSERT((volatile void *) NULL);
+}
+#endif
+
 #if HARD_FAULT_LOG_ENABLE
 /**
  * Log register contents to UART when a hard fault occurs.
  */
-extern "C" void debugHardfault(uint32_t * sp)
+extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
 {
 #if SILABS_LOG_ENABLED
-    uint32_t cfsr  = SCB->CFSR;
-    uint32_t hfsr  = SCB->HFSR;
-    uint32_t mmfar = SCB->MMFAR;
-    uint32_t bfar  = SCB->BFAR;
-    uint32_t r0    = sp[0];
-    uint32_t r1    = sp[1];
-    uint32_t r2    = sp[2];
-    uint32_t r3    = sp[3];
-    uint32_t r12   = sp[4];
-    uint32_t lr    = sp[5];
-    uint32_t pc    = sp[6];
-    uint32_t psr   = sp[7];
+    [[maybe_unused]] uint32_t cfsr  = SCB->CFSR;
+    [[maybe_unused]] uint32_t hfsr  = SCB->HFSR;
+    [[maybe_unused]] uint32_t mmfar = SCB->MMFAR;
+    [[maybe_unused]] uint32_t bfar  = SCB->BFAR;
+    [[maybe_unused]] uint32_t r0    = sp[0];
+    [[maybe_unused]] uint32_t r1    = sp[1];
+    [[maybe_unused]] uint32_t r2    = sp[2];
+    [[maybe_unused]] uint32_t r3    = sp[3];
+    [[maybe_unused]] uint32_t r12   = sp[4];
+    [[maybe_unused]] uint32_t lr    = sp[5];
+    [[maybe_unused]] uint32_t pc    = sp[6];
+    [[maybe_unused]] uint32_t psr   = sp[7];
 
     ChipLogError(NotSpecified, "HardFault:");
     ChipLogError(NotSpecified, "SCB->CFSR   0x%08lx", cfsr);
@@ -113,24 +142,56 @@ extern "C" void debugHardfault(uint32_t * sp)
     ChipLogError(NotSpecified, "LR          0x%08lx", lr);
     ChipLogError(NotSpecified, "PC          0x%08lx", pc);
     ChipLogError(NotSpecified, "PSR         0x%08lx", psr);
+    SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
 
     configASSERTNULL(NULL);
 }
 
 /**
- * Override default hard-fault handler
+ * Log a fault to the debugHardfault function.
+ * This function is called by the fault handlers to log the fault details.
  */
+
+extern "C" __attribute__((naked)) void LogFault_Handler(void)
+{
+    uint32_t * sp;
+    __asm volatile("tst lr, #4 \n"
+                   "ite eq \n"
+                   "mrseq %0, msp \n"
+                   "mrsne %0, psp \n"
+                   : "=r"(sp));
+    debugHardfault(sp);
+}
+
+#ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 extern "C" __attribute__((naked)) void HardFault_Handler(void)
 {
-    __asm volatile("tst lr, #4                                    \n"
-                   "ite eq                                        \n"
-                   "mrseq r0, msp                                 \n"
-                   "mrsne r0, psp                                 \n"
-                   "ldr r1, debugHardfault_address                \n"
-                   "bx r1                                         \n"
-                   "debugHardfault_address: .word debugHardfault  \n");
+    __asm volatile("b LogFault_Handler");
 }
+extern "C" __attribute__((naked)) void mpu_fault_handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+extern "C" __attribute__((naked)) void BusFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+extern "C" __attribute__((naked)) void UsageFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+#if (__CORTEX_M >= 23U)
+extern "C" __attribute__((naked)) void SecureFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+#endif // (__CORTEX_M >= 23U)
+extern "C" __attribute__((naked)) void DebugMon_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+#endif // !SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 
 extern "C" void vApplicationMallocFailedHook(void)
 {
@@ -142,12 +203,10 @@ extern "C" void vApplicationMallocFailedHook(void)
     const char * faultMessage = "Failed to allocate memory on HEAP.";
 #if SILABS_LOG_ENABLED
     ChipLogError(NotSpecified, "%s", faultMessage);
-#endif
+    SILABS_UART_FLUSH();
+#endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
-    // Allow some time for the Fault event to be sent before the chipAbort action
-    // Depending of the task at fault, it is possible the event can't be transmitted.
-    vTaskDelay(pdMS_TO_TICKS(1000));
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
 }
@@ -164,12 +223,10 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTask
     snprintf(faultMessage, sizeof faultMessage, "%s Task overflowed", pcTaskName);
 #if SILABS_LOG_ENABLED
     ChipLogError(NotSpecified, "%s", faultMessage);
-#endif
+    SILABS_UART_FLUSH();
+#endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
-    // Allow some time for the Fault event to be sent before the chipAbort action
-    // Depending of the task at fault, it is possible the event can't be transmitted.
-    vTaskDelay(pdMS_TO_TICKS(1000));
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
 }
@@ -229,7 +286,7 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
-#ifndef BRD4325A
+#if !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode)
 {
     char faultMessage[kMaxFaultStringLen] = { 0 };
@@ -248,14 +305,11 @@ extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode
 #else
     ChipLogError(NotSpecified, "%s", faultMessage);
 #endif // RAIL_ASSERT_DEBUG_STRING
+    SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
-    // Allow some time for the Fault event to be sent before the chipAbort action
-    // Depending of the task at fault, it is possible the event can't be transmitted.
-    vTaskDelay(pdMS_TO_TICKS(1000));
     chipAbort();
 }
-#endif // BRD4325A
-
+#endif // !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 #endif // HARD_FAULT_LOG_ENABLE

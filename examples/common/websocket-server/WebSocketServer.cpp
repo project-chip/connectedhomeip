@@ -23,6 +23,7 @@
 
 #include <deque>
 #include <mutex>
+#include <string>
 
 constexpr uint16_t kDefaultWebSocketServerPort                 = 9002;
 constexpr uint16_t kMaxMessageBufferLen                        = 8192;
@@ -152,7 +153,12 @@ static int OnWebSocketCallback(lws * wsi, lws_callback_reasons reason, void * us
     }
     else if (LWS_CALLBACK_WSI_DESTROY == reason)
     {
+        std::lock_guard<std::mutex> lock(gMutex);
+        // Nullify the instance first under lock to prevent new Send() operations
+        // from successfully queueing messages for this dying instance.
         gWebSocketInstance = nullptr;
+        // Then clear any messages that might have been queued before this point.
+        gMessageQueue.clear();
     }
     else if (LWS_CALLBACK_PROTOCOL_INIT == reason)
     {
@@ -177,28 +183,46 @@ CHIP_ERROR WebSocketServer::Run(chip::Optional<uint16_t> port, WebSocketServerDe
     info.protocols                    = protocols;
     static const lws_retry_bo_t retry = {
         .secs_since_valid_ping   = 400,
-        .secs_since_valid_hangup = 400,
+        .secs_since_valid_hangup = 420,
     };
     info.retry_and_idle_policy = &retry;
 
-    auto context = lws_create_context(&info);
-    VerifyOrReturnError(nullptr != context, CHIP_ERROR_INTERNAL);
+    mContext = lws_create_context(&info);
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INTERNAL);
 
     mRunning  = true;
     mDelegate = delegate;
 
     while (mRunning)
     {
-        lws_service(context, -1);
+        lws_service(mContext, -1);
 
         std::lock_guard<std::mutex> lock(gMutex);
-        if (gMessageQueue.size())
+        if (!gMessageQueue.empty())
         {
             lws_callback_on_writable(gWebSocketInstance);
         }
     }
-    lws_context_destroy(context);
+
+    lws_context_destroy(mContext);
+    mContext = nullptr;
     return CHIP_NO_ERROR;
+}
+
+void WebSocketServer::Stop()
+{
+    if (!mRunning)
+    {
+        return;
+    }
+
+    mRunning = false;
+
+    // Wake the poll/sleep inside lws_service()
+    if (mContext != nullptr)
+    {
+        lws_cancel_service(mContext);
+    }
 }
 
 bool WebSocketServer::OnWebSocketMessageReceived(char * msg)

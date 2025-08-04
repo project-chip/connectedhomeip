@@ -11,7 +11,7 @@ You can use this example as a reference for creating your own application.
 
 For information on how to build, run, test and debug this example and further
 information about the platform it is run on see
-[Open IoT SDK examples](../../../docs/guides/openiotsdk_examples.md).
+[Open IoT SDK examples](../../../docs/platforms/openiotsdk/openiotsdk_examples.md).
 
 The example name to use in the scripts is `all-clusters-app`.
 
@@ -31,7 +31,7 @@ follow traces in the terminal.
 ### Commissioning
 
 Read the
-[Open IoT SDK commissioning guide](../../../docs/guides/openiotsdk_commissioning.md)
+[Open IoT SDK commissioning guide](../../../docs/platforms/openiotsdk/openiotsdk_commissioning.md)
 to see how to use the Matter controller to commission and control the
 application.
 

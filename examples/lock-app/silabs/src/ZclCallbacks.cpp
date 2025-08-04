@@ -48,7 +48,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == DoorLock::Id && attributeId == DoorLock::Attributes::LockState::Id)
     {
-        DoorLock::DlLockState lockState = *(reinterpret_cast<DoorLock::DlLockState *>(value));
+        [[maybe_unused]] DoorLock::DlLockState lockState = *(reinterpret_cast<DoorLock::DlLockState *>(value));
         ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(lockState));
 #ifdef DIC_ENABLE
@@ -89,7 +89,14 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
     bool status = LockMgr().Unlock(endpointId, fabricIdx, nodeId, pinCode, err);
     if (status == true)
     {
-        LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);
+        if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
+        {
+            LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLATCH_ACTION);
+        }
+        else
+        {
+            LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);
+        }
     }
 
     return status;

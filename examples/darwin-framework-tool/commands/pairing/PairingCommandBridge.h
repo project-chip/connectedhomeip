@@ -17,52 +17,61 @@
  */
 
 #pragma once
+
 #include "../common/CHIPCommandBridge.h"
+#include <commands/dcl/HTTPSRequest.h>
+
 #import <Matter/Matter.h>
 
 enum class PairingMode
 {
-    None,
+    Unpair,
     Code,
     Ble,
     AlreadyDiscoveredByIndex,
 };
 
-enum class PairingNetworkType
+enum class CommissioningType
 {
-    None,
-    WiFi,
-    Thread,
-    Ethernet,
+    None,           // establish PASE only
+    WithoutNetwork, // commission but don't configure network
+    WithWiFi,       // commission and configure WiFi
+    WithThread,     // commission and configure Thread
 };
 
 class PairingCommandBridge : public CHIPCommandBridge
 {
 public:
-    PairingCommandBridge(const char * commandName, PairingMode mode, PairingNetworkType networkType) :
-        CHIPCommandBridge(commandName), mPairingMode(mode), mNetworkType(networkType)
+    PairingCommandBridge(const char * commandName, PairingMode mode, CommissioningType commissioningType) :
+        CHIPCommandBridge(commandName), mPairingMode(mode), mCommissioningType(commissioningType)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
-        switch (networkType)
+        switch (commissioningType)
         {
-        case PairingNetworkType::None:
-        case PairingNetworkType::Ethernet:
+        case CommissioningType::None:
+        case CommissioningType::WithoutNetwork:
             break;
-        case PairingNetworkType::WiFi:
+        case CommissioningType::WithWiFi:
             AddArgument("ssid", &mSSID);
             AddArgument("password", &mPassword);
             break;
-        case PairingNetworkType::Thread:
+        case CommissioningType::WithThread:
             AddArgument("operationalDataset", &mOperationalDataset);
             break;
         }
 
         switch (mode)
         {
-        case PairingMode::None:
+        case PairingMode::Unpair:
             break;
         case PairingMode::Code:
             AddArgument("payload", &mOnboardingPayload);
+            AddArgument("dcl-hostname", &mDCLHostName,
+                        "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
+            AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
+            AddArgument("dcl-disable-https", 0, 1, &mDCLDisableHttps, "Disable HTTPS (use plain HTTP)");
+            AddArgument("dcl-disable-https-validation", 0, 1, &mDCLDisableHttpsValidation, "Disable HTTPS validation");
+            AddArgument("use-dcl", 0, 1, &mUseDCL, "Use DCL to fetch onboarding information");
             break;
         case PairingMode::Ble:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
@@ -71,20 +80,23 @@ public:
         case PairingMode::AlreadyDiscoveredByIndex:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("index", 0, UINT16_MAX, &mIndex);
+            AddArgument("dcl-hostname", &mDCLHostName,
+                        "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
+            AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
+            AddArgument("use-dcl", 0, 1, &mUseDCL, "Use DCL to fetch onboarding information");
             break;
         }
 
-        if (mode != PairingMode::None)
+        if (commissioningType != CommissioningType::None)
         {
             AddArgument("country-code", &mCountryCode,
                         "Country code to use to set the Basic Information cluster's Location attribute");
+            AddArgument("use-device-attestation-delegate", 0, 1, &mUseDeviceAttestationDelegate,
+                        "If true, use a device attestation delegate that always wants to be notified about attestation results.  "
+                        "Defaults to false.");
+            AddArgument("device-attestation-failsafe-time", 0, UINT16_MAX, &mDeviceAttestationFailsafeTime,
+                        "If set, the time to extend the failsafe to before calling the device attestation delegate");
         }
-
-        AddArgument("use-device-attestation-delegate", 0, 1, &mUseDeviceAttestationDelegate,
-                    "If true, use a device attestation delegate that always wants to be notified about attestation results.  "
-                    "Defaults to false.");
-        AddArgument("device-attestation-failsafe-time", 0, UINT16_MAX, &mDeviceAttestationFailsafeTime,
-                    "If set, the time to extend the failsafe to before calling the device attestation delegate");
     }
 
     /////////// CHIPCommandBridge Interface /////////
@@ -96,10 +108,11 @@ private:
     void PairWithIndex(NSError * __autoreleasing * error);
     void PairWithPayload(NSError * __autoreleasing * error);
     void Unpair();
-    void SetUpDeviceControllerDelegate();
+    void SetUpDeviceControllerDelegate(NSError * __autoreleasing * error);
+    void MaybeDisplayTermsAndConditions(MTRCommissioningParameters * params, NSError * __autoreleasing * error);
 
     const PairingMode mPairingMode;
-    const PairingNetworkType mNetworkType;
+    const CommissioningType mCommissioningType;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
@@ -111,4 +124,9 @@ private:
     chip::Optional<bool> mUseDeviceAttestationDelegate;
     chip::Optional<uint16_t> mDeviceAttestationFailsafeTime;
     chip::Optional<char *> mCountryCode;
+    chip::Optional<char *> mDCLHostName;
+    chip::Optional<uint16_t> mDCLPort;
+    chip::Optional<bool> mDCLDisableHttps;
+    chip::Optional<bool> mDCLDisableHttpsValidation;
+    chip::Optional<bool> mUseDCL;
 };

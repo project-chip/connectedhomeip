@@ -55,10 +55,10 @@ tests:
           ./chip-tv-casting-app lowpower read accepted-command-list 1 1
 
           On TH Verify that the DUT is no longer in a low-power state by sending above command
-          [1654248854.491911][3652:3657] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0508 Attribute 0x0000_FFF9 DataVersion: 2125568804
-          [1654248854.491994][3652:3657] CHIP:TOO:   AcceptedCommandList: 1 entries
-          [1654248854.492040][3652:3657] CHIP:TOO:     [1]: 0
-          [1654248854.492157][3652:3657] CHIP:EM: Sending Standalone Ack for MessageCounter:15063522 on exchange 51389i
+          [1654248854.491911][3652:3657] [TOO] Endpoint: 1 Cluster: 0x0000_0508 Attribute 0x0000_FFF9 DataVersion: 2125568804
+          [1654248854.491994][3652:3657] [TOO]   AcceptedCommandList: 1 entries
+          [1654248854.492040][3652:3657] [TOO]     [1]: 0 (Sleep)
+          [1654248854.492157][3652:3657] [EM] Sending Standalone Ack for MessageCounter:15063522 on exchange 51389i
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

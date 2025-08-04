@@ -27,6 +27,7 @@ set(CONFIG_CHIP_PROJECT_CONFIG_INCLUDE_DIRS "" CACHE STRING "")
 set(CONFIG_CHIP_LIB_TESTS NO CACHE BOOL "")
 set(CONFIG_CHIP_LIB_SHELL NO CACHE BOOL "")
 
+set(CONFIG_CHIP_FORCE_LOGGING_STDIO NO CACHE BOOL "Enable stdio logging backend")
 set(CONFIG_CHIP_DETAIL_LOGGING YES CACHE BOOL "Enable logging at detail level")
 set(CONFIG_CHIP_PROGRESS_LOGGING YES CACHE BOOL "Enable logging at progress level")
 set(CONFIG_CHIP_AUTOMATION_LOGGING YES CACHE BOOL "Enable logging at automation level")
@@ -73,7 +74,6 @@ function(chip_add_data_model target scope model_name)
     include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
     chip_configure_data_model(${target}
         SCOPE ${scope}
-        INCLUDE_SERVER
         ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../${model_name}-common/${model_name}-app.zap
     )
 endfunction()

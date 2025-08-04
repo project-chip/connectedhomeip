@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,8 @@
 
 #include "CastingApp.h"
 
+#include "CommissionerDeclarationHandler.h"
+#include "ConnectionCallbacks.h"
 #include "support/CastingStore.h"
 #include "support/ChipDeviceEventHandler.h"
 
@@ -84,34 +86,51 @@ CHIP_ERROR CastingApp::Initialize(const AppParameters & appParameters)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CastingApp::UpdateCommissionableDataProvider(chip::DeviceLayer::CommissionableDataProvider * commissionableDataProvider)
+{
+    ChipLogProgress(Discovery, "CastingApp::UpdateCommissionableDataProvider()");
+    chip::DeviceLayer::SetCommissionableDataProvider(commissionableDataProvider);
+    return mAppParameters->SetCommissionableDataProvider(commissionableDataProvider);
+}
+
+void ReconnectHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
+{
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingApp::ConnectionHandler() Could not reconnect to CastingPlayer %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "CastingApp::ConnectionHandler() Reconnected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+    }
+}
+
 CHIP_ERROR CastingApp::Start()
 {
-    ChipLogProgress(Discovery, "CastingApp::Start() called");
+    ChipLogProgress(Discovery, "CastingApp::Start()");
     VerifyOrReturnError(mState == CASTING_APP_NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
 
-    // start Matter server
+    // Start Matter server
     chip::ServerInitParams * serverInitParams = mAppParameters->GetServerInitParamsProvider()->Get();
     VerifyOrReturnError(serverInitParams != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(*serverInitParams));
 
-    // perform post server startup registrations
+    // Perform post server startup registrations
     ReturnErrorOnFailure(PostStartRegistrations());
 
-    // reconnect (or verify connection) to the CastingPlayer that the app was connected to before being stopped, if any
+    // Reconnect (or verify connection) to the CastingPlayer that the app was connected to before being stopped, if any
     if (CastingPlayer::GetTargetCastingPlayer() != nullptr)
     {
-        CastingPlayer::GetTargetCastingPlayer()->VerifyOrEstablishConnection(
-            [](CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer, "CastingApp::Start Could not reconnect to CastingPlayer %" CHIP_ERROR_FORMAT,
-                                 err.Format());
-                }
-                else
-                {
-                    ChipLogProgress(AppServer, "CastingApp::Start Reconnected to CastingPlayer(ID: %s)", castingPlayer->GetId());
-                }
-            });
+        matter::casting::core::ConnectionCallbacks connectionCallbacks;
+        connectionCallbacks.mOnConnectionComplete = ReconnectHandler;
+        // Re-connecting to a CastingPLayer does not require a full User Directed Commissioning (UDC) process so
+        // CommissionerDeclaration messages are not expected. Leaving ConnectionCallbacks mCommissionerDeclarationCallback as
+        // nullptr.
+        ChipLogProgress(
+            Discovery,
+            "CastingApp::Start() calling VerifyOrEstablishConnection() to reconnect (or verify connection) to a CastingPlayer");
+        CastingPlayer::GetTargetCastingPlayer()->VerifyOrEstablishConnection(connectionCallbacks);
     }
 
     return CHIP_NO_ERROR;
@@ -119,7 +138,7 @@ CHIP_ERROR CastingApp::Start()
 
 CHIP_ERROR CastingApp::PostStartRegistrations()
 {
-    ChipLogProgress(Discovery, "CastingApp::PostStartRegistrations() called");
+    ChipLogProgress(Discovery, "CastingApp::PostStartRegistrations()");
     VerifyOrReturnError(mState == CASTING_APP_NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     auto & server = chip::Server::GetInstance();
 
@@ -136,14 +155,29 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // Register DeviceEvent Handler
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(ChipDeviceEventHandler::Handle, 0));
 
+    ChipLogProgress(
+        Discovery,
+        "CastingApp::PostStartRegistrations() calling GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler()");
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
+    // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
+        CommissionerDeclarationHandler::GetInstance());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
     mState = CASTING_APP_RUNNING; // CastingApp started successfully, set state to RUNNING
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CastingApp::Stop()
 {
-    ChipLogProgress(Discovery, "CastingApp::Stop() called");
+    ChipLogProgress(Discovery, "CastingApp::Stop()");
     VerifyOrReturnError(mState == CASTING_APP_RUNNING, CHIP_ERROR_INCORRECT_STATE);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     // Shutdown the Matter server
     chip::Server::GetInstance().Shutdown();
@@ -155,8 +189,6 @@ CHIP_ERROR CastingApp::Stop()
 
 CHIP_ERROR CastingApp::ShutdownAllSubscriptions()
 {
-    VerifyOrReturnError(mState == CASTING_APP_RUNNING, CHIP_ERROR_INCORRECT_STATE);
-
     chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
 
     return CHIP_NO_ERROR;

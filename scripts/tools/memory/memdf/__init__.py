@@ -18,4 +18,7 @@
 from memdf.df import DF, DFs, ExtentDF, SectionDF, SegmentDF, SymbolDF
 from memdf.util.config import Config, ConfigDescription
 
-__all__ = [DF, SymbolDF, SectionDF, SegmentDF, ExtentDF, DFs, Config, ConfigDescription]
+__all__ = [
+    'DF', 'SymbolDF', 'SectionDF', 'SegmentDF', 'ExtentDF',
+    'DFs', 'Config', 'ConfigDescription',
+]

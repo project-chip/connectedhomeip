@@ -159,6 +159,15 @@ CHIP_ERROR BDXDownloader::FetchNextData()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR BDXDownloader::SkipData(uint32_t numBytes)
+{
+    VerifyOrReturnError(mState == State::kInProgress, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mBdxTransfer.PrepareBlockQueryWithSkip(numBytes));
+    PollTransferSession();
+
+    return CHIP_NO_ERROR;
+}
+
 void BDXDownloader::OnDownloadTimeout()
 {
     Reset();

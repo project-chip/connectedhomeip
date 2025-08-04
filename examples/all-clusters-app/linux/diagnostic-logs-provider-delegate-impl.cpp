@@ -20,6 +20,8 @@
 
 #include <lib/support/SafeInt.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app::Clusters::DiagnosticLogs;
 

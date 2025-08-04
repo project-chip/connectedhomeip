@@ -20,7 +20,6 @@ import("${chip_root}/src/system/system.gni")
 
 source_set("commands") {
   sources = [
-    "Base64.cpp",
     "Help.cpp",
     "Help.h",
     "Meta.cpp",
@@ -37,14 +36,17 @@ source_set("commands") {
   }
 
   if (chip_enable_wifi) {
-    sources += [ "WiFi.cpp" ]
+    sources += [
+      "WiFi.cpp",
+      "WiFi.h",
+    ]
   }
 
   if (chip_enable_ble && chip_device_platform != "none") {
     sources += [ "BLE.cpp" ]
   }
 
-  if (chip_enable_nfc && chip_device_platform != "none") {
+  if (chip_enable_nfc_onboarding_payload && chip_device_platform != "none") {
     sources += [ "NFC.cpp" ]
   }
 
@@ -63,7 +65,7 @@ source_set("commands") {
   }
 
   if (chip_device_platform != "none") {
-    public_deps += [ "${chip_root}/src/app/server" ]
+    deps = [ "${chip_root}/src/setup_payload:onboarding-codes-utils" ]
   }
 
   cflags = [ "-Wconversion" ]

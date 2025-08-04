@@ -69,6 +69,12 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "WiFi network SSID not retrieved from persisted storage: %" CHIP_ERROR_FORMAT, err.Format());
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            return err;
+        }
+        /* AP ssid has not been set. It's possible after factory-reset.
+        Do not return an error as it will cancel the cluster registration */
         return CHIP_NO_ERROR;
     }
 
@@ -78,7 +84,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     {
         ChipLogProgress(DeviceLayer, "WiFi network credentials not retrieved from persisted storage: %" CHIP_ERROR_FORMAT,
                         err.Format());
-        return CHIP_NO_ERROR;
+        return err;
     }
 
     mSavedNetwork.credentialsLen = credentialsLen;
@@ -90,7 +96,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     mpStatusChangeCallback = networkStatusChangeCallback;
 
     // Connect to saved network
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    err = ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
 
     return err;
 }
@@ -112,6 +118,17 @@ CHIP_ERROR NXPWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
 {
+    struct wlan_network searchedNetwork = { 0 };
+
+    /* If network was added we have to remove it (as the connection failed) from wifi driver to be able
+    to connect to another network next commissioning */
+    if (wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
+    {
+        if (wlan_remove_network(mStagingNetwork.ssid) != WM_SUCCESS)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
     mStagingNetwork = mSavedNetwork;
 
     return CHIP_NO_ERROR;
@@ -148,8 +165,7 @@ Status NXPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDeb
 
     // Use empty ssid for representing invalid network
     mStagingNetwork.ssidLen = 0;
-    memset(mStagingNetwork.ssid, 0, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-    memset(mStagingNetwork.credentials, 0, DeviceLayer::Internal::kMaxWiFiKeyLength);
+
     return Status::kSuccess;
 }
 
@@ -193,6 +209,12 @@ CHIP_ERROR NXPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
 
 void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan debugText, int32_t connectStatus)
 {
+    /* Commit wifi network credentials in flash only if the connection succeeded */
+    if (commissioningError == NetworkCommissioning::Status::kSuccess)
+    {
+        CommitConfiguration();
+    }
+
     if (mpConnectCallback != nullptr)
     {
         mpConnectCallback->OnResult(commissioningError, debugText, connectStatus);
@@ -205,8 +227,7 @@ void NXPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
 
-    ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %.*s", static_cast<int>(networkId.size()),
-                    networkId.data());
+    ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %s", NullTerminated(networkId).c_str());
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
@@ -243,7 +264,7 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) requested");
 
     (void) memset(&wlan_scan_param, 0, sizeof(wlan_scan_params_v2_t));
-    wlan_scan_param.cb = &NXPWiFiDriver::OnScanWiFiNetworkDone;
+    wlan_scan_param.cb = &NXPWiFiDriver::_OnScanWiFiNetworkDoneCallBack;
 
     if ((ssid.size() > 0) && (ssid.size() < MLAN_MAX_SSID_LENGTH))
     {
@@ -264,8 +285,23 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return CHIP_NO_ERROR;
 }
 
-// TODO should be modified to do it in the context of the Matter stack
-int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
+int NXPWiFiDriver::_OnScanWiFiNetworkDoneCallBack(unsigned int count)
+{
+    ChipDeviceEvent event;
+    event.Type                          = DeviceEventType::kPlatformNxpScanWiFiNetworkDoneEvent;
+    event.Platform.ScanWiFiNetworkCount = count;
+    CHIP_ERROR err                      = PlatformMgr().PostEvent(&event);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
+        return WM_FAIL;
+    }
+    return WM_SUCCESS;
+}
+
+// The processing of the scan callback should be done in the context of the Matter stack, as the scan callback will call Matter
+// stack APIs
+int NXPWiFiDriver::ScanWiFINetworkDoneFromMatterTaskContext(unsigned int count)
 {
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) done, found: %u", count);
 
@@ -385,6 +421,15 @@ void NXPWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callb
     }
 }
 
+uint32_t NXPWiFiDriver::GetSupportedWiFiBandsMask() const
+{
+    uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+#ifdef CONFIG_5GHz_SUPPORT
+    bands |= (1UL << chip::to_underlying(WiFiBandEnum::k5g));
+#endif
+    return bands;
+}
+
 static CHIP_ERROR GetConnectedNetwork(Network & network)
 {
     struct wlan_network wlan_network;
@@ -434,7 +479,10 @@ bool NXPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
         if (connectedNetwork.networkIDLen == item.networkIDLen &&
             memcmp(connectedNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {
-            item.connected = true;
+            if (ConnectivityMgr().IsWiFiStationConnected())
+            {
+                item.connected = true;
+            }
         }
     }
 

@@ -153,24 +153,26 @@ public:
     virtual ~UserPrompter() = default;
 };
 
-// TODO: rename this to Passcode?
 class DLL_EXPORT PasscodeService
 {
 public:
     /**
      * @brief
-     *   Called to determine if the given target app is available to the commissionee with the given given
+     *   Called to determine if the given target app is available to the commissionee with the given
      * vendorId/productId, and if so, return the passcode.
+     *
+     * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
+     *
+     * After lookup and attempting to obtain the passcode, implementor should call HandleContentAppCheck();
      *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    info               App info to look for.
-     *  @param[in]    passcode           Passcode for the given commissionee, or 0 if passcode cannot be obtained.
      *
      */
-    virtual bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
-                                     chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) = 0;
+    virtual void LookupTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                                        chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info) = 0;
 
     /**
      * @brief
@@ -186,20 +188,37 @@ public:
 
     /**
      * @brief
-     *   Called to get the setup passcode from the content app corresponding to the given vendorId/productId
-     * Returns 0 if passcode cannot be obtained
+     *   Called to get the setup passcode from the content app corresponding to the given vendorId/productId.
      *
-     * If user responds with OK then implementor should call CommissionerRespondOk();
-     * If user responds with Cancel then implementor should call CommissionerRespondCancel();
+     * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
+     *
+     * After attempting to obtain the passcode, implementor should call HandleContentAppPasscodeResponse();
      *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
      *
      */
-    virtual uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
+    virtual void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
 
     virtual ~PasscodeService() = default;
+};
+
+class DLL_EXPORT AppInstallationService
+{
+public:
+    /**
+     * @brief
+     *   Called to check if the given target app is available to the commissione with th given
+     *   vendorId/productId
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) = 0;
+
+    virtual ~AppInstallationService() = default;
 };
 
 class DLL_EXPORT PostCommissioningListener
@@ -213,12 +232,14 @@ public:
      *  @param[in]    vendorId           The vendorid from the DAC of the new node.
      *  @param[in]    productId          The productid from the DAC of the new node.
      *  @param[in]    nodeId             The node id for the newly commissioned node.
+     *  @param[in]    rotatingId         The rotating ID to handle account login.
+     *  @param[in]    passcode           The passcode to handle account login.
      *  @param[in]    exchangeMgr        The exchange manager to be used to get an exchange context.
      *  @param[in]    sessionHandle      A reference to an established session.
      *
      */
-    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                        chip::Messaging::ExchangeManager & exchangeMgr,
+    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, chip::CharSpan rotatingId,
+                                        uint32_t passcode, chip::Messaging::ExchangeManager & exchangeMgr,
                                         const chip::SessionHandle & sessionHandle) = 0;
 
     virtual ~PostCommissioningListener() = default;
@@ -260,6 +281,11 @@ public:
     void ResetState();
 
     /**
+     * Check whether we have a valid session (and reset state if not).
+     */
+    void ValidateSession();
+
+    /**
      * UserConfirmationProvider callback.
      *
      * Notification that a UDC protocol message was received.
@@ -267,6 +293,24 @@ public:
      * This code will call the registered UserPrompter's PromptForCommissionOKPermission
      */
     void OnUserDirectedCommissioningRequest(UDCClientState state) override;
+
+    /**
+     * UserConfirmationProvider callback.
+     *
+     * Notification that a Cancel UDC protocol message was received.
+     *
+     * This code will call the registered UserPrompter's HidePromptsOnCancel
+     */
+    void OnCancel(UDCClientState state) override;
+
+    /**
+     * UserConfirmationProvider callback.
+     *
+     * Notification that a CommissionerPasscodeReady UDC protocol message was received.
+     *
+     * This code will trigger the Commissioner to begin commissioning
+     */
+    void OnCommissionerPasscodeReady(UDCClientState state) override;
 
     /**
      * This method should be called after the user has given consent for commissioning of the client
@@ -282,10 +326,38 @@ public:
     void Cancel();
 
     /**
+     * @brief
+     *   Called with the result of attempting to obtain the passcode from the content app corresponding to the given
+     * vendorId/productId.
+     *
+     *  @param[in]    passcode           Passcode for the given commissionee, or 0 if passcode cannot be obtained.
+     *
+     */
+    void HandleContentAppPasscodeResponse(uint32_t passcode);
+    void InternalHandleContentAppPasscodeResponse();
+
+    /**
+     * Cache the passcode to use for commissioning
+     */
+    inline void SetPasscode(uint32_t passcode) { mPasscode = passcode; }
+
+    /**
+     * @brief
+     *   Called with the result of attempting to lookup and obtain the passcode from the content app corresponding to the given
+     * target.
+     *
+     *  @param[in]    target             Target app info for app check.
+     *  @param[in]    passcode           Passcode for the given commissionee, or 0 if passcode cannot be obtained.
+     *
+     */
+    void HandleTargetContentAppCheck(chip::Protocols::UserDirectedCommissioning::TargetAppInfo target, uint32_t passcode);
+
+    /**
      * This method should be called with the passcode for the client
      * indicated in the UserPrompter's PromptForCommissionPasscode callback
      */
     void CommissionWithPasscode(uint32_t passcode);
+    void InternalCommissionWithPasscode();
 
     /**
      * This method should be called by the commissioner to indicate that commissioning succeeded.
@@ -337,6 +409,15 @@ public:
      * Assign a PasscodeService
      */
     inline void SetPasscodeService(PasscodeService * passcodeService) { mPasscodeService = passcodeService; }
+    inline PasscodeService * GetPasscodeService() { return mPasscodeService; }
+
+    /**
+     * Assign an AppInstallationService
+     */
+    inline void SetAppInstallationService(AppInstallationService * appInstallationService)
+    {
+        mAppInstallationService = appInstallationService;
+    }
 
     /**
      * Assign a Commissioner Callback to perform commissioning once user consent has been given
@@ -371,10 +452,13 @@ protected:
     uint16_t mVendorId  = 0;
     uint16_t mProductId = 0;
     NodeId mNodeId      = 0;
+    uint32_t mPasscode  = 0;
+    std::string mRotatingId;
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;
     PasscodeService * mPasscodeService                     = nullptr;
+    AppInstallationService * mAppInstallationService       = nullptr;
     CommissionerCallback * mCommissionerCallback           = nullptr;
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };

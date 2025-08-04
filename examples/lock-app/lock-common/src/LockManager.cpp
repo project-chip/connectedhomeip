@@ -18,8 +18,8 @@
 
 #include "LockManager.h"
 
-#include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
+#include <memory>
 
 using chip::to_underlying;
 
@@ -98,8 +98,9 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
         numberOfHolidaySchedules = 10;
     }
 
-    mEndpoints.emplace_back(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
-                            numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser, numberOfHolidaySchedules);
+    mEndpoints.emplace_back(std::make_unique<LockEndpoint>(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials,
+                                                           numberOfWeekDaySchedulesPerUser, numberOfYearDaySchedulesPerUser,
+                                                           numberOfCredentialsSupportedPerUser, numberOfHolidaySchedules));
 
     ChipLogProgress(Zcl,
                     "Initialized new lock door endpoint "
@@ -107,6 +108,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
                     "numberOfCredentialsSupportedPerUser=%d,holidaySchedules=%d]",
                     endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
                     numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser, numberOfHolidaySchedules);
+    DoorLockServer::Instance().SetDelegate(endpointId, mEndpoints.back().get());
 
     return true;
 }
@@ -303,11 +305,11 @@ DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t holidayIn
 
 LockEndpoint * LockManager::getEndpoint(chip::EndpointId endpointId)
 {
-    for (auto & mEndpoint : mEndpoints)
+    for (auto & endpoint : mEndpoints)
     {
-        if (mEndpoint.GetEndpointId() == endpointId)
+        if (endpoint->GetEndpointId() == endpointId)
         {
-            return &mEndpoint;
+            return endpoint.get();
         }
     }
     return nullptr;

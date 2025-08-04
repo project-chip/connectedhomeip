@@ -33,6 +33,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/EventLogging.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
+#include <platform/internal/NFCCommissioningManager.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -89,6 +90,16 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Initialize the CHIP TCP layer.
+    err = TCPEndPointManager()->Init(SystemLayer());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "TCP initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    SuccessOrExit(err);
+#endif
+
     // TODO Perform dynamic configuration of the core CHIP objects based on stored settings.
 
     // Initialize the CHIP BLE manager.
@@ -109,11 +120,22 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
-    // Initialize the NFC Manager.
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC
-    err = NFCMgr().Init();
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "NFC Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    // Initialize the NFC onboarding payload manager
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
+    err = NFCOnboardingPayloadMgr().Init();
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(DeviceLayer, "NFC onboarding payload manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
+#endif
+
+    // Initialize the CHIP NFC manager for NFC-based Commissioning
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    err = NFCCommissioningMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "NFC-based Commissioning Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    SuccessOrExit(err);
 #endif
 
     // TODO Initialize CHIP Event Logging.
@@ -129,15 +151,30 @@ exit:
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
-    ChipLogError(DeviceLayer, "Inet Layer shutdown");
+    ChipLogProgress(DeviceLayer, "Inet Layer shutdown");
     UDPEndPointManager()->Shutdown();
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    TCPEndPointManager()->Shutdown();
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    ChipLogError(DeviceLayer, "BLE shutdown");
+    ChipLogProgress(DeviceLayer, "BLE Layer shutdown");
     BLEMgr().Shutdown();
 #endif
 
-    ChipLogError(DeviceLayer, "System Layer shutdown");
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(DeviceLayer, "WiFi-PAF Layer shutdown");
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
+        [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    ChipLogProgress(DeviceLayer, "NFCCommissioningMgr shutdown");
+    NFCCommissioningMgr().Shutdown();
+#endif
+
+    ChipLogProgress(DeviceLayer, "System Layer shutdown");
     SystemLayer().Shutdown();
 }
 

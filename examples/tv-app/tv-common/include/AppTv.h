@@ -63,6 +63,7 @@ using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 using SupportedProtocolsBitmap    = app::Clusters::ContentLauncher::SupportedProtocolsBitmap;
+using SupportedCluster            = chip::AppPlatform::ContentApp::SupportedCluster;
 
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
@@ -73,7 +74,8 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, const char * setupPIN) :
+                   const char * szApplicationVersion, const char * setupPIN, std::vector<SupportedCluster> supportedClusters) :
+        ContentApp{ supportedClusters },
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
         mAccountLoginDelegate(setupPIN),
@@ -91,6 +93,11 @@ public:
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
+    bool MatchesPidVid(uint16_t productId, uint16_t vendorId)
+    {
+        return vendorId == mApplicationBasicDelegate.HandleGetVendorId() &&
+            productId == mApplicationBasicDelegate.HandleGetProductId();
+    }
 
 protected:
     ApplicationBasicManager mApplicationBasicDelegate;
@@ -138,15 +145,17 @@ public:
                                                                 uint16_t productId) override;
 
     void AddAdminVendorId(uint16_t vendorId);
+    // Add the app to the list of mContentApps
+    void InstallContentApp(uint16_t vendorId, uint16_t productId);
+    // Remove the app from the list of mContentApps
+    bool UninstallContentApp(uint16_t vendorId, uint16_t productId);
+    // Print mContentApps and endpoints
+    void LogInstalledApps();
+    // TODO: method to retrieve list of mContentApps
+    // https://github.com/project-chip/connectedhomeip/issues/34020
 
 protected:
-    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = {
-        ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890"),
-        ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021"),
-        ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
-        ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021")
-    };
-
+    std::vector<std::unique_ptr<ContentAppImpl>> mContentApps;
     std::vector<uint16_t> mAdminVendorIds{};
 };
 
