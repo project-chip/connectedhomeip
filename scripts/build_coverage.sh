@@ -130,6 +130,7 @@ for i in "$@"; do
             ;;
         --xml)
             GENERATE_XML=true
+            shift
             ;;
         -q | --quiet)
             QUIET_FLAG=("--quiet")
