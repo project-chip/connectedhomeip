@@ -47,6 +47,9 @@ DataModel::ActionReturnStatus SoilMeasurementCluster::ReadAttribute(const DataMo
     case SoilMeasurement::Attributes::ClusterRevision::Id: {
         return encoder.Encode(SoilMeasurement::kRevision);
     }
+    case SoilMeasurement::Attributes::FeatureMap::Id: {
+        return encoder.Encode(static_cast<uint32_t>(0));
+    }
     default:
         return Protocols::InteractionModel::Status::UnreportableAttribute;
     }
@@ -63,13 +66,6 @@ SoilMeasurementCluster::SetSoilMoistureMeasuredValue(
     EndpointId endpointId, const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
 {
     return mLogic.SetSoilMoistureMeasuredValue(endpointId, soilMoistureMeasuredValue);
-}
-
-CHIP_ERROR
-SoilMeasurementCluster::SetSoilMoistureMeasurementLimits(
-    const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits)
-{
-    return mLogic.SetSoilMoistureMeasurementLimits(soilMoistureMeasurementLimits);
 }
 
 } // namespace Clusters

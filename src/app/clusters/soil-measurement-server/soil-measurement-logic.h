@@ -32,7 +32,7 @@ namespace Clusters {
 class SoilMeasurementLogic
 {
 public:
-    SoilMeasurementLogic() { mAttrProvider = nullptr; };
+    SoilMeasurementLogic();
     virtual ~SoilMeasurementLogic() = default;
 
     void Startup(AttributePersistenceProvider * attrStorage);
@@ -47,10 +47,6 @@ public:
     SetSoilMoistureMeasuredValue(
         EndpointId endpointId,
         const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
-
-    CHIP_ERROR
-    SetSoilMoistureMeasurementLimits(
-        const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits);
 
 private:
     SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mSoilMoistureMeasurementLimits;

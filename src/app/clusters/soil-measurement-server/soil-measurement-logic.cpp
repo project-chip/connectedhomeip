@@ -26,14 +26,35 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace {
+
+const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
+    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
+};
+
+const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
+    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 100,
+    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
+        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
+};
+
+} // namespace
+
+SoilMeasurementLogic::SoilMeasurementLogic() : mSoilMoistureMeasurementLimits(kDefaultSoilMoistureMeasurementLimits)
+{
+    mAttrProvider = nullptr;
+    mSoilMoistureMeasuredValue.SetNull();
+}
+
 void SoilMeasurementLogic::Startup(AttributePersistenceProvider * attrProvider)
 {
     VerifyOrReturn(mAttrProvider == nullptr);
     VerifyOrReturn(attrProvider != nullptr);
 
     mAttrProvider = attrProvider;
-
-    mSoilMoistureMeasuredValue.SetNull();
 
     SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type measurementLimits;
     MutableByteSpan measurementLimitsBytes(reinterpret_cast<uint8_t *>(&measurementLimits), sizeof(measurementLimits));
@@ -43,6 +64,7 @@ void SoilMeasurementLogic::Startup(AttributePersistenceProvider * attrProvider)
 
     if (error != CHIP_NO_ERROR)
     {
+        measurementLimits = kDefaultSoilMoistureMeasurementLimits;
     }
 
     mSoilMoistureMeasurementLimits = measurementLimits;
@@ -54,6 +76,7 @@ void SoilMeasurementLogic::Startup(AttributePersistenceProvider * attrProvider)
 
     if (error != CHIP_NO_ERROR)
     {
+        measuredValue.SetNull();
     }
 
     mSoilMoistureMeasuredValue = measuredValue;
@@ -92,15 +115,6 @@ SoilMeasurementLogic::SetSoilMoistureMeasuredValue(
         MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id,
                                                SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id);
     }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-SoilMeasurementLogic::SetSoilMoistureMeasurementLimits(
-    const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits)
-{
-    mSoilMoistureMeasurementLimits = soilMoistureMeasurementLimits;
 
     return CHIP_NO_ERROR;
 }
