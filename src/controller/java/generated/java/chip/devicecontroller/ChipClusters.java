@@ -60734,11 +60734,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void manuallyTriggerTransport(DefaultClusterCallback callback, Integer connectionID, Integer activationReason, Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct> timeControl) {
-      manuallyTriggerTransport(callback, connectionID, activationReason, timeControl, 0);
+    public void manuallyTriggerTransport(DefaultClusterCallback callback, Integer connectionID, Integer activationReason, Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct> timeControl, Optional<byte[]> userDefined) {
+      manuallyTriggerTransport(callback, connectionID, activationReason, timeControl, userDefined, 0);
     }
 
-    public void manuallyTriggerTransport(DefaultClusterCallback callback, Integer connectionID, Integer activationReason, Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct> timeControl, int timedInvokeTimeoutMs) {
+    public void manuallyTriggerTransport(DefaultClusterCallback callback, Integer connectionID, Integer activationReason, Optional<ChipStructs.PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct> timeControl, Optional<byte[]> userDefined, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -60754,6 +60754,10 @@ public class ChipClusters {
       BaseTLVType timeControltlvValue = timeControl.<BaseTLVType>map((nonOptionaltimeControl) -> nonOptionaltimeControl.encodeTlv()).orElse(new EmptyType());
       elements.add(new StructElement(timeControlFieldID, timeControltlvValue));
 
+      final long userDefinedFieldID = 3L;
+      BaseTLVType userDefinedtlvValue = userDefined.<BaseTLVType>map((nonOptionaluserDefined) -> new ByteArrayType(nonOptionaluserDefined)).orElse(new EmptyType());
+      elements.add(new StructElement(userDefinedFieldID, userDefinedtlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -60762,16 +60766,16 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void findTransport(FindTransportResponseCallback callback, @Nullable Optional<Integer> connectionID) {
+    public void findTransport(FindTransportResponseCallback callback, @Nullable Integer connectionID) {
       findTransport(callback, connectionID, 0);
     }
 
-    public void findTransport(FindTransportResponseCallback callback, @Nullable Optional<Integer> connectionID, int timedInvokeTimeoutMs) {
+    public void findTransport(FindTransportResponseCallback callback, @Nullable Integer connectionID, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long connectionIDFieldID = 0L;
-      BaseTLVType connectionIDtlvValue = connectionID != null ? connectionID.<BaseTLVType>map((nonOptionalconnectionID) -> new UIntType(nonOptionalconnectionID)).orElse(new EmptyType()) : new NullType();
+      BaseTLVType connectionIDtlvValue = connectionID != null ? new UIntType(connectionID) : new NullType();
       elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
 
       StructType commandArgs = new StructType(elements);

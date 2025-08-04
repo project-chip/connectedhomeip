@@ -15430,6 +15430,7 @@ public:
         AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
         AddArgument("ActivationReason", 0, UINT8_MAX, &mRequest.activationReason);
         AddArgument("TimeControl", &mComplex_TimeControl, "", Argument::kOptional);
+        AddArgument("UserDefined", &mRequest.userDefined);
         ClusterCommand::AddArguments();
     }
 
