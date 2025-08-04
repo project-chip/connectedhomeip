@@ -23,13 +23,13 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestSoilMeasurementCluster.cpp" ]
 
-  sources = [ ]
+  sources = []
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/clusters/soil-measurement-server",
+    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/lib/support",
   ]
 }
