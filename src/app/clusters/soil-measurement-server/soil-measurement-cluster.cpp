@@ -28,7 +28,7 @@ CHIP_ERROR SoilMeasurementCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    mLogic.Startup(context.attributeStorage);
+    mLogic.Startup(mPath.mEndpointId, context.attributeStorage);
 
     return CHIP_NO_ERROR;
 }

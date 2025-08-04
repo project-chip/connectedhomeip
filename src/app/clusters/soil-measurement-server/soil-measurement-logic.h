@@ -35,7 +35,7 @@ public:
     SoilMeasurementLogic();
     virtual ~SoilMeasurementLogic() = default;
 
-    void Startup(AttributePersistenceProvider * attrStorage);
+    void Startup(EndpointId endpointId, AttributePersistenceProvider * attrStorage);
 
     // Attributes handling for cluster
     SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type GetSoilMoistureMeasurementLimits();

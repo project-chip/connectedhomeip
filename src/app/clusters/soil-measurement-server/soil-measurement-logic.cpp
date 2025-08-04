@@ -49,7 +49,7 @@ SoilMeasurementLogic::SoilMeasurementLogic() : mSoilMoistureMeasurementLimits(kD
     mSoilMoistureMeasuredValue.SetNull();
 }
 
-void SoilMeasurementLogic::Startup(AttributePersistenceProvider * attrProvider)
+void SoilMeasurementLogic::Startup(EndpointId endpointId, AttributePersistenceProvider * attrProvider)
 {
     VerifyOrReturn(mAttrProvider == nullptr);
     VerifyOrReturn(attrProvider != nullptr);
@@ -59,7 +59,7 @@ void SoilMeasurementLogic::Startup(AttributePersistenceProvider * attrProvider)
     SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type measurementLimits;
     MutableByteSpan measurementLimitsBytes(reinterpret_cast<uint8_t *>(&measurementLimits), sizeof(measurementLimits));
     CHIP_ERROR error = mAttrProvider->ReadValue(
-        { kRootEndpointId, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::Id },
+        { endpointId, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::Id },
         measurementLimitsBytes);
 
     if (error != CHIP_NO_ERROR)
@@ -72,7 +72,7 @@ void SoilMeasurementLogic::Startup(AttributePersistenceProvider * attrProvider)
     SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type measuredValue;
     MutableByteSpan measuredValueBytes(reinterpret_cast<uint8_t *>(&measuredValue), sizeof(measuredValue));
     error = mAttrProvider->ReadValue(
-        { kRootEndpointId, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id }, measuredValueBytes);
+        { endpointId, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id }, measuredValueBytes);
 
     if (error != CHIP_NO_ERROR)
     {

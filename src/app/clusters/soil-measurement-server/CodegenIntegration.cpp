@@ -86,6 +86,9 @@ CHIP_ERROR
 SetSoilMoistureMeasuredValue(EndpointId endpoint,
                              const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
 {
+    // This cluster is only enabled for endpoint 1.
+    VerifyOrReturnError(endpoint == 1, CHIP_ERROR_INVALID_ARGUMENT);
+
     return gServer.Cluster().SetSoilMoistureMeasuredValue(endpoint, soilMoistureMeasuredValue);
 }
 
