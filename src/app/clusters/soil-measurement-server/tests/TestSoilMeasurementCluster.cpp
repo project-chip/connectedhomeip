@@ -40,7 +40,7 @@ struct TestSoilMeasurementCluster : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
- 
+
 TEST_F(TestSoilMeasurementCluster, AttributeTest)
 {
     {
@@ -91,8 +91,6 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasurementLimits)
 {
     {
         SoilMeasurementLogic soilMeasurement;
-
-        soilMeasurement.SetSoilMoistureMeasurementLimits(kDefaultSoilMoistureMeasurementLimits);
 
         const auto & measurementLimits = soilMeasurement.GetSoilMoistureMeasurementLimits();
         ASSERT_EQ(measurementLimits.measurementType, kDefaultSoilMoistureMeasurementLimits.measurementType);

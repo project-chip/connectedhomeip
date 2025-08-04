@@ -29,9 +29,6 @@ CHIP_ERROR
 SetSoilMoistureMeasuredValue(chip::EndpointId endpoint,
                              const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
-CHIP_ERROR
-SetSoilMoistureMeasurementLimits(const Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits);
-
 } // namespace SoilMeasurement
 } // namespace Clusters
 } // namespace app

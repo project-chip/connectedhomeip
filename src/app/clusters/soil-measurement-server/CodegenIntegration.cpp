@@ -33,19 +33,6 @@ namespace {
 
 LazyRegisteredServerCluster<SoilMeasurementCluster> gServer;
 
-const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
-    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
-};
-
-const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
-    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
-    .measured         = true,
-    .minMeasuredValue = 0,
-    .maxMeasuredValue = 100,
-    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
-        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
-};
-
 } // namespace
 
 void emberAfSoilMeasurementClusterServerInitCallback(EndpointId endpoint) {}
@@ -62,10 +49,6 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "SoilMeasurement cluster error registration");
-    }
-    else
-    {
-        SoilMeasurement::SetSoilMoistureMeasurementLimits(kDefaultSoilMoistureMeasurementLimits);
     }
 }
 
@@ -104,12 +87,6 @@ SetSoilMoistureMeasuredValue(EndpointId endpoint,
                              const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
 {
     return gServer.Cluster().SetSoilMoistureMeasuredValue(endpoint, soilMoistureMeasuredValue);
-}
-
-CHIP_ERROR
-SetSoilMoistureMeasurementLimits(const Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits)
-{
-    return gServer.Cluster().SetSoilMoistureMeasurementLimits(soilMoistureMeasurementLimits);
 }
 
 } // namespace SoilMeasurement
