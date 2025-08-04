@@ -50,12 +50,12 @@ class CommissioningFlowBlocks:
 
         self._logger.info("Getting AttestationNonce")
         attestation_nonce: bytes = b''
-        if hasattr(self._credential_provider, "get_attestation_nonce") and callable(self._credential_provider.get_attestation_nonce()):
+        if hasattr(self._credential_provider, "get_attestation_nonce") and callable(self._credential_provider.get_attestation_nonce):
             attestation_nonce = await self._credential_provider.get_attestation_nonce()
 
         self._logger.info("Getting CSR Nonce")
         csr_nonce: bytes = b''
-        if hasattr(self._credential_provider, "get_csr_nonce") and callable(self._credential_provider.get_csr_nonce()):
+        if hasattr(self._credential_provider, "get_csr_nonce") and callable(self._credential_provider.get_csr_nonce):
             csr_nonce = await self._credential_provider.get_csr_nonce()
 
         self._logger.info("Sending AttestationRequest")
