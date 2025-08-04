@@ -251,11 +251,19 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupRootCert(EndpointId ma
     return LookupRootCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
-CHIP_ERROR TlsCertificateManagementCommandDelegate::RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
+Status TlsCertificateManagementCommandDelegate::RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnValue(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
-    return mCertificateTable.RemoveRootCertificate(fabric, id);
+    auto result = mCertificateTable.RemoveRootCertificate(fabric, id);
+    if (result == CHIP_ERROR_NOT_FOUND)
+    {
+        return Status::NotFound;
+    }
+
+    VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
+
+    return Status::Success;
 }
 
 Status TlsCertificateManagementCommandDelegate::GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
@@ -400,11 +408,19 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::LookupClientCert(EndpointId 
     return LookupClientCertByFingerprint(matterEndpoint, fabric, calculatedFingerprint, loadedCallback);
 }
 
-CHIP_ERROR TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
+Status TlsCertificateManagementCommandDelegate::RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnValue(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
-    return mCertificateTable.RemoveClientCertificate(fabric, id);
+    auto result = mCertificateTable.RemoveClientCertificate(fabric, id);
+    if (result == CHIP_ERROR_NOT_FOUND)
+    {
+        return Status::NotFound;
+    }
+
+    VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
+
+    return Status::Success;
 }
 
 static CertificateTableImpl gCertificateTableInstance;

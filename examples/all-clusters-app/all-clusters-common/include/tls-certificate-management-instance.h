@@ -51,7 +51,7 @@ public:
                                            LoadedRootCertificateCallback loadedCallback) const override;
     CHIP_ERROR LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & certificate,
                               LoadedRootCertificateCallback loadedCallback) const override;
-    CHIP_ERROR RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override;
+    Protocols::InteractionModel::Status RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override;
 
     Protocols::InteractionModel::Status GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
                                                           const ClientCsrType & request,
@@ -71,7 +71,7 @@ public:
                                              LoadedClientCertificateCallback loadedCallback) const override;
     CHIP_ERROR LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & certificate,
                                 LoadedClientCertificateCallback loadedCallback) const override;
-    CHIP_ERROR RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
+    Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
 
     static inline TlsCertificateManagementCommandDelegate & getInstance() { return instance; }
 };

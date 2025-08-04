@@ -186,7 +186,7 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric to load root certificates for
      * @param[in] loadedCallback lambda to execute on list of all matching certificates.  If this function returns an error result,
-     * iteration stops and returns that same error result.
+     * that error is propagated.
      */
     virtual CHIP_ERROR RootCertsForFabric(EndpointId matterEndpoint, FabricIndex fabric,
                                           RootCertificateListCallback loadedCallback) const = 0;
@@ -211,7 +211,7 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
      * @param[in] fingerprint The fingerprint of the root certificate to find.
-     * @param[out] loadedCallback The lambda to execute with the loaded root cert.
+     * @param[in] loadedCallback The lambda to execute with the loaded root cert.
      * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
      */
     virtual CHIP_ERROR LookupRootCertByFingerprint(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
@@ -231,14 +231,15 @@ public:
      * @param[in] id The id of the root certificate to remove.
      * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
      */
-    virtual CHIP_ERROR RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
+    virtual Protocols::InteractionModel::Status RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
 
     /**
      * @brief Generates a client certificate signing request (CSR)
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fingerprint The fingerprint of the root certificate to find.
-     * @param[out] loadedCallback The lambda to execute with the generated client CSR.
+     * @param[in] loadedCallback The lambda to execute with the generated client CSR. This lambda will be called before this method
+     * returns.
      * @return NotFound if no mapping is found.
      */
     virtual Protocols::InteractionModel::Status GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
@@ -264,8 +265,7 @@ public:
      loadedCallback has a guaranteed lifetime of the method call.
      *
      * @param[in] loadedCallback lambda to execute with allocated memory for client certificate loading.  If this function returns
-     an error result,  returns that same error result.
-
+     an error result, returns that same error result.
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
      */
@@ -277,7 +277,7 @@ public:
      guaranteed lifetime of the method call.
      *
      * @param[in] loadedCallback lambda to execute with allocated memory for client certificate loading.  If this function returns
-     an error result,  returns that same error result.
+     an error result, that error is propagated.
 
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric to load client certificates for
@@ -292,7 +292,7 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
      * @param[in] id The id of the client certificate to find.
-     * @param[out] loadedCallback The lambda to execute with the loaded client cert.
+     * @param[in] loadedCallback The lambda to execute with the loaded client cert.
      * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
      */
     virtual CHIP_ERROR FindClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id,
@@ -305,7 +305,7 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
      * @param[in] fingerprint The fingerprint of the client certificate to find.
-     * @param[out] loadedCallback The lambda to execute with the loaded client cert.
+     * @param[in] loadedCallback The lambda to execute with the loaded client cert.
      * @return NotFound if no mapping is found.
      */
     virtual CHIP_ERROR LookupClientCertByFingerprint(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
@@ -326,7 +326,8 @@ public:
      * @param[in] id The id of the client certificate to remove.
      * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
      */
-    virtual CHIP_ERROR RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
+    virtual Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                 Tls::TLSCAID id) = 0;
 
 protected:
     friend class TlsCertificateManagementServer;

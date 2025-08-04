@@ -26,6 +26,7 @@ using namespace chip::app::Storage;
 using namespace chip::app::Storage::Data;
 using namespace chip::app::Clusters::Tls;
 using namespace chip::app::Clusters::TlsCertificateManagement::Structs;
+using chip::TLV::EstimateStructOverhead;
 
 using RootSerializer   = DefaultSerializer<CertificateId, CertificateTable::RootCertStruct>;
 using ClientSerializer = DefaultSerializer<CertificateId, CertificateTable::ClientCertWithKey>;
@@ -67,11 +68,13 @@ struct StoredCertificate
     FabricIndex fabric = kUndefinedFabricIndex;
 };
 
-// Currently takes 5 Bytes to serialize Container and value in a TLV: 1 byte start struct, 2 bytes control + tag for the value, 4
-// byte value, 1 byte end struct. Leaves space for potential increase in ID size.
-static constexpr size_t kMaxCertificates =
-    (kMaxRootCertificatesPerFabric + kMaxClientCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS;
-static constexpr size_t kPersistentBufferNextIdBytes = 12 + (kMaxCertificates * sizeof(StoredCertificate));
+static constexpr size_t kPersistentBufferNextIdBytes =
+    EstimateStructOverhead(sizeof(uint16_t), // mNextClientId
+                           sizeof(uint16_t), // mNextRootId,
+                           EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
+                               (kMaxRootCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS), // mRootCertMapping
+                           EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
+                               (kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS)); // mClientCertMapping
 
 struct GlobalCertificateData : public PersistentData<kPersistentBufferNextIdBytes>
 {
@@ -185,8 +188,8 @@ struct GlobalCertificateData : public PersistentData<kPersistentBufferNextIdByte
             TLV::TLVType entryIdContainer;
             if (i >= max)
             {
-                // In-memory cannot be smaller than what we've stored in persistence, due to bindings
-                // to FabricTableImpl
+                // In-memory is not allowed to be smaller than what we've stored in persistence,
+                // due to bindings to FabricTableImpl
                 return CHIP_ERROR_INTERNAL;
             }
             auto & stored = target[i];
@@ -251,7 +254,7 @@ private:
     CHIP_ERROR DoRemoval(PersistentStorageDelegate & storage, CertificateTable & table, FabricIndex fabric, uint16_t id,
                          size_t count, StoredCertificate * source)
     {
-        // Find the entry in teh global mapping
+        // Find the entry in the global mapping
         StoredCertificate * foundEntry = nullptr;
         for (size_t i = 0; i < count; ++i)
         {
@@ -292,12 +295,16 @@ private:
     {
         bool looped = false;
         bool taken;
+        uint16_t outOfIdCheck = nextId;
         do
         {
             if (nextId == maxId)
             {
-                VerifyOrReturnError(!looped, CHIP_ERROR_ENDPOINT_POOL_FULL);
                 nextId = 0;
+            }
+            if (nextId == outOfIdCheck)
+            {
+                VerifyOrReturnError(!looped, CHIP_ERROR_ENDPOINT_POOL_FULL);
                 looped = true;
             }
             taken = false;
@@ -562,7 +569,7 @@ CHIP_ERROR CertificateTableImpl::UpsertRootCertificateEntry(FabricIndex fabric, 
     }
 
     CertificateId tableId(localId);
-    const RootCertStruct updatedEntry = { localId, Optional<ByteSpan>(certificate), fabric };
+    const RootCertStruct updatedEntry = { localId, MakeOptional(certificate), fabric };
     ReturnErrorOnFailure(mRootCertificates.SetTableEntry(fabric, tableId, updatedEntry, buffer));
     id.SetValue(localId);
     return CHIP_NO_ERROR;
@@ -610,7 +617,7 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    // TODO(gmarcosb): Use PSAKeyAllocator instead
+    // TODO(gmarcosb): Use an interface like PSAKeyAllocator instead, but not bound to PSA
 
     Crypto::P256Keypair keyPair;
 
