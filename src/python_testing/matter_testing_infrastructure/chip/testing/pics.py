@@ -21,6 +21,10 @@ import typing
 import xml.etree.ElementTree as ET
 
 
+def event_pics_str(pics_base: str, id: int) -> str:
+    return f'{pics_base}.S.E{id:02x}'
+
+
 def attribute_pics_str(pics_base: str, id: int) -> str:
     return f'{pics_base}.S.A{id:04x}'
 
