@@ -35,6 +35,7 @@ import logging
 import time
 
 import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -77,6 +78,24 @@ class TC_SU_2_8(MatterBaseTest):
         dut_node_id = self.dut_node_id
         controller = self.default_controller
         fabric_id_th2 = controller.fabricId + 1
+
+        th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
+        th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=0xFFF1, fabricId=fabric_id_th2)
+        th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+
+        params = await self.open_commissioning_window(controller, dut_node_id)
+        setup_pin_code = params.commissioningParameters.setupPinCode
+        long_discriminator = params.randomDiscriminator
+
+        resp = await th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id,
+            setupPinCode=setup_pin_code,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=long_discriminator
+        )
+
+        logging.info(f"TH2 commissioning: {resp}")
+
         # th1_dut_node_id = self.dut_node_id
 
         valid_states = {
@@ -88,7 +107,7 @@ class TC_SU_2_8(MatterBaseTest):
         }
 
         provider_th1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=self.dut_node_id,
+            providerNodeID=1,
             endpoint=endpoint,
             fabricIndex=controller.fabricId
         )
@@ -122,7 +141,15 @@ class TC_SU_2_8(MatterBaseTest):
             targets=[]
         )
 
-        acl_attr = Clusters.Objects.AccessControl.Attributes.Acl(value=[acl_admin, acl_view])
+        acl_operate = Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=controller.fabricId,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[]
+        )
+
+        acl_attr = Clusters.Objects.AccessControl.Attributes.Acl(value=[acl_admin, acl_view, acl_operate])
 
         resp = await controller.WriteAttribute(
             self.dut_node_id,  # Is this ok?
@@ -140,7 +167,7 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info(f"TH1 provider: {provider_th1}")
 
         await self.write_ota_providers(controller=controller, providers=[provider_th1], endpoint=endpoint)
-        await self.write_ota_providers(controller=controller, providers=[provider_th2], endpoint=endpoint)  # Is this ok?
+        await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)  # Is this ok?
 
         # TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
