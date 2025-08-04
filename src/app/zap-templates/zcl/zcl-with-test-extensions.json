@@ -235,7 +235,7 @@
         "Commodity Metering": [
             "MeteredQuantity",
             "MeteredQuantityTimestamp",
-            "MeasurementType",
+            "TariffUnit",
             "MaximumMeteredQuantities"
         ],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
@@ -799,7 +799,6 @@
             "ClusterRevision"
         ],
         "Unit Localization": ["TemperatureUnit"],
-        "Zone Management": ["TwoDCartesianMax"],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",
@@ -812,6 +811,15 @@
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason"
+        ],
+        "Zone Management": [
+            "MaxUserDefinedZones",
+            "MaxZones",
+            "SensitivityMax",
+            "Sensitivity",
+            "TwoDCartesianMax",
+            "FeatureMap",
+            "ClusterRevision"
         ]
     },
     "mandatoryDeviceTypes": "0x0016",
