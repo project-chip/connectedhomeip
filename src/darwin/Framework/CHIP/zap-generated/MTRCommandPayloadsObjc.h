@@ -12405,6 +12405,8 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull activationReason MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct * _Nullable timeControl MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable userDefined MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
