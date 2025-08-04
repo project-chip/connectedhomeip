@@ -1,1 +1,1 @@
-148 : Update docker image to add ffmpeg, curl dev packages for cross compile
+154 : [NXP] Update NXP SDK docker to 25.06.00

@@ -2909,6 +2909,7 @@ public class ClusterIDMapping {
             TCUpdateDeadline(9L),
             RecoveryIdentifier(10L),
             NetworkRecoveryReason(11L),
+            IsCommissioningWithoutPower(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18591,7 +18592,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ManuallyTriggerTransportCommandField {ConnectionID(0),ActivationReason(1),TimeControl(2),;
+                }public enum ManuallyTriggerTransportCommandField {ConnectionID(0),ActivationReason(1),TimeControl(2),UserDefined(3),;
                     private final int id;
                     ManuallyTriggerTransportCommandField(int id) {
                         this.id = id;
@@ -20313,7 +20314,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             MeteredQuantity(0L),
             MeteredQuantityTimestamp(1L),
-            MeasurementType(2L),
+            TariffUnit(2L),
             MaximumMeteredQuantities(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),

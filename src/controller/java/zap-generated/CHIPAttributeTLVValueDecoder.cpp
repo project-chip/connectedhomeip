@@ -5005,6 +5005,22 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::IsCommissioningWithoutPower::Id: {
+            using TypeInfo = Attributes::IsCommissioningWithoutPower::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            jboolean jnivalue              = static_cast<jboolean>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           jnivalue, value);
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -44631,6 +44647,44 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     {
                         jobject newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional;
                         jobject
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterface;
+                        std::string
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterfaceClassName =
+                                "java/lang/Integer";
+                        std::string
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterfaceCtorSignature =
+                                "(I)V";
+                        jint
+                            jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterface =
+                                static_cast<jint>(
+                                    entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CMAFInterface);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterfaceClassName
+                                .c_str(),
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterfaceCtorSignature
+                                .c_str(),
+                            jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterface,
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterface);
+                        jobject
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDuration;
+                        std::string
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDurationClassName =
+                                "java/lang/Integer";
+                        std::string
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDurationCtorSignature =
+                                "(I)V";
+                        jint
+                            jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDuration =
+                                static_cast<jint>(
+                                    entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().segmentDuration);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDurationClassName
+                                .c_str(),
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDurationCtorSignature
+                                .c_str(),
+                            jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDuration,
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDuration);
+                        jobject
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_chunkDuration;
                         std::string
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_chunkDurationClassName =
@@ -44649,6 +44703,30 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                 .c_str(),
                             jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_chunkDuration,
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_chunkDuration);
+                        jobject
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup;
+                        std::string
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupClassName =
+                                "java/lang/Integer";
+                        std::string
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupCtorSignature =
+                                "(I)V";
+                        jint
+                            jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup =
+                                static_cast<jint>(
+                                    entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupClassName
+                                .c_str(),
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroupCtorSignature
+                                .c_str(),
+                            jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup,
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup);
+                        jobject
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                            entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName,
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName));
                         jobject
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKey;
                         if (!entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
@@ -44683,6 +44761,41 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             chip::JniReferences::GetInstance().CreateOptional(
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyInsideOptional,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKey);
+                        }
+                        jobject
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID;
+                        if (!entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID);
+                        }
+                        else
+                        {
+                            jobject
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional;
+                            jbyteArray
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray =
+                                    env->NewByteArray(static_cast<jsize>(entry_0.transportOptions.Value()
+                                                                             .containerOptions.CMAFContainerOptions.Value()
+                                                                             .CENCKeyID.Value()
+                                                                             .size()));
+                            env->SetByteArrayRegion(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray,
+                                0,
+                                static_cast<jsize>(entry_0.transportOptions.Value()
+                                                       .containerOptions.CMAFContainerOptions.Value()
+                                                       .CENCKeyID.Value()
+                                                       .size()),
+                                reinterpret_cast<const jbyte *>(entry_0.transportOptions.Value()
+                                                                    .containerOptions.CMAFContainerOptions.Value()
+                                                                    .CENCKeyID.Value()
+                                                                    .data()));
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional =
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray;
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID);
                         }
                         jobject
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled;
@@ -44720,41 +44833,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabledInsideOptional,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled);
                         }
-                        jobject
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID;
-                        if (!entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue())
-                        {
-                            chip::JniReferences::GetInstance().CreateOptional(
-                                nullptr,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID);
-                        }
-                        else
-                        {
-                            jobject
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional;
-                            jbyteArray
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray =
-                                    env->NewByteArray(static_cast<jsize>(entry_0.transportOptions.Value()
-                                                                             .containerOptions.CMAFContainerOptions.Value()
-                                                                             .CENCKeyID.Value()
-                                                                             .size()));
-                            env->SetByteArrayRegion(
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray,
-                                0,
-                                static_cast<jsize>(entry_0.transportOptions.Value()
-                                                       .containerOptions.CMAFContainerOptions.Value()
-                                                       .CENCKeyID.Value()
-                                                       .size()),
-                                reinterpret_cast<const jbyte *>(entry_0.transportOptions.Value()
-                                                                    .containerOptions.CMAFContainerOptions.Value()
-                                                                    .CENCKeyID.Value()
-                                                                    .data()));
-                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional =
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptionalByteArray;
-                            chip::JniReferences::GetInstance().CreateOptional(
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyIDInsideOptional,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID);
-                        }
 
                         {
                             jclass CMAFContainerOptionsStructStructClass_6;
@@ -44771,7 +44849,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             jmethodID CMAFContainerOptionsStructStructCtor_6;
                             err = chip::JniReferences::GetInstance().FindMethod(
                                 env, CMAFContainerOptionsStructStructClass_6, "<init>",
-                                "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
+                                "String;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
                                 &CMAFContainerOptionsStructStructCtor_6);
                             if (err != CHIP_NO_ERROR || CMAFContainerOptionsStructStructCtor_6 == nullptr)
                             {
@@ -44783,10 +44862,14 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional = env->NewObject(
                                 CMAFContainerOptionsStructStructClass_6, CMAFContainerOptionsStructStructCtor_6,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CMAFInterface,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_segmentDuration,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_chunkDuration,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKey,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID);
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_CENCKeyID,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled);
                         }
                         chip::JniReferences::GetInstance().CreateOptional(
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional,
@@ -51029,8 +51112,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::MeasurementType::Id: {
-            using TypeInfo = Attributes::MeasurementType::TypeInfo;
+        case Attributes::TariffUnit::Id: {
+            using TypeInfo = Attributes::TariffUnit::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

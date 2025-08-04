@@ -2208,6 +2208,7 @@ private:
 | * TCUpdateDeadline                                                  | 0x0009 |
 | * RecoveryIdentifier                                                | 0x000A |
 | * NetworkRecoveryReason                                             | 0x000B |
+| * IsCommissioningWithoutPower                                       | 0x000C |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -15429,6 +15430,7 @@ public:
         AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
         AddArgument("ActivationReason", 0, UINT8_MAX, &mRequest.activationReason);
         AddArgument("TimeControl", &mComplex_TimeControl, "", Argument::kOptional);
+        AddArgument("UserDefined", &mRequest.userDefined);
         ClusterCommand::AddArguments();
     }
 
@@ -17420,7 +17422,7 @@ private:
 | Attributes:                                                         |        |
 | * MeteredQuantity                                                   | 0x0000 |
 | * MeteredQuantityTimestamp                                          | 0x0001 |
-| * MeasurementType                                                   | 0x0002 |
+| * TariffUnit                                                        | 0x0002 |
 | * MaximumMeteredQuantities                                          | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -20268,12 +20270,14 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "tcupdate-deadline", Attributes::TCUpdateDeadline::Id, credsIssuerConfig),            //
         make_unique<ReadAttribute>(Id, "recovery-identifier", Attributes::RecoveryIdentifier::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "network-recovery-reason", Attributes::NetworkRecoveryReason::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                //
+        make_unique<ReadAttribute>(Id, "is-commissioning-without-power", Attributes::IsCommissioningWithoutPower::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<uint64_t>>(Id, "breadcrumb", 0, UINT64_MAX, Attributes::Breadcrumb::Id, WriteCommandType::kWrite,
                                               credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type>>(
@@ -20304,6 +20308,8 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
             WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum>>>(
             Id, "network-recovery-reason", 0, UINT8_MAX, Attributes::NetworkRecoveryReason::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "is-commissioning-without-power", 0, 1, Attributes::IsCommissioningWithoutPower::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -20331,11 +20337,13 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeAttribute>(Id, "tcupdate-deadline", Attributes::TCUpdateDeadline::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "recovery-identifier", Attributes::RecoveryIdentifier::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "network-recovery-reason", Attributes::NetworkRecoveryReason::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "is-commissioning-without-power", Attributes::IsCommissioningWithoutPower::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         //
         // Events
         //
@@ -26760,30 +26768,30 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
                                                                              Attributes::Primary6Intensity::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "white-point-x", 0, UINT16_MAX, Attributes::WhitePointX::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "white-point-y", 0, UINT16_MAX, Attributes::WhitePointY::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-rx", 0, UINT16_MAX, Attributes::ColorPointRX::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-ry", 0, UINT16_MAX, Attributes::ColorPointRY::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "color-point-rintensity", 0, UINT8_MAX,
                                                                              Attributes::ColorPointRIntensity::Id,
-                                                                             WriteCommandType::kWrite, credsIssuerConfig), //
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-gx", 0, UINT16_MAX, Attributes::ColorPointGX::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-gy", 0, UINT16_MAX, Attributes::ColorPointGY::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "color-point-gintensity", 0, UINT8_MAX,
                                                                              Attributes::ColorPointGIntensity::Id,
-                                                                             WriteCommandType::kWrite, credsIssuerConfig), //
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-bx", 0, UINT16_MAX, Attributes::ColorPointBX::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-by", 0, UINT16_MAX, Attributes::ColorPointBY::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "color-point-bintensity", 0, UINT8_MAX,
                                                                              Attributes::ColorPointBIntensity::Id,
-                                                                             WriteCommandType::kWrite, credsIssuerConfig), //
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "enhanced-current-hue", 0, UINT16_MAX, Attributes::EnhancedCurrentHue::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>>(
@@ -31075,8 +31083,8 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                      //
         make_unique<ReadAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
-                                   credsIssuerConfig),                                                          //
-        make_unique<ReadAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig), //
+                                   credsIssuerConfig),                                                //
+        make_unique<ReadAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "maximum-metered-quantities", Attributes::MaximumMeteredQuantities::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
@@ -31091,9 +31099,8 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "metered-quantity-timestamp", 0, UINT32_MAX,
                                                                               Attributes::MeteredQuantityTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>>>(
-            Id, "measurement-type", 0, UINT16_MAX, Attributes::MeasurementType::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>>>(
+            Id, "tariff-unit", 0, UINT8_MAX, Attributes::TariffUnit::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "maximum-metered-quantities", 0, UINT16_MAX,
                                                                               Attributes::MaximumMeteredQuantities::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -31111,8 +31118,8 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
         make_unique<SubscribeAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
-                                        credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig), //
+                                        credsIssuerConfig),                                                //
+        make_unique<SubscribeAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "maximum-metered-quantities", Attributes::MaximumMeteredQuantities::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //

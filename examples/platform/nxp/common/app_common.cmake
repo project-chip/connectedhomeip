@@ -41,10 +41,6 @@ if (CONFIG_CHIP_APP_COMMON)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/include
     )
-    target_compile_definitions(app
-        PRIVATE
-        APP_QUEUE_TICKS_TO_WAIT=${CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT}
-    )
 
     if (CONFIG_APP_FREERTOS_OS)
         target_sources(app PRIVATE
@@ -97,6 +93,13 @@ if (CONFIG_DIAG_LOGS_DEMO)
     )
 endif()
 
+if(CONFIG_CHIP_SE05X)
+    list(FIND EXTRA_MCUX_MODULES "${CHIP_ROOT}/third_party/simw-top-mini/repo/matter" se_index)
+    if(se_index EQUAL -1)
+        message(FATAL_ERROR "MCUX_MODULES must include ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter in the application when CONFIG_CHIP_SE05X is enabled")
+    endif()
+endif()
+
 if (CONFIG_CHIP_APP_FACTORY_DATA)
     if (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_PLATFORM)
         target_sources(app PRIVATE
@@ -108,9 +111,17 @@ if (CONFIG_CHIP_APP_FACTORY_DATA)
             )
         endif()
     elseif (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_COMMON)
-        target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
-        )
+        if (CONFIG_CHIP_SE05X)
+            target_sources(app PRIVATE
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/rw61x_factory_data/AppFactoryDataDefaultImpl.cpp
+            )
+            target_include_directories(app PRIVATE
+                ${CHIP_ROOT}/examples)
+        else ()
+            target_sources(app PRIVATE
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
+            )
+        endif()
     endif()
 endif()
 
@@ -209,6 +220,10 @@ if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreEmpty.cpp
         )
+    elseif (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE_SE05X)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreSE05X.cpp
+        )
     endif()
 endif()
 
@@ -233,8 +248,8 @@ if (CONFIG_CHIP_APP_OTA_REQUESTOR)
     endif()
     if (CONFIG_CHIP_APP_PLATFORM_OTA_UTILS)
         target_sources(app PRIVATE
-            # Use the example provided by mcxw71_k32w1 platform until a common solution is proposed.
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71_k32w1/ota/OtaUtils.cpp
+            # Use the example provided by mcxw71 platform until a common solution is proposed.
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/ota/OtaUtils.cpp
         )
     endif()
 endif()
@@ -259,8 +274,8 @@ if (CONFIG_CHIP_APP_UI_FEEDBACK)
             )
         else()
             target_sources(app PRIVATE
-                # Use the example provided by mcxw71_k32w1 platform until a common solution is proposed.
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71_k32w1/util/LedOnOff.cpp
+                # Use the example provided by mcxw71 platform until a common solution is proposed.
+                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../mcxw71/util/LedOnOff.cpp
             )
         endif()
     endif()

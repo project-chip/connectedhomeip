@@ -382,7 +382,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(NullableRangeRestricte
 } // namespace NullableRangeRestrictedInt16s
 namespace WriteOnlyInt8u {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WriteOnlyInt8u::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+                                                          std::nullopt, Access::Privilege::kOperate);
 } // namespace WriteOnlyInt8u
 namespace NullableGlobalEnum {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NullableGlobalEnum::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -520,6 +520,19 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace TestDifferentVendorMeiRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace TestEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestEvent
+namespace TestFabricScopedEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestFabricScopedEvent
+namespace TestDifferentVendorMeiEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestDifferentVendorMeiEvent
+
+} // namespace Events
 } // namespace UnitTesting
 } // namespace Clusters
 } // namespace app
