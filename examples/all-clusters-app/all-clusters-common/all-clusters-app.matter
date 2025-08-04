@@ -6654,6 +6654,12 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
 
+  enum CMAFInterfaceEnum : enum8 {
+    kInterface1 = 0;
+    kInterface2DASH = 1;
+    kInterface2HLS = 2;
+  }
+
   enum ContainerFormatEnum : enum8 {
     kCMAF = 0 [spec_name = "CMAF"];
   }
@@ -6670,6 +6676,8 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidCombination = 6;
     kInvalidTriggerType = 7;
     kInvalidTransportStatus = 8;
+    kInvalidOptions = 9;
+    kInvalidStreamUsage = 10;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -6715,10 +6723,14 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct CMAFContainerOptionsStruct {
-    int16u chunkDuration = 0;
-    optional octet_string<16> CENCKey = 1;
-    optional boolean metadataEnabled = 2;
-    optional octet_string<16> CENCKeyID = 3;
+    CMAFInterfaceEnum CMAFInterface = 0;
+    int16u segmentDuration = 1;
+    int16u chunkDuration = 2;
+    int8u sessionGroup = 3;
+    char_string<16> trackName = 4;
+    optional octet_string<16> CENCKey = 5;
+    optional octet_string<16> CENCKeyID = 6;
+    optional boolean metadataEnabled = 7;
   }
 
   struct ContainerOptionsStruct {
@@ -6796,10 +6808,11 @@ provisional cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TriggerActivationReasonEnum activationReason = 1;
     optional TransportMotionTriggerTimeControlStruct timeControl = 2;
+    optional long_octet_string<256> userDefined = 3;
   }
 
   request struct FindTransportRequest {
-    optional nullable int16u connectionID = 0;
+    nullable int16u connectionID = 0;
   }
 
   response struct FindTransportResponse = 7 {
