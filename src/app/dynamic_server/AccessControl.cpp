@@ -51,8 +51,12 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
         bool isOtaEndpoint =
             (requestPath.endpoint == kOtaProviderDynamicEndpointId && requestPath.cluster == OtaSoftwareUpdateProvider::Id);
 
+        // Check for WebRTC Transport Requestor endpoint
+        bool isWebRtcEndpoint =
+            (requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
+
         // Only allow these specific endpoints
-        if (!isOtaEndpoint)
+        if (!isOtaEndpoint && !isWebRtcEndpoint)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }

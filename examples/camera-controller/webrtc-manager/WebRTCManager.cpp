@@ -18,8 +18,8 @@
 
 #include "WebRTCManager.h"
 
+#include <app/dynamic_server/AccessControl.h>
 #include <commands/interactive/InteractiveCommands.h>
-#include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
@@ -39,9 +39,8 @@ namespace {
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
 
-constexpr const char * kStreamGstDestIp                      = "127.0.0.1";
-constexpr uint16_t kVideoStreamGstDestPort                   = 5000;
-constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
+constexpr const char * kStreamGstDestIp    = "127.0.0.1";
+constexpr uint16_t kVideoStreamGstDestPort = 5000;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
@@ -86,7 +85,7 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 
 } // namespace
 
-WebRTCManager::WebRTCManager() {}
+WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate) {}
 
 WebRTCManager::~WebRTCManager()
 {
@@ -95,15 +94,8 @@ WebRTCManager::~WebRTCManager()
 
 void WebRTCManager::Init()
 {
-    Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
-
-    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT,
-                     kWebRTCRequesterDynamicEndpointId, err.Format());
-    }
+    dynamic_server::InitAccessControl();
+    mWebRTCRequestorServer.Init();
 }
 
 CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args)
@@ -258,7 +250,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     chip::ScopedNodeId peerId(nodeId, fabricIndex);
 
-    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRegisteredServerCluster.Cluster());
+    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRequestorServer);
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 

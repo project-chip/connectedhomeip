@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -14,18 +15,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/WebRTCTransportRequestor/ClusterId.h>
-#include <clusters/WebRTCTransportRequestor/Commands.h>
-#include <clusters/WebRTCTransportRequestor/Enums.h>
-#include <clusters/WebRTCTransportRequestor/Metadata.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/support/Span.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/reporting/reporting.h>
+#include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
+
 #include <string>
-#include <sys/types.h>
 #include <vector>
 
 namespace chip {
@@ -105,7 +106,7 @@ public:
     virtual CHIP_ERROR HandleEnd(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) = 0;
 };
 
-class WebRTCTransportRequestorServer : public DefaultServerCluster
+class WebRTCTransportRequestorServer : private AttributeAccessInterface, private CommandHandlerInterface
 {
 public:
     enum class UpsertResultEnum : uint8_t
@@ -124,14 +125,26 @@ public:
      */
     WebRTCTransportRequestorServer(EndpointId endpointId, WebRTCTransportRequestorDelegate & delegate);
 
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
+    /**
+     * @brief
+     *  WebRTCTransportRequestorServer destructor for clean up.
+     *
+     */
+    ~WebRTCTransportRequestorServer();
 
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    /**
+     * * @brief
+     * Initializes the WebRTCTransportRequestorServer instance.
+     *
+     * @return Returns an error if the registration fails.
+     */
+    CHIP_ERROR Init();
 
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    /**
+     * @brief
+     *   Unregisters the command handler and attribute interface, releasing resources.
+     */
+    void Shutdown();
 
     /**
      * @brief
@@ -146,7 +159,7 @@ public:
      * @param session The session data to insert or update.
      * @return kInserted if a new session was added, kUpdated if an existing one was modified.
      */
-    UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
+    UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session); // Now public
 
     /**
      * @brief
@@ -161,17 +174,22 @@ private:
     WebRTCTransportRequestorDelegate & mDelegate;
     std::vector<WebRTCSessionStruct> mCurrentSessions;
 
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    // CommandHandlerInterface
+    void InvokeCommand(HandlerContext & ctx) override;
+
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
     uint16_t GenerateSessionId();
-    bool IsPeerNodeSessionValid(uint16_t sessionId, const CommandHandler & commandHandler);
+    bool IsPeerNodeSessionValid(uint16_t sessionId, HandlerContext & ctx);
 
     // Command handlers
-    DataModel::ActionReturnStatus HandleOffer(const Commands::Offer::DecodableType & req, const CommandHandler & commandHandler);
-    DataModel::ActionReturnStatus HandleAnswer(const Commands::Answer::DecodableType & req, const CommandHandler & commandHandler);
-    DataModel::ActionReturnStatus HandleICECandidates(const Commands::ICECandidates::DecodableType & req,
-                                                      const CommandHandler & commandHandler);
-    DataModel::ActionReturnStatus HandleEnd(const Commands::End::DecodableType & req, const CommandHandler & commandHandler);
+    void HandleOffer(HandlerContext & ctx, const Commands::Offer::DecodableType & req);
+    void HandleAnswer(HandlerContext & ctx, const Commands::Answer::DecodableType & req);
+    void HandleICECandidates(HandlerContext & ctx, const Commands::ICECandidates::DecodableType & req);
+    void HandleEnd(HandlerContext & ctx, const Commands::End::DecodableType & req);
 };
 
 } // namespace WebRTCTransportRequestor
