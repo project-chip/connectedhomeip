@@ -54,8 +54,8 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
 
 void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)
 {
-    // This cluster should only exist in Root endpoint.
-    VerifyOrReturn(endpoint == kRootEndpointId);
+    // This cluster is only enabled for endpoint 1.
+    VerifyOrReturn(endpoint == 1);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
 
