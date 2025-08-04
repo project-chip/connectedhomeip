@@ -356,7 +356,7 @@ For example:
 ninja -C out/debug mac_arm64_gcc/tests/TestSessionManagerDispatch
 
 # OR enter build directory:
-cd out/host
+cd out/debug
 ninja linux_x64_clang/phony/src/transport/tests/TestSessionManagerDispatch.run
 ```
 
