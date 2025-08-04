@@ -88,7 +88,7 @@ public:
 
     // Data
     CHIP_ERROR UpsertRootCertificateEntry(FabricIndex fabric_index, Optional<TLSCAID> & id, RootBuffer & buffer,
-                                          const chip::ByteSpan & certificate) override;
+                                          const ByteSpan & certificate) override;
     CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID id, BufferedRootCert & entry) override;
     CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID id) override;
     CHIP_ERROR IterateRootCertificates(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn) override;

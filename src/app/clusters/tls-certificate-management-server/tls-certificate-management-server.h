@@ -168,8 +168,8 @@ public:
                                                                              Tls::TLSCAID & outCaid) = 0;
 
     /**
-     * @brief Executes loadedCallback for each root certificate. The certificate passed to loadedCallback has a guaranteed lifetime
-     * of the method call.
+     * @brief Executes loadedCallback for each root certificate with matching (matterEndpoint, fabric). The certificate passed to
+     * loadedCallback has a guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -184,7 +184,7 @@ public:
      * lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
-     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] fabric The fabric to load root certificates for
      * @param[in] loadedCallback lambda to execute on list of all matching certificates.  If this function returns an error result,
      * iteration stops and returns that same error result.
      */
@@ -192,7 +192,7 @@ public:
                                           RootCertificateListCallback loadedCallback) const = 0;
 
     /**
-     * @brief Finds the TLSCertStruct with the given id. The certificates passed to loadedCallback has a
+     * @brief Finds the TLSCertStruct with the given (matterEndpoint, fabric, id). The certificates passed to loadedCallback has a
      * guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
@@ -205,8 +205,8 @@ public:
                                     LoadedRootCertificateCallback loadedCallback) const = 0;
 
     /**
-     * @brief Finds the TLSCertStruct with the given fingerprint. The certificates passed to loadedCallback has a
-     * guaranteed lifetime of the method call.
+     * @brief Finds the TLSCertStruct with the given (matterEndpoint, fabric, fingerprint). The certificates passed to
+     * loadedCallback has a guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -224,7 +224,7 @@ public:
     virtual CHIP_ERROR LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & cert,
                                       LoadedRootCertificateCallback loadedCallback) const = 0;
     /**
-     * @brief Removes the root certificate with the given ID
+     * @brief Removes the root certificate with the given (matterEndpoint, fabric, id)
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -260,8 +260,8 @@ public:
     ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ProvisionClientCertificateType & provisionReq) = 0;
 
     /**
-     * @brief Executes loadedCallback for each client certificate.  The certificate passed to loadedCallback has a guaranteed
-     lifetime of the method call.
+     * @brief Executes loadedCallback for each client certificate matching (matterEndpoint, fabric).  The certificate passed to
+     loadedCallback has a guaranteed lifetime of the method call.
      *
      * @param[in] loadedCallback lambda to execute with allocated memory for client certificate loading.  If this function returns
      an error result,  returns that same error result.
@@ -280,14 +280,14 @@ public:
      an error result,  returns that same error result.
 
      * @param[in] matterEndpoint The matter endpoint to query against
-     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] fabric The fabric to load client certificates for
      */
     virtual CHIP_ERROR ClientCertsForFabric(EndpointId matterEndpoint, FabricIndex fabric,
                                             ClientCertificateListCallback loadedCallback) const = 0;
 
     /**
-     * @brief Finds the TLSClientCertificateDetailStruct with the given id. The certificates passed to loadedCallback has a
-     * guaranteed lifetime of the method call.
+     * @brief Finds the TLSClientCertificateDetailStruct with the given (matterEndpoint, fabric, id). The certificates passed to
+     * loadedCallback has a guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -299,8 +299,8 @@ public:
                                       LoadedClientCertificateCallback loadedCallback) const = 0;
 
     /**
-     * @brief Finds the TLSClientCertificateDetailStruct with the given fingerprint. The certificates passed to loadedCallback has a
-     * guaranteed lifetime of the method call.
+     * @brief Finds the TLSClientCertificateDetailStruct with the given (matterEndpoint, fabric, fingerprint). The certificates
+     * passed to loadedCallback has a guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -319,7 +319,7 @@ public:
                                         LoadedClientCertificateCallback loadedCallback) const = 0;
 
     /**
-     * @brief Removes the client certificate with the given ID
+     * @brief Removes the client certificate with the given (matterEndpoint, fabric, id)
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with

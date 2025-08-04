@@ -543,7 +543,7 @@ CHIP_ERROR CertificateTableImpl::SetEndpoint(EndpointId endpoint)
 }
 
 CHIP_ERROR CertificateTableImpl::UpsertRootCertificateEntry(FabricIndex fabric, Optional<TLSCAID> & id, RootBuffer & buffer,
-                                                            const chip::ByteSpan & certificate)
+                                                            const ByteSpan & certificate)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -562,7 +562,7 @@ CHIP_ERROR CertificateTableImpl::UpsertRootCertificateEntry(FabricIndex fabric, 
     }
 
     CertificateId tableId(localId);
-    const RootCertStruct updatedEntry = { localId, Optional<chip::ByteSpan>(certificate), fabric };
+    const RootCertStruct updatedEntry = { localId, Optional<ByteSpan>(certificate), fabric };
     ReturnErrorOnFailure(mRootCertificates.SetTableEntry(fabric, tableId, updatedEntry, buffer));
     id.SetValue(localId);
     return CHIP_NO_ERROR;

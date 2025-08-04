@@ -304,7 +304,8 @@ public:
         return StorageKeyName::Formatted("f/%x/e/%x/tlsc/%x", fabric, endpoint, idx);
     }
 
-    // Stores global data about certificates for the given endpoint, across all fabrics
+    // Stores global data about certificates for the given endpoint, across all fabrics, used by CertificateTableImpl
+    // Applications can also create their own implementation extending CertificateTable
     static StorageKeyName TlsEndpointGlobalDataKey(EndpointId endpoint)
     {
         return StorageKeyName::Formatted("g/tlsr/g/%x", endpoint);

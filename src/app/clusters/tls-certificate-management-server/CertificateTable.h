@@ -109,7 +109,7 @@ public:
      * @param entry[in] the value to set
      */
     virtual CHIP_ERROR UpsertRootCertificateEntry(FabricIndex fabric_index, Optional<TLSCAID> & id, RootBuffer & buffer,
-                                                  const chip::ByteSpan & certificate) = 0;
+                                                  const ByteSpan & certificate) = 0;
 
     /**
      * @brief Loads the specified (fabric_index, id) root cert into entry; if the implementation
@@ -117,8 +117,18 @@ public:
      *
      * @param entry[out] the resulting loaded entry, where entry.mCert will contain the loaded certificate
      */
-    virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID id, BufferedRootCert & entry)                = 0;
-    virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID id)                                          = 0;
+    virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID id, BufferedRootCert & entry) = 0;
+    virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID id)                           = 0;
+
+    /**
+     * @brief Executes iterateFn with an iterator for root certificates. The iterator passed to iterateFn has a guaranteed lifetime
+     * of the method call.
+     *
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[out] store A buffer to load the entry into as needed
+     * @param[in] iterateFn lambda to execute for the iterator.  If this function returns an error result,
+     * that error is proxied as the result of this method.
+     */
     virtual CHIP_ERROR IterateRootCertificates(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn) = 0;
     virtual CHIP_ERROR RemoveRootCertificate(FabricIndex fabric, TLSCAID id)                                                  = 0;
     virtual CHIP_ERROR GetRootCertificateCount(FabricIndex fabric, uint8_t & outCount)                                        = 0;
@@ -130,7 +140,7 @@ public:
 
       * @param nonce[in] the nonce to be used for creating nonceSignature
       * @param buffer[in] a temporary buffer for temporary serialization, if necessary
-      * @param nocsrElementsBuffer[in] a temporary buffer large enough to write nocsr_elements_message to
+      * @param nocsrElementsBuffer[out] a temporary buffer large enough to write nocsr_elements_message to
       * @param id[out] the generated ID for the client certificate
       * @param csr[out] a DER-encoded certificate signing request using the newly-created key pair
       * @param nonceSignature[out] a nonce signature
@@ -155,10 +165,20 @@ public:
      */
     virtual CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, BufferedClientCert & entry) = 0;
     virtual CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id)                             = 0;
+
+    /**
+     * @brief Executes iterateFn with an iterator for client certificates. The iterator passed to iterateFn has a guaranteed
+     * lifetime of the method call.
+     *
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[out] store A buffer to load the entry into as needed
+     * @param[in] iterateFn lambda to execute for the iterator.  If this function returns an error result,
+     * that error is proxied as the result of this method.
+     */
     virtual CHIP_ERROR IterateClientCertificates(FabricIndex fabric, BufferedClientCert & store,
-                                                 IterateClientCertFnType iterateFn)                                 = 0;
-    virtual CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id)                                     = 0;
-    virtual CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount)                            = 0;
+                                                 IterateClientCertFnType iterateFn)      = 0;
+    virtual CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id)          = 0;
+    virtual CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount) = 0;
 
 protected:
     static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)

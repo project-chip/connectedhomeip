@@ -801,9 +801,7 @@
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",
-            "ProvisionedRootCertificates",
-            "MaxClientCertificates",
-            "ProvisionedClientCertificates"
+            "MaxClientCertificates"
         ],
         "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
         "Thermostat": [
