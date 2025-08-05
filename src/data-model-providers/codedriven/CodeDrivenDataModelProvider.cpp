@@ -254,13 +254,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & e
 
     ReturnErrorOnFailure(mServerClusterRegistry.Register(entry));
 
-    // If the provider has already been started, startup the cluster.
-    if (mServerClusterContext.has_value())
-    {
-        ReturnErrorOnFailure(entry.serverClusterInterface->Startup(*mServerClusterContext));
-    }
-
-    return CHIP_NO_ERROR;
+    // Startup the cluster if the provider has been started (i.e. context exists).
+    VerifyOrReturnError(mServerClusterContext.has_value(), CHIP_NO_ERROR);
+    return entry.serverClusterInterface->Startup(*mServerClusterContext);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * cluster)
