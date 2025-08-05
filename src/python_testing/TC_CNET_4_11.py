@@ -21,7 +21,7 @@ import logging
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from matter_testing_infrastructure.chip.testing.wifi import (MAX_RETRIES, TIMED_REQUEST_TIMEOUT_MS, TIMEOUT, WIFI_WAIT_SECONDS,
-                                                             change_networks, connect_host_wifi)
+                                                             change_networks, connect_host_wifi, find_network_and_assert, verify_operational_network)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -38,45 +38,6 @@ class TC_CNET_4_11(MatterBaseTest):
     @property
     def default_timeout(self) -> int:
         return TIMEOUT
-
-    async def find_network_and_assert(self, networks, ssid, should_be_connected=True):
-        asserts.assert_is_not_none(networks, "Could not read networks.")
-        for idx, network in enumerate(networks):
-            if network.networkID == ssid.encode():
-                connection_state = "connected" if network.connected else "not connected"
-                asserts.assert_equal(network.connected, should_be_connected, f"Wifi network {ssid} is {connection_state}.")
-                return idx
-        asserts.fail(f"Wifi network not found for SSID: {ssid}")
-
-    async def verify_operational_network(self, ssid):
-        networks = None
-        retry = 1
-        while retry <= MAX_RETRIES:
-            logger.info(f" --- verify_operational_network: Trying to verify operational network: {retry}/{MAX_RETRIES}")
-            try:
-                networks = await asyncio.wait_for(
-                    self.read_single_attribute_check_success(
-                        cluster=cnet,
-                        attribute=cnet.Attributes.Networks
-                    ),
-                    timeout=TIMEOUT
-                )
-            except Exception as e:
-                logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
-                # Let's wait a couple of seconds to change networks
-                await asyncio.sleep(WIFI_WAIT_SECONDS)
-            finally:
-                if networks and len(networks) > 0 and networks[0].connected:
-                    logger.info(f" --- verify_operational_network: networks: {networks}")
-                    break
-                else:
-                    retry += 1
-        else:
-            asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
-
-        userwifi_netidx = await self.find_network_and_assert(networks, ssid)
-        if userwifi_netidx is not None:
-            logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
 
     def steps_TC_CNET_4_11(self):
         return [
@@ -214,7 +175,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # Verify that the Networks attribute list has an entry with the following fields:
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
-        userwifi_netidx = await self.find_network_and_assert(networks, wifi_1st_ap_ssid)
+        userwifi_netidx = await find_network_and_assert(networks, wifi_1st_ap_ssid)
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
         self.step(4)
@@ -267,7 +228,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is FALSE
-        await self.find_network_and_assert(networks, wifi_2nd_ap_ssid, False)
+        await find_network_and_assert(networks, wifi_2nd_ap_ssid, False)
 
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2
         self.step(7)
@@ -289,7 +250,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Verify that the TH successfully connects to the DUT
         await asyncio.sleep(WIFI_WAIT_SECONDS)
-        await self.verify_operational_network(wifi_2nd_ap_ssid)
+        await verify_operational_network(test=self, ssid=wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(9)
@@ -331,7 +292,7 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(12)
 
         await asyncio.sleep(WIFI_WAIT_SECONDS)
-        await self.verify_operational_network(wifi_1st_ap_ssid)
+        await verify_operational_network(test=self, ssid=wifi_1st_ap_ssid)
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(13)
@@ -397,7 +358,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Verify that the TH successfully connects to the DUT
         await asyncio.sleep(WIFI_WAIT_SECONDS)
-        await self.verify_operational_network(wifi_2nd_ap_ssid)
+        await verify_operational_network(test=self, ssid=wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(18)
@@ -439,7 +400,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # 2. Connected is of type bool and is TRUE
-        await self.find_network_and_assert(networks, wifi_2nd_ap_ssid)
+        await find_network_and_assert(networks, wifi_2nd_ap_ssid)
 
 
 if __name__ == "__main__":

@@ -20,7 +20,8 @@ import logging
 import platform
 import shutil
 import subprocess
-from typing import Optional
+from mobly import asserts
+from typing import Optional, List
 
 import chip.clusters as Clusters
 
@@ -255,41 +256,58 @@ async def change_networks(test, cluster, ssid: str, password: str, breadcrumb: i
     else:
         logger.error(f" --- change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
 
-    async def find_network_and_assert(self, networks, ssid, should_be_connected=True):
-        asserts.assert_is_not_none(networks, "Could not read networks.")
-        for idx, network in enumerate(networks):
-            if network.networkID == ssid.encode():
-                connection_state = "connected" if network.connected else "not connected"
-                asserts.assert_equal(network.connected, should_be_connected, f"Wifi network {ssid} is {connection_state}.")
-                return idx
-        asserts.fail(f"Wifi network not found for SSID: {ssid}")
 
-    async def verify_operational_network(self, ssid):
-        networks = None
-        retry = 1
-        while retry <= MAX_RETRIES:
-            logger.info(f" --- verify_operational_network: Trying to verify operational network: {retry}/{MAX_RETRIES}")
-            try:
-                networks = await asyncio.wait_for(
-                    self.read_single_attribute_check_success(
-                        cluster=cnet,
-                        attribute=cnet.Attributes.Networks
-                    ),
-                    timeout=TIMEOUT
-                )
-            except Exception as e:
-                logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
-                # Let's wait a couple of seconds to change networks
-                await asyncio.sleep(WIFI_WAIT_SECONDS)
-            finally:
-                if networks and len(networks) > 0 and networks[0].connected:
-                    logger.info(f" --- verify_operational_network: networks: {networks}")
-                    break
-                else:
-                    retry += 1
-        else:
-            asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
+async def find_network_and_assert(networks: List, ssid: str, should_be_connected=True) -> Optional[int]:
+    """Searches for the given SSID in the list of networks and returns its index if found."""
+    asserts.assert_is_not_none(networks, "Could not read networks.")
+    for idx, network in enumerate(networks):
+        if network.networkID == ssid.encode():
+            connection_state = "connected" if network.connected else "not connected"
+            asserts.assert_equal(network.connected, should_be_connected, f"Wifi network {ssid} is {connection_state}.")
+            return idx
+    asserts.fail(f"Wifi network not found for SSID: {ssid}")
 
-        userwifi_netidx = await self.find_network_and_assert(networks, ssid)
-        if userwifi_netidx is not None:
-            logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
+
+async def verify_operational_network(test, ssid: str) -> None:
+    """
+    Verifies that the DUT has successfully connected to the specified SSID by reading the Networks attribute.
+
+    This function will attempt to read the Networks attribute from the DUT using the test context.
+    It retries up to MAX_RETRIES if the DUT is not yet connected or if any exception occurs.
+    If after MAX_RETRIES it still cannot verify the DUT's connection, it will fail the test.
+
+    Args:
+        test: Test context object with methods to send commands and read attributes.
+        ssid (str): The SSID of the network that the DUT should be connected to.
+
+    Raises:
+        AssertionError: If the DUT does not report being connected to the specified SSID after MAX_RETRIES.
+    """
+    networks = None
+    retry = 1
+    while retry <= MAX_RETRIES:
+        logger.info(f" --- verify_operational_network: Trying to verify operational network: {retry}/{MAX_RETRIES}")
+        try:
+            networks = await asyncio.wait_for(
+                test.read_single_attribute_check_success(
+                    cluster=cnet,
+                    attribute=cnet.Attributes.Networks
+                ),
+                timeout=TIMEOUT
+            )
+        except Exception as e:
+            logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
+            # Let's wait a couple of seconds to change networks
+            await asyncio.sleep(WIFI_WAIT_SECONDS)
+        finally:
+            if networks and len(networks) > 0 and networks[0].connected:
+                logger.info(f" --- verify_operational_network: networks: {networks}")
+                break
+            else:
+                retry += 1
+    else:
+        asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
+
+    userwifi_netidx = await find_network_and_assert(networks, ssid)
+    if userwifi_netidx is not None:
+        logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
