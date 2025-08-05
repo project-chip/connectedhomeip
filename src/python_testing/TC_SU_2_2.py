@@ -51,12 +51,6 @@ from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-from chip.clusters.Objects import OtaSoftwareUpdateRequestor
-from chip.clusters.Types import NullValue
-from src.test_driver.openiotsdk import (connect_device, disconnect_device, discover_device, get_setup_payload, send_zcl_command,
-                                        write_zcl_attribute)
-
-
 # Create a logger
 logger = logging.getLogger(__name__)
 
