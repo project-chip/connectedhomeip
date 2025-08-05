@@ -20,8 +20,8 @@ from chip.testing.global_attribute_ids import is_standard_attribute_id
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
 from chip.tlv import uint
+from DeviceConformanceTests import DeviceConformanceTests
 from mobly import asserts, signals
-from TC_DeviceConformance import DeviceConformanceTests
 
 
 class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
