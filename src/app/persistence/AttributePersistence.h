@@ -62,7 +62,7 @@ public:
     /// Load the given string from concrete storage.
     ///
     /// NOTE: `value` is take as an internal short string to avoid the templates that Storage::String
-    /// imply, however callers are generally expected to pass in a `Storage::String` value and
+    /// implies, however callers are generally expected to pass in a `Storage::String` value and
     /// not use internal classes directly.
     ///
     /// Returns true on success, false on failure. On failure the string is reset to empty.
