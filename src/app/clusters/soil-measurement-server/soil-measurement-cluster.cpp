@@ -65,6 +65,7 @@ CHIP_ERROR
 SoilMeasurementCluster::SetSoilMoistureMeasuredValue(
     EndpointId endpointId, const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
 {
+    VerifyOrReturnError(endpointId == mPath.mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     return mLogic.SetSoilMoistureMeasuredValue(endpointId, soilMoistureMeasuredValue);
 }
 
