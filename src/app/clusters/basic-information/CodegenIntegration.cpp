@@ -30,7 +30,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-// AdministratorCommissioningCluster implementation is specifically implemented
+// BasicInformationCluster implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
 // So either:
 //   - we have a fixed config and it is endpoint 0 OR
