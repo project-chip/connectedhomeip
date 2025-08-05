@@ -338,6 +338,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                                 Privilege requestPrivilege)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidPrivilege(requestPrivilege), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
 
