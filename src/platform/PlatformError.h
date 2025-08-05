@@ -29,7 +29,7 @@
 #ifdef __cplusplus
 
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
-#define MATTER_PLATFORM_ERROR(code) chip::Platform::Internal::MapPlatformError(code, location)
+#define MATTER_PLATFORM_ERROR(code) chip::Platform::Internal::MapPlatformError(code, std::source_location::current())
 #elif CHIP_CONFIG_ERROR_SOURCE
 #define MATTER_PLATFORM_ERROR(code) chip::Platform::Internal::MapPlatformError(code, __FILE__, __LINE__)
 #else
