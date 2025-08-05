@@ -67,7 +67,6 @@ class MdnsDiscovery:
             interfaces (list[str]): IPv6 interfaces used for discovery.
             _azc (AsyncZeroconf): Zeroconf manager instance.
             _discovered_services (dict): Stores results of service discovery.
-            _name_filter (str | None): Optional filter for matching specific service names.
             _event (asyncio.Event): Event used to synchronize async discovery.
             _verbose_logging (bool): Enables detailed logging output.
         """
@@ -79,9 +78,6 @@ class MdnsDiscovery:
 
         # A dictionary to store discovered services.
         self._discovered_services = {}
-
-        # Filtering to apply for received data items
-        self._name_filter = None
 
         # An asyncio Event to signal when a service has been discovered
         self._event = Event()
@@ -103,7 +99,6 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
-        # self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONER.value, log_output, discovery_timeout_sec)
 
     async def get_commissionable_service(self, log_output: bool = False,
@@ -119,7 +114,6 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
-        # self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONABLE.value, log_output, discovery_timeout_sec)
 
     async def get_operational_services(self,
