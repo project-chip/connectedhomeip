@@ -283,8 +283,8 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info("Step #1.3 - Wait")
         await asyncio.sleep(5)
         # ******
-        logger.info("Step #1.4 - DUT envía QueryImage al Provider y espera respuesta")
-        logger.info(f"tep #1.4 - Info requestor(th1): {vars(th1)}")
+        logger.info("Step #1.4 - DUT send QueryImage to Provider and wait for response")
+        logger.info(f"Step #1.4 - Info requestor(th1): {vars(th1)}")
         # product_id = await self.read_single_attribute(th1, endpoint=0, cluster="BasicInformation", attribute="productID")
         # logger.info(f"ProductId del requestor: {th1.productId}")
 
