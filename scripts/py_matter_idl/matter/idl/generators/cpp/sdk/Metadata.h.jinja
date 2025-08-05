@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -39,11 +40,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(
 } // namespace {{attribute.definition.name | upfirst}}
 {% endfor %}
 
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
-  {% for attribute in cluster.attributes | reject("global_attribute") -%}
-  {% if not attribute.definition.is_optional -%}
+{%- set madatoryAttributeList = cluster.attributes | reject("global_attribute") | reject("is_optional") | list -%}
+constexpr std::array<DataModel::AttributeEntry, {{ madatoryAttributeList | length }}> kMandatoryMetadata = {
+  {% for attribute in madatoryAttributeList -%}
   {{attribute.definition.name | upfirst}}::kMetadataEntry, 
-  {%- endif -%}
   {% endfor %}
 };
 

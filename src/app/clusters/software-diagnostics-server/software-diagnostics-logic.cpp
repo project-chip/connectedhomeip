@@ -107,8 +107,7 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
         { mEnabledAttributes.enableCurrentWatermarks, Attributes::CurrentHeapHighWatermark::kMetadataEntry },
     };
 
-    size_t spanSize = sizeof(Attributes::kMandatoryMetadata) / sizeof(chip::app::DataModel::AttributeEntry);
-    return listBuilder.Append(Span<const DataModel::AttributeEntry>(SoftwareDiagnostics::Attributes::kMandatoryMetadata, spanSize),
+    return listBuilder.Append(Span(SoftwareDiagnostics::Attributes::kMandatoryMetadata),
                               Span(optionalEntries));
 }
 
