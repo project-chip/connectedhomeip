@@ -1,27 +1,19 @@
 name: 'Setup ccache'
 description: 'Configures and restores the ccache cache'
 inputs:
-  cache-version:
-    required: true
-    description: 'A version string to bust the cache'
   build-variant:
     required: true
     description: 'The build variant for cache key uniqueness'
 outputs:
   cache-primary-key:
     description: "The primary key used for the cache"
-    value: ${{ steps.generate-cache-key.outputs.cache_key }}
+    value: ${{ steps.cache-vars.outputs.cache_key }}
+  cache-hit:
+    description: "A boolean value to indicate an exact match was found for the primary key"
+    value: ${{ steps.ccache-restore.outputs.cache-hit }}
 runs:
   using: "composite"
   steps:
-    - name: Set cache prefix
-      shell: bash
-      run: |
-        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-          echo "CACHE_PREFIX=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-        else
-          echo "CACHE_PREFIX=master" >> $GITHUB_ENV
-        fi
     - name: Configure ccache
       shell: bash
       run: |
@@ -30,19 +22,27 @@ runs:
         echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
         echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
         echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
-    - name: Generate cache key
+        echo "CCACHE_MAXSIZE=5G" >> $GITHUB_ENV
+        echo "CCACHE_COMPRESS=1" >> $GITHUB_ENV
+        echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+    - name: Prepare cache variables
+      id: cache-vars
       shell: bash
-      id: generate-cache-key
       run: |
-        CACHE_KEY="ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-${{ github.sha }}"
-        echo "CACHE_KEY=${CACHE_KEY}" >> $GITHUB_ENV
-        echo "cache_key=${CACHE_KEY}" >> $GITHUB_OUTPUT
-    - name: ccache restore
+        CACHE_WEEK=$(date +%G-%V)
+        echo "CACHE_WEEK=${CACHE_WEEK}" >> "$GITHUB_ENV"
+
+        CCACHE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-w${CACHE_WEEK}"
+        echo "CCACHE_KEY=${CCACHE_KEY}" >> "$GITHUB_ENV"
+        echo "cache_key=${CCACHE_KEY}" >> "$GITHUB_OUTPUT"
+
+        CCACHE_RESTORE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-"
+        echo "CCACHE_RESTORE_KEY=${CCACHE_RESTORE_KEY}" >> "$GITHUB_ENV"
+    - name: Restore ccache
       id: ccache-restore
       uses: actions/cache/restore@v4
       with:
         path: .ccache
-        key: ${{ env.CACHE_KEY }}
+        key: ${{ env.CCACHE_KEY }}
         restore-keys: |
-          ccache-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-
-          ccache-master-${{ runner.os }}-${{ inputs.build-variant }}-${{ inputs.cache-version }}-
+          ${{ env.CCACHE_RESTORE_KEY }}

@@ -84,7 +84,6 @@ jobs:
               id: ccache
               uses: ./.github/actions/setup-ccache
               with:
-                cache-version: '153' 
                 build-variant: ${{ matrix.build_variant }}
 
             - name: Validate that xml are parsable
@@ -376,13 +375,12 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
-            - name: ccache save
-              id: ccache-save
-              if: always()
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
-                  key: ${{ env.CACHE_KEY }}
+                  key: ${{ env.CCACHE_KEY }}
 
     test_suites_darwin:
         name: Test Suites - Darwin
@@ -425,7 +423,6 @@ jobs:
               id: ccache
               uses: ./.github/actions/setup-ccache
               with:
-                cache-version: '153' 
                 build-variant: ${{ matrix.build_variant }}
 
             - name: Build Python env
@@ -519,13 +516,12 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
-            - name: ccache save
-              id: ccache-save
-              if: always()
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
-                  key: ${{ env.CACHE_KEY }}
+                  key: ${{ env.CCACHE_KEY }}
 
     repl_tests_linux:
         name: REPL Tests - Linux
@@ -572,7 +568,6 @@ jobs:
               id: ccache
               uses: ./.github/actions/setup-ccache
               with:
-                cache-version: '153' 
                 build-variant: ${{ matrix.build_variant }}
 
             - name: Build python env
@@ -866,13 +861,12 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
-            - name: ccache save
-              id: ccache-save
-              if: always()
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
-                  key: ${{ env.CACHE_KEY }}
+                  key: ${{ env.CCACHE_KEY }}
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
@@ -912,7 +906,6 @@ jobs:
               id: ccache
               uses: ./.github/actions/setup-ccache
               with:
-                cache-version: '153' 
                 build-variant: ${{ matrix.build_variant }}
 
             - name: Build Python REPL and example apps
@@ -961,10 +954,9 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
-            - name: ccache save
-              id: ccache-save
-              if: always()
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
-                  key: ${{ env.CACHE_KEY }}
+                  key: ${{ env.CCACHE_KEY }}
