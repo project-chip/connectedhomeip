@@ -58,5 +58,5 @@ protected:
     void InitDataModelForTesting() override {}
 };
 
-}
-}
+} // namespace TestDataModel
+} // namespace chip

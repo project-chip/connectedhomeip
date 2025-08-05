@@ -24,16 +24,10 @@
 #include <app/util/DataModelHandler.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <controller/tests/data_model/DataModelFixtures.h>
 #include <controller/tests/DispatchDataModel.h>
+#include <controller/tests/data_model/DataModelFixtures.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-
-using namespace chip::Controller;
-using namespace chip::Credentials;
-using namespace chip::app;
-using namespace chip::Test;
-using namespace chip::TestDataModel;
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
@@ -74,16 +68,16 @@ private:
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 };
 
-//Test DeviceControllerFactory Class
+// Test DeviceControllerFactory Class
 class TestDeviceControllerFactory : public chip::Test::AppContext
 {
 public:
     void SetUp() override
     {
         AppContext::SetUp();
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&DispatchTestDataModel::Instance());
-        factoryInitParams.listenPort = 88;
-        factoryInitParams.fabricTable = nullptr;
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&chip::TestDataModel::DispatchTestDataModel::Instance());
+        factoryInitParams.listenPort               = 88;
+        factoryInitParams.fabricTable              = nullptr;
         factoryInitParams.fabricIndependentStorage = &factoryStorage;
     }
     void TearDown() override
@@ -105,13 +99,13 @@ private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
-//Test all methods of DeviceControllerFactory with four different tests.
+// Test all methods of DeviceControllerFactory with four different tests.
 TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
 {
-    //Set all the basic requirement to test DeviceControllerFactory
-    DeviceController device;
-    DeviceCommissioner commissioner;
-    SetupParams dParams;
+    // Set all the basic requirement to test DeviceControllerFactory
+    chip::Controller::DeviceController device;
+    chip::Controller::DeviceCommissioner commissioner;
+    chip::Controller::SetupParams dParams;
 
     chip::TestPersistentStorageDelegate cerStorage;
 
@@ -137,39 +131,39 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    //Set initials params of factoryInitParams
-    factoryInitParams.sessionKeystore = &keystore;
+    // Set initials params of factoryInitParams
+    factoryInitParams.sessionKeystore   = &keystore;
     factoryInitParams.groupDataProvider = &sProvider;
-    factoryInitParams.opCertStore = &opCertStore;
+    factoryInitParams.opCertStore       = &opCertStore;
 
-    /*
-     * Test DeviceControllerFactory init fail to do not define DataModel
-     */
+    //
+    // Test DeviceControllerFactory init fails to not define DataModel
+    //
     {
-        //Expect init fealure to test a print log error
+        // Expect an init method failure when the data model is not initialized to test print log error.
         CHIP_ERROR err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
         EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    //Init device controller factory
+    // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
 
-    /*
-     * Test success init DeviceControllerFactory without fabricTable
-     */
+    //
+    // Test success init DeviceControllerFactory without fabricTable
+    //
     {
         CHIP_ERROR err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
         DeviceControllerFactory::GetInstance().Shutdown();
     }
 
-    factoryInitParams.fabricTable = &fHolder.GetFabricTable();
+    factoryInitParams.fabricTable              = &fHolder.GetFabricTable();
     factoryInitParams.sessionResumptionStorage = &sessionStorage;
     factoryInitParams.enableServerInteractions = true;
 
-    /*
-     * Test SetupController and SetupCommissioner
-     */
+    //
+    // Test SetupController and SetupCommissioner
+    //
     {
         CHIP_ERROR err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -184,9 +178,9 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         DeviceControllerFactory::GetInstance().Shutdown();
     }
 
-    /*
-     * Test retain and release system state
-     */
+    //
+    // Test retain and release system state
+    //
     {
         CHIP_ERROR err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -198,15 +192,15 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().GetSystemState()->IsShutDown());
         
-        //Reinit system state
+        // Reinit system state
         EXPECT_EQ(DeviceControllerFactory::GetInstance().EnsureAndRetainSystemState(), CHIP_NO_ERROR);
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
         DeviceControllerFactory::GetInstance().Shutdown();
     }
-    //Free opCertStore and engine before to end
+    // Free opCertStore and engine before finish
     opCertStore.Finish();
     engine->Shutdown();
 }
 
 // Add more test cases as needed to cover different scenarios
-}// namespace
+} // namespace
