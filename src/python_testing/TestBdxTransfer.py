@@ -150,7 +150,10 @@ class TestBdxTransfer(MatterBaseTest):
                                      Clusters.DiagnosticLogs.Enums.StatusEnum.kSuccess,
                                      "Invalid command response")
 
-                await asyncio.sleep(0.1)  # Without sleep the next BDX transfer will fail.
+                # Without sleep the next BDX transfer will fail.
+                # See https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/bdx/bdx-transfer.cpp#L108
+                # where the session is ended after the final acknowledgement is sent, but before receipt of the StandaloneAck.
+                await asyncio.sleep(0.1)
 
             else:  # Sent inline
 
