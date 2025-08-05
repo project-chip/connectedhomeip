@@ -62,23 +62,21 @@ private:
 
 void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrProvider)
 {
-    VerifyOrReturn(mAttrProvider == nullptr);
     VerifyOrReturn(attrProvider != nullptr);
 
-    mAttrProvider = attrProvider;
-
-    InitializeCalendarType();
-    InitializeHourFormat();
+    InitializeCalendarType(attrProvider);
+    InitializeHourFormat(attrProvider);
 }
 
-void TimeFormatLocalizationLogic::InitializeCalendarType()
+void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistenceProvider * attrProvider)
 {
+    VerifyOrReturn(attrProvider != nullptr);
     CalendarTypeEnum calendarType = kDefaultCalendarType;
 
     // Try to read existing calendar type from persistence
     MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
     CHIP_ERROR error =
-        mAttrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, calendarBytes);
+        attrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, calendarBytes);
 
     // If read failed or value is invalid, use default
     // Can't tell for sure if ReadValue will not change previous variable value
@@ -95,15 +93,16 @@ void TimeFormatLocalizationLogic::InitializeCalendarType()
         calendarType = validCalendar;
     }
 
-    setActiveCalendarType(calendarType);
+    setActiveCalendarType(calendarType, attrProvider);
 }
 
-void TimeFormatLocalizationLogic::InitializeHourFormat()
+void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvider * attrProvider)
 {
+    VerifyOrReturn(attrProvider != nullptr);
     HourFormatEnum hourFormat = kDefaultHourFormat;
 
     MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
-    CHIP_ERROR error = mAttrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, hourBytes);
+    CHIP_ERROR error = attrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, hourBytes);
 
     // If read failed or value is invalid, use default
     // Can't tell for sure if ReadValue will not change previous variable value
@@ -113,7 +112,7 @@ void TimeFormatLocalizationLogic::InitializeHourFormat()
         hourFormat = kDefaultHourFormat;
     }
 
-    setHourFormat(hourFormat);
+    setHourFormat(hourFormat, attrProvider);
 }
 
 CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const
@@ -171,16 +170,16 @@ TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveC
     return mCalendarType;
 }
 
-DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFormatLocalization::HourFormatEnum rHour)
+DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFormatLocalization::HourFormatEnum rHour, AttributePersistenceProvider * attrProvider)
 {
-    VerifyOrReturnValue(mAttrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnValue(attrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
 
     if (rHour == HourFormatEnum::kUnknownEnumValue)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    CHIP_ERROR result = mAttrProvider->WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id },
+    CHIP_ERROR result = attrProvider->WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id },
                                                   { reinterpret_cast<const uint8_t *>(&rHour), sizeof(rHour) });
     if (result == CHIP_NO_ERROR)
     {
@@ -191,9 +190,9 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFor
     return Protocols::InteractionModel::Status::WriteIgnored;
 }
 
-DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar)
+DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar, AttributePersistenceProvider * attrProvider)
 {
-    VerifyOrReturnValue(mAttrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnValue(attrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
     // TODO: Confirm error values for this operation.
     if (!mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
@@ -207,7 +206,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType
     }
 
     // Now try to write the value using the AttributeProvider.
-    CHIP_ERROR result = mAttrProvider->WriteValue(
+    CHIP_ERROR result = attrProvider->WriteValue(
         { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
         { reinterpret_cast<const uint8_t *>(&rCalendar), sizeof(rCalendar) });
     if (result == CHIP_NO_ERROR)

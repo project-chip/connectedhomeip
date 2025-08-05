@@ -45,7 +45,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(cons
     case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
         TimeFormatLocalization::CalendarTypeEnum tCalendar;
         ReturnErrorOnFailure(decoder.Decode(tCalendar));
-        auto result = mLogic.setActiveCalendarType(tCalendar);
+        auto result = mLogic.setActiveCalendarType(tCalendar, mContext->attributeStorage);
         if (result == Protocols::InteractionModel::Status::Success)
         {
             NotifyAttributeChanged(TimeFormatLocalization::Attributes::ActiveCalendarType::Id);
@@ -55,7 +55,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(cons
     case TimeFormatLocalization::Attributes::HourFormat::Id: {
         TimeFormatLocalization::HourFormatEnum tHour;
         ReturnErrorOnFailure(decoder.Decode(tHour));
-        auto result = mLogic.setHourFormat(tHour);
+        auto result = mLogic.setHourFormat(tHour, mContext->attributeStorage);
         if (result == Protocols::InteractionModel::Status::Success)
         {
             NotifyAttributeChanged(TimeFormatLocalization::Attributes::HourFormat::Id);

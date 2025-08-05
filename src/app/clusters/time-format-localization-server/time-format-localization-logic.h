@@ -37,7 +37,6 @@ public:
     static constexpr size_t kMaxExpectedAttributeCount = 3;
 
     TimeFormatLocalizationLogic(BitFlags<TimeFormatLocalization::Feature> features) :
-        mAttrProvider(nullptr),
         mFeatures(features),
         mHourFormat(kDefaultHourFormat),
         mCalendarType(kDefaultCalendarType) {};
@@ -50,8 +49,8 @@ public:
     // Attributes handling for cluster
     TimeFormatLocalization::HourFormatEnum GetHourFormat() const;
     TimeFormatLocalization::CalendarTypeEnum GetActiveCalendarType() const;
-    DataModel::ActionReturnStatus setHourFormat(TimeFormatLocalization::HourFormatEnum rHour);
-    DataModel::ActionReturnStatus setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar);
+    DataModel::ActionReturnStatus setHourFormat(TimeFormatLocalization::HourFormatEnum rHour, AttributePersistenceProvider * attrProvider);
+    DataModel::ActionReturnStatus setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar, AttributePersistenceProvider * attrProvider);
     CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) const;
 
@@ -61,10 +60,9 @@ private:
     bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
                                  TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
 
-    void InitializeCalendarType();
-    void InitializeHourFormat();
+    void InitializeCalendarType(AttributePersistenceProvider * attrProvider);
+    void InitializeHourFormat(AttributePersistenceProvider * attrProvider);
 
-    AttributePersistenceProvider * mAttrProvider;
     BitFlags<TimeFormatLocalization::Feature> mFeatures;
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
