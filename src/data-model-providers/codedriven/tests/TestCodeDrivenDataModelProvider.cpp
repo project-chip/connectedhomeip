@@ -876,7 +876,7 @@ TEST_F(TestCodeDrivenDataModelProvider, Shutdown)
     static ServerClusterRegistration cluster_registration(testCluster);
     ASSERT_EQ(mProvider.AddCluster(cluster_registration), CHIP_NO_ERROR);
 
-    mProvider.Shutdown();
+    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
     EXPECT_TRUE(testCluster.shutdownCalled);
 }
 
@@ -890,8 +890,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ReadAttributeOnInvalidPath)
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     uint32_t readValue;
-    EXPECT_EQ(ReadU32Attribute(mProvider, ConcreteDataAttributePath(1, 99, 1), readValue), CHIP_IM_GLOBAL_STATUS(Failure));
-    EXPECT_EQ(ReadU32Attribute(mProvider, ConcreteDataAttributePath(99, 1, 1), readValue), CHIP_IM_GLOBAL_STATUS(Failure));
+    EXPECT_EQ(ReadU32Attribute(mProvider, ConcreteDataAttributePath(1, 99, 1), readValue), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(ReadU32Attribute(mProvider, ConcreteDataAttributePath(99, 1, 1), readValue), CHIP_ERROR_KEY_NOT_FOUND);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, WriteAttributeOnInvalidPath)
@@ -904,8 +904,8 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttributeOnInvalidPath)
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     uint32_t valueToWrite = 123;
-    EXPECT_EQ(WriteU32Attribute(mProvider, ConcreteDataAttributePath(1, 99, 1), valueToWrite), CHIP_IM_GLOBAL_STATUS(Failure));
-    EXPECT_EQ(WriteU32Attribute(mProvider, ConcreteDataAttributePath(99, 1, 1), valueToWrite), CHIP_IM_GLOBAL_STATUS(Failure));
+    EXPECT_EQ(WriteU32Attribute(mProvider, ConcreteDataAttributePath(1, 99, 1), valueToWrite), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(WriteU32Attribute(mProvider, ConcreteDataAttributePath(99, 1, 1), valueToWrite), CHIP_ERROR_KEY_NOT_FOUND);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveNonExistentEndpoint)
@@ -929,7 +929,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
     DataModel::InvokeRequest requestUnsupportedEndpoint = { .path = ConcreteCommandPath(5, 10, 1) };
     auto result                                         = mProvider.InvokeCommand(requestUnsupportedEndpoint, reader, nullptr);
     EXPECT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Failure));
+    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
@@ -948,7 +948,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
     DataModel::InvokeRequest requestUnsupportedCluster = { .path = ConcreteCommandPath(1, 99, 1) };
     auto result                                        = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
     EXPECT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Failure));
+    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, SingleServerClusterInterfaceWithMultipleClustersAndMultipleEndpoints)
@@ -991,8 +991,7 @@ TEST_F(TestCodeDrivenDataModelProvider, SingleServerClusterInterfaceWithMultiple
 
     {
         ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
-        ASSERT_EQ(mProvider.ServerClusters(99, builder), CHIP_NO_ERROR);
-        ASSERT_EQ(builder.Size(), 0u);
+        EXPECT_EQ(mProvider.ServerClusters(99, builder), CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
     }
 }
 

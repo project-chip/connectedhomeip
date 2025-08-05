@@ -121,37 +121,31 @@ CHIP_ERROR
 CodeDrivenDataModelProvider::SemanticTags(EndpointId endpointId,
                                           ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out)
 {
-    EndpointInterface * epProvider = GetEndpointInterface(endpointId);
-    if (epProvider == nullptr)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-    return epProvider->SemanticTags(out);
+    EndpointInterface * endpoint = GetEndpointInterface(endpointId);
+    VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    return endpoint->SemanticTags(out);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out)
 {
-    EndpointInterface * epProvider = GetEndpointInterface(endpointId);
-    if (epProvider == nullptr)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-    return epProvider->DeviceTypes(out);
+    EndpointInterface * endpoint = GetEndpointInterface(endpointId);
+    VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    return endpoint->DeviceTypes(out);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & out)
 {
-    EndpointInterface * epProvider = GetEndpointInterface(endpointId);
-    if (epProvider == nullptr)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-    return epProvider->ClientClusters(out);
+    EndpointInterface * endpoint = GetEndpointInterface(endpointId);
+    VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    return endpoint->ClientClusters(out);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::ServerClusters(EndpointId endpointId,
                                                        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & out)
 {
+    EndpointInterface * endpoint = GetEndpointInterface(endpointId);
+    VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+
     size_t count = 0;
     for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
     {
