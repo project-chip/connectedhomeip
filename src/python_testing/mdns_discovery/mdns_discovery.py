@@ -68,7 +68,6 @@ class MdnsDiscovery:
             _azc (AsyncZeroconf): Zeroconf manager instance.
             _discovered_services (dict): Stores results of service discovery.
             _event (asyncio.Event): Event used to synchronize async discovery.
-            _verbose_logging (bool): Enables detailed logging output.
         """
         # List of IPv6 addresses to use for mDNS discovery.
         self.interfaces = get_ipv6_addresses()
@@ -81,9 +80,6 @@ class MdnsDiscovery:
 
         # An asyncio Event to signal when a service has been discovered
         self._event = Event()
-
-        # Verbose logging
-        self._verbose_logging = verbose_logging
 
     # Public methods
     async def get_commissioner_services(self, log_output: bool = False,
@@ -328,8 +324,7 @@ class MdnsDiscovery:
                 timeout=discovery_timeout_sec * 1000)
 
             if is_discovered:
-                if self._verbose_logging:
-                    logger.info(f"Service record information (AAAA) for '{hostname}' discovered.")
+                logger.info(f"Service record information (AAAA) for '{hostname}' discovered.")
 
                 # Get IPv6 addresses and convert to QuadaRecord objects
                 ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
@@ -375,8 +370,7 @@ class MdnsDiscovery:
         )
 
         if self._discovered_services:
-            if self._verbose_logging:
-                logger.info(f"Service record information (PTR) for '{service_types}' discovered.")
+            logger.info(f"Service record information (PTR) for '{service_types}' discovered.")
             ptr_records = [
                 record
                 for records in self._discovered_services.values()
@@ -611,8 +605,7 @@ class MdnsDiscovery:
             self._event.set()
 
             if is_discovered:
-                if self._verbose_logging:
-                    logger.info(f"Service record information {rec_types} for '{service_name}' / '{service_type}' discovered.")
+                logger.info(f"Service record information {rec_types} for '{service_name}' / '{service_type}' discovered.")
 
                 # Convert discovred service info into MdnsServiceInfo object
                 mdns_service_info = MdnsServiceInfo(service_info)
