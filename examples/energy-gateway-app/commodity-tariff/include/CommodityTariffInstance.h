@@ -57,8 +57,16 @@ public:
 
     CommodityTariffDelegate * GetDelegate() { return mDelegate; };
 
+    void ActivateTariffTimeTracking(uint32_t timestamp);
+    void TariffTimeTrackingSetOffset(uint32_t offset);
 private:
     CommodityTariffDelegate * mDelegate;
+
+    void ScheduleTariffTimeUpdate();
+    void TariffTimeUpdCb();
+
+protected:
+    uint32_t GetCurrentTimestamp() override;
 };
 
 } // namespace CommodityTariff

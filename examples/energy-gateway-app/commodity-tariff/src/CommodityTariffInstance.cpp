@@ -20,6 +20,7 @@
 #include <csetjmp>
 
 #include <app/clusters/commodity-tariff-server/CommodityTariffConsts.h>
+#include <locale>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,9 +43,47 @@ using DayStructType               = DayStruct::Type;
 using DayPatternStructType        = DayPatternStruct::Type;
 using CalendarPeriodStructType    = CalendarPeriodStruct::Type;
 
+static constexpr uint32_t TimerPollInterval = 30;
+static uint32_t TimestampNow = 0;
+
 CHIP_ERROR CommodityTariffInstance::Init()
 {
     return Instance::Init();
+}
+
+uint32_t CommodityTariffInstance::GetCurrentTimestamp()
+{
+    return TimestampNow;
+}
+
+void CommodityTariffInstance::ScheduleTariffTimeUpdate()
+{
+    DeviceLayer::SystemLayer().StartTimer(
+        System::Clock::Milliseconds32(TimerPollInterval * 1000),
+        [](System::Layer *, void * context) {
+            static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb();
+        },
+        this);
+}
+
+void CommodityTariffInstance::TariffTimeUpdCb()
+{
+    GetDelegate()->TryToactivateDelayedTariff(TimestampNow);
+    TariffTimeAttrsSync();
+    TimestampNow += TimerPollInterval;
+    ScheduleTariffTimeUpdate();
+}
+
+void CommodityTariffInstance::ActivateTariffTimeTracking(uint32_t timestamp)
+{
+    TimestampNow = timestamp;
+
+    ScheduleTariffTimeUpdate();
+}
+
+void CommodityTariffInstance::TariffTimeTrackingSetOffset(uint32_t offset)
+{
+    TimestampNow += offset;
 }
 
 void CommodityTariffInstance::Shutdown()
@@ -75,6 +114,11 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
     {
         ChipLogError(NotSpecified, "TariffPeriods not present!");
         return false;
+    }
+
+    if (GetStartDate_MgmtObj().HasValue())
+    {
+        UpdCtx.TariffStartTimestamp = GetStartDate_MgmtObj().GetNewValue().Value();
     }
 
     assert(!UpdCtx.DayEntryKeyIDs.empty());
@@ -116,7 +160,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         }
     }
 
-    if (GetIndividualDays_MgmtObj().IsValid() && (!GetIndividualDays_MgmtObj().GetNewValue().IsNull()))
+    if (GetIndividualDays_MgmtObj().IsValid() && (!GetIndividualDays_MgmtObj().HasNewValue()))
     {
 
         assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
@@ -138,7 +182,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         DayEntriesData_is_available = true;
     }
 
-    if (GetCalendarPeriods_MgmtObj().IsValid() && (!GetCalendarPeriods_MgmtObj().GetNewValue().IsNull()))
+    if (GetCalendarPeriods_MgmtObj().IsValid() && (!GetCalendarPeriods_MgmtObj().HasNewValue()))
     {
         assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
 

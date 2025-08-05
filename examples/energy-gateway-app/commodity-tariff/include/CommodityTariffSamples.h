@@ -347,7 +347,7 @@ const TariffDataSet kTariffPresets[] = {
            Sample1::TariffPeriods,
             std::size(Sample1::TariffPeriods))),
 
-        .TariffTestTimestamp = 0, //01-Dec-2024
+        .TariffTestTimestamp = 1733011200, //01-Dec-2024
     },
     // Sample 2
     {
@@ -374,7 +374,7 @@ const TariffDataSet kTariffPresets[] = {
            Sample2::TariffPeriods,
             std::size(TariffDataSamples::Sample2::TariffPeriods))),
 
-        .TariffTestTimestamp = 0, //01-Jun-2025
+        .TariffTestTimestamp = 1748736000, //01-Jun-2025
     }
 };
 
