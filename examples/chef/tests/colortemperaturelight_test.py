@@ -48,7 +48,8 @@ class TC_COLORTEMPERATURELIGHT(MatterBaseTest):
         # Commissioning already done.
 
         self.step(2)
-        asserts.assert_equal(await self._read_remaining_time(), 0)  # Check no transition in progress.
+        # Check no transition in progress.
+        asserts.assert_equal(await self._read_remaining_time(), 0)
         await self.send_single_cmd(
             cmd=Clusters.Objects.ColorControl.Commands.MoveColorTemperature(
                 moveMode=Clusters.Objects.ColorControl.Enums.MoveModeEnum.kUp,
@@ -62,7 +63,8 @@ class TC_COLORTEMPERATURELIGHT(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=self._COLORTEMPERATURELIGHT_ENDPOINT,
         )  # Start transition
-        asserts.assert_greater(await self._read_remaining_time(), 0)  # Check transition started
+        # Check transition started
+        asserts.assert_greater(await self._read_remaining_time(), 0)
         await self.send_single_cmd(
             cmd=Clusters.Objects.ColorControl.Commands.StopMoveStep(
                 optionsMask=Clusters.Objects.ColorControl.Bitmaps.OptionsBitmap.kExecuteIfOff,
@@ -72,7 +74,8 @@ class TC_COLORTEMPERATURELIGHT(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=self._COLORTEMPERATURELIGHT_ENDPOINT,
         )  # Stop transition
-        asserts.assert_equal(await self._read_remaining_time(), 0)  # Check transition stopped
+        # Check transition stopped
+        asserts.assert_equal(await self._read_remaining_time(), 0)
 
 
 if __name__ == "__main__":
