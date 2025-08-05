@@ -95,4 +95,3 @@ SpanEndpoint::SpanEndpoint(EndpointId id, DataModel::EndpointCompositionPattern 
 
 } // namespace app
 } // namespace chip
-

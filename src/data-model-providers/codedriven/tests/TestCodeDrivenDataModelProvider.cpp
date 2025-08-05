@@ -1113,4 +1113,3 @@ TEST_F(TestCodeDrivenDataModelProvider, AddDuplicateEndpointId)
     EXPECT_EQ(mProvider.AddEndpoint(*registration1), CHIP_NO_ERROR);
     EXPECT_EQ(mProvider.AddEndpoint(*registration2), CHIP_ERROR_DUPLICATE_KEY_ID);
 }
-
