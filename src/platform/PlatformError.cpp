@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file contains free functions for mapping Platform 
+ *      This file contains free functions for mapping Platform
  *      specific errors into CHIP errors
  */
 
