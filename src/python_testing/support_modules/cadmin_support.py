@@ -58,15 +58,6 @@ class CADMINBaseTest(MatterBaseTest):
         )
         return current_fabric_index
 
-    async def get_txt_record(self):
-        discovery = mdns_discovery.MdnsDiscovery()
-        comm_service = await discovery.get_commissionable_service(
-            discovery_timeout_sec=240,
-            log_output=False,
-        )
-        # TODO: remove as it's unused
-        return comm_service[0]
-
     async def write_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
         result = await th.WriteAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
         asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
@@ -143,25 +134,11 @@ class CADMINBaseTest(MatterBaseTest):
             d_match = self.d == expected_d
             return cm_match and d_match
 
-    async def get_all_txt_records(self):
-        discovery = mdns_discovery.MdnsDiscovery()
-        await discovery.discover(
-            discovery_timeout_sec=240,
-            log_output=False,
-            service_types=[MdnsServiceType.COMMISSIONABLE.value]
-        )
-        # TODO: remove this, see below
-        
-        
-        if MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
-            return discovery._discovered_services[MdnsServiceType.COMMISSIONABLE.value]
-        return []
-
     async def wait_for_correct_cm_value(self, expected_cm_value: int, expected_discriminator: int, max_attempts: int = 5, delay_sec: int = 5):
         """Wait for the correct CM value and discriminator in DNS-SD with retries."""
         for attempt in range(max_attempts):
-            raw_services = await self.get_all_txt_records()
-            # TODO: swap for get comiisionable services, return array
+            discovery = mdns_discovery.MdnsDiscovery()
+            raw_services = await discovery.get_commissionable_services(discovery_timeout_sec=240, log_output=True)
 
             services = [self.ParsedService(service) for service in raw_services]
 

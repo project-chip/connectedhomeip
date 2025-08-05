@@ -84,7 +84,7 @@ class MdnsDiscovery:
     # Public methods
     async def get_commissioner_services(self, log_output: bool = False,
                                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                       ) -> Dict[str, List[MdnsServiceInfo]]:
+                                       ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers commissioner mDNS services on the network.
 
@@ -93,7 +93,7 @@ class MdnsDiscovery:
             log_output (bool): If True, logs the discovered services to the console.
 
         Returns:
-            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types to lists of discovered service info objects.
+            List[MdnsServiceInfo]: List of discovered commissioner services, or an empty list if none found.
         """
         await self.discover(
             service_types=[MdnsServiceType.COMMISSIONER.value],
@@ -103,11 +103,11 @@ class MdnsDiscovery:
             log_output=log_output
         )
 
-        return self._discovered_services
+        return self._discovered_services.get(MdnsServiceType.COMMISSIONER.value, [])
 
     async def get_commissionable_services(self, log_output: bool = False,
                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                         ) -> Dict[str, List[MdnsServiceInfo]]:
+                                         ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers commissionable mDNS services on the network.
 
@@ -116,7 +116,7 @@ class MdnsDiscovery:
             log_output (bool): If True, logs the discovered services to the console.
 
         Returns:
-            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types to lists of discovered service info objects.
+            List[MdnsServiceInfo]: List of discovered commissionable services, or an empty list if none found.
         """
         await self.discover(
             service_types=[MdnsServiceType.COMMISSIONABLE.value],
@@ -126,11 +126,11 @@ class MdnsDiscovery:
             log_output=log_output
         )
 
-        return self._discovered_services
+        return self._discovered_services.get(MdnsServiceType.COMMISSIONABLE.value, [])
 
     async def get_operational_services(self, log_output: bool = False,
                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                      ) -> Dict[str, List[MdnsServiceInfo]]:
+                                      ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers operational mDNS services on the network.
 
@@ -139,7 +139,7 @@ class MdnsDiscovery:
             log_output (bool): If True, logs the discovered services to the console.
 
         Returns:
-            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types to lists of discovered service info objects.
+            List[MdnsServiceInfo]: List of discovered operational services, or an empty list if none found.
         """
         await self.discover(
             service_types=[MdnsServiceType.OPERATIONAL.value],
@@ -149,11 +149,11 @@ class MdnsDiscovery:
             log_output=log_output
         )
 
-        return self._discovered_services
+        return self._discovered_services.get(MdnsServiceType.OPERATIONAL.value, [])
 
     async def get_border_router_services(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                        ) -> Dict[str, List[MdnsServiceInfo]]:
+                                        ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers border router mDNS services on the network.
 
@@ -162,17 +162,17 @@ class MdnsDiscovery:
             log_output (bool): If True, logs the discovered services to the console.
 
         Returns:
-            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types to lists of discovered service info objects.
+            List[MdnsServiceInfo]: List of discovered border router services, or an empty list if none found.
         """
         await self.discover(
-            service_types=[MdnsServiceType.OPERATIONAL.value],
+            service_types=[MdnsServiceType.BORDER_ROUTER.value],
             query_service=True,
             append_results=True,
             discovery_timeout_sec=discovery_timeout_sec,
             log_output=log_output
         )
 
-        return self._discovered_services
+        return self._discovered_services.get(MdnsServiceType.BORDER_ROUTER.value, [])
 
     async def get_all_services(self, log_output: bool = False,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
@@ -485,7 +485,7 @@ class MdnsDiscovery:
         # Log discovery stats
         services_count = sum(len(ptr_list) for ptr_list in self._discovered_services.values())
         types_count = len(self._discovered_services)
-        logger.info(f"Discovered {services_count} mDNS services across {types_count} service types")
+        logger.info(f"Discovered {services_count} mDNS service(s) across {types_count} service type(s)")
 
         # If service querying is enabled, perform controlled parallel queries to
         # retrieve service information (TXT, SRV, A/AAAA) for each discovered PTR

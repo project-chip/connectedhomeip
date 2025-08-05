@@ -40,7 +40,7 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mdns_discovery.mdns_discovery import MdnsDiscovery
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 
 
@@ -80,6 +80,11 @@ class TC_CADMIN_1_15(MatterBaseTest):
         await th.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+
+    def get_instance_name(self, compressed_fabric_id) -> str:
+        node_id = self.dut_node_id
+        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        return instance_name
 
     def steps_TC_CADMIN_1_15(self) -> list[TestStep]:
         return [
@@ -178,15 +183,14 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
         op_services = []
         for th, compressed_id in compressed_fabric_ids.items():
-            service = await MdnsDiscovery.get_operational_service(
-                mdns,
-                node_id=self.dut_node_id,
-                compressed_fabric_id=compressed_id,
-                log_output=True
+            instance_name = self.get_instance_name(compressed_id)
+            operational_service_name = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+
+            services = await mdns.get_operational_services(log_output=True)
+            service = next(
+                (s for s in services if s.service_name == operational_service_name),
+                None
             )
-            
-            # TODO: receive the array, filter with the operational service
-            
             op_services.append(service.instance_name)
 
         asserts.assert_equal(
