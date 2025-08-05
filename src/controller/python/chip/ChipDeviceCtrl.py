@@ -1758,9 +1758,10 @@ class ChipDeviceControllerBase():
     def TestOnlyPrepareToReceiveBdxData(self) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
-        
-        If no BDX transfer is initiated, such as when the log is small and is sent inline instead, the caller must call bdx_future.cancel()
-        to indicate that the future is no longer needed. Otherwise the Diagnostic Logs cluster will respond Busy to any further requests for logs.
+
+        If no BDX transfer is initiated, the caller must cancel the returned future to avoid interfering with other BDX transfers.
+        For example, the Diagnostic Logs clusters won't start a BDX transfer when the log is small so the future must be cancelled to allow later
+        attempts to retrieve logs to succeed.
 
         Returns:
             a future that will yield a BdxTransfer with the init message from the transfer.
@@ -1779,6 +1780,8 @@ class ChipDeviceControllerBase():
     def TestOnlyPrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data to the node.
+
+        If no BDX transfer is initiated, the caller must cancel the returned future to avoid interfering with other BDX transfers.
 
         Returns:
             A future that will yield a BdxTransfer with the init message from the transfer.
