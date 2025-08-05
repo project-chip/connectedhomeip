@@ -78,11 +78,11 @@ public:
 
     // Delete copy constructor and assignment operator. SpanEndpoint holds non-owning data (Spans).
     // This helps prevent accidental copies that could lead multiple objects pointing to the same external data.
-    SpanEndpoint(const SpanEndpoint &) = delete;
+    SpanEndpoint(const SpanEndpoint &)             = delete;
     SpanEndpoint & operator=(const SpanEndpoint &) = delete;
 
     // Allow move semantics for SpanEndpoint.
-    SpanEndpoint(SpanEndpoint &&) = default;
+    SpanEndpoint(SpanEndpoint &&)             = default;
     SpanEndpoint & operator=(SpanEndpoint &&) = default;
 
     const DataModel::EndpointEntry & GetEndpointEntry() const override { return mEndpointEntry; }

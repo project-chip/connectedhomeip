@@ -48,11 +48,11 @@ TEST(TestSpanEndpoint, InstantiateWithAllParameters)
     DataModel::EndpointCompositionPattern composition = DataModel::EndpointCompositionPattern::kTree;
     EndpointId parentId                               = 0;
 
-    const chip::ClusterId clientClusters[]    = { 10, 20 };
-    const SemanticTag semanticTags[]          = { { .mfgCode = chip::VendorId::TestVendor1, .namespaceID = 1, .tag = 1 },
-                                                  { .mfgCode = chip::VendorId::TestVendor2, .namespaceID = 2, .tag = 2 } };
-    const DeviceTypeEntry deviceTypes[]       = { { .deviceTypeId = 100, .deviceTypeRevision = 1 },
-                                                  { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
+    const chip::ClusterId clientClusters[] = { 10, 20 };
+    const SemanticTag semanticTags[]       = { { .mfgCode = chip::VendorId::TestVendor1, .namespaceID = 1, .tag = 1 },
+                                               { .mfgCode = chip::VendorId::TestVendor2, .namespaceID = 2, .tag = 2 } };
+    const DeviceTypeEntry deviceTypes[]    = { { .deviceTypeId = 100, .deviceTypeRevision = 1 },
+                                               { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
 
     auto result = SpanEndpoint::Builder(id)
                       .SetComposition(composition)
@@ -142,10 +142,8 @@ TEST(TestSpanEndpoint, BuildWithSpecificEndpointEntry)
                                           .parentId           = 1,
                                           .compositionPattern = DataModel::EndpointCompositionPattern::kTree };
 
-    auto result = SpanEndpoint::Builder(newEntry.id)
-                      .SetParentId(newEntry.parentId)
-                      .SetComposition(newEntry.compositionPattern)
-                      .Build();
+    auto result =
+        SpanEndpoint::Builder(newEntry.id).SetParentId(newEntry.parentId).SetComposition(newEntry.compositionPattern).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
 
     const auto & provider       = std::get<SpanEndpoint>(result);

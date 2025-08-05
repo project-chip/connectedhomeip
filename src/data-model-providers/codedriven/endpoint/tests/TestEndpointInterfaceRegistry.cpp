@@ -29,9 +29,8 @@ TEST(TestEndpointInterfaceRegistry, CreateAndDestroy)
     EndpointInterfaceRegistry registry;
 
     // Create a provider
-    auto build_result = SpanEndpoint::Builder(kTestEndpointId1)
-                            .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                            .Build();
+    auto build_result =
+        SpanEndpoint::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
     auto provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result)));
     ASSERT_NE(provider, nullptr);
@@ -60,15 +59,13 @@ TEST(TestEndpointInterfaceRegistry, RegisterMultipleProviders)
 {
     EndpointInterfaceRegistry registry;
 
-    auto build_result1 = SpanEndpoint::Builder(kTestEndpointId1)
-                             .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                             .Build();
+    auto build_result1 =
+        SpanEndpoint::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1));
     auto provider1 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1)));
 
-    auto build_result2 = SpanEndpoint::Builder(kTestEndpointId2)
-                             .SetComposition(DataModel::EndpointCompositionPattern::kTree)
-                             .Build();
+    auto build_result2 =
+        SpanEndpoint::Builder(kTestEndpointId2).SetComposition(DataModel::EndpointCompositionPattern::kTree).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result2));
     auto provider2 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result2)));
 
@@ -96,15 +93,13 @@ TEST(TestEndpointInterfaceRegistry, RegisterDuplicateProviderId)
 {
     EndpointInterfaceRegistry registry;
 
-    auto build_result1a = SpanEndpoint::Builder(kTestEndpointId1)
-                              .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                              .Build();
+    auto build_result1a =
+        SpanEndpoint::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1a));
     auto provider1a = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1a)));
 
-    auto build_result1b = SpanEndpoint::Builder(kTestEndpointId1)
-                              .SetComposition(DataModel::EndpointCompositionPattern::kTree)
-                              .Build(); // Same ID
+    auto build_result1b =
+        SpanEndpoint::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kTree).Build(); // Same ID
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1b));
     auto provider1b = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1b)));
 
@@ -125,9 +120,8 @@ TEST(TestEndpointInterfaceRegistry, RegisterDuplicateProviderId)
 TEST(TestEndpointInterfaceRegistry, RegisterSameRegistrationObject)
 {
     EndpointInterfaceRegistry registry;
-    auto build_result = SpanEndpoint::Builder(kTestEndpointId1)
-                            .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                            .Build();
+    auto build_result =
+        SpanEndpoint::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
     auto provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result)));
     ASSERT_NE(provider, nullptr);
@@ -155,15 +149,13 @@ TEST(TestEndpointInterfaceRegistry, IteratorTest)
 {
     EndpointInterfaceRegistry registry;
 
-    auto build_result1 = SpanEndpoint::Builder(kTestEndpointId1)
-                             .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                             .Build();
+    auto build_result1 =
+        SpanEndpoint::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1));
     auto provider1 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1)));
 
-    auto build_result2 = SpanEndpoint::Builder(kTestEndpointId2)
-                             .SetComposition(DataModel::EndpointCompositionPattern::kTree)
-                             .Build();
+    auto build_result2 =
+        SpanEndpoint::Builder(kTestEndpointId2).SetComposition(DataModel::EndpointCompositionPattern::kTree).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result2));
     auto provider2 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result2)));
 
@@ -197,9 +189,8 @@ TEST(TestEndpointInterfaceRegistry, IteratorTest)
 TEST(TestEndpointInterfaceRegistry, RegisterInvalidArgs)
 {
     EndpointInterfaceRegistry registry;
-    auto build_result_valid = SpanEndpoint::Builder(kValidIdForArgsTest)
-                                  .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                                  .Build();
+    auto build_result_valid =
+        SpanEndpoint::Builder(kValidIdForArgsTest).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result_valid));
     auto providerValid = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result_valid)));
     ASSERT_NE(providerValid, nullptr);
@@ -217,15 +208,13 @@ TEST(TestEndpointInterfaceRegistry, RegisterInvalidArgs)
 
     // Case 3: EndpointInterfaceRegistration already part of a list (entry.next != nullptr)
     // To test this, we need two valid providers and registrations.
-    auto build_result_list1                                        = SpanEndpoint::Builder(kListId1ForArgsTest)
-                                  .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                                  .Build();
+    auto build_result_list1 =
+        SpanEndpoint::Builder(kListId1ForArgsTest).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result_list1));
     auto providerForList1 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result_list1)));
 
-    auto build_result_list2                                        = SpanEndpoint::Builder(kListId2ForArgsTest)
-                                  .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                                  .Build();
+    auto build_result_list2 =
+        SpanEndpoint::Builder(kListId2ForArgsTest).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result_list2));
     auto providerForList2 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result_list2)));
     EndpointInterfaceRegistration registrationInList1(*providerForList1);
@@ -254,10 +243,8 @@ TEST(TestEndpointInterfaceRegistry, StressTestRegistration)
     providers_storage.reserve(kNumProviders);
     for (int i = 0; i < kNumProviders; ++i)
     {
-        EndpointId id = static_cast<EndpointId>(i + 1);
-        auto build_result                                      = SpanEndpoint::Builder(id)
-                                .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                                .Build();
+        EndpointId id     = static_cast<EndpointId>(i + 1);
+        auto build_result = SpanEndpoint::Builder(id).SetComposition(DataModel::EndpointCompositionPattern::kFullFamily).Build();
         ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
         providers_storage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result))));
         ids.push_back(id);
@@ -319,9 +306,8 @@ TEST(TestEndpointInterfaceRegistry, StressTestRegistration)
 TEST(TestEndpointInterfaceRegistry, TestEndpointEntryConstructionAndAccess)
 {
     // Create an endpoint instance to have a valid reference for registrations.
-    auto build_result = SpanEndpoint::Builder(kTestEndpointId1)
-                            .SetComposition(DataModel::EndpointCompositionPattern::kTree)
-                            .Build();
+    auto build_result =
+        SpanEndpoint::Builder(kTestEndpointId1).SetComposition(DataModel::EndpointCompositionPattern::kTree).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
     auto endpoint = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result)));
     ASSERT_NE(endpoint, nullptr);
@@ -339,8 +325,8 @@ TEST(TestEndpointInterfaceRegistry, TestEndpointEntryConstructionAndAccess)
 
     // 2. Test construction with a custom EndpointEntry.
     {
-        constexpr EndpointId kCustomId = 99;
-        constexpr EndpointId kCustomParentId = 123;
+        constexpr EndpointId kCustomId        = 99;
+        constexpr EndpointId kCustomParentId  = 123;
         DataModel::EndpointEntry custom_entry = { kCustomId, kCustomParentId, DataModel::EndpointCompositionPattern::kTree };
 
         EndpointInterfaceRegistration registration(*endpoint, custom_entry);

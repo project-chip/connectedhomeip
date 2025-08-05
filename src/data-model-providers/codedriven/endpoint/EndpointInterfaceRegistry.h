@@ -41,19 +41,18 @@ struct EndpointInterfaceRegistration
     EndpointInterfaceRegistration * next;
 
     EndpointInterfaceRegistration(EndpointInterface & interface,
-        DataModel::EndpointEntry entry = {kInvalidEndpointId, kInvalidEndpointId, DataModel::EndpointCompositionPattern::kFullFamily},
-        EndpointInterfaceRegistration * next_item = nullptr) :
-        endpointInterface(&interface), endpointEntry(entry), next(next_item)
+                                  DataModel::EndpointEntry entry            = { kInvalidEndpointId, kInvalidEndpointId,
+                                                                                DataModel::EndpointCompositionPattern::kFullFamily },
+                                  EndpointInterfaceRegistration * next_item = nullptr) :
+        endpointInterface(&interface),
+        endpointEntry(entry), next(next_item)
     {}
     EndpointInterfaceRegistration(EndpointInterfaceRegistration && other) = default;
 
     EndpointInterfaceRegistration(const EndpointInterfaceRegistration & other)             = delete;
     EndpointInterfaceRegistration & operator=(const EndpointInterfaceRegistration & other) = delete;
 
-    DataModel::EndpointEntry GetEndpointEntry() const
-    {
-        return endpointEntry;
-    }
+    DataModel::EndpointEntry GetEndpointEntry() const { return endpointEntry; }
 };
 
 /**

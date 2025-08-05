@@ -388,9 +388,9 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverServerClusters)
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     static MockServerCluster mockServerCluster1(ConcreteClusterPath(1, 10), 1, BitFlags<DataModel::ClusterQualityFlags>());
-    static MockServerCluster
-        mockServerCluster2(ConcreteClusterPath(1, 20), 2,
-                           BitFlags<DataModel::ClusterQualityFlags>().Set(DataModel::ClusterQualityFlags::kDiagnosticsData));
+    static MockServerCluster mockServerCluster2(
+        ConcreteClusterPath(1, 20), 2,
+        BitFlags<DataModel::ClusterQualityFlags>().Set(DataModel::ClusterQualityFlags::kDiagnosticsData));
     static MockServerCluster descriptorClusterEP1({ endpointEntry1.id, chip::app::Clusters::Descriptor::Id }, 1,
                                                   BitFlags<DataModel::ClusterQualityFlags>());
 
@@ -435,8 +435,7 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverTags)
 {
     static const SemanticTag sSemanticTagsArray[] = { semanticTag1, semanticTag2 };
 
-    auto build_pair =
-        SpanEndpoint::Builder(endpointEntry1.id).SetSemanticTags(Span<const SemanticTag>(sSemanticTagsArray)).Build();
+    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id).SetSemanticTags(Span<const SemanticTag>(sSemanticTagsArray)).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
     auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
 
@@ -526,9 +525,9 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
     CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
-    static const ClusterId clientClustersArray[]          = { 0xD001, 0xD002 };
-    static const SemanticTag semanticTagsArray[]          = { { .mfgCode = VendorId::Google, .namespaceID = 10, .tag = 100 },
-                                                     { .mfgCode = VendorId::Google, .namespaceID = 11, .tag = 101 } };
+    static const ClusterId clientClustersArray[]               = { 0xD001, 0xD002 };
+    static const SemanticTag semanticTagsArray[]               = { { .mfgCode = VendorId::Google, .namespaceID = 10, .tag = 100 },
+                                                                   { .mfgCode = VendorId::Google, .namespaceID = 11, .tag = 101 } };
     static const DataModel::DeviceTypeEntry deviceTypesArray[] = { { .deviceTypeId = 0x7001, .deviceTypeRevision = 1 },
                                                                    { .deviceTypeId = 0x7002, .deviceTypeRevision = 2 } };
 
@@ -928,7 +927,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
     reader.Init(buffer->Start(), buffer->DataLength());
 
     DataModel::InvokeRequest requestUnsupportedEndpoint = { .path = ConcreteCommandPath(5, 10, 1) };
-    auto result = mProvider.InvokeCommand(requestUnsupportedEndpoint, reader, nullptr);
+    auto result                                         = mProvider.InvokeCommand(requestUnsupportedEndpoint, reader, nullptr);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Failure));
 }
@@ -947,7 +946,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
     reader.Init(buffer->Start(), buffer->DataLength());
 
     DataModel::InvokeRequest requestUnsupportedCluster = { .path = ConcreteCommandPath(1, 99, 1) };
-    auto result = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
+    auto result                                        = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Failure));
 }

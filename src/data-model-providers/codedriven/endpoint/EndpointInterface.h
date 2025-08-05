@@ -57,7 +57,6 @@ public:
      * @param[out] out The buffer to fill with ServerClusterInterface pointers.
      * @return CHIP_NO_ERROR on success or CHIP_ERROR_NO_MEMORY if the buffer is too small.
      */
-
 };
 
 } // namespace app
