@@ -38,7 +38,7 @@ tests:
           constraints:
               type: list
 
- - label: "Step 2: TH reads the CurrentOutput attribute"
+    - label: "Step 2: TH reads the CurrentOutput attribute"
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:
