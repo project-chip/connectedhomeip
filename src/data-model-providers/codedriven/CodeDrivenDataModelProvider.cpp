@@ -63,10 +63,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
 
 CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
 {
-    // Shutdown all registered server clusters
     for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
     {
-        cluster->Shutdown();
+        RemoveCluster(cluster); // This will call Shutdown() on the cluster if needed.
     }
     mServerClusterContext.reset();
     return CHIP_NO_ERROR;
