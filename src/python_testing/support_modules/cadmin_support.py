@@ -29,7 +29,6 @@ from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest
 from mdns_discovery import mdns_discovery
-from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mobly import asserts
 
 

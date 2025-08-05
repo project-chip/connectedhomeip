@@ -100,7 +100,7 @@ class TC_ICDM_5_1(MatterBaseTest):
 
         # Verify at least one service is present and is of operational type
         asserts.assert_true(len(services) > 0,
-            f"At least one operational service ('{service_type}') must present.")
+                            f"At least one operational service ('{service_type}') must present.")
 
         # Get operational node service
         service = None
@@ -112,7 +112,7 @@ class TC_ICDM_5_1(MatterBaseTest):
 
         # Verify operational node service is present
         asserts.assert_is_not_none(service,
-            f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
+                                   f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
 
         # Get TXT record
         icdTxtRecord = OperatingModeEnum(int(service.txt_record['ICD']))

@@ -40,8 +40,8 @@ from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError as IME
 from chip.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
-from support_modules.cadmin_support import CADMINBaseTest
 from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
 
 
 class TC_CADMIN_1_5(CADMINBaseTest):

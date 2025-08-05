@@ -83,8 +83,8 @@ class MdnsDiscovery:
 
     # Public methods
     async def get_commissioner_services(self, log_output: bool = False,
-                                       discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                       ) -> List[MdnsServiceInfo]:
+                                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
+                                        ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers commissioner mDNS services on the network.
 
@@ -106,8 +106,8 @@ class MdnsDiscovery:
         return self._discovered_services.get(MdnsServiceType.COMMISSIONER.value, [])
 
     async def get_commissionable_services(self, log_output: bool = False,
-                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                         ) -> List[MdnsServiceInfo]:
+                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
+                                          ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers commissionable mDNS services on the network.
 
@@ -129,8 +129,8 @@ class MdnsDiscovery:
         return self._discovered_services.get(MdnsServiceType.COMMISSIONABLE.value, [])
 
     async def get_operational_services(self, log_output: bool = False,
-                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                      ) -> List[MdnsServiceInfo]:
+                                       discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
+                                       ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers operational mDNS services on the network.
 
@@ -152,8 +152,8 @@ class MdnsDiscovery:
         return self._discovered_services.get(MdnsServiceType.OPERATIONAL.value, [])
 
     async def get_border_router_services(self, log_output: bool = False,
-                                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                        ) -> List[MdnsServiceInfo]:
+                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
+                                         ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers border router mDNS services on the network.
 
