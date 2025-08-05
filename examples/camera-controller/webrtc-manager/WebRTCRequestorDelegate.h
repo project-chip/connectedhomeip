@@ -21,7 +21,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
 
-class WebRTCRequestorDelegate : public chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate
+class WebRTCRequestorDelegate : public chip::app::Clusters::WebRTCTransportRequestor::Delegate
 {
 public:
     using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;

@@ -31,7 +31,7 @@ using OnEndCallback           = int (*)(uint16_t, uint8_t);
 
 constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
 
-class WebRTCTransportRequestorManager : public chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate
+class WebRTCTransportRequestorManager : public chip::app::Clusters::WebRTCTransportRequestor::Delegate
 {
 public:
     using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
