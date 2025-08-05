@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/persistence/String.h"
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <app/persistence/AttributePersistence.h>
@@ -61,7 +62,7 @@ bool AttributePersistence::InternalRawLoadNativeEndianValue(const ConcreteAttrib
 
 bool AttributePersistence::LoadString(const ConcreteAttributePath & path, Storage::Internal::ShortString & value)
 {
-    Storage::Internal::ShortStringWriteIO io(value);
+    Storage::Internal::ShortStringInputAdapter io(value);
     MutableByteSpan rawBytes = io.ReadBuffer();
 
     if (!VerifySuccessLogOnFailure(path, mProvider.ReadValue(path, rawBytes)))
@@ -74,7 +75,7 @@ bool AttributePersistence::LoadString(const ConcreteAttributePath & path, Storag
 
 CHIP_ERROR AttributePersistence::StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value)
 {
-    Storage::Internal::ShortStringReadIO io(value);
+    Storage::Internal::ShortStringOutputAdapter io(value);
     return mProvider.WriteValue(path, io.ContentWithPrefix());
 }
 
