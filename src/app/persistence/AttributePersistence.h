@@ -52,7 +52,7 @@ public:
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - write to storage
-    template <typename T, typename std::enable_if<std::is_arithmetic_v<T>>::type * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
     CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
         ReturnErrorOnFailure(decoder.Decode(value));
