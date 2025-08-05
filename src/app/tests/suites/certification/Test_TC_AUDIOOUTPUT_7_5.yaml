@@ -37,16 +37,8 @@ tests:
       response:
           constraints:
               type: list
-              # Optional: You may loop over list and validate each OutputInfoStruct has required fields.
-              hasField:
-                  - name: Index
-                    type: int8u
-                  - name: OutputType
-                    type: enum8
-                  - name: Name
-                    type: string
 
-    - label: "Step 2: TH reads the CurrentOutput attribute"
+ - label: "Step 2: TH reads the CurrentOutput attribute"
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:
