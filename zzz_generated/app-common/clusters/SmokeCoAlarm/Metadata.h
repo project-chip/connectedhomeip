@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -71,10 +72,10 @@ namespace ExpiryDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ExpiryDate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ExpiryDate
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
     ExpressedState::kMetadataEntry,     BatteryAlert::kMetadataEntry,      TestInProgress::kMetadataEntry,
     HardwareFaultAlert::kMetadataEntry, EndOfServiceAlert::kMetadataEntry,
+
 };
 
 } // namespace Attributes

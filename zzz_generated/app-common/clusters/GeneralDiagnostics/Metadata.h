@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -64,11 +65,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TestEventTriggersEnabl
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace TestEventTriggersEnabled
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     NetworkInterfaces::kMetadataEntry,
     RebootCount::kMetadataEntry,
     TestEventTriggersEnabled::kMetadataEntry,
+
 };
 
 } // namespace Attributes

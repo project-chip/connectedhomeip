@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -23,9 +24,9 @@ namespace FlipFlop {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(FlipFlop::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace FlipFlop
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
     FlipFlop::kMetadataEntry,
+
 };
 
 } // namespace Attributes

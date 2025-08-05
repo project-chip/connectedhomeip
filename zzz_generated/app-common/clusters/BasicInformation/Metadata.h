@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -115,8 +116,7 @@ namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 16> kMandatoryMetadata = {
     DataModelRevision::kMetadataEntry,
     VendorName::kMetadataEntry,
     VendorID::kMetadataEntry,
@@ -133,6 +133,7 @@ constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     SpecificationVersion::kMetadataEntry,
     MaxPathsPerInvoke::kMetadataEntry,
     ConfigurationVersion::kMetadataEntry,
+
 };
 
 } // namespace Attributes

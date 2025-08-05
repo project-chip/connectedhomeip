@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -48,12 +49,12 @@ namespace EndpointUniqueID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(EndpointUniqueID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace EndpointUniqueID
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     DeviceTypeList::kMetadataEntry,
     ServerList::kMetadataEntry,
     ClientList::kMetadataEntry,
     PartsList::kMetadataEntry,
+
 };
 
 } // namespace Attributes

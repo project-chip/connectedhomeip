@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -56,10 +57,10 @@ namespace WattRating {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WattRating::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace WattRating
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     CookTime::kMetadataEntry,
     MaxCookTime::kMetadataEntry,
+
 };
 
 } // namespace Attributes

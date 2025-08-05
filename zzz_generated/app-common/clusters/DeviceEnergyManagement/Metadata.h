@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -52,10 +53,10 @@ namespace OptOutState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OptOutState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OptOutState
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
     ESAType::kMetadataEntry,     ESACanGenerate::kMetadataEntry, ESAState::kMetadataEntry,
     AbsMinPower::kMetadataEntry, AbsMaxPower::kMetadataEntry,
+
 };
 
 } // namespace Attributes

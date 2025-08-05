@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -37,12 +38,12 @@ namespace MaxGroupKeysPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxGroupKeysPerFabric::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaxGroupKeysPerFabric
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     GroupKeyMap::kMetadataEntry,
     GroupTable::kMetadataEntry,
     MaxGroupsPerFabric::kMetadataEntry,
     MaxGroupKeysPerFabric::kMetadataEntry,
+
 };
 
 } // namespace Attributes

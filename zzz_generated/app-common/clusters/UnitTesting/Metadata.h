@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -396,8 +397,7 @@ namespace MeiInt8u {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeiInt8u::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace MeiInt8u
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 85> kMandatoryMetadata = {
     Boolean::kMetadataEntry,
     Bitmap8::kMetadataEntry,
     Bitmap16::kMetadataEntry,
@@ -483,6 +483,7 @@ constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     NullableGlobalEnum::kMetadataEntry,
     NullableGlobalStruct::kMetadataEntry,
     MeiInt8u::kMetadataEntry,
+
 };
 
 } // namespace Attributes

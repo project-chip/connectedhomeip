@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -74,10 +75,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(IsCommissioningWithout
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace IsCommissioningWithoutPower
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
     Breadcrumb::kMetadataEntry,         BasicCommissioningInfo::kMetadataEntry,       RegulatoryConfig::kMetadataEntry,
     LocationCapability::kMetadataEntry, SupportsConcurrentConnection::kMetadataEntry,
+
 };
 
 } // namespace Attributes

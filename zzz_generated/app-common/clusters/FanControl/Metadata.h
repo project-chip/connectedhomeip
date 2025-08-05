@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -67,12 +68,12 @@ namespace AirflowDirection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(AirflowDirection::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace AirflowDirection
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     FanMode::kMetadataEntry,
     FanModeSequence::kMetadataEntry,
     PercentSetting::kMetadataEntry,
     PercentCurrent::kMetadataEntry,
+
 };
 
 } // namespace Attributes

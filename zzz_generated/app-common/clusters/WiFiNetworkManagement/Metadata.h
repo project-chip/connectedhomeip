@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -27,10 +28,10 @@ namespace PassphraseSurrogate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PassphraseSurrogate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kManage, std::nullopt);
 } // namespace PassphraseSurrogate
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     Ssid::kMetadataEntry,
     PassphraseSurrogate::kMetadataEntry,
+
 };
 
 } // namespace Attributes

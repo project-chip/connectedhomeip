@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -43,11 +44,11 @@ namespace BoostState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BoostState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BoostState
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     HeaterTypes::kMetadataEntry,
     HeatDemand::kMetadataEntry,
     BoostState::kMetadataEntry,
+
 };
 
 } // namespace Attributes

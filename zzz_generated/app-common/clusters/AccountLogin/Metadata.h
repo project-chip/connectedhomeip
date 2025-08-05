@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,8 +20,7 @@ namespace AccountLogin {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };
 

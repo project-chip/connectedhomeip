@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -109,8 +110,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultRandomizationTy
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace DefaultRandomizationType
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 17> kMandatoryMetadata = {
     TariffInfo::kMetadataEntry,
     TariffUnit::kMetadataEntry,
     StartDate::kMetadataEntry,
@@ -128,6 +128,7 @@ constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     TariffPeriods::kMetadataEntry,
     CurrentTariffComponents::kMetadataEntry,
     NextTariffComponents::kMetadataEntry,
+
 };
 
 } // namespace Attributes

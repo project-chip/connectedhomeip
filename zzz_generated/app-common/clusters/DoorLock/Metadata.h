@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -220,13 +221,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfAliroEndpointK
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace NumberOfAliroEndpointKeysSupported
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
     LockState::kMetadataEntry,
     LockType::kMetadataEntry,
     ActuatorEnabled::kMetadataEntry,
     OperatingMode::kMetadataEntry,
     SupportedOperatingModes::kMetadataEntry,
+
 };
 
 } // namespace Attributes

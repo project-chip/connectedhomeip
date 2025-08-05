@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -23,9 +24,9 @@ namespace StateValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(StateValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace StateValue
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
     StateValue::kMetadataEntry,
+
 };
 
 } // namespace Attributes

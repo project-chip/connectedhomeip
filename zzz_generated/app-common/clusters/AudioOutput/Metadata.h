@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -28,10 +29,10 @@ namespace CurrentOutput {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentOutput::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentOutput
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     OutputList::kMetadataEntry,
     CurrentOutput::kMetadataEntry,
+
 };
 
 } // namespace Attributes

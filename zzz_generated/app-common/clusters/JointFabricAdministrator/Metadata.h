@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -24,9 +25,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AdministratorFabricInd
                                                           BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kAdminister, std::nullopt);
 } // namespace AdministratorFabricIndex
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
     AdministratorFabricIndex::kMetadataEntry,
+
 };
 
 } // namespace Attributes

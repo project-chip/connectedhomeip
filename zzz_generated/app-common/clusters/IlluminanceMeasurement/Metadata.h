@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -39,11 +40,11 @@ namespace LightSensorType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LightSensorType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LightSensorType
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     MeasuredValue::kMetadataEntry,
     MinMeasuredValue::kMetadataEntry,
     MaxMeasuredValue::kMetadataEntry,
+
 };
 
 } // namespace Attributes

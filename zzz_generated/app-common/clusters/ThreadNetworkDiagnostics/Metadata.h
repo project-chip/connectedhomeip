@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -289,8 +290,7 @@ namespace Rloc16 {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Rloc16::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Rloc16
-
-constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
+constexpr std::array<DataModel::AttributeEntry, 19> kMandatoryMetadata = {
     Channel::kMetadataEntry,
     RoutingRole::kMetadataEntry,
     NetworkName::kMetadataEntry,
@@ -310,6 +310,7 @@ constexpr DataModel::AttributeEntry kMandatoryMetadata[] = {
     ActiveNetworkFaultsList::kMetadataEntry,
     ExtAddress::kMetadataEntry,
     Rloc16::kMetadataEntry,
+
 };
 
 } // namespace Attributes
