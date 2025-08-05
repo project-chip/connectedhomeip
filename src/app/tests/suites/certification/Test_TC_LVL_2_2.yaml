@@ -39,6 +39,9 @@ config:
     StartUpCurrentLevelConfigValue:
         type: int8u
         defaultValue: 5
+    StartUpCurrentLevelConfigResetValue:
+        type: int8u
+        defaultValue: 100
 
 tests:
     - label:
@@ -229,6 +232,16 @@ tests:
           constraints:
               type: int8u
               notValue: StartUpCurrentLevelValue
+
+    #This is a reset step that is needed to reset the value of the attribute to another value then the one used in 6b in order to ensure successful test repetitions.
+    - label:
+            "writes back StartUpCurrentLevel attribute to the DUT with
+            a different value than that in 6c"
+      PICS: LVL.S.A4000
+      command: "writeAttribute"
+      attribute: "StartUpCurrentLevel"
+      arguments:
+          value: StartUpCurrentLevelConfigResetValue
 
     #This is a reset step that is needed to reset the value of the attribute to the default values so as to not effect other test cases.
     - label: "writes back default value of OnOffTransitionTime attribute"
