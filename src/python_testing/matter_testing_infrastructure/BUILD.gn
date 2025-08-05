@@ -50,6 +50,7 @@ pw_python_package("chip-testing-module") {
     "chip/testing/matter_stack_state.py",
     "chip/testing/matter_test_config.py",
     "chip/testing/matter_testing.py",
+    "chip/testing/matter_testing_defaults.py",
     "chip/testing/metadata.py",
     "chip/testing/pics.py",
     "chip/testing/problem_notices.py",
