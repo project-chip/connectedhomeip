@@ -62,9 +62,8 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(cons
         }
         return result;
     }
-    default: {
+    default: 
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
     }
 }
 
@@ -73,21 +72,21 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
 {
     switch (request.path.mAttributeId)
     {
-    case TimeFormatLocalization::Attributes::HourFormat::Id: {
+    case TimeFormatLocalization::Attributes::HourFormat::Id: 
         return encoder.Encode(mLogic.GetHourFormat());
-    }
-    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
+    
+    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: 
         return encoder.Encode(mLogic.GetActiveCalendarType());
-    }
-    case TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id: {
+    
+    case TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id: 
         return mLogic.GetSupportedCalendarTypes(encoder);
-    }
-    case TimeFormatLocalization::Attributes::FeatureMap::Id: {
+    
+    case TimeFormatLocalization::Attributes::FeatureMap::Id: 
         return encoder.Encode(mLogic.GetFeatureMap().Raw());
-    }
-    case TimeFormatLocalization::Attributes::ClusterRevision::Id: {
+    
+    case TimeFormatLocalization::Attributes::ClusterRevision::Id: 
         return encoder.Encode(TimeFormatLocalization::kRevision);
-    }
+    
     default:
         return Protocols::InteractionModel::Status::UnreportableAttribute;
     }
