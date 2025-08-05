@@ -84,8 +84,10 @@ def global_attribute(attribute: Attribute) -> bool:
 def response_struct(s: Struct) -> bool:
     return s.code is not None
 
+
 def is_optional(attribute: Attribute) -> bool:
     return attribute.definition.is_optional
+
 
 class SdkGenerator(CodeGenerator):
     """
