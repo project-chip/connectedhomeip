@@ -1,9 +1,14 @@
+# NOTE: we currently want to see coverage but not enforce it.
+#
+# See https://docs.codecov.com/docs/common-recipe-list#set-non-blocking-status-checks
 coverage:
   status:
     project:
-      if_ci_failed: success
+      default:
+        informational: true
     patch:
-      if_ci_failed: success
+      default:
+        informational: true
 
 parsers:
   cobertura:
