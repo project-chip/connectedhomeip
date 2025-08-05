@@ -534,4 +534,9 @@ jobs:
                 bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}                
 
             - name: Run Build Coverage
-              run: ./scripts/build_coverage.sh --yaml
+              run: ./scripts/build_coverage.sh --yaml --xml
+
+            - name: Upload coverage reports to Codecov with GitHub Action
+              uses: codecov/codecov-action@v5
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

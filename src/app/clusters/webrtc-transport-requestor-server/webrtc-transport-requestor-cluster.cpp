@@ -55,7 +55,7 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
 
-WebRTCTransportRequestorServer::WebRTCTransportRequestorServer(EndpointId endpointId, WebRTCTransportRequestorDelegate & delegate) :
+WebRTCTransportRequestorServer::WebRTCTransportRequestorServer(EndpointId endpointId, Delegate & delegate) :
     DefaultServerCluster({ endpointId, WebRTCTransportRequestor::Id }), mDelegate(delegate)
 {}
 
@@ -91,7 +91,7 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::Inv
         {
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
-        return HandleOffer(req, *handler);
+        return HandleOffer(*handler, req);
     }
     case Commands::Answer::Id: {
         Commands::Answer::DecodableType req;
@@ -99,7 +99,7 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::Inv
         {
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
-        return HandleAnswer(req, *handler);
+        return HandleAnswer(*handler, req);
     }
     case Commands::ICECandidates::Id: {
         Commands::ICECandidates::DecodableType req;
@@ -107,7 +107,7 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::Inv
         {
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
-        return HandleICECandidates(req, *handler);
+        return HandleICECandidates(*handler, req);
     }
     case Commands::End::Id: {
         Commands::End::DecodableType req;
@@ -115,7 +115,7 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportRequestorServer::Inv
         {
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
-        return HandleEnd(req, *handler);
+        return HandleEnd(*handler, req);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
@@ -175,8 +175,8 @@ bool WebRTCTransportRequestorServer::IsPeerNodeSessionValid(uint16_t sessionId, 
     return (peerNodeId == existingSession->peerNodeID) && (peerFabricIndex == existingSession->GetFabricIndex());
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const Commands::Offer::DecodableType & req,
-                                                                          const CommandHandler & commandHandler)
+DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const CommandHandler & commandHandler,
+                                                                          const Commands::Offer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
 
@@ -185,8 +185,8 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const 
         return Protocols::InteractionModel::Status::NotFound;
     }
 
-    // Create arguments for WebRTCTransportRequestorDelegate.
-    WebRTCTransportRequestorDelegate::OfferArgs args;
+    // Create arguments for Delegate.
+    Delegate::OfferArgs args;
     args.sdp = std::string(req.sdp.data(), req.sdp.size());
 
     // Convert ICE servers list from DecodableList to vector.
@@ -217,8 +217,8 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleOffer(const 
     return mDelegate.HandleOffer(sessionId, args);
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const Commands::Answer::DecodableType & req,
-                                                                           const CommandHandler & commandHandler)
+DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const CommandHandler & commandHandler,
+                                                                           const Commands::Answer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
@@ -235,8 +235,8 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleAnswer(const
 }
 
 DataModel::ActionReturnStatus
-WebRTCTransportRequestorServer::HandleICECandidates(const Commands::ICECandidates::DecodableType & req,
-                                                    const CommandHandler & commandHandler)
+WebRTCTransportRequestorServer::HandleICECandidates(const CommandHandler & commandHandler,
+                                                    const Commands::ICECandidates::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
 
@@ -273,8 +273,8 @@ WebRTCTransportRequestorServer::HandleICECandidates(const Commands::ICECandidate
     return mDelegate.HandleICECandidates(sessionId, candidates);
 }
 
-DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const Commands::End::DecodableType & req,
-                                                                        const CommandHandler & commandHandler)
+DataModel::ActionReturnStatus WebRTCTransportRequestorServer::HandleEnd(const CommandHandler & commandHandler,
+                                                                        const Commands::End::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto reason        = req.reason;
