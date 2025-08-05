@@ -20,10 +20,14 @@ import logging
 import platform
 import shutil
 import subprocess
+from typing import Optional
+
+import chip.clusters as Clusters
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+cnet = Clusters.NetworkCommissioning
 
 MAX_RETRIES = 5
 TIMEOUT = 900
@@ -31,8 +35,17 @@ TIMED_REQUEST_TIMEOUT_MS = 5000
 WIFI_WAIT_SECONDS = 5
 
 
-async def connect_wifi_linux(ssid, password):
-    """ Connects to WiFi with the SSID and Password provided as arguments using 'nmcli' in Linux."""
+async def connect_wifi_linux(ssid: str, password: str) -> Optional[subprocess.CompletedProcess]:
+    """
+    Connects to a WiFi network using nmcli on Linux systems.
+
+    Args:
+        ssid (str): The SSID of the WiFi network to connect to.
+        password (str): The password for the WiFi network.
+
+    Returns:
+        subprocess.CompletedProcess or None: Result of the connection attempt.
+    """
     if isinstance(ssid, bytes):
         ssid = ssid.decode()
     if isinstance(password, bytes):
@@ -88,8 +101,17 @@ async def connect_wifi_linux(ssid, password):
         return result
 
 
-async def connect_wifi_mac(ssid, password):
-    """ Connects to WiFi with the SSID and Password provided as arguments using 'networksetup' in Mac."""
+async def connect_wifi_mac(ssid: str, password: str) -> Optional[subprocess.CompletedProcess]:
+    """
+    Connects to a WiFi network using networksetup on macOS systems.
+
+    Args:
+        ssid (str): The SSID of the WiFi network to connect to.
+        password (str): The password for the WiFi network.
+
+    Returns:
+        subprocess.CompletedProcess or None: Result of the connection attempt.
+    """
     if not shutil.which("networksetup"):
         logger.error(" --- connect_wifi_mac: 'networksetup' is not present. Please install 'networksetup'.")
         return None
@@ -124,8 +146,15 @@ async def connect_wifi_mac(ssid, password):
         return result
 
 
-async def connect_host_wifi(ssid, password):
-    """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi function. """
+async def connect_host_wifi(ssid: str, password: str) -> None:
+    """
+    Connects the host machine to a WiFi network by detecting the OS and using the appropriate method.
+    Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi function.
+
+    Args:
+        ssid (str): The SSID of the WiFi network to connect to.
+        password (str): The password for the WiFi network.
+    """
     os_name = platform.system()
     logger.info(f" --- connect_host_wifi: OS detected: {os_name}")
 
@@ -158,8 +187,16 @@ async def connect_host_wifi(ssid, password):
             retry += 1
 
 
-def is_network_switch_successful(err):
-    """ Verifies if networkingStatus is 0 (kSuccess) """
+def is_network_switch_successful(err) -> bool:
+    """
+    Verifies if a network switch command succeeded by checking the networkingStatus attribute.
+
+    Args:
+        err: The response object or exception from the network switch command.
+
+    Returns:
+        bool: True if the network switch was successful, False otherwise.
+    """
     return (
         err is None or
         (hasattr(err, "networkingStatus") and
@@ -167,9 +204,18 @@ def is_network_switch_successful(err):
     )
 
 
-async def change_networks(test, cluster, ssid, password, breadcrumb):
-    """ Changes networks in DUT by sending ConnectNetwork command and
-        changes TH network by calling connect_host_wifi function."""
+async def change_networks(test, cluster, ssid: str, password: str, breadcrumb: int) -> None:
+    """
+    Changes the DUT's WiFi network and switches the TH's network accordingly.
+    Handles retries and verifies successful reconnection.
+
+    Args:
+        test: Test context to send commands.
+        cluster: Network Commissioning Cluster to send commands through.
+        ssid (str): The SSID of the WiFi network to switch to.
+        password (str): The password for the WiFi network.
+        breadcrumb (int): Breadcrumb value for ConnectNetwork command.
+    """
     # ConnectNetwork tells the DUT to change to the second Wi-Fi network, while TH stays in the first one
     # so they loose connection between each other. Thus, ConnectNetwork can throw an exception
     retry = 1
@@ -208,3 +254,42 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
         retry += 1
     else:
         logger.error(f" --- change_networks: Failed to switch networks after {MAX_RETRIES} retries.")
+
+    async def find_network_and_assert(self, networks, ssid, should_be_connected=True):
+        asserts.assert_is_not_none(networks, "Could not read networks.")
+        for idx, network in enumerate(networks):
+            if network.networkID == ssid.encode():
+                connection_state = "connected" if network.connected else "not connected"
+                asserts.assert_equal(network.connected, should_be_connected, f"Wifi network {ssid} is {connection_state}.")
+                return idx
+        asserts.fail(f"Wifi network not found for SSID: {ssid}")
+
+    async def verify_operational_network(self, ssid):
+        networks = None
+        retry = 1
+        while retry <= MAX_RETRIES:
+            logger.info(f" --- verify_operational_network: Trying to verify operational network: {retry}/{MAX_RETRIES}")
+            try:
+                networks = await asyncio.wait_for(
+                    self.read_single_attribute_check_success(
+                        cluster=cnet,
+                        attribute=cnet.Attributes.Networks
+                    ),
+                    timeout=TIMEOUT
+                )
+            except Exception as e:
+                logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
+                # Let's wait a couple of seconds to change networks
+                await asyncio.sleep(WIFI_WAIT_SECONDS)
+            finally:
+                if networks and len(networks) > 0 and networks[0].connected:
+                    logger.info(f" --- verify_operational_network: networks: {networks}")
+                    break
+                else:
+                    retry += 1
+        else:
+            asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
+
+        userwifi_netidx = await self.find_network_and_assert(networks, ssid)
+        if userwifi_netidx is not None:
+            logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
