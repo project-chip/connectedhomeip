@@ -23,12 +23,20 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavutil/channel_layout.h>
 #include <libavformat/avformat.h>
 #include <libavutil/avutil.h>
 #include <libavutil/error.h>
 #include <libavutil/opt.h>
 #include <libavutil/timestamp.h>
 }
+
+#include <libavcodec/version.h>
+#include <libavutil/version.h>
+
+#ifndef LIBAVCODEC_VERSION_INT
+#error "no version_int"
+#endif
 
 #define IS_H264_FRAME_NALU_HEAD(frame)                                                                                             \
     (((frame)[0] == 0x00) && ((frame)[1] == 0x00) && (((frame)[2] == 0x01) || (((frame)[2] == 0x00) && ((frame)[3] == 0x01))))
@@ -391,11 +399,29 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
             Stop();
             return -1;
         }
+
+
         mAudioEncoderContext->sample_rate = mAudioInfo.mSampleRate;
-        av_channel_layout_default(&mAudioEncoderContext->ch_layout, mAudioInfo.mChannels);
-        mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
-        mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
-        mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
+
+        #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(59, 37, 100)
+
+            ChipLogProgress(Camera, "Version < 5.1");
+            mAudioEncoderContext->channels       = mAudioInfo.mChannels;
+            mAudioEncoderContext->channel_layout = static_cast<uint64_t>(av_get_default_channel_layout(mAudioEncoderContext->channels));
+            mAudioEncoderContext->bit_rate       = mAudioInfo.mBitRate;
+            mAudioEncoderContext->sample_fmt     = audioCodec->sample_fmts[0];
+            mAudioEncoderContext->time_base      = (AVRational){ 1, mAudioInfo.mSampleRate };
+
+        #else
+
+            ChipLogError(Camera, "Version >= 5.1");
+            av_channel_layout_default(&mAudioEncoderContext->ch_layout, mAudioInfo.mChannels);
+            mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
+            mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
+            mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
+
+        #endif
+
         mAudioEncoderContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
         AVDictionary * opts                         = NULL;
         av_dict_set(&opts, "strict", "experimental", 0);
