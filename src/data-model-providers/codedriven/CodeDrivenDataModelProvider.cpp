@@ -23,8 +23,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-
-
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
@@ -72,7 +70,7 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::ReadAttribute(const D
                                                                          AttributeValueEncoder & encoder)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(request.path);
-    VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
     return serverCluster->ReadAttribute(request, encoder);
 }
 
@@ -80,7 +78,7 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const 
                                                                           AttributeValueDecoder & decoder)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(request.path);
-    VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
     return serverCluster->WriteAttribute(request, decoder);
 }
 
@@ -97,7 +95,7 @@ std::optional<DataModel::ActionReturnStatus> CodeDrivenDataModelProvider::Invoke
                                                                                         CommandHandler * handler)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(request.path);
-    VerifyOrReturnError(serverCluster != nullptr, Status::Failure);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
     return serverCluster->InvokeCommand(request, input_arguments, handler);
 }
 
