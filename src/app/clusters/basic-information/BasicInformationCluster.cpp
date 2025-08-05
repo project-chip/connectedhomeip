@@ -327,6 +327,8 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
         return encoder.Encode<uint16_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
     case ConfigurationVersion::Id:
         return ReadConfigurationVersion(configManager, encoder);
+    case Reachable::Id:
+        return encoder.Encode<bool>(true);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
