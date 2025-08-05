@@ -67,9 +67,7 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
     }
 
     {
-        // No attributes enabled
-        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
-        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
 
         TimeFormatLocalizationLogic onlyMandatory(features);
 
@@ -109,8 +107,7 @@ TEST_F(TestTimeFormatLocalizationCluster, ListCalendarTest)
     Access::SubjectDescriptor descriptor;
     AttributeValueEncoder encoder(builder, descriptor, path, version);
 
-    BitFlags<TimeFormatLocalization::Feature> features{ 0 };
-    features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+    BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
 
     // Save old provider
     DeviceLayer::DeviceInfoProvider * oldProvider = DeviceLayer::GetDeviceInfoProvider();
@@ -253,8 +250,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
     // Test 1: Basic functionality with features enabled
     {
         testAttrProvider.Reset();
-        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
-        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
         TimeFormatLocalizationLogic clusterSim(features);
         clusterSim.Startup(&testAttrProvider);
 
@@ -275,8 +271,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
     // Test 2: Invalid hour format value
     {
         testAttrProvider.Reset();
-        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
-        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
         TimeFormatLocalizationLogic clusterSim(features);
         clusterSim.Startup(&testAttrProvider);
 
@@ -289,8 +284,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
     // Test 3: Unsupported calendar type
     {
         testAttrProvider.Reset();
-        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
-        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
         TimeFormatLocalizationLogic clusterSim(features);
         clusterSim.Startup(&testAttrProvider);
 
@@ -314,8 +308,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
 
     // Test 5: Writing with null provider
     {
-        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
-        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
         TimeFormatLocalizationLogic clusterSim(features);
         // Use nullptr in the setter to trigger an error.
 
@@ -328,8 +321,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
     // Test 6: Provider write failure
     {
         testAttrProvider.Reset();
-        BitFlags<TimeFormatLocalization::Feature> features{ 0 };
-        features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
+        BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
         TimeFormatLocalizationLogic clusterSim(features);
         clusterSim.Startup(&testAttrProvider);
 
