@@ -52,13 +52,10 @@ TEST_F(TestSoilMeasurementCluster, AttributeTest)
         ASSERT_EQ(soilMeasurement.Attributes(attributesBuilder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
-        ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ SoilMeasurement::Attributes::SoilMoistureMeasuredValue::kMetadataEntry }),
+        ASSERT_EQ(expectedAttributes.Append(SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::kMetadataEntry),
                   CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
+        ASSERT_EQ(expectedAttributes.Append(SoilMeasurement::Attributes::SoilMoistureMeasuredValue::kMetadataEntry), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedAttributes.AppendElements(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
     }
 }
 
