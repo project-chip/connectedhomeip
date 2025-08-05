@@ -102,8 +102,6 @@ class TC_ICDM_5_1(MatterBaseTest):
         asserts.assert_true(len(services) > 0 and service_type in services,
             f"At least one operational service ('{service_type}') must present.")
 
-        # logging.info(f"..lop {services}")
-
         # Get operational node service
         service = None
         for srv in services[service_type]:
