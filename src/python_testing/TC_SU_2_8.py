@@ -96,8 +96,6 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info(f"TH2 commissioning: {resp}")
 
-        # th1_dut_node_id = self.dut_node_id
-
         valid_states = {
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
@@ -167,7 +165,20 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info(f"TH1 provider: {provider_th1}")
 
         await self.write_ota_providers(controller=controller, providers=[provider_th1], endpoint=endpoint)
-        await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)  # Is this ok?
+        # await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)  # Is this ok?
+
+        cmd = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
+            providerNodeID=1,
+            vendorID=0xFFF1,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable,
+            metadataForNode=None,
+            endpoint=endpoint
+        )
+
+        resp = await self.send_single_cmd(
+            cmd=cmd,
+            dev_ctrl=th2
+        )
 
         # TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
