@@ -231,7 +231,7 @@ shared_library("jni") {
 
   # Compatibility with 16K pages for Andropid 15+ support on 64-bit devices.
   # See https://developer.android.com/guide/practices/page-sizes
-  ldflags += [ "-z,max-page-size=16384" ]
+  ldflags += [ "-Wl,-z,max-page-size=16384" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
