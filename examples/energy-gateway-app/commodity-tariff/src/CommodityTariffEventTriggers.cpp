@@ -62,7 +62,7 @@ static const TariffDataSet & GetPreset(size_t index)
     X(CalendarPeriods)
 
 #define ATTR_ITEM(field) \
-    {!tariff_preset.field.IsNull(), { dg->Get##field##_MgmtObj().SetNewValue(tariff_preset.field), #field}}
+    {tariff_preset.field.IsNull(), { dg->Get##field##_MgmtObj().SetNewValue(tariff_preset.field), #field}}
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
@@ -84,7 +84,7 @@ void SetTestEventTrigger_TariffDataUpdated()
 
     for (const auto & item : required_tariff_items)
     {
-        if (!item.first) // isNull is true
+        if (item.first)
         {
              ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\"is not present", item.second.second);
              return;
@@ -101,7 +101,7 @@ void SetTestEventTrigger_TariffDataUpdated()
 
     for (const auto & item : optional_tariff_items)
     {
-        if (item.first)
+        if (!item.first)
         {
             if (item.second.first != CHIP_NO_ERROR)
             {

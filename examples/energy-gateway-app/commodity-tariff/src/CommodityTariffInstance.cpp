@@ -116,7 +116,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         return false;
     }
 
-    if (GetStartDate_MgmtObj().HasValue())
+    if (GetStartDate_MgmtObj().HasNewValue())
     {
         UpdCtx.TariffStartTimestamp = GetStartDate_MgmtObj().GetNewValue().Value();
     }
@@ -160,7 +160,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         }
     }
 
-    if (GetIndividualDays_MgmtObj().IsValid() && (!GetIndividualDays_MgmtObj().HasNewValue()))
+    if (GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().HasNewValue()))
     {
 
         assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
@@ -182,7 +182,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         DayEntriesData_is_available = true;
     }
 
-    if (GetCalendarPeriods_MgmtObj().IsValid() && (!GetCalendarPeriods_MgmtObj().HasNewValue()))
+    if (GetCalendarPeriods_MgmtObj().IsValid() && (GetCalendarPeriods_MgmtObj().HasNewValue()))
     {
         assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
 
