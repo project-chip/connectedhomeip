@@ -24,6 +24,11 @@ void pychip_WebRTCTransportRequestor_Init()
     WebRTCTransportRequestorManager::Instance().Init();
 }
 
+void pychip_WebRTCTransportRequestor_Shutdown()
+{
+    WebRTCTransportRequestorManager::Instance().Shutdown();
+}
+
 void pychip_WebRTCTransportRequestor_InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,
                                                    OnICECandidatesCallback onICECandidatesCallback, OnEndCallback onEndCallback)
 {
