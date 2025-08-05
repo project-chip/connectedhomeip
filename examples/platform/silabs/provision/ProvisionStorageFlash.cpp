@@ -487,28 +487,6 @@ CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & 
     return Flash::Get(Parameters::ID::kPersistentUniqueId, value, max, size);
 }
 
-CHIP_ERROR Storage::SetSoftwareVersionString(const char * value, size_t len)
-{
-    return Flash::Set(Parameters::ID::kSwVersionStr, value, len);
-}
-
-CHIP_ERROR Storage::GetSoftwareVersionString(char * value, size_t max)
-{
-    size_t size    = 0;
-    CHIP_ERROR err = Flash::Get(Parameters::ID::kSwVersionStr, value, max, size);
-
-#if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING)
-    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
-    {
-        VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
-        VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-        Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-        err = CHIP_NO_ERROR;
-    }
-#endif
-    return err;
-}
-
 //
 // CommissionableDataProvider
 //
