@@ -349,11 +349,12 @@ private:
 #define MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(zcl_type) MockAttributeId(zcl_type + 0x1000)
 #define MOCK_ATTRIBUTE_CONFIG_NULLABLE(zcl_type)                                                                                   \
     MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(zcl_type), zcl_type,                                                   \
-                        MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE)
+                        MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE)
 
 #define MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type) MockAttributeId(zcl_type + 0x2000)
 #define MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(zcl_type)                                                                               \
-    MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type), zcl_type, MATTER_ATTRIBUTE_FLAG_WRITABLE)
+    MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type), zcl_type,                                               \
+                        MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE)
 
 // clang-format off
 const MockNodeConfig gTestNodeConfig({
@@ -420,7 +421,7 @@ const MockNodeConfig gTestNodeConfig({
             MockAttributeConfig(
               kReadOnlyAttributeId,
               ZCL_INT32U_ATTRIBUTE_TYPE,
-              MATTER_ATTRIBUTE_FLAG_NULLABLE    // NOTE: explicltly NOT MATTER_ATTRIBUTE_FLAG_WRITABLE
+              MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE   // NOTE: explicitly NOT MATTER_ATTRIBUTE_FLAG_WRITABLE
             )
         }),
         MockClusterConfig(MockClusterId(4), {
@@ -568,7 +569,7 @@ const MockNodeConfig gTestNodeConfig({
 
             // Special case handling
             MockAttributeConfig(kAttributeIdReadOnly, ZCL_INT32S_ATTRIBUTE_TYPE, 0),
-            MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE),
+            MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE ),
         }),
     }),
     MockEndpointConfig(kMockEndpoint4, {

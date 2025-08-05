@@ -7562,17 +7562,17 @@ cluster ColorControl = 768 {
   readonly attribute optional int16u primary6X = 40;
   readonly attribute optional int16u primary6Y = 41;
   readonly attribute optional nullable int8u primary6Intensity = 42;
-  attribute access(write: manage) optional int16u whitePointX = 48;
-  attribute access(write: manage) optional int16u whitePointY = 49;
-  attribute access(write: manage) optional int16u colorPointRX = 50;
-  attribute access(write: manage) optional int16u colorPointRY = 51;
-  attribute access(write: manage) optional nullable int8u colorPointRIntensity = 52;
-  attribute access(write: manage) optional int16u colorPointGX = 54;
-  attribute access(write: manage) optional int16u colorPointGY = 55;
-  attribute access(write: manage) optional nullable int8u colorPointGIntensity = 56;
-  attribute access(write: manage) optional int16u colorPointBX = 58;
-  attribute access(write: manage) optional int16u colorPointBY = 59;
-  attribute access(write: manage) optional nullable int8u colorPointBIntensity = 60;
+  readonly attribute optional int16u whitePointX = 48;
+  readonly attribute optional int16u whitePointY = 49;
+  readonly attribute optional int16u colorPointRX = 50;
+  readonly attribute optional int16u colorPointRY = 51;
+  readonly attribute optional nullable int8u colorPointRIntensity = 52;
+  readonly attribute optional int16u colorPointGX = 54;
+  readonly attribute optional int16u colorPointGY = 55;
+  readonly attribute optional nullable int8u colorPointGIntensity = 56;
+  readonly attribute optional int16u colorPointBX = 58;
+  readonly attribute optional int16u colorPointBY = 59;
+  readonly attribute optional nullable int8u colorPointBIntensity = 60;
   readonly attribute optional int16u enhancedCurrentHue = 16384;
   readonly attribute EnhancedColorModeEnum enhancedColorMode = 16385;
   readonly attribute optional int8u colorLoopActive = 16386;
@@ -9035,7 +9035,7 @@ cluster MediaPlayback = 1286 {
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 cluster MediaInput = 1287 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum InputTypeEnum : enum8 {
     kInternal = 0;
@@ -9080,13 +9080,13 @@ cluster MediaInput = 1287 {
     char_string name = 1;
   }
 
-  /** Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List. */
+  /** Upon receipt, this command SHALL change the media input on the device to the input at a specific index in the Input List. */
   command SelectInput(SelectInputRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL display the active status of the input list on screen. */
+  /** Upon receipt, this command SHALL display the active status of the input list on screen. */
   command ShowInputStatus(): DefaultSuccess = 1;
-  /** Upon receipt, this SHALL hide the input list from the screen. */
+  /** Upon receipt, this command SHALL hide the input list from the screen. */
   command HideInputStatus(): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus. */
+  /** Upon receipt, this command SHALL rename the input at a specific index in the Input List. */
   command access(invoke: manage) RenameInput(RenameInputRequest): DefaultSuccess = 3;
 }
 
@@ -10289,6 +10289,12 @@ provisional cluster WebRTCTransportRequestor = 1364 {
 provisional cluster PushAvStreamTransport = 1365 {
   revision 1;
 
+  enum CMAFInterfaceEnum : enum8 {
+    kInterface1 = 0;
+    kInterface2DASH = 1;
+    kInterface2HLS = 2;
+  }
+
   enum ContainerFormatEnum : enum8 {
     kCMAF = 0 [spec_name = "CMAF"];
   }
@@ -10305,6 +10311,8 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidCombination = 6;
     kInvalidTriggerType = 7;
     kInvalidTransportStatus = 8;
+    kInvalidOptions = 9;
+    kInvalidStreamUsage = 10;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -10350,10 +10358,14 @@ provisional cluster PushAvStreamTransport = 1365 {
   }
 
   struct CMAFContainerOptionsStruct {
-    int16u chunkDuration = 0;
-    optional octet_string<16> CENCKey = 1;
-    optional boolean metadataEnabled = 2;
-    optional octet_string<16> CENCKeyID = 3;
+    CMAFInterfaceEnum CMAFInterface = 0;
+    int16u segmentDuration = 1;
+    int16u chunkDuration = 2;
+    int8u sessionGroup = 3;
+    char_string<16> trackName = 4;
+    optional octet_string<16> CENCKey = 5;
+    optional octet_string<16> CENCKeyID = 6;
+    optional boolean metadataEnabled = 7;
   }
 
   struct ContainerOptionsStruct {
@@ -10431,10 +10443,11 @@ provisional cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TriggerActivationReasonEnum activationReason = 1;
     optional TransportMotionTriggerTimeControlStruct timeControl = 2;
+    optional long_octet_string<256> userDefined = 3;
   }
 
   request struct FindTransportRequest {
-    optional nullable int16u connectionID = 0;
+    nullable int16u connectionID = 0;
   }
 
   response struct FindTransportResponse = 7 {
@@ -11345,7 +11358,7 @@ provisional cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
   readonly attribute nullable int16u maximumMeteredQuantities = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -11566,7 +11579,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute nullable int8s nullableRangeRestrictedInt8s = 16423;
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
-  attribute optional int8u writeOnlyInt8u = 16426;
+  writeonly attribute optional int8u writeOnlyInt8u = 16426;
   attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
   attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
   readonly attribute command_id generatedCommandList[] = 65528;
