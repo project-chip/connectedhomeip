@@ -21,8 +21,8 @@
  *      specific errors into CHIP errors
  */
 
-#include <platform/PlatformError.h>
 #include <lib/core/CHIPConfig.h>
+#include <platform/PlatformError.h>
 
 #include <lib/core/ErrorStr.h>
 
