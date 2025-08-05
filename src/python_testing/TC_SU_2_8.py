@@ -69,7 +69,6 @@ class TC_SU_2_8(MatterBaseTest):
         Configure ACL entries required for OTA communication.
         """
 
-        node_id = controller.nodeId
         fabric_id = controller.fabricId
 
         acl_entries = [
@@ -77,7 +76,7 @@ class TC_SU_2_8(MatterBaseTest):
                 fabricIndex=fabric_id,
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[node_id],
+                subjects=[],
                 targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
                     endpoint=endpoint,
                     cluster=Clusters.OtaSoftwareUpdateRequestor.id
@@ -87,14 +86,14 @@ class TC_SU_2_8(MatterBaseTest):
                 fabricIndex=fabric_id,
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[node_id],
+                subjects=[],
                 targets=[]
             ),
             Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
                 fabricIndex=fabric_id,
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[node_id],
+                subjects=[],
                 targets=[]
             )
         ]
@@ -205,13 +204,16 @@ class TC_SU_2_8(MatterBaseTest):
             fabricIndex=fabric_id_th2
         )
 
+        logging.info(f"Provider TH1: {provider_th1}.")
+        logging.info(f"Provider TH2: {provider_th2}.")
+
         if fabric_id_th2 == controller.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {controller.fabricId} and TH2: {fabric_id_th2}.")
 
         await self.write_ota_providers(controller=controller, providers=[provider_th1], endpoint=endpoint)
         await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)
 
-        await self.announce_provider(controller=th2, provider_node_id=2, vendor_id=vendor_id, endpoint=endpoint)
+        await self.announce_provider(controller=th2, provider_node_id=dut_node_id, vendor_id=vendor_id, endpoint=endpoint)
 
         # TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
