@@ -119,7 +119,6 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         self.step(3)
         # Wait for DNS-SD advertisement with correct CM value and discriminator
         # This will either return a valid service or assert failure
-        # TODO: get this from the cadmin support import
         service = await self.wait_for_correct_cm_value(
             expected_cm_value=2,
             expected_discriminator=params.randomDiscriminator

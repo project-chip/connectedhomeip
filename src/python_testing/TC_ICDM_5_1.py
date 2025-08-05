@@ -98,7 +98,7 @@ class TC_ICDM_5_1(MatterBaseTest):
         dut_instance_name = self.get_dut_instance_name()
         service_name = f"{dut_instance_name}.{service_type}"
 
-        # Verify at least one service is present and is of operational type
+        # Verify at least one service is present
         asserts.assert_true(len(services) > 0,
                             f"At least one operational service ('{service_type}') must present.")
 
