@@ -64,45 +64,134 @@ class TC_SU_2_8(MatterBaseTest):
         ]
         return steps
 
+    async def configure_acl_permissions(self, controller, endpoint: int):
+        """
+        Configure ACL entries required for OTA communication.
+        """
+
+        node_id = controller.nodeId
+        fabric_id = controller.fabricId
+
+        acl_entries = [
+            Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
+                fabricIndex=fabric_id,
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[node_id],
+                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                    endpoint=endpoint,
+                    cluster=Clusters.OtaSoftwareUpdateRequestor.id
+                )],
+            ),
+            Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
+                fabricIndex=fabric_id,
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[node_id],
+                targets=[]
+            ),
+            Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
+                fabricIndex=fabric_id,
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[node_id],
+                targets=[]
+            )
+        ]
+
+        acl_attr = Clusters.Objects.AccessControl.Attributes.Acl(value=acl_entries)
+        resp = await controller.WriteAttribute(self.dut_node_id, [(endpoint, acl_attr)])
+        asserts.assert_equal(resp[0].Status, Status.Success, "ACL write failed.")
+        logging.info("ACL permissions configured successfully.")
+
     async def write_ota_providers(self, controller, providers, endpoint):
+        """
+        Write DefaultOtaProviders list to DUT.
+        """
+
         resp = await controller.WriteAttribute(
             self.dut_node_id,
             [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(providers))]
         )
         asserts.assert_equal(resp[0].Status, Status.Success, "Write OTA providers failed.")
+        logging.info(f"OTA providers written: {providers}.")
+
+    async def announce_provider(self, controller, provider_node_id: int, vendor_id: int, endpoint: int):
+        """
+        Send AnnounceOTAProvider command from given controller.
+        """
+
+        cmd = Clusters.Objects.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
+            providerNodeID=provider_node_id,
+            vendorID=vendor_id,
+            announcementReason=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
+            metadataForNode=None,
+            endpoint=endpoint
+        )
+
+        resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
+        logging.info(f"AnnounceOTAProvider sent from node {controller.nodeId} to DUT.")
+
+    async def wait_for_valid_update_state(self, endpoint: int, valid_states: set):
+        """
+        Poll UpdateState until it enters a valid one.
+        """
+
+        max_wait = 30
+        interval = 5
+        elapsed = 0
+
+        while elapsed < max_wait:
+            state = await self.read_single_attribute_check_success(
+                node_id=self.dut_node_id,
+                endpoint=endpoint,
+                attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+                cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
+            )
+
+            logging.info(f"[{elapsed}s] UpdateState = {state.name}.")
+
+            if state in valid_states:
+                return state
+
+            time.sleep(interval)
+            elapsed += interval
+
+        raise AssertionError(f"DUT did not reach expected OTA state. Final state: {state.name}.")
 
     @async_test_body
     async def test_TC_SU_2_8(self):
 
+        # Commissioning TH1 (CLI) and TH2 (python test)
+        self.step(0)
+
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
-        controller = self.default_controller
+        controller = self.default_controller  # TH1
         fabric_id_th2 = controller.fabricId + 1
+        vendor_id = 0xFFF1  # from CLI
 
+        logging.info(f"Setting up TH2.")
         th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=0xFFF1, fabricId=fabric_id_th2)
+        th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id_th2)
         th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
+        logging.info(f"Openning commissioning window on DUT.")
         params = await self.open_commissioning_window(controller, dut_node_id)
-        setup_pin_code = params.commissioningParameters.setupPinCode
-        long_discriminator = params.randomDiscriminator
 
         resp = await th2.CommissionOnNetwork(
             nodeId=self.dut_node_id,
-            setupPinCode=setup_pin_code,
+            setupPinCode=params.commissioningParameters.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=long_discriminator
+            filter=params.randomDiscriminator
         )
 
-        logging.info(f"TH2 commissioning: {resp}")
+        logging.info(f"TH2 commissioned: {resp}.")
 
-        valid_states = {
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnUserConsent
-        }
+        await self.configure_acl_permissions(controller, endpoint)
+
+        # DUT sends a QueryImage command to TH1/OTA-P.
+        self.step(1)
 
         provider_th1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
             providerNodeID=1,
@@ -119,93 +208,23 @@ class TC_SU_2_8(MatterBaseTest):
         if fabric_id_th2 == controller.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {controller.fabricId} and TH2: {fabric_id_th2}.")
 
-        logging.info(f"Write ACL")
-
-        acl_admin = Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=controller.fabricId,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],  # Is this ok?
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=endpoint, cluster=Clusters.OtaSoftwareUpdateRequestor.id
-            )]
-        )
-
-        acl_view = Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=controller.fabricId,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],
-            targets=[]
-        )
-
-        acl_operate = Clusters.Objects.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=controller.fabricId,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[],
-            targets=[]
-        )
-
-        acl_attr = Clusters.Objects.AccessControl.Attributes.Acl(value=[acl_admin, acl_view, acl_operate])
-
-        resp = await controller.WriteAttribute(
-            self.dut_node_id,  # Is this ok?
-            [(endpoint, acl_attr)]
-        )
-
-        asserts.assert_equal(resp[0].Status, Status.Success, "ACL write failed")
-
-        # Commissioning
-        self.step(0)
-
-        # DUT sends a QueryImage command to TH1/OTA-P.
-        self.step(1)
-
-        logging.info(f"TH1 provider: {provider_th1}")
-
         await self.write_ota_providers(controller=controller, providers=[provider_th1], endpoint=endpoint)
-        # await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)  # Is this ok?
+        await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)
 
-        cmd = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=1,
-            vendorID=0xFFF1,
-            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable,
-            metadataForNode=None,
-            endpoint=endpoint
-        )
-
-        resp = await self.send_single_cmd(
-            cmd=cmd,
-            dev_ctrl=th2
-        )
+        await self.announce_provider(controller=th2, provider_node_id=2, vendor_id=vendor_id, endpoint=endpoint)
 
         # TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
 
-        max_wait = 30
-        interval = 5
-        elapsed = 0
+        valid_states = {
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnUserConsent
+        }
 
-        update_state = None
-        while elapsed < max_wait:
-            update_state = await self.read_single_attribute_check_success(
-                node_id=dut_node_id,
-                endpoint=endpoint,
-                attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
-                cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
-            )
-
-            logging.info(f"UpdateState after {elapsed}s: {update_state.name}")
-
-            if update_state in valid_states:
-                break
-
-            time.sleep(interval)
-            elapsed += interval
-
-        asserts.assert_true(update_state in valid_states,
-                            f"DUT did not reach {valid_states} state after fallback to TH2. The state is {update_state}.")
+        await self.wait_for_valid_update_state(endpoint, valid_states)
 
 
 if __name__ == "__main__":
