@@ -229,7 +229,8 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
      * @param[in] id The id of the root certificate to remove.
-     * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
+     * @return Success if the certificate was removed, NotFound if the certificate could not be found for (matterEndpoint, fabric),
+     * InvalidInState if the certificate is attached/in-use
      */
     virtual Protocols::InteractionModel::Status RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
 
@@ -324,7 +325,8 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
      * @param[in] id The id of the client certificate to remove.
-     * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
+     * @return Success if the certificate was removed, NotFound if the certificate could not be found for (matterEndpoint, fabric),
+     * InvalidInState if the certificate is attached/in-use
      */
     virtual Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric,
                                                                  Tls::TLSCAID id) = 0;

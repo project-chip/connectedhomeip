@@ -127,7 +127,7 @@ public:
      * @param[in] fabric The fabric the certificate is associated with
      * @param[out] store A buffer to load the entry into as needed
      * @param[in] iterateFn lambda to execute for the iterator.  If this function returns an error result,
-     * that error is proxied as the result of this method.
+     * iteration stops and the error is returned from this method.
      */
     virtual CHIP_ERROR IterateRootCertificates(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn) = 0;
     virtual CHIP_ERROR RemoveRootCertificate(FabricIndex fabric, TLSCAID id)                                                  = 0;
@@ -173,7 +173,7 @@ public:
      * @param[in] fabric The fabric the certificate is associated with
      * @param[out] store A buffer to load the entry into as needed
      * @param[in] iterateFn lambda to execute for the iterator.  If this function returns an error result,
-     * that error is proxied as the result of this method.
+     * iteration stops, and the error result is returned from this method.
      */
     virtual CHIP_ERROR IterateClientCertificates(FabricIndex fabric, BufferedClientCert & store,
                                                  IterateClientCertFnType iterateFn)      = 0;

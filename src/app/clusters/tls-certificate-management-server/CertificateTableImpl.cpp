@@ -298,14 +298,14 @@ private:
         uint16_t outOfIdCheck = nextId;
         do
         {
-            if (nextId == maxId)
-            {
-                nextId = 0;
-            }
             if (nextId == outOfIdCheck)
             {
                 VerifyOrReturnError(!looped, CHIP_ERROR_ENDPOINT_POOL_FULL);
                 looped = true;
+            }
+            if (nextId == maxId)
+            {
+                nextId = 0;
             }
             taken = false;
             for (size_t i = 0; i < count; i++)
