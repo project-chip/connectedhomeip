@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "time-format-localization-cluster.h"
+#include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
 #include <tracing/macros.h>
 
