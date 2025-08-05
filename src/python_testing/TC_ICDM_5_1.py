@@ -89,7 +89,7 @@ class TC_ICDM_5_1(MatterBaseTest):
         return instance_name
 
     async def _get_icd_txt_record(self) -> OperatingModeEnum:
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
+        discovery = mdns_discovery.MdnsDiscovery()
         services = await discovery.get_operational_services(
             log_output=True, discovery_timeout_sec=240)
 

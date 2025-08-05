@@ -83,7 +83,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
             return cm_match and d_match
 
     async def get_all_txt_records(self):
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
+        discovery = mdns_discovery.MdnsDiscovery()
 
         await discovery.discover(
             discovery_timeout_sec=240,

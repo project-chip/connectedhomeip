@@ -42,7 +42,7 @@ DNS_TYPE_MAP = {_TYPE_SRV: "SRV", _TYPE_TXT: "TXT", _TYPE_A: "A", _TYPE_AAAA: "A
 
 class MdnsDiscovery:
 
-    def __init__(self, verbose_logging: bool = False):
+    def __init__(self):
         """
         A class for performing asynchronous mDNS service discovery using Zeroconf.
 
