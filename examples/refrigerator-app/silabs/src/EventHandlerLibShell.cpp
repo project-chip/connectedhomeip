@@ -88,6 +88,29 @@ CHIP_ERROR AlarmHelpHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR EventRefrigeratorAlarmCommandHandler(int argc, char ** argv)
+{
+    sShellRefrigeratorEventAlarmDoorSubCommands.ExecCommand(argc, argv);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RefrigeratorAlarmSuppressHandler(int argc, char ** argv)
+{
+    if (argc != 0)
+    {
+        ChipLogError(Shell, "Incorrect arguments");
+        return AlarmHelpHandler(argc, argv);
+    }
+
+    RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
+    data->eventId                     = RefrigeratorAlarm::Events::Notify::Fields::kMask;
+    data->doorState                   = static_cast<AlarmBitmap>(0);
+
+    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 {
 
@@ -112,7 +135,7 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
     int value = std::stoi(argv[0]); // Safe to use now, as we validated the input earlier
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
-    data->eventId                     = RefrigeratorAlarm::Events::Notify::Id;
+    data->eventId                     = RefrigeratorAlarm::Events::Notify::Fields::kState;
     data->doorState                   = static_cast<AlarmBitmap>(value);
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
@@ -129,7 +152,8 @@ CHIP_ERROR RegisterRefrigeratorEvents()
 {
     static const shell_command_t sRefrigeratorSubCommands[] = {
         { &RefrigeratorHelpHandler, "help", "Usage: refrigeratoralarm <subcommand>" },
-        { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" }
+        { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" },
+        { &EventRefrigeratorAlarmCommandHandler, "alarm", "Usage: refrigeratoralarm alarm <subcommand>" }
     };
 
     static const shell_command_t sRefrigeratorEventSubCommands[] = {
@@ -138,7 +162,8 @@ CHIP_ERROR RegisterRefrigeratorEvents()
     };
 
     static const shell_command_t sRefrigeratorEventAlarmDoorSubCommands[] = {
-        { &AlarmHelpHandler, "help", "Usage : Refrigerator event to change door state" }
+        { &AlarmHelpHandler, "help", "Usage : refrigeratoralarm alarm <subcommand>" },
+        { &RefrigeratorAlarmSuppressHandler, "suppress", "Suppress the refrigerator alarm" }
     };
 
     static const shell_command_t sRefrigeratorCommand = { &RefrigeratorCommandHandler, "refrigeratoralarm",
@@ -162,7 +187,13 @@ void EventWorkerFunction(intptr_t context)
 
     switch (data->eventId)
     {
-    case RefrigeratorAlarm::Events::Notify::Id: {
+    case RefrigeratorAlarm::Events::Notify::Fields::kMask : {
+        RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
+        RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, alarmData->doorState);
+        break;
+    }
+
+    case RefrigeratorAlarm::Events::Notify::Fields::kState : {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
         RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, alarmData->doorState);
         break;
