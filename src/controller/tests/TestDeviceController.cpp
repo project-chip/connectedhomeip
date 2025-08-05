@@ -117,7 +117,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
     chip::SimpleSessionResumptionStorage sessionStorage;
     FabricTableHolder fHolder;
     chip::TestPersistentStorageDelegate sStorageDelegate;
-    
+
     Credentials::GroupDataProviderImpl sProvider(5, 8);
     sessionStorage.Init(&storage);
 
@@ -193,7 +193,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         EXPECT_FALSE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().GetSystemState()->IsShutDown());
-        
+
         // Reinit system state
         EXPECT_EQ(DeviceControllerFactory::GetInstance().EnsureAndRetainSystemState(), CHIP_NO_ERROR);
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
