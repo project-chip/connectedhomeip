@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "default-media-controller.h"
+#include "pushav-prerollbuffer.h"
 #include <algorithm>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -23,40 +24,63 @@ void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t v
 {
     ChipLogProgress(Camera, "Registering transport: videoStreamID=%u, audioStreamID=%u", videoStreamID, audioStreamID);
 
-    std::lock_guard<std::mutex> lock(mConnectionsMutex);
-    mConnections.push_back({ transport, videoStreamID, audioStreamID });
+    std::lock_guard<std::mutex> lock(connectionsMutex);
+    connections.push_back({ transport, videoStreamID, audioStreamID });
 
-    ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) mConnections.size());
+    auto * bufferSink                      = new BufferSink();
+    bufferSink->transport                  = transport;
+    bufferSink->requestedPreBufferLengthMs = 0;    // by default give only live stream
+    bufferSink->minKeyframeIntervalMs      = 1000; // TODO:get values from camera-device
+
+    std::unordered_set<std::string> streamKeys;
+    streamKeys.insert("a" + std::to_string(audioStreamID));
+    streamKeys.insert("v" + std::to_string(videoStreamID));
+
+    preRollBuffer.RegisterTransportToBuffer(bufferSink, streamKeys);
+    sinkMap[transport] = bufferSink;
+    ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) connections.size());
 }
 
 void DefaultMediaController::UnregisterTransport(Transport * transport)
 {
-    std::lock_guard<std::mutex> lock(mConnectionsMutex);
-    mConnections.erase(std::remove_if(mConnections.begin(), mConnections.end(),
-                                      [transport](const Connection & c) { return c.transport == transport; }),
-                       mConnections.end());
+    std::lock_guard<std::mutex> lock(connectionsMutex);
+    connections.erase(std::remove_if(connections.begin(), connections.end(),
+                                     [transport](const Connection & c) { return c.transport == transport; }),
+                      connections.end());
+    auto it = sinkMap.find(transport);
+    if (it != sinkMap.end())
+    {
+        preRollBuffer.DeregisterTransportFromBuffer(it->second);
+        delete it->second;
+        sinkMap.erase(it);
+        ChipLogProgress(Camera, "Sink deregistered for transport.");
+    }
 }
 
 void DefaultMediaController::DistributeVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-    std::lock_guard<std::mutex> lock(mConnectionsMutex);
-    for (const Connection & connection : mConnections)
-    {
-        if (connection.videoStreamID == videoStreamID && connection.transport && connection.transport->CanSendVideo())
-        {
-            connection.transport->SendVideo(data, size, videoStreamID);
-        }
-    }
+
+    std::string streamKey = "v" + std::to_string(videoStreamID);
+    preRollBuffer.PushFrameToBuffer(streamKey, data, size);
 }
 
 void DefaultMediaController::DistributeAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
-    std::lock_guard<std::mutex> lock(mConnectionsMutex);
-    for (const Connection & connection : mConnections)
+    std::string streamKey = "a" + std::to_string(audioStreamID);
+    preRollBuffer.PushFrameToBuffer(streamKey, data, size);
+}
+
+void DefaultMediaController::SetPreRollLength(Transport * transport, uint16_t preRollBufferLength)
+
+{
+    auto it = sinkMap.find(transport);
+    if (it != sinkMap.end() && it->second != nullptr)
     {
-        if (connection.audioStreamID == audioStreamID && connection.transport && connection.transport->CanSendAudio())
-        {
-            connection.transport->SendAudio(data, size, audioStreamID);
-        }
+        it->second->requestedPreBufferLengthMs = preRollBufferLength;
+        ChipLogProgress(Camera, "Delay updated for transport to %u ms", preRollBufferLength);
+    }
+    else
+    {
+        ChipLogError(Camera, "SetDelay: Transport not registered");
     }
 }
