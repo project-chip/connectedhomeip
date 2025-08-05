@@ -43,3 +43,19 @@ source_set("instance-header") {
   # generally being unit tests or data_model.gni/data_model.cmake files)
   sources = [ "Instance.h" ]
 }
+
+source_set("headers") {
+  sources = [ "CodegenDataModelProvider.h" ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:command-handler-interface",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/server-cluster:registry",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
+}
