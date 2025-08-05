@@ -20,6 +20,7 @@
 #include <app/EventLogging.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 
 using namespace chip::app::Clusters::TimeFormatLocalization;
 using namespace chip::app::Clusters::TimeFormatLocalization::Attributes;
@@ -29,7 +30,9 @@ namespace app {
 namespace Clusters {
 
 namespace {
-
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    HourFormat::kMetadataEntry,
+};
 class AutoReleaseIterator
 {
 public:
@@ -223,21 +226,14 @@ TimeFormatLocalization::HourFormatEnum TimeFormatLocalizationLogic::GetHourForma
 
 CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) const
 {
-    // Ensure capacity just in case
-    ReturnErrorOnFailure(
-        builder.EnsureAppendCapacity(kMaxExpectedAttributeCount + DefaultServerCluster::GlobalAttributes().size()));
-    // Mandatory attributes
-    ReturnErrorOnFailure(builder.Append(HourFormat::kMetadataEntry));
+    AttributeListBuilder listBuilder(builder);
 
-    // These attributes depend on the Feature CalendarFormat (CALFMT)
-    if (mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
-    {
-        ReturnErrorOnFailure(builder.Append(ActiveCalendarType::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(SupportedCalendarTypes::kMetadataEntry));
-    }
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+        {mFeatures.Has(Feature::kCalendarFormat), ActiveCalendarType::kMetadataEntry},
+        {mFeatures.Has(Feature::kCalendarFormat), SupportedCalendarTypes::kMetadataEntry}
+    };
 
-    // Finally, the global attributes
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
 }
 
 BitFlags<TimeFormatLocalization::Feature> TimeFormatLocalizationLogic::GetFeatureMap() const

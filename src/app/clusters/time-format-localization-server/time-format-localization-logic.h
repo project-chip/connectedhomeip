@@ -64,10 +64,10 @@ private:
     void InitializeCalendarType();
     void InitializeHourFormat();
 
+    AttributePersistenceProvider * mAttrProvider;
     BitFlags<TimeFormatLocalization::Feature> mFeatures;
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
-    AttributePersistenceProvider * mAttrProvider;
 };
 
 } // namespace Clusters
