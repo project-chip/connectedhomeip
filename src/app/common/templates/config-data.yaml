@@ -80,7 +80,6 @@ ClustersWithInitFunctions:
     - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
-    - Time Format Localization
     - Thermostat
     - Mode Select
     - Sample MEI
@@ -109,7 +108,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Door Lock
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
-    - Time Format Localization
     - Localization Configuration
     - Mode Select
     - Fan Control

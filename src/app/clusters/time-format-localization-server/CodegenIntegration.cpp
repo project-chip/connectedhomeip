@@ -35,8 +35,6 @@ LazyRegisteredServerCluster<TimeFormatLocalizationCluster> gServer;
 
 }
 
-void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint) {}
-
 void emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // This cluster should only exist in Root endpoint.
@@ -73,13 +71,6 @@ void emberAfTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
     }
 
     gServer.Destroy();
-}
-
-Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
-    const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
-{
-
-    return Protocols::InteractionModel::Status::Success;
 }
 
 void MatterTimeFormatLocalizationPluginServerInitCallback() {}
