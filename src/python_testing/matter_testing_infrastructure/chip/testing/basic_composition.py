@@ -185,7 +185,7 @@ class BasicCompositionTests:
 
         if self.test_from_file:
             cache = JsonToMatterTlv(self.test_from_file)
-            self.endpoints = cache.attributeCache
+            self.endpoints = cache.GetUpdatedAttributeCache()
             self.endpoints_tlv = cache.attributeTLVCache
             log_test_start()
             return
@@ -226,9 +226,7 @@ class BasicCompositionTests:
 
         self.dump_wildcard(dump_device_composition_path)
 
-        logging.info("###########################################################")
-        logging.info("Start of actual tests")
-        logging.info("###########################################################")
+        log_test_start()
 
         arl_data = arls_populated(self.endpoints_tlv)
         asserts.assert_false(

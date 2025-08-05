@@ -3143,5 +3143,5 @@ class TLVJsonConverter():
                         # no data, this is a value decode error
                         tlvData = ValueDecodeFailure()
                     cache.UpdateTLV(path=path, dataVersion=0, data=tlvData)
-                    cache.UpdateCachedData(set([path]))
+                    cache.GetUpdatedAttributeCache()
         return cache
