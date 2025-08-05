@@ -51,10 +51,10 @@ class MdnsDiscovery:
         commissionable, operational, and border router services.
 
         Key Methods:
-            - `get_commissioner_service()`: Discover Matter commissioner services.
-            - `get_commissionable_service()`: Discover Matter commissionable devices.
-            - `get_operational_service()`: Discover operational Matter nodes.
-            - `get_border_router_service()`: Discover Thread border routers.
+            - `get_commissioner_services()`: Discover Matter commissioner services.
+            - `get_commissionable_services()`: Discover Matter commissionable devices.
+            - `get_operational_services()`: Discover operational Matter nodes.
+            - `get_border_router_services()`: Discover Thread border routers.
             - `get_all_services()`: Get service info from all available discovered services.
             - `get_all_service_types()`: Discover all available service types.
             - `get_ptr_records()`: Discover PTR records for given service types.
@@ -523,34 +523,6 @@ class MdnsDiscovery:
                 self._log_output()
 
     # Private methods
-    async def _get_service(self, service_type: str,
-                           log_output: bool,
-                           discovery_timeout_sec: float,
-                           query_service: bool = True
-                           ) -> Optional[MdnsServiceInfo]:
-        """
-        Asynchronously discovers a specific type of mDNS service within the network and returns its details.
-
-        Args:
-            service_type (str): Represents the type of mDNS service to discover.
-            log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 30 seconds.
-            query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
-
-        Returns:
-            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
-                                    any. Returns None if no service of the specified type is discovered within
-                                    the timeout period.
-        """
-        await self.discover(
-            discovery_timeout_sec=discovery_timeout_sec,
-            log_output=log_output,
-            service_types=[service_type],
-            query_service=query_service,
-        )
-
-
-
     def _on_service_state_change(
         self,
         zeroconf: Zeroconf,
