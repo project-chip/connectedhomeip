@@ -230,7 +230,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
     ReturnErrorOnFailure(mEndpointInterfaceRegistry.Register(registration));
 
     // Update the next available endpoint ID
-    mNextAvailableEndpointId = registration.endpointEntry.id + 1;
+    mNextAvailableEndpointId = std::max(mNextAvailableEndpointId, static_cast<EndpointId>(registration.endpointEntry.id + 1));
 
     return CHIP_NO_ERROR;
 }
