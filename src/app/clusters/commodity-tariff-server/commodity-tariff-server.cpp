@@ -269,16 +269,6 @@ void Instance::ResetCurrentAttributes()
     mNextTariffComponents_MgmtObj.Cleanup();
 }
 
-static uint32_t GetCurrentTimestamp()
-{
-    System::Clock::Microseconds64 utcTimeUnix;
-    uint64_t chipEpochTime;
-    System::SystemClock().GetClock_RealTime(utcTimeUnix);
-    UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
-
-    return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
-}
-
 void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aUpdatedAttrIds)
 {
     for (const auto & attr_id : aUpdatedAttrIds)
@@ -288,54 +278,11 @@ void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aU
 
     if (is_erased)
     {
-        UpdateCurrentAttrs(UpdateEventCode::TariffErased);
+        DeinitCurrentAttrs();
         return;
     }
 
-    UpdateCurrentAttrs(UpdateEventCode::TariffUpdated);
-}
-
-void Instance::ScheduleTariffActivation(uint32_t delay)
-{
-    DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(delay * 1000),
-        [](System::Layer *, void * context) {
-            static_cast<Instance *>(context)->UpdateCurrentAttrs(UpdateEventCode::TariffUpdated);
-        },
-        this);
-}
-
-void Instance::ScheduleMidnightUpdate()
-{
-    uint32_t now                  = GetCurrentTimestamp();
-    uint32_t secondsSinceMidnight = static_cast<uint32_t>(now % kSecondsPerDay);
-    uint32_t delay                = (secondsSinceMidnight == 0) ? static_cast<uint32_t>(kSecondsPerDay)
-                                                                : static_cast<uint32_t>(kSecondsPerDay - secondsSinceMidnight);
-
-    DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(delay * 1000),
-        [](System::Layer *, void * context) {
-            static_cast<Instance *>(context)->UpdateCurrentAttrs(UpdateEventCode::DaysUpdating);
-        },
-        this);
-}
-
-void Instance::ScheduleDayEntryUpdate(uint16_t minutesSinceMidnight)
-{
-    uint32_t now                  = GetCurrentTimestamp();
-    uint32_t secondsSinceMidnight = now % kSecondsPerDay;
-    uint32_t triggerOffset        = minutesSinceMidnight * 60;
-
-    // Calculate delay considering next day if needed
-    uint32_t delay = (triggerOffset > secondsSinceMidnight) ? triggerOffset - secondsSinceMidnight
-                                                            : kSecondsPerDay - secondsSinceMidnight + triggerOffset;
-
-    DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(delay * 1000),
-        [](System::Layer *, void * context) {
-            static_cast<Instance *>(context)->UpdateCurrentAttrs(UpdateEventCode::DayEntryUpdating);
-        },
-        this);
+    InitCurrentAttrs();
 }
 
 namespace Utils {
@@ -560,18 +507,14 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     if (err == CHIP_NO_ERROR)
     {
         err = mgmtObj.SetNewValue(MakeNullable(tempList));
+
         if (err == CHIP_NO_ERROR)
         {
-            if ((err = mgmtObj.UpdateBegin(nullptr)) == CHIP_NO_ERROR)
+            err = mgmtObj.UpdateBegin(nullptr);
+
+            if (mgmtObj.UpdateFinish()) // Success path
             {
-                if (mgmtObj.UpdateCommit()) // Success path
-                {
-                    aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
-                }
-            }
-            else
-            {
-                mgmtObj.UpdateFinish(); // Clean up on validation failure
+                aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
             }
         }
     }
@@ -611,55 +554,33 @@ static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
     aCtx.mTariffProvider = nullptr;
 }
 
-void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
+void Instance::InitCurrentAttrs()
 {
-    uint32_t timestampNow = GetCurrentTimestamp();
+    AttrsCtxInit(mDelegate, mServerTariffAttrsCtx);
+    UpdateCurrentAttrs();
+}
 
-    ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", static_cast<std::underlying_type_t<UpdateEventCode>>(aEvt));
+void Instance::UpdateCurrentAttrs()
+{
+    uint32_t now = GetCurrentTimestamp();
+    bool daysUpdIsNeeded = false;
+    bool dayEntriesUpdIsNeeded = false;
 
-    // Only for test purposes
-    if (mServerTariffAttrsCtx.mForwardAlarmTriggerTime)
+    if (!now)
     {
-        timestampNow                                   = mServerTariffAttrsCtx.mForwardAlarmTriggerTime;
-        mServerTariffAttrsCtx.mForwardAlarmTriggerTime = 0;
-    }
-
-    if (mServerTariffAttrsCtx.mTariffProvider == nullptr && aEvt != UpdateEventCode::TariffUpdated)
-    {
+        ChipLogError(NotSpecified, "The timestamp value cant be zero!");
         return;
     }
 
-    switch (aEvt)
-    {
-    case UpdateEventCode::TariffErased: {
-        [[fallthrough]];
-    }
-    case UpdateEventCode::TariffUpdated: {
-        // Handle tariff structure updates
-        // This would be triggered when primary attributes change
-        // Reset all current attributes to null
-        AttrsCtxDeinit(mServerTariffAttrsCtx);
-        ResetCurrentAttributes();
+    const uint32_t secondsSinceMidnight = now % kSecondsPerDay;
+    daysUpdIsNeeded = (secondsSinceMidnight < kSecondsPerMinute) ? true : false;
 
-        if (aEvt == UpdateEventCode::TariffErased)
-        {
-            return;
-        }
-
-        if (mDelegate.GetStartDate().Value() > timestampNow)
-        {
-            ScheduleTariffActivation(mDelegate.GetStartDate().Value() - timestampNow);
-            return;
-        }
-        AttrsCtxInit(mDelegate, mServerTariffAttrsCtx);
-        // Fall through to days updating
-        [[fallthrough]];
-    }
-    case UpdateEventCode::DaysUpdating: {
+    if (daysUpdIsNeeded)
+    { 
         DataModel::Nullable<Structs::DayStruct::Type> Day;
         if (mCurrentDay.IsNull())
         {
-            Day.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, timestampNow));
+            Day.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now));
             // Find current day
             if (Utils::DayIsValid(&Day.Value()))
             {
@@ -679,18 +600,16 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
             return;
         }
 
-        Day = Utils::FindDay(mServerTariffAttrsCtx, timestampNow + kSecondsPerDay);
+        Day = Utils::FindDay(mServerTariffAttrsCtx, now + kSecondsPerDay);
         if (Utils::DayIsValid(&Day.Value()))
         {
             SetNextDay(Day);
         }
-
-        ScheduleMidnightUpdate();
-        // Fall through to DayEntries updating
-        [[fallthrough]];
     }
-    case UpdateEventCode::DayEntryUpdating: {
-        uint16_t minutesSinceMidnight = static_cast<uint16_t>((timestampNow % kSecondsPerDay) / 60);
+
+    if (dayEntriesUpdIsNeeded)
+    {
+        uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);
         uint16_t nextUpdInterval      = 0;
         auto & mCurrentDayEntryIDs    = mCurrentDay.Value().dayEntryIDs;
         DataModel::Nullable<Structs::DayEntryStruct::Type> tmpDayEntry;
@@ -745,10 +664,14 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
                 tmpDate.SetNonNull(mCurrentDay.Value().date);
             }
             SetNextDayEntryDate(tmpDate);
-            ScheduleDayEntryUpdate(nextUpdInterval);
         }
     }
-    }
+}
+
+void Instance::DeinitCurrentAttrs()
+{
+    AttrsCtxDeinit(mServerTariffAttrsCtx);
+    ResetCurrentAttributes();
 }
 
 void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData)
@@ -816,21 +739,6 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
-/**
- * @brief Passes the specified time offset value to the context variable that is used to override the real-time stamp.
- * In depens on the time shift value may triggered DaysUpdating or DayEntryUpdating event handling.
- */
-void Instance::SetupTimeShiftOffset(uint32_t offset)
-{
-    mServerTariffAttrsCtx.mForwardAlarmTriggerTime = offset;
-
-    // Determine if this update crosses day boundary
-    const bool crossesMidnight      = (mServerTariffAttrsCtx.mForwardAlarmTriggerTime) % kSecondsPerDay == 0;
-    const UpdateEventCode eventType = crossesMidnight ? UpdateEventCode::DaysUpdating : UpdateEventCode::DayEntryUpdating;
-
-    UpdateCurrentAttrs(eventType);
 }
 
 } // namespace CommodityTariff

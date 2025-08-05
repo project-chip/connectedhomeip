@@ -181,8 +181,9 @@ struct TariffUpdateCtx
     std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs; /* IDs mentioned in CalendarPeriods items */
 
     BitMask<Feature> mFeature;
-    EndpointId mEndpoint;
-    bool mAnyHasChanged = false;
+
+    uint32_t TariffUpdateTimestamp;
+    uint32_t TariffStartTimestamp;
 };
 
 /**
@@ -219,9 +220,9 @@ public:
      * 2. Cross-field validation (TariffDataUpd_CrossValidator)
      * 3. Commit or abort (TariffDataUpd_Commit/Abort)
      */
-    void TariffDataUpdate()
+    void TariffDataUpdate(uint32_t aNowTimestamp)
     {
-        TariffUpdateCtx UpdCtx = { .mFeature = mFeature, .mEndpoint = mEndpointId };
+        TariffUpdateCtx UpdCtx = { .mFeature = mFeature, .TariffUpdateTimestamp = aNowTimestamp };
 
         if (!TariffDataUpd_Init(UpdCtx))
         {
@@ -231,32 +232,29 @@ public:
         {
             ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
         }
-        else
+        else {
+            if (UpdCtx.TariffStartTimestamp > UpdCtx.TariffUpdateTimestamp)
+            {
+                DelayedTariffUpdateIsActive = true;
+                return;
+            }
+        }
+
+        TariffDataUpd_Finish();
+    }
+
+    void TryToactivateDelayedTariff(uint32_t now)
+    {
+        if (!DelayedTariffUpdateIsActive)
         {
-            std::vector<AttributeId> UpdatedAttrIds;
-
-            TariffDataUpd_Commit(UpdatedAttrIds);
-
-            if (!UpdatedAttrIds.empty())
-            {
-                ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
-
-                if (mTariffDataUpdatedCb != nullptr)
-                {
-                    mTariffDataUpdatedCb(false, UpdatedAttrIds);
-                }
-            }
-            else
-            {
-                ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
-            }
-
-            UpdatedAttrIds.clear();
-
             return;
         }
 
-        TariffDataUpd_Abort();
+        if (now >= GetStartDate_MgmtObj().GetNewValue().Value())
+        {
+            TariffDataUpd_Finish();
+            DelayedTariffUpdateIsActive = false;
+        }
     }
 
     // Attribute accessors
@@ -294,14 +292,6 @@ private:
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
-    static void TariffDataUpd_AttrChangeCb(AttributeId aAttrId, void * CbCtx)
-    {
-        TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
-        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
-        MatterReportingAttributeChangeCallback(UpdCtx->mEndpoint, CommodityTariff::Id, aAttrId);
-        UpdCtx->mAnyHasChanged = true;
-    }
-
     // Primary attrs update pipeline methods
     bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
@@ -317,28 +307,39 @@ private:
 
     virtual bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return true; }
 
-    void TariffDataUpd_Commit(std::vector<AttributeId> & aUpdatedAttrIds)
+    void TariffDataUpd_Finish()
     {
+        std::vector<AttributeId> UpdatedAttrIds;
+
 #define X(attrName, attrType) \
-        if (m##attrName##_MgmtObj.UpdateCommit());                      \
+        if (m##attrName##_MgmtObj.UpdateFinish());                      \
         {                                                               \
-            aUpdatedAttrIds.push_back(m##attrName##_MgmtObj.GetAttrId());  \
+            UpdatedAttrIds.push_back(m##attrName##_MgmtObj.GetAttrId());  \
         }
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-    }
 
-    void TariffDataUpd_Abort()
-    {
-#define X(attrName, attrType) m##attrName##_MgmtObj.UpdateFinish();
-        COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
-#undef X
+        if (!UpdatedAttrIds.empty())
+        {
+            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+            if (mTariffDataUpdatedCb != nullptr)
+            {
+                mTariffDataUpdatedCb(false, UpdatedAttrIds);
+            }
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
+        }
+
+        UpdatedAttrIds.clear();
     }
 
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;
     std::function<void(bool, std::vector<AttributeId>&)> mTariffDataUpdatedCb;
+    bool DelayedTariffUpdateIsActive = false;
 };
 
 struct CurrentTariffAttrsCtx
@@ -394,21 +395,11 @@ public:
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, aAttrId);
     }
 
-    /**
-     * @brief Passes the specified time offset value to the context variable that is used to override the real-time stamp.
-     * In depends on the time shift value may triggered DaysUpdating or DayEntryUpdating event handling.
-     */
-    void SetupTimeShiftOffset(uint32_t offset);
-
-private:
-    enum class UpdateEventCode
+    void TariffTimeAttrsSync()
     {
-        TariffErased,
-        TariffUpdated,
-        DaysUpdating,
-        DayEntryUpdating
-    };
-
+        UpdateCurrentAttrs();
+    }
+private:
     CurrentTariffAttrsCtx mServerTariffAttrsCtx;
 
     Delegate & mDelegate;
@@ -447,10 +438,20 @@ private:
     void ResetCurrentAttributes();
 
     // Current attrs (time depended) update methods
-    void UpdateCurrentAttrs(UpdateEventCode aEvt);
-    void ScheduleTariffActivation(uint32_t delay);
-    void ScheduleMidnightUpdate();
-    void ScheduleDayEntryUpdate(uint16_t minutesSinceMidnight);
+    void InitCurrentAttrs();
+    void UpdateCurrentAttrs();
+    void DeinitCurrentAttrs();
+
+protected:
+    virtual uint32_t GetCurrentTimestamp()
+    {
+        System::Clock::Microseconds64 utcTimeUnix;
+        uint64_t chipEpochTime;
+        System::SystemClock().GetClock_RealTime(utcTimeUnix);
+        UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
+    
+        return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
+    };
 };
 
 } // namespace CommodityTariff

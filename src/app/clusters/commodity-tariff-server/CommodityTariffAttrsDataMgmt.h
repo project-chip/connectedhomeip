@@ -612,8 +612,7 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  *   kIdle -> kInitialized [label="CreateNewValue()"];
  *   kInitialized -> kAssigned [label="MarkAsAssigned()"];
  *   kAssigned -> kValidated [label="UpdateBegin()"];
- *   kValidated -> kUpdated  [label="UpdateCommit()"];
- *   kUpdated -> kIdle  [label="UpdateFinish() (mandatory)"];
+ *   kValidated ->  kIdle  [label="UpdateFinish() (mandatory)"];
  *
  *   // Early termination paths
  *   kInitialized -> kIdle [label="UpdateFinish()" style="dashed"];
@@ -627,18 +626,15 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  * 2. Modify value       // 
  * 3. MarkAsAssigned()   // kInitialized → kAssigned
  * 4. UpdateBegin()      // kAssigned → kValidated
- * 5. UpdateCommit()     // kValidated → kUpdated
- * 6. UpdateFinish()        // kUpdated → kIdle (mandatory cleanup)
+ * 6. UpdateFinish()     // kValidated →  kIdle (mandatory cleanup)
  *
  * ### Critical Notes:
- * - UpdateFinish() MUST be called after UpdateCommit()
  * - Omitting UpdateFinish() will leak resources
  * - UpdateFinish() can be called at any state for cleanup
  *
  * @see CreateNewValue()
  * @see MarkAsAssigned()
  * @see UpdateBegin()
- * @see UpdateCommit()
  * @see UpdateFinish()
  */
 template <typename T>
@@ -903,30 +899,8 @@ public:
     }
 
     /**
-     * @brief commits the validated new value if it differs from the previous one
-     * @return The return value indicates that the stored value is changed.
-     */
-    bool UpdateCommit()
-    {
-        /* Skip if the attribute object has no new attached data */
-        if (mUpdateState == UpdateState::kIdle)
-        {
-            return false;
-        }
-
-        assert(mUpdateState == UpdateState::kValidated);
-
-        if (HasChanged())
-        {
-            mUpdateState = UpdateState::kUpdated;
-        }
-
-        return UpdateFinish();
-    }
-
-    /**
      * @brief the function performs a correct completion of the value update process
-     * @return The return value indicates that the stored value is changed.
+     * @return The return value indicates that the stored value has changed.
      * @note Performs cleanup and resets to idle state
      */
     bool UpdateFinish()
@@ -938,7 +912,7 @@ public:
             return false;
         }
 
-        if (mUpdateState == UpdateState::kUpdated)
+        if ((mUpdateState == UpdateState::kValidated) && (HasChanged()))
         {
             if (HasValue())
             {
@@ -1011,7 +985,6 @@ private:
         kInitialized, // New value initialized
         kAssigned,    // New value populated
         kValidated,   // New value validated
-        kUpdated,     // New value committed
     };
 
     CHIP_ERROR ValidateNewValue() { return Validate(GetNewValueRef()); }

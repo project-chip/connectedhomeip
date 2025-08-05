@@ -166,6 +166,9 @@ CHIP_ERROR TariffUnitDataClass::Validate(const ValueType & aValue) const
 
 CHIP_ERROR StartDateDataClass::Validate(const ValueType & aValue) const
 {
+    VerifyOrReturnError((aValue.IsNull() || (static_cast<TariffUpdateCtx *>(mAuxData)->TariffUpdateTimestamp <= aValue.Value())),
+            CHIP_ERROR_INVALID_ARGUMENT);
+
     return CHIP_NO_ERROR;
 }
 
