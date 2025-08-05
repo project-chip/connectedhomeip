@@ -103,7 +103,7 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
-        self._name_filter = None
+        # self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONER.value, log_output, discovery_timeout_sec)
 
     async def get_commissionable_service(self, log_output: bool = False,
@@ -119,12 +119,10 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
-        self._name_filter = None
+        # self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONABLE.value, log_output, discovery_timeout_sec)
 
     async def get_operational_service(self,
-                                      node_id: Optional[int] = None,
-                                      compressed_fabric_id: Optional[int] = None,
                                       discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                                       log_output: bool = False
                                       ) -> Optional[MdnsServiceInfo]:
@@ -140,14 +138,15 @@ class MdnsDiscovery:
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
+        await self.discover(
+            service_type=[MdnsServiceType.OPERATIONAL.value],
+            query_service=True,
+            append_results=True,
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=log_output
+        )
 
-        # Validation to ensure that both node_id and compressed_fabric_id are provided or both are None.
-        if (node_id is None) != (compressed_fabric_id is None):
-            raise ValueError("Both node_id and compressed_fabric_id must be provided together or not at all.")
-
-        self._name_filter = f'{compressed_fabric_id:016x}-{node_id:016x}.{MdnsServiceType.OPERATIONAL.value}'.upper()
-        logger.info(f"name filter {self._name_filter}")
-        return await self._get_service(MdnsServiceType.OPERATIONAL.value, log_output, discovery_timeout_sec, self._name_filter)
+        return self._discovered_services
 
     async def get_border_router_service(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
@@ -512,7 +511,6 @@ class MdnsDiscovery:
     async def _get_service(self, service_type: str,
                            log_output: bool,
                            discovery_timeout_sec: float,
-                           service_name: str = None,
                            query_service: bool = True
                            ) -> Optional[MdnsServiceInfo]:
         """
@@ -522,7 +520,6 @@ class MdnsDiscovery:
             service_type (str): Represents the type of mDNS service to discover.
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 30 seconds.
-            service_name (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available.
             query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
 
         Returns:
@@ -537,18 +534,7 @@ class MdnsDiscovery:
             query_service=query_service,
         )
 
-        if self._verbose_logging:
-            logger.info("Getting service from discovered services: %s", self._discovered_services)
 
-        if service_type in self._discovered_services:
-            if service_name is not None:
-                for service in self._discovered_services[service_type]:
-                    if service.service_name == service_name.replace("._MATTER._TCP.LOCAL.", "._matter._tcp.local."):
-                        return service
-            else:
-                return self._discovered_services[service_type][0]
-        else:
-            return None
 
     def _on_service_state_change(
         self,
@@ -572,23 +558,17 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        if self._verbose_logging:
-            logger.info("Received service data. State change: %s on %s / %s", state_change, name, service_type)
-
+        # Exit if status isn't 'Added'
         if state_change in [ServiceStateChange.Removed, ServiceStateChange.Updated]:
             return
 
-        if self._name_filter is not None and name.upper() != self._name_filter:
-            if self._verbose_logging:
-                logger.info("   Name does NOT match \'%s\' vs \'%s\'", self._name_filter, name.upper())
-            return
+        logger.info(f"Service info added. Service name: '{name}', Service Type: '{service_type}'")
 
+        # Used by the _monitor_discovery_silence function
         self._last_discovery_time = time.time()
 
         # Gather PTR record information
         self._discovered_services.setdefault(service_type, [])
-
-        # Prevent duplicate PtrRecord entries for the same 'service_name' under a 'service_type'
         existing_names = {r.service_name for r in self._discovered_services[service_type]}
         if name not in existing_names:
             self._discovered_services[service_type].append(PtrRecord(service_type=service_type, service_name=name))

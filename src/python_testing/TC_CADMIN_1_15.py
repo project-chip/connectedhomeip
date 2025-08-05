@@ -184,6 +184,9 @@ class TC_CADMIN_1_15(MatterBaseTest):
                 compressed_fabric_id=compressed_id,
                 log_output=True
             )
+            
+            # TODO: receive the array, filter with the operational service
+            
             op_services.append(service.instance_name)
 
         asserts.assert_equal(

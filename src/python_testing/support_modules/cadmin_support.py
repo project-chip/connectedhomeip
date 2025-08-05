@@ -64,7 +64,8 @@ class CADMINBaseTest(MatterBaseTest):
             discovery_timeout_sec=240,
             log_output=False,
         )
-        return comm_service
+        # TODO: remove as it's unused
+        return comm_service[0]
 
     async def write_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
         result = await th.WriteAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
@@ -149,7 +150,9 @@ class CADMINBaseTest(MatterBaseTest):
             log_output=False,
             service_types=[MdnsServiceType.COMMISSIONABLE.value]
         )
-
+        # TODO: remove this, see below
+        
+        
         if MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
             return discovery._discovered_services[MdnsServiceType.COMMISSIONABLE.value]
         return []
@@ -158,6 +161,8 @@ class CADMINBaseTest(MatterBaseTest):
         """Wait for the correct CM value and discriminator in DNS-SD with retries."""
         for attempt in range(max_attempts):
             raw_services = await self.get_all_txt_records()
+            # TODO: swap for get comiisionable services, return array
+
             services = [self.ParsedService(service) for service in raw_services]
 
             # Look through all services for a match

@@ -90,7 +90,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
             log_output=False,
             service_types=[MdnsServiceType.COMMISSIONABLE.value]
         )
-
+        # TODO: remove this, will be replaced with mdns get comm.... sevices
         if MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
             return discovery._discovered_services[MdnsServiceType.COMMISSIONABLE.value]
         return []
@@ -100,6 +100,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
         for attempt in range(max_attempts):
             raw_services = await self.get_all_txt_records()
             services = [self.ParsedService(service) for service in raw_services]
+            
+            # TODO: remove this, will be replaced with the cadmin support version
 
             # Look through all services for a match
             for parsed_service in services:
@@ -198,6 +200,7 @@ class TC_CADMIN_1_5(MatterBaseTest):
         self.step(3)
         # Wait for DNS-SD advertisement with correct CM value and discriminator
         # This will either return a valid service or assert failure
+        # TODO: get this from the cadmin support import
         service = await self.wait_for_correct_cm_value(
             expected_cm_value=2,
             expected_discriminator=params.randomDiscriminator

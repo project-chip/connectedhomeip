@@ -82,21 +82,50 @@ class TC_ICDM_5_1(MatterBaseTest):
     async def _send_single_icdm_command(self, command):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)
 
+    def get_dut_instance_name(self, log_result: bool = False) -> str:
+        node_id = self.dut_node_id
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        return instance_name
+
     async def _get_icd_txt_record(self) -> OperatingModeEnum:
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        service = await discovery.get_operational_service(
-            node_id=self.dut_node_id,
-            compressed_fabric_id=self.default_controller.GetCompressedFabricId(),
+        services = await discovery.get_operational_services(
             log_output=True, discovery_timeout_sec=240)
 
-        asserts.assert_is_not_none(
-            service, f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
+        # Get operational service name
+        service_type = mdns_discovery.MdnsServiceType.OPERATIONAL.value
+        dut_instance_name = self.get_dut_instance_name()
+        service_name = f"{dut_instance_name}.{service_type}"
+
+        asserts.assert_greater(len(services), 0,
+            f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
+
+        if service_type in services:
+            for s in services:
+                if service_name is not None and s.service_name.upper() != service_name:
+                    logger.info("   Name does NOT match \'%s\' vs \'%s\'", service_name, s.service_name.upper())
+                        
+                if s.service_name.replace(service_type.upper(), service_type) == service_name:
+                    service = s
+
+
 
         icdTxtRecord = OperatingModeEnum(int(service.txt_record['ICD']))
         if icdTxtRecord.value != int(service.txt_record['ICD']):
             raise AttributeError(f'Not a known ICD type: {service.txt_record["ICD"]}')
 
         return icdTxtRecord
+
+        if service_type in self._discovered_services:
+             for service in self._discovered_services[service_type]:
+                if service.service_name == service_name.replace(service_type.upper(), service_type):
+                    return service
+
+
+
+
+
 
     #
     # Test Harness Helpers
