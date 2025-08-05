@@ -23,15 +23,12 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#include <iterator>
+
 
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
-
-using std::begin;
-using std::end;
 
 CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
