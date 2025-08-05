@@ -82,7 +82,7 @@ class TC_ICDM_5_1(MatterBaseTest):
     async def _send_single_icdm_command(self, command):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)
 
-    def get_dut_instance_name(self, log_result: bool = False) -> str:
+    def get_dut_instance_name(self) -> str:
         node_id = self.dut_node_id
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
