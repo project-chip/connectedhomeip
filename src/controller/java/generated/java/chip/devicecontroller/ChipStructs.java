@@ -9082,7 +9082,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
   public @Nullable Optional<Integer> position;
   public @Nullable Optional<Boolean> latch;
   public Optional<Integer> speed;
-  public @Nullable Optional<Boolean> secureState;
+  public @Nullable Boolean secureState;
   private static final long POSITION_ID = 0L;
   private static final long LATCH_ID = 1L;
   private static final long SPEED_ID = 2L;
@@ -9092,7 +9092,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
     @Nullable Optional<Integer> position,
     @Nullable Optional<Boolean> latch,
     Optional<Integer> speed,
-    @Nullable Optional<Boolean> secureState
+    @Nullable Boolean secureState
   ) {
     this.position = position;
     this.latch = latch;
@@ -9105,7 +9105,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
     values.add(new StructElement(POSITION_ID, position != null ? position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(LATCH_ID, latch != null ? latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
-    values.add(new StructElement(SECURE_STATE_ID, secureState != null ? secureState.<BaseTLVType>map((nonOptionalsecureState) -> new BooleanType(nonOptionalsecureState)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(SECURE_STATE_ID, secureState != null ? new BooleanType(secureState) : new NullType()));
 
     return new StructType(values);
   }
@@ -9117,7 +9117,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
     @Nullable Optional<Integer> position = null;
     @Nullable Optional<Boolean> latch = null;
     Optional<Integer> speed = Optional.empty();
-    @Nullable Optional<Boolean> secureState = null;
+    @Nullable Boolean secureState = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == POSITION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -9137,7 +9137,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
       } else if (element.contextTagNum() == SECURE_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          secureState = Optional.of(castingValue.value(Boolean.class));
+          secureState = castingValue.value(Boolean.class);
         }
       }
     }
@@ -15890,33 +15890,53 @@ public static class PushAvStreamTransportClusterTransportTriggerOptionsStruct {
   }
 }
 public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
+  public Integer CMAFInterface;
+  public Integer segmentDuration;
   public Integer chunkDuration;
+  public Integer sessionGroup;
+  public String trackName;
   public Optional<byte[]> CENCKey;
-  public Optional<Boolean> metadataEnabled;
   public Optional<byte[]> CENCKeyID;
-  private static final long CHUNK_DURATION_ID = 0L;
-  private static final long CENC_KEY_ID = 1L;
-  private static final long METADATA_ENABLED_ID = 2L;
-  private static final long CENC_KEY_ID_ID = 3L;
+  public Optional<Boolean> metadataEnabled;
+  private static final long CMAF_INTERFACE_ID = 0L;
+  private static final long SEGMENT_DURATION_ID = 1L;
+  private static final long CHUNK_DURATION_ID = 2L;
+  private static final long SESSION_GROUP_ID = 3L;
+  private static final long TRACK_NAME_ID = 4L;
+  private static final long CENC_KEY_ID = 5L;
+  private static final long CENC_KEY_ID_ID = 6L;
+  private static final long METADATA_ENABLED_ID = 7L;
 
   public PushAvStreamTransportClusterCMAFContainerOptionsStruct(
+    Integer CMAFInterface,
+    Integer segmentDuration,
     Integer chunkDuration,
+    Integer sessionGroup,
+    String trackName,
     Optional<byte[]> CENCKey,
-    Optional<Boolean> metadataEnabled,
-    Optional<byte[]> CENCKeyID
+    Optional<byte[]> CENCKeyID,
+    Optional<Boolean> metadataEnabled
   ) {
+    this.CMAFInterface = CMAFInterface;
+    this.segmentDuration = segmentDuration;
     this.chunkDuration = chunkDuration;
+    this.sessionGroup = sessionGroup;
+    this.trackName = trackName;
     this.CENCKey = CENCKey;
-    this.metadataEnabled = metadataEnabled;
     this.CENCKeyID = CENCKeyID;
+    this.metadataEnabled = metadataEnabled;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CMAF_INTERFACE_ID, new UIntType(CMAFInterface)));
+    values.add(new StructElement(SEGMENT_DURATION_ID, new UIntType(segmentDuration)));
     values.add(new StructElement(CHUNK_DURATION_ID, new UIntType(chunkDuration)));
+    values.add(new StructElement(SESSION_GROUP_ID, new UIntType(sessionGroup)));
+    values.add(new StructElement(TRACK_NAME_ID, new StringType(trackName)));
     values.add(new StructElement(CENC_KEY_ID, CENCKey.<BaseTLVType>map((nonOptionalCENCKey) -> new ByteArrayType(nonOptionalCENCKey)).orElse(new EmptyType())));
-    values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
     values.add(new StructElement(CENC_KEY_ID_ID, CENCKeyID.<BaseTLVType>map((nonOptionalCENCKeyID) -> new ByteArrayType(nonOptionalCENCKeyID)).orElse(new EmptyType())));
+    values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -15925,38 +15945,66 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
+    Integer CMAFInterface = null;
+    Integer segmentDuration = null;
     Integer chunkDuration = null;
+    Integer sessionGroup = null;
+    String trackName = null;
     Optional<byte[]> CENCKey = Optional.empty();
-    Optional<Boolean> metadataEnabled = Optional.empty();
     Optional<byte[]> CENCKeyID = Optional.empty();
+    Optional<Boolean> metadataEnabled = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == CHUNK_DURATION_ID) {
+      if (element.contextTagNum() == CMAF_INTERFACE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          CMAFInterface = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SEGMENT_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          segmentDuration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CHUNK_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           chunkDuration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SESSION_GROUP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionGroup = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TRACK_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          trackName = castingValue.value(String.class);
         }
       } else if (element.contextTagNum() == CENC_KEY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           CENCKey = Optional.of(castingValue.value(byte[].class));
         }
-      } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          metadataEnabled = Optional.of(castingValue.value(Boolean.class));
-        }
       } else if (element.contextTagNum() == CENC_KEY_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           CENCKeyID = Optional.of(castingValue.value(byte[].class));
         }
+      } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          metadataEnabled = Optional.of(castingValue.value(Boolean.class));
+        }
       }
     }
     return new PushAvStreamTransportClusterCMAFContainerOptionsStruct(
+      CMAFInterface,
+      segmentDuration,
       chunkDuration,
+      sessionGroup,
+      trackName,
       CENCKey,
-      metadataEnabled,
-      CENCKeyID
+      CENCKeyID,
+      metadataEnabled
     );
   }
 
@@ -15964,17 +16012,29 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n");
+    output.append("\tCMAFInterface: ");
+    output.append(CMAFInterface);
+    output.append("\n");
+    output.append("\tsegmentDuration: ");
+    output.append(segmentDuration);
+    output.append("\n");
     output.append("\tchunkDuration: ");
     output.append(chunkDuration);
+    output.append("\n");
+    output.append("\tsessionGroup: ");
+    output.append(sessionGroup);
+    output.append("\n");
+    output.append("\ttrackName: ");
+    output.append(trackName);
     output.append("\n");
     output.append("\tCENCKey: ");
     output.append(CENCKey.isPresent() ? Arrays.toString(CENCKey.get()) : "");
     output.append("\n");
-    output.append("\tmetadataEnabled: ");
-    output.append(metadataEnabled);
-    output.append("\n");
     output.append("\tCENCKeyID: ");
     output.append(CENCKeyID.isPresent() ? Arrays.toString(CENCKeyID.get()) : "");
+    output.append("\n");
+    output.append("\tmetadataEnabled: ");
+    output.append(metadataEnabled);
     output.append("\n");
     output.append("}\n");
     return output.toString();

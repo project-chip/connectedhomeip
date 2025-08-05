@@ -17,4 +17,7 @@ import("//build_overrides/chip.gni")
 declare_args() {
   # Build controller (set to false for a device)
   chip_support_commissioning_in_controller = true
+
+  # Build controller with webrtc python bindings
+  chip_support_webrtc_python_bindings = false
 }

@@ -16,6 +16,7 @@
 #include "AdministratorCommissioningCluster.h"
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AdministratorCommissioning/Commands.h>
 #include <lib/support/CodeUtils.h>
 
@@ -40,7 +41,7 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommandsWithBasicCommissionin
     AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::kMetadataEntry,
 };
 
-constexpr DataModel::AttributeEntry kAttributes[] = {
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
     AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
     AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
@@ -56,13 +57,13 @@ DataModel::ActionReturnStatus AdministratorCommissioningCluster::ReadAttribute(c
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(BitFlags<AdministratorCommissioning::Feature>{ 0 }.Raw());
+        return encoder.Encode(BitFlags<AdministratorCommissioning::Feature>{ 0 });
     case ClusterRevision::Id:
         return encoder.Encode(AdministratorCommissioning::kRevision);
     case WindowStatus::Id:
         return encoder.Encode(mLogic.GetWindowStatus());
     case AdminFabricIndex::Id:
-        return encoder.Encode(mLogic.GetOpenerFabricIndex());
+        return encoder.Encode(mLogic.GetAdminFabricIndex());
     case AdminVendorId::Id:
         return encoder.Encode(mLogic.GetAdminVendorId());
     default:
@@ -102,8 +103,9 @@ CHIP_ERROR AdministratorCommissioningCluster::AcceptedCommands(const ConcreteClu
 CHIP_ERROR AdministratorCommissioningCluster::Attributes(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.ReferenceExisting(kAttributes));
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryAttributes), {});
 }
 
 std::optional<DataModel::ActionReturnStatus> AdministratorCommissioningWithBasicCommissioningWindowCluster::InvokeCommand(
@@ -144,7 +146,7 @@ AdministratorCommissioningWithBasicCommissioningWindowCluster::ReadAttribute(con
 
     if (request.path.mAttributeId == FeatureMap::Id)
     {
-        return encoder.Encode(mFeatures.Raw());
+        return encoder.Encode(mFeatures);
     }
 
     return AdministratorCommissioningCluster::ReadAttribute(request, encoder);

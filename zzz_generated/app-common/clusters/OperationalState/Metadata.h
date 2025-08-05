@@ -68,6 +68,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Resume::Id, BitF
 } // namespace Resume
 
 } // namespace Commands
+
+namespace Events {
+namespace OperationalError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationalError
+namespace OperationCompletion {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationCompletion
+
+} // namespace Events
 } // namespace OperationalState
 } // namespace Clusters
 } // namespace app

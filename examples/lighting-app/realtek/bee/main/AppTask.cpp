@@ -27,7 +27,6 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
@@ -353,6 +352,11 @@ void AppTask::BLEAdvEventHandler(AppEvent * aEvent)
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
 {
     if (btnIdx != APP_TOGGLE_BUTTON && btnIdx != APP_FUNCTION_BUTTON && btnIdx != APP_LEVEL_BUTTON && btnIdx != APP_BLE_ADV_BUTTON)
+    {
+        return;
+    }
+
+    if (!chip::DeviceManager::CHIPDeviceManager::GetInstance().IsInitDone())
     {
         return;
     }

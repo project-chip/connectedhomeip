@@ -181,12 +181,3 @@ static_library("Linux") {
     public_deps += [ "${chip_root}/src/wifipaf" ]
   }
 }
-
-source_set("logging") {
-  deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
-  ]
-
-  sources = [ "Logging.cpp" ]
-}

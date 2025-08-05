@@ -50,6 +50,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RenameInput::Id,
 } // namespace RenameInput
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace MediaInput
 } // namespace Clusters
 } // namespace app
