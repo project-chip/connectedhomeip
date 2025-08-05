@@ -263,11 +263,11 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
         EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kChinese);
 
         // Test valid writes
-        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr), 
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr, &testAttrProvider), 
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k12hr);
 
-        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian),
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian, &testAttrProvider),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kGregorian);
     }
@@ -280,7 +280,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
         TimeFormatLocalizationLogic clusterSim(features);
         clusterSim.Startup(&testAttrProvider);
 
-        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::kUnknownEnumValue),
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::kUnknownEnumValue, &testAttrProvider),
                   Protocols::InteractionModel::Status::ConstraintError);
         // Value should remain unchanged
         EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k24hr);
@@ -295,7 +295,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
         clusterSim.Startup(&testAttrProvider);
 
         // Try to set a calendar type that's not in the supported list
-        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kPersian),
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kPersian, &testAttrProvider),
                   Protocols::InteractionModel::Status::ConstraintError);
         // Value should remain unchanged
         EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kChinese);
@@ -308,7 +308,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
         TimeFormatLocalizationLogic clusterSim(features);
         clusterSim.Startup(&testAttrProvider);
 
-        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian),
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian, &testAttrProvider),
                   Protocols::InteractionModel::Status::UnsupportedAttribute);
     }
 
@@ -317,11 +317,11 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
         BitFlags<TimeFormatLocalization::Feature> features{ 0 };
         features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
         TimeFormatLocalizationLogic clusterSim(features);
-        // Don't call Startup, leaving provider as nullptr
+        // Use nullptr in the setter to trigger an error.
 
-        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr),
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr, nullptr),
                   Protocols::InteractionModel::Status::Failure);
-        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian),
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian, nullptr),
                   Protocols::InteractionModel::Status::Failure);
     }
 
@@ -334,9 +334,9 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
         clusterSim.Startup(&testAttrProvider);
 
         testAttrProvider.SetShouldFailWrite(true);
-        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr),
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr, &testAttrProvider),
                   Protocols::InteractionModel::Status::WriteIgnored);
-        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian),
+        EXPECT_EQ(clusterSim.setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum::kGregorian, &testAttrProvider),
                   Protocols::InteractionModel::Status::WriteIgnored);
         testAttrProvider.SetShouldFailWrite(false);
     }
