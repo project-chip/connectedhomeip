@@ -86,51 +86,64 @@ class MdnsDiscovery:
         self._verbose_logging = verbose_logging
 
     # Public methods
-    async def get_commissioner_service(self, log_output: bool = False,
+    async def get_commissioner_services(self, log_output: bool = False,
                                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                       ) -> Optional[MdnsServiceInfo]:
+                                       ) -> Dict[str, List[MdnsServiceInfo]]:
         """
-        Asynchronously discovers a commissioner mDNS service within the network.
+        Asynchronously discovers commissioner mDNS services on the network.
 
-        Optional args:
-            log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 30 seconds.
+        Args:
+            discovery_timeout_sec (float): How long to wait for discovery, in seconds. Defaults to 30.
+            log_output (bool): If True, logs the discovered services to the console.
 
         Returns:
-            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
+            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types to lists of discovered service info objects.
         """
-        return await self._get_service(MdnsServiceType.COMMISSIONER.value, log_output, discovery_timeout_sec)
+        await self.discover(
+            service_types=[MdnsServiceType.COMMISSIONER.value],
+            query_service=True,
+            append_results=True,
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=log_output
+        )
 
-    async def get_commissionable_service(self, log_output: bool = False,
+        return self._discovered_services
+
+    async def get_commissionable_services(self, log_output: bool = False,
                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                         ) -> Optional[MdnsServiceInfo]:
+                                         ) -> Dict[str, List[MdnsServiceInfo]]:
         """
-        Asynchronously discovers a commissionable mDNS service within the network.
+        Asynchronously discovers commissionable mDNS services on the network.
 
-        Optional args:
-            log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 30 seconds.
+        Args:
+            discovery_timeout_sec (float): How long to wait for discovery, in seconds. Defaults to 30.
+            log_output (bool): If True, logs the discovered services to the console.
 
         Returns:
-            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
+            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types to lists of discovered service info objects.
         """
-        return await self._get_service(MdnsServiceType.COMMISSIONABLE.value, log_output, discovery_timeout_sec)
+        await self.discover(
+            service_types=[MdnsServiceType.COMMISSIONABLE.value],
+            query_service=True,
+            append_results=True,
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=log_output
+        )
 
-    async def get_operational_services(self,
-                                      discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                                      log_output: bool = False
-                                      ) -> Optional[MdnsServiceInfo]:
+        return self._discovered_services
+
+    async def get_operational_services(self, log_output: bool = False,
+                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
+                                      ) -> Dict[str, List[MdnsServiceInfo]]:
         """
-        Asynchronously discovers an operational mDNS service within the network.
+        Asynchronously discovers operational mDNS services on the network.
 
-        Optional args:
-            log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 30 seconds.
-            node_id: the node id to create the service name from
-            compressed_fabric_id: the fabric id to create the service name from
+        Args:
+            discovery_timeout_sec (float): How long to wait for discovery, in seconds. Defaults to 30.
+            log_output (bool): If True, logs the discovered services to the console.
 
         Returns:
-            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
+            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types to lists of discovered service info objects.
         """
         await self.discover(
             service_types=[MdnsServiceType.OPERATIONAL.value],
@@ -142,20 +155,28 @@ class MdnsDiscovery:
 
         return self._discovered_services
 
-    async def get_border_router_service(self, log_output: bool = False,
+    async def get_border_router_services(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                        ) -> Optional[MdnsServiceInfo]:
+                                        ) -> Dict[str, List[MdnsServiceInfo]]:
         """
-        Asynchronously discovers a border router mDNS service within the network.
+        Asynchronously discovers border router mDNS services on the network.
 
-        Optional args:
-            log_output (bool): Logs the discovered services to the console. Defaults to False.
-            discovery_timeout_sec (float): Defaults to 30 seconds.
+        Args:
+            discovery_timeout_sec (float): How long to wait for discovery, in seconds. Defaults to 30.
+            log_output (bool): If True, logs the discovered services to the console.
 
         Returns:
-            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
+            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types to lists of discovered service info objects.
         """
-        return await self._get_service(MdnsServiceType.BORDER_ROUTER.value, log_output, discovery_timeout_sec)
+        await self.discover(
+            service_types=[MdnsServiceType.OPERATIONAL.value],
+            query_service=True,
+            append_results=True,
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=log_output
+        )
+
+        return self._discovered_services
 
     async def get_all_services(self, log_output: bool = False,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
