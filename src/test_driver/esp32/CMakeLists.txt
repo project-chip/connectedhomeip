@@ -59,6 +59,9 @@ esp32_unit_test(NAME testSetupPayload LIBRARY SetupPayloadTests)
 esp32_unit_test(NAME testSystemLayer LIBRARY SystemLayerTests)
 esp32_unit_test(NAME testUserDirectedCommissioning LIBRARY UserDirectedCommissioningTests)
 
+esp32_unit_test(NAME testRawTransport LIBRARY RawTransportTests               EXTRA_LIBRARIES -lNetworkTestHelpers -lInetTestHelpers)
+esp32_unit_test(NAME testTransportLayer LIBRARY TransportLayerTests           EXTRA_LIBRARIES -lNetworkTestHelpers -lInetTestHelpers -lCertTestVectors)
+
 # TODO: libAppTests depends on MessagingTestHelpers, which depends on
 # NetworkTestHelpers.  That sort of depends on InetTestHelpers or
 # equivalent (to provide gSystemLayer, gInet, InitNetwork(),
