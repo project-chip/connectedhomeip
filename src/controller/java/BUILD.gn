@@ -229,6 +229,8 @@ shared_library("jni") {
     ldflags = [ "-Wl,--gc-sections" ]
   }
 
+  ldflags += [ "-z,max-page-size=16384" ]
+
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
