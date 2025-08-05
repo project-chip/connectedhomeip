@@ -112,7 +112,7 @@ private:
 /// Represents a string of maximum length of `N` characters
 ///
 /// The string storage will be formatted to support persistent storage I/O,
-/// specifically stored as a length-prefixed string and it also maintas a null terminator
+/// specifically stored as a length-prefixed string and it also maintains a null terminator
 /// so that both char-span and null terminated views are usable. The storage
 /// overhead of this string is 2 bytes (one for length prefix, one for null terminator).
 template <size_t N, typename = std::enable_if_t<(N < 255) && (N > 0)>>
