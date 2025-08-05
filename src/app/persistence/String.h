@@ -111,7 +111,7 @@ private:
 
 /// Represents a string of maximum length of `N` characters
 ///
-/// The string storage will be formatted specifically to support persistent storage I/O,
+/// The string storage will be formatted to support persistent storage I/O,
 /// specifically stored as a length-prefixed string and it also maintas a null terminator
 /// so that both char-span and null terminated views are usable. The storage
 /// overhead of this string is 2 bytes (one for length prefix, one for null terminator).
