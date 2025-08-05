@@ -371,11 +371,11 @@ bool DayIsValid(Structs::DayStruct::Type * aDay)
 
 std::pair<const Structs::DayEntryStruct::Type *, const Structs::DayEntryStruct::Type *>
 FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t> & dayEntryIDs, uint16_t minutesSinceMidnight,
-             uint16_t * nextUpdInterval)
+             uint16_t * CurrentEntryMinutesRemain)
 {
     const Structs::DayEntryStruct::Type * currentPtr = nullptr;
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
-    *nextUpdInterval                                 = 0;
+    *CurrentEntryMinutesRemain                                 = 0;
 
     for (const auto & entryID : dayEntryIDs)
     {
@@ -411,7 +411,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         {
             currentPtr       = current;
             nextPtr          = next;
-            *nextUpdInterval = static_cast<uint16_t>(duration - (minutesSinceMidnight - current->startTime));
+            *CurrentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - current->startTime));
             break;
         }
     }
@@ -464,7 +464,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
 
     if (period == nullptr)
     {
-        err = CHIP_ERROR_NOT_FOUND;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     const size_t componentCount = period->tariffComponentIDs.size();
@@ -564,7 +564,6 @@ void Instance::UpdateCurrentAttrs()
 {
     uint32_t now = GetCurrentTimestamp();
     bool daysUpdIsNeeded = false;
-    bool dayEntriesUpdIsNeeded = false;
 
     if (!now)
     {
@@ -607,15 +606,14 @@ void Instance::UpdateCurrentAttrs()
         }
     }
 
-    if (dayEntriesUpdIsNeeded)
-    {
+    do {
         uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);
-        uint16_t nextUpdInterval      = 0;
+        uint16_t CurrentEntryMinutesRemain      = 0;
         auto & mCurrentDayEntryIDs    = mCurrentDay.Value().dayEntryIDs;
         DataModel::Nullable<Structs::DayEntryStruct::Type> tmpDayEntry;
         DataModel::Nullable<uint32_t> tmpDate;
         auto [current, next] =
-            Utils::FindDayEntry(mServerTariffAttrsCtx, mCurrentDayEntryIDs, minutesSinceMidnight, &nextUpdInterval);
+            Utils::FindDayEntry(mServerTariffAttrsCtx, mCurrentDayEntryIDs, minutesSinceMidnight, &CurrentEntryMinutesRemain);
 
         tmpDayEntry.SetNull();
         tmpDate.SetNull();
@@ -653,9 +651,9 @@ void Instance::UpdateCurrentAttrs()
 
         SetNextDayEntry(tmpDayEntry);
 
-        if (nextUpdInterval > 0)
+        if (CurrentEntryMinutesRemain > 0)
         {
-            if ((nextUpdInterval >= (kDayEntryDurationLimit - minutesSinceMidnight)) && !mNextDay.IsNull())
+            if ((CurrentEntryMinutesRemain >= (kDayEntryDurationLimit - minutesSinceMidnight)) && !mNextDay.IsNull())
             {
                 tmpDate.SetNonNull(mNextDay.Value().date);
             }
@@ -665,7 +663,7 @@ void Instance::UpdateCurrentAttrs()
             }
             SetNextDayEntryDate(tmpDate);
         }
-    }
+    } while (0);
 }
 
 void Instance::DeinitCurrentAttrs()
