@@ -98,34 +98,30 @@ class TC_ICDM_5_1(MatterBaseTest):
         dut_instance_name = self.get_dut_instance_name()
         service_name = f"{dut_instance_name}.{service_type}"
 
-        asserts.assert_greater(len(services), 0,
+        # Verify at least one service is present and is of operational type
+        asserts.assert_true(len(services) > 0 and service_type in services,
+            f"At least one operational service ('{service_type}') must present.")
+
+        # logging.info(f"..lop {services}")
+
+        # Get operational node service
+        service = None
+        for srv in services[service_type]:
+            if service_name is not None and srv.service_name.upper() != service_name:
+                logger.info("   Name does NOT match \'%s\' vs \'%s\'", service_name, srv.service_name.upper())
+            if srv.service_name.replace(service_type.upper(), service_type) == service_name:
+                service = srv
+
+        # Verify operational node service is present
+        asserts.assert_is_not_none(service,
             f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
 
-        if service_type in services:
-            for s in services:
-                if service_name is not None and s.service_name.upper() != service_name:
-                    logger.info("   Name does NOT match \'%s\' vs \'%s\'", service_name, s.service_name.upper())
-                        
-                if s.service_name.replace(service_type.upper(), service_type) == service_name:
-                    service = s
-
-
-
+        # Get TXT record
         icdTxtRecord = OperatingModeEnum(int(service.txt_record['ICD']))
         if icdTxtRecord.value != int(service.txt_record['ICD']):
             raise AttributeError(f'Not a known ICD type: {service.txt_record["ICD"]}')
 
         return icdTxtRecord
-
-        if service_type in self._discovered_services:
-             for service in self._discovered_services[service_type]:
-                if service.service_name == service_name.replace(service_type.upper(), service_type):
-                    return service
-
-
-
-
-
 
     #
     # Test Harness Helpers

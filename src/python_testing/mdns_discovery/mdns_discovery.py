@@ -122,7 +122,7 @@ class MdnsDiscovery:
         # self._name_filter = None
         return await self._get_service(MdnsServiceType.COMMISSIONABLE.value, log_output, discovery_timeout_sec)
 
-    async def get_operational_service(self,
+    async def get_operational_services(self,
                                       discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                                       log_output: bool = False
                                       ) -> Optional[MdnsServiceInfo]:
@@ -139,7 +139,7 @@ class MdnsDiscovery:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
         """
         await self.discover(
-            service_type=[MdnsServiceType.OPERATIONAL.value],
+            service_types=[MdnsServiceType.OPERATIONAL.value],
             query_service=True,
             append_results=True,
             discovery_timeout_sec=discovery_timeout_sec,
