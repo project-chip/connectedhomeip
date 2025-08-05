@@ -75,7 +75,8 @@ public:
     void SetUp() override
     {
         AppContext::SetUp();
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&chip::TestDataModel::DispatchTestDataModel::Instance());
+        mOldProvider =
+            InteractionModelEngine::GetInstance()->SetDataModelProvider(&chip::TestDataModel::DispatchTestDataModel::Instance());
         factoryInitParams.listenPort               = 88;
         factoryInitParams.fabricTable              = nullptr;
         factoryInitParams.fabricIndependentStorage = &factoryStorage;
@@ -95,6 +96,7 @@ protected:
     TestSessionKeystoreImpl keystore;
     chip::TestPersistentStorageDelegate factoryStorage;
     chip::Controller::FactoryInitParams factoryInitParams;
+
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
