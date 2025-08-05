@@ -32,7 +32,7 @@ bool ShortString::SetContent(CharSpan value)
     return true;
 }
 
-bool ShortStringWriteIO::FinalizeRead(ByteSpan actuallyRead)
+bool ShortStringInputAdapter::FinalizeRead(ByteSpan actuallyRead)
 {
     if (!ShortPascalString::IsValid(actuallyRead))
     {

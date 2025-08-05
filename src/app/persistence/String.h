@@ -61,8 +61,8 @@ public:
     /// If the set fails, the value is set to empty string and false is returned.
     bool SetContent(CharSpan value);
 
-    friend class ShortStringReadIO;
-    friend class ShortStringWriteIO;
+    friend class ShortStringOutputAdapter;
+    friend class ShortStringInputAdapter;
 
 private:
     char * mBuffer;
@@ -77,11 +77,15 @@ private:
 
 /// Provides internal access and processing to a ShortString class.
 ///
+/// The class is intended to read raw data into a short string: it provides
+/// access to the internal read buffer and allows a `FinalizeRead` call to
+/// perform final validation of the read.
+///
 /// Meant for internal use only, this is NOT public API outside the SDK code itself.
-class ShortStringWriteIO
+class ShortStringInputAdapter
 {
 public:
-    ShortStringWriteIO(ShortString & value) : mValue(value) {}
+    ShortStringInputAdapter(ShortString & value) : mValue(value) {}
     MutableByteSpan ReadBuffer() { return mValue.AsPascal().RawFullBuffer(); }
 
     /// Method to be called once data has been read into ReadBuffer
@@ -96,11 +100,14 @@ private:
 
 /// Provides internal access and processing to a ShortString class.
 ///
+/// The class is intended to provide access to a serializable view of the
+/// short string, specifically access to its content with length.
+///
 /// Meant for internal use only, this is NOT public API outside the SDK code itself.
-class ShortStringReadIO
+class ShortStringOutputAdapter
 {
 public:
-    ShortStringReadIO(const ShortString & value) : mValue(value) {}
+    ShortStringOutputAdapter(const ShortString & value) : mValue(value) {}
     ByteSpan ContentWithPrefix() const { return mValue.AsPascal().ContentWithLenPrefix(); }
 
 private:
