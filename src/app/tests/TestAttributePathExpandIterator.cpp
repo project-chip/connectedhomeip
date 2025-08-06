@@ -162,7 +162,7 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         ASSERT_LT(index, MATTER_ARRAY_SIZE(paths));
-        EXPECT_EQ(paths[index], path);
+        EXPECT_EQ(paths[index], path); // NOLINT(clang-analyzer-security.ArrayBound): checked above
         index++;
     }
     EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
@@ -305,8 +305,8 @@ TEST_F(TestAttributePathExpandIterator, TestNoWildcard)
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
-        EXPECT_EQ(paths[index], path);
+        ASSERT_LT(index, MATTER_ARRAY_SIZE(paths));
+        EXPECT_EQ(paths[index], path); // NOLINT(clang-analyzer-security.ArrayBound): checked above
         index++;
     }
     EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
