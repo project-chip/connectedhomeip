@@ -20,10 +20,10 @@ import logging
 import platform
 import shutil
 import subprocess
-from mobly import asserts
-from typing import Optional, List
+from typing import List, Optional
 
 import chip.clusters as Clusters
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
