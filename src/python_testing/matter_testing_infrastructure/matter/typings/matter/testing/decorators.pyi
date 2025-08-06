@@ -1,9 +1,9 @@
-# src/python_testing/matter_testing_infrastructure/chip/typings/chip/testing/decorators.pyi
+# src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/decorators.pyi
 
 from enum import IntFlag
 from typing import TYPE_CHECKING, Callable
 
-# Assume types from chip.clusters can be imported.
+# Assume types from matter.clusters can be imported.
 from matter.clusters import Attribute
 from matter.clusters import ClusterObjects as ClusterObjects
 

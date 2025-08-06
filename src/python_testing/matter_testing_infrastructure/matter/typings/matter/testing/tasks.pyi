@@ -1,4 +1,4 @@
-# src/python_testing/matter_testing_infrastructure/chip/typings/chip/testing/tasks.py
+# src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/tasks.py
 
 import threading
 from typing import Any, BinaryIO, Callable, Optional, Pattern, Union

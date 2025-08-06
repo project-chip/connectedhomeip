@@ -94,7 +94,7 @@ class AttributeValue:
 
 
 class AttributeMatcher:
-    """Matcher for a self-descripbed AttributeValue matcher, to be used in `await_all_expected_report_matches` methods.
+    """Matcher for a self-described AttributeValue matcher, to be used in `await_all_expected_report_matches` methods.
 
     This class embodies a predicate for a condition that must be matched by an attribute report.
 
@@ -109,7 +109,7 @@ class AttributeMatcher:
 
         The condition matched should be clearly expressed by the `description` property.
         """
-        pass
+        return False
 
     @property
     def description(self):

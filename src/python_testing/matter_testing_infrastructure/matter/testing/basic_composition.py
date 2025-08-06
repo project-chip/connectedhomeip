@@ -34,10 +34,9 @@ import matter.clusters.ClusterObjects
 import matter.tlv
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import ValueDecodeFailure
-
-from .conformance import ConformanceException
-from .matter_testing import MatterTestConfig, ProblemNotice
-from .spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
+from matter.testing.conformance import ConformanceException
+from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
 
 @dataclass

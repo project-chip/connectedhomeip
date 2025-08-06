@@ -32,12 +32,11 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import Attribute
 from matter.clusters import ClusterObjects as ClusterObjects
-
-from .global_attribute_ids import GlobalAttributeIds
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 
 # conditional import to avoid circular dependency but still allow type checking
 if TYPE_CHECKING:
-    from .matter_testing import MatterBaseTest
+    from matter.testing.matter_testing import MatterBaseTest
 
 EndpointCheckFunction = Callable[[
     Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]

@@ -1,4 +1,4 @@
-# src/python_testing/matter_testing_infrastructure/chip/typings/chip/testing/apps.py
+# src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/apps.py
 
 from typing import Any
 
