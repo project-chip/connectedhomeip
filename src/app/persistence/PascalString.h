@@ -89,7 +89,7 @@ public:
     /// Interprets the given buffer as the pascal string content.
     ///
     /// Note that this references the given buffer in place. Buffer lifetime must
-    /// exceed the PascalString lifetime.
+    /// exceed the PascalBuffer lifetime.
     template <size_t N>
     PascalBuffer(T (&data)[N]) : mData(data), mMaxSize(N - PREFIX_LEN)
     {
