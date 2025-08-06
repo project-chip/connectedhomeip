@@ -57,7 +57,7 @@ cluster = MeterIdentification
 
 
 class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
-    """Implementation of test case TC_MTRID_2_1."""
+    """Implementation of test case TC_MTRID_3_1."""
 
     def desc_TC_MTRID_3_1(self) -> str:
         """Returns a description of this test"""
