@@ -370,7 +370,7 @@ void GeneralDiagnosticsCluster::OnDeviceReboot(BootReasonEnum bootReason)
 
     GeneralDiagnostics::Events::BootReason::Type event{ bootReason };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
@@ -386,7 +386,7 @@ void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxH
         reinterpret_cast<const GeneralDiagnostics::HardwareFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::HardwareFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
@@ -402,7 +402,7 @@ void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadi
         reinterpret_cast<const GeneralDiagnostics::RadioFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::RadioFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
@@ -418,7 +418,7 @@ void GeneralDiagnosticsCluster::OnNetworkFaultsDetect(const GeneralFaults<kMaxNe
         reinterpret_cast<const GeneralDiagnostics::NetworkFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::NetworkFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)

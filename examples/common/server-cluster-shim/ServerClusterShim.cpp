@@ -290,11 +290,7 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
 ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     // Context not initialized. Need to call Startup(context) before writing.
-    if (mContext == nullptr || mContext->interactionContext == nullptr ||
-        mContext->interactionContext->dataModelChangeListener == nullptr)
-    {
-        return Status::InvalidInState;
-    }
+    VerifyOrReturnError(mContext != nullptr, Status::InvalidInState);
 
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
