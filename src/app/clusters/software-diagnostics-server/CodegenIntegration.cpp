@@ -36,22 +36,16 @@ namespace {
 
 LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 
-// Check if attribute is enabled (statically or dynamically) through ember
-bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
-{
-    return emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, attributeId);
-}
-
 } // namespace
 
 void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapHighWatermark::Id),
+        .enableThreadMetrics     = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::ThreadMetrics::Id),
+        .enableCurrentHeapFree   = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapFree::Id),
+        .enableCurrentHeapUsed   = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapUsed::Id),
+        .enableCurrentWatermarks = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapHighWatermark::Id),
     };
 
     gServer.Create(enabledAttributes);
