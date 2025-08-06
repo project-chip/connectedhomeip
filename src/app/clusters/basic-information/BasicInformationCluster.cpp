@@ -146,6 +146,14 @@ inline CHIP_ERROR ReadSoftwareVersion(DeviceLayer::ConfigurationManager & config
     return aEncoder.Encode(softwareVersion);
 }
 
+inline CHIP_ERROR ReadSoftwareVersionString(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
+{
+    constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
+    char softwareVersionString[kMaxLen + 1] = { 0 };
+    ReturnErrorOnFailure(configManager.GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString)));
+    return aEncoder.Encode(CharSpan(softwareVersionString, strnlen(softwareVersionString, kMaxLen)));
+}
+
 inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen                  = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
@@ -299,8 +307,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case SoftwareVersion::Id:
         return ReadSoftwareVersion(configManager, encoder);
     case SoftwareVersionString::Id:
-        return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetSoftwareVersionString,
-                                       false /* unimplementedAllowed */, encoder);
+        return ReadSoftwareVersionString(configManager, aEncoder);
     case ManufacturingDate::Id:
         return ReadManufacturingDate(deviceInfoProvider, encoder);
     case PartNumber::Id:
