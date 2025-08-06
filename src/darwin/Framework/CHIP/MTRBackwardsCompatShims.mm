@@ -38,6 +38,7 @@
 #include <app/util/im-client-callbacks.h>
 #include <controller/CHIPCluster.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <type_traits>
 
@@ -66,6 +67,456 @@ public:
 };
 
 } // anonymous namespace
+
+#pragma mark - Color Control attributes that used to be writable but were switched to readonly.
+
+@implementation MTRBaseClusterColorControl (AttributesNowReadonly)
+
+- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    dispatch_async(self.callbackQueue, ^{
+        completion([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+    dispatch_async(self.callbackQueue, ^{
+        completionHandler([MTRError errorForIMStatusCode:chip::Protocols::InteractionModel::Status::UnsupportedWrite]);
+    });
+}
+
+@end
+
+@implementation MTRClusterColorControl (AttributesNowReadonly)
+
+- (void)writeAttributeWhitePointXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeWhitePointXWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeWhitePointXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeWhitePointYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeWhitePointYWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeWhitePointYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointRXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointRXWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointRXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointRYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointRYWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointRYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointRIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointRIntensityWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointRIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointGXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointGXWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointGXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointGYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointGYWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointGYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointGIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointGIntensityWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointGIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointBXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointBXWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointBXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointBYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointBYWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointBYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (void)writeAttributeColorPointBIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeColorPointBIntensityWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+
+- (void)writeAttributeColorPointBIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+@end
 
 #pragma mark - Clusters that were removed wholesale: OnOffSwitchConfiguration
 
