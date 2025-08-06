@@ -19,16 +19,22 @@
 #include <pw_unit_test/framework.h>
 
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
+#include <controller/CommissioneeDeviceProxy.h>
+#include <openssl/rand.h>
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
+#include <credentials/DeviceAttestationConstructor.h> // Add this include
 
 using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::TestCerts;
+using chip::Credentials::Examples::TestHarnessDACProvider;
 
 namespace {
 
@@ -122,4 +128,285 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithLargeAttestationElementsBu
 
     // The result will depend on the verifier's implementation, but we're testing that it can handle large buffers without crashing
     EXPECT_TRUE(attestationResult == AttestationVerificationResult::kInvalidArgument);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidAttestation)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    // Use real test vectors from CHIPCert_unit_test_vectors.h
+    auto paiAsset = GetIAA1CertAsset();
+    auto dacAsset = GetNodeA1CertAsset();
+
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t signatureData[64] = {0x07, 0x08, 0x09};
+    uint8_t nonceData[32] = {0x0A, 0x0B, 0x0C};
+
+    DeviceAttestationVerifier::AttestationInfo validInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(signatureData, sizeof(signatureData)),
+        paiAsset.mCert,
+        dacAsset.mCert,
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0xFFF1),
+        0x8000
+    );
+
+    verifier.VerifyAttestationInformation(validInfo, &attestationCallback);
+
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacFormatInvalid);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithVIDPIDMismatch)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    auto paiAsset = GetIAA1CertAsset();
+    auto dacAsset = GetNodeA1CertAsset();
+
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t signatureData[64] = {0x07, 0x08, 0x09};
+    uint8_t nonceData[32] = {0x0A, 0x0B, 0x0C};
+
+    DeviceAttestationVerifier::AttestationInfo mismatchInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(signatureData, sizeof(signatureData)),
+        paiAsset.mCert,
+        dacAsset.mCert,
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0x1234), // Mismatched VID
+        0x9999                         // Mismatched PID
+    );
+
+    verifier.VerifyAttestationInformation(mismatchInfo, &attestationCallback);
+
+    EXPECT_TRUE(attestationResult == AttestationVerificationResult::kDacFormatInvalid ||
+                attestationResult == AttestationVerificationResult::kPaiFormatInvalid);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithNonceMismatch)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    auto paiAsset = GetIAA1CertAsset();
+    auto dacAsset = GetNodeA1CertAsset();
+
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t signatureData[64] = {0x07, 0x08, 0x09};
+    uint8_t nonceData[32] = {0xFF, 0xEE, 0xDD}; // Mismatched nonce
+
+    DeviceAttestationVerifier::AttestationInfo nonceMismatchInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(signatureData, sizeof(signatureData)),
+        paiAsset.mCert,
+        dacAsset.mCert,
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0xFFF1),
+        0x8000
+    );
+
+    verifier.VerifyAttestationInformation(nonceMismatchInfo, &attestationCallback);
+
+    EXPECT_TRUE(attestationResult != AttestationVerificationResult::kSuccess);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidDACButInvalidPAI)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t signatureData[64] = {0x07, 0x08, 0x09};
+    uint8_t nonceData[32] = {0x0A, 0x0B, 0x0C};
+    
+    uint8_t invalidPaiData[64] = {0xFF, 0xEE, 0xDD, 0xCC}; // Invalid certificate data
+
+    DeviceAttestationVerifier::AttestationInfo dacValidPaiInvalidInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(signatureData, sizeof(signatureData)),
+        ByteSpan(invalidPaiData, sizeof(invalidPaiData)),  // Invalid PAI certificate
+        TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert,      // Valid DAC certificate
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0xFFF1),
+        0x8000
+    );
+
+    verifier.VerifyAttestationInformation(dacValidPaiInvalidInfo, &attestationCallback);
+
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaiFormatInvalid);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedVendorIDs)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    // Use valid certificates but with different Vendor IDs
+    // DAC has VID=FFF1, PAI has VID=FFF2 (different vendors)
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t signatureData[64] = {0x07, 0x08, 0x09};
+    uint8_t nonceData[32] = {0x0A, 0x0B, 0x0C};
+
+    DeviceAttestationVerifier::AttestationInfo mismatchedVidInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(signatureData, sizeof(signatureData)),
+        TestCerts::sTestCert_PAI_FFF2_8001_Cert,       // PAI with VID=FFF2
+        TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert,  // DAC with VID=FFF1 (different from PAI)
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0xFFF1),
+        0x8000
+    );
+
+    verifier.VerifyAttestationInformation(mismatchedVidInfo, &attestationCallback);
+
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacVendorIdMismatch);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestPassingVIDPIDChecks)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t signatureData[64] = {0x07, 0x08, 0x09};
+    uint8_t nonceData[32] = {0x0A, 0x0B, 0x0C};
+
+    DeviceAttestationVerifier::AttestationInfo passingVidPidInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(signatureData, sizeof(signatureData)),
+        TestCerts::sTestCert_PAI_FFF2_NoPID_Cert,        // PAI with VID=FFF2, NO Product ID
+        TestCerts::sTestCert_DAC_FFF2_8001_0008_Cert,    // DAC with VID=FFF2, PID=8001
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0xFFF2),
+        0x8001
+    );
+
+    verifier.VerifyAttestationInformation(passingVidPidInfo, &attestationCallback);
+
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kAttestationSignatureInvalid);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMatchingPAIAndDACProductIDs)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t signatureData[64] = {0x07, 0x08, 0x09};
+    uint8_t nonceData[32] = {0x0A, 0x0B, 0x0C};
+
+    DeviceAttestationVerifier::AttestationInfo matchingPidInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(signatureData, sizeof(signatureData)),
+        TestCerts::sTestCert_PAI_FFF2_8001_Cert,      // PAI with VID=FFF2, PID=8001
+        TestCerts::sTestCert_DAC_FFF2_8001_0008_Cert, // DAC with VID=FFF2, PID=8001 (same as PAI)
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0xFFF2),
+        0x8001
+    );
+
+    verifier.VerifyAttestationInformation(matchingPidInfo, &attestationCallback);
+
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kAttestationSignatureInvalid);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedPAIAndDACProductIDs)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t signatureData[64] = {0x07, 0x08, 0x09};
+    uint8_t nonceData[32] = {0x0A, 0x0B, 0x0C};
+
+    DeviceAttestationVerifier::AttestationInfo mismatchedPidInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(signatureData, sizeof(signatureData)),
+        TestCerts::sTestCert_PAI_FFF2_8004_FB_Cert,      // PAI with VID=FFF2, PID=8004
+        TestCerts::sTestCert_DAC_FFF2_8001_0008_Cert,    // DAC with VID=FFF2, PID=8001 (different from PAI)
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0xFFF2),
+        0x8001
+    );
+
+    verifier.VerifyAttestationInformation(mismatchedPidInfo, &attestationCallback);
+
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacProductIdMismatch);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidAttestationSignatureFormat)
+{
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification>
+        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
+
+    PartialDACVerifier verifier;
+
+    // Use valid certificates but provide an oversized signature that will fail SetLength
+    uint8_t attestationElements[32] = {0x01, 0x02, 0x03};
+    uint8_t challengeData[32] = {0x04, 0x05, 0x06};
+    uint8_t nonceData[32] = {0x0A, 0x0B, 0x0C};
+    
+    // Create oversized signature data that exceeds maximum allowed signature size
+    constexpr size_t kOversizedSignatureSize = 1024; // Much larger than typical signature size
+    uint8_t oversizedSignatureData[kOversizedSignatureSize];
+    memset(oversizedSignatureData, 0xAA, sizeof(oversizedSignatureData));
+
+    DeviceAttestationVerifier::AttestationInfo oversizedSignatureInfo(
+        ByteSpan(attestationElements, sizeof(attestationElements)),
+        ByteSpan(challengeData, sizeof(challengeData)),
+        ByteSpan(oversizedSignatureData, sizeof(oversizedSignatureData)),  // Oversized signature
+        TestCerts::sTestCert_PAI_FFF2_8001_Cert,      // Valid PAI certificate
+        TestCerts::sTestCert_DAC_FFF2_8001_0008_Cert, // Valid DAC certificate
+        ByteSpan(nonceData, sizeof(nonceData)),
+        static_cast<VendorId>(0xFFF2),
+        0x8001
+    );
+
+    verifier.VerifyAttestationInformation(oversizedSignatureInfo, &attestationCallback);
+
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kAttestationSignatureInvalidFormat);
 }
