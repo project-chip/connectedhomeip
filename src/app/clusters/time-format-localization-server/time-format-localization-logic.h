@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -49,8 +50,8 @@ public:
     // Attributes handling for cluster
     TimeFormatLocalization::HourFormatEnum GetHourFormat() const;
     TimeFormatLocalization::CalendarTypeEnum GetActiveCalendarType() const;
-    DataModel::ActionReturnStatus setHourFormat(TimeFormatLocalization::HourFormatEnum rHour, AttributePersistenceProvider * attrProvider);
-    DataModel::ActionReturnStatus setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar, AttributePersistenceProvider * attrProvider);
+    DataModel::ActionReturnStatus setHourFormat(TimeFormatLocalization::HourFormatEnum rHour, AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder);
+    DataModel::ActionReturnStatus setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar, AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder);
     CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) const;
 

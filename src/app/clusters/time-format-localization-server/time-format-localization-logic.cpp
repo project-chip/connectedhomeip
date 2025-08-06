@@ -20,6 +20,7 @@
 #include <app/EventLogging.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 
 using namespace chip::app::Clusters::TimeFormatLocalization;
@@ -71,48 +72,35 @@ void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrPro
 void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistenceProvider * attrProvider)
 {
     VerifyOrReturn(attrProvider != nullptr);
-    CalendarTypeEnum calendarType = kDefaultCalendarType;
 
     // Try to read existing calendar type from persistence
-    MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
-    CHIP_ERROR error =
-        attrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, calendarBytes);
+    AttributePersistence attrPersistence {*attrProvider};
 
-    // If read failed or value is invalid, use default
-    // Can't tell for sure if ReadValue will not change previous variable value
-    // so will set it again to default.
-    if (error != CHIP_NO_ERROR)
-    {
-        calendarType = kDefaultCalendarType;
-    }
+    attrPersistence.LoadNativeEndianValue<CalendarTypeEnum>({ kRootEndpointId, TimeFormatLocalization::Id, 
+        TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType, kDefaultCalendarType);
 
-    // Ensure the calendar type is within the supported CalendarList, otherwise choose one from that list.
+    ChipLogError(Zcl, "Initial value for Calendar: %d", (int)mCalendarType);
+
+    // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
+    // If initial value is not one of the allowed values, pick one valid value and write it.
     CalendarTypeEnum validCalendar = kDefaultCalendarType;
-    if (!IsSupportedCalendarType(calendarType, &validCalendar))
+    if (!IsSupportedCalendarType(mCalendarType, &validCalendar))
     {
-        calendarType = validCalendar;
+        mCalendarType = validCalendar;
     }
 
-    setActiveCalendarType(calendarType, attrProvider);
 }
 
 void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvider * attrProvider)
 {
     VerifyOrReturn(attrProvider != nullptr);
-    HourFormatEnum hourFormat = kDefaultHourFormat;
+    AttributePersistence attrPersistence {*attrProvider};
 
-    MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
-    CHIP_ERROR error = attrProvider->ReadValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, hourBytes);
+    attrPersistence.LoadNativeEndianValue<HourFormatEnum>({ kRootEndpointId, TimeFormatLocalization::Id, 
+        TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat, kDefaultHourFormat);
 
-    // If read failed or value is invalid, use default
-    // Can't tell for sure if ReadValue will not change previous variable value
-    // so will set it again to default.
-    if (error != CHIP_NO_ERROR)
-    {
-        hourFormat = kDefaultHourFormat;
-    }
+    ChipLogError(Zcl, "Initial value for Hour: %d", (int)mHourFormat);
 
-    setHourFormat(hourFormat, attrProvider);
 }
 
 CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const
@@ -170,27 +158,19 @@ TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveC
     return mCalendarType;
 }
 
-DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFormatLocalization::HourFormatEnum rHour, AttributePersistenceProvider * attrProvider)
+DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFormatLocalization::HourFormatEnum rHour, AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder)
 {
     VerifyOrReturnValue(attrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
 
-    if (rHour == HourFormatEnum::kUnknownEnumValue)
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
+    AttributePersistence attrPersistence {*attrProvider};
 
-    CHIP_ERROR result = attrProvider->WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id },
-                                                  { reinterpret_cast<const uint8_t *>(&rHour), sizeof(rHour) });
-    if (result == CHIP_NO_ERROR)
-    {
-        mHourFormat = rHour;
-        return Protocols::InteractionModel::Status::Success;
-    }
+    CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, 
+        decoder, mHourFormat);
 
-    return Protocols::InteractionModel::Status::WriteIgnored;
+    return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success : Protocols::InteractionModel::Status::ConstraintError;
 }
 
-DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar, AttributePersistenceProvider * attrProvider)
+DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar, AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder)
 {
     VerifyOrReturnValue(attrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
     // TODO: Confirm error values for this operation.
@@ -205,13 +185,14 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
+    AttributePersistence attrPersistence {*attrProvider};
+
     // Now try to write the value using the AttributeProvider.
-    CHIP_ERROR result = attrProvider->WriteValue(
-        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
-        { reinterpret_cast<const uint8_t *>(&rCalendar), sizeof(rCalendar) });
+    CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, 
+        decoder, mCalendarType);
+
     if (result == CHIP_NO_ERROR)
     {
-        mCalendarType = rCalendar;
         return Protocols::InteractionModel::Status::Success;
     }
 

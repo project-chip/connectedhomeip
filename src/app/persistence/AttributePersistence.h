@@ -49,13 +49,41 @@ public:
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
     }
 
+    template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
+    bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
+    {
+        using UnderlyingType = std::underlying_type_t<T>;
+        UnderlyingType underlyingValue = static_cast<UnderlyingType>(value);
+        const UnderlyingType underlyingLoadFailure = static_cast<UnderlyingType>(valueOnLoadFailure);
+        bool success = InternalRawLoadNativeEndianValue(path, &underlyingValue, &underlyingLoadFailure, sizeof(UnderlyingType));
+        if(success)
+        {
+            value = static_cast<T>(underlyingValue);
+        }
+        else
+        {
+            value = valueOnLoadFailure;
+        }
+        return success;
+    }
+
+
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - write to storage
-    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
     CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
-        ReturnErrorOnFailure(decoder.Decode(value));
+        T decodedValue;
+
+        ReturnErrorOnFailure(decoder.Decode(decodedValue));
+        if constexpr (std::is_enum_v<T>)
+        {
+            VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_ERROR_INCORRECT_STATE);
+        }
+
+        value = decodedValue;
+        
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
 
