@@ -26,10 +26,10 @@ to low-level DNS records such as PTR, SRV, TXT, A, and AAAA.
 
 ### Service Discovery Methods
 
-These methods perform targeted discovery for specific Matter service types.
-Each one browses for mDNS advertisements and then queries the discovered
-services to retrieve detailed metadata. They return a list of fully resolved
-service instances, including addresses, ports, TXT records, and more.
+These methods perform targeted discovery for specific Matter service types. Each
+one browses for mDNS advertisements and then queries the discovered services to
+retrieve detailed metadata. They return a list of fully resolved service
+instances, including addresses, ports, TXT records, and more.
 
 -   `get_operational_services()`: Discover operational Matter nodes.
 -   `get_commissioner_services()`: Discover Matter commissioners.
@@ -50,7 +50,8 @@ TXT, A, AAAA) for a given service or host and return their detailed information.
 
 ### Service Type Discovery Methods
 
-These methods are used to identify the types of services being advertised on the local network, either generically or specific to Matter commissionable devices.
+These methods are used to identify the types of services being advertised on the
+local network, either generically or specific to Matter commissionable devices.
 
 -   `get_all_service_types()`: Discover service types of any kind on the
     network.
@@ -59,7 +60,8 @@ These methods are used to identify the types of services being advertised on the
 
 ## 🧪 Example Usage
 
-Below are minimal examples that perform operational node discovery and get a SRV record respectively.
+Below are minimal examples that perform operational node discovery and get a SRV
+record respectively.
 
 ```python
 import asyncio
@@ -80,6 +82,7 @@ async def main():
 
 asyncio.run(main())
 ```
+
 ```python
 import asyncio
 from mdns_discovery.mdns_discovery import MdnsDiscovery
@@ -101,15 +104,14 @@ async def main():
 asyncio.run(main())
 ```
 
-
-
-
 ## 🧩 Discovery Logic (Method Flow)
-
 
 ### 🔄 Service Discovery Flow Mechanics
 
-The following flow illustrates the internal discovery and resolution process shared by all the **service discovery methods** including `get_all_services()`. The method `get_commissionable_services()` is used here as a representative example.
+The following flow illustrates the internal discovery and resolution process
+shared by all the **service discovery methods** including `get_all_services()`.
+The method `get_commissionable_services()` is used here as a representative
+example.
 
 ```text
 get_commissionable_services()
@@ -131,11 +133,12 @@ returns list[MdnsServiceInfo]
 
 ### 🔄 Record Query Flow Mechanics
 
-The following flows illustrate the internal logic behind the **record query methods**. These methods query specific DNS record types directly.
+The following flows illustrate the internal logic behind the **record query
+methods**. These methods query specific DNS record types directly.
 
 #### 🎯 `get_srv_record` and `get_txt_record`
 
- The method `get_srv_record()` is used here as a representative example.
+The method `get_srv_record()` is used here as a representative example.
 
 ```text
 get_srv_record()
@@ -184,7 +187,9 @@ returns list[PtrRecord]
 
 ### 🔄 Service Types Discovery Flow Mechanics
 
-The following flows illustrate the internal logic behind **service type discovery**. These flows identify available mDNS service types being advertised on the network, without resolving full service instance details.
+The following flows illustrate the internal logic behind **service type
+discovery**. These flows identify available mDNS service types being advertised
+on the network, without resolving full service instance details.
 
 #### 🎯 `get_all_service_types`
 
@@ -216,6 +221,6 @@ returns List[str]
 
 ## 📌 General Information
 
-> For a complete overview of available methods, their functionality, and supported parameters, refer to the inline docstrings or inspect the source code directly.
-
-
+> For a complete overview of available methods, their functionality, and
+> supported parameters, refer to the inline docstrings or inspect the source
+> code directly.
