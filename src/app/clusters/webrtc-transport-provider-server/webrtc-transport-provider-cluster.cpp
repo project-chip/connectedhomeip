@@ -440,7 +440,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
 
     // If WebRTCSessionID is not null and does not match a value in CurrentSessions: Respond with NOT_FOUND.
