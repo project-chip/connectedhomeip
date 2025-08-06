@@ -162,6 +162,19 @@ inline constexpr DataModel::AttributeEntry
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace WiredFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace WiredFaultChange
+namespace BatFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace BatFaultChange
+namespace BatChargeFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace BatChargeFaultChange
+
+} // namespace Events
 } // namespace PowerSource
 } // namespace Clusters
 } // namespace app

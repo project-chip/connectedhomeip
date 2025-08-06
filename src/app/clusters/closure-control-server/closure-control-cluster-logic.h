@@ -41,6 +41,8 @@ enum class OptionalAttributeEnum : uint32_t
 {
     kCountdownTime = 0x1
 };
+// As per the spec, the maximum allowed CurrentErrorList size is 10.
+constexpr int kCurrentErrorListMaxSize = 10;
 
 /**
  * @brief Structure is used to configure and validate the Cluster configuration.
@@ -119,9 +121,10 @@ struct ClusterState
     DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
     DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
     BitFlags<LatchControlModesBitmap> mLatchControlModes;
+    ClosureErrorEnum mCurrentErrorList[kCurrentErrorListMaxSize] = {};
 
-    // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
-    // active errors.
+    // The current error count is used to track the number of errors in the CurrentErrorList.
+    size_t mCurrentErrorCount = 0;
 };
 
 /**
@@ -172,11 +175,33 @@ public:
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
     CHIP_ERROR GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
     CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
-    // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list
-    CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
     CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
+
+    /**
+     * @brief Gets the current error list.
+     *        This method is used to retrieve the current error list.
+     *        The outputSpan must initially be of size kCurrentErrorListMaxSize and will be resized to the correct size for the
+     * list.
+     * @param[out] outputSpan The span to fill with the current error list.
+     *
+     * @return CHIP_NO_ERROR if the retrieval was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_BUFFER_TOO_SMALL if the outputSpan size is not equal to kCurrentErrorListMaxSize.
+     */
+    CHIP_ERROR GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan);
+
+    /**
+     * @brief Reads the CurrentErrorList attribute.
+     *        This method is used to read the CurrentErrorList attribute and encode it using the provided encoder.
+     *
+     * @param[in] encoder The encoder to use for encoding the CurrentErrorList attribute.
+     *
+     * @return CHIP_NO_ERROR if the read was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     */
+    CHIP_ERROR ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     /**
      * @brief Set SetOverallCurrentState.
@@ -240,6 +265,23 @@ public:
     {
         return SetCountdownTime(countdownTime, true);
     }
+
+    /**
+     * @brief Adds error to current error list.
+     *
+     * @param[in] error The error to be added to the current error list.
+     *
+     * @return CHIP_NO_ERROR if the error was added successfully.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
+    CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error);
+
+    /**
+     * @brief Clears the current error list.
+     *        This method should be called whenever the current error list needs to be reset.
+     */
+    void ClearCurrentErrorList();
 
     /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState, parameters and conformance.
@@ -344,17 +386,6 @@ private:
      *         false, otherwise
      */
     bool IsSupportedMainState(MainStateEnum mainState) const;
-
-    /**
-     * @brief Function validates if the requested mainState is a valid transition from the current state.
-     *        TODO: Add functionnal description of the state machine
-     *
-     * @param mainState requested main state to be applied
-     *
-     * @return true, transition from current to requested is valid
-     *         false, otherwise
-     */
-    bool IsValidMainStateTransition(MainStateEnum mainState) const;
 
     /**
      * @brief Function validates if the requested overallCurrentState positioning is supported by the closure.

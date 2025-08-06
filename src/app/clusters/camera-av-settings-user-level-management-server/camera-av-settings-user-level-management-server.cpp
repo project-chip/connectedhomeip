@@ -63,23 +63,24 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     // Make sure mandated Features are set
     //
     VerifyOrReturnError(HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) ||
-                            HasFeature(Feature::kMechanicalZoom),
+                            HasFeature(Feature::kMechanicalZoom) || HasFeature(Feature::kDigitalPTZ),
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl,
                                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. At least one of "
-                                     "Pan, Tilt, or Zoom must be supported",
+                                     "Mechanical Pan, Tilt, Zoom or Digital PTZ must be supported",
                                      mEndpointId));
 
     // All of the attributes are dependent on Feature Flags being set, ensure that this is the case
     //
-    // However MPTZPosition is dependent on one of Pan, Tilt, or Zoom, we wouldn't be at this point if one of those weren't set, so
-    // we explicitly check that it is present
-    //
-    if (!SupportsOptAttr(OptionalAttributes::kMptzPosition))
+    if (SupportsOptAttr(OptionalAttributes::kMptzPosition))
     {
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. MPTZPosition must be supported",
-                     mEndpointId);
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        VerifyOrReturnError(
+            HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom),
+            CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPosition is enabled "
+                         "then one of Pan, Tilt, or Zoom is required",
+                         mEndpointId));
     }
 
     if (SupportsOptAttr(OptionalAttributes::kMaxPresets))
@@ -491,9 +492,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(Attribu
             presetStruct.presetID = preset;
             presetStruct.name     = CharSpan(name.c_str(), name.size());
             presetStruct.settings = mptzPresets.GetMptzPosition();
-            ChipLogDetail(Zcl,
-                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Encoding an instance of MPTZPresetStruct. ID = %d. Name = %.*s",
-                          mEndpointId, presetStruct.presetID, static_cast<int>(presetStruct.name.size()), presetStruct.name.data());
+            ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Encoding an instance of MPTZPresetStruct. ID = %d. Name = %s",
+                          mEndpointId, presetStruct.presetID, NullTerminated(presetStruct.name).c_str());
             ReturnErrorOnFailure(encoder.Encode(presetStruct));
         }
 

@@ -566,12 +566,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     __block id testDelegate = nil;
 #ifdef DEBUG
     // Save the first delegate for testing
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
-        testDelegate = delegateInfo.delegate;
-        break;
-    }
+    testDelegate = [_delegateManager firstDelegate];
 #endif
-    [_delegates removeAllObjects];
+    [_delegateManager removeAllDelegates];
 
     // Delete subscription callback object to tear down ReadClient
     MTRDeviceMatterCPPObjectsHolder * matterCPPObjectsHolder = self.matterCPPObjectsHolder;
@@ -924,7 +921,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             MTR_LOG_ERROR("%@ _setUTCTime failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
         }
 #ifdef DEBUG
-        {
+        if (self) {
             std::lock_guard lock(self->_lock);
             [self _callDelegatesWithBlock:^(id testDelegate) {
                 if ([testDelegate respondsToSelector:@selector(unitTestSetUTCTimeInvokedForDevice:error:)]) {
@@ -4077,7 +4074,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             queue:queue
                        completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
                            mtr_strongify(self);
-                           {
+                           if (self) {
                                std::lock_guard lock(self->_lock);
                                self.diagnosticLogTransferInProgress = NO;
                                [self _notifyDelegateOfPrivateInternalPropertiesChanges];
@@ -4571,8 +4568,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    if (attributePathsToReport.count > 0) {
-        MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    // Log each changed path on a separate line, so log line truncation does not
+    // hide which attributes actually changed in this report.  Note that for
+    // things that did not change we log them one per line above in the
+    // !shouldReportAttribute case.
+    for (MTRAttributePath * path in attributePathsToReport) {
+        MTR_LOG("%@ report from reported values %@", self, path);
     }
 
     return attributesToReport;

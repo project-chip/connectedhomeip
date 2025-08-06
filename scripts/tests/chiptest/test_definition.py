@@ -198,6 +198,7 @@ class TestTarget(Enum):
     NETWORK_MANAGER = auto()
     ENERGY_GATEWAY = auto()
     ENERGY_MANAGEMENT = auto()
+    CLOSURE = auto()
 
 
 @dataclass
@@ -218,6 +219,7 @@ class ApplicationPaths:
     network_manager_app: typing.List[str]
     energy_gateway_app: typing.List[str]
     energy_management_app: typing.List[str]
+    closure_app: typing.List[str]
 
     def items(self):
         return [self.chip_tool, self.all_clusters_app, self.lock_app,
@@ -225,7 +227,7 @@ class ApplicationPaths:
                 self.tv_app, self.bridge_app, self.lit_icd_app,
                 self.microwave_oven_app, self.chip_repl_yaml_tester_cmd,
                 self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app,
-                self.energy_gateway_app, self.energy_management_app]
+                self.energy_gateway_app, self.energy_management_app, self.closure_app]
 
     def items_with_key(self):
         """
@@ -257,6 +259,7 @@ class ApplicationPaths:
             (self.network_manager_app, "matter-network-manager-app"),
             (self.energy_gateway_app, "chip-energy-gateway-app"),
             (self.energy_management_app, "chip-energy-management-app"),
+            (self.closure_app, "closure-app"),
         ]
 
 
@@ -378,6 +381,8 @@ class TestDefinition:
                 target_app = paths.energy_gateway_app
             elif self.target == TestTarget.ENERGY_MANAGEMENT:
                 target_app = paths.energy_management_app
+            elif self.target == TestTarget.CLOSURE:
+                target_app = paths.closure_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")

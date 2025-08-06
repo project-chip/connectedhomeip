@@ -129,10 +129,7 @@ Davis, CA 95616, USA
     <attribute id="0x0005" name="EndpointUniqueID" type="string">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
       <constraint>
         <maxLength value="32"/>
       </constraint>
