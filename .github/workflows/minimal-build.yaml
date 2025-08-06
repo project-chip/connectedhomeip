@@ -45,6 +45,8 @@ jobs:
               with:
                   platform: linux
 
+            - name: Print GN version
+              run: gn --version
             - name: Configure and build All Clusters App
               run: |
                   CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux --enable-recommended=no && ./ninja-build
