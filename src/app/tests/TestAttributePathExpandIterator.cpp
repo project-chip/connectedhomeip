@@ -161,7 +161,7 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
+        ASSERT_LT(index, MATTER_ARRAY_SIZE(paths));
         EXPECT_EQ(paths[index], path);
         index++;
     }
