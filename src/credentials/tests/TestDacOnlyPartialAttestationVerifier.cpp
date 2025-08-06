@@ -33,12 +33,11 @@ using namespace chip::TestCerts;
 namespace {
 
 // Callback function to capture attestation verification results
-static void OnAttestationInformationVerificationCallback(void * context, 
-                                                         const DeviceAttestationVerifier::AttestationInfo & info,
+static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
                                                          AttestationVerificationResult result)
 {
     AttestationVerificationResult * pResult = reinterpret_cast<AttestationVerificationResult *>(context);
-    *pResult = result;
+    *pResult                                = result;
 }
 
 } // namespace
@@ -46,82 +45,81 @@ static void OnAttestationInformationVerificationCallback(void * context,
 struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
+// Test verifier behavior with empty parameters
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidParameters)
 {
-    // Test with empty/invalid AttestationInfo - should fail with kInvalidArgument
+    // Create attestation verification result variable
+    // This will be used to capture the result of the verification callback
     AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> 
-        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
-    
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
+        OnAttestationInformationVerificationCallback, &attestationResult);
+
     PartialDACVerifier verifier;
-    
-    // Create AttestationInfo with empty buffers - this should fail
-    DeviceAttestationVerifier::AttestationInfo invalidInfo(
-        ByteSpan(), // empty attestationElements
-        ByteSpan(), // empty attestationChallenge  
-        ByteSpan(), // empty attestationSignature
-        ByteSpan(), // empty paiDer
-        ByteSpan(), // empty dacDer
-        ByteSpan(), // empty attestationNonce
-        static_cast<VendorId>(0xFFF1), // vendorId
-        0x8000      // productId
+
+    // Create AttestationInfo with empty buffers
+    DeviceAttestationVerifier::AttestationInfo invalidInfo(ByteSpan(),                    // empty attestationElements
+                                                           ByteSpan(),                    // empty attestationChallenge
+                                                           ByteSpan(),                    // empty attestationSignature
+                                                           ByteSpan(),                    // empty paiDer
+                                                           ByteSpan(),                    // empty dacDer
+                                                           ByteSpan(),                    // empty attestationNonce
+                                                           static_cast<VendorId>(0xFFF1), // vendorId
+                                                           0x8000                         // productId
     );
-    
+
     // Call the verifier with invalid info
     verifier.VerifyAttestationInformation(invalidInfo, &attestationCallback);
-    
+
     // Expect it to fail with invalid argument error
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kInvalidArgument);
 }
 
+// Test verifier behavior with oversized attestationElements buffer - verifies handling of large data
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithLargeAttestationElementsBuffer)
 {
     // Create a buffer with more than 900 elements
     constexpr size_t kLargeBufferSize = 1024; // More than 900 elements
     uint8_t largeBuffer[kLargeBufferSize];
-    
+
     // Fill the buffer with some test data
     for (size_t i = 0; i < kLargeBufferSize; i++)
     {
         largeBuffer[i] = static_cast<uint8_t>(i % 256); // Fill with repeating pattern 0-255
     }
-    
+
     // Create ByteSpan from the large buffer
     ByteSpan largeAttestationElements(largeBuffer, kLargeBufferSize);
-    
-    // Test with attestation verifier
+
+    // Create attestation verification result variable
+    // This will be used to capture the result of the verification callback
     AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> 
-        attestationCallback(OnAttestationInformationVerificationCallback, &attestationResult);
-    
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
+        OnAttestationInformationVerificationCallback, &attestationResult);
+
     PartialDACVerifier verifier;
-    
+
     // Create some minimal valid test data for other required fields
-    uint8_t challengeData[32] = {0x01, 0x02, 0x03}; // Example challenge
-    uint8_t signatureData[64] = {0x04, 0x05, 0x06}; // Example signature
-    uint8_t paiData[256] = {0x07, 0x08, 0x09}; // Example PAI certificate
-    uint8_t dacData[256] = {0x0A, 0x0B, 0x0C}; // Example DAC certificate
-    uint8_t nonceData[32] = {0x0D, 0x0E, 0x0F}; // Example nonce
-    
+    uint8_t challengeData[32] = { 0x01, 0x02, 0x03 }; // Example challenge
+    uint8_t signatureData[64] = { 0x04, 0x05, 0x06 }; // Example signature
+    uint8_t paiData[256]      = { 0x07, 0x08, 0x09 }; // Example PAI certificate
+    uint8_t dacData[256]      = { 0x0A, 0x0B, 0x0C }; // Example DAC certificate
+    uint8_t nonceData[32]     = { 0x0D, 0x0E, 0x0F }; // Example nonce
+
+    // Create AttestationInfo with large buffer
     DeviceAttestationVerifier::AttestationInfo infoWithLargeBuffer(
-        largeAttestationElements,                    // Large attestationElements buffer
-        ByteSpan(challengeData, sizeof(challengeData)),
-        ByteSpan(signatureData, sizeof(signatureData)),
-        ByteSpan(paiData, sizeof(paiData)),
-        ByteSpan(dacData, sizeof(dacData)),
-        ByteSpan(nonceData, sizeof(nonceData)),
+        largeAttestationElements, // Large attestationElements buffer
+        ByteSpan(challengeData, sizeof(challengeData)), ByteSpan(signatureData, sizeof(signatureData)),
+        ByteSpan(paiData, sizeof(paiData)), ByteSpan(dacData, sizeof(dacData)), ByteSpan(nonceData, sizeof(nonceData)),
         static_cast<VendorId>(0xFFF1), // vendorId
         0x8000                         // productId
     );
-    
+
     // Call the verifier with large buffer
     verifier.VerifyAttestationInformation(infoWithLargeBuffer, &attestationCallback);
 
-    // The result will depend on the verifier's implementation, but we're testing
-    // that it can handle large buffers without crashing
+    // The result will depend on the verifier's implementation, but we're testing that it can handle large buffers without crashing
     EXPECT_TRUE(attestationResult == AttestationVerificationResult::kInvalidArgument);
 }
