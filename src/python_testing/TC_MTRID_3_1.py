@@ -176,6 +176,7 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             logger.info("PICS MTRID.S.F00 is not True")
             self.mark_current_step_skipped()
 
+        power_threshold = None
         if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
             power_threshold = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
@@ -183,7 +184,7 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             if power_threshold is not NullValue:
                 asserts.assert_true(
                     isinstance(power_threshold, Globals.Structs.PowerThresholdStruct),
-                    "val must be of type Globals.Structs.PowerThresholdStruct",
+                    "power_threshold must be of type Globals.Structs.PowerThresholdStruct",
                 )
 
         self.step("8")
