@@ -30,10 +30,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MeteredQuantityTimesta
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace MeteredQuantityTimestamp
-namespace MeasurementType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace TariffUnit {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TariffUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace MeasurementType
+} // namespace TariffUnit
 namespace MaximumMeteredQuantities {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantities::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
@@ -43,6 +43,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantiti
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace CommodityMetering
 } // namespace Clusters
 } // namespace app

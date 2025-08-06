@@ -519,6 +519,16 @@ struct LwIPEvent;
 #endif /* CHIP_SYSTEM_CONFIG_NUM_TIMERS */
 
 /**
+ *  @def CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+ *
+ *  @brief
+ *      Defines whether (1) or not (0) to enable the use of Thread Local Storage (TLS).
+ */
+#ifndef CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 1
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+
+/**
  *  @def CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
  *
  *  @brief
