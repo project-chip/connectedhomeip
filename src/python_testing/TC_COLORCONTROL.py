@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class TC_COLORCONTROL(MatterBaseTest):
-    """Tests for colorcontrol cluster."""
+    """Tests for colorcontrol cluster app server code."""
 
     _COLORCONTROL_ENDPOINT = 1
 
