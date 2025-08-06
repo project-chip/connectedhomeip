@@ -17,8 +17,6 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-// #include <app/static-cluster-config/SoilMeasurement.h>
-#include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
