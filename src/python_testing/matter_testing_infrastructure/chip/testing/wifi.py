@@ -183,7 +183,7 @@ async def connect_host_wifi(ssid: str, password: str) -> None:
 
         except subprocess.CalledProcessError as e:
             logger.error(
-                f" --- connect_host_wifi: Exception: {e} when trying to connect to {ssid} stderr: {conn.stderr.decode()}")
+                f" --- connect_host_wifi: Exception: {e} when trying to connect to {ssid} stderr: {conn.stderr}")
         finally:
             retry += 1
 
