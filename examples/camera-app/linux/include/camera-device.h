@@ -22,6 +22,7 @@
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
+#include "zone-manager.h"
 
 #include "default-media-controller.h"
 #include <protocols/interaction_model/StatusCode.h>
@@ -61,6 +62,9 @@ static constexpr uint16_t kVideoSensorWidthPixels    = 1920;    // 1080p resolut
 static constexpr uint16_t kVideoSensorHeightPixels   = 1080;    // 1080p resolution
 static constexpr uint16_t kMinImageRotation          = 0;
 static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
+static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
+static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
+static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
 
 #define INVALID_SPKR_LEVEL (0)
 
@@ -83,6 +87,7 @@ public:
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
 
@@ -261,6 +266,22 @@ public:
 
     uint8_t GetZoomMax() override;
 
+    uint8_t GetMaxZones() override { return kMaxZones; }
+
+    uint8_t GetMaxUserDefinedZones() override { return kMaxUserDefinedZones; }
+
+    uint8_t GetSensitivityMax() override { return kSensitivityMax; }
+
+    uint8_t GetDetectionSensitivity() override { return mDetectionSensitivity; }
+
+    CameraError SetDetectionSensitivity(uint8_t aSensitivity) override;
+
+    CameraError CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
+
+    CameraError UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
+
+    CameraError RemoveZoneTrigger(uint16_t zoneID) override;
+
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
     CameraError SetZoom(uint8_t aZoom) override;
@@ -272,6 +293,10 @@ public:
     std::vector<SnapshotStream> & GetAvailableSnapshotStreams() override { return mSnapshotStreams; }
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
+
+    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneID);
+
+    void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
 
 private:
     int videoDeviceFd            = -1;
@@ -295,6 +320,7 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderManager mWebRTCProviderManager;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
+    chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
 
     DefaultMediaController mMediaController;
 
@@ -324,6 +350,7 @@ private:
     uint16_t mImageRotation                = kMinImageRotation;
     bool mImageFlipHorizontal              = false;
     bool mImageFlipVertical                = false;
+    uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };
