@@ -21,7 +21,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
 #include <controller/python/chip/native/PyChipError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
@@ -47,7 +47,7 @@ public:
     ~WebRTCTransportProviderClient() = default;
 
     // methods to be called from python
-    void Init(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
+    void Init(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
 
     PyChipError SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
                             size_t length);

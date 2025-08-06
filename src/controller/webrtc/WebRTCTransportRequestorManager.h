@@ -18,13 +18,10 @@
 #pragma once
 
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
-
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-#include <app/dynamic_server/AccessControl.h>
-#endif
 
 // The Python callbacks to call when certain events happen in WebRTCTransportRequestor.
 using OnOfferCallback         = int (*)(uint16_t, const char *);
@@ -32,7 +29,9 @@ using OnAnswerCallback        = int (*)(uint16_t, const char *);
 using OnICECandidatesCallback = int (*)(uint16_t, const char **, const int);
 using OnEndCallback           = int (*)(uint16_t, uint8_t);
 
-class WebRTCTransportRequestorManager : public chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate
+constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
+
+class WebRTCTransportRequestorManager : public chip::app::Clusters::WebRTCTransportRequestor::Delegate
 {
 public:
     using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
@@ -63,14 +62,9 @@ public:
     void UpsertSession(const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & session);
 
 private:
-    WebRTCTransportRequestorManager() : mWebRTCRequestorServer(webRTCRequesterDynamicEndpointId, *this){};
+    WebRTCTransportRequestorManager()  = default;
     ~WebRTCTransportRequestorManager() = default;
 
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-    int webRTCRequesterDynamicEndpointId = kWebRTCRequesterDynamicEndpointId;
-#else
-    int webRTCRequesterDynamicEndpointId = 1;
-#endif
-
-    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer mWebRTCRequestorServer;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer>
+        mWebRTCRegisteredServerCluster;
 };

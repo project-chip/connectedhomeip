@@ -397,69 +397,58 @@ limitations under the License.
       </otherwiseConform>
     </attribute>
     <!-- PRIMARY_6_INTENSITY -->
-    <attribute side="server" code="0x0030" name="WhitePointX" define="COLOR_CONTROL_WHITE_POINT_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x0030" name="WhitePointX" define="COLOR_CONTROL_WHITE_POINT_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- WHITE_POINT_X -->
-    <attribute side="server" code="0x0031" name="WhitePointY" define="COLOR_CONTROL_WHITE_POINT_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x0031" name="WhitePointY" define="COLOR_CONTROL_WHITE_POINT_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- WHITE_POINT_Y -->
-    <attribute side="server" code="0x0032" name="ColorPointRX" define="COLOR_CONTROL_COLOR_POINT_R_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x0032" name="ColorPointRX" define="COLOR_CONTROL_COLOR_POINT_R_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_R_X -->
-    <attribute side="server" code="0x0033" name="ColorPointRY" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x0033" name="ColorPointRY" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_R_Y -->
-    <attribute side="server" code="0x0034" name="ColorPointRIntensity" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
+    <attribute side="server" code="0x0034" name="ColorPointRIntensity" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="int8u" isNullable="true" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_R_INTENSITY -->
-    <attribute side="server" code="0x0036" name="ColorPointGX" define="COLOR_CONTROL_COLOR_POINT_G_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x0036" name="ColorPointGX" define="COLOR_CONTROL_COLOR_POINT_G_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_G_X -->
-    <attribute side="server" code="0x0037" name="ColorPointGY" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x0037" name="ColorPointGY" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_G_Y -->
-    <attribute side="server" code="0x0038" name="ColorPointGIntensity" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
+    <attribute side="server" code="0x0038" name="ColorPointGIntensity" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="int8u" isNullable="true" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_G_INTENSITY -->
-    <attribute side="server" code="0x003A" name="ColorPointBX" define="COLOR_CONTROL_COLOR_POINT_B_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x003A" name="ColorPointBX" define="COLOR_CONTROL_COLOR_POINT_B_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_B_X -->
-    <attribute side="server" code="0x003B" name="ColorPointBY" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+    <attribute side="server" code="0x003B" name="ColorPointBY" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_B_Y -->
-    <attribute side="server" code="0x003C" name="ColorPointBIntensity" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
+    <attribute side="server" code="0x003C" name="ColorPointBIntensity" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="int8u" isNullable="true" writable="false" optional="true">
       <access op="read" role="view"/>
-      <access op="write" role="manage"/>
       <optionalConform/>
     </attribute>
     <!-- COLOR_POINT_B_INTENSITY -->
