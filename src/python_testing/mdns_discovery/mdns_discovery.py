@@ -304,7 +304,7 @@ class MdnsDiscovery:
     async def get_quada_records(self, hostname: str,
                                 discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                                 log_output: bool = False
-                                ) -> Optional[list[QuadaRecord]]:
+                                ) -> list[QuadaRecord]:
         """
         Asynchronously retrieves the AAAA (IPv6) record of a device on the local network via mDNS.
 
@@ -318,7 +318,7 @@ class MdnsDiscovery:
             log_output (bool, optional): Whether to log the discovered information. Defaults to False.
 
         Returns:
-            Optional[list[QuadaRecord]]: A list of discovered QuadaRecord objects, or None if no services were found.
+            list[QuadaRecord]: A list of discovered QuadaRecord objects.
         """
         logger.info(f"Service record information lookup (AAAA) for '{hostname}' in progress...")
 
@@ -335,11 +335,10 @@ class MdnsDiscovery:
 
                 # Get IPv6 addresses and convert to QuadaRecord objects
                 ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
+                quada_records: list[QuadaRecord] = []
+
                 if ipv6_addresses:
-                    quada_records: list[QuadaRecord] = [
-                        QuadaRecord(ipv6)
-                        for ipv6 in ipv6_addresses
-                    ]
+                    quada_records = [QuadaRecord(ipv6) for ipv6 in ipv6_addresses]
 
                 # Adds service to discovered services
                 self._discovered_services = {hostname: [ipv6 for ipv6 in quada_records]}
@@ -348,15 +347,15 @@ class MdnsDiscovery:
                     self._log_output()
 
                 return quada_records
-            else:
-                logger.error(f"Service record information (AAAA) for '{hostname}' not found.")
-                return None
+
+            logger.error(f"Service record information (AAAA) for '{hostname}' not found.")
+            return []
 
     async def get_ptr_records(self,
                               service_types: list[str],
                               discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                               log_output: bool = False,
-                              ) -> Optional[list[PtrRecord]]:
+                              ) -> list[PtrRecord]:
         """
         Asynchronously discovers mDNS PTR records for the given service types.
 
@@ -366,7 +365,7 @@ class MdnsDiscovery:
             log_output (bool): If True, logs the discovered PTR records grouped by service type as JSON.
 
         Returns:
-            Optional[list[PtrRecord]]: A list of discovered PtrRecord objects, or None if no services were found.
+            list[PtrRecord]: A list of discovered PtrRecord objects.
         """
         logger.info(f"Service record information lookup (PTR) for '{service_types}' in progress...")
         await self.discover(
@@ -378,15 +377,17 @@ class MdnsDiscovery:
 
         if self._discovered_services:
             logger.info(f"Service record information (PTR) for '{service_types}' discovered.")
+
             ptr_records = [
                 record
-                for records in self._discovered_services.values()
-                for record in records
+                for record_list in self._discovered_services.values()
+                for record in record_list
             ]
+
             return ptr_records
-        else:
-            logger.error(f"Service record information (PTR) for '{service_types}' not found.")
-            return None
+
+        logger.error(f"Service record information (PTR) for '{service_types}' not found.")
+        return []
 
     async def get_commissionable_subtypes(self,
                                           discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
