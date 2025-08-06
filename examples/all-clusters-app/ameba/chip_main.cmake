@@ -203,8 +203,6 @@ list(
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
 
     ${chip_dir}/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
-
-    ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
 add_library(
