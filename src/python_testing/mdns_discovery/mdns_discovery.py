@@ -27,7 +27,7 @@ from mdns_discovery.data_clases.quada_record import QuadaRecord
 from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from mdns_discovery.service_listeners.mdns_service_listener import MdnsServiceListener
-from mdns_discovery.utils.net_utils import get_ipv6_addresses
+from mdns_discovery.utils.net_utils import get_host_ipv6_addresses
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncZeroconf, AsyncZeroconfServiceTypes
 from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT
@@ -71,7 +71,7 @@ class MdnsDiscovery:
             _event (asyncio.Event): Event used to synchronize async discovery.
         """
         # List of IPv6 addresses to use for mDNS discovery.
-        self.interfaces = get_ipv6_addresses()
+        self.interfaces = get_host_ipv6_addresses()
 
         # An instance of Zeroconf to manage mDNS operations.
         self._azc = AsyncZeroconf(interfaces=self.interfaces)
