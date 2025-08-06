@@ -26,10 +26,7 @@ to low-level DNS records such as PTR, SRV, TXT, A, and AAAA.
 
 ### Service Discovery Methods
 
-These methods perform targeted discovery for specific Matter service types. Each
-one browses for mDNS advertisements and then queries the discovered services to
-retrieve detailed metadata. They return a list of fully resolved service
-instances, including addresses, ports, TXT records, and more.
+These methods perform discovery for Matter and non-Matter services. Each one browses for mDNS advertisements and then resolves the discovered services to retrieve complete service information.
 
 -   `get_operational_services()`: Discover operational Matter nodes.
 -   `get_commissioner_services()`: Discover Matter commissioners.
@@ -50,8 +47,7 @@ TXT, A, AAAA) for a given service or host and return their detailed information.
 
 ### Service Type Discovery Methods
 
-These methods are used to identify the types of services being advertised on the
-local network, either generically or specific to Matter commissionable devices.
+These methods identify the types of services advertised on the local network, including both non-Matter services and Matter commissionable services.
 
 -   `get_all_service_types()`: Discover service types of any kind on the
     network.
