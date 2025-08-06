@@ -54,16 +54,8 @@ CHIP_ERROR BLEManagerImpl::InitHostController(BLECallbackDelegate::GapGenericCal
     /* Has to be called after RNG_Init(), once seed is generated. */
     (void) Controller_SetRandomSeed();
 
-    /* Create BLE Host Task */
-    VerifyOrExit(Ble_HostTaskInit() == KOSA_StatusSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-
-    VerifyOrExit(Hcit_Init(Ble_HciRecv) == gHciSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
-
-    /* Set BD Address in Controller. Must be done after HCI init and before Host init. */
-    Ble_SetBDAddr();
-
     /* BLE Host Stack Init */
-    VerifyOrExit(Ble_HostInitialize(cb_fp, Hcit_SendPacket) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(Ble_Initialize(cb_fp) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* configure tx power to use in NBU specific to BLE */
     Controller_SetTxPowerLevelDbm(mAdvertisingDefaultTxPower_c, gAdvTxChannel_c);

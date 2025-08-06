@@ -16728,7 +16728,7 @@ public static class CommodityTariffClusterTariffComponentStruct {
     values.add(new StructElement(AUXILIARY_LOAD_ID, auxiliaryLoad.<BaseTLVType>map((nonOptionalauxiliaryLoad) -> nonOptionalauxiliaryLoad.encodeTlv()).orElse(new EmptyType())));
     values.add(new StructElement(PEAK_PERIOD_ID, peakPeriod.<BaseTLVType>map((nonOptionalpeakPeriod) -> nonOptionalpeakPeriod.encodeTlv()).orElse(new EmptyType())));
     values.add(new StructElement(POWER_THRESHOLD_ID, powerThreshold.<BaseTLVType>map((nonOptionalpowerThreshold) -> nonOptionalpowerThreshold.encodeTlv()).orElse(new EmptyType())));
-    values.add(new StructElement(THRESHOLD_ID, threshold != null ? new UIntType(threshold) : new NullType()));
+    values.add(new StructElement(THRESHOLD_ID, threshold != null ? new IntType(threshold) : new NullType()));
     values.add(new StructElement(LABEL_ID, label != null ? label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(PREDICTED_ID, predicted.<BaseTLVType>map((nonOptionalpredicted) -> new BooleanType(nonOptionalpredicted)).orElse(new EmptyType())));
 
@@ -16780,8 +16780,8 @@ public static class CommodityTariffClusterTariffComponentStruct {
           powerThreshold = Optional.of(ChipStructs.CommodityTariffClusterPowerThresholdStruct.decodeTlv(castingValue));
         }
       } else if (element.contextTagNum() == THRESHOLD_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
           threshold = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == LABEL_ID) {
