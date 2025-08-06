@@ -8,11 +8,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    restyled:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-            - uses: actions/checkout@v4
+  restyled:
+      runs-on: ubuntu-latest
+      steps:
+          - name: Checkout
+          - uses: actions/checkout@v4
 
       - uses: restyled-io/actions/setup@v4
 
