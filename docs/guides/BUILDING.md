@@ -357,7 +357,7 @@ ninja -C out/debug mac_arm64_gcc/tests/TestSessionManagerDispatch
 
 # OR enter build directory:
 cd out/debug
-ninja linux_x64_clang/phony/src/transport/tests/TestSessionManagerDispatch
+ninja linux_x64_clang/phony/src/transport/tests/TestSessionManagerDispatch.run
 ```
 
 ## Using `build_examples.py`
