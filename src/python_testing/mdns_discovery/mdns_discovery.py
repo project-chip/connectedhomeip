@@ -62,6 +62,7 @@ class MdnsDiscovery:
             - `get_txt_record()`: Query TXT records for a given service instance.
             - `get_quada_records()`: Query A/AAAA records for a given host.
             - `get_commissionable_subtypes()`: Discover supported subtypes for commissionable nodes.
+            - `discover()`: The mDNS discovery engine powering the discovery methods.
 
         Attributes:
             interfaces (list[str]): IPv6 interfaces used for discovery.
@@ -188,7 +189,13 @@ class MdnsDiscovery:
             Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types (str) to
                                             lists of MdnsServiceInfo objects.
         """
-        await self.discover(discovery_timeout_sec, log_output, all_services=True, query_service=True, append_results=True)
+        await self.discover(
+            all_services=True,
+            query_service=True,
+            append_results=True,
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=log_output
+        )
 
         return self._discovered_services
 
@@ -431,9 +438,10 @@ class MdnsDiscovery:
             service_types (Optional[List[str]]): Specific service types to discover (e.g., ['_matterc._udp.local.']).
             all_services (bool): If True, discovers all available mDNS services.
             query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
-            append_results (bool): If True, appends the result to `self._discovered_services` without clearing previous entries.
-                                   If False, resets `self._discovered_services` before storing the new result. This only applies
-                                   when 'query_service' is True, as it's passed down to the '_query_service_info' function.
+            append_results (bool): If True, appends the results to `self._discovered_services` without clearing previous entries.
+                                   If False, clears `self._discovered_services` before storing the new result.
+                                   This argument only takes effect when 'query_service' is True, as it's meant to be passed down
+                                   to the '_query_service_info' function.
         Raises:
             ValueError: If both `all_services` and `service_types` are provided.
 
@@ -561,7 +569,7 @@ class MdnsDiscovery:
                                   query_record_types: set[int] = QUERY_RECORD_TYPES,
                                   append_results: bool = False,
                                   log_output: bool = False
-                                  ) -> None:
+                                  ) -> Optional[MdnsServiceInfo]:
         """
         Queries mDNS service record details for a given service instance, including SRV, TXT, A, and AAAA records.
 
@@ -570,12 +578,13 @@ class MdnsDiscovery:
             service_name (str): The full service name instance to query (e.g., 'device123._matter._tcp.local.').
             discovery_timeout_sec (float): Maximum time in seconds to wait for discovery events. Defaults to DISCOVERY_TIMEOUT_SEC.
             query_record_types (set[int]): DNS record types to request (e.g., {33, 16, 1, 28} for SRV, TXT, A, AAAA). Defaults to QUERY_RECORD_TYPES.
-            append_results (bool): If True, appends the result to `self._discovered_services` without clearing previous entries.
-                                   If False, resets `self._discovered_services` before storing the new result.
+            append_results (bool): If True, appends the results to `self._discovered_services` without clearing previous entries.
+                                   If False, clears `self._discovered_services` before storing the new result.
             log_output (bool): Whether to log the resulting service info as JSON after discovery.
 
         Returns:
-            None: Results are stored in `self._discovered_services`.
+            Optional[MdnsServiceInfo]: A fully resolved service instance containing details such as host address, port,
+            and associated TXT records, or None if the service could not be resolved.
         """
         rec_types = "(" + ", ".join(DNS_TYPE_MAP.get(t, str(t)) for t in query_record_types) + ")"
 
