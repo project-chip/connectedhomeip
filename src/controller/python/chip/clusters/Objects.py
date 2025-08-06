@@ -49669,7 +49669,7 @@ class CommodityTariff(Cluster):
                         ClusterObjectFieldDescriptor(Label="auxiliaryLoad", Tag=3, Type=typing.Optional[CommodityTariff.Structs.AuxiliaryLoadSwitchSettingsStruct]),
                         ClusterObjectFieldDescriptor(Label="peakPeriod", Tag=4, Type=typing.Optional[CommodityTariff.Structs.PeakPeriodStruct]),
                         ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=5, Type=typing.Optional[Globals.Structs.PowerThresholdStruct]),
-                        ClusterObjectFieldDescriptor(Label="threshold", Tag=6, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="threshold", Tag=6, Type=typing.Union[Nullable, int]),
                         ClusterObjectFieldDescriptor(Label="label", Tag=7, Type=typing.Union[None, Nullable, str]),
                         ClusterObjectFieldDescriptor(Label="predicted", Tag=8, Type=typing.Optional[bool]),
                     ])
@@ -49680,7 +49680,7 @@ class CommodityTariff(Cluster):
             auxiliaryLoad: 'typing.Optional[CommodityTariff.Structs.AuxiliaryLoadSwitchSettingsStruct]' = None
             peakPeriod: 'typing.Optional[CommodityTariff.Structs.PeakPeriodStruct]' = None
             powerThreshold: 'typing.Optional[Globals.Structs.PowerThresholdStruct]' = None
-            threshold: 'typing.Union[Nullable, uint]' = NullValue
+            threshold: 'typing.Union[Nullable, int]' = NullValue
             label: 'typing.Union[None, Nullable, str]' = None
             predicted: 'typing.Optional[bool]' = None
 
