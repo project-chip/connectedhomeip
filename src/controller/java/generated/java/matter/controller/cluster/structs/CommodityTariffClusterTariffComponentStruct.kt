@@ -30,7 +30,7 @@ class CommodityTariffClusterTariffComponentStruct(
   val auxiliaryLoad: Optional<CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct>,
   val peakPeriod: Optional<CommodityTariffClusterPeakPeriodStruct>,
   val powerThreshold: Optional<CommodityTariffClusterPowerThresholdStruct>,
-  val threshold: UInt?,
+  val threshold: Long?,
   val label: Optional<String>?,
   val predicted: Optional<Boolean>,
 ) {
@@ -168,7 +168,7 @@ class CommodityTariffClusterTariffComponentStruct(
         }
       val threshold =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_THRESHOLD))
+          tlvReader.getLong(ContextSpecificTag(TAG_THRESHOLD))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_THRESHOLD))
           null

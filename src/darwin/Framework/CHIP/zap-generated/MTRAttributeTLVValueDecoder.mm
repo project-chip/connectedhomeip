@@ -19432,7 +19432,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                     if (entry_1.threshold.IsNull()) {
                         newElement_1.threshold = nil;
                     } else {
-                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                        newElement_1.threshold = [NSNumber numberWithLongLong:entry_1.threshold.Value()];
                     }
                     if (entry_1.label.HasValue()) {
                         if (entry_1.label.Value().IsNull()) {
@@ -19618,7 +19618,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                     if (entry_1.threshold.IsNull()) {
                         newElement_1.threshold = nil;
                     } else {
-                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                        newElement_1.threshold = [NSNumber numberWithLongLong:entry_1.threshold.Value()];
                     }
                     if (entry_1.label.HasValue()) {
                         if (entry_1.label.Value().IsNull()) {
@@ -19732,7 +19732,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                     if (entry_1.threshold.IsNull()) {
                         newElement_1.threshold = nil;
                     } else {
-                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                        newElement_1.threshold = [NSNumber numberWithLongLong:entry_1.threshold.Value()];
                     }
                     if (entry_1.label.HasValue()) {
                         if (entry_1.label.Value().IsNull()) {
