@@ -199,35 +199,6 @@ class MdnsDiscovery:
 
         return self._discovered_services
 
-    async def get_all_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,) -> List[str]:
-        """
-        Asynchronously discovers all available mDNS service types within the network and returns a list
-        of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
-        function to perform the network scan for mDNS services.
-
-        Optional args:
-            log_output (bool): If set to True, the discovered service types are logged to the console.
-                            This can be useful for debugging or informational purposes. Defaults to False.
-            discovery_timeout_sec (float): The maximum time (in seconds) to wait for the discovery process. Defaults to 10.0 seconds.
-
-        Returns:
-            List[str]: A list containing the service types (str) of the discovered mDNS services. Each
-                    element in the list is a string representing a unique type of service found during
-                    the discovery process.
-        """
-        logger.info("Discovering all available mDNS service types...")
-        try:
-            service_types = list(set(await wait_for(AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces), timeout=discovery_timeout_sec)))
-        except TimeoutError:
-            logger.info(f"mDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
-            service_types = []
-
-        if log_output:
-            logger.info(
-                "\n\nDiscovered mDNS service types:\n%s\n", "\n".join(f"  - {s}" for s in service_types))
-
-        return service_types
-
     async def get_srv_record(self, service_name: str,
                              service_type: str,
                              discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
@@ -388,6 +359,35 @@ class MdnsDiscovery:
 
         logger.error(f"Service record information (PTR) for '{service_types}' not found.")
         return []
+
+    async def get_all_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,) -> List[str]:
+        """
+        Asynchronously discovers all available mDNS service types within the network and returns a list
+        of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
+        function to perform the network scan for mDNS services.
+
+        Optional args:
+            log_output (bool): If set to True, the discovered service types are logged to the console.
+                            This can be useful for debugging or informational purposes. Defaults to False.
+            discovery_timeout_sec (float): The maximum time (in seconds) to wait for the discovery process. Defaults to 10.0 seconds.
+
+        Returns:
+            List[str]: A list containing the service types (str) of the discovered mDNS services. Each
+                    element in the list is a string representing a unique type of service found during
+                    the discovery process.
+        """
+        logger.info("Discovering all available mDNS service types...")
+        try:
+            service_types = list(set(await wait_for(AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces), timeout=discovery_timeout_sec)))
+        except TimeoutError:
+            logger.info(f"mDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
+            service_types = []
+
+        if log_output:
+            logger.info(
+                "\n\nDiscovered mDNS service types:\n%s\n", "\n".join(f"  - {s}" for s in service_types))
+
+        return service_types
 
     async def get_commissionable_subtypes(self,
                                           discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
