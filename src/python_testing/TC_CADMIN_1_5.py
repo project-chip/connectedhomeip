@@ -43,6 +43,7 @@ from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError as IME
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
+from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mobly import asserts
 
 
@@ -83,11 +84,15 @@ class TC_CADMIN_1_5(MatterBaseTest):
 
     async def get_all_txt_records(self):
         discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        discovery._service_types = [mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
-        await discovery._discover(discovery_timeout_sec=240, log_output=False)
 
-        if mdns_discovery.MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
-            return discovery._discovered_services[mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
+        await discovery._discover(
+            discovery_timeout_sec=240,
+            log_output=False,
+            service_types=[MdnsServiceType.COMMISSIONABLE.value]
+        )
+
+        if MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
+            return discovery._discovered_services[MdnsServiceType.COMMISSIONABLE.value]
         return []
 
     async def wait_for_correct_cm_value(self, expected_cm_value: int, expected_discriminator: int, max_attempts: int = 5, delay_sec: int = 5):
