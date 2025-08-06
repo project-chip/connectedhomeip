@@ -60,7 +60,7 @@ scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py 
 -   [cluster objects](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/Objects.py)
 -   [matter_testing_infrastructure](https://github.com/project-chip/connectedhomeip/tree/master/src/python_testing/matter_testing_infrastructure)
     Python test utilities
-    -   [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
+    -   [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py)
         MatterBaseTest base class for tests.
 -   [Python Matter controller libraries](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/matter)
     -   [Matter Device Controller interface](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/ChipDeviceCtrl.py)
