@@ -102,7 +102,7 @@ public:
     /// buffer_size includes the prefix and must be at least PREFIX_LEN (this is NOT checked).
     ///
     /// Note that this references the given buffer in place. The buffer that the span
-    /// points to must have a lifetime that exceeds the PascalString lifetime.
+    /// points to must have a lifetime that exceeds the PascalBuffer lifetime.
     PascalBuffer(Span<T> data) : mData(data.data()), mMaxSize(static_cast<LengthType>(data.size() - PREFIX_LEN)) {}
 
     /// Returns the content of the pascal string.
