@@ -90,7 +90,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const
     case Attributes::FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     default:
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        return Status::UnsupportedAttribute;
     }
 }
 
