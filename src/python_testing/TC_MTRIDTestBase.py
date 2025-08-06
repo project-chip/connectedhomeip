@@ -18,9 +18,10 @@
 import logging
 import time
 
-from chip.clusters import Globals
+from chip.clusters import ClusterObjects, Globals
 from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -52,3 +53,11 @@ class MeterIdentificationTestBaseHelper:
                 "PowerThresholdSource attribute must return a Globals.Enums.PowerThresholdSourceEnum",
                 Globals.Enums.PowerThresholdSourceEnum,
             )
+
+    async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> None:
+
+        try:
+            asserts.assert_not_equal(reports[attribute], saved_value, saved_value,
+                                     "Reported value should be different from saved value")
+        except KeyError as err:
+            asserts.fail(f"There is not reports for attribute {attribute_name}:\n{err}")
