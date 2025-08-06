@@ -36,8 +36,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                           async_test_body, default_matter_test_main)
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_VALCC_3_3(MatterBaseTest):
@@ -97,7 +97,7 @@ class TC_VALCC_3_3(MatterBaseTest):
         self.step(5)
         cluster = Clusters.ValveConfigurationAndControl
         attributes = cluster.Attributes
-        attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        attribute_subscription = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(6)

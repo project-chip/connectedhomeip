@@ -16,7 +16,7 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace MaxNetworks {
@@ -100,6 +100,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(QueryIdentity::I
 } // namespace QueryIdentity
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace NetworkCommissioning
 } // namespace Clusters
 } // namespace app

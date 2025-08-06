@@ -104,13 +104,6 @@ protected:
     void NotifyConnectivity(void);
 
     /**
-     * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
-     *
-     * @param[in] ip New IPv4 address
-     */
-    void GotIPv4Address(uint32_t ip);
-
-    /**
      * @brief Function resets the IP and connectiity flags and triggers the DHCP operation
      *
      */

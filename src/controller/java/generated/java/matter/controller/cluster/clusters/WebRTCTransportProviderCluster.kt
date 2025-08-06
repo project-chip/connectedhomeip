@@ -106,10 +106,10 @@ class WebRTCTransportProviderCluster(
     audioStreamID: UShort?,
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
     ICETransportPolicy: String?,
-    metadataOptions: UByte?,
+    metadataEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
   ): SolicitOfferResponse {
-    val commandId: UInt = 1u
+    val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -140,9 +140,9 @@ class WebRTCTransportProviderCluster(
       tlvWriter.put(ContextSpecificTag(TAG_ICE_TRANSPORT_POLICY_REQ), ICETransportPolicy)
     }
 
-    val TAG_METADATA_OPTIONS_REQ: Int = 6
-    metadataOptions?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_METADATA_OPTIONS_REQ), metadataOptions)
+    val TAG_METADATA_ENABLED_REQ: Int = 6
+    metadataEnabled?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_METADATA_ENABLED_REQ), metadataEnabled)
     }
     tlvWriter.endStructure()
 
@@ -249,10 +249,10 @@ class WebRTCTransportProviderCluster(
     audioStreamID: UShort?,
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
     ICETransportPolicy: String?,
-    metadataOptions: UByte?,
+    metadataEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
   ): ProvideOfferResponse {
-    val commandId: UInt = 3u
+    val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -291,9 +291,9 @@ class WebRTCTransportProviderCluster(
       tlvWriter.put(ContextSpecificTag(TAG_ICE_TRANSPORT_POLICY_REQ), ICETransportPolicy)
     }
 
-    val TAG_METADATA_OPTIONS_REQ: Int = 8
-    metadataOptions?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_METADATA_OPTIONS_REQ), metadataOptions)
+    val TAG_METADATA_ENABLED_REQ: Int = 8
+    metadataEnabled?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_METADATA_ENABLED_REQ), metadataEnabled)
     }
     tlvWriter.endStructure()
 
@@ -384,7 +384,7 @@ class WebRTCTransportProviderCluster(
     sdp: String,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 5u
+    val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -409,10 +409,10 @@ class WebRTCTransportProviderCluster(
 
   suspend fun provideICECandidates(
     webRTCSessionID: UShort,
-    ICECandidates: List<String>,
+    ICECandidates: List<WebRTCTransportProviderClusterICECandidateStruct>,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 6u
+    val commandId: UInt = 5u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -423,7 +423,7 @@ class WebRTCTransportProviderCluster(
     val TAG_ICE_CANDIDATES_REQ: Int = 1
     tlvWriter.startArray(ContextSpecificTag(TAG_ICE_CANDIDATES_REQ))
     for (item in ICECandidates.iterator()) {
-      tlvWriter.put(AnonymousTag, item)
+      item.toTlv(AnonymousTag, tlvWriter)
     }
     tlvWriter.endArray()
     tlvWriter.endStructure()
@@ -444,7 +444,7 @@ class WebRTCTransportProviderCluster(
     reason: UByte,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 7u
+    val commandId: UInt = 6u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)

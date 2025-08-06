@@ -45,8 +45,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                           has_cluster, run_if_endpoint_matches)
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_I_2_4(MatterBaseTest):
@@ -124,7 +124,7 @@ class TC_I_2_4(MatterBaseTest):
         cluster = Clusters.Identify
 
         self.step(2)
-        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         # Verify Q requirements for IdentifyTime attribute by write to IdentifyTime

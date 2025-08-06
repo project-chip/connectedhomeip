@@ -22,7 +22,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.problem_notices import ProblemNotice
 from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
                                          add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                          combine_derived_clusters_with_base, get_data_model_directory)
@@ -268,35 +269,44 @@ class TestSpecParsingSupport(MatterBaseTest):
         self.all_spec_clusters = set([(id, c.name, c.pics) for id, c in self.spec_xml_clusters.items()])
 
     def test_build_xml_override(self):
-        # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
-        one_five_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+        one_two_clusters, one_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_2)
         one_three_clusters, one_three_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
         one_four_clusters, one_four_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         one_four_one_clusters, one_four_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+        one_four_two_xml_clusters, one_four_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
 
-        # We know 1.3, 1.4 and 1.4.1 are clear of errors, ensure it stays that way.
+        # We know 1.2, 1.3, 1.4 and 1.4.1, 1.4.2 are clear of errors, ensure it stays that way.
+        asserts.assert_equal(len(one_two_problems), 0, "Unexpected problems found on 1.2 cluster parsing")
         asserts.assert_equal(len(one_three_problems), 0, "Unexpected problems found on 1.3 cluster parsing")
         asserts.assert_equal(len(one_four_problems), 0, "Unexpected problems found on 1.4 cluster parsing")
         asserts.assert_equal(len(one_four_one_problems), 0, "Unexpected problems found on 1.4.1 cluster parsing")
+        asserts.assert_equal(len(one_four_two_problems), 0, "Unexpected problems found on 1.4.2 cluster parsing")
 
-        asserts.assert_greater(len(set(one_five_xml_clusters.keys()) - set(one_three_clusters.keys())),
-                               0, "Master dir does not contain any clusters not in 1.3")
-        asserts.assert_greater(len(set(one_five_xml_clusters.keys()) - set(one_four_clusters.keys())),
-                               0, "Master dir does not contain any clusters not in 1.4")
+        asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_two_clusters.keys())),
+                               0, "1.2.2 dir does not contain any clusters not in 1.3")
+        asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_three_clusters.keys())),
+                               0, "1.4.2 dir does not contain any clusters not in 1.3")
+        asserts.assert_equal(len(set(one_four_two_xml_clusters.keys()) - set(one_four_clusters.keys())),
+                             0, "1.4.2 contains clusters not in 1.4")
         asserts.assert_greater(len(set(one_four_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "1.4 dir does not contain any clusters not in 1.3")
         asserts.assert_equal(len(one_four_clusters.keys()), len(one_four_one_clusters.keys()),
                              "1.4 and 1.4.1 do not contain the same clusters")
+
+        # The following clusters were removed in 1.3: Scenes, Leaf Wetness Measurement, Soil Moisture Measurement
+        one_two_removed = set([0x0005, 0x0407, 0x0408])
+        asserts.assert_equal(set(one_two_clusters.keys()) - set(one_three_clusters.keys()),
+                             one_two_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
         # only the pulse width modulation cluster was removed post 1.3
         one_four_removed = set([Clusters.PulseWidthModulation.id])
         asserts.assert_equal(set(one_three_clusters.keys()) - set(one_four_clusters.keys()),
                              one_four_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
-        # Ballast and all the proxy clusters are being removed in 1.5
+        # Ballast and all the proxy clusters are being removed in 1.4.2
         one_five_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
                                Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
-        asserts.assert_equal(set(one_four_clusters.keys())-set(one_five_xml_clusters.keys()),
+        asserts.assert_equal(set(one_four_clusters.keys())-set(one_four_two_xml_clusters.keys()),
                              one_five_removed, "There are some 1.4 clusters that are unexpectedly not included in the TOT spec")
-        asserts.assert_equal(set(one_three_clusters.keys())-set(one_five_xml_clusters.keys()),
+        asserts.assert_equal(set(one_three_clusters.keys())-set(one_four_two_xml_clusters.keys()),
                              one_four_removed.union(one_five_removed), "There are some 1.3 clusters that are unexpectedly not included in the TOT spec")
 
         str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
@@ -501,19 +511,19 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_false(clusters[id].is_provisional, "Non-provisional cluster marked as provisional")
 
     def test_atomic_thermostat(self):
-        one_five_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+        one_four_two_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
         one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
         one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
 
-        asserts.assert_in("Atomic Request", one_five_xml_clusters[Clusters.Thermostat.id].command_map,
+        asserts.assert_in("Atomic Request", one_four_two_xml_clusters[Clusters.Thermostat.id].command_map,
                           "Atomic request not found on thermostat command map")
-        request_id = one_five_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Request"]
-        asserts.assert_in(request_id, one_five_xml_clusters[Clusters.Thermostat.id].accepted_commands.keys(),
+        request_id = one_four_two_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Request"]
+        asserts.assert_in(request_id, one_four_two_xml_clusters[Clusters.Thermostat.id].accepted_commands.keys(),
                           "Atomic request not found in thermostat accepted command list")
 
         asserts.assert_in("Atomic Response", one_four_clusters[Clusters.Thermostat.id].command_map,
                           "Atomic response not found in the thermostat command map")
-        response_id = one_five_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Response"]
+        response_id = one_four_two_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Response"]
         asserts.assert_in(response_id, one_four_clusters[Clusters.Thermostat.id].generated_commands.keys(),
                           "Atomic response not found in thermostat generated command list")
 

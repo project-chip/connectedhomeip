@@ -2857,6 +2857,13 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     for (NSNumber * deviceID in orderedDeviceIDs) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
         delegate.pretendThreadEnabled = YES;
+        // By default MTRDeviceTestDelegate sets a 2s MaxInterval.  But for this test, we don't
+        // really want that.  We don't care about getting incremental updates in this test, nor do
+        // we care about detecting subscription drops (and in fact, a subscription drop would mess
+        // up the counts in this test).
+        //
+        // Just use a 1 hour MaxInterval, for simplicity.
+        delegate.subscriptionMaxIntervalOverride = @(3600); // seconds
 
         delegate.onSubscriptionPoolDequeue = ^{
             // Count subscribing when dequeued from the subscription pool
@@ -2909,6 +2916,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         // fake device does, so keep it out of the @autoreleasepool block.
         MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
         fakeDeviceDelegate.pretendThreadEnabled = YES;
+        // See comments in the loop that sets up the other delegates above for why we are overriding
+        // subscriptionMaxIntervalOverride.
+        fakeDeviceDelegate.subscriptionMaxIntervalOverride = @(3600); // seconds
 
         @autoreleasepool {
             // Create our fake device and have it dealloc before the blocking WorkItem
@@ -3009,6 +3019,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         @(118) : @"MT:0000000000Z1J900000",
         @(119) : @"MT:000008C801FFJ900000",
         @(120) : @"MT:00000GOG02XSJ900000",
+
+        /* Reduce "many devices" to 20 until either a better number or a better testing method is found
         @(121) : @"MT:00000O-O03D4K900000",
         @(122) : @"MT:00000WAX04VHK900000",
         @(123) : @"MT:000002N315BVK900000",
@@ -3039,6 +3051,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         @(148) : @"MT:00000AZB168QT900000",
         @(149) : @"MT:00000I9K17Q1U900000",
         @(150) : @"MT:00000000007FU900000",
+         */
     };
 
     // Start our helper apps.

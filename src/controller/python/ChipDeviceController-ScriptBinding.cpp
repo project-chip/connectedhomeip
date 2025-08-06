@@ -163,6 +163,7 @@ PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, c
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
 PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_DeleteAllSessionResumption(chip::Controller::DeviceCommissioner * devCtrl);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                            uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port);
 PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
@@ -182,6 +183,13 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
                                                             chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                             chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
                                                             uint16_t discriminator, uint8_t optionInt);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+PyChipError pychip_DeviceController_OpenJointCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                 chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+                                                                 chip::NodeId nodeid, chip::EndpointId endpointId, uint16_t timeout,
+                                                                 uint32_t iteration, uint16_t discriminator);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
@@ -712,6 +720,16 @@ PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::Dev
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+PyChipError pychip_DeviceController_DeleteAllSessionResumption(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    FabricIndex fabricIndex = devCtrl->GetFabricIndex();
+
+    PyReturnErrorOnFailure(ToPyChipError(
+        DeviceControllerFactory::GetInstance().GetSystemState()->GetSessionResumptionStorage()->DeleteAll(fabricIndex)));
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                            uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port)
 {
@@ -790,6 +808,27 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
 
     return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+PyChipError pychip_DeviceController_OpenJointCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                 chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+                                                                 chip::NodeId nodeid, chip::EndpointId endpointId, uint16_t timeout,
+                                                                 uint32_t iteration, uint16_t discriminator)
+{
+    SetupPayload payload;
+    auto opener = Platform::New<Controller::CommissioningWindowOpener>(static_cast<chip::Controller::DeviceController *>(devCtrl));
+    PyChipError err =
+        ToPyChipError(opener->OpenJointCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                               .SetNodeId(nodeid)
+                                                               .SetTimeout(timeout)
+                                                               .SetIteration(iteration)
+                                                               .SetDiscriminator(discriminator)
+                                                               .SetCallback(pairingDelegate->GetOpenWindowCallback(opener))
+                                                               .SetEndpointId(endpointId),
+                                                           payload));
+    return err;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 PyChipError
 pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,

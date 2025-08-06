@@ -132,7 +132,12 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         // TODO: add option to pass in custom PAA Trust Store path to the python controller app
         const chip::Credentials::AttestationTrustStore * testingRootStore =
             GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
-        chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+        // TODO: Ensure that attestation revocation data is actually provided.
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        chip::Credentials::DeviceAttestationVerifier * dacVerifier =
+            chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+        VerifyOrDie(dacVerifier != nullptr);
+        dacVerifier->EnableVerboseLogs(true);
         chip::Credentials::SetDeviceAttestationVerifier(dacVerifier);
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
@@ -158,7 +163,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         err = gOperationalCredentialsIssuer.Initialize(gServerStorage);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Operational credentials issuer initialization failed: %s", chip::ErrorStr(err));
+            ChipLogError(Controller, "Operational credentials issuer initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
 
@@ -200,12 +205,12 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
                                                                         compressedFabricIdSpan));
         }
     exit:
-        ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));
+        ChipLogProgress(Controller, "Commissioner initialization status: %" CHIP_ERROR_FORMAT, err.Format());
     });
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Commissioner initialization failed: %s", chip::ErrorStr(err));
+        ChipLogError(Controller, "Commissioner initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
         return nullptr;
     }
 

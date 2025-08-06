@@ -1777,6 +1777,24 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000000A: {
+                "attributeName": "RecoveryIdentifier",
+                "attributeId": 0x0000000A,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "NetworkRecoveryReason",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "IsCommissioningWithoutPower",
+                "attributeId": 0x0000000C,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -7805,15 +7823,21 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "OverallState",
+                "attributeName": "OverallCurrentState",
                 "attributeId": 0x00000003,
                 "type": "",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "OverallTarget",
+                "attributeName": "OverallTargetState",
                 "attributeId": 0x00000004,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "LatchControlModes",
+                "attributeId": 0x00000005,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -7879,7 +7903,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Target",
+                "attributeName": "TargetState",
                 "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
@@ -7935,6 +7959,12 @@ class ChipClusters:
             0x0000000A: {
                 "attributeName": "ModulationType",
                 "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "LatchControlModes",
+                "attributeId": 0x0000000B,
                 "type": "int",
                 "reportable": True,
             },
@@ -8286,6 +8316,22 @@ class ChipClusters:
                 "commandName": "SetActivePresetRequest",
                 "args": {
                     "presetHandle": "bytes",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "AddThermostatSuggestion",
+                "args": {
+                    "presetHandle": "bytes",
+                    "effectiveTime": "int",
+                    "expirationInMinutes": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "RemoveThermostatSuggestion",
+                "args": {
+                    "uniqueID": "int",
                 },
             },
             0x000000FE: {
@@ -8685,6 +8731,30 @@ class ChipClusters:
             0x00000052: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
                 "attributeId": 0x00000052,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000053: {
+                "attributeName": "MaxThermostatSuggestions",
+                "attributeId": 0x00000053,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000054: {
+                "attributeName": "ThermostatSuggestions",
+                "attributeId": 0x00000054,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000055: {
+                "attributeName": "CurrentThermostatSuggestion",
+                "attributeId": 0x00000055,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000056: {
+                "attributeName": "ThermostatSuggestionNotFollowingReason",
+                "attributeId": 0x00000056,
                 "type": "int",
                 "reportable": True,
             },
@@ -9295,77 +9365,66 @@ class ChipClusters:
                 "attributeId": 0x00000030,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000031: {
                 "attributeName": "WhitePointY",
                 "attributeId": 0x00000031,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000032: {
                 "attributeName": "ColorPointRX",
                 "attributeId": 0x00000032,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000033: {
                 "attributeName": "ColorPointRY",
                 "attributeId": 0x00000033,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000034: {
                 "attributeName": "ColorPointRIntensity",
                 "attributeId": 0x00000034,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000036: {
                 "attributeName": "ColorPointGX",
                 "attributeId": 0x00000036,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000037: {
                 "attributeName": "ColorPointGY",
                 "attributeId": 0x00000037,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000038: {
                 "attributeName": "ColorPointGIntensity",
                 "attributeId": 0x00000038,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x0000003A: {
                 "attributeName": "ColorPointBX",
                 "attributeId": 0x0000003A,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x0000003B: {
                 "attributeName": "ColorPointBY",
                 "attributeId": 0x0000003B,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x0000003C: {
                 "attributeName": "ColorPointBIntensity",
                 "attributeId": 0x0000003C,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00004000: {
                 "attributeName": "EnhancedCurrentHue",
@@ -12562,14 +12621,21 @@ class ChipClusters:
             },
             0x00000003: {
                 "commandId": 0x00000003,
-                "commandName": "GetTwoDCartesianZone",
+                "commandName": "RemoveZone",
                 "args": {
                     "zoneID": "int",
                 },
             },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "CreateOrUpdateTrigger",
+                "args": {
+                    "trigger": "ZoneTriggerControlStruct",
+                },
+            },
             0x00000005: {
                 "commandId": 0x00000005,
-                "commandName": "RemoveZone",
+                "commandName": "RemoveTrigger",
                 "args": {
                     "zoneID": "int",
                 },
@@ -12577,30 +12643,47 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SupportedZoneSources",
+                "attributeName": "MaxUserDefinedZones",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Zones",
+                "attributeName": "MaxZones",
                 "attributeId": 0x00000001,
-                "type": "",
+                "type": "int",
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "Triggers",
+                "attributeName": "Zones",
                 "attributeId": 0x00000002,
                 "type": "",
                 "reportable": True,
-                "writable": True,
             },
             0x00000003: {
-                "attributeName": "Sensitivity",
+                "attributeName": "Triggers",
                 "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "SensitivityMax",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "Sensitivity",
+                "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
+            },
+            0x00000006: {
+                "attributeName": "TwoDCartesianMax",
+                "attributeId": 0x00000006,
+                "type": "",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -12669,8 +12752,8 @@ class ChipClusters:
                     "maxResolution": "VideoResolutionStruct",
                     "minBitRate": "int",
                     "maxBitRate": "int",
-                    "minFragmentLen": "int",
-                    "maxFragmentLen": "int",
+                    "minKeyFrameInterval": "int",
+                    "maxKeyFrameInterval": "int",
                     "watermarkEnabled": "bool",
                     "OSDEnabled": "bool",
                 },
@@ -12847,7 +12930,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000012: {
-                "attributeName": "RankedVideoStreamPrioritiesList",
+                "attributeName": "StreamUsagePriorities",
                 "attributeId": 0x00000012,
                 "type": "int",
                 "reportable": True,
@@ -13187,8 +13270,8 @@ class ChipClusters:
         "clusterName": "WebRTCTransportProvider",
         "clusterId": 0x00000553,
         "commands": {
-            0x00000001: {
-                "commandId": 0x00000001,
+            0x00000000: {
+                "commandId": 0x00000000,
                 "commandName": "SolicitOffer",
                 "args": {
                     "streamUsage": "int",
@@ -13197,11 +13280,11 @@ class ChipClusters:
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
-                    "metadataOptions": "int",
+                    "metadataEnabled": "bool",
                 },
             },
-            0x00000003: {
-                "commandId": 0x00000003,
+            0x00000002: {
+                "commandId": 0x00000002,
                 "commandName": "ProvideOffer",
                 "args": {
                     "webRTCSessionID": "int",
@@ -13212,27 +13295,27 @@ class ChipClusters:
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",
                     "ICETransportPolicy": "str",
-                    "metadataOptions": "int",
+                    "metadataEnabled": "bool",
                 },
             },
-            0x00000005: {
-                "commandId": 0x00000005,
+            0x00000004: {
+                "commandId": 0x00000004,
                 "commandName": "ProvideAnswer",
                 "args": {
                     "webRTCSessionID": "int",
                     "sdp": "str",
                 },
             },
-            0x00000006: {
-                "commandId": 0x00000006,
+            0x00000005: {
+                "commandId": 0x00000005,
                 "commandName": "ProvideICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidates": "str",
+                    "ICECandidates": "ICECandidateStruct",
                 },
             },
-            0x00000007: {
-                "commandId": 0x00000007,
+            0x00000006: {
+                "commandId": 0x00000006,
                 "commandName": "EndSession",
                 "args": {
                     "webRTCSessionID": "int",
@@ -13283,8 +13366,8 @@ class ChipClusters:
         "clusterName": "WebRTCTransportRequestor",
         "clusterId": 0x00000554,
         "commands": {
-            0x00000001: {
-                "commandId": 0x00000001,
+            0x00000000: {
+                "commandId": 0x00000000,
                 "commandName": "Offer",
                 "args": {
                     "webRTCSessionID": "int",
@@ -13293,24 +13376,24 @@ class ChipClusters:
                     "ICETransportPolicy": "str",
                 },
             },
-            0x00000002: {
-                "commandId": 0x00000002,
+            0x00000001: {
+                "commandId": 0x00000001,
                 "commandName": "Answer",
                 "args": {
                     "webRTCSessionID": "int",
                     "sdp": "str",
                 },
             },
-            0x00000003: {
-                "commandId": 0x00000003,
+            0x00000002: {
+                "commandId": 0x00000002,
                 "commandName": "ICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidates": "str",
+                    "ICECandidates": "ICECandidateStruct",
                 },
             },
-            0x00000004: {
-                "commandId": 0x00000004,
+            0x00000003: {
+                "commandId": 0x00000003,
                 "commandName": "End",
                 "args": {
                     "webRTCSessionID": "int",
@@ -13398,6 +13481,7 @@ class ChipClusters:
                     "connectionID": "int",
                     "activationReason": "int",
                     "timeControl": "TransportMotionTriggerTimeControlStruct",
+                    "userDefined": "bytes",
                 },
             },
             0x00000006: {
@@ -14462,8 +14546,14 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "MeasurementType",
+                "attributeName": "TariffUnit",
                 "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "MaximumMeteredQuantities",
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
             },
@@ -14703,6 +14793,12 @@ class ChipClusters:
                 "args": {
                     "field1": "TestGlobalStruct",
                     "field2": "int",
+                },
+            },
+            0x0000001A: {
+                "commandId": 0x0000001A,
+                "commandName": "TestCheckCommandFlags",
+                "args": {
                 },
             },
             0xFFF200AA: {
@@ -15054,6 +15150,13 @@ class ChipClusters:
                 "attributeName": "GlobalStruct",
                 "attributeId": 0x00000034,
                 "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x000000FE: {
+                "attributeName": "UnsupportedAttributeRequiringAdminPrivilege",
+                "attributeId": 0x000000FE,
+                "type": "bool",
                 "reportable": True,
                 "writable": True,
             },

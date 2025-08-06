@@ -2705,6 +2705,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+                if (cppValue.energyImported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyImported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -2734,6 +2744,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                     memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().endSystime.Value()];
                 } else {
                     memberValue.endSystime = nil;
+                }
+                if (cppValue.energyExported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyExported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
                 }
             } else {
                 memberValue = nil;
@@ -2777,6 +2797,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+                if (cppValue.energyImported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyImported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -2806,6 +2836,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                     memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().endSystime.Value()];
                 } else {
                     memberValue.endSystime = nil;
+                }
+                if (cppValue.energyExported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyExported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
                 }
             } else {
                 memberValue = nil;
@@ -4087,6 +4127,239 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
 {
     using namespace Clusters::Thermostat;
     switch (aEventId) {
+    case Events::SystemModeChange::Id: {
+        Events::SystemModeChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterSystemModeChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousSystemMode.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousSystemMode.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.previousSystemMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentSystemMode)];
+            value.currentSystemMode = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::LocalTemperatureChange::Id: {
+        Events::LocalTemperatureChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterLocalTemperatureChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.currentLocalTemperature.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithShort:cppValue.currentLocalTemperature.Value()];
+            }
+            value.currentLocalTemperature = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::OccupancyChange::Id: {
+        Events::OccupancyChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterOccupancyChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousOccupancy.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousOccupancy.Value().Raw()];
+            } else {
+                memberValue = nil;
+            }
+            value.previousOccupancy = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.currentOccupancy.Raw()];
+            value.currentOccupancy = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::SetpointChange::Id: {
+        Events::SetpointChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterSetpointChangeEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.systemMode)];
+            value.systemMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.occupancy.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.occupancy.Value().Raw()];
+            } else {
+                memberValue = nil;
+            }
+            value.occupancy = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousSetpoint.HasValue()) {
+                memberValue = [NSNumber numberWithShort:cppValue.previousSetpoint.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.previousSetpoint = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithShort:cppValue.currentSetpoint];
+            value.currentSetpoint = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::RunningStateChange::Id: {
+        Events::RunningStateChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterRunningStateChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousRunningState.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.previousRunningState.Value().Raw()];
+            } else {
+                memberValue = nil;
+            }
+            value.previousRunningState = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.currentRunningState.Raw()];
+            value.currentRunningState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::RunningModeChange::Id: {
+        Events::RunningModeChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterRunningModeChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousRunningMode.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousRunningMode.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.previousRunningMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentRunningMode)];
+            value.currentRunningMode = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ActiveScheduleChange::Id: {
+        Events::ActiveScheduleChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterActiveScheduleChangeEvent new];
+
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.previousScheduleHandle.HasValue()) {
+                if (cppValue.previousScheduleHandle.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = AsData(cppValue.previousScheduleHandle.Value().Value());
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.previousScheduleHandle = memberValue;
+        } while (0);
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.currentScheduleHandle.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsData(cppValue.currentScheduleHandle.Value());
+            }
+            value.currentScheduleHandle = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ActivePresetChange::Id: {
+        Events::ActivePresetChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterActivePresetChangeEvent new];
+
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.previousPresetHandle.HasValue()) {
+                if (cppValue.previousPresetHandle.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = AsData(cppValue.previousPresetHandle.Value().Value());
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.previousPresetHandle = memberValue;
+        } while (0);
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.currentPresetHandle.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsData(cppValue.currentPresetHandle.Value());
+            }
+            value.currentPresetHandle = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known Thermostat event.
         break;
@@ -4774,24 +5047,9 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
         __auto_type * value = [MTRZoneManagementClusterZoneTriggeredEvent new];
 
         do {
-            NSArray * _Nonnull memberValue;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.zones.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                memberValue = array_0;
-            }
-            value.zones = memberValue;
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.zone];
+            value.zone = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -4811,24 +5069,9 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
         __auto_type * value = [MTRZoneManagementClusterZoneStoppedEvent new];
 
         do {
-            NSArray * _Nonnull memberValue;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.zones.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                memberValue = array_0;
-            }
-            value.zones = memberValue;
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.zone];
+            value.zone = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;

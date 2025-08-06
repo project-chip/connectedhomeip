@@ -23,7 +23,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
 
@@ -51,17 +50,16 @@ static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
  * on the device.
  */
 using SceneTableBase = SceneTable<scenes::ExtensionFieldSetsImpl>;
-class DefaultSceneTableImpl
-    : public SceneTableBase,
-      public app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>
+class DefaultSceneTableImpl : public SceneTableBase,
+                              public app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData>
 {
 public:
-    using Super = app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
+    using Super = app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData>;
 
     DefaultSceneTableImpl() : Super(kMaxScenesPerFabric, kMaxScenesPerEndpoint) {}
     ~DefaultSceneTableImpl() { Finish(); };
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
+    CHIP_ERROR Init(PersistentStorageDelegate & storage) override;
     void Finish() override;
 
     // Scene count

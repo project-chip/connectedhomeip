@@ -45,8 +45,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import Status
-from matter.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                           default_matter_test_main)
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class OrderEnum(Enum):
@@ -160,15 +160,15 @@ class TC_FAN_3_1(MatterBaseTest):
         attr = cluster.Attributes
 
         self.subscriptions = [
-            ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
-            ClusterAttributeChangeAccumulator(cluster, attr.PercentCurrent),
-            ClusterAttributeChangeAccumulator(cluster, attr.FanMode)
+            AttributeSubscriptionHandler(cluster, attr.PercentSetting),
+            AttributeSubscriptionHandler(cluster, attr.PercentCurrent),
+            AttributeSubscriptionHandler(cluster, attr.FanMode)
         ]
 
         if self.supports_multispeed:
             self.subscriptions.extend([
-                ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting),
-                ClusterAttributeChangeAccumulator(cluster, attr.SpeedCurrent)
+                AttributeSubscriptionHandler(cluster, attr.SpeedSetting),
+                AttributeSubscriptionHandler(cluster, attr.SpeedCurrent)
             ])
 
         for sub in self.subscriptions:

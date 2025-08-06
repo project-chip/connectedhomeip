@@ -38,21 +38,17 @@ from time import sleep
 from typing import Optional
 
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.native import PyChipError
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 
-class TC_CADMIN_1_11(MatterBaseTest):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.support = CADMINSupport(self)
-
+class TC_CADMIN_1_11(CADMINBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode is None:
             params = await th.OpenCommissioningWindow(
@@ -210,7 +206,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
 
         # Read CurrentFabricIndex attribute from the Operational Credentials cluster
         self.step(10)
-        th2_idx = await self.support.read_currentfabricindex(self.th2)
+        th2_idx = await self.read_currentfabricindex(self.th2)
 
         self.step(11)
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)

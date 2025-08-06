@@ -28,12 +28,17 @@
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
@@ -91,6 +96,10 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #ifdef CONFIG_CHIP_ICD_DSLS_SUPPORT
 bool sIsSitModeRequested = false;
 #endif
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
+#endif
 } // namespace
 
 namespace LedConsts {
@@ -146,6 +155,8 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
         return err;
     }
+
+    sThreadNetworkDriver.Init();
 #else
     return CHIP_ERROR_INTERNAL;
 #endif // CONFIG_NET_L2_OPENTHREAD

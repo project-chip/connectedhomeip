@@ -55,7 +55,8 @@ from TC_DEMTestBase import DEMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -179,7 +180,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
         self.step("3")
         # Subscribe to Events and when they are sent push them to a queue for checking later
-        events_callback = EventChangeCallback(Clusters.DeviceEnergyManagement)
+        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.DeviceEnergyManagement)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     self.get_endpoint(default=1))

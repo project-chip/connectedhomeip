@@ -31,6 +31,7 @@ IGNORE: Set[str] = {
     '/mock/',
     '/python/',
     '/Test',
+    '/testing/',
     '/tests/',
     '/tools/',
 
@@ -140,8 +141,15 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h': {'string', 'vector'},
     # Camera AV Stream Management and Camera AV Settings User Level Management clusters are expected to run on resource-capable devices
     'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
+    'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.cpp': {'set'},
     'src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h': {'string', 'vector'},
-    'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h': {'string', 'vector'},
+    'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h': {'string', 'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h': {'vector'},
+    'src/app/clusters/zone-management-server/zone-management-server.h': {'vector'},
+    'src/app/clusters/zone-management-server/zone-geometry.h': {'vector', 'set'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
     'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
@@ -163,11 +171,13 @@ ALLOW: Dict[str, Set[str]] = {
     # Uses platform-define to switch between list and array
     'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
 
-    # Not really for embedded consumers; uses std::deque to keep track
-    # of a list of discovered things.
-    'src/controller/SetUpCodePairer.h': {'deque'},
+    # Not really for embedded consumers, because commissioners tend to not be embedded.
+    'src/controller/SetUpCodePairer.h': {'deque', 'vector'},
+    'src/controller/SetUpCodePairer.cpp': {'vector'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
+    'src/controller/ExamplePersistentStorage.h': {'string'},
+    'src/controller/jcm/TrustVerification.h': {'string'},
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
@@ -202,4 +212,9 @@ ALLOW: Dict[str, Set[str]] = {
     # Not intended for embedded clients
     'src/app/server/JointFabricDatastore.cpp': {'vector'},
     'src/app/server/JointFabricDatastore.h': {'vector'},
+
+    # For webrtc python bindings
+    'src/controller/webrtc/WebRTC.h': {'string'},
+    'src/controller/webrtc/WebRTCClient.h': {'map', 'string'},
+    'src/controller/webrtc/WebRTCTransportRequestorManager.cpp': {'string', 'vector'},
 }

@@ -20,6 +20,9 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/python_wheel.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/controller/flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/platform/python.gni")
 import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
@@ -33,7 +36,7 @@ config("controller_wno_deprecate") {
 }
 
 shared_library("ChipDeviceCtrl") {
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     output_name = "_ChipDeviceCtrl"
   } else {
     output_name = "_ChipServer"
@@ -50,7 +53,7 @@ shared_library("ChipDeviceCtrl") {
 
   defines = []
 
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
       "ChipDeviceController-Discovery.cpp",
@@ -76,6 +79,7 @@ shared_library("ChipDeviceCtrl") {
       "matter/crypto/p256keypair.cpp",
       "matter/crypto/p256keypair.h",
       "matter/discovery/NodeResolution.cpp",
+      "matter/fault_injection/FaultInjection.cpp",
       "matter/icd/PyChipCheckInDelegate.cpp",
       "matter/icd/PyChipCheckInDelegate.h",
       "matter/interaction_model/Delegate.cpp",
@@ -91,6 +95,14 @@ shared_library("ChipDeviceCtrl") {
       "matter/tracing/TracingSetup.cpp",
       "matter/utils/DeviceProxyUtils.cpp",
     ]
+    if (chip_support_webrtc_python_bindings) {
+      sources += [
+        "matter/webrtc/RTCClient.cpp",
+        "matter/webrtc/WebRTC.cpp",
+        "matter/webrtc/WebRTC.h",
+        "matter/webrtc/WebRTCTransportCluster.cpp",
+      ]
+    }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
 
@@ -137,9 +149,19 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/transport",
   ]
 
-  if (chip_controller) {
+  if (chip_support_webrtc_python_bindings) {
     public_deps += [
-      "${chip_root}/src/controller/data_model",
+      "${chip_root}/src/controller/webrtc:chip_webrtc",
+      "${chip_root}/third_party/libdatachannel:libdatachannel",
+    ]
+    include_dirs += [
+      "${chip_root}/src/controller/webrtc/",
+      "${chip_root}/third_party/libdatachannel/repo/include",
+    ]
+  }
+
+  if (chip_support_commissioning_in_controller) {
+    public_deps += [
       "${chip_root}/src/credentials:file_attestation_trust_store",
       "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/tracing/json",
@@ -152,6 +174,23 @@ shared_library("ChipDeviceCtrl") {
       "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
+
+    if (chip_build_controller_dynamic_server) {
+      defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
+
+      deps += [ "${chip_root}/src/controller:nodatamodel" ]
+
+      # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
+      # defined and application is supposed to provide it. This adds the sources
+      # in the same way "data_model" implementations do
+      #
+      # DynamicDispatcher in src/app:interaction-model implements the actual required
+      # ember callbacks in this case...
+      sources += codegen_data_model_SOURCES
+      public_deps += codegen_data_model_PUBLIC_DEPS
+    } else {
+      public_deps += [ "${chip_root}/src/controller/data_model" ]
+    }
   } else {
     public_deps += [ "$chip_data_model" ]
   }
@@ -198,6 +237,7 @@ matter_python_wheel_action("matter-core") {
         "matter/discovery/library_handle.py",
         "matter/discovery/types.py",
         "matter/exceptions/__init__.py",
+        "matter/fault_injection/__init__.py",
         "matter/interaction_model/__init__.py",
         "matter/interaction_model/delegate.py",
         "matter/internal/__init__.py",
@@ -220,8 +260,20 @@ matter_python_wheel_action("matter-core") {
         "matter/yaml/format_converter.py",
         "matter/yaml/runner.py",
       ]
+      if (chip_support_webrtc_python_bindings) {
+        sources += [
+          "matter/webrtc/__init__.py",
+          "matter/webrtc/command.py",
+          "matter/webrtc/library_handle.py",
+          "matter/webrtc/peer_connection.py",
+          "matter/webrtc/types.py",
+          "matter/webrtc/utils.py",
+          "matter/webrtc/webrtc_client.py",
+          "matter/webrtc/webrtc_manager.py",
+        ]
+      }
 
-      if (chip_controller) {
+      if (chip_support_commissioning_in_controller) {
         sources += [ "matter/ChipDeviceCtrl.py" ]
       } else {
         sources += [ "matter/server/__init__.py" ]
@@ -229,7 +281,7 @@ matter_python_wheel_action("matter-core") {
     },
     {
       src_dir = target_out_dir
-      if (chip_controller) {
+      if (chip_support_commissioning_in_controller) {
         sources = [ "${target_out_dir}/matter/_ChipDeviceCtrl.so" ]
       } else {
         sources = [ "${target_out_dir}/matter/_ChipServer.so" ]
@@ -265,9 +317,13 @@ matter_python_wheel_action("matter-core") {
     "matter.setup_payload",
     "matter.storage",
     "matter.tracing",
+    "matter.fault_injection",
   ]
+  if (chip_support_webrtc_python_bindings) {
+    py_packages += [ "matter.webrtc" ]
+  }
 
-  if (!chip_controller) {
+  if (!chip_support_commissioning_in_controller) {
     py_packages += [ "matter.server" ]
   }
 
@@ -304,7 +360,7 @@ matter_python_wheel_action("matter-core") {
 
   py_platform_tag = py_platform_tag + "_" + cpu_tag
 
-  if (chip_controller) {
+  if (chip_support_commissioning_in_controller) {
     lib_name = "_ChipDeviceCtrl.so"
   } else {
     lib_name = "_ChipServer.so"

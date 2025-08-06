@@ -42,8 +42,9 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                           default_matter_test_main)
+from matter.testing.matter_stack_state import MatterStackState
+from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 

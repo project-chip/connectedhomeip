@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-#include <controller/AutoCommissioner.h>
-
 #include <app/InteractionModelTimeout.h>
+#include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
@@ -39,11 +38,7 @@ AutoCommissioner::AutoCommissioner()
     SetCommissioningParameters(CommissioningParameters());
 }
 
-AutoCommissioner::~AutoCommissioner()
-{
-    ReleaseDAC();
-    ReleasePAI();
-}
+AutoCommissioner::~AutoCommissioner() {}
 
 void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate)
 {
@@ -386,6 +381,14 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        if (mParams.GetUseJCM().ValueOr(false))
+        {
+            return CommissioningStage::kJCMTrustVerification;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        return CommissioningStage::kSendOpCertSigningRequest;
+    case CommissioningStage::kJCMTrustVerification:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
@@ -507,7 +510,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
 // No specific actions to take when an error happens since this command can fail and commissioning can still succeed.
 static void OnFailsafeFailureForCASE(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "ExtendFailsafe received failure response %s\n", chip::ErrorStr(error));
+    ChipLogProgress(Controller, "ExtendFailsafe received failure response: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
 // No specific actions to take upon success.
@@ -577,6 +580,9 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     auto transportType =
         mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
     mNeedsNetworkSetup = (transportType == Transport::Type::kBle);
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kNfc);
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
 #endif
@@ -668,6 +674,20 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
     mParams.SetAdminSubject(adminSubject);
 
     return CHIP_NO_ERROR;
+}
+
+void AutoCommissioner::CleanupCommissioning()
+{
+    if (IsSecondaryNetworkSupported() && TryingSecondaryNetwork())
+    {
+        ResetTryingSecondaryNetwork();
+    }
+    mPAI.Free();
+    mDAC.Free();
+    mCommissioneeDeviceProxy = nullptr;
+    mOperationalDeviceProxy  = OperationalDeviceProxy();
+    mDeviceCommissioningInfo = ReadCommissioningInfo();
+    mNeedsDST                = false;
 }
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
@@ -777,17 +797,26 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                     mParams.ClearICDStayActiveDurationMsec();
                 }
             }
+
             break;
         }
         case CommissioningStage::kConfigureTimeZone:
             mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;
             break;
-        case CommissioningStage::kSendPAICertificateRequest:
-            SetPAI(report.Get<RequestedCertificate>().certificate);
+        case CommissioningStage::kSendPAICertificateRequest: {
+            auto reportPAISpan = report.Get<RequestedCertificate>().certificate;
+
+            mPAI.CopyFromSpan(reportPAISpan);
+            mParams.SetPAI(mPAI.Span());
             break;
-        case CommissioningStage::kSendDACCertificateRequest:
-            SetDAC(report.Get<RequestedCertificate>().certificate);
+        }
+        case CommissioningStage::kSendDACCertificateRequest: {
+            auto reportDACSpan = report.Get<RequestedCertificate>().certificate;
+
+            mDAC.CopyFromSpan(reportDACSpan);
+            mParams.SetDAC(ByteSpan(mDAC.Span()));
             break;
+        }
         case CommissioningStage::kSendAttestationRequest: {
             auto & elements  = report.Get<AttestationResponse>().attestationElements;
             auto & signature = report.Get<AttestationResponse>().signature;
@@ -849,16 +878,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
         case CommissioningStage::kCleanup:
-            if (IsSecondaryNetworkSupported() && TryingSecondaryNetwork())
-            {
-                ResetTryingSecondaryNetwork();
-            }
-            ReleasePAI();
-            ReleaseDAC();
-            mCommissioneeDeviceProxy = nullptr;
-            mOperationalDeviceProxy  = OperationalDeviceProxy();
-            mDeviceCommissioningInfo = ReadCommissioningInfo();
-            mNeedsDST                = false;
+            CleanupCommissioning();
             return CHIP_NO_ERROR;
         default:
             break;
@@ -924,80 +944,6 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
 
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(proxy, nextStage));
-    return CHIP_NO_ERROR;
-}
-
-void AutoCommissioner::ReleaseDAC()
-{
-    if (mDAC != nullptr)
-    {
-        Platform::MemoryFree(mDAC);
-    }
-    mDACLen = 0;
-    mDAC    = nullptr;
-}
-
-CHIP_ERROR AutoCommissioner::SetDAC(const ByteSpan & dac)
-{
-    if (dac.size() == 0)
-    {
-        ReleaseDAC();
-        return CHIP_NO_ERROR;
-    }
-
-    VerifyOrReturnError(dac.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mDACLen != 0)
-    {
-        ReleaseDAC();
-    }
-
-    VerifyOrReturnError(CanCastTo<uint16_t>(dac.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    if (mDAC == nullptr)
-    {
-        mDAC = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(dac.size()));
-    }
-    VerifyOrReturnError(mDAC != nullptr, CHIP_ERROR_NO_MEMORY);
-    mDACLen = static_cast<uint16_t>(dac.size());
-    memcpy(mDAC, dac.data(), mDACLen);
-    mParams.SetDAC(ByteSpan(mDAC, mDACLen));
-
-    return CHIP_NO_ERROR;
-}
-
-void AutoCommissioner::ReleasePAI()
-{
-    if (mPAI != nullptr)
-    {
-        chip::Platform::MemoryFree(mPAI);
-    }
-    mPAILen = 0;
-    mPAI    = nullptr;
-}
-
-CHIP_ERROR AutoCommissioner::SetPAI(const chip::ByteSpan & pai)
-{
-    if (pai.size() == 0)
-    {
-        ReleasePAI();
-        return CHIP_NO_ERROR;
-    }
-
-    VerifyOrReturnError(pai.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mPAILen != 0)
-    {
-        ReleasePAI();
-    }
-
-    VerifyOrReturnError(CanCastTo<uint16_t>(pai.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    if (mPAI == nullptr)
-    {
-        mPAI = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(pai.size()));
-    }
-    VerifyOrReturnError(mPAI != nullptr, CHIP_ERROR_NO_MEMORY);
-    mPAILen = static_cast<uint16_t>(pai.size());
-    memcpy(mPAI, pai.data(), mPAILen);
-    mParams.SetPAI(ByteSpan(mPAI, mPAILen));
-
     return CHIP_NO_ERROR;
 }
 

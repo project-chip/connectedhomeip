@@ -22,7 +22,7 @@ from random import randbytes
 
 import matter.clusters as Clusters
 from matter.clusters import Attribute
-from matter.testing.matter_testing import MatterTestConfig
+from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.runner import MockTestRunner
 
 

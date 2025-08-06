@@ -19,10 +19,12 @@
 #include <app/data-model-provider/Provider.h>
 
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
 #include <app/util/af-types.h>
-#include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
@@ -54,7 +56,7 @@ public:
     void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
-    ServerClusterInterfaceRegistry & Registry() { return mRegistry; }
+    SingleEndpointServerClusterRegistry & Registry() { return mRegistry; }
 
     /// Generic model implementations
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
@@ -78,6 +80,7 @@ public:
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId) override;
 #endif
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
@@ -118,7 +121,7 @@ private:
     // Ember requires a persistence provider, so we make sure we can always have something
     PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
-    ServerClusterInterfaceRegistry mRegistry;
+    SingleEndpointServerClusterRegistry mRegistry;
 
     /// Finds the specified ember cluster
     ///

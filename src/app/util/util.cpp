@@ -140,7 +140,9 @@ void MatterServiceAreaPluginServerInitCallback() {}
 void MatterWaterHeaterManagementPluginServerInitCallback() {}
 void MatterWaterHeaterModePluginServerInitCallback() {}
 void MatterCommodityPricePluginServerInitCallback() {}
+void MatterCommodityTariffPluginServerInitCallback() {}
 void MatterElectricalGridConditionsPluginServerInitCallback() {}
+void MatterSoilMeasurementPluginServerInitCallback() {}
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {

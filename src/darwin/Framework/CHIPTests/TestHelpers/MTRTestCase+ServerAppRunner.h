@@ -20,6 +20,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface MTRTestCaseServerApp : NSObject
+@end
+
 @interface MTRTestCase (ServerAppRunner)
 
 /**
@@ -48,11 +51,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Same thing as startAppWithName, but also commissions the application on
  * controller with the provided node ID.
  */
-- (void)startCommissionedAppWithName:(NSString *)name
-                           arguments:(NSArray<NSString *> *)arguments
-                          controller:(MTRDeviceController *)controller
-                             payload:(NSString *)payload
-                              nodeID:(NSNumber *)nodeID;
+- (nullable MTRTestCaseServerApp *)startCommissionedAppWithName:(NSString *)name
+                                                      arguments:(NSArray<NSString *> *)arguments
+                                                     controller:(MTRDeviceController *)controller
+                                                        payload:(NSString *)payload
+                                                         nodeID:(NSNumber *)nodeID;
 
 /**
  * Same thing, but also starts a controller on a test fabric, commissions the
@@ -70,6 +73,12 @@ NS_ASSUME_NONNULL_BEGIN
  * end of the current suite.
  */
 + (nullable MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments nodeID:(NSNumber *)nodeID;
+
+/**
+ * Restarts a server app, using the original arguments of the app, concatenated
+ * with additionalArguments.
+ */
+- (BOOL)restartApp:(MTRTestCaseServerApp *)app additionalArguments:(NSArray<NSString *> *)additionalArguments;
 
 /**
  * Get the unique index that will be used for the next initialization.  This

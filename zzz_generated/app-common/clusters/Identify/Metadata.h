@@ -16,7 +16,7 @@ namespace app {
 namespace Clusters {
 namespace Identify {
 
-inline constexpr uint32_t kRevision = 4;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
 namespace IdentifyTime {
@@ -41,6 +41,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(TriggerEffect::I
 } // namespace TriggerEffect
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Identify
 } // namespace Clusters
 } // namespace app

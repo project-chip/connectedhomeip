@@ -257,7 +257,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         }
         else if (CHIP_NO_ERROR != error)
         {
-            ChipLogError(SoftwareUpdate, "Matter image header parser error %s", chip::ErrorStr(error));
+            ChipLogError(SoftwareUpdate, "Matter image header parser error: %" CHIP_ERROR_FORMAT, error.Format());
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
             imageProcessor->mHeaderParser.Clear();
             return;

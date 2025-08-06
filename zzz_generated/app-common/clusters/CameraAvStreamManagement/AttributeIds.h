@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 46;
+
 namespace MaxConcurrentEncoders {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MaxConcurrentEncoders
@@ -84,9 +88,9 @@ namespace AllocatedSnapshotStreams {
 inline constexpr AttributeId Id = 0x00000011;
 } // namespace AllocatedSnapshotStreams
 
-namespace RankedVideoStreamPrioritiesList {
+namespace StreamUsagePriorities {
 inline constexpr AttributeId Id = 0x00000012;
-} // namespace RankedVideoStreamPrioritiesList
+} // namespace StreamUsagePriorities
 
 namespace SoftRecordingPrivacyModeEnabled {
 inline constexpr AttributeId Id = 0x00000013;

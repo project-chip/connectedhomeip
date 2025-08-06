@@ -227,6 +227,11 @@ namespace GlobalStruct {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(GlobalStruct::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace GlobalStruct
+namespace UnsupportedAttributeRequiringAdminPrivilege {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(UnsupportedAttributeRequiringAdminPrivilege::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kAdminister, Access::Privilege::kAdminister);
+} // namespace UnsupportedAttributeRequiringAdminPrivilege
 namespace Unsupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Unsupported::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -377,7 +382,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(NullableRangeRestricte
 } // namespace NullableRangeRestrictedInt16s
 namespace WriteOnlyInt8u {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WriteOnlyInt8u::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+                                                          std::nullopt, Access::Privilege::kOperate);
 } // namespace WriteOnlyInt8u
 namespace NullableGlobalEnum {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NullableGlobalEnum::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -503,12 +508,31 @@ namespace GlobalEchoRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GlobalEchoRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace GlobalEchoRequest
+namespace TestCheckCommandFlags {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    TestCheckCommandFlags::Id,
+    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
+    Access::Privilege::kOperate);
+} // namespace TestCheckCommandFlags
 namespace TestDifferentVendorMeiRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(TestDifferentVendorMeiRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
 } // namespace TestDifferentVendorMeiRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace TestEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestEvent
+namespace TestFabricScopedEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestFabricScopedEvent
+namespace TestDifferentVendorMeiEvent {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TestDifferentVendorMeiEvent
+
+} // namespace Events
 } // namespace UnitTesting
 } // namespace Clusters
 } // namespace app

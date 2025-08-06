@@ -41,6 +41,8 @@ ignoreAttributeDecodeFailureList = [
      Clusters.Objects.UnitTesting.Attributes.ClusterErrorBoolean),
     (1, Clusters.Objects.UnitTesting,
      Clusters.Objects.UnitTesting.Attributes.FailureInt32U),
+    (1, Clusters.Objects.UnitTesting,
+     Clusters.Objects.UnitTesting.Attributes.WriteOnlyInt8u),
 ]
 
 
@@ -130,7 +132,11 @@ class ClusterObjectTests:
     async def TestReadWriteOnlyAttribute(cls, devCtrl):
         logger.info("Test wildcard read of attributes containing write-only attribute")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(Clusters.UnitTesting)])
-        if Clusters.UnitTesting.Attributes.WriteOnlyInt8u in res[1][Clusters.UnitTesting]:
+
+        actual_status = res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.WriteOnlyInt8u].Reason.status
+        expected_status = chip.interaction_model.Status.UnsupportedRead
+
+        if expected_status != actual_status:
             raise AssertionError("Received un-expected WriteOnlyInt8u attribute in TestCluster")
 
     @classmethod

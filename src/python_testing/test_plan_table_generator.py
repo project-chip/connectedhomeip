@@ -23,7 +23,8 @@ from pathlib import Path
 
 import click
 
-from matter.testing.matter_testing import MatterTestConfig, generate_mobly_test_config
+from matter.testing.matter_testing import MatterTestConfig
+from matter.testing.runner import generate_mobly_test_config
 
 
 def indent_multiline(multiline: str, num_spaces: int) -> str:

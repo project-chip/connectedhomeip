@@ -49,7 +49,7 @@ executable("${sample_name}") {
     "${project_dir}/common/chef-laundry-washer-controls-delegate-impl.cpp",
     "${project_dir}/common/chef-laundry-washer-mode.cpp",
     "${project_dir}/common/chef-operational-state-delegate-impl.cpp",
-    "${project_dir}/common/chef-rpc-actions-worker.cpp",
+    "${project_dir}/common/chef-pump.cpp",
     "${project_dir}/common/chef-rvc-mode-delegate.cpp",
     "${project_dir}/common/chef-rvc-operational-state-delegate.cpp",
     "${project_dir}/common/clusters/audio-output/AudioOutputManager.cpp",
@@ -61,6 +61,8 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/low-power/LowPowerManager.cpp",
     "${project_dir}/common/clusters/media-input/MediaInputManager.cpp",
     "${project_dir}/common/clusters/media-playback/MediaPlaybackManager.cpp",
+    "${project_dir}/common/clusters/microwave-oven-control/chef-microwave-oven-control.cpp",
+    "${project_dir}/common/clusters/microwave-oven-mode/chef-microwave-oven-mode.cpp",
     "${project_dir}/common/clusters/oven-cavity-operational-state/chef-oven-cavity-operational-state.cpp",
     "${project_dir}/common/clusters/oven-mode/chef-oven-mode.cpp",
     "${project_dir}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp",
@@ -88,8 +90,10 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters",
   ]
 
+  defines = [ "CHIP_CONFIG_ENABLE_ACL_EXTENSIONS=1" ]
+
   if (chip_enable_pw_rpc) {
-    defines = [
+    defines += [
       "PW_RPC_ENABLED",
       "PW_RPC_ACTIONS_SERVICE=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
@@ -104,6 +108,7 @@ executable("${sample_name}") {
     sources += [
       "${chip_root}/examples/platform/linux/Rpc.cpp",
       "${chip_root}/examples/platform/linux/system_rpc_server.cc",
+      "${project_dir}/common/chef-rpc-actions-worker.cpp",
     ]
 
     deps += [

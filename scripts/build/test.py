@@ -44,7 +44,6 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'TIZEN_SDK_SYSROOT': 'TEST_TIZEN_SDK_SYSROOT',
         'TELINK_ZEPHYR_SDK_DIR': 'TELINK_ZEPHYR_SDK_DIR',
         'SYSROOT_AARCH64': 'SYSROOT_AARCH64',
-        'NXP_K32W0_SDK_ROOT': 'TEST_NXP_K32W0_SDK_ROOT',
         'IMX_SDK_ROOT': 'IMX_SDK_ROOT',
         'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
         'JAVA_HOME': 'TEST_JAVA_HOME',

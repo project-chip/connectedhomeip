@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
  *      mbedTLS based implementation of CHIP crypto primitives
  */
 
-#include "CHIPCryptoPAL.h"
+#include <crypto/CHIPCryptoPAL.h>
 
 #include <type_traits>
 
@@ -41,6 +41,7 @@
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/oid.h>
+#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
