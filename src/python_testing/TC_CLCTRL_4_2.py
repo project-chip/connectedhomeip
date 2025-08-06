@@ -234,7 +234,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         self.step("3a")
         if latch_control_modes != 0:
             logging.info("LatchControlModes is not 0, skipping steps 3b to 3e")
-            self.mark_step_range_skipped("3b", "3e") 
+            self.mark_step_range_skipped("3b", "3e")
         else:
             logging.info("LatchControlModes is 0, proceeding with fully manual latch tests")
             self.step("3b")
@@ -268,7 +268,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         self.step("4a")
         if latch_control_modes != 1:
             logging.info("LatchControlModes is not 1, skipping steps 4b to 4h")
-            self.mark_step_range_skipped("4b", "4h") 
+            self.mark_step_range_skipped("4b", "4h")
         else:
             self.step("4b")
             try:
