@@ -24,6 +24,6 @@ import("${build_root}/config/android_abi.gni")
 # Generally CHIP cannot ensure a single shared library per java application, so a shared
 # CPP support library is used
 copy("shared_cpplib") {
-  sources = [ "${android_ndk_root}/sources/cxx-stl/llvm-libc++/libs/${android_abi}/libc++_shared.so" ]
+  sources = [ "${android_ndk_root}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so" ]
   outputs = [ "${root_out_dir}/lib/jni/${android_abi}/libc++_shared.so" ]
 }
