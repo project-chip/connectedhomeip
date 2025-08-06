@@ -163,6 +163,7 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             logger.info("PICS MTRID.S.A0003 is not True")
             self.mark_current_step_skipped()
 
+        protocol_version = None
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ProtocolVersion):
             protocol_version = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
