@@ -86,9 +86,9 @@ public:
     PascalBuffer(PascalBuffer &&)      = default;
     PascalBuffer(const PascalBuffer &) = default;
 
-    /// Interprets the given buffer as the pascal string content.
+    /// Interprets the given data as the pascal string content.
     ///
-    /// Note that this references the given buffer in place. Buffer lifetime must
+    /// Note that this references the given data in place. Data lifetime must
     /// exceed the PascalBuffer lifetime.
     template <size_t N>
     PascalBuffer(T (&data)[N]) : mData(data), mMaxSize(N - PREFIX_LEN)
