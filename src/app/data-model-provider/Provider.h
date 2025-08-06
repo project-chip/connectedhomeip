@@ -51,7 +51,8 @@ public:
         mContext.emplace(context);
         return CHIP_NO_ERROR;
     }
-    virtual CHIP_ERROR Shutdown() {
+    virtual CHIP_ERROR Shutdown()
+    {
         mContext.reset();
         return CHIP_NO_ERROR;
     }
