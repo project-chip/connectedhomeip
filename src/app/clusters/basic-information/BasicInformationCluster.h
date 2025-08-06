@@ -43,11 +43,18 @@ enum class OptionalBasicInformationAttributes : uint16_t
     kDisableMandatoryUniqueIDOnPurpose = 1 << 8,
 };
 
-/// The BasicInformationCluster is a SINGLETON that only applies to
-/// the root endpoint id.
+/// This class provides a code-driven implementation for the Basic Information cluster,
+/// centralizing its logic and state. It is designed as a singleton because the cluster
+/// is defined to exist only once per node, specifically on the root endpoint (Endpoint 0).
 ///
-/// If registered, it auto-registers itself as a PlatformManagerDelegate
-/// and will emit startup/shtdown events
+/// As a PlatformManagerDelegate, it automatically hooks into the node's lifecycle to
+/// emit the mandatory StartUp and optional ShutDown events, ensuring spec compliance.
+///
+/// Note on the implementation of the singleton pattern:
+/// The constructor is public to allow for a global variable instantiation. This approach
+/// can save flash memory compared to a function-static instance, which often requires
+/// additional thread-safety mechanisms. The intended usage is via the static
+/// `Instance()` method, which returns a reference to the global instance.
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
