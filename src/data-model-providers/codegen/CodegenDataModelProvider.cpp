@@ -129,7 +129,7 @@ CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
     Reset();
     mRegistry.ClearContext();
-    return CHIP_NO_ERROR;
+    return DataModel::Provider::Shutdown();
 }
 
 CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
