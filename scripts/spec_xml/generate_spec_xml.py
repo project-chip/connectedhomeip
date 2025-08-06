@@ -25,10 +25,10 @@ from pathlib import Path
 
 import click
 import paths
-from matter.testing.spec_parsing import build_xml_clusters
+from lxml import etree
+
 from matter.testing.conformance import ConformanceDecision
 from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
-from lxml import etree
 
 # Replace hardcoded paths with dynamic paths using paths.py functions
 DEFAULT_CHIP_ROOT = paths.get_chip_root()
