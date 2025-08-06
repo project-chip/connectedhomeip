@@ -32,18 +32,16 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
-using chip::Protocols::InteractionModel::Status;
+using namespace chip::app::Clusters::WebRTCTransportProvider::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
 constexpr uint16_t kMaxSessionId = 65534;
 
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-    Commands::SolicitOffer::kMetadataEntry,
-    Commands::ProvideOffer::kMetadataEntry,
-    Commands::ProvideAnswer::kMetadataEntry,
-    Commands::ProvideICECandidates::kMetadataEntry,
-    Commands::EndSession::kMetadataEntry,
+    Commands::SolicitOffer::kMetadataEntry,         Commands::ProvideOffer::kMetadataEntry, Commands::ProvideAnswer::kMetadataEntry,
+    Commands::ProvideICECandidates::kMetadataEntry, Commands::EndSession::kMetadataEntry,
 };
 
 constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
@@ -77,7 +75,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const
 {
     switch (request.path.mAttributeId)
     {
-    case Attributes::CurrentSessions::Id:
+    case CurrentSessions::Id:
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             for (auto & session : mCurrentSessions)
             {
@@ -88,6 +86,9 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const
     case ClusterRevision::Id:
         return encoder.Encode(kRevision);
     case FeatureMap::Id:
+        // TODO: Allow delegate to specify supported features
+        // Currently hardcoded to 0 (no features supported)
+        // METADATA feature (bit 0) should be configurable based on delegate capabilities
         return encoder.Encode<uint32_t>(0);
     default:
         return Status::UnsupportedAttribute;
@@ -104,36 +105,31 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportProviderServer::Invo
     {
     case Commands::SolicitOffer::Id: {
         Commands::SolicitOffer::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex),
-                             Protocols::InteractionModel::Status::InvalidCommand);
+        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
         return HandleSolicitOffer(*handler, req);
     }
     case Commands::ProvideOffer::Id: {
         Commands::ProvideOffer::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex),
-                             Protocols::InteractionModel::Status::InvalidCommand);
+        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
         return HandleProvideOffer(*handler, req);
     }
     case Commands::ProvideAnswer::Id: {
         Commands::ProvideAnswer::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex),
-                             Protocols::InteractionModel::Status::InvalidCommand);
+        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
         return HandleProvideAnswer(*handler, req);
     }
     case Commands::ProvideICECandidates::Id: {
         Commands::ProvideICECandidates::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex),
-                             Protocols::InteractionModel::Status::InvalidCommand);
+        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
         return HandleProvideICECandidates(*handler, req);
     }
     case Commands::EndSession::Id: {
         Commands::EndSession::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex),
-                             Protocols::InteractionModel::Status::InvalidCommand);
+        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
         return HandleEndSession(*handler, req);
     }
     default:
-        return Protocols::InteractionModel::Status::UnsupportedCommand;
+        return Status::UnsupportedCommand;
     }
 }
 
@@ -260,27 +256,27 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
 
     bool privacyModeActive = false;
     if (mDelegate.IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Cannot determine privacy mode state");
-        return Protocols::InteractionModel::Status::InvalidInState;
+        return Status::InvalidInState;
     }
 
     if (privacyModeActive)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Privacy mode is enabled");
-        return Protocols::InteractionModel::Status::InvalidInState;
+        return Status::InvalidInState;
     }
 
     // At least one of Video Stream ID and Audio Stream ID has to be present
     if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
     {
         ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
-        return Protocols::InteractionModel::Status::InvalidCommand;
+        return Status::InvalidCommand;
     }
 
     // Validate VideoStreamID against AllocatedVideoStreams.
@@ -294,7 +290,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
             if (!mDelegate.HasAllocatedVideoStreams())
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: video requested when there are no AllocatedVideoStreams");
-                return Protocols::InteractionModel::Status::InvalidInState;
+                return Status::InvalidInState;
             }
         }
         else
@@ -304,7 +300,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: VideoStreamID %u does not match AllocatedVideoStreams",
                              req.videoStreamID.Value().Value());
-                return Protocols::InteractionModel::Status::DynamicConstraintError;
+                return Status::DynamicConstraintError;
             }
         }
     }
@@ -320,7 +316,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
             if (!mDelegate.HasAllocatedAudioStreams())
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedAudioStreams");
-                return Protocols::InteractionModel::Status::InvalidInState;
+                return Status::InvalidInState;
             }
         }
         else
@@ -330,7 +326,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: AudioStreamID %u does not match AllocatedAudioStreams",
                              req.audioStreamID.Value().Value());
-                return Protocols::InteractionModel::Status::DynamicConstraintError;
+                return Status::DynamicConstraintError;
             }
         }
     }
@@ -361,7 +357,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
         if (listErr != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleSolicitOffer: ICECandidates list error: %" CHIP_ERROR_FORMAT, listErr.Format());
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
 
         args.iceServers.SetValue(std::move(localIceServers));
@@ -382,7 +378,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
     WebRTCSessionStruct outSession;
     bool deferredOffer = false;
 
-    auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
+    auto status = ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
     if (!status.IsSuccess())
     {
         return status;
@@ -418,7 +414,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::SolicitOffer::Id);
     commandHandler.AddResponse(requestPath, resp);
 
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(CommandHandler & commandHandler,
@@ -450,7 +446,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
         WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
         if (existingSession == nullptr)
         {
-            return Protocols::InteractionModel::Status::NotFound;
+            return Status::NotFound;
         }
 
         // Use the existing session for further processing (re-offer case).
@@ -468,20 +464,20 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
         if (mDelegate.IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot determine privacy mode state");
-            return Protocols::InteractionModel::Status::InvalidInState;
+            return Status::InvalidInState;
         }
 
         if (privacyModeActive)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Privacy mode is enabled");
-            return Protocols::InteractionModel::Status::InvalidInState;
+            return Status::InvalidInState;
         }
 
         // At least one of Video Stream ID and Audio Stream ID has to be present
         if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
         {
             ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
 
         // Validate VideoStreamID against AllocatedVideoStreams.
@@ -493,7 +489,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
             {
                 ChipLogError(Zcl, "HandleProvideOffer: VideoStreamID %u does not match AllocatedVideoStreams",
                              videoStreamID.Value().Value());
-                return Protocols::InteractionModel::Status::DynamicConstraintError;
+                return Status::DynamicConstraintError;
             }
         }
         else if (videoStreamID.HasValue() && videoStreamID.Value().IsNull())
@@ -503,7 +499,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
             if (!mDelegate.HasAllocatedVideoStreams())
             {
                 ChipLogError(Zcl, "HandleProvideOffer: No video streams currently allocated");
-                return Protocols::InteractionModel::Status::InvalidInState;
+                return Status::InvalidInState;
             }
             // Automatic selection will be handled by the delegate in HandleProvideOffer.
         }
@@ -515,7 +511,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
             {
                 ChipLogError(Zcl, "HandleProvideOffer: AudioStreamID %u does not match AllocatedAudioStreams",
                              audioStreamID.Value().Value());
-                return Protocols::InteractionModel::Status::DynamicConstraintError;
+                return Status::DynamicConstraintError;
             }
         }
         else if (audioStreamID.HasValue() && audioStreamID.Value().IsNull())
@@ -525,7 +521,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
             if (!mDelegate.HasAllocatedAudioStreams())
             {
                 ChipLogError(Zcl, "HandleProvideOffer: No audio streams currently allocated");
-                return Protocols::InteractionModel::Status::InvalidInState;
+                return Status::InvalidInState;
             }
             // Automatic selection will be handled by the delegate in HandleProvideOffer.
         }
@@ -535,7 +531,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot meet resource management conditions");
-            return Protocols::InteractionModel::Status::ResourceExhausted;
+            return Status::ResourceExhausted;
         }
 
         // Generate new sessiond id
@@ -565,7 +561,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
         if (listErr != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: ICEServers list error: %" CHIP_ERROR_FORMAT, listErr.Format());
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Status::InvalidCommand;
         }
 
         args.iceServers.SetValue(std::move(localIceServers));
@@ -606,7 +602,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::ProvideOffer::Id);
     commandHandler.AddResponse(requestPath, resp);
 
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideAnswer(CommandHandler & commandHandler,
@@ -618,7 +614,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideAnswer
     WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
     if (existingSession == nullptr)
     {
-        return Protocols::InteractionModel::Status::NotFound;
+        return Status::NotFound;
     }
 
     std::string sdpAnswer(sdpSpan.data(), sdpSpan.size());
@@ -645,13 +641,13 @@ WebRTCTransportProviderServer::HandleProvideICECandidates(CommandHandler & comma
     if (listErr != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleProvideICECandidates: ICECandidates list error: %" CHIP_ERROR_FORMAT, listErr.Format());
-        return Protocols::InteractionModel::Status::InvalidCommand;
+        return Status::InvalidCommand;
     }
 
     WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
     if (existingSession == nullptr)
     {
-        return Protocols::InteractionModel::Status::NotFound;
+        return Status::NotFound;
     }
 
     // Delegate the handling of ICE candidates.
@@ -669,13 +665,13 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleEndSession(Co
     if (reason == WebRTCEndReasonEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "HandleEndSession: Invalid reason value %u.", to_underlying(reason));
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Status::ConstraintError;
     }
 
     WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
     if (existingSession == nullptr)
     {
-        return Protocols::InteractionModel::Status::NotFound;
+        return Status::NotFound;
     }
 
     // Delegate handles decrementing reference counts on video/audio streams if applicable.
