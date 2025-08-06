@@ -99,7 +99,7 @@ public:
 
     /// Uses an existing buffer for the pascal string, represented as a span.
     ///
-    /// buffer_size includes the prefix and must be at least PREFIX_LEN (this is NOT checked).
+    /// The size of the span includes the prefix and must be at least PREFIX_LEN (this is NOT checked).
     ///
     /// Note that this references the given buffer in place. The buffer that the span
     /// points to must have a lifetime that exceeds the PascalBuffer lifetime.
