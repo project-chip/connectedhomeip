@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -45,6 +46,10 @@ namespace CumulativeEnergyReset {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CumulativeEnergyReset::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CumulativeEnergyReset
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    Accuracy::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

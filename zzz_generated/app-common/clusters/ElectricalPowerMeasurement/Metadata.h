@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -101,6 +102,13 @@ namespace NeutralCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NeutralCurrent::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NeutralCurrent
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    PowerMode::kMetadataEntry,
+    NumberOfMeasurementTypes::kMetadataEntry,
+    Accuracy::kMetadataEntry,
+    ActivePower::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
