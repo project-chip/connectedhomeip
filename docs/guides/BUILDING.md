@@ -337,7 +337,7 @@ ninja -C out/host src/inet/tests:tests_run
 
 To run a unit test, pass the target path to ninja in the form:
 "<platform>/phony/<src_path>/<test_file>.run" OR
-"<platform>/tests/<test_file>.run"
+"<platform>/tests/<test_file>"
 
 -   `<platform>` is the build configuration directory, such as `linux_x64_clang`
     for a Linux build using Clang. You can find this by looking at the
