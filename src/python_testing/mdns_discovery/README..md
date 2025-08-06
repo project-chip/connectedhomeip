@@ -1,8 +1,14 @@
 # MdnsDiscovery — Matter mDNS Service Discovery Tool
 
-The `MdnsDiscovery` class is a utility designed to discover Matter devices on the local network using mDNS over IPv6. It facilitates service discovery for the four core Matter roles: commissioner, commissionable node, operational node, and Thread border router. Internally, it leverages the [**python-zeroconf**](https://github.com/python-zeroconf/python-zeroconf)` library to perform mDNS lookups.
+The `MdnsDiscovery` class is a utility designed to discover Matter devices on
+the local network using mDNS over IPv6. It facilitates service discovery for the
+four core Matter roles: commissioner, commissionable node, operational node, and
+Thread border router. Internally, it leverages the
+[**python-zeroconf**](https://github.com/python-zeroconf/python-zeroconf)`
+library to perform mDNS lookups.
 
-In addition to high-level service queries, the class also provides direct access to low-level DNS records such as PTR, SRV, TXT, A, and AAAA.
+In addition to high-level service queries, the class also provides direct access
+to low-level DNS records such as PTR, SRV, TXT, A, and AAAA.
 
 ## 📁 Folder Structure
 
@@ -19,27 +25,36 @@ mdns_discovery/
 ## 📦 Features
 
 ### Service Discovery Methods
-> These methods perform targeted discovery for specific Matter service types. Each one browses for mDNS advertisements and then queries the discovered services to retrieve detailed metadata. They return a list of fully resolved service instances, including addresses, ports, TXT records, and more.
 
-- `get_operational_services()`: Discover operational Matter nodes.
-- `get_commissioner_services()`: Discover Matter commissioners.
-- `get_commissionable_services()`: Discover commissionable Matter devices.
-- `get_border_router_services()`: Discover Thread border routers.
-- `get_all_services()`: Discover services of any kind on the network.
-- `get_all_service_types()`: Discover service types of any kind on the network.
-- `get_commissionable_subtypes()`: Discovers Matter commissionable subtypes advertised during an open commissioning window.
+> These methods perform targeted discovery for specific Matter service types.
+> Each one browses for mDNS advertisements and then queries the discovered
+> services to retrieve detailed metadata. They return a list of fully resolved
+> service instances, including addresses, ports, TXT records, and more.
+
+-   `get_operational_services()`: Discover operational Matter nodes.
+-   `get_commissioner_services()`: Discover Matter commissioners.
+-   `get_commissionable_services()`: Discover commissionable Matter devices.
+-   `get_border_router_services()`: Discover Thread border routers.
+-   `get_all_services()`: Discover services of any kind on the network.
+-   `get_all_service_types()`: Discover service types of any kind on the
+    network.
+-   `get_commissionable_subtypes()`: Discovers Matter commissionable subtypes
+    advertised during an open commissioning window.
 
 ### Record Query Methods
-> These methods perform direct queries for specific DNS record types (PTR, SRV, TXT, A, AAAA) and return their detailed information.
 
-- `get_ptr_records(service_type)`
-- `get_srv_record(service_name)`
-- `get_txt_record(service_name)`
-- `get_quada_records(hostname)`
+> These methods perform direct queries for specific DNS record types (PTR, SRV,
+> TXT, A, AAAA) and return their detailed information.
+
+-   `get_ptr_records(service_type)`
+-   `get_srv_record(service_name)`
+-   `get_txt_record(service_name)`
+-   `get_quada_records(hostname)`
 
 ## 🧪 Example Usage
 
-Below is a minimal async example that performs operational node discovery and prints each service’s instance name and IP addresses.
+Below is a minimal async example that performs operational node discovery and
+prints each service’s instance name and IP addresses.
 
 ```python
 import asyncio
