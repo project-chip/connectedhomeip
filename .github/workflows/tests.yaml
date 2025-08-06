@@ -233,7 +233,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
                   "
             - name: Build Apps
-              # TODO: Add back removed build targets.
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build_python.sh \
@@ -242,7 +241,19 @@ jobs:
                      "
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
+                        --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
+                        --target linux-x64-lock-${BUILD_VARIANT} \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT} \
+                        --target linux-x64-ota-requestor-${BUILD_VARIANT} \
+                        --target linux-x64-tv-app-${BUILD_VARIANT} \
+                        --target linux-x64-bridge-${BUILD_VARIANT} \
+                        --target linux-x64-lit-icd-${BUILD_VARIANT} \
+                        --target linux-x64-microwave-oven-${BUILD_VARIANT} \
+                        --target linux-x64-rvc-${BUILD_VARIANT} \
+                        --target linux-x64-network-manager-${BUILD_VARIANT} \
+                        --target linux-x64-energy-gateway-${BUILD_VARIANT} \
+                        --target linux-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
