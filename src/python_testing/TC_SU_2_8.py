@@ -128,7 +128,7 @@ class TC_SU_2_8(MatterBaseTest):
             endpoint=endpoint
         )
 
-        resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
+        await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
         logging.info(f"AnnounceOTAProvider sent from node {controller.nodeId} to DUT.")
 
     async def wait_for_valid_update_state(self, endpoint: int, valid_states: set):
@@ -170,12 +170,12 @@ class TC_SU_2_8(MatterBaseTest):
         fabric_id_th2 = controller.fabricId + 1
         vendor_id = 0xFFF1  # from CLI
 
-        logging.info(f"Setting up TH2.")
+        logging.info("Setting up TH2.")
         th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id_th2)
         th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
-        logging.info(f"Openning commissioning window on DUT.")
+        logging.info("Openning commissioning window on DUT.")
         params = await self.open_commissioning_window(controller, dut_node_id)
 
         resp = await th2.CommissionOnNetwork(
@@ -193,7 +193,7 @@ class TC_SU_2_8(MatterBaseTest):
         provider_discriminator_1 = 1111
         provider_passcode_1 = 20202021
 
-        logging.info(f"Commissioning OTA Provider 1 to TH1")
+        logging.info("Commissioning OTA Provider 1 to TH1")
 
         await controller.CommissionOnNetwork(  # Is this ok?
             nodeId=provider_node_id_1,
@@ -208,7 +208,7 @@ class TC_SU_2_8(MatterBaseTest):
         provider_discriminator_2 = 2222
         provider_passcode_2 = 20202021
 
-        logging.info(f"Commissioning OTA Provider 2 to TH2")
+        logging.info("Commissioning OTA Provider 2 to TH2")
 
         await controller.CommissionOnNetwork(  # Is this ok?
             nodeId=provider_node_id_2,
