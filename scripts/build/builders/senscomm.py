@@ -23,6 +23,7 @@ class SenscommApp(Enum):
     LIGHT = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    AYLA = auto()
 
     def ExampleName(self):
         if self == SenscommApp.LOCK:
@@ -33,18 +34,22 @@ class SenscommApp(Enum):
             return 'all-clusters-app'
         elif self == SenscommApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
+        elif self == SenscommApp.AYLA:
+            return 'ayla-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == SenscommApp.LOCK:
-            return 'chip-psoc6-lock-example'
+            return 'chip-scm1612s-lock-example'
         elif self == SenscommApp.LIGHT:
-            return 'chip-psoc6-lighting-example'
+            return 'chip-scm1612s-lighting-example'
         elif self == SenscommApp.ALL_CLUSTERS:
-            return 'chip-psoc6-clusters-example'
+            return 'chip-scm1612s-clusters-example'
         elif self == SenscommApp.ALL_CLUSTERS_MINIMAL:
-            return 'chip-psoc6-clusters-minimal-example'
+            return 'chip-scm1612s-clusters-minimal-example'
+        elif self == SenscommApp.AYLA:
+            return 'chip-scm1612s-ayla-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -57,6 +62,8 @@ class SenscommApp(Enum):
             return 'clusters_minimal_app.flashbundle.txt'
         elif self == SenscommApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
+        elif self == SenscommApp.AYLA:
+            return 'ayla_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 

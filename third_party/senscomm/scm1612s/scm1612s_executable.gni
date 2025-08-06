@@ -54,7 +54,7 @@ template("scm1612s_postbuild") {
       "--align", "4",
       "--version", "0.1",
       "--header-size", "0x20",
-      "--slot-size", "0x180000",
+      "--slot-size", "0x1A0000",
       "--pad-header",
       rebase_path("${root_out_dir}/${original_image_name}", root_build_dir),
       rebase_path("${root_out_dir}/${mcuboot_image_name}", root_build_dir),

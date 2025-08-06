@@ -265,7 +265,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
 
     scm_wifi_clear_config(WIFI_IF_STA);
-    scm_fs_clear_all_config_value();
+    scm_fs_clear_all_config_value(NULL);
 
     SCM1612SConfig::FactoryResetConfig();
 

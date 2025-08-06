@@ -430,6 +430,7 @@ def BuildSenscommTarget():
         TargetPart('all-clusters', app=SenscommApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal',
                    app=SenscommApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('ayla', app=SenscommApp.AYLA),
     ])
 
     return target

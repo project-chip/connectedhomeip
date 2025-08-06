@@ -1,0 +1,325 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/scm1612s.gni")
+
+template("scm1612s_ayla_sources") {
+  config("ayla_configs") {
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+    include_dirs += [
+        "${scm1612s_sdk_root}/app/ayla/components/ada",
+        "${scm1612s_sdk_root}/app/ayla/components/ada/include",
+        "${scm1612s_sdk_root}/app/ayla/components/ayla/include",
+        "${scm1612s_sdk_root}/app/ayla/components/al/include",
+        "${scm1612s_sdk_root}/app/ayla/components/al/lwip/include",
+        "${scm1612s_sdk_root}/app/ayla/components/al/wise/include",
+        "${scm1612s_sdk_root}/app/ayla/components/al/mbedtls/include",
+        "${scm1612s_sdk_root}/app/ayla/components/adw",
+        "${scm1612s_sdk_root}/app/ayla/components/adw/include",
+        "${scm1612s_sdk_root}/app/ayla/components/adb/include",
+        "${scm1612s_sdk_root}/app/ayla/components/adm/include",
+        "${scm1612s_sdk_root}/app/ayla/components/jsmn",
+        "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src",
+        "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main",
+        "${scm1612s_sdk_root}/api/include",
+        "${scm1612s_sdk_root}/include/FreeRTOS",
+        "${scm1612s_sdk_root}/include/freebsd",
+        "${scm1612s_sdk_root}/lib",
+        "${scm1612s_sdk_root}/lib/lwip/src/include",
+        "${scm1612s_sdk_root}/lib/lwip/ports/freertos/include",
+        "${scm1612s_sdk_root}/lib/mbedtls-2.28.10/include",
+        "${scm1612s_sdk_root}/lib/net",
+        "${scm1612s_sdk_root}/lib/net/http_parser",
+        "${scm1612s_sdk_root}/lib/net/http_server/include",
+        "${scm1612s_sdk_root}/lib/scm_mcuboot/mcuboot/boot/bootutil/include",
+        "${scm1612s_sdk_root}/lib/scm_mcuboot/mcuboot/boot/wise/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble_host/mynewt-nimble/porting/nimble/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/porting/nimble/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/transport/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/porting/npl/wise/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/bas/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/tps/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/gap/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/lls/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/ias/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/dis/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/gatt/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/services/ans/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/util/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/store/ram/include",
+        "${scm1612s_sdk_root}/lib/ble/nimble/mynewt-nimble/nimble/host/store/config/include",
+    ]
+    defines = [
+      "AYLA_MATTER_SUPPORT",
+      "CONFIG_RENDEZVOUS_MODE=2", #Make it a build argument
+      "SCM_PORT",
+      "AYLA_SCM_SUPPORT",
+      "AYLA_LAN_SUPPORT",
+      "AYLA_LOCAL_CONTROL_SUPPORT",
+      "AYLA_LOG_BUF_ALIGN4",
+      "AYLA_METRICS_SUPPORT",
+      "AYLA_STRERROR_R_SUPPORT",
+      "CLIENT_MT",
+      "LOG_LOCK",
+      "LOG_SEV_SHORT",
+      "AYLA_LOG_SNAPSHOTS",
+      "STATIC_WEB_CONTENT_IN_MEMORY",
+      "XXD_BIN_TO_C",
+    ]
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+    cflags = [
+      # avoid warning to error temporarily
+      #"-Wno-error",
+      #"-Wno-unused-function",
+      #"-Wno-address",
+      #"-Wno-missing-field-initializers",
+    ]
+    if (defined(invoker.cflags)) {
+      defines += invoker.cflags
+    }
+  }
+
+  ayla_target_name = target_name
+
+  # Add sources here
+  source_set(ayla_target_name) {
+    sources = [
+      #app/reporting
+      "${chip_root}/src/app/reporting/reporting.cpp",
+      "${chip_root}/src/app/reporting/SynchronizedReportSchedulerImpl.cpp",
+      "${chip_root}/src/app/reporting/ReportSchedulerImpl.cpp",
+      "${chip_root}/src/app/reporting/Engine.cpp",
+      #app/util
+      "${chip_root}/src/app/util/binding-table.cpp",
+      #"${chip_root}/src/app/util/MatterCallbacks.cpp",
+      "${chip_root}/src/app/util/attribute-storage.cpp",
+      "${chip_root}/src/app/util/DataModelHandler.cpp",
+      #"${chip_root}/src/app/util/attribute-metadata.cpp",
+      "${chip_root}/src/app/util/privilege-storage.cpp",
+      "${chip_root}/src/app/util/ember-compatibility-functions.cpp",
+      "${chip_root}/src/app/util/generic-callback-stubs.cpp",
+      #"${chip_root}/src/app/util/ember-strings.cpp",
+      "${chip_root}/src/app/util/attribute-table.cpp",
+      "${chip_root}/src/app/util/util.cpp",
+      #app/clusters
+      "${chip_root}/src/app/clusters/descriptor/descriptor.cpp",
+      "${chip_root}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp",
+      "${chip_root}/src/app/clusters/groups-server/groups-server.cpp",
+      "${chip_root}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp",
+      "${chip_root}/src/app/clusters/fixed-label-server/fixed-label-server.cpp",
+      "${chip_root}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp",
+      "${chip_root}/src/app/clusters/user-label-server/user-label-server.cpp",
+      "${chip_root}/src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp",
+      "${chip_root}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp",
+      "${chip_root}/src/app/clusters/network-commissioning/network-commissioning.cpp",
+      "${chip_root}/src/app/clusters/basic-information/basic-information.cpp",
+      "${chip_root}/src/app/clusters/access-control-server/access-control-server.cpp",
+      "${chip_root}/src/app/clusters/on-off-server/on-off-server.cpp",
+      "${chip_root}/src/app/clusters/bindings/BindingManager.cpp",
+      "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
+      "${chip_root}/src/app/clusters/bindings/bindings.cpp",
+      "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp",
+      "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
+      "${chip_root}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp",
+      "${chip_root}/src/app/clusters/diagnostic-logs-server/BDXDiagnosticLogsProvider.cpp",
+      "${chip_root}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp",
+      "${chip_root}/src/app/clusters/identify-server/identify-server.cpp",
+      #zzz_generated/app-common
+      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp",
+      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
+      #json_format_string
+      "${scm1612s_sdk_root}/app/ayla/components/jsmn/jsmn.c",
+      #mqtt
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTConnectClient.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTConnectServer.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTDeserializePublish.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTFormat.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTPacket.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTSerializePublish.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTSubscribeClient.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTSubscribeServer.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTUnsubscribeClient.c",
+      "${scm1612s_sdk_root}/app/ayla/components/paho/MQTTPacket/src/MQTTUnsubscribeServer.c",
+      #ada
+      "${scm1612s_sdk_root}/app/ayla/components/ada/ada_conf.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/ada_err.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/ada_mbuf.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/ada_timer.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/ame.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/ame_json.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/batch.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_ame.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_auth.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_batch.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_cli.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_conf.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_ifp.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_metrics.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_ota.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_prop.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/client_task.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/clientv2_msg.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/conf_json.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/http2mqtt_client.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/http_client.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/lan.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/local_control.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/log_client.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/log_page.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/metrics.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/metrics_page.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/mqtt_client.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/mqtt_packet.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/mqttv1_client.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/oem.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/onboard_msg.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/prop_mgr.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/prop_page.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/sched.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/schedeval.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/server.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/server_alt.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/server_req.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/server_test.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/sprop.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/sys_conf.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/test_svc.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ada/certs/ca_certs_der_txt.c",
+      #adm
+      "${scm1612s_sdk_root}/app/ayla/components/adm/adm.cpp", 
+      "${scm1612s_sdk_root}/app/ayla/components/adm/adm_cli.cpp",
+      "${scm1612s_sdk_root}/app/ayla/components/adm/adm_data_provider.cpp", 
+      "${scm1612s_sdk_root}/app/ayla/components/adm/ayla-server.cpp",
+      "${scm1612s_sdk_root}/app/ayla/components/adm/ayla-lc-server.cpp",
+      #ayla
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/ayla_base64.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/callback.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/clock_fmt.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/clock_sw.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/clock_utils.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/conf.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/crc.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/crc16.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/crc8.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/endian.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/format_mac.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/format_string.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/hostname_valid.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/http.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/ipaddr_fmt.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/jsmn_get.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/jsmn_iterate.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/json_format_string.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/log.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/log_buf.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/log_cmd.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/log_conf.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/log_io.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/lookup_by_name.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/lookup_by_val.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/parse_argv.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/parse_date.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/parse_hex.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/parse_mac.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/parse_url.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/snprintf.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/time_cli.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/timer.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/tlv.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/uri_arg_allowed_map.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/uri_decode.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/uri_encode.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/utf8.c",
+      "${scm1612s_sdk_root}/app/ayla/components/ayla/vsnprintf.c",
+      #al
+      "${scm1612s_sdk_root}/app/ayla/components/al/cmsis_os/al_err.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/cmsis_os/al_os_lock.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/cmsis_os/al_os_thread.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/mbedtls/al_aes.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/mbedtls/al_hash_sha1.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/mbedtls/al_hash_sha256.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/mbedtls/al_hmac_sha256.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/mbedtls/al_net_stream.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/mbedtls/al_random.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/mbedtls/al_rsa.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/lwip/al_ada_thread.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/lwip/al_net_addr.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/lwip/pfm_net_socket.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_assert.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_clock.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_log.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_log_snap.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_os_reboot.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_os_mem.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_persist.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_bt.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_bt_cli.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_wifi.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_net_if.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_net_dns.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_net_mdnss.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_net_sntp.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_httpd.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_matter.cpp",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/pfm_random.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/pfm_ada_thread.c",
+      "${scm1612s_sdk_root}/app/ayla/components/al/wise/pfm_net_socket_init.c",
+      #demo
+      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/app_common.c",
+      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/app_main.c",
+      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/demo_matter.c",
+      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/demo_ota.c",
+      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/app/callback-stub.cpp",
+      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/app/cluster-init-callback.cpp",
+      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/zap-generated/IMClusterCommandHandler.cpp",
+      #entry
+      "${scm1612s_sdk_root}/app/ayla/main.c",
+    ]
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    public_deps = [ 
+        "${chip_root}/src/crypto:public_headers",
+        "${chip_root}/src/app/common:attribute-type",
+        "${chip_root}/src/credentials:credentials",
+        "${chip_root}/src/app/common:cluster-objects",
+        "${chip_root}/src/app:app",
+        "${chip_root}/src/app/data-model:data-model",
+        "${chip_root}/src/app/server:server",
+        "${chip_root}/src/platform:platform",
+        "${chip_root}/src/protocols/interaction_model:interaction_model",
+    ]
+    if (defined(invoker.public_deps)) {
+      public_deps += invoker.public_deps
+    }
+
+    public_configs = [
+        ":ayla_configs",
+        "${chip_root}/src:includes"
+    ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
