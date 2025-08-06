@@ -34,6 +34,11 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 #endif
 
+#include "sl_component_catalog.h"
+#ifdef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+#include "ZigbeeCallbacks.h"
+#endif // SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -283,10 +288,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     error = SilabsConfig::FactoryResetConfig();
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     GetDefaultInstance().ClearThreadStack();
+#ifdef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+    Zigbee::TokenFactoryReset();
+#endif
 
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
@@ -294,7 +302,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     error = WifiInterface::GetInstance().TriggerDisconnection();
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
