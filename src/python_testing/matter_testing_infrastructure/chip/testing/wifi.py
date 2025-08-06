@@ -295,18 +295,25 @@ async def verify_operational_network(test, ssid: str) -> None:
                 ),
                 timeout=TIMEOUT
             )
+            if networks:
+                for network in networks:
+                    logger.info(f"Checking network: SSID={network.networkID.decode()} Connected={network.connected}")
+                    if network.networkID == ssid.encode():
+                        if network.connected:
+                            logger.info(f" --- verify_operational_network: DUT connected to SSID: {ssid}")
+                            return
+                        else:
+                            logger.warning(f" --- verify_operational_network: SSID {ssid} found but not connected.")
+                        break
+
         except Exception as e:
             logger.error(f" --- verify_operational_network: Exception reading networks: {e}")
-            # Let's wait a couple of seconds to change networks
-            await asyncio.sleep(WIFI_WAIT_SECONDS)
-        finally:
-            if networks and len(networks) > 0 and networks[0].connected:
-                logger.info(f" --- verify_operational_network: networks: {networks}")
-                break
-            else:
-                retry += 1
-    else:
-        asserts.fail(f" --- verify_operational_network: Could not read networks after {MAX_RETRIES} retries.")
+
+        # Let's wait a couple of seconds and retry
+        retry += 1
+        await asyncio.sleep(WIFI_WAIT_SECONDS)
+
+    asserts.fail(f" --- verify_operational_network: DUT did not connect to SSID {ssid} after {MAX_RETRIES} retries.")
 
     userwifi_netidx = await find_network_and_assert(networks, ssid)
     if userwifi_netidx is not None:
