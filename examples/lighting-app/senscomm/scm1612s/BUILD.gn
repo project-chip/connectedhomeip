@@ -108,10 +108,9 @@ scm1612s_executable("lighting_app") {
 
   defines = []
 
-#  if (chip_enable_ota_requestor) {
-#    defines += [ "MT793X_OTA_ENABLED" ]
-#    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
-#  }
+  if (chip_enable_ota_requestor) {
+    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+  }
 
   if (enable_heap_monitoring) {
     sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]

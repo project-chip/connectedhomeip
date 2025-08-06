@@ -52,6 +52,10 @@
 #include "lib/shell/commands/Help.h"
 #endif // ENABLE_CHIP_SHELL
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <OTAConfig.h>
+#endif
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
@@ -385,6 +389,9 @@ CHIP_ERROR AppTask::Init()
     RegisterLightCommands();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    OTAConfig::Init();
+#endif
     return error;
 }
 

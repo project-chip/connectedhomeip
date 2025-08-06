@@ -19,9 +19,15 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include "OTAImageProcessorImpl.h"
-#ifdef __no_stub__
-#include "filogic.h"
-#endif /* __no_stub__ */
+#include "wise_err.h"
+#include "wise_system.h"
+#include "flash_map_backend/flash_map_backend.h"
+#include "sysflash.h"
+#include "bootutil/bootutil_public.h"
+#include "cmsis_os.h"
+
+const static struct flash_area *fap;
+static uint32_t mOTAImageOffset;
 
 namespace chip {
 
@@ -43,18 +49,8 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
 
     ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::Apply()");
-#ifdef __no_stub__
-    filogic_ota_state_t err = FILOGIC_OTA_SUCCESS;
+    wise_restart();
 
-    filogic_ota_apply_sync(mFilogicCtx, &err);
-
-    if (err != FILOGIC_OTA_SUCCESS)
-    {
-        ChipLogError(SoftwareUpdate, "OTA image apply fail");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-#endif /* __no_stub__ */
     return CHIP_NO_ERROR;
 }
 
@@ -80,9 +76,9 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
+    int ret;
     ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::HandlePrepareDownload()");
 
-#ifdef __no_stub__
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     if (imageProcessor == nullptr)
@@ -96,16 +92,13 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-    imageProcessor->mFilogicCtx = DeviceLayer::PlatformMgrImpl().mFilogicCtx;
-
-    filogic_ota_state_t filogic_err;
-    filogic_ota_init_sync(imageProcessor->mFilogicCtx, &filogic_err);
-
-    if (filogic_err != FILOGIC_OTA_SUCCESS)
+    ret = flash_area_open(FLASH_AREA_IMAGE_SECONDARY(0), &fap);
+    if (ret < 0)
     {
-        ChipLogError(SoftwareUpdate, "Filogic ota init fail");
+        ChipLogError(SoftwareUpdate, "flash_area_open fail %d", ret);
         return;
     }
+    mOTAImageOffset = 0;
 
     imageProcessor->mHeaderParser.Init();
     if (!imageProcessor->mHeaderParser.IsInitialized())
@@ -114,7 +107,6 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
     imageProcessor->mParams.downloadedBytes = 0;
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
-#endif /* __no_stub__ */
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
@@ -124,6 +116,9 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     {
         return;
     }
+
+    flash_area_close(fap);
+    boot_set_pending_multi(0, 1);
 
     imageProcessor->ReleaseBlock();
 }
@@ -142,6 +137,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
+    int ret;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -166,16 +162,14 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (!block.empty())
     {
-#ifdef __no_stub__
-        filogic_ota_state_t filogic_err;
-        filogic_ota_io_write_sync(imageProcessor->mFilogicCtx, block.data(), block.size(), &filogic_err);
-        if (filogic_err != FILOGIC_OTA_SUCCESS)
+        ret = flash_area_write(fap, mOTAImageOffset, (const void *)block.data(), (uint32_t)block.size());
+        if (ret < 0)
         {
-            ChipLogError(SoftwareUpdate, "OTA process block fail %d", filogic_err);
+            ChipLogError(SoftwareUpdate, "flash_area_write fail %d", ret);
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
             return;
         }
-#endif /* __no_stub__ */
+        mOTAImageOffset += block.size();
     }
 
     ChipLogProgress(SoftwareUpdate, "OTA downloaded bytes: %ld", static_cast<uint32_t>(imageProcessor->mParams.downloadedBytes));
