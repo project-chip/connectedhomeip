@@ -19,7 +19,7 @@ to low-level DNS records such as PTR, SRV, TXT, A, and AAAA.
 ├── 📁service_listeners/          # Service listeners used during discovery sessions
 ├── 📁utils/                      # Utility functions: IPv6 filtering and other utils
 ├── 📄mdns_async_service_info.py  # Supports querying specific mDNS record types
-├── 📄mdns_discovery.py           # Main entry point for mDNS discovery operations
+└── 📄mdns_discovery.py           # Main entry point for mDNS discovery operations
 ```
 
 ## 📦 Features
