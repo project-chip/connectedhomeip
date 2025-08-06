@@ -217,13 +217,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         self.step("4a")
         if not is_position_supported or is_latching_supported:
             logging.info("Skipping steps 4b to 4h as Positioning feature is not supported or Latching feature is supported")
-            self.skip_step("4b")
-            self.skip_step("4c")
-            self.skip_step("4d")
-            self.skip_step("4e")
-            self.skip_step("4f")
-            self.skip_step("4g")
-            self.skip_step("4h")
+            self.mark_step_range_skipped("4b", "4h")
         else:
             self.step("4b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
@@ -279,19 +273,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         self.step("5a")
         if not is_latching_supported or is_position_supported:
             logging.info("Skipping steps 5b to 5n as Latching feature is not supported or Positioning feature is supported")
-            self.skip_step("5b")
-            self.skip_step("5c")
-            self.skip_step("5d")
-            self.skip_step("5e")
-            self.skip_step("5f")
-            self.skip_step("5g")
-            self.skip_step("5h")
-            self.skip_step("5i")
-            self.skip_step("5j")
-            self.skip_step("5k")
-            self.skip_step("5l")
-            self.skip_step("5m")
-            self.skip_step("5n")
+            self.mark_step_range_skipped("5b", "5n")
         else:
             self.step("5b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
@@ -305,11 +287,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.step("5c")
             if not current_latch:
                 logging.info("CurrentLatch is False, skipping Latch = False preparation steps")
-                self.skip_step("5d")
-                self.skip_step("5e")
-                self.skip_step("5f")
-                self.skip_step("5g")
-                self.skip_step("5h")
+                self.mark_step_range_skipped("5d", "5h")
             else:
                 logging.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
 
@@ -384,13 +362,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         self.step("6a")
         if not is_speed_supported or is_latching_supported:
             logging.info("Skipping steps 6b to 6h as Speed feature is not supported or Latching feature is supported")
-            self.skip_step("6b")
-            self.skip_step("6c")
-            self.skip_step("6d")
-            self.skip_step("6e")
-            self.skip_step("6f")
-            self.skip_step("6g")
-            self.skip_step("6h")
+            self.mark_step_range_skipped("6b", "6h")
         else:
             self.step("6b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
@@ -485,9 +457,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Position = MoveToFullyClosed and Speed = 4 but got: {e}")
         else:
-            self.skip_step("7b")
-            self.skip_step("7c")
-            self.skip_step("7d")
+            self.mark_step_range_skipped("7b", "7d")
 
         self.step("8a")
         if is_latching_supported:
@@ -549,16 +519,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
         else:
             logging.info("Skipping steps 8b to 8k as Latching feature is not supported")
-            self.skip_step("8b")
-            self.skip_step("8c")
-            self.skip_step("8d")
-            self.skip_step("8e")
-            self.skip_step("8f")
-            self.skip_step("8g")
-            self.skip_step("8h")
-            self.skip_step("8i")
-            self.skip_step("8j")
-            self.skip_step("8k")
+            self.mark_step_range_skipped("8b", "8k")
 
         self.step("9a")
         if is_position_supported:
