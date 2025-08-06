@@ -53,10 +53,10 @@ class ContextAttributesChangeListener : public AttributesChangedListener
 public:
     ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
     {}
-    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(path); }
+    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
 
 private:
-    DataModel::ProviderChangeListener * mListener;
+    DataModel::ProviderChangeListener & mListener;
 };
 
 /// Attempts to read via an attribute access interface (AAI)
@@ -330,7 +330,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         }
     }
 
-    ContextAttributesChangeListener changeListener(*mContext->interactionContext);
+    ContextAttributesChangeListener changeListener(mContext->interactionContext);
 
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);

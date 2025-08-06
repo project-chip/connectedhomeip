@@ -190,15 +190,13 @@ class CodegenDataModelProviderWithContext : public CodegenDataModelProvider
 public:
     CodegenDataModelProviderWithContext()
     {
-        InteractionModelContext context{
-            .eventsGenerator         = &mEventGenerator,
-            .dataModelChangeListener = &mChangeListener,
-            .actionContext           = &mActionContext,
-        };
-
-        Startup(context);
+        Startup({
+            .eventsGenerator         = mEventGenerator,
+            .dataModelChangeListener = mChangeListener,
+            .actionContext           = mActionContext,
+        });
     }
-    ~CodegenDataModelProviderWithContext() { Shutdown(); }
+    ~CodegenDataModelProviderWithContext() override { Shutdown(); }
 
     TestProviderChangeListener & ChangeListener() { return mChangeListener; }
     const TestProviderChangeListener & ChangeListener() const { return mChangeListener; }
