@@ -42,10 +42,11 @@ void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree   = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed   = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapHighWatermark::Id),
+        .enableThreadMetrics   = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::ThreadMetrics::Id),
+        .enableCurrentHeapFree = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapFree::Id),
+        .enableCurrentHeapUsed = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapUsed::Id),
+        .enableCurrentWatermarks =
+            emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapHighWatermark::Id),
     };
 
     gServer.Create(enabledAttributes);
