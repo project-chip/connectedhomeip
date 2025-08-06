@@ -104,6 +104,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     def close_all(self) -> None:
         """Closes all existing peer connections and clears the internal mappings."""
         with self._lock:
+            self.shutdown_webrtc_requestor_server()
             self._node_id_map.clear()
             self._peerconnection_map.clear()
 
