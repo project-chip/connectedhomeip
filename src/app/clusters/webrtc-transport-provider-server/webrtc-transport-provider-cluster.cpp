@@ -85,9 +85,9 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const
             }
             return CHIP_NO_ERROR;
         });
-    case Attributes::ClusterRevision::Id:
+    case ClusterRevision::Id:
         return encoder.Encode(kRevision);
-    case Attributes::FeatureMap::Id:
+    case FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     default:
         return Status::UnsupportedAttribute;
