@@ -272,8 +272,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
         self.step("5a")
         if not is_latching_supported or is_position_supported:
-            logging.info("Skipping steps 5b to 5n as Latching feature is not supported or Positioning feature is supported")
-            self.mark_step_range_skipped("5b", "5n")
+            logging.info("Skipping steps 5b to 5s as Latching feature is not supported or Positioning feature is supported")
+            self.mark_step_range_skipped("5b", "5s")
         else:
             self.step("5b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
@@ -342,12 +342,41 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
                 self.step("5l")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
+            
+            sub_handler.reset()
+                
             self.step("5m")
-            if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
-                logging.info("LatchControlModes Bit 0 is 1, skipping step 5n")
+            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                logging.info("LatchControlModes Bit 1 is 0, skipping steps 5n")
                 self.skip_step("5n")
             else:
                 self.step("5n")
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=False), timedRequestTimeoutMs=1000)
+                    logging.info("MoveTo command with Position = MoveToFullyOpen and Latch = False sent successfully")
+                except InteractionModelError as e:
+                    logging.error(f"MoveTo command with Position = MoveToFullyOpen and Latch = False failed: {e}")
+                    asserts.assert_equal(e.status, Status.Success,
+                                         f"Expected Success status for MoveTo with Position = MoveToFullyOpen and Latch = False, but got: {e}")
+
+            self.step("5o")
+            if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                logging.info("LatchControlModes Bit 1 is 1, skipping step 5p")
+                self.skip_step("5p")
+            else:
+                self.step("5p")
+                logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")
+                self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched.")
+
+            self.step("5q")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
+
+            self.step("5r")
+            if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
+                logging.info("LatchControlModes Bit 0 is 1, skipping step 5s")
+                self.skip_step("5s")
+            else:
+                self.step("5s")
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True), timedRequestTimeoutMs=1000)
                     logging.error("MoveTo command with Position = MoveToFullyOpen and Latch = True should have failed but succeeded")
@@ -467,59 +496,48 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             logging.info(f"CurrentLatch: {current_latch}")
 
             self.step("8c")
-            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
+            if current_latch and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
                 self.skip_step("8d")
             else:
                 self.step("8d")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True), timedRequestTimeoutMs=1000)
-                    logging.info("MoveTo command with Latch = True sent successfully")
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    logging.info(f"MoveTo command with Latch = {current_latch} sent successfully")
                 except InteractionModelError as e:
-                    logging.error(f"MoveTo command with Latch = True failed: {e}")
-                    asserts.assert_equal(e.status, Status.Success,
-                                         f"Expected Success status for MoveTo with Latch = True, but got: {e}")
+                    logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
+                    asserts.assert_equal(e.status, Status.InvalidInState,
+                                         f"Expected InvalidInState status for MoveTo with Latch = {current_latch}, but got: {e}")
 
             self.step("8e")
-            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+            if not current_latch and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 self.skip_step("8f")
             else:
                 self.step("8f")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
-                    logging.info("MoveTo command with Latch = False sent successfully")
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    logging.info(f"MoveTo command with Latch = {current_latch} sent successfully")
                 except InteractionModelError as e:
-                    logging.error(f"MoveTo command with Latch = False failed: {e}")
-                    asserts.assert_equal(e.status, Status.Success,
-                                         f"Expected Success status for MoveTo with Latch = False, but got: {e}")
+                    logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
+                    asserts.assert_equal(e.status, Status.InvalidInState,
+                                         f"Expected InvalidInState status for MoveTo with Latch = {current_latch}, but got: {e}")
 
             self.step("8g")
-            if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching or not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
                 self.skip_step("8h")
             else:
                 self.step("8h")
-                logging.info("LatchControlModes Bit 1 is 1, unlatch device manually")
-                self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched")
-
-            self.step("8i")
-            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
-
-            self.step("8j")
-            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                self.skip_step("8k")
-            else:
-                self.step("8k")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
-                    logging.info("MoveTo command with Latch = False sent successfully")
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    logging.info(f"MoveTo command with Latch = {current_latch} sent successfully")
                 except InteractionModelError as e:
-                    logging.error(f"MoveTo command with Latch = False failed: {e}")
+                    logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
                     asserts.assert_equal(e.status, Status.Success,
-                                         f"Expected Success status for MoveTo with Latch = False, but got: {e}")
+                                         f"Expected Success status for MoveTo with Latch = {current_latch}, but got: {e}")
             sub_handler.reset()
 
         else:
-            logging.info("Skipping steps 8b to 8k as Latching feature is not supported")
-            self.mark_step_range_skipped("8b", "8k")
+            logging.info("Skipping steps 8b to 8h as Latching feature is not supported")
+            self.mark_step_range_skipped("8b", "8h")
 
         self.step("9a")
         if is_position_supported:
