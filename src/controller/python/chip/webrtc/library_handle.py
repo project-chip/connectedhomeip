@@ -116,6 +116,10 @@ class WebRTCRequestorNativeBindings:
         handle = get_webrtc_requestor_handle()
         handle.pychip_WebRTCTransportRequestor_Init()
 
+    def shutdown_webrtc_requestor_server(self):
+        handle = get_webrtc_requestor_handle()
+        handle.pychip_WebRTCTransportRequestor_Shutdown()
+
     def set_webrtc_requestor_delegate_callbacks(self):
         handle = get_webrtc_requestor_handle()
         handle.pychip_WebRTCTransportRequestor_InitCallbacks(

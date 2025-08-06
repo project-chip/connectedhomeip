@@ -23,6 +23,7 @@ get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/
 set(PRIV_INCLUDE_DIRS_LIST
   "${CHIP_ROOT}/examples/providers"
   "${ENERGY_GATEWAY_DIR}/commodity-price/include"
+  "${ENERGY_GATEWAY_DIR}/commodity-metering/include"
   "${ENERGY_GATEWAY_DIR}/common/include"
   "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/include"
   "${ENERGY_GATEWAY_DIR}/meter-identification/include"
@@ -35,6 +36,7 @@ set(SRC_DIRS_LIST
   "${APP_COMMON_GEN_DIR}"
   "${CHIP_ROOT}/examples/providers"
   "${ENERGY_GATEWAY_DIR}/commodity-price/src"
+  "${ENERGY_GATEWAY_DIR}/commodity-metering/src"
   "${ENERGY_GATEWAY_DIR}/common/src"
   "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/src"
   "${ENERGY_GATEWAY_DIR}/meter-identification/src"

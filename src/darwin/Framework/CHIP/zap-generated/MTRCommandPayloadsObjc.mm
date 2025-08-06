@@ -37508,7 +37508,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.tariffComponent.threshold.IsNull()) {
             self.tariffComponent.threshold = nil;
         } else {
-            self.tariffComponent.threshold = [NSNumber numberWithUnsignedInt:decodableStruct.tariffComponent.threshold.Value()];
+            self.tariffComponent.threshold = [NSNumber numberWithLongLong:decodableStruct.tariffComponent.threshold.Value()];
         }
         if (decodableStruct.tariffComponent.label.HasValue()) {
             if (decodableStruct.tariffComponent.label.Value().IsNull()) {

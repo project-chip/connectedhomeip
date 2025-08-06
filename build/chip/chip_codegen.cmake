@@ -33,12 +33,15 @@ function(chip_codegen TARGET_NAME)
 
     set(CHIP_CODEGEN_PREGEN_DIR "" CACHE PATH "Pre-generated directory to use instead of compile-time code generation.")
 
+    # Python is required for code generation
+    find_package(Python3 REQUIRED)
+
     # Output paths can contain placeholders such as
     # {{defined_cluster_name}} or {{server_cluster_name}}
     #
     # This translates them to the actually fully expanded path.
     execute_process(
-            COMMAND "${CHIP_ROOT}/scripts/codegen_paths.py" "--idl" "${ARG_INPUT}" ${ARG_OUTPUTS}
+            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/codegen_paths.py" "--idl" "${ARG_INPUT}" ${ARG_OUTPUTS}
             OUTPUT_VARIABLE GENERATED_PATHS_OUT
     )
     string(REPLACE "\n" ";" GENERATED_PATHS "${GENERATED_PATHS_OUT}")
@@ -60,9 +63,6 @@ function(chip_codegen TARGET_NAME)
             list(APPEND OUT_NAMES "${GEN_FOLDER}/${NAME}")
         endforeach()
 
-        # Python is expected to be in the path
-        # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
-        find_package(Python3 REQUIRED)
         add_custom_command(
             OUTPUT ${OUT_NAMES}
             COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/codegen.py"

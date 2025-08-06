@@ -10490,7 +10490,7 @@ provisional cluster Chime = 1366 {
 }
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
-cluster CommodityTariff = 1792 {
+provisional cluster CommodityTariff = 1792 {
   revision 1;
 
   enum AuxiliaryLoadSettingEnum : enum8 {
@@ -10569,7 +10569,7 @@ cluster CommodityTariff = 1792 {
     optional AuxiliaryLoadSwitchSettingsStruct auxiliaryLoad = 3;
     optional PeakPeriodStruct peakPeriod = 4;
     optional PowerThresholdStruct powerThreshold = 5;
-    nullable int32u threshold = 6;
+    nullable int64s threshold = 6;
     optional nullable char_string<128> label = 7;
     optional boolean predicted = 8;
   }
