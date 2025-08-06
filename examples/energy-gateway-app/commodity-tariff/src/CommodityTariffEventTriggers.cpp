@@ -26,12 +26,12 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
+using namespace chip::app::Clusters::CommodityTariff::TariffDataSamples;
 
 static constexpr uint32_t kSecondsPer4hr = 14400; // 4 hours in seconds
 
 uint8_t presetIndex = 0;
 
-namespace TariffDataSamples {
 // Number of presets (compile-time constant)
 
 // Safe accessor function
@@ -44,7 +44,6 @@ static const TariffDataSet & GetPreset(size_t index)
 
     return kTariffPresets[index];
 }
-} // namespace TariffDataSamples
 
 #define COMMODITY_TARIFF_ATTRIBUTES_REQ \
     X(TariffUnit)                   \
@@ -66,7 +65,7 @@ static const TariffDataSet & GetPreset(size_t index)
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
-    const TariffDataSamples::TariffDataSet & tariff_preset = TariffDataSamples::GetPreset(presetIndex++);
+    const TariffDataSet & tariff_preset = GetPreset(presetIndex++);
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
     CommodityTariffInstance * instance = GetCommodityTariffInstance();
 

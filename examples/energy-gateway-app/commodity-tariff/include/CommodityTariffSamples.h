@@ -20,124 +20,183 @@
 
 #include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace CommodityTariff {
 namespace TariffDataSamples {
-
-using namespace chip;
-using namespace chip::app::DataModel;
-using namespace chip::app::Clusters::Globals;
-using namespace chip::app::Clusters::Globals::Structs;
-using namespace chip::app::Clusters::CommodityTariff;
-using namespace chip::app::Clusters::CommodityTariff::Structs;
-
-// Helper function to create CharSpan from string literal
-inline CharSpan MakeCharSpan(const char * str) {
-    return CharSpan(str, strlen(str));
-}
 
 // Sample 1 Data
 namespace Sample1 {
 
-static const TariffInformationStruct::Type TariffInfo() {
-    TariffInformationStruct::Type info;
-    info.tariffLabel.SetNonNull(MakeCharSpan("Full Tariff One"));
-    info.providerName.SetNonNull(MakeCharSpan("Default Provider"));
-    
-    CurrencyStruct::Type currency;
-    currency.currency = 120;
-    currency.decimalPoints = 0;
-    info.currency = MakeOptional(Nullable<CurrencyStruct::Type>(currency));
-    
-    info.blockMode.SetNonNull(static_cast<BlockModeEnum>(0));
-    return info;
+// Tariff Information
+static inline Structs::TariffInformationStruct::Type TariffInfo() {
+    return {
+        .tariffLabel = DataModel::MakeNullable(CharSpan::fromCharString("Full Tariff One")),
+        .providerName = DataModel::MakeNullable(CharSpan::fromCharString("Default Provider")),
+        .currency = MakeOptional(DataModel::MakeNullable<Globals::Structs::CurrencyStruct::Type>({
+            .currency = 120,
+            .decimalPoints = 0
+        })),
+        .blockMode = DataModel::MakeNullable(static_cast<BlockModeEnum>(0))
+    };
 }
 
 static const uint32_t dayEntryIDs1[] = {10, 11, 12, 13, 14, 15, 16};
 static const uint32_t dayEntryIDs2[] = {20, 21, 22, 23, 24, 25, 26};
 static const uint32_t dayEntryIDs3[] = {30};
 
-static DayEntryStruct::Type DayEntries[] = {
-    {10, 0, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {11, 240, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {12, 480, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {13, 720, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {14, 960, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {15, 1200, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {16, 1440, MakeOptional(static_cast<uint16_t>(60)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {20, 0, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {21, 240, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {22, 480, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {23, 720, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {24, 960, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {25, 1200, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {26, 1440, MakeOptional(static_cast<uint16_t>(60)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {30, 0, MakeOptional(static_cast<uint16_t>(1500)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))}
+// Day Entries
+static inline Structs::DayEntryStruct::Type DayEntries[] = {
+    { .dayEntryID = 10,
+      .startTime = 0,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 11,
+      .startTime = 240,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 12,
+      .startTime = 480,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 13,
+      .startTime = 720,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 14,
+      .startTime = 960,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 15,
+      .startTime = 1200,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 16,
+      .startTime = 1440,
+      .duration = MakeOptional(static_cast<uint16_t>(60)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 20,
+      .startTime = 0,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 21,
+      .startTime = 240,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 22,
+      .startTime = 480,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 23,
+      .startTime = 720,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 24,
+      .startTime = 960,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 25,
+      .startTime = 1200,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 26,
+      .startTime = 1440,
+      .duration = MakeOptional(static_cast<uint16_t>(60)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 30,
+      .startTime = 0,
+      .duration = MakeOptional(static_cast<uint16_t>(1500)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) }
 };
 
-static DayPatternStruct::Type DayPatterns[] = {
-    {0, BitMask<DayPatternDayOfWeekBitmap>(0x55), List<const uint32_t>(dayEntryIDs1)},
-    {1, BitMask<DayPatternDayOfWeekBitmap>(0x2A), List<const uint32_t>(dayEntryIDs2)}
+// Day Patterns
+static inline Structs::DayPatternStruct::Type DayPatterns[] = {
+    { .dayPatternID = 0,
+      .daysOfWeek = BitMask<DayPatternDayOfWeekBitmap>(0x55),
+      .dayEntryIDs = Span<const uint32_t>(dayEntryIDs1) },
+    { .dayPatternID = 1,
+      .daysOfWeek = BitMask<DayPatternDayOfWeekBitmap>(0x2A),
+      .dayEntryIDs = Span<const uint32_t>(dayEntryIDs2) }
 };
 
-const uint32_t dayPatternIDs[] = {0, 1};
+static const uint32_t dayPatternIDs[] = {0, 1};
 
-static CalendarPeriodStruct::Type CalendarPeriods[] = {
-    {Nullable<uint32_t>(0), List<const uint32_t>(dayPatternIDs)}
+// Calendar Periods
+static inline Structs::CalendarPeriodStruct::Type CalendarPeriods[] = {
+    { .startDate = DataModel::Nullable<uint32_t>(0),
+      .dayPatternIDs = Span<const uint32_t>(dayPatternIDs) }
 };
 
-static DayStruct::Type IndividualDays[] = {
-    {1745427104, static_cast<DayTypeEnum>(1), List<const uint32_t>(dayEntryIDs3)}
+static inline Structs::DayStruct::Type IndividualDays[] = {
+    { .date = 1745427104,
+      .dayType = static_cast<DayTypeEnum>(1),
+      .dayEntryIDs = Span<const uint32_t>(dayEntryIDs3) }
 };
 
-static TariffComponentStruct::Type TariffComponents[] = {
-    {
-        10,
-        MakeOptional(Nullable<TariffPriceStruct::Type>({
-            static_cast<TariffPriceTypeEnum>(0),
-            MakeOptional(static_cast<int64_t>(15)), // 0.15 represented as fixed point
-            MakeOptional(static_cast<int16_t>(1))
-        })),
-        MakeOptional(false),
-        MakeOptional(AuxiliaryLoadSwitchSettingsStruct::Type{
-            1,
-            static_cast<AuxiliaryLoadSettingEnum>(0)
-        }),
-        MakeOptional(PeakPeriodStruct::Type{
-            static_cast<PeakPeriodSeverityEnum>(1),
-            1
-        }),
-        MakeOptional(PowerThresholdStruct::Type{
-            MakeOptional(2400000),
-            MakeOptional(120),
-            static_cast<PowerThresholdSourceEnum>(0)
-        }),
-        Nullable<uint32_t>(120),
-        MakeOptional(Nullable<CharSpan>(MakeCharSpan("Tariff Component 1"))),
-        MakeOptional(false)
+static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
+    { .tariffComponentID = 10,
+      .price = MakeOptional(DataModel::Nullable<Structs::TariffPriceStruct::Type>({
+          .priceType = static_cast<Globals::TariffPriceTypeEnum>(0),
+          .price = MakeOptional(static_cast<int64_t>(15)),
+          .priceLevel = MakeOptional(static_cast<int16_t>(1))
+      })),
+      .friendlyCredit = MakeOptional(false),
+      .auxiliaryLoad = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
+          .number = 1,
+          .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0)
+      }),
+      .peakPeriod = MakeOptional(Structs::PeakPeriodStruct::Type{
+          .severity = static_cast<PeakPeriodSeverityEnum>(1),
+          .peakPeriod = 1
+      }),
+      .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
+          .powerThreshold = MakeOptional(2400000),
+          .apparentPowerThreshold = MakeOptional(120),
+          .powerThresholdSource = static_cast<Globals::PowerThresholdSourceEnum>(0)
+      }),
+      .threshold = DataModel::Nullable<uint32_t>(120),
+      .label = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 1"))),
+      .predicted = MakeOptional(false)
     },
-    {
-        20,
-        MakeOptional(Nullable<TariffPriceStruct::Type>({
-            static_cast<TariffPriceTypeEnum>(0),
-            MakeOptional(static_cast<int64_t>(20)), // 0.20 represented as fixed point
-            MakeOptional(static_cast<int16_t>(0))
-        })),
-        MakeOptional(false),
-        MakeOptional(AuxiliaryLoadSwitchSettingsStruct::Type{
-            1,
-            static_cast<AuxiliaryLoadSettingEnum>(0)
-        }),
-        MakeOptional(PeakPeriodStruct::Type{
-            static_cast<PeakPeriodSeverityEnum>(1),
-            1
-        }),
-        MakeOptional(PowerThresholdStruct::Type{
-            MakeOptional(4800000),
-            MakeOptional(240),
-            static_cast<PowerThresholdSourceEnum>(0)
-        }),
-        Nullable<uint32_t>(240),
-        MakeOptional(Nullable<CharSpan>(MakeCharSpan("Tariff Component 2"))),
-        MakeOptional(false)
+    { .tariffComponentID = 20,
+      .price = MakeOptional(DataModel::Nullable<Structs::TariffPriceStruct::Type>({
+          .priceType = static_cast<Globals::TariffPriceTypeEnum>(0),
+          .price = MakeOptional(static_cast<int64_t>(20)),
+          .priceLevel = MakeOptional(static_cast<int16_t>(0))
+      })),
+      .friendlyCredit = MakeOptional(false),
+      .auxiliaryLoad = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
+          .number = 1,
+          .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0)
+      }),
+      .peakPeriod = MakeOptional(Structs::PeakPeriodStruct::Type{
+          .severity = static_cast<PeakPeriodSeverityEnum>(1),
+          .peakPeriod = 1
+      }),
+      .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
+          .powerThreshold = MakeOptional(4800000),
+          .apparentPowerThreshold = MakeOptional(240),
+          .powerThresholdSource = static_cast<Globals::PowerThresholdSourceEnum>(0)
+      }),
+      .threshold = DataModel::Nullable<uint32_t>(240),
+      .label = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 2"))),
+      .predicted = MakeOptional(false)
     }
 };
 
@@ -152,12 +211,22 @@ static const uint32_t period4Components[] = {20};
 static const uint32_t period5DayEntries[] = {30};
 static const uint32_t period5Components[] = {10};
 
-static TariffPeriodStruct::Type TariffPeriods[] = {
-    {Nullable<CharSpan>(MakeCharSpan("Period 1")), List<const uint32_t>(period1DayEntries), List<const uint32_t>(period1Components)},
-    {Nullable<CharSpan>(MakeCharSpan("Period 2")), List<const uint32_t>(period2DayEntries), List<const uint32_t>(period2Components)},
-    {Nullable<CharSpan>(MakeCharSpan("Period 3")), List<const uint32_t>(period3DayEntries), List<const uint32_t>(period3Components)},
-    {Nullable<CharSpan>(MakeCharSpan("Period 4")), List<const uint32_t>(period4DayEntries), List<const uint32_t>(period4Components)},
-    {Nullable<CharSpan>(MakeCharSpan("Period 5")), List<const uint32_t>(period5DayEntries), List<const uint32_t>(period5Components)}
+static inline Structs::TariffPeriodStruct::Type TariffPeriods[] = {
+    { .label = DataModel::MakeNullable(CharSpan::fromCharString("Period 1")),
+      .dayEntryIDs = DataModel::List<const uint32_t>(period1DayEntries),
+      .tariffComponentIDs = DataModel::List<const uint32_t>(period1Components) },
+    { .label = DataModel::MakeNullable(CharSpan::fromCharString("Period 2")),
+      .dayEntryIDs = DataModel::List<const uint32_t>(period2DayEntries),
+      .tariffComponentIDs = DataModel::List<const uint32_t>(period2Components) },
+    { .label = DataModel::MakeNullable(CharSpan::fromCharString("Period 3")),
+      .dayEntryIDs = DataModel::List<const uint32_t>(period3DayEntries),
+      .tariffComponentIDs = DataModel::List<const uint32_t>(period3Components) },
+    { .label = DataModel::MakeNullable(CharSpan::fromCharString("Period 4")),
+      .dayEntryIDs = DataModel::List<const uint32_t>(period4DayEntries),
+      .tariffComponentIDs = DataModel::List<const uint32_t>(period4Components) },
+    { .label = DataModel::MakeNullable(CharSpan::fromCharString("Period 5")),
+      .dayEntryIDs = DataModel::List<const uint32_t>(period5DayEntries),
+      .tariffComponentIDs = DataModel::List<const uint32_t>(period5Components) }
 };
 
 } // namespace Sample1
@@ -165,117 +234,148 @@ static TariffPeriodStruct::Type TariffPeriods[] = {
 // Sample 2 Data
 namespace Sample2 {
 
-static const TariffInformationStruct::Type TariffInfo() {
-    TariffInformationStruct::Type info;
-    info.tariffLabel.SetNonNull(MakeCharSpan("Full Tariff Two"));
-    info.providerName.SetNonNull(MakeCharSpan("Example Provider"));
-    
-    CurrencyStruct::Type currency;
-    currency.currency = 200;
-    currency.decimalPoints = 1;
-    info.currency = MakeOptional(Nullable<CurrencyStruct::Type>(currency));
-    
-    info.blockMode.SetNonNull(static_cast<BlockModeEnum>(1));
-    return info;
+// Tariff Information
+static inline Structs::TariffInformationStruct::Type TariffInfo() {
+    return {
+        .tariffLabel = DataModel::MakeNullable(CharSpan::fromCharString("Full Tariff Two")),
+        .providerName = DataModel::MakeNullable(CharSpan::fromCharString("Example Provider")),
+        .currency = MakeOptional(DataModel::Nullable<Globals::Structs::CurrencyStruct::Type>({
+            .currency = 200,
+            .decimalPoints = 1
+        })),
+        .blockMode = DataModel::MakeNullable(static_cast<BlockModeEnum>(0))
+    };
 }
 
-const uint32_t dayEntryIDs[] = {10, 11, 12, 13, 14, 15, 16};
+static const uint32_t dayEntryIDs[] = {10, 11, 12, 13, 14, 15, 16};
 
-static DayEntryStruct::Type DayEntries[] = {
-    {10, 0, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {11, 240, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {12, 480, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {13, 720, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {14, 960, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {15, 1200, MakeOptional(static_cast<uint16_t>(240)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))},
-    {16, 1440, MakeOptional(static_cast<uint16_t>(60)), MakeOptional(static_cast<int16_t>(0)), MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0))}
+// Day Entries
+static inline Structs::DayEntryStruct::Type DayEntries[] = {
+    { .dayEntryID = 10,
+      .startTime = 0,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 11,
+      .startTime = 240,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 12,
+      .startTime = 480,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 13,
+      .startTime = 720,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 14,
+      .startTime = 960,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 15,
+      .startTime = 1200,
+      .duration = MakeOptional(static_cast<uint16_t>(240)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) },
+    { .dayEntryID = 16,
+      .startTime = 1440,
+      .duration = MakeOptional(static_cast<uint16_t>(60)),
+      .randomizationOffset = MakeOptional(static_cast<int16_t>(0)),
+      .randomizationType = MakeOptional(static_cast<DayEntryRandomizationTypeEnum>(0)) }
 };
 
-static DayPatternStruct::Type DayPatterns[] = {
-    {0, BitMask<DayPatternDayOfWeekBitmap>(0x7F), List<const uint32_t>(dayEntryIDs)}
+// Day Patterns
+static inline Structs::DayPatternStruct::Type DayPatterns[] = {
+    { .dayPatternID = 0,
+      .daysOfWeek = BitMask<DayPatternDayOfWeekBitmap>(0x7F),
+      .dayEntryIDs = DataModel::List<const uint32_t>(dayEntryIDs) }
 };
 
 static const uint32_t dayPatternIDs[] = {0};
 
-static CalendarPeriodStruct::Type CalendarPeriods[] = {
-    {Nullable<uint32_t>(0), List<const uint32_t>(dayPatternIDs)}
+// Calendar Periods
+static inline Structs::CalendarPeriodStruct::Type CalendarPeriods[] = {
+    { .startDate = DataModel::Nullable<uint32_t>(0),
+      .dayPatternIDs = DataModel::List<const uint32_t>(dayPatternIDs) }
 };
 
-static TariffComponentStruct::Type TariffComponents[] = {
-    {
-        10,
-        MakeOptional(Nullable<TariffPriceStruct::Type>({
-            static_cast<TariffPriceTypeEnum>(0),
-            MakeOptional(static_cast<int64_t>(15)), // 0.15 represented as fixed point
-            MakeOptional(static_cast<int16_t>(1))
-        })),
-        MakeOptional(false),
-        MakeOptional(AuxiliaryLoadSwitchSettingsStruct::Type{
-            1,
-            static_cast<AuxiliaryLoadSettingEnum>(0)
-        }),
-        MakeOptional(PeakPeriodStruct::Type{
-            static_cast<PeakPeriodSeverityEnum>(1),
-            1
-        }),
-        MakeOptional(PowerThresholdStruct::Type{
-            MakeOptional(2400000),
-            MakeOptional(120),
-            static_cast<PowerThresholdSourceEnum>(0)
-        }),
-        Nullable<uint32_t>(120),
-        MakeOptional(Nullable<CharSpan>(MakeCharSpan("Tariff Component 1"))),
-        MakeOptional(false)
+// Tariff Components
+static inline Structs::TariffComponentStruct::Type TariffComponents[] = {
+    { .tariffComponentID = 10,
+      .price = MakeOptional(DataModel::Nullable<Structs::TariffPriceStruct::Type>({
+          .priceType = static_cast<Globals::TariffPriceTypeEnum>(0),
+          .price = MakeOptional(static_cast<int64_t>(15)),
+          .priceLevel = MakeOptional(static_cast<int16_t>(1))
+      })),
+      .friendlyCredit = MakeOptional(false),
+      .auxiliaryLoad = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
+          .number = 1,
+          .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0)
+      }),
+      .peakPeriod = MakeOptional(Structs::PeakPeriodStruct::Type{
+          .severity = static_cast<PeakPeriodSeverityEnum>(1),
+          .peakPeriod = 1
+      }),
+      .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
+          .powerThreshold = MakeOptional(2400000),
+          .apparentPowerThreshold = MakeOptional(120),
+          .powerThresholdSource = static_cast<Globals::PowerThresholdSourceEnum>(0)
+      }),
+      .threshold = DataModel::Nullable<uint32_t>(120),
+      .label = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 1"))),
+      .predicted = MakeOptional(false)
     },
-    {
-        20,
-        MakeOptional(Nullable<TariffPriceStruct::Type>({
-            static_cast<TariffPriceTypeEnum>(0),
-            MakeOptional(static_cast<int64_t>(20)), // 0.20 represented as fixed point
-            MakeOptional(static_cast<int16_t>(0))
-        })),
-        MakeOptional(false),
-        MakeOptional(AuxiliaryLoadSwitchSettingsStruct::Type{
-            1,
-            static_cast<AuxiliaryLoadSettingEnum>(0)
-        }),
-        MakeOptional(PeakPeriodStruct::Type{
-            static_cast<PeakPeriodSeverityEnum>(1),
-            1
-        }),
-        MakeOptional(PowerThresholdStruct::Type{
-            MakeOptional(4800000),
-            MakeOptional(240),
-            static_cast<PowerThresholdSourceEnum>(0)
-        }),
-        Nullable<uint32_t>(240),
-        MakeOptional(Nullable<CharSpan>(MakeCharSpan("Tariff Component 2"))),
-        MakeOptional(false)
+    { .tariffComponentID = 20,
+      .price = MakeOptional(DataModel::Nullable<Structs::TariffPriceStruct::Type>({
+          .priceType = static_cast<Globals::TariffPriceTypeEnum>(0),
+          .price = MakeOptional(static_cast<int64_t>(20)),
+          .priceLevel = MakeOptional(static_cast<int16_t>(0))
+      })),
+      .friendlyCredit = MakeOptional(false),
+      .auxiliaryLoad = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
+          .number = 1,
+          .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0)
+      }),
+      .peakPeriod = MakeOptional(Structs::PeakPeriodStruct::Type{
+          .severity = static_cast<PeakPeriodSeverityEnum>(1),
+          .peakPeriod = 1
+      }),
+      .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
+          .powerThreshold = MakeOptional(4800000),
+          .apparentPowerThreshold = MakeOptional(240),
+          .powerThresholdSource = static_cast<Globals::PowerThresholdSourceEnum>(0)
+      }),
+      .threshold = DataModel::Nullable<uint32_t>(240),
+      .label = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 2"))),
+      .predicted = MakeOptional(false)
     },
-    {
-        30,
-        MakeOptional(Nullable<TariffPriceStruct::Type>({
-            static_cast<TariffPriceTypeEnum>(0),
-            MakeOptional(static_cast<int64_t>(50)), // 0.50 represented as fixed point
-            MakeOptional(static_cast<int16_t>(0))
-        })),
-        MakeOptional(true),
-        MakeOptional(AuxiliaryLoadSwitchSettingsStruct::Type{
-            1,
-            static_cast<AuxiliaryLoadSettingEnum>(0)
-        }),
-        MakeOptional(PeakPeriodStruct::Type{
-            static_cast<PeakPeriodSeverityEnum>(1),
-            1
-        }),
-        MakeOptional(PowerThresholdStruct::Type{
-            MakeOptional(3200000),
-            MakeOptional(320),
-            static_cast<PowerThresholdSourceEnum>(0)
-        }),
-        Nullable<uint32_t>(320),
-        MakeOptional(Nullable<CharSpan>(MakeCharSpan("Tariff Component 3"))),
-        MakeOptional(true)
+    { .tariffComponentID = 30,
+      .price = MakeOptional(DataModel::Nullable<Structs::TariffPriceStruct::Type>({
+          .priceType = static_cast<Globals::TariffPriceTypeEnum>(0),
+          .price = MakeOptional(static_cast<int64_t>(50)),
+          .priceLevel = MakeOptional(static_cast<int16_t>(0))
+      })),
+      .friendlyCredit = MakeOptional(true),
+      .auxiliaryLoad = MakeOptional(Structs::AuxiliaryLoadSwitchSettingsStruct::Type{
+          .number = 1,
+          .requiredState = static_cast<AuxiliaryLoadSettingEnum>(0)
+      }),
+      .peakPeriod = MakeOptional(Structs::PeakPeriodStruct::Type{
+          .severity = static_cast<PeakPeriodSeverityEnum>(1),
+          .peakPeriod = 1
+      }),
+      .powerThreshold = MakeOptional(Globals::Structs::PowerThresholdStruct::Type{
+          .powerThreshold = MakeOptional(3200000),
+          .apparentPowerThreshold = MakeOptional(320),
+          .powerThresholdSource = static_cast<Globals::PowerThresholdSourceEnum>(0)
+      }),
+      .threshold = DataModel::Nullable<uint32_t>(320),
+      .label = MakeOptional(DataModel::MakeNullable(CharSpan::fromCharString("Tariff Component 3"))),
+      .predicted = MakeOptional(true)
     }
 };
 
@@ -286,32 +386,33 @@ static const uint32_t period2Components[] = {20};
 static const uint32_t period3DayEntries[] = {12, 15};
 static const uint32_t period3Components[] = {30};
 
-static TariffPeriodStruct::Type TariffPeriods[] = {
-    {Nullable<CharSpan>(MakeCharSpan("Period 1")), List<const uint32_t>(period1DayEntries), List<const uint32_t>(period1Components)},
-    {Nullable<CharSpan>(MakeCharSpan("Period 2")), List<const uint32_t>(period2DayEntries), List<const uint32_t>(period2Components)},
-    {Nullable<CharSpan>(MakeCharSpan("Period 3")), List<const uint32_t>(period3DayEntries), List<const uint32_t>(period3Components)}
+// Tariff Periods
+static inline Structs::TariffPeriodStruct::Type TariffPeriods[] = {
+    { .label = DataModel::MakeNullable(CharSpan::fromCharString("Period 1")),
+      .dayEntryIDs = DataModel::List<const uint32_t>(period1DayEntries),
+      .tariffComponentIDs = DataModel::List<const uint32_t>(period1Components) },
+    { .label = DataModel::MakeNullable(CharSpan::fromCharString("Period 2")),
+      .dayEntryIDs = DataModel::List<const uint32_t>(period2DayEntries),
+      .tariffComponentIDs = DataModel::List<const uint32_t>(period2Components) },
+    { .label = DataModel::MakeNullable(CharSpan::fromCharString("Period 3")),
+      .dayEntryIDs = DataModel::List<const uint32_t>(period3DayEntries),
+      .tariffComponentIDs = DataModel::List<const uint32_t>(period3Components) }
 };
 
 } // namespace Sample2
 
-#define COMMODITY_TARIFF_ATTRIBUTES                                                \
-    X(TariffUnit,                   Nullable<TariffUnitEnum>)                      \
-    X(StartDate,                    Nullable<uint32_t>)                            \
-    X(DefaultRandomizationOffset,   Nullable<int16_t>)                             \
-    X(DefaultRandomizationType,     Nullable<DayEntryRandomizationTypeEnum>)       \
-    X(TariffInfo,                   Nullable<TariffInformationStruct::Type>)       \
-    X(DayEntries,                   Nullable<List<DayEntryStruct::Type>>)          \
-    X(DayPatterns,                  Nullable<List<DayPatternStruct::Type>>)        \
-    X(TariffComponents,             Nullable<List<TariffComponentStruct::Type>>)   \
-    X(TariffPeriods,                Nullable<List<TariffPeriodStruct::Type>>)      \
-    X(IndividualDays,               Nullable<List<DayStruct::Type>>)               \
-    X(CalendarPeriods,              Nullable<List<CalendarPeriodStruct::Type>>)
-
-// Then define your struct using the macro
 struct TariffDataSet {
-#define X(attrName, attrType) attrType attrName;
-    COMMODITY_TARIFF_ATTRIBUTES
-#undef X
+    DataModel::Nullable<Globals::TariffUnitEnum> TariffUnit;
+    DataModel::Nullable<uint32_t> StartDate;
+    DataModel::Nullable<int16_t> DefaultRandomizationOffset;
+    DataModel::Nullable<DayEntryRandomizationTypeEnum> DefaultRandomizationType;
+    DataModel::Nullable<Structs::TariffInformationStruct ::Type> TariffInfo;
+    DataModel::Nullable<DataModel::List<Structs::DayEntryStruct ::Type>> DayEntries;
+    DataModel::Nullable<DataModel::List<Structs::DayPatternStruct ::Type>> DayPatterns;
+    DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct ::Type>> TariffComponents;
+    DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct ::Type>> TariffPeriods;
+    DataModel::Nullable<DataModel::List<Structs::DayStruct ::Type>> IndividualDays;
+    DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct ::Type>> CalendarPeriods;
     uint32_t TariffTestTimestamp;
 };
 
@@ -321,29 +422,32 @@ static constexpr size_t kCount = 2;
 const TariffDataSet kTariffPresets[] = {
     // Sample 1
     {
-        .TariffInfo = MakeNullable(Sample1::TariffInfo()),
-        .TariffUnit = Nullable<TariffUnitEnum>(TariffUnitEnum::kKWh),
-        .StartDate =  Nullable<uint32_t>(0),
-        .DefaultRandomizationOffset = Nullable<int16_t>(0),
-        .DefaultRandomizationType = Nullable<DayEntryRandomizationTypeEnum>(DayEntryRandomizationTypeEnum::kNone),
+        .TariffInfo = DataModel::MakeNullable(Sample1::TariffInfo()),
+        
+        .TariffUnit = DataModel::Nullable<Globals::TariffUnitEnum>(Globals::TariffUnitEnum::kKWh),
+        .StartDate =  DataModel::Nullable<uint32_t>(0),
+        .DefaultRandomizationOffset = DataModel::Nullable<int16_t>(0),
+        .DefaultRandomizationType = DataModel::Nullable<DayEntryRandomizationTypeEnum>(DayEntryRandomizationTypeEnum::kNone),
 
-        .DayEntries = MakeNullable(List<DayEntryStruct::Type>(
+        .DayEntries = DataModel::MakeNullable(DataModel::List<Structs::DayEntryStruct::Type>(
             Sample1::DayEntries,
             std::size(Sample1::DayEntries)
         )),
-        .DayPatterns = MakeNullable(List<DayPatternStruct::Type>(
+        
+        .DayPatterns = DataModel::MakeNullable(DataModel::List<Structs::DayPatternStruct::Type>(
            Sample1::DayPatterns,
             std::size(TariffDataSamples::Sample1::DayPatterns))),
-        .CalendarPeriods = MakeNullable(List<CalendarPeriodStruct::Type>(
+          
+        .CalendarPeriods = DataModel::MakeNullable(DataModel::List<Structs::CalendarPeriodStruct::Type>(
            Sample1::CalendarPeriods,
             std::size(TariffDataSamples::Sample1::CalendarPeriods))),
-        .IndividualDays = MakeNullable(List<DayStruct::Type>(
+        .IndividualDays = DataModel::MakeNullable(DataModel::List<Structs::DayStruct::Type>(
            Sample1::IndividualDays,
             std::size(TariffDataSamples::Sample1::IndividualDays))),
-        .TariffComponents = MakeNullable(List<TariffComponentStruct::Type>(
+        .TariffComponents = DataModel::MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(
            Sample1::TariffComponents,
             std::size(Sample1::TariffComponents))),
-        .TariffPeriods = MakeNullable(List<TariffPeriodStruct::Type>(
+        .TariffPeriods = DataModel::MakeNullable(DataModel::List<Structs::TariffPeriodStruct::Type>(
            Sample1::TariffPeriods,
             std::size(Sample1::TariffPeriods))),
 
@@ -351,26 +455,27 @@ const TariffDataSet kTariffPresets[] = {
     },
     // Sample 2
     {
-        .TariffInfo = MakeNullable(TariffDataSamples::Sample2::TariffInfo()),
-        .TariffUnit = Nullable<TariffUnitEnum>(TariffUnitEnum::kKWh),
-        .StartDate =  Nullable<uint32_t>(0),
-        .DefaultRandomizationOffset = Nullable<int16_t>(0),
-        .DefaultRandomizationType = Nullable<DayEntryRandomizationTypeEnum>(DayEntryRandomizationTypeEnum::kNone),
-        .DayEntries = MakeNullable(List<DayEntryStruct::Type>(
+        .TariffInfo = DataModel::MakeNullable(Sample2::TariffInfo()),
+
+        .TariffUnit = DataModel::Nullable<Globals::TariffUnitEnum>(Globals::TariffUnitEnum::kKWh),
+        .StartDate =  DataModel::Nullable<uint32_t>(0),
+        .DefaultRandomizationOffset = DataModel::Nullable<int16_t>(0),
+        .DefaultRandomizationType = DataModel::Nullable<DayEntryRandomizationTypeEnum>(DayEntryRandomizationTypeEnum::kNone),
+        .DayEntries = DataModel::MakeNullable(DataModel::List<Structs::DayEntryStruct::Type>(
             Sample2::DayEntries,
             std::size(Sample2::DayEntries)
         )),
-        .DayPatterns = MakeNullable(List<DayPatternStruct::Type>(
+        .DayPatterns = DataModel::MakeNullable(DataModel::List<Structs::DayPatternStruct::Type>(
            Sample2::DayPatterns,
             std::size(TariffDataSamples::Sample2::DayPatterns))),
-        .CalendarPeriods = MakeNullable(List<CalendarPeriodStruct::Type>(
+        .CalendarPeriods = DataModel::MakeNullable(DataModel::List<Structs::CalendarPeriodStruct::Type>(
            Sample2::CalendarPeriods,
             std::size(TariffDataSamples::Sample2::CalendarPeriods))),
         .IndividualDays = NullOptional, // No individual days in sample 2
-        .TariffComponents = MakeNullable(List<TariffComponentStruct::Type>(
+        .TariffComponents = DataModel::MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(
            Sample2::TariffComponents,
             std::size(TariffDataSamples::Sample2::TariffComponents))),
-        .TariffPeriods = MakeNullable(List<TariffPeriodStruct::Type>(
+        .TariffPeriods = DataModel::MakeNullable(DataModel::List<Structs::TariffPeriodStruct::Type>(
            Sample2::TariffPeriods,
             std::size(TariffDataSamples::Sample2::TariffPeriods))),
 
@@ -378,7 +483,8 @@ const TariffDataSet kTariffPresets[] = {
     }
 };
 
-// Clean up the macro
-#undef COMMODITY_TARIFF_ATTRIBUTES
-
 } // namespace TariffDataSamples
+} // namespace CommodityTariff
+} // namespace Clusters
+} // namespace app
+} // namespace chip
