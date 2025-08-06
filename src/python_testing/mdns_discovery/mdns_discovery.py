@@ -56,11 +56,11 @@ class MdnsDiscovery:
             - `get_operational_services()`: Discover operational Matter nodes.
             - `get_border_router_services()`: Discover Thread border routers.
             - `get_all_services()`: Get service info from all available discovered services.
-            - `get_all_service_types()`: Discover all available service types.
             - `get_ptr_records()`: Discover PTR records for given service types.
             - `get_srv_record()`: Query SRV records for a given service instance.
             - `get_txt_record()`: Query TXT records for a given service instance.
             - `get_quada_records()`: Query A/AAAA records for a given host.
+            - `get_all_service_types()`: Discover all available service types.
             - `get_commissionable_subtypes()`: Discover supported subtypes for commissionable nodes.
             - `discover()`: The mDNS discovery engine powering the discovery methods.
 
