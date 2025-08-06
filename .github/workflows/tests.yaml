@@ -233,6 +233,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
                   "
             - name: Build Apps
+              # TODO: Add back removed build targets.
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build_python.sh \
