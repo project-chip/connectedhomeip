@@ -69,12 +69,15 @@ class TC_SU_2_2(MatterBaseTest):
         Args:
             controller: The Matter controller (e.g., th1, th4) that will perform the write operation.
             acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
+            node_id: 
 
         Raises:
             AssertionError: If writing the ACL attribute fails (status is not Status.Success).
         """
+
+    async def write_acl(self, controller, node_id, acl):
         result = await controller.WriteAttribute(
-            self.dut_node_id,
+            node_id,
             [(0, Clusters.AccessControl.Attributes.Acl(acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
@@ -131,16 +134,14 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
         # 1. Launch OTA Provider (TH2) from Terminal 1:
         #     ./out/debug/chip-ota-provider-app --filepath firmware_v2.ota
-        # 2. Manually commission the OTA Provider using Node ID 1 (Terminal 2):
-        #     ./out/chip-tool/chip-tool pairing onnetwork 1 20202021
-        # 3. Launch OTA Requestor (TH1 / DUT) from Terminal 3:
+        # 2. Launch OTA Requestor (TH1 / DUT) from Terminal 2:
         #     ./out/debug/chip-ota-requestor-app \
         #         --discriminator 1234 \
         #         --passcode 20202021 \
         #         --secured-device-port 5541 \
         #         --autoApplyImage \
         #         --KVS /tmp/chip_kvs_requestor
-        # 4. Run Python test with commission Provisioner/Requestor (Terminal 2):
+        # 3. Run Python test with commission Provisioner/Requestor (Terminal 2):
         #     python3 src/python_testing/TC_SU_2_2.py \
         #         --commissioning-method on-network \
         #         --discriminator 1234 \
@@ -148,61 +149,37 @@ class TC_SU_2_2(MatterBaseTest):
         #         --vendor-id 65521 \
         #         --product-id 32769 \
         #         --nodeId 2
-        #     python3 src/python_testing/TC_SU_2_2.py \
-        #         --commissioning-method on-network \
-        #   --discriminator 1234 \
-        #   --passcode 20202021 \
-        #   --vendor-id 65521 \
-        #   --product-id 32769 \
-        #   --nodeId 2
-
         # ------------------------------------------------------------------------------------
 
         self.step(0)
 
         # Read the Steps
+
         self.step(1)
+        # ------------------------------------------------------------------------------------
+        # Step 1.0: DUT is already commissioned via test args (DUT/TH1 = OTA Requestor)
+        # ------------------------------------------------------------------------------------
         # 1.0 Establishing TH1 controller - DUT is TH1, NodeID=2, Fabric=1
         th1 = self.default_controller
         th1_node_id = self.dut_node_id
         th1_fabric_id = th1.fabricId
-        logger.info(f'Step #1.0 - DUT NodeID (OTA Requestor): {th1_node_id}')
-        logger.info(f'Step #1.0 - TH1 FabricID (Should be Fabric 1): {th1_fabric_id}')
+        logger.info(f'Step #1.0 - DUT/TH1 NodeID (OTA Requestor): {th1_node_id}')  # NodeID = 2
+        logger.info(f'Step #1.0 - DUT/TH1 FabricID: {th1_fabric_id}')              # FabricID = 1
 
-        # Read the actual value of DefaultOTAProviders attribute on the DUT (TH1, NodeID=2)
-        actual_otap_info = await self.read_single_attribute_check_success(
-            cluster=self.cluster_otar,
-            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
-        logger.info(f'Step #1.0 - Read actaul DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
+        # ------------------------------------------------------------------------------------
+        # Step # 1.1 - Commissioning TH2 (OTA Provider) using TH1 controller
+        # ------------------------------------------------------------------------------------
 
-        # TH2 is the OTA Provider (NodeID=1) for fabric 1
-        provider_th2_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
-            providerNodeID=1,   # TH2 is the OTA Provider (NodeID=1)
-            endpoint=0,
-            fabricIndex=1       # Fabric ID from TH1 (controller writing to DUT)
-        )
-
-        # DefaultOTAProviders attribute with the provider list
-        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=[provider_th2_for_fabric1])
-
-        # Write the DefaultOTAProviders attribute to the DUT (TH1)
-        resp = await self.write_single_attribute(
-            attribute_value=attr,
-            endpoint_id=0
-        )
-        logger.info(f'Step #1.0 - Write DefaultOTAProviders response: {resp}')
-        # Verify write succeeded (response code 0)
-        asserts.assert_equal(resp, Status.Success, "Failed to write DefaultOTAProviders attribute")
-
+        # Setup TH2 controller (Provider)
         # 1.1 Establishing TH2 controller - TH2, NodeID=1, Fabric=1
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th1.fabricId + 1)
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th1.fabricId)
         th2 = th2_fabric_admin.NewController(nodeId=1, useTestCommissioner=True)
-
-        th2_node_id = th2.nodeId
         th2_fabric_id = th2.fabricId
-        logger.info(f'Step #1.1 - TH2 (PROVIDER) NodeID: {th2_node_id}')
-        logger.info(f'Step #1.1 - TH2 (PROVIDER) FabricID: {th2_fabric_id}')
+        th2_node_id = th2.nodeId
+
+        logger.info(f'Step #1.1 - TH2 (Provider) NodeID: {th2_node_id}')           # NodeID = 1
+        logger.info(f'Step #1.1 - TH2 (Provider) FabricID: {th2_fabric_id}')       # FabricID = 1
 
         params = await self.open_commissioning_window(th1, th1_node_id)
         setup_pin_code = params.commissioningParameters.setupPinCode
@@ -210,101 +187,222 @@ class TC_SU_2_2(MatterBaseTest):
         # setup_qr_code = params.commissioningParameters.setupQRCode
         logger.info(f'Step #1.1: Commissioning window opened: {vars(params)}')
 
-        logger.info('Step #1.1 - Commissioning DUT with TH2...')
+        logger.info('Step #1.1 - Commissioning DUT with TH3...')
         resp = await th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id,
+            nodeId=th2_node_id,
             setupPinCode=setup_pin_code,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=long_discriminator)
         logger.info(f'Step #1.1 - TH2 Commissioning response: {resp}')
 
-        # ACL on DUT to allow access from TH2 (Provider)
-        admin_acl_for_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+        # ------------------------------------------------------------------------------------
+        # Step # 1.1 - Check Fabrics
+        # ------------------------------------------------------------------------------------
+
+        # Read TH1 fabrics
+        th1_fabrics = await th1.ReadAttribute(
+            nodeid=th1_node_id,
+            attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            returnClusterObject=True
+        )
+        logger.info(f"Step #1.1 - TH1 Fabrics: {th1_fabrics[0]}")
+
+        # Read TH2 fabrics
+        th2_fabrics = await th2.ReadAttribute(
+            nodeid=th2_node_id,
+            attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            returnClusterObject=True
+        )
+        logger.info(f"Step #1.1 - TH2 Fabrics: {th2_fabrics[0]}")
+
+        # ------------------------------------------------------------------------------------
+        # Step #1.2 - Read the current OTA providers on the DUT (TH1),
+        # create a ProviderLocation structure pointing to TH2 as the OTA provider,
+        # and write this updated provider list back to the DUT (TH1)
+        # ------------------------------------------------------------------------------------
+
+        # Read the actual value of DefaultOTAProviders attribute on the DUT (TH1, NodeID=2)
+        actual_otap_info = await self.read_single_attribute_check_success(
+            dev_ctrl=th1,
+            cluster=self.cluster_otar,
+            attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
+        logger.info(f'Step #1.2 - Read actaul DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
+
+        # Create the ProviderLocation struct for TH2 (the OTA Provider) (NodeID=1, Fabric=1)
+        provider_th2_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
+            providerNodeID=th2_node_id,        # TH2 is the OTA Provider (NodeID=1)
+            endpoint=0,
+            fabricIndex=th1.fabricId           # FabricId from TH1 (the DUT)
+        )
+        logger.info(f'Step #1.2 - ProviderLocation to write: {provider_th2_for_fabric1}')
+
+        # Create the DefaultOTAProviders attribute with the OTA provider list
+        attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=[provider_th2_for_fabric1])
+        logger.info(f'Step #1.2 - Attribute to write: {attr}')
+
+        # Write the DefaultOTAProviders attribute to the DUT (TH1)
+        resp = await th1.WriteAttribute(
+            attributes=[(0, attr)],
+            nodeid=th1_node_id,
+        )
+        logger.info(f'Step #1.2 - Write DefaultOTAProviders response: {resp}')
+        # Verify write succeeded (response code 0)
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
+
+        # ------------------------------------------------------------------------------------
+        # Step # 1.3 - ACLs on DUT (TH1) to allow access from Provider (TH2)
+        # ------------------------------------------------------------------------------------
+
+        # TH1: Requestor (DUT)
+        # TH2: Provider
+
+        logger.info(f'Step #1.3 - TH1 fabricId: {th1.fabricId}, nodeId: {th1.nodeId}')
+        logger.info(f'Step #1.3 - TH2 fabricId: {th2.fabricId}, nodeId: {th2.nodeId}')
+        logger.info(f'Step #1.3 - th1_node_id: {th1_node_id}')
+
+        # ACL on TH1 (DUT) to allow TH2 to operate OTA Requestor cluster and view attributes
+
+        # TH2 can send commands to OTA Requestor cluster on TH1
+        acl_operate_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=th1._fabricIndex,
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[th2_node_id],
+            subjects=[th2.nodeId],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateRequestor.id)]
+        )
+
+        # TH2 can view attributes on TH1 (optional but recommended)
+        acl_view_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=th1._fabricIndex,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[th2.nodeId],
             targets=[]
         )
 
-        resp = await self.write_acl(th1, [admin_acl_for_provider])
-        logger.info(f'Step #1.1 - Wrote ACL on DUT (TH1) to allow access to Provider (TH2): {resp}')
+        # TH2 can administer (modify ACLs etc.) on TH1 - optional
+        acl_admin_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=th1._fabricIndex,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[th2.nodeId],
+            targets=[]
+        )
 
-        # ACL on Provider to allow access from DUT (Requestor)
-        admin_acl_for_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+        # Group all three ACL entries and write them on TH1 (DUT)
+        acls_on_th1 = [acl_admin_provider, acl_view_provider, acl_operate_provider]
+        resp = await self.write_acl(th1, th1_node_id, acls_on_th1)
+        logger.info(f'Step #1.3 - Wrote ACLs on DUT (TH1) to allow access from Provider (TH2): {resp}')
+
+        # # Read ACL
+        # acls_read_th1 = await self.read_acl(th1)
+        # logger.info(f'Step #1.3 - ACLs on TH1 after write: {acls_read_th1}')
+
+        # ACL on TH2 to allow TH1 to operate OTA Provider cluster and view attributes
+
+        # TH1 can send commands to OTA Provider cluster on TH2
+        acl_operate_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=th2._fabricIndex,
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[th1_node_id],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=0,
+                cluster=Clusters.OtaSoftwareUpdateProvider.id
+            )]
+        )
+
+        # TH1 can view attributes on TH2
+        acl_view_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=th2._fabricIndex,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[th1_node_id],
             targets=[]
         )
 
-        resp = await self.write_acl(th2, [admin_acl_for_requestor])
-        logger.info(f'Step #1.1 - Wrote ACL on Provider (TH2) to allow access from DUT (TH1): {resp}')
+        # TH1 can administer on TH2 (optional)
+        acl_admin_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex=th2._fabricIndex,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[th1_node_id],
+            targets=[]
+        )
 
-        # 1.2 TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT/Requestor)
-        logger.info("Step #1.2 - DUT sends QueryImage command to TH/OTA-P")
+        # Group all ACL entries and write them on TH2 (Provider)
+        acls_on_th2 = [acl_admin_requestor, acl_view_requestor, acl_operate_requestor]
+        resp = await self.write_acl(th2, th2_node_id, acls_on_th2)
+        logger.info(f'Step #1.3 - Wrote ACLs on Provider (TH2) to allow access from DUT (TH1): {resp}')
+        # # Read ACL
+        # acls_read_th2 = await self.read_acl(th2)
+        # logger.info(f"Step #1.3 - ACLs on TH2 after write: {acls_read_th2}")
+
+        # ------------------------------------------------------------------------------------
+        # Step # 1.4 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT/Requestor)
+        # ------------------------------------------------------------------------------------
+
+        logger.info("Step #1.4 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT)")
         cmd = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=1,
+            providerNodeID=th2.nodeId,
             vendorID=0xFFF1,
             announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable,
             metadataForNode=None,
             endpoint=0
         )
-        logger.info(f"Step #1.2 - cmd AnnounceOTAProvider: {cmd}")
+        logger.info(f"Step #1.4 - cmd AnnounceOTAProvider: {cmd}")
 
+        logger.info(f'Step #1.4 - Sending AnnounceOTAProvider to node: {th1_node_id}, should be: {self.dut_node_id}')
         resp = await self.send_single_cmd(
             dev_ctrl=th2,
-            node_id=th1_node_id,
+            node_id=self.dut_node_id,
             cmd=cmd
-
         )
-        logger.info(f"Step #1.2 - Sent AnnounceOTAProvider to DUT, response: {resp}")
+        logger.info(f"Step #1.4 - Sent AnnounceOTAProvider to DUT, response: {resp}")
 
-        # TODO: Need to make it work from here
-        logger.info("Step #1.3 - ArmFailSafe")
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
-            expiryLengthSeconds=60,
-            breadcrumb=1
-        )
-        resp = await self.send_single_cmd(
-            dev_ctrl=th1,
-            node_id=th1_node_id,
-            cmd=cmd,
-            endpoint=0
-        )
-        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-                             "Failure status returned from arm failsafe")
-
-        logger.info("Step #1.3 - Wait")
-        await asyncio.sleep(5)
-        # ******
-        logger.info("Step #1.4 - DUT send QueryImage to Provider and wait for response")
-        logger.info(f"Step #1.4 - Info requestor(th1): {vars(th1)}")
-        # product_id = await self.read_single_attribute(th1, endpoint=0, cluster="BasicInformation", attribute="productID")
-        # logger.info(f"ProductId del requestor: {th1.productId}")
-
-        cmd_query_image = Clusters.OtaSoftwareUpdateProvider.Commands.QueryImage(
-            vendorID=0xFFF1,
-            productID=0x8000,
-            softwareVersion=0,
-            protocolsSupported=[Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous],
-            hardwareVersion=None,
-            location=None,
-            requestorCanConsent=None,
-            metadataForProvider=None
-        )
-
-        logger.info("Step #1.4 - Send QueryImage from DUT to Provider")
-        resp = await self.send_single_cmd(
-            dev_ctrl=th1,
-            node_id=th2_node_id,
-            cmd=cmd_query_image,
-            endpoint=0
-        )
-        logger.info(f"Step #1.4 - Response from Provider: {resp}")
-
-        # 1.5 Verify that QueryImageResponse QueryStatus is UpdateAvailable
-        # 1.6 Verify that software image transfer from TH/OTA-P to DUT is successful
-
-
+        # # TODO: Need to make it work from here
+        # logger.info("Step #1.5 - ArmFailSafe")
+        # cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
+        #     expiryLengthSeconds=60,
+        #     breadcrumb=1
+        # )
+        # resp = await self.send_single_cmd(
+        #     dev_ctrl=th1,
+        #     node_id=th1_node_id,
+        #     cmd=cmd,
+        #     endpoint=0
+        # )
+        # asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+        #                      "Failure status returned from arm failsafe")
+        # logger.info("Step #1.5 - Wait")
+        # await asyncio.sleep(5)
+        # # ******
+        # logger.info("Step #1.6 - DUT send QueryImage to Provider and wait for response")
+        # logger.info(f"Step #1.6 - Info requestor(th1): {vars(th1)}")
+        # # product_id = await self.read_single_attribute(th1, endpoint=0, cluster="BasicInformation", attribute="productID")
+        # # logger.info(f"ProductId del requestor: {th1.productId}")
+        # # Clusters.OtaSoftwareUpdateRequestor.Commands.
+        # cmd_query_image = Clusters.OtaSoftwareUpdateProvider.Commands.QueryImage(
+        #     vendorID=0xFFF1,
+        #     productID=0x8000,
+        #     softwareVersion=0,
+        #     protocolsSupported=[Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous],
+        #     hardwareVersion=None,
+        #     location=None,
+        #     requestorCanConsent=None,
+        #     metadataForProvider=None
+        # )
+        # logger.info("Step #1.7 - Send QueryImage from DUT to Provider")
+        # resp = await self.send_single_cmd(
+        #     dev_ctrl=th1,
+        #     node_id=th2_node_id,
+        #     cmd=cmd_query_image,
+        #     endpoint=0
+        # )
+        # logger.info(f"Step #1.7 - Response from Provider: {resp}")
+        # # 1.8 Verify that QueryImageResponse QueryStatus is UpdateAvailable
+        # # 1.9 Verify that software image transfer from TH/OTA-P to DUT is successful
 if __name__ == "__main__":
     default_matter_test_main()
