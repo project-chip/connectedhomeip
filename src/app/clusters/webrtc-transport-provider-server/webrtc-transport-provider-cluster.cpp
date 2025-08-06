@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -31,7 +32,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
-using namespace chip::app::Clusters::WebRTCTransportProvider::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
@@ -44,6 +44,10 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     WebRTCTransportProvider::Commands::ProvideAnswer::kMetadataEntry,
     WebRTCTransportProvider::Commands::ProvideICECandidates::kMetadataEntry,
     WebRTCTransportProvider::Commands::EndSession::kMetadataEntry,
+};
+
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry,
 };
 
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
@@ -65,7 +69,7 @@ namespace Clusters {
 namespace WebRTCTransportProvider {
 
 WebRTCTransportProviderServer::WebRTCTransportProviderServer(EndpointId endpointId, Delegate & delegate) :
-    DefaultServerCluster({ endpointId, WebRTCTransportProvider::Id }), mDelegate(delegate)
+    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
 {}
 
 DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -81,8 +85,10 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const
             }
             return CHIP_NO_ERROR;
         });
-    case ClusterRevision::Id:
-        return encoder.Encode(WebRTCTransportProvider::kRevision);
+    case Attributes::ClusterRevision::Id:
+        return encoder.Encode(kRevision);
+    case Attributes::FeatureMap::Id:
+        return encoder.Encode<uint32_t>(0);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -137,6 +143,13 @@ CHIP_ERROR WebRTCTransportProviderServer::AcceptedCommands(const ConcreteCluster
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
+CHIP_ERROR WebRTCTransportProviderServer::Attributes(const ConcreteClusterPath & path,
+                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryAttributes), Span<AttributeListBuilder::OptionalAttributeEntry>());
+}
+
 // Helper functions
 WebRTCSessionStruct * WebRTCTransportProviderServer::FindSession(uint16_t sessionId)
 {
@@ -168,8 +181,7 @@ WebRTCTransportProviderServer::UpsertResultEnum WebRTCTransportProviderServer::U
         result = UpsertResultEnum::kInserted;
     }
 
-    // Use the correct attribute change reporting
-    NotifyAttributeChanged(WebRTCTransportProvider::Attributes::CurrentSessions::Id);
+    NotifyAttributeChanged(Attributes::CurrentSessions::Id);
 
     return result;
 }
@@ -186,8 +198,7 @@ void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
     // If a session was removed, the size will be smaller.
     if (mCurrentSessions.size() < originalSize)
     {
-        // Use the correct attribute change reporting
-        NotifyAttributeChanged(WebRTCTransportProvider::Attributes::CurrentSessions::Id);
+        NotifyAttributeChanged(Attributes::CurrentSessions::Id);
     }
 }
 
@@ -238,7 +249,7 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionId()
     // This should never happen in practice since we support 65534 sessions
     // and typical applications will have far fewer active sessions
     ChipLogError(Zcl, "All session IDs are in use!");
-    VerifyOrDie(false);
+    chipDie();
 }
 
 // Command Handlers
@@ -404,7 +415,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleSolicitOffer(
         resp.audioStreamID.SetValue(outSession.audioStreamID);
     }
 
-    ConcreteCommandPath requestPath(mPath.mEndpointId, WebRTCTransportProvider::Id, Commands::SolicitOffer::Id);
+    ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::SolicitOffer::Id);
     commandHandler.AddResponse(requestPath, resp);
 
     return Protocols::InteractionModel::Status::Success;
@@ -592,7 +603,7 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::HandleProvideOffer(
         resp.audioStreamID.SetValue(outSession.audioStreamID);
     }
 
-    ConcreteCommandPath requestPath(mPath.mEndpointId, WebRTCTransportProvider::Id, Commands::ProvideOffer::Id);
+    ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::ProvideOffer::Id);
     commandHandler.AddResponse(requestPath, resp);
 
     return Protocols::InteractionModel::Status::Success;
