@@ -65,38 +65,26 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
     ChipLogProgress(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d", static_cast<unsigned>(mIndex), mEndpoint);
 
-    bool retval    = true;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     const char * labelPtr = matter_get_fixed_label_name(mIndex);
     const char * valuePtr = matter_get_fixed_label_value(mIndex);
 
     if (labelPtr == nullptr || valuePtr == nullptr)
     {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        return false;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
-        VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
+    VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
+    VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
 
-        Platform::CopyString(mFixedLabelNameBuf, labelPtr);
-        Platform::CopyString(mFixedLabelValueBuf, valuePtr);
+    Platform::CopyString(mFixedLabelNameBuf, labelPtr);
+    Platform::CopyString(mFixedLabelValueBuf, valuePtr);
 
-        output.label = CharSpan::fromCharString(mFixedLabelNameBuf);
-        output.value = CharSpan::fromCharString(mFixedLabelValueBuf);
+    output.label = CharSpan::fromCharString(mFixedLabelNameBuf);
+    output.value = CharSpan::fromCharString(mFixedLabelValueBuf);
 
-        mIndex++;
+    mIndex++;
 
-        retval = true;
-    }
-    else
-    {
-        retval = false;
-    }
-
-    return retval;
+    return true;
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
@@ -211,33 +199,22 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 {
     VerifyOrReturnError(mIndex < matter_get_supported_locale_count(), false);
 
-    bool retval                  = true;
-    CHIP_ERROR err               = CHIP_NO_ERROR;
     const char * activeLocalePtr = matter_get_supported_locale_value(mIndex);
 
     if (activeLocalePtr == nullptr)
     {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        return false;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(std::strlen(activeLocalePtr) <= kMaxActiveLocaleLength, false);
+    VerifyOrReturnError(std::strlen(activeLocalePtr) <= kMaxActiveLocaleLength, false);
 
-        Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, activeLocalePtr);
+    Platform::CopyString(mActiveLocaleBuf, kMaxActiveLocaleLength + 1, activeLocalePtr);
 
-        output = CharSpan::fromCharString(mActiveLocaleBuf);
+    output = CharSpan::fromCharString(mActiveLocaleBuf);
 
-        mIndex++;
+    mIndex++;
 
-        retval = true;
-    }
-    else
-    {
-        retval = false;
-    }
-
-    return retval;
+    return true;
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
@@ -254,7 +231,6 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
 {
     VerifyOrReturnError(mIndex < matter_get_calendar_type_count(), false);
 
-    size_t count      = matter_get_calendar_type_count();
     uint8_t key_value = 0;
 
     bool retval = matter_get_calendar_type_value(mIndex, &key_value);
