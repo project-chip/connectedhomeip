@@ -16,10 +16,16 @@
  */
 #pragma once
 
-#include <app/clusters/soil-measurement-server/soil-measurement-logic.h>
-
+#include <app/AttributeValueEncoder.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/SoilMeasurement/ClusterId.h>
+#include <clusters/SoilMeasurement/Enums.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/ReadOnlyBuffer.h>
+#include <platform/DeviceInfoProvider.h>
 
 namespace chip {
 namespace app {
@@ -37,13 +43,21 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    // Attributes handling for cluster
+    SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type GetSoilMoistureMeasurementLimits();
+    SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type GetSoilMoistureMeasuredValue();
+
     CHIP_ERROR
     SetSoilMoistureMeasuredValue(
         EndpointId endpointId,
         const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
+    CHIP_ERROR SetSoilMoistureMeasurementLimits(
+        const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits);
+
 protected:
-    SoilMeasurementLogic mLogic;
+    SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mSoilMoistureMeasurementLimits;
+    SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type mSoilMoistureMeasuredValue;
 };
 
 } // namespace Clusters

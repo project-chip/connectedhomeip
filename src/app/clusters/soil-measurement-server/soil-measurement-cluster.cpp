@@ -15,21 +15,37 @@
  */
 
 #include "soil-measurement-cluster.h"
+#include <app/reporting/reporting.h>
 #include <clusters/SoilMeasurement/Metadata.h>
+#include <lib/core/CHIPError.h>
 #include <tracing/macros.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-SoilMeasurementCluster::SoilMeasurementCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, SoilMeasurement::Id }) {}
+SoilMeasurementCluster::SoilMeasurementCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, SoilMeasurement::Id })
+{
+    mSoilMoistureMeasuredValue.SetNull();
+}
 
 CHIP_ERROR SoilMeasurementCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    mLogic.Startup(mPath.mEndpointId, context.attributeStorage);
+    // VerifyOrReturnError(context.attributeStorage != nullptr, CHIP_INVALID_ARGUMENT);
 
+    SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type measuredValue;
+    MutableByteSpan measuredValueBytes(reinterpret_cast<uint8_t *>(&measuredValue), sizeof(measuredValue));
+    CHIP_ERROR error = context.attributeStorage->ReadValue(
+        { mPath.mEndpointId, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id }, measuredValueBytes);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        measuredValue.SetNull();
+    }
+
+    mSoilMoistureMeasuredValue = measuredValue;
     return CHIP_NO_ERROR;
 }
 
@@ -39,10 +55,10 @@ DataModel::ActionReturnStatus SoilMeasurementCluster::ReadAttribute(const DataMo
     switch (request.path.mAttributeId)
     {
     case SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::Id: {
-        return encoder.Encode(mLogic.GetSoilMoistureMeasurementLimits());
+        return encoder.Encode(GetSoilMoistureMeasurementLimits());
     }
     case SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id: {
-        return encoder.Encode(mLogic.GetSoilMoistureMeasuredValue());
+        return encoder.Encode(GetSoilMoistureMeasuredValue());
     }
     case SoilMeasurement::Attributes::ClusterRevision::Id: {
         return encoder.Encode(SoilMeasurement::kRevision);
@@ -58,15 +74,50 @@ DataModel::ActionReturnStatus SoilMeasurementCluster::ReadAttribute(const DataMo
 CHIP_ERROR SoilMeasurementCluster::Attributes(const ConcreteClusterPath & path,
                                               ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    return mLogic.Attributes(builder);
+    // Ensure capacity just in case
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(2 + DefaultServerCluster::GlobalAttributes().size()));
+    // Mandatory attributes
+    ReturnErrorOnFailure(builder.Append(SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::kMetadataEntry));
+    ReturnErrorOnFailure(builder.Append(SoilMeasurement::Attributes::SoilMoistureMeasuredValue::kMetadataEntry));
+
+    // Finally, the global attributes
+    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
 CHIP_ERROR
 SoilMeasurementCluster::SetSoilMoistureMeasuredValue(
     EndpointId endpointId, const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
 {
-    VerifyOrReturnError(endpointId == mPath.mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-    return mLogic.SetSoilMoistureMeasuredValue(endpointId, soilMoistureMeasuredValue);
+    if (mSoilMoistureMeasuredValue != soilMoistureMeasuredValue)
+    {
+        mSoilMoistureMeasuredValue = soilMoistureMeasuredValue;
+
+        MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id,
+                                               SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type
+SoilMeasurementCluster::GetSoilMoistureMeasurementLimits()
+{
+    return mSoilMoistureMeasurementLimits;
+}
+
+SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type SoilMeasurementCluster::GetSoilMoistureMeasuredValue()
+{
+    return mSoilMoistureMeasuredValue;
+}
+
+CHIP_ERROR
+SoilMeasurementCluster::SetSoilMoistureMeasurementLimits(
+    const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits)
+{
+    mSoilMoistureMeasurementLimits = soilMoistureMeasurementLimits;
+    mSoilMoistureMeasuredValue.SetNull();
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Clusters

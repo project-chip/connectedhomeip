@@ -44,12 +44,11 @@ struct TestSoilMeasurementCluster : public ::testing::Test
 TEST_F(TestSoilMeasurementCluster, AttributeTest)
 {
     {
-        SoilMeasurementLogic soilMeasurement;
-
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        EndpointId endpoint = 1;
+        SoilMeasurementCluster soilMeasurement(endpoint);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(soilMeasurement.Attributes(attributesBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(soilMeasurement.Attributes(ConcreteClusterPath(endpoint, SoilMeasurement::Id), attributesBuilder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
         ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
@@ -78,7 +77,7 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
 {
     {
         EndpointId endpoint = 1;
-        SoilMeasurementLogic soilMeasurement;
+        SoilMeasurementCluster soilMeasurement(endpoint);
 
         soilMeasurement.SetSoilMoistureMeasuredValue(endpoint, 50);
 
@@ -89,7 +88,10 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasurementLimits)
 {
     {
-        SoilMeasurementLogic soilMeasurement;
+        EndpointId endpoint = 1;
+        SoilMeasurementCluster soilMeasurement(endpoint);
+
+        soilMeasurement.SetSoilMoistureMeasurementLimits(kDefaultSoilMoistureMeasurementLimits);
 
         const auto & measurementLimits = soilMeasurement.GetSoilMoistureMeasurementLimits();
         ASSERT_EQ(measurementLimits.measurementType, kDefaultSoilMoistureMeasurementLimits.measurementType);
