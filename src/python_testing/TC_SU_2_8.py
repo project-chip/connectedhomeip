@@ -187,19 +187,50 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info(f"TH2 commissioned: {resp}.")
 
+        # Commissioning Provider-TH1
+
+        provider_node_id_1 = 10
+        provider_discriminator_1 = 1111
+        provider_passcode_1 = 20202021
+
+        logging.info(f"Commissioning OTA Provider 1 to TH1")
+
+        await controller.CommissionOnNetwork(  # Is this ok?
+            nodeId=provider_node_id_1,
+            setupPinCode=provider_passcode_1,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_discriminator_1
+        )
+
+        # Commissioning Provider-TH2
+
+        provider_node_id_2 = 11
+        provider_discriminator_2 = 2222
+        provider_passcode_2 = 20202021
+
+        logging.info(f"Commissioning OTA Provider 2 to TH2")
+
+        await controller.CommissionOnNetwork(  # Is this ok?
+            nodeId=provider_node_id_2,
+            setupPinCode=provider_passcode_2,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_discriminator_2
+        )
+
         await self.configure_acl_permissions(controller, endpoint)
+        await self.configure_acl_permissions(th2, endpoint)  # Is this ok?
 
         # DUT sends a QueryImage command to TH1/OTA-P.
         self.step(1)
 
         provider_th1 = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=1,
+            providerNodeID=provider_node_id_1,
             endpoint=endpoint,
             fabricIndex=controller.fabricId
         )
 
         provider_th2 = Clusters.Objects.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=self.dut_node_id,
+            providerNodeID=provider_node_id_2,
             endpoint=endpoint,
             fabricIndex=fabric_id_th2
         )
@@ -211,8 +242,9 @@ class TC_SU_2_8(MatterBaseTest):
             raise AssertionError(f"Fabric IDs are the same for TH1: {controller.fabricId} and TH2: {fabric_id_th2}.")
 
         await self.write_ota_providers(controller=controller, providers=[provider_th1], endpoint=endpoint)
-        await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)
+        # await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)
 
+        await self.announce_provider(controller=controller, provider_node_id=dut_node_id, vendor_id=vendor_id, endpoint=endpoint)
         await self.announce_provider(controller=th2, provider_node_id=dut_node_id, vendor_id=vendor_id, endpoint=endpoint)
 
         # TH1/OTA-P does not respond with QueryImageResponse.
