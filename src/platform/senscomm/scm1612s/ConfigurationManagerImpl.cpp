@@ -94,22 +94,41 @@ CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
     return SCM1612SConfig::ReadConfigValue(SCM1612SConfig::kConfigKey_BootCount, rebootCount);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return SCM1612SConfig::WriteConfigValue(SCM1612SConfig::kConfigKey_BootCount, rebootCount);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 {
+    CHIP_ERROR err;
     uint32_t bootCount = 0;
     if (SCM1612SConfig::ConfigValueExists(SCM1612SConfig::kConfigKey_BootCount))
     {
-        GetRebootCount(bootCount);
+        err = GetRebootCount(bootCount);
+        SuccessOrExit(err);
+
+        err = StoreRebootCount(bootCount + 1);
+        SuccessOrExit(err);
     }
-    return SCM1612SConfig::WriteConfigValue(SCM1612SConfig::kConfigKey_BootCount, bootCount + 1);
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
+exit:
+    return err;
 }
 
-uint32_t ConfigurationManagerImpl::GetBootReason(void)
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
     BootReasonType matterBootCause;
     matterBootCause = BootReasonType::kUnspecified;
-    return to_underlying(matterBootCause);
+    bootReason = to_underlying(matterBootCause);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)

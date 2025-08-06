@@ -55,6 +55,11 @@ public:
     CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults) override;
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & BssId) override;
+    CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
+    CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
+#endif
 };
 
 /**
