@@ -305,7 +305,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def certificate_authority_manager(self) -> matter.CertificateAuthority.CertificateAuthorityManager:
-       return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
+        return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
 
     @property
     def dut_node_id(self) -> int:

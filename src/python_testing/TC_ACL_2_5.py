@@ -133,7 +133,6 @@ class TC_ACL_2_5(MatterBaseTest):
                              Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
                              "Expected Added change type")
 
-
         asserts.assert_equal(subscription_event.latestValue.data,
                              D_OK_EMPTY,
                              "LatestValue.Data should be D_OK_EMPTY")
@@ -152,16 +151,16 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(6)
         # Create a new extension with different data to replace the existing one
         # Value is from test plan and is a valid top level anonymous list containing one element.
-        D_OK_SINGLE=bytes.fromhex(
+        D_OK_SINGLE = bytes.fromhex(
             '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018'
         )
-        new_extension=Clusters.AccessControl.Structs.AccessControlExtensionStruct(
+        new_extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_SINGLE)
 
         # Write the new extension
         logging.info(f"Writing new extension with data {D_OK_SINGLE.hex()}")
-        extensions_list=[new_extension]
-        result=await self.write_attribute_with_encoding_option(
+        extensions_list = [new_extension]
+        result = await self.write_attribute_with_encoding_option(
             self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))],
@@ -174,7 +173,7 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(7)
         # Wait for and verify the event
         logging.info("Waiting for AccessControlExtensionChanged event...")
-        event_data1=events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+        event_data1 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
         if not force_legacy_encoding:
             # Verify event data
@@ -216,7 +215,7 @@ class TC_ACL_2_5(MatterBaseTest):
                                  f1,
                                  "FabricIndex should be the current fabric index")
 
-            event_data2=events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+            event_data2 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
             # Verify event data 2 struct
             asserts.assert_equal(event_data2.changeType,
                                  Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
@@ -239,16 +238,16 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(8)
         # Try to write an extension that exceeds max length (128 bytes)
         # Value is from test plan and is a valid top-level anonymous list with a length of 129 (too long)
-        too_long_data=bytes.fromhex(
+        too_long_data = bytes.fromhex(
             "17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"
         )
-        too_long_extension=Clusters.AccessControl.Structs.AccessControlExtensionStruct(
+        too_long_extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=too_long_data)
 
         # This should fail with CONSTRAINT_ERROR
         logging.info("Attempting to write extension that exceeds max length (should fail)")
-        extensions_list=[too_long_extension]
-        a=await self.write_attribute_with_encoding_option(
+        extensions_list = [too_long_extension]
+        a = await self.write_attribute_with_encoding_option(
             self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))],
@@ -262,10 +261,10 @@ class TC_ACL_2_5(MatterBaseTest):
         # Verify no event was generated for the failed write
         logging.info("Reading events after failed write (too long extension)...")
 
-        latest_event_num=await self.get_latest_event_number(acec_event)
+        latest_event_num = await self.get_latest_event_number(acec_event)
 
         # Try to read events directly
-        events_response2=await self.default_controller.ReadEvent(
+        events_response2 = await self.default_controller.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True,
@@ -279,7 +278,7 @@ class TC_ACL_2_5(MatterBaseTest):
             asserts.assert_equal(len(events_response2), 0, "There should be no events found")
 
         if force_legacy_encoding:
-            event_data3=events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+            event_data3 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
             # Verify event data 1 struct
             asserts.assert_equal(event_data3.changeType,
                                  Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
@@ -302,8 +301,8 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
         logging.info("Attempting to write multiple extensions (should fail)")
-        extensions_list=[extension, new_extension]
-        b=await self.write_attribute_with_encoding_option(
+        extensions_list = [extension, new_extension]
+        b = await self.write_attribute_with_encoding_option(
             self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))],
@@ -317,9 +316,9 @@ class TC_ACL_2_5(MatterBaseTest):
         # Verify no event was generated at all, since the whole extensions list was rejected.
         logging.info("Reading events after failed write (multiple extensions)...")
 
-        latest_event_num2=await self.get_latest_event_number(acec_event)
+        latest_event_num2 = await self.get_latest_event_number(acec_event)
 
-        events_response3=await self.default_controller.ReadEvent(
+        events_response3 = await self.default_controller.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True,
@@ -332,7 +331,7 @@ class TC_ACL_2_5(MatterBaseTest):
         if not force_legacy_encoding:
             asserts.assert_equal(len(events_response3), 0, "There should be no events found")
         else:
-            event_data4=events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+            event_data4 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
             # Verify event data 2 struct
             asserts.assert_equal(event_data4.changeType,
                                  Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
@@ -355,8 +354,8 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(12)
         # Write an empty list to clear all extensions
         logging.info("Writing empty extension list to clear all extensions...")
-        extensions_list2=[]
-        result=await self.write_attribute_with_encoding_option(
+        extensions_list2 = []
+        result = await self.write_attribute_with_encoding_option(
             self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list2))],
@@ -368,7 +367,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         self.step(13)
         logging.info("Waiting for AccessControlExtensionChanged event...")
-        event_data5=events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+        event_data5 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
 
         if not force_legacy_encoding:
             # Verify event data
@@ -409,15 +408,15 @@ class TC_ACL_2_5(MatterBaseTest):
             self.skip_step(14)
 
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
-        event_path=[(self.matter_test_config.endpoint, acec_event, 1)]
-        events=await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
         return max([e.Header.EventNumber for e in events])
 
     def desc_TC_ACL_2_5(self) -> str:
         return "[TC-ACL-2.5]  AccessControlExtensionChanged event"
 
     def steps_TC_ACL_2_5(self) -> list[TestStep]:
-        steps=[
+        steps = [
             TestStep(1, "TH1 commissions DUT using admin node ID",
                      is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -449,7 +448,7 @@ class TC_ACL_2_5(MatterBaseTest):
     @ async_test_body
     async def test_TC_ACL_2_5(self):
         await self.internal_test_TC_ACL_2_5(force_legacy_encoding=False)
-        self.current_step_index=0
+        self.current_step_index = 0
         await self.internal_test_TC_ACL_2_5(force_legacy_encoding=True)
 
 
