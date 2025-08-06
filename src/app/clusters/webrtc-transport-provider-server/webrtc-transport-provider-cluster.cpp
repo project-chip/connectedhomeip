@@ -39,11 +39,11 @@ namespace {
 constexpr uint16_t kMaxSessionId = 65534;
 
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-    WebRTCTransportProvider::Commands::SolicitOffer::kMetadataEntry,
-    WebRTCTransportProvider::Commands::ProvideOffer::kMetadataEntry,
-    WebRTCTransportProvider::Commands::ProvideAnswer::kMetadataEntry,
-    WebRTCTransportProvider::Commands::ProvideICECandidates::kMetadataEntry,
-    WebRTCTransportProvider::Commands::EndSession::kMetadataEntry,
+    Commands::SolicitOffer::kMetadataEntry,
+    Commands::ProvideOffer::kMetadataEntry,
+    Commands::ProvideAnswer::kMetadataEntry,
+    Commands::ProvideICECandidates::kMetadataEntry,
+    Commands::EndSession::kMetadataEntry,
 };
 
 constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
