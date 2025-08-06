@@ -59,7 +59,7 @@ public:
 
     // During the transition phase, we expect a large subset of code to require access to
     // event emitting, path marking and other operations
-    [[nodiscard]] const InteractionModelContext & CurrentContext() const { return *mContext; }
+    [[nodiscard]] const std::optional<InteractionModelContext> & CurrentContext() const { return mContext; }
 
     /// NOTE: this code is NOT required to handle `List` global attributes:
     ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList
@@ -129,6 +129,9 @@ public:
                                                             CommandHandler * handler) = 0;
 
 protected:
+    // Every functional provider needs a context, however a context is only
+    // available after startup, hence optional: there is no context after startup
+    // or before shutdown.
     std::optional<InteractionModelContext> mContext;
 };
 

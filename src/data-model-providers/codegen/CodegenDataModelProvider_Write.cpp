@@ -50,12 +50,19 @@ using Protocols::InteractionModel::Status;
 class ContextAttributesChangeListener : public AttributesChangedListener
 {
 public:
-    ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
+    ContextAttributesChangeListener(const std::optional<DataModel::InteractionModelContext> & context) :
+        mListener(context.has_value() ? &context->dataModelChangeListener : nullptr)
     {}
-    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
+    void MarkDirty(const AttributePathParams & path) override
+    {
+        if (mListener != nullptr)
+        {
+            mListener->MarkDirty(path);
+        }
+    }
 
 private:
-    DataModel::ProviderChangeListener & mListener;
+    DataModel::ProviderChangeListener * mListener;
 };
 
 /// Attempts to write via an attribute access interface (AAI)
