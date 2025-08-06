@@ -202,7 +202,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
 DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) {
     switch(request.path.mAttributeId){
-        case GroupKeyManagement::Attributes::GroupKeyMap {
+        case GroupKeyManagement::Attributes::GroupKeyMap: {
             // TODO: wrap this call in NotifyAttributeChangedIfSuccess() 
             return WriteGroupKeyMap(request.path, decoder);
         }
@@ -213,6 +213,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const Da
 
 CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) {
     AttributeListBuilder listBuilder(builder);
+    // TODO: remove the hard coded mandatory attributes and use the code generated ones
     return listBuilder.Append(Span(kMandatoryAttributes), Span<const AttributeListBuilder::OptionalAttributeEntry>());
 }
 
@@ -627,7 +628,7 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKe
 
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleKeySetRead(
+std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKeySetRead(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData)
 {
@@ -691,7 +692,7 @@ std::optional<DataModel::ActionReturnStatus> HandleKeySetRead(
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleKeySetRemove(
+std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKeySetRemove(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData)
 
@@ -728,7 +729,7 @@ std::optional<DataModel::ActionReturnStatus> HandleKeySetRemove(
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleKeySetReadAllIndices(
+std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKeySetReadAllIndices(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData)
 {
