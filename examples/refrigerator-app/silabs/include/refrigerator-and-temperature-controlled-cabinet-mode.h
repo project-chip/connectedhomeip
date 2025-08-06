@@ -33,7 +33,8 @@ const uint8_t ModeNormal      = 0;
 const uint8_t ModeRapidCool   = 1;
 const uint8_t ModeRapidFreeze = 2;
 
-/// This is an application level delegate to handle TemperatureControlledCabinetMode commands according to the specific business logic.
+/// This is an application level delegate to handle TemperatureControlledCabinetMode commands according to the specific business
+/// logic.
 class RefrigeratorAndTemperatureControlledCabinetModeDelegate : public ModeBase::Delegate
 {
 private:

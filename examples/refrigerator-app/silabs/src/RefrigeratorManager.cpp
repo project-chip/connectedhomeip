@@ -113,7 +113,7 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
 }
 
 void RefrigeratorManager::RefAlarmAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
-                                                          uint16_t size)
+                                                         uint16_t size)
 {
     switch (attributeId)
     {

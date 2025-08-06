@@ -187,13 +187,13 @@ void EventWorkerFunction(intptr_t context)
 
     switch (data->eventId)
     {
-    case RefrigeratorAlarm::Events::Notify::Fields::kMask : {
+    case RefrigeratorAlarm::Events::Notify::Fields::kMask: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
         RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, alarmData->doorState);
         break;
     }
 
-    case RefrigeratorAlarm::Events::Notify::Fields::kState : {
+    case RefrigeratorAlarm::Events::Notify::Fields::kState: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
         RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, alarmData->doorState);
         break;
