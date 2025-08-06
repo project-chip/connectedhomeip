@@ -40,11 +40,11 @@ RUN set -x \
 # Download and install android NDK
 RUN set -x \
     && cd /tmp \
-    && wget https://dl.google.com/android/repository/android-ndk-r23c-linux.zip \
+    && wget https://dl.google.com/android/repository/android-ndk-r28c-linux.zip \
     && mkdir -p /opt/android \
     && cd /opt/android \
-    && unzip /tmp/android-ndk-r23c-linux.zip \
-    && rm -f /tmp/android-ndk-r23c-linux.zip \
+    && unzip /tmp/android-ndk-r28c-linux.zip \
+    && rm -f /tmp/android-ndk-r28c-linux.zip \
     && : # last line
 
 # Install specific release of openssl and compile for x86/armv7-a
@@ -57,7 +57,7 @@ RUN set -x \
 RUN set -x \
     && export OPENSSL_ARMV7=/usr/local/src/armeabi-v7a \
     && export OPENSSL_X86=/usr/local/src/x86 \
-    && export ANDROID_NDK_HOME=/opt/android/android-ndk-r23c \
+    && export ANDROID_NDK_HOME=/opt/android/android-ndk-r28c \
     && export PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH \
     && cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1t.tar.gz \
     && mkdir -p $OPENSSL_ARMV7 && cd $OPENSSL_ARMV7 && tar xfz /tmp/openssl-1.1.1t.tar.gz \
@@ -68,5 +68,5 @@ RUN set -x \
     && : # last line
 
 ENV ANDROID_HOME=/opt/android/sdk
-ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
+ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r28c
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
