@@ -128,6 +128,7 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
     Reset();
+    mContext.reset();
     mRegistry.ClearContext();
     return DataModel::Provider::Shutdown();
 }
@@ -136,8 +137,9 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 {
     // server clusters require a valid persistent storage delegate
     VerifyOrReturnError(mPersistentStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    mContext.emplace(context);
 
     // Ember NVM requires have a data model provider. attempt to create one if one is not available
     //

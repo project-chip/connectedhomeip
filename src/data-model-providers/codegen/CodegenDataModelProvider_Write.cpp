@@ -130,7 +130,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         }
     }
 
-    ContextAttributesChangeListener change_listener(CurrentContext());
+    ContextAttributesChangeListener change_listener(mContext);
 
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
@@ -215,7 +215,7 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
 
 void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
-    ContextAttributesChangeListener change_listener(CurrentContext());
+    ContextAttributesChangeListener change_listener(mContext);
     if (path.mClusterId != kInvalidClusterId)
     {
         emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &change_listener);
