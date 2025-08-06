@@ -307,7 +307,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case SoftwareVersion::Id:
         return ReadSoftwareVersion(configManager, encoder);
     case SoftwareVersionString::Id:
-        return ReadSoftwareVersionString(configManager, aEncoder);
+        return ReadSoftwareVersionString(configManager, encoder);
     case ManufacturingDate::Id:
         return ReadManufacturingDate(deviceInfoProvider, encoder);
     case PartNumber::Id:
