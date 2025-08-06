@@ -25,11 +25,11 @@
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
-#include <app/clusters/soil-measurement-server/CodegenIntegration.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
+#include <soil-measurement-stub.h>
 
 #include "ButtonEventsSimulator.h"
 #include <air-quality-instance.h>

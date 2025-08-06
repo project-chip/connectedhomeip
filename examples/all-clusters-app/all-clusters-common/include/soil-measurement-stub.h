@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {

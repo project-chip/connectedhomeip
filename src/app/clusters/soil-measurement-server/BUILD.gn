@@ -18,8 +18,6 @@ source_set("soil-measurement-server") {
   sources = [
     "soil-measurement-cluster.cpp",
     "soil-measurement-cluster.h",
-    "soil-measurement-logic.cpp",
-    "soil-measurement-logic.h",
   ]
 
   public_deps = [
