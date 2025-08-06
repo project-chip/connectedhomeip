@@ -67,6 +67,7 @@
 #include <lib/core/TLVWriter.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
@@ -190,6 +191,7 @@ class CodegenDataModelProviderWithContext : public CodegenDataModelProvider
 public:
     CodegenDataModelProviderWithContext()
     {
+        SetPersistentStorageDelegate(&mStorageDelegate);
         Startup({
             .eventsGenerator         = mEventGenerator,
             .dataModelChangeListener = mChangeListener,
@@ -205,6 +207,7 @@ private:
     TestEventGenerator mEventGenerator;
     TestProviderChangeListener mChangeListener;
     TestActionContext mActionContext;
+    TestPersistentStorageDelegate mStorageDelegate;
 };
 
 class MockAccessControl : public Access::AccessControl::Delegate, public Access::AccessControl::DeviceTypeResolver
