@@ -739,12 +739,12 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
-    config.app_pipe = args.app_pipe
-    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
+    config.pipe_name = args.app_pipe
+    if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
-        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
+        logging.error("Named pipe %r does NOT exist" % config.pipe_name)
+        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.fail_on_skipped_tests = args.fail_on_skipped
 
