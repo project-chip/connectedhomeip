@@ -70,14 +70,6 @@ class CADMINSupport:
         )
         return current_fabric_index
 
-    async def get_txt_record(self):
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        comm_service = await discovery.get_commissionable_service(
-            discovery_timeout_sec=240,
-            log_output=False,
-        )
-        return comm_service
-
     def calculate_clock_skew_factor(self, duration_seconds: int) -> int:
         """
         Calculate the clock skew factor for commissioning window monitoring.
