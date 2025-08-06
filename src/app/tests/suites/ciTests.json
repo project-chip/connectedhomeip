@@ -8,8 +8,7 @@
         "Test_TC_ACL_2_6",
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
-        "Test_TC_ACL_2_9",
-        "Test_TC_ACL_2_10"
+        "Test_TC_ACL_2_9"
     ],
     "ContentAppObserver": [],
     "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_5"],
