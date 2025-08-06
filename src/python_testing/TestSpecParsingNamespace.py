@@ -129,7 +129,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
         # Complete namespace version checks for 1.3, 1.4, 1.4.1, 1.4.2, known differences and relationships:
         # 1.3: has Common Position and Common Closure
         # 1.4/1.4.1: removed Common Position, kept Common Closure, added Common Area/Landmark/Relative Position
-        # 1.4.2: removed Common Closure, added back Common Position, kept new ones from 1.4/1.4.1
+        # 1.4.2: kept Common Closure, added back Common Position, kept new ones from 1.4/1.4.1
 
         # Check changes from 1.3 to 1.4
         removed_1_3_to_1_4 = set(one_three.keys()) - set(one_four.keys())
@@ -154,11 +154,11 @@ class TestSpecParsingNamespace(MatterBaseTest):
         # 1.4.2 vs 1.3 comparison
         removed_1_4_2_vs_1_3 = set(one_three.keys()) - set(one_four_two.keys())
         removed_names_1_4_2_vs_1_3 = {one_three[id].name for id in removed_1_4_2_vs_1_3}
-        expected_removed_1_4_2_vs_1_3 = {"Common Closure"}
+        expected_removed_1_4_2_vs_1_3 = set()  # No namespaces should be removed from 1.3 to 1.4.2
         asserts.assert_equal(
             removed_names_1_4_2_vs_1_3,
             expected_removed_1_4_2_vs_1_3,
-            f"Expected only 'Common Closure' to be removed from 1.3 to 1.4.2, but got: {removed_names_1_4_2_vs_1_3}")
+            f"Expected no namespaces to be removed from 1.3 to 1.4.2, but got: {removed_names_1_4_2_vs_1_3}")
 
         added_1_4_2_vs_1_3 = set(one_four_two.keys()) - set(one_three.keys())
         added_names_1_4_2_vs_1_3 = {one_four_two[id].name for id in added_1_4_2_vs_1_3}
@@ -171,11 +171,11 @@ class TestSpecParsingNamespace(MatterBaseTest):
         # 1.4.2 vs 1.4 comparison
         removed_1_4_2_vs_1_4 = set(one_four.keys()) - set(one_four_two.keys())
         removed_names_1_4_2_vs_1_4 = {one_four[id].name for id in removed_1_4_2_vs_1_4}
-        expected_removed_1_4_2_vs_1_4 = {"Common Closure"}
+        expected_removed_1_4_2_vs_1_4 = set()  # No namespaces should be removed from 1.4 to 1.4.2
         asserts.assert_equal(
             removed_names_1_4_2_vs_1_4,
             expected_removed_1_4_2_vs_1_4,
-            f"Expected only 'Common Closure' to be removed from 1.4 to 1.4.2, but got: {removed_names_1_4_2_vs_1_4}")
+            f"Expected no namespaces to be removed from 1.4 to 1.4.2, but got: {removed_names_1_4_2_vs_1_4}")
 
         added_1_4_2_vs_1_4 = set(one_four_two.keys()) - set(one_four.keys())
         added_names_1_4_2_vs_1_4 = {one_four_two[id].name for id in added_1_4_2_vs_1_4}
@@ -186,11 +186,11 @@ class TestSpecParsingNamespace(MatterBaseTest):
         # Check changes from 1.4.1 to 1.4.2
         removed_1_4_1_to_1_4_2 = set(one_four_one.keys()) - set(one_four_two.keys())
         removed_names_1_4_1_to_1_4_2 = {one_four_one[id].name for id in removed_1_4_1_to_1_4_2}
-        expected_removed_1_4_1_to_1_4_2 = {"Common Closure"}
+        expected_removed_1_4_1_to_1_4_2 = set()  # No namespaces should be removed from 1.4.1 to 1.4.2
         asserts.assert_equal(
             removed_names_1_4_1_to_1_4_2,
             expected_removed_1_4_1_to_1_4_2,
-            f"Expected only 'Common Closure' to be removed from 1.4.1 to 1.4.2, but got: {removed_names_1_4_1_to_1_4_2}")
+            f"Expected no namespaces to be removed from 1.4.1 to 1.4.2, but got: {removed_names_1_4_1_to_1_4_2}")
 
         added_1_4_2_vs_1_4_1 = set(one_four_two.keys()) - set(one_four_one.keys())
         added_names_1_4_2_vs_1_4_1 = {one_four_two[id].name for id in added_1_4_2_vs_1_4_1}
