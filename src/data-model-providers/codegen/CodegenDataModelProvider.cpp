@@ -161,10 +161,10 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     InitDataModelForTesting();
 
     return mRegistry.SetContext(ServerClusterContext{
-        .provider           = this,
-        .storage            = mPersistentStorageDelegate,
-        .attributeStorage   = GetAttributePersistenceProvider(),
-        .interactionContext = &mContext,
+        .provider           = *this,
+        .storage            = *mPersistentStorageDelegate,
+        .attributeStorage   = *GetAttributePersistenceProvider(),
+        .interactionContext = *mContext,
     });
 }
 

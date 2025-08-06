@@ -167,7 +167,8 @@ bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
+        mIterator(iterator) {};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
@@ -1924,13 +1925,11 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     mDataModelProvider = model;
     if (mDataModelProvider != nullptr)
     {
-        DataModel::InteractionModelContext context;
-
-        context.eventsGenerator         = &EventManagement::GetInstance();
-        context.dataModelChangeListener = &mReportingEngine;
-        context.actionContext           = this;
-
-        CHIP_ERROR err = mDataModelProvider->Startup(context);
+        CHIP_ERROR err = mDataModelProvider->Startup({
+            .eventsGenerator         = EventManagement::GetInstance(),
+            .dataModelChangeListener = mReportingEngine,
+            .actionContext           = *this,
+        });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
