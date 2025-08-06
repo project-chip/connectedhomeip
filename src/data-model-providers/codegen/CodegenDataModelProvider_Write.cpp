@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/ProviderChangeListener.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -50,19 +51,11 @@ using Protocols::InteractionModel::Status;
 class ContextAttributesChangeListener : public AttributesChangedListener
 {
 public:
-    ContextAttributesChangeListener(const std::optional<DataModel::InteractionModelContext> & context) :
-        mListener(context.has_value() ? &context->dataModelChangeListener : nullptr)
-    {}
-    void MarkDirty(const AttributePathParams & path) override
-    {
-        if (mListener != nullptr)
-        {
-            mListener->MarkDirty(path);
-        }
-    }
+    ContextAttributesChangeListener(DataModel::ProviderChangeListener & listener) : mListener(listener) {}
+    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
 
 private:
-    DataModel::ProviderChangeListener * mListener;
+    DataModel::ProviderChangeListener & mListener;
 };
 
 /// Attempts to write via an attribute access interface (AAI)
@@ -103,6 +96,9 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return cluster->WriteAttribute(request, decoder);
     }
 
+    // we must be started up to accept writes (we make use of the context below)
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
@@ -130,7 +126,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         }
     }
 
-    ContextAttributesChangeListener change_listener(mContext);
+    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
 
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
@@ -215,7 +211,10 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
 
 void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
-    ContextAttributesChangeListener change_listener(mContext);
+    // we must be started up to process changes since we use the context
+    VerifyOrReturn(mContext.has_value());
+
+    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
     if (path.mClusterId != kInvalidClusterId)
     {
         emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &change_listener);
