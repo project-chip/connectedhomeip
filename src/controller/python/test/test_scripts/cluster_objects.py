@@ -134,7 +134,7 @@ class ClusterObjectTests:
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(Clusters.UnitTesting)])
 
         actual_status = res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.WriteOnlyInt8u].Reason.status
-        expected_status = chip.interaction_model.Status.UnsupportedRead
+        expected_status = matter.interaction_model.Status.UnsupportedRead
 
         if expected_status != actual_status:
             raise AssertionError("Received un-expected WriteOnlyInt8u attribute in TestCluster")

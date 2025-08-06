@@ -40,10 +40,10 @@
 
 import logging
 
-import matter_testing_infrastructure.chip.testing.global_attribute_ids as global_attribute_ids
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.global_attribute_ids as global_attribute_ids
 from matter.clusters.Attribute import ValueDecodeFailure
 from matter.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS
 from matter.clusters.Objects import AccessControl

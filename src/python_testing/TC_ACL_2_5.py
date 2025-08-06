@@ -283,7 +283,7 @@ class TC_ACL_2_5(MatterBaseTest):
             asserts.assert_equal(event_data3.changeType,
                                  Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
                                  "Expected Removed change type")
-            asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data3.adminPasscodeID)),
+            asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data3.adminPasscodeID)),
                               "AdminPasscodeID should be Null")
             asserts.assert_equal(event_data3.adminNodeID,
                                  self.default_controller.nodeId,
@@ -336,7 +336,7 @@ class TC_ACL_2_5(MatterBaseTest):
             asserts.assert_equal(event_data4.changeType,
                                  Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
                                  "Expected Added change type")
-            asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data4.adminPasscodeID)),
+            asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data4.adminPasscodeID)),
                               "AdminPasscodeID should be Null")
             asserts.assert_equal(event_data4.adminNodeID,
                                  self.default_controller.nodeId,
@@ -381,7 +381,7 @@ class TC_ACL_2_5(MatterBaseTest):
                                  D_OK_EMPTY,
                                  "LatestValue.Data should match D_OK_EMPTY")
 
-        asserts.assert_in('chip.clusters.Types.Nullable', str(type(event_data5.adminPasscodeID)),
+        asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data5.adminPasscodeID)),
                           "AdminPasscodeID should be Null")
 
         asserts.assert_equal(event_data5.changeType,
