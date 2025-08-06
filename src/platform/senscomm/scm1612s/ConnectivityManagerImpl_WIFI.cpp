@@ -195,6 +195,7 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
         scm_wifi_dhcp_start();
+        NetworkCommissioning::WiseWiFiDriver::GetInstance().UpdateWiFiAuthmode();
         DriveStationState();
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
@@ -244,6 +245,11 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         ip6addr_ntoa_r(&got_ip.ip6_info.ip, addrStr, sizeof(addrStr));
 
         UpdateInternetConnectivityState(hadIPv4Conn, true, reinterpret_cast<const uint8_t *>(addrStr));
+    }
+        break;
+    case SYSTEM_EVENT_STA_NO_NETWORK:
+    {
+        scm_wifi_sta_connect_advance();
     }
         break;
     default:

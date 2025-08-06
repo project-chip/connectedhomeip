@@ -28,6 +28,12 @@
 #include "wise_err.h"
 #include "scm_wifi.h"
 
+#define SECURITY_OPEN 0
+#define SECURITY_TKIP 2
+#define SECURITY_CCMP 3
+#define SECURITY_CCMP_256 4
+#define SECURITY_SAE  6
+
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -101,6 +107,46 @@ CHIP_ERROR WiseWiFiDriver::CommitConfiguration()
     return CHIP_NO_ERROR;
 }
 
+void WiseWiFiDriver::UpdateWiFiAuthmode()
+{
+    wifi_config_t config;
+    wifi_auth_mode_t authmode = WIFI_AUTH_OPEN;
+    scm_wifi_get_config(WIFI_IF_STA, &config);
+
+    switch (config.sta.proto)
+    {
+        case WIFI_PROTO_WPA:
+            authmode = WIFI_AUTH_WPA_PSK;
+            break;
+        case WIFI_PROTO_WPA2:
+            switch (config.sta.alg)
+            {
+                case SECURITY_CCMP:
+                    authmode = WIFI_AUTH_WPA2_PSK;
+                    break;
+                case SECURITY_SAE:
+                    authmode = WIFI_AUTH_WPA3_SAE;
+                    break;
+                default:
+                    authmode = WIFI_AUTH_OPEN;
+                    break;
+            }
+            break;
+        default:
+            authmode = WIFI_AUTH_OPEN;
+            break;
+    }
+
+    ChipLogProgress(NetworkProvisioning, "WiseWiFiDriver::UpdateWiFiAuthmode, authmode %d %d", 
+                    mStagingNetwork.auth_mode, authmode);
+
+    if (mStagingNetwork.auth_mode != authmode)
+    {
+        mStagingNetwork.auth_mode = authmode;
+        CommitConfiguration();
+    }
+}
+
 CHIP_ERROR WiseWiFiDriver::RevertConfiguration()
 {
     ChipLogProgress(NetworkProvisioning, "WiseWiFiDriver::RevertConfiguration");
@@ -134,8 +180,7 @@ Status WiseWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, M
     memcpy(mStagingNetwork.ssid, ssid.data(), ssid.size());
     mStagingNetwork.ssidLen = static_cast<decltype(mStagingNetwork.ssidLen)>(ssid.size());
 
-    // TODO: Get the auth mode from the user
-    mStagingNetwork.auth_mode = SCM_WIFI_SECURITY_WPA2PSK;
+    mStagingNetwork.auth_mode = credentials.size() != 0 ? WIFI_AUTH_WPA2_PSK : WIFI_AUTH_OPEN;
 
     return Status::kSuccess;
 }
@@ -177,32 +222,28 @@ CHIP_ERROR WiseWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen
     memcpy(req.key, key, keyLen);
     switch (mStagingNetwork.auth_mode)
     {
-        case 3:
-        req.auth = SCM_WIFI_SECURITY_SAE;
-        break;
-        case 2:
-        req.auth = SCM_WIFI_SECURITY_WPA2PSK;
-        break;
-        case 0:
+        case WIFI_AUTH_WPA3_SAE:
+            req.auth = SCM_WIFI_SECURITY_SAE;
+            break;
+        case WIFI_AUTH_WPA2_PSK:
+            req.auth = SCM_WIFI_SECURITY_WPA2PSK;
+            break;
+        case WIFI_AUTH_OPEN:
+            req.auth = SCM_WIFI_SECURITY_OPEN;
+            break;
+        case SCM_WIFI_SECURITY_UNKNOWN:
         default:
-        req.auth = SCM_WIFI_SECURITY_OPEN;
-        break;
+            req.auth = SCM_WIFI_SECURITY_WPA2PSK;
+            break;
     }
     req.pairwise = SCM_WIFI_PAIRWISE_AES;
 
-    ret = scm_wifi_sta_set_config(&req, NULL);
-
+    scm_wifi_sta_set_config(&req, NULL);
 #if 0
     ChipLogProgress(NetworkProvisioning, "ssid: %s %d", ssid, ssidLen);
     ChipLogProgress(NetworkProvisioning, "key: %s %d", key, keyLen);
     ChipLogProgress(NetworkProvisioning, "auth: %d", mStagingNetwork.auth_mode);
 #endif
-
-    if (ret != WISE_OK)
-    {
-        ChipLogProgress(NetworkProvisioning, "scm_wifi_sta_set_config failed");
-        return CHIP_ERROR_INTERNAL;
-    }
 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
 
