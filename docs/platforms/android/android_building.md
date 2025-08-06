@@ -15,18 +15,18 @@ There are following Apps on Android
 
 <hr>
 
-- [Building Android](#building-android)
-  - [Source files](#source-files)
-  - [Requirements for building](#requirements-for-building)
-    - [Linux](#linux)
-    - [MacOS](#macos)
-    - [ABIs and TARGET\_CPU](#abis-and-target_cpu)
-    - [Gradle \& JDK Version](#gradle--jdk-version)
-    - [Kotlin Version](#kotlin-version)
-  - [Preparing for build](#preparing-for-build)
-  - [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
-  - [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
-  - [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
+-   [Building Android](#building-android)
+    -   [Source files](#source-files)
+    -   [Requirements for building](#requirements-for-building)
+        -   [Linux](#linux)
+        -   [MacOS](#macos)
+        -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
+        -   [Gradle \& JDK Version](#gradle--jdk-version)
+        -   [Kotlin Version](#kotlin-version)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
+    -   [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
+    -   [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
 
 <hr>
 
