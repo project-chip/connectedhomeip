@@ -41,12 +41,6 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommandsWithBasicCommissionin
     AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::kMetadataEntry,
 };
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    AdministratorCommissioning::Attributes::WindowStatus::kMetadataEntry,
-    AdministratorCommissioning::Attributes::AdminFabricIndex::kMetadataEntry,
-    AdministratorCommissioning::Attributes::AdminVendorId::kMetadataEntry,
-};
-
 }; // namespace
 
 DataModel::ActionReturnStatus AdministratorCommissioningCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -105,7 +99,7 @@ CHIP_ERROR AdministratorCommissioningCluster::Attributes(const ConcreteClusterPa
 {
 
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryAttributes), {});
+    return listBuilder.Append(Span(AdministratorCommissioning::Attributes::kMandatoryMetadata), {});
 }
 
 std::optional<DataModel::ActionReturnStatus> AdministratorCommissioningWithBasicCommissioningWindowCluster::InvokeCommand(

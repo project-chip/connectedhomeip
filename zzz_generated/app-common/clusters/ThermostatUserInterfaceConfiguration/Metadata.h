@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -32,6 +33,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ScheduleProgrammingVis
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           Access::Privilege::kManage);
 } // namespace ScheduleProgrammingVisibility
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    TemperatureDisplayMode::kMetadataEntry,
+    KeypadLockout::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

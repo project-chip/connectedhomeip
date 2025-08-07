@@ -18,6 +18,7 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/util.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -35,36 +36,17 @@ namespace {
 
 LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 
-// compile-time evaluated method if "is <EP>::SoftwareDiagnostics::<ATTR>" enabled
-constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
-{
-    for (auto & config : SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig)
-    {
-        if (config.endpointNumber != endpointId)
-        {
-            continue;
-        }
-        for (auto & attr : config.enabledAttributes)
-        {
-            if (attr == attributeId)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 } // namespace
 
 void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapHighWatermark::Id),
+        .enableThreadMetrics   = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::ThreadMetrics::Id),
+        .enableCurrentHeapFree = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapFree::Id),
+        .enableCurrentHeapUsed = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapUsed::Id),
+        .enableCurrentWatermarks =
+            emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapHighWatermark::Id),
     };
 
     gServer.Create(enabledAttributes);
