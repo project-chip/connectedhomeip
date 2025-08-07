@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -31,6 +32,11 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace CurrentConnections
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    SupportedFormats::kMetadataEntry,
+    CurrentConnections::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -70,6 +76,16 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace FindTransport
 
 } // namespace Commands
+
+namespace Events {
+namespace PushTransportBegin {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PushTransportBegin
+namespace PushTransportEnd {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PushTransportEnd
+
+} // namespace Events
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:153
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -153,7 +153,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:153
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -331,7 +331,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:153
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -365,9 +365,9 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   python -m ensurepip --upgrade
-                  python -m pip install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
-                  python -m pip install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
-                  python -m pip install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
+                  python -m pip install ./out/controller/python/matter_core-1.0.0-cp37-abi3-linux_x86_64.whl
+                  python -m pip install ./out/controller/python/matter_clusters-1.0.0-py3-none-any.whl
+                  python -m pip install ./out/controller/python/matter_repl-1.0.0-py3-none-any.whl
 
             - name: Run Python tests
               shell: bash
@@ -396,7 +396,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:153
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -520,7 +520,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:153
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -531,7 +531,12 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}                
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Run Build Coverage
-              run: ./scripts/build_coverage.sh --yaml
+              run: ./scripts/build_coverage.sh --yaml --xml
+
+            - name: Upload coverage reports to Codecov with GitHub Action
+              uses: codecov/codecov-action@v5
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

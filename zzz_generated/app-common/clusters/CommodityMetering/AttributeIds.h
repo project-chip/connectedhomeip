@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace CommodityMetering {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 9;
+
 namespace MeteredQuantity {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MeteredQuantity
@@ -23,6 +27,10 @@ inline constexpr AttributeId Id = 0x00000001;
 namespace TariffUnit {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace TariffUnit
+
+namespace MaximumMeteredQuantities {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace MaximumMeteredQuantities
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

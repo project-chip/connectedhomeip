@@ -142,7 +142,7 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
 
     DataModel::Nullable<GenericOverallCurrentState> overallState(GenericOverallCurrentState(
         MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), MakeOptional(DataModel::MakeNullable(true))));
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallCurrentState(overallState));
     DataModel::Nullable<GenericOverallTargetState> overallTarget(
         GenericOverallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),

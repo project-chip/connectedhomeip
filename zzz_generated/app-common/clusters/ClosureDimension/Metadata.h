@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -67,20 +68,29 @@ namespace LatchControlModes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LatchControlModes
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    CurrentState::kMetadataEntry,
+    TargetState::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
 namespace SetTarget {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetTarget::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(SetTarget::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kOperate);
 } // namespace SetTarget
 namespace Step {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Step::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(Step::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kOperate);
 } // namespace Step
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ClosureDimension
 } // namespace Clusters
 } // namespace app

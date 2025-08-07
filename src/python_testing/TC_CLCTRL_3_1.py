@@ -25,7 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --timeout 30
+#       --timeout 120
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -35,12 +35,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 
 def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
@@ -68,6 +69,11 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_3_1(MatterBaseTest):
+    @property
+    def default_timeout(self) -> int:
+        # Default timeout for this test case is 120 seconds, multiple calibrates can take a while
+        return 120
+
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -150,7 +156,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
         logging.info("Establishing a wildcard subscription")
 
-        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
         await sub_handler.start(dev_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # STEP 2d: TH reads from the DUT the (0xFFFB) AttributeList attribute
@@ -175,7 +181,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
         sub_handler.reset()
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
@@ -203,7 +209,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         self.step("4a")
 
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
@@ -223,7 +229,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
         sub_handler.reset()
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
@@ -293,7 +299,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
                     logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
                     # Simulating manual unlatching by waiting for user input
-                    self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                    self.wait_for_user_input(prompt_msg="Press Enter after unlatching the DUT...")
                     logging.info("Manual unlatching completed.")
                 else:
                     logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to step 5f")
@@ -304,7 +310,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
                     try:
                         await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                             latch=False
-                        ), endpoint=endpoint)
+                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -356,7 +362,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -377,7 +383,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen
-            ), endpoint=endpoint)
+            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -409,7 +415,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed
-            ), endpoint=endpoint)
+            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -428,7 +434,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         self.step("6f")
 
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.InvalidInState, f"The Calibrate command sent in an incorrect state: {e.status}")

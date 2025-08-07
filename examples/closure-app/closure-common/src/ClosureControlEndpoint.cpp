@@ -77,13 +77,6 @@ bool ClosureControlDelegate::IsReadyToMove()
     return true;
 }
 
-bool ClosureControlDelegate::IsManualLatchingNeeded()
-{
-    // This function should return true if manual latching is needed.
-    // For now, we will return false.
-    return false;
-}
-
 ElapsedS ClosureControlDelegate::GetCalibrationCountdownTime()
 {
     // This function should return the calibration countdown time.
@@ -224,7 +217,7 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
         MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), MakeOptional(DataModel::MakeNullable(true))));
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
     DataModel::Nullable<GenericOverallTargetState> overallTargetState = DataModel::NullNullable;
 
     mLogic.SetMainState(MainStateEnum::kStopped);
@@ -272,6 +265,25 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
     {
         overallCurrentState.Value().speed.SetValue(overallTargetState.Value().speed.Value());
     }
+
+    bool isClosureInSecureState = true;
+
+    // First, check if the closure is fully closed and has positioning feature.
+    if (mLogic.GetConformance().FeatureMap().Has(Feature::kPositioning))
+    {
+        isClosureInSecureState &= overallCurrentState.Value().position.HasValue() &&
+            !overallCurrentState.Value().position.Value().IsNull() &&
+            overallCurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed;
+    }
+
+    // Next, check if motion latching is enabled and latch is true.
+    if (mLogic.GetConformance().FeatureMap().Has(Feature::kMotionLatching))
+    {
+        isClosureInSecureState &= overallCurrentState.Value().latch.HasValue() &&
+            !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value() == true;
+    }
+
+    overallCurrentState.Value().secureState.SetNonNull(isClosureInSecureState);
 
     mLogic.SetOverallCurrentState(overallCurrentState);
 }

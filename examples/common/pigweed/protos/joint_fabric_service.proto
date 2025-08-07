@@ -22,14 +22,22 @@ message OwnershipContext {
   uint64 node_id = 1; // jf-admin-app should finalize commissioning with this specific node_id
   bool jcm = 2; // should be set to true if jf-admin-app has to finalize the jcm process
   bytes trustedIcacPublicKeyB = 3; // see spec., JCM steps
+  uint32 peerAdminJFAdminClusterEndpointId = 4;
 }
 
-message ICACCSROptions {
-  uint64 anchor_fabric_id = 1;
+enum TransactionType {
+  ICAC_CSR = 0;
+  CROSS_SIGNED_ICAC = 1;
 }
 
-message ICACCSR {
-  bytes csr = 1;
+message RequestOptions {
+  TransactionType transaction_type = 1;
+  uint64 anchor_fabric_id = 2; // required only for CROSS_SIGNED_ICAC_REQUEST
+}
+
+message Response {
+  TransactionType transaction_type = 1;
+  bytes response_bytes = 2;
 }
 
 service JointFabric {
@@ -37,9 +45,8 @@ service JointFabric {
   rpc TransferOwnership(OwnershipContext) returns (pw.protobuf.Empty) {}
 
   // Server streaming: JFC initiates, JFA is RPC Server-Streaming
-  rpc GetICACCSR(pw.protobuf.Empty) returns (stream ICACCSROptions);
+  rpc GetStream(pw.protobuf.Empty) returns (stream RequestOptions);
 
-  // JFC replies with the ICACCSR each time JFA requests it
-  // (JFA uses the above ICACCSROptions stream for requests)
-  rpc ReplyWithICACCSR(ICACCSR) returns (pw.protobuf.Empty);
+  // JFA uses the above GetStream stream for 
+  rpc ResponseStream(Response) returns (pw.protobuf.Empty);
 }

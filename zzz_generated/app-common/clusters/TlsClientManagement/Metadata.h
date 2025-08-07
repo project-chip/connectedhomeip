@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -29,6 +30,11 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedEndpoints
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    MaxProvisioned::kMetadataEntry,
+    ProvisionedEndpoints::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -50,6 +56,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveEndpoint
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace TlsClientManagement
 } // namespace Clusters
 } // namespace app

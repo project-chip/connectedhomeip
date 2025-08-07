@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -30,6 +31,11 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ActiveMessageIDs
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    Messages::kMetadataEntry,
+    ActiveMessageIDs::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -48,6 +54,19 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace CancelMessagesRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace MessageQueued {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessageQueued
+namespace MessagePresented {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessagePresented
+namespace MessageComplete {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessageComplete
+
+} // namespace Events
 } // namespace Messages
 } // namespace Clusters
 } // namespace app

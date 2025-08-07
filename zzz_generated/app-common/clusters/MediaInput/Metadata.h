@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -28,6 +29,11 @@ namespace CurrentInput {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentInput::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentInput
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    InputList::kMetadataEntry,
+    CurrentInput::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -50,6 +56,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RenameInput::Id,
 } // namespace RenameInput
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace MediaInput
 } // namespace Clusters
 } // namespace app

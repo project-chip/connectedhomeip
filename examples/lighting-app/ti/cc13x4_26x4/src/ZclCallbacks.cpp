@@ -20,8 +20,8 @@
  *   This file implements the handler for data model messages.
  */
 
-#include "AppConfig.h"
-#include "LightingManager.h"
+#include <AppConfig.h>
+#include <LightingManager.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>

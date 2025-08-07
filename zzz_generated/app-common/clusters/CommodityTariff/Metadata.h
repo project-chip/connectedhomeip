@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -109,6 +110,26 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultRandomizationTy
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace DefaultRandomizationType
+constexpr std::array<DataModel::AttributeEntry, 17> kMandatoryMetadata = {
+    TariffInfo::kMetadataEntry,
+    TariffUnit::kMetadataEntry,
+    StartDate::kMetadataEntry,
+    DayEntries::kMetadataEntry,
+    DayPatterns::kMetadataEntry,
+    CalendarPeriods::kMetadataEntry,
+    IndividualDays::kMetadataEntry,
+    CurrentDay::kMetadataEntry,
+    NextDay::kMetadataEntry,
+    CurrentDayEntry::kMetadataEntry,
+    CurrentDayEntryDate::kMetadataEntry,
+    NextDayEntry::kMetadataEntry,
+    NextDayEntryDate::kMetadataEntry,
+    TariffComponents::kMetadataEntry,
+    TariffPeriods::kMetadataEntry,
+    CurrentTariffComponents::kMetadataEntry,
+    NextTariffComponents::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -123,6 +144,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetDayEntry::Id,
 } // namespace GetDayEntry
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace CommodityTariff
 } // namespace Clusters
 } // namespace app

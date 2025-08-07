@@ -22,8 +22,14 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
 
     if (request.jcm && (Crypto::kP256_PublicKey_Length != request.trustedIcacPublicKeyB.size))
     {
-        return pw::Status::OutOfRange();
         ChipLogError(JointFabric, "Invalid ICAC Public Key Size");
+        return pw::Status::OutOfRange();
+    }
+
+    if (request.jcm && request.peerAdminJFAdminClusterEndpointId == kInvalidEndpointId)
+    {
+        return pw::Status::OutOfRange();
+        ChipLogError(JointFabric, "Invalid Peer Admin Endpoint ID for the JF Administrator Cluster");
     }
 
     for (size_t i = 0; i < Crypto::kP256_PublicKey_Length; ++i)
@@ -32,26 +38,27 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
     }
 
     OwnershipTransferContext * data = Platform::New<OwnershipTransferContext>(
-        request.node_id, request.jcm, ByteSpan(request.trustedIcacPublicKeyB.bytes, request.trustedIcacPublicKeyB.size));
+        request.node_id, request.jcm, ByteSpan(request.trustedIcacPublicKeyB.bytes, request.trustedIcacPublicKeyB.size),
+        request.peerAdminJFAdminClusterEndpointId);
     VerifyOrReturnValue(data, pw::Status::Internal());
     DeviceLayer::PlatformMgr().ScheduleWork(FinalizeCommissioningWork, reinterpret_cast<intptr_t>(data));
 
     return pw::OkStatus();
 }
 
-void JointFabric::GetICACCSR(const ::pw_protobuf_Empty & request, ServerWriter<::ICACCSROptions> & writer)
+void JointFabric::GetStream(const ::pw_protobuf_Empty & request, ServerWriter<::RequestOptions> & writer)
 {
-    ChipLogProgress(JointFabric, "GetICACCSR Stream Opened");
-    rpcStreamGetICACCSR = std::move(writer);
+    ChipLogProgress(JointFabric, "GetStream Opened");
+    rpcGetStream = std::move(writer);
 
     return;
 }
 
-::pw::Status JointFabric::ReplyWithICACCSR(const ::ICACCSR & ICACCSRBytes, ::pw_protobuf_Empty & response)
+::pw::Status JointFabric::ResponseStream(const ::Response & ICACCSRBytes, ::pw_protobuf_Empty & response)
 {
     ChipLogProgress(JointFabric, "RPC ReplyWithICACCSR");
 
-    CopySpanToMutableSpan(ByteSpan(ICACCSRBytes.csr.bytes, ICACCSRBytes.csr.size), icacCSRSpan);
+    CopySpanToMutableSpan(ByteSpan(ICACCSRBytes.response_bytes.bytes, ICACCSRBytes.response_bytes.size), icacCSRSpan);
 
     responseReceived = true;
     responseCv.notify_one();
@@ -59,19 +66,19 @@ void JointFabric::GetICACCSR(const ::pw_protobuf_Empty & request, ServerWriter<:
     return pw::OkStatus();
 }
 
-CHIP_ERROR JointFabric::GetICACCSRForJF(uint64_t anchorFabricId, MutableByteSpan & icacCSR)
+CHIP_ERROR JointFabric::GetICACCSRForJF(MutableByteSpan & icacCSR)
 {
     std::mutex responseMutex;
     std::unique_lock<std::mutex> lock(responseMutex);
     ::pw::Status status;
 
     // JFA requests an ICAC CSR from JFC
-    ICACCSROptions icaccsrOptions{ anchorFabricId };
-    status = rpcStreamGetICACCSR.Write(icaccsrOptions);
+    RequestOptions requestOptions{ TransactionType::TransactionType_ICAC_CSR };
+    status = rpcGetStream.Write(requestOptions);
 
     if (pw::OkStatus() != status)
     {
-        ChipLogError(JointFabric, "Writing to RPC stream GetICACCSR failed");
+        ChipLogError(JointFabric, "Writing to GetStream failed");
         return CHIP_ERROR_SHUT_DOWN;
     }
 
@@ -89,7 +96,7 @@ CHIP_ERROR JointFabric::GetICACCSRForJF(uint64_t anchorFabricId, MutableByteSpan
 
 void JointFabric::CloseStreams()
 {
-    rpcStreamGetICACCSR.Finish();
+    rpcGetStream.Finish();
 }
 
 } // namespace joint_fabric_service

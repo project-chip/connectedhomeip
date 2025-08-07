@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -85,10 +86,23 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalContactUnoccup
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           Access::Privilege::kManage);
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    Occupancy::kMetadataEntry,
+    OccupancySensorType::kMetadataEntry,
+    OccupancySensorTypeBitmap::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace OccupancyChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OccupancyChanged
+
+} // namespace Events
 } // namespace OccupancySensing
 } // namespace Clusters
 } // namespace app
