@@ -157,7 +157,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                      "Receive CONSTRAINT_ERROR response from the DUT"),
             TestStep("7d", "If the SP feature is supported, send MoveTo command with Position = MoveToFullyClosed and Speed = 4",
                      "Receive CONSTRAINT_ERROR response from the DUT"),
-            TestStep("8a", "Check LT feature support", "Skip steps 8b to 8h if the LT feature is not supported"),
+            TestStep("8a", "Check LT feature support", "Skip steps 8b to 8j if the LT feature is not supported"),
             TestStep("8b", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Latching field is saved as CurrentLatch"),
             TestStep("8c", "Preparing Latch-State: If CurrentLatch is True and LatchControlModes Bit 0 = 1, skip step 8d"),
@@ -166,8 +166,11 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             TestStep("8e", "If CurrentLatch is False and LatchControlModes Bit 1 = 1, skip step 8f"),
             TestStep("8f", "Send MoveTo command with Latch = CurrentLatch",
                      "Receive INVALID_IN_STATE response from the DUT"),
-            TestStep("8g", "If LatchControlModes Bit 1 = 0 or LatchControlModes Bit 0 = 0, skip step 8h"),
+            TestStep("8g", "If CurrentLatch is True and LatchControlModes Bit 0 = 0, skip step 8h"),
             TestStep("8h", "Send MoveTo command with Latch = CurrentLatch",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep("8i", "If CurrentLatch is False and LatchControlModes Bit 1 = 0, skip step 8j"),
+            TestStep("8j", "Send MoveTo command with Latch = CurrentLatch",
                      "Receive SUCCESS response from the DUT"),
             TestStep("9a", "Check PS feature support", "Skip steps 9b and 9c if the PS feature is not supported"),
             TestStep("9b", "Read the OverallCurrentState attribute",
@@ -547,7 +550,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                          f"Expected InvalidInState status for MoveTo with Latch = {current_latch}, but got: {e}")
 
             self.step("8g")
-            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching or not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
+            if current_latch and not (latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching):
                 self.skip_step("8h")
             else:
                 self.step("8h")
@@ -558,11 +561,24 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
                     asserts.assert_equal(e.status, Status.Success,
                                          f"Expected Success status for MoveTo with Latch = {current_latch}, but got: {e}")
+
+            self.step("8i")
+            if not current_latch and not (latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching):
+                self.skip_step("8j")
+            else:
+                self.step("8j")
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    logging.info(f"MoveTo command with Latch = {current_latch} sent successfully")
+                except InteractionModelError as e:
+                    logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
+                    asserts.assert_equal(e.status, Status.Success,
+                                         f"Expected Success status for MoveTo with Latch = {current_latch}, but got: {e}")
             sub_handler.reset()
 
         else:
-            logging.info("Skipping steps 8b to 8h as Latching feature is not supported")
-            self.mark_step_range_skipped("8b", "8h")
+            logging.info("Skipping steps 8b to 8j as Latching feature is not supported")
+            self.mark_step_range_skipped("8b", "8j")
 
         self.step("9a")
         if is_position_supported:
