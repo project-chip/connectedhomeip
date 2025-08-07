@@ -15,13 +15,13 @@
 #    limitations under the License.
 #
 
-from jinja2 import Template
 import xml.etree.ElementTree as ElementTree
 import zipfile
 
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_namespaces, parse_namespace,
-                                       get_data_model_directory, DataModelLevel)
+from chip.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
+                                       parse_namespace)
+from jinja2 import Template
 from mobly import asserts
 
 
