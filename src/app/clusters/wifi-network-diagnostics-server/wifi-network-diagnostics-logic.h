@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "app/server-cluster/OptionalAttributes.h"
 #include <app/AttributeValueEncoder.h>
+#include <app/server-cluster/OptionalAttributes.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -40,8 +40,8 @@ public:
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const ClusterAttributeBits<WiFiNetworkDiagnostics::Id> & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mEndpointId(endpointId),
-        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes),
+        mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }

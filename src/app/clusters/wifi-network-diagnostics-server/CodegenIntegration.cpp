@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include "app/server-cluster/OptionalAttributes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/server-cluster/OptionalAttributes.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>

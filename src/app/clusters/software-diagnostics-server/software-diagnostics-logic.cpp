@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/MetadataTypes.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/CodeUtils.h>

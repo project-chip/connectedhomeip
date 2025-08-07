@@ -16,11 +16,10 @@
  */
 #pragma once
 
-#include "app/server-cluster/OptionalAttributes.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
-
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributes.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/Commands.h>
 #include <clusters/SoftwareDiagnostics/Events.h>
@@ -28,6 +27,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
+
 #include <sys/types.h>
 
 namespace chip {

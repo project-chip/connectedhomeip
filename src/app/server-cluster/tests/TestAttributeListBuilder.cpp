@@ -15,10 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model-provider/MetadataTypes.h"
-#include "app/server-cluster/OptionalAttributes.h"
 #include <pw_unit_test/framework.h>
 
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/OptionalAttributes.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
