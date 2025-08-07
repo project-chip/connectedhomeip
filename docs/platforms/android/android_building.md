@@ -43,7 +43,7 @@ directory.
 
 ## Requirements for building
 
-You need Android SDK 26 & NDK 23.2.8568313 downloaded to your machine. Set the
+You need Android SDK 30 & NDK 28.2.13676358 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded.
@@ -52,7 +52,7 @@ downloaded.
 2. Install NDK:
     1. Tools -> SDK Manager -> SDK Tools Tab
     2. Click [x] Show Package Details
-    3. Select NDK (Side by Side) -> 23.2.8568313
+    3. Select NDK (Side by Side) -> 28.2.13676358
     4. Apply
 3. Install Command Line Tools:
     1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
@@ -70,14 +70,14 @@ downloaded.
 
 ```
 export ANDROID_HOME=~/Android/Sdk
-export ANDROID_NDK_HOME=~/Android/Sdk/ndk/23.2.8568313
+export ANDROID_NDK_HOME=~/Android/Sdk/ndk/28.2.13676358
 ```
 
 ### MacOS
 
 ```
 export ANDROID_HOME=~/Library/Android/sdk
-export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/23.2.8568313
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/28.2.13676358
 ```
 
 <a name="abi"></a>

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -71,6 +72,11 @@ namespace OverrunCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OverrunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OverrunCount
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    Bssid::kMetadataEntry,         SecurityType::kMetadataEntry, WiFiVersion::kMetadataEntry,
+    ChannelNumber::kMetadataEntry, Rssi::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

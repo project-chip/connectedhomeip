@@ -19,6 +19,7 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
+#include <app/util/util.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -41,36 +42,20 @@ LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
 LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 #endif
 
-// compile-time evaluated method if "is <EP>::GeneralDiagnostics::<ATTR>" enabled
-constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
-{
-    for (auto & config : GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig)
-    {
-        if (config.endpointNumber != endpointId)
-        {
-            continue;
-        }
-        for (auto & attr : config.enabledAttributes)
-        {
-            if (attr == attributeId)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
 } // namespace
 
 void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == kRootEndpointId);
     const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableTotalOperationalHours = IsAttributeEnabled(endpointId, Attributes::TotalOperationalHours::Id),
-        .enableBootReason            = IsAttributeEnabled(endpointId, Attributes::BootReason::Id),
-        .enableActiveHardwareFaults  = IsAttributeEnabled(endpointId, Attributes::ActiveHardwareFaults::Id),
-        .enableActiveRadioFaults     = IsAttributeEnabled(endpointId, Attributes::ActiveRadioFaults::Id),
-        .enableActiveNetworkFaults   = IsAttributeEnabled(endpointId, Attributes::ActiveNetworkFaults::Id),
+        .enableTotalOperationalHours =
+            emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::TotalOperationalHours::Id),
+        .enableBootReason = emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::BootReason::Id),
+        .enableActiveHardwareFaults =
+            emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::ActiveHardwareFaults::Id),
+        .enableActiveRadioFaults = emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::ActiveRadioFaults::Id),
+        .enableActiveNetworkFaults =
+            emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::ActiveNetworkFaults::Id),
     };
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)

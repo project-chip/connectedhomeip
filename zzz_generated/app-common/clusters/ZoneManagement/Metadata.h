@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -49,6 +50,13 @@ namespace TwoDCartesianMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TwoDCartesianMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TwoDCartesianMax
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    MaxZones::kMetadataEntry,
+    Zones::kMetadataEntry,
+    Triggers::kMetadataEntry,
+    SensitivityMax::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

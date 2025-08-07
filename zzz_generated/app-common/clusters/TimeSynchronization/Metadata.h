@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -73,6 +74,11 @@ namespace SupportsDNSResolve {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportsDNSResolve::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SupportsDNSResolve
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    UTCTime::kMetadataEntry,
+    Granularity::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

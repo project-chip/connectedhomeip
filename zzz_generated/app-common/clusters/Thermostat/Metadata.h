@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -297,6 +298,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    LocalTemperature::kMetadataEntry,
+    ControlSequenceOfOperation::kMetadataEntry,
+    SystemMode::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

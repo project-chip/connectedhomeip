@@ -32,9 +32,10 @@ import typing
 
 import click
 import coloredlogs
-from chip.testing.metadata import Metadata, MetadataReader
-from chip.testing.tasks import Subprocess
 from colorama import Fore, Style
+
+from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.tasks import Subprocess
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))

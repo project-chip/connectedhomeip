@@ -24,7 +24,7 @@ if [[ $# -ne 1 ]]; then
     exit 1
 fi
 
-pydoc-markdown -I "$PYTHONPATH" --py3 -m chip.ChipDeviceCtrl '{
+pydoc-markdown -I "$PYTHONPATH" --py3 -m matter.ChipDeviceCtrl '{
     renderer: {
       type: markdown,
       descriptive_class_title: false,

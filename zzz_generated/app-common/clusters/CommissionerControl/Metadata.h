@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -24,6 +25,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategor
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kManage,
                                                           std::nullopt);
 } // namespace SupportedDeviceCategories
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    SupportedDeviceCategories::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -29,6 +30,11 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedLocales
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    ActiveLocale::kMetadataEntry,
+    SupportedLocales::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

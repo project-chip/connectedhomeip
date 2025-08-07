@@ -36,9 +36,10 @@
 # === END CI TEST ARGUMENTS ===
 
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 cluster_eevsem_mode = Clusters.EnergyEvseMode
 
