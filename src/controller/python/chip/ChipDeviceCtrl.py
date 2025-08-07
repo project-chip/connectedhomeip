@@ -2444,8 +2444,9 @@ class ChipDeviceControllerBase():
                     c_void_p, c_void_p, c_uint64, c_uint16, c_uint16, c_uint32, c_uint16]
                 self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.restype = PyChipError
             except AttributeError:
-                LOGGER.warning("Joint Fabric support is not available in this Matter SDK build. "
-                               "OpenJointCommissioningWindow() will not be available.")
+                def _unsupported_joint_fabric(*args, **kwargs):
+                    raise NotImplementedError("Joint Fabric support is not available in this Matter SDK build.")
+                self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow = _unsupported_joint_fabric
 
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
