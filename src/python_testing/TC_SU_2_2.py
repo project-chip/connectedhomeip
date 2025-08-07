@@ -163,8 +163,12 @@ class TC_SU_2_2(MatterBaseTest):
         th1 = self.default_controller
         th1_node_id = self.dut_node_id
         th1_fabric_id = th1.fabricId
-        logger.info(f'Step #1.0 - DUT/TH1 NodeID (OTA Requestor): {th1_node_id}')  # NodeID = 2
-        logger.info(f'Step #1.0 - DUT/TH1 FabricID: {th1_fabric_id}')              # FabricID = 1
+        th1_node_id_c = th1.nodeId
+        th1_fabric_admin = self.default_controller.fabricAdmin
+        logger.info(f'Step #1.0 - DUT/TH1 self.dut_node_id (OTA Requestor): {th1_node_id}')  # NodeID = 2
+        logger.info(f'Step #1.0 - DUT/TH1 th1.fabricId: {th1_fabric_id}')              # FabricID = 1
+        logger.info(f'Step #1.0 - th1.nodeId: {th1_node_id_c}')
+        logger.info(f'Step #1.0 - self.default_controller.fabricAdmin: {th1_fabric_admin}')              # FabricID = 1
 
         # ------------------------------------------------------------------------------------
         # Step 1.1 - Setup TH2 (Provider) in same fabric
@@ -172,15 +176,21 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Setup TH2 controller (Provider)
         # 1.1 Establishing TH2 controller - TH2, NodeID=1, Fabric=1
-        th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th1.fabricId)
+
         th2_node_id = 1
-        th2 = th2_fabric_admin.NewController(nodeId=th2_node_id, useTestCommissioner=True)
+        th2 = th1_fabric_admin.NewController(nodeId=th2_node_id, useTestCommissioner=True)
         th2_fabric_id = th2.fabricId
 
+        # DELETE
+        # th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        # th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th1.fabricId)
+        # th2 = th2_fabric_admin.NewController(nodeId=th2_node_id, useTestCommissioner=True)
+        # th2_fabric_id = th2.fabricId
+        # DELETE
+
         logger.info(f'Step #1.1 - TH2 (Provider) NodeID th2_node_id: {th2_node_id}')           # NodeID = 1
-        logger.info(f'Step #1.1 - TH2 (Provider)  nodeId: {th2.nodeId}')           # NodeID = 1
-        logger.info(f'Step #1.1 - TH2 (Provider) FabricID: {th2_fabric_id}')       # FabricID = 1
+        logger.info(f'Step #1.1 - TH2 (Provider)  h2.nodeId: {th2.nodeId}')           # NodeID = 1
+        logger.info(f'Step #1.1 - TH2 (Provider) th2.fabricId: {th2_fabric_id}')       # FabricID = 1
 
         # ------------------------------------------------------------------------------------
         # Step 1.2 - Open commissioning window on DUT (via TH1)
@@ -197,44 +207,20 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
 
         logger.info('Step #1.3 - Commissioning DUT with TH2')
+        # resp = await th2.CommissionOnNetwork(
+        #     nodeId=th2_node_id,
+        #     setupPinCode=setup_pin_code,
+        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+        #     filter=long_discriminator)
+        # logger.info(f'Step #1.3 - TH2 Commissioning response: {resp}')
+
         resp = await th2.CommissionOnNetwork(
-            nodeId=th2_node_id,
-            setupPinCode=setup_pin_code,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=long_discriminator)
+            nodeId=1,
+            setupPinCode=20202021,    # CHECK VALUE FROM PROVIDER -----------------------------
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.NONE,
+            filter=None
+        )
         logger.info(f'Step #1.3 - TH2 Commissioning response: {resp}')
-
-        # ------------------------------------------------------------------------------------
-        # Step # 1.4 - Check Fabrics
-        # ------------------------------------------------------------------------------------
-
-        cluster = Clusters.Objects.OperationalCredentials
-        attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th1, endpoint=0, cluster=cluster, attribute=attribute)
-
-        # Read TH1 fabrics
-        th1_fabrics = await th1.ReadAttribute(
-            nodeid=th1_node_id,
-            attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
-            returnClusterObject=True
-        )
-        # logger.info(f"Step #1.4 - TH1 Fabrics: {th1_fabrics[0]}")
-        th1_fabric_data = list(th1_fabrics[0].values())[0]  # Obtiene el objeto OperationalCredentials
-        for f in th1_fabric_data.fabrics:
-            logger.info(
-                f"Step #1.4 - TH1 Fabric -> FabricID: {f.fabricID}, NodeID: {f.nodeID}, VendorID: {f.vendorID}, FabricIndex: {f.fabricIndex}")
-
-        # Read TH2 fabrics
-        th2_fabrics = await th2.ReadAttribute(
-            nodeid=th2_node_id,
-            attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
-            returnClusterObject=True
-        )
-        # logger.info(f"Step #1.4 - TH2 Fabrics: {th2_fabrics[0]}")
-        th2_fabric_data = list(th2_fabrics[0].values())[0]
-        for f in th2_fabric_data.fabrics:
-            logger.info(
-                f"Step #1.4 - TH2 Fabric -> FabricID: {f.fabricID}, NodeID: {f.nodeID}, VendorID: {f.vendorID}, FabricIndex: {f.fabricIndex}")
 
         # ------------------------------------------------------------------------------------
         # Step #1.5 - Read the current OTA providers on the DUT (TH1),
@@ -359,33 +345,25 @@ class TC_SU_2_2(MatterBaseTest):
         # Step # 1.7 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT/Requestor)
         # ------------------------------------------------------------------------------------
 
+        logger.info("Step #1.7 - Force test read response")
+        resp = await th2.ReadAttribute(
+            self.dut_node_id,
+            [(0, Clusters.BasicInformation.Attributes.ProductID)]
+        )
+        logger.info(f"Step #1.7 - test read response: {resp}")
+
+        resp = await th2.GetConnectedDevice(self.dut_node_id, allowPASE=False)
+        logger.info(f"Step #1.7 - test GetConnectedDevice response: {resp}")
+
         logger.info("Step #1.7 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT)")
         cmd = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=th2.nodeId,
+            providerNodeID=0x0000000000000001,  # th2.nodeId,  # CHECK VALUE FROM PROVIDER -------------------------
             vendorID=0xFFF1,
             announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable,
             metadataForNode=None,
             endpoint=0
         )
         logger.info(f"Step #1.7 - cmd AnnounceOTAProvider: {cmd}")
-
-        resp = await th2.GetConnectedDevice(self.dut_node_id, allowPASE=False)
-        logger.info(f"Step #1.7 - test GetConnectedDevice response: {resp}")
-
-        logger.info("Step #1.7 - Force test read response")
-        resp = await th2.ReadAttribute(
-            self.dut_node_id,
-            [(Clusters.BasicInformation, Clusters.BasicInformation.Attributes.ProductID)]
-        )
-        logger.info(f"Step #1.7 - test read response: {resp}")
-
-        # resp = await self.read_single_attribute_check_success(
-        #     cluster=Clusters.BasicInformation,
-        #     attribute=Clusters.BasicInformation.Attributes.VendorID,
-        #     dev_ctrl=th2,
-        #     node_id=self.dut_node_id,
-        #     endpoint=0
-        # )
 
         logger.info(f'Step #1.7 - Sending AnnounceOTAProvider to node: {th1_node_id}, should be: {self.dut_node_id}')
         resp = await self.send_single_cmd(
@@ -395,47 +373,29 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f"Step #1.7 - Sent AnnounceOTAProvider to DUT, response: {resp}")
 
-        # # # TODO: Need to make it work from here
-        # logger.info("Step #1.5 - ArmFailSafe")
-        # cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
-        #     expiryLengthSeconds=60,
-        #     breadcrumb=1
-        # )
-        # resp = await self.send_single_cmd(
-        #     dev_ctrl=th1,
-        #     node_id=th1_node_id,
-        #     cmd=cmd,
-        #     endpoint=0
-        # )
-        # asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-        #                      "Failure status returned from arm failsafe")
-        # logger.info("Step #1.5 - Wait")
-        # await asyncio.sleep(5)
-        # # ******
-        # logger.info("Step #1.6 - DUT send QueryImage to Provider and wait for response")
-        # logger.info(f"Step #1.6 - Info requestor(th1): {vars(th1)}")
-        # # product_id = await self.read_single_attribute(th1, endpoint=0, cluster="BasicInformation", attribute="productID")
-        # # logger.info(f"ProductId del requestor: {th1.productId}")
-        # # Clusters.OtaSoftwareUpdateRequestor.Commands.
-        # cmd_query_image = Clusters.OtaSoftwareUpdateProvider.Commands.QueryImage(
-        #     vendorID=0xFFF1,
-        #     productID=0x8000,
-        #     softwareVersion=0,
-        #     protocolsSupported=[Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous],
-        #     hardwareVersion=None,
-        #     location=None,
-        #     requestorCanConsent=None,
-        #     metadataForProvider=None
-        # )
-        # logger.info("Step #1.7 - Send QueryImage from DUT to Provider")
-        # resp = await self.send_single_cmd(
-        #     dev_ctrl=th1,
-        #     node_id=th2_node_id,
-        #     cmd=cmd_query_image,
-        #     endpoint=0
-        # )
-        # logger.info(f"Step #1.7 - Response from Provider: {resp}")
-        # # 1.8 Verify that QueryImageResponse QueryStatus is UpdateAvailable
-        # # 1.9 Verify that software image transfer from TH/OTA-P to DUT is successful
+        logger.info("Step #1.8 - DUT send QueryImage to Provider and wait for response")
+        cmd_query_image = Clusters.OtaSoftwareUpdateProvider.Commands.QueryImage(
+            vendorID=0xFFF1,
+            productID=0x8000,
+            softwareVersion=0,
+            protocolsSupported=[Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous],
+            hardwareVersion=None,
+            location=None,
+            requestorCanConsent=None,
+            metadataForProvider=None
+        )
+        logger.info(f"Step #1.7 - cmd cmd_query_image: {cmd_query_image}")
+
+        logger.info("Step #1.8 - Send QueryImage from DUT to Provider")
+        resp = await self.send_single_cmd(
+            dev_ctrl=th1,
+            node_id=th2_node_id,
+            cmd=cmd_query_image,
+            endpoint=0
+        )
+        logger.info(f"Step #1.8 - Response from Provider: {resp}")
+
+        # 1.8 Verify that QueryImageResponse QueryStatus is UpdateAvailable
+        # 1.9 Verify that software image transfer from TH/OTA-P to DUT is successful
 if __name__ == "__main__":
     default_matter_test_main()
