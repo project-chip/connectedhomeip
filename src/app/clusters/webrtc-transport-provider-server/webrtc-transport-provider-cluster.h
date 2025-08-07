@@ -17,9 +17,11 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/WebRTCTransportProvider/ClusterId.h>
+#include <clusters/WebRTCTransportProvider/Commands.h>
+#include <clusters/WebRTCTransportProvider/Enums.h>
+#include <clusters/WebRTCTransportProvider/Metadata.h>
 #include <string>
 #include <vector>
 
@@ -274,39 +276,29 @@ public:
     virtual bool HasAllocatedAudioStreams() = 0;
 };
 
-class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterface
+class WebRTCTransportProviderServer : public DefaultServerCluster
 {
 public:
     /**
      * @brief
      *   Constructs the WebRTCTransportProviderServer with the specified delegate and endpoint.
      *
+     * @param[in] endpointId The Endpoint where the WebRTC Transport Provider cluster is published.
      * @param[in] delegate   A reference to an implementation of the Delegate interface. Must remain
      *                       valid for the lifetime of this object.
-     * @param[in] endpointId The Endpoint where the WebRTC Transport Provider cluster is published.
      */
-    WebRTCTransportProviderServer(Delegate & delegate, EndpointId endpointId);
+    WebRTCTransportProviderServer(EndpointId endpointId, Delegate & delegate);
 
-    /**
-     * @brief
-     *   Destructor. Cleans up any internal data, but does not destroy the delegate.
-     */
-    ~WebRTCTransportProviderServer() override;
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
 
-    /**
-     * @brief
-     *   Registers the command handler and attribute interface with the Matter Stack.
-     * @return CHIP_ERROR
-     *   - CHIP_NO_ERROR on successful registration.
-     *   - Other CHIP_ERROR codes if registration fails.
-     */
-    CHIP_ERROR Init();
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    /**
-     * @brief
-     *   Unregisters the command handler and attribute interface, releasing resources.
-     */
-    void Shutdown();
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     /**
      * @brief Get a reference to the current WebRTC sessions.
@@ -325,25 +317,27 @@ private:
         kUpdated  = 0x01,
     };
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    void InvokeCommand(HandlerContext & ctx) override;
+    Delegate & mDelegate;
+    std::vector<WebRTCSessionStruct> mCurrentSessions;
 
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
-    WebRTCSessionStruct * CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId);
+    WebRTCSessionStruct * CheckForMatchingSession(const CommandHandler & commandHandler, uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     void RemoveSession(uint16_t sessionId);
     uint16_t GenerateSessionId();
 
     // Command Handlers
-    void HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req);
-    void HandleProvideOffer(HandlerContext & ctx, const Commands::ProvideOffer::DecodableType & req);
-    void HandleProvideAnswer(HandlerContext & ctx, const Commands::ProvideAnswer::DecodableType & req);
-    void HandleProvideICECandidates(HandlerContext & ctx, const Commands::ProvideICECandidates::DecodableType & req);
-    void HandleEndSession(HandlerContext & ctx, const Commands::EndSession::DecodableType & req);
-
-    Delegate & mDelegate;
-    std::vector<WebRTCSessionStruct> mCurrentSessions;
+    DataModel::ActionReturnStatus HandleSolicitOffer(CommandHandler & commandHandler,
+                                                     const Commands::SolicitOffer::DecodableType & req);
+    DataModel::ActionReturnStatus HandleProvideOffer(CommandHandler & commandHandler,
+                                                     const Commands::ProvideOffer::DecodableType & req);
+    DataModel::ActionReturnStatus HandleProvideAnswer(CommandHandler & commandHandler,
+                                                      const Commands::ProvideAnswer::DecodableType & req);
+    DataModel::ActionReturnStatus HandleProvideICECandidates(CommandHandler & commandHandler,
+                                                             const Commands::ProvideICECandidates::DecodableType & req);
+    DataModel::ActionReturnStatus HandleEndSession(CommandHandler & commandHandler,
+                                                   const Commands::EndSession::DecodableType & req);
 };
 
 } // namespace WebRTCTransportProvider
