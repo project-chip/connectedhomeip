@@ -133,7 +133,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             TestStep("5r", "Unlatch the device manually",
                      "Wait for user input to confirm the device is unlatched"),
             TestStep("5s", "Wait until a subscription report with OverallCurrentState.Latch is received",
-                        "OverallCurrentState.Latch should be False"),
+                     "OverallCurrentState.Latch should be False"),
             TestStep("5t", "If LatchControlModes Bit 0 = 1, skip step 5u"),
             TestStep("5u", "Send MoveTo command with Position = MoveToFullyOpen and Latch = True",
                      "Receive INVALID_IN_STATE response from the DUT"),
@@ -352,9 +352,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
                 self.step("5l")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
-            
+
             sub_handler.reset()
-            
+
             self.step("5m")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_latch: bool = None
@@ -362,14 +362,14 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 current_latch = NullValue
             else:
                 current_latch = overall_current_state.latch
-                
+
             self.step("5n")
             if not current_latch:
                 logging.info("CurrentLatch is False, skipping steps 5o to 5s")
                 self.mark_step_range_skipped("5o", "5s")
             else:
                 logging.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
-                
+
                 self.step("5o")
                 if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                     logging.info("LatchControlModes Bit 1 is 0, skipping steps 5p")
@@ -382,7 +382,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     except InteractionModelError as e:
                         logging.error(f"MoveTo command with Latch = False failed: {e}")
                         asserts.assert_equal(e.status, Status.Success,
-                                            f"Expected Success status for MoveTo with Latch = False, but got: {e}")
+                                             f"Expected Success status for MoveTo with Latch = False, but got: {e}")
 
                 self.step("5q")
                 if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
