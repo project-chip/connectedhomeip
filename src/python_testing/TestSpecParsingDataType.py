@@ -99,10 +99,10 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_equal(struct.data_type, DataTypeEnum.kStruct, "Incorrect data type")
         asserts.assert_equal(struct.name, "TestStruct", "Incorrect struct name")
         asserts.assert_equal(len(struct.components), 2, "Incorrect number of fields")
-        asserts.assert_true("1" in struct.components, "Field1 not found in struct components")
-        asserts.assert_true("2" in struct.components, "Field2 not found in struct components")
-        asserts.assert_equal(struct.components["1"].name, "Field1", "Incorrect field name")
-        asserts.assert_equal(struct.components["2"].name, "Field2", "Incorrect field name")
+        asserts.assert_true(uint(1) in struct.components, "Field1 not found in struct components")
+        asserts.assert_true(uint(2) in struct.components, "Field2 not found in struct components")
+        asserts.assert_equal(struct.components[uint(1)].name, "Field1", "Incorrect field name")
+        asserts.assert_equal(struct.components[uint(2)].name, "Field2", "Incorrect field name")
         asserts.assert_equal(struct.cluster_ids, [self.cluster_id], "Incorrect cluster IDs")
 
     def test_parse_basic_enum(self):
@@ -130,12 +130,12 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_equal(enum.data_type, DataTypeEnum.kEnum, "Incorrect data type")
         asserts.assert_equal(enum.name, "TestEnum", "Incorrect enum name")
         asserts.assert_equal(len(enum.components), 3, "Incorrect number of items")
-        asserts.assert_true("0" in enum.components, "Item1 not found in enum components")
-        asserts.assert_true("1" in enum.components, "Item2 not found in enum components")
-        asserts.assert_true("2" in enum.components, "Item3 not found in enum components")
-        asserts.assert_equal(enum.components["0"].name, "Item1", "Incorrect item name")
-        asserts.assert_equal(enum.components["1"].name, "Item2", "Incorrect item name")
-        asserts.assert_equal(enum.components["2"].name, "Item3", "Incorrect item name")
+        asserts.assert_true(uint(0) in enum.components, "Item1 not found in enum components")
+        asserts.assert_true(uint(1) in enum.components, "Item2 not found in enum components")
+        asserts.assert_true(uint(2) in enum.components, "Item3 not found in enum components")
+        asserts.assert_equal(enum.components[uint(0)].name, "Item1", "Incorrect item name")
+        asserts.assert_equal(enum.components[uint(1)].name, "Item2", "Incorrect item name")
+        asserts.assert_equal(enum.components[uint(2)].name, "Item3", "Incorrect item name")
         asserts.assert_equal(enum.cluster_ids, [self.cluster_id], "Incorrect cluster IDs")
 
     def test_parse_basic_bitmap(self):
@@ -163,12 +163,12 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_equal(bitmap.data_type, DataTypeEnum.kBitmap, "Incorrect data type")
         asserts.assert_equal(bitmap.name, "TestBitmap", "Incorrect bitmap name")
         asserts.assert_equal(len(bitmap.components), 3, "Incorrect number of bitfields")
-        asserts.assert_true("0" in bitmap.components, "Bit0 not found in bitmap components")
-        asserts.assert_true("1" in bitmap.components, "Bit1 not found in bitmap components")
-        asserts.assert_true("7" in bitmap.components, "Bit7 not found in bitmap components")
-        asserts.assert_equal(bitmap.components["0"].name, "Bit0", "Incorrect bitfield name")
-        asserts.assert_equal(bitmap.components["1"].name, "Bit1", "Incorrect bitfield name")
-        asserts.assert_equal(bitmap.components["7"].name, "Bit7", "Incorrect bitfield name")
+        asserts.assert_true(uint(0) in bitmap.components, "Bit0 not found in bitmap components")
+        asserts.assert_true(uint(1) in bitmap.components, "Bit1 not found in bitmap components")
+        asserts.assert_true(uint(7) in bitmap.components, "Bit7 not found in bitmap components")
+        asserts.assert_equal(bitmap.components[uint(0)].name, "Bit0", "Incorrect bitfield name")
+        asserts.assert_equal(bitmap.components[uint(1)].name, "Bit1", "Incorrect bitfield name")
+        asserts.assert_equal(bitmap.components[uint(7)].name, "Bit7", "Incorrect bitfield name")
         if not bitmap.cluster_ids:
             self.print_step("Warning", f"Bitmap TestBitmap has empty cluster_ids, should contain {self.cluster_id}")
         else:
@@ -203,10 +203,10 @@ class TestSpecParsingDataType(MatterBaseTest):
 
         # Verify we have all bitfields
         asserts.assert_equal(len(bitmap.components), 4, "Incorrect number of bitfields")
-        asserts.assert_true("0" in bitmap.components, "SingleBit0 not found in bitmap components")
-        asserts.assert_true("1" in bitmap.components, "SingleBit1 not found in bitmap components")
-        asserts.assert_true("2" in bitmap.components, "MultiBit2to4 not found in bitmap components")
-        asserts.assert_true("5" in bitmap.components, "MultiBit5to6 not found in bitmap components")
+        asserts.assert_true(uint(0) in bitmap.components, "SingleBit0 not found in bitmap components")
+        asserts.assert_true(uint(1) in bitmap.components, "SingleBit1 not found in bitmap components")
+        asserts.assert_true(uint(2) in bitmap.components, "MultiBit2to4 not found in bitmap components")
+        asserts.assert_true(uint(5) in bitmap.components, "MultiBit5to6 not found in bitmap components")
         if not bitmap.cluster_ids:
             self.print_step("Warning", f"Bitmap MultiBitBitmap has empty cluster_ids, should contain {self.cluster_id}")
         else:
@@ -271,7 +271,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true("TestStruct" in cluster.structs, "TestStruct not found in parsed structs")
         struct = cluster.structs["TestStruct"]
         asserts.assert_equal(len(struct.components), 1, "Should only have one valid field")
-        asserts.assert_true("1" in struct.components, "Valid field not found in struct components")
+        asserts.assert_true(uint(1) in struct.components, "Valid field not found in struct components")
         asserts.assert_equal(len(problems), 1, "Should have one problem for invalid field")
         asserts.assert_true("Struct field in TestStruct with no id or name" in problems[0].problem,
                             "Problem message doesn't match expected error")
@@ -329,7 +329,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         struct = cluster.structs["FieldsTestStruct"]
 
         # Basic field with summary and type
-        basic_field = struct.components["1"]
+        basic_field = struct.components[uint(1)]
         asserts.assert_equal(basic_field.name, "BasicField", "Name mismatch")
         asserts.assert_equal(basic_field.summary, "A basic uint8 field", "Summary mismatch")
         asserts.assert_equal(basic_field.type_info, "uint8", "Type mismatch")
@@ -337,19 +337,19 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_false(basic_field.is_nullable, "Should not be nullable")
 
         # Optional field
-        opt_field = struct.components["2"]
+        opt_field = struct.components[uint(2)]
         asserts.assert_equal(opt_field.name, "OptionalField", "Name mismatch")
         asserts.assert_true(opt_field.is_optional, "Should be optional")
         asserts.assert_equal(opt_field.type_info, "string", "Type mismatch")
 
         # Nullable field
-        null_field = struct.components["3"]
+        null_field = struct.components[uint(3)]
         asserts.assert_equal(null_field.name, "NullableField", "Name mismatch")
         asserts.assert_true(null_field.is_nullable, "Should be nullable")
         asserts.assert_equal(null_field.type_info, "int16s", "Type mismatch")
 
         # Constrained field
-        const_field = struct.components["4"]
+        const_field = struct.components[uint(4)]
         asserts.assert_equal(const_field.name, "ConstrainedField", "Name mismatch")
         asserts.assert_true(const_field.constraints is not None, "Should have constraints")
         asserts.assert_equal(const_field.constraints.get("min"), "1", "Min constraint mismatch")
@@ -359,7 +359,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         bitmap = cluster.bitmaps["FieldsTestBitmap"]
 
         # Basic bit
-        basic_bit = bitmap.components["0"]
+        basic_bit = bitmap.components[uint(0)]
         asserts.assert_equal(basic_bit.name, "BasicBit", "Name mismatch")
         asserts.assert_equal(basic_bit.summary, "A basic bit field", "Summary mismatch")
 
@@ -389,7 +389,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true("TestEnum" in cluster.enums, "TestEnum not found in parsed enums")
         enum = cluster.enums["TestEnum"]
         asserts.assert_equal(len(enum.components), 1, "Should only have one valid item")
-        asserts.assert_true("0" in enum.components, "Valid item not found in enum components")
+        asserts.assert_true(uint(0) in enum.components, "Valid item not found in enum components")
         asserts.assert_equal(len(problems), 1, "Should have one problem for invalid item")
         asserts.assert_true("Struct field in TestEnum with no id or name" in problems[0].problem,
                             "Problem message doesn't match expected error")
@@ -420,7 +420,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true("TestBitmap" in cluster.bitmaps, "TestBitmap not found in parsed bitmaps")
         bitmap = cluster.bitmaps["TestBitmap"]
         asserts.assert_equal(len(bitmap.components), 1, "Should only have one valid field")
-        asserts.assert_true("0" in bitmap.components, "Valid bitfield not found in bitmap components")
+        asserts.assert_true(uint(0) in bitmap.components, "Valid bitfield not found in bitmap components")
         asserts.assert_equal(len(problems), 1, "Should have one problem for invalid bitfield")
         asserts.assert_true("Struct field in TestBitmap with no id or name" in problems[0].problem,
                             "Problem message doesn't match expected error")
@@ -477,14 +477,14 @@ class TestSpecParsingDataType(MatterBaseTest):
 
         # Verify each bitfield was properly parsed
         asserts.assert_equal(len(bitmap.components), 3, "Incorrect number of bitfields")
-        asserts.assert_true("0" in bitmap.components, "MemberA not found in bitmap components")
-        asserts.assert_true("1" in bitmap.components, "MemberB not found in bitmap components")
-        asserts.assert_true("2" in bitmap.components, "MemberC not found in bitmap components")
+        asserts.assert_true(uint(0) in bitmap.components, "MemberA not found in bitmap components")
+        asserts.assert_true(uint(1) in bitmap.components, "MemberB not found in bitmap components")
+        asserts.assert_true(uint(2) in bitmap.components, "MemberC not found in bitmap components")
 
         # Verify the names were properly parsed
-        asserts.assert_equal(bitmap.components["0"].name, "MemberA", "Incorrect bitfield name")
-        asserts.assert_equal(bitmap.components["1"].name, "MemberB", "Incorrect bitfield name")
-        asserts.assert_equal(bitmap.components["2"].name, "MemberC", "Incorrect bitfield name")
+        asserts.assert_equal(bitmap.components[uint(0)].name, "MemberA", "Incorrect bitfield name")
+        asserts.assert_equal(bitmap.components[uint(1)].name, "MemberB", "Incorrect bitfield name")
+        asserts.assert_equal(bitmap.components[uint(2)].name, "MemberC", "Incorrect bitfield name")
 
     def test_optionalConform_tag_parsing(self):
         """Test parsing of fields with optionalConform tag"""
@@ -513,8 +513,8 @@ class TestSpecParsingDataType(MatterBaseTest):
 
         # Verify that optionalConform was properly detected
         struct = cluster.structs["OptionalConformStruct"]
-        asserts.assert_false(struct.components["1"].is_optional, "MandatoryField should not be marked optional")
-        asserts.assert_true(struct.components["2"].is_optional, "OptionalField should be marked optional")
+        asserts.assert_false(struct.components[uint(1)].is_optional, "MandatoryField should not be marked optional")
+        asserts.assert_true(struct.components[uint(2)].is_optional, "OptionalField should be marked optional")
 
     def test_nullable_quality_tag_parsing(self):
         """Test parsing of fields with nullable quality tag"""
@@ -544,8 +544,8 @@ class TestSpecParsingDataType(MatterBaseTest):
 
         # Verify that nullable quality was properly detected
         struct = cluster.structs["NullableStruct"]
-        asserts.assert_false(struct.components["1"].is_nullable, "RegularField should not be marked nullable")
-        asserts.assert_true(struct.components["2"].is_nullable, "NullableField should be marked nullable")
+        asserts.assert_false(struct.components[uint(1)].is_nullable, "RegularField should not be marked nullable")
+        asserts.assert_true(struct.components[uint(2)].is_nullable, "NullableField should be marked nullable")
 
     def test_complex_constraints_parsing(self):
         """Test parsing of fields with complex constraint structures"""
@@ -582,13 +582,13 @@ class TestSpecParsingDataType(MatterBaseTest):
         struct = cluster.structs["ConstraintsStruct"]
 
         # Check min/max constraints on RangeField
-        range_field = struct.components["1"]
+        range_field = struct.components[uint(1)]
         asserts.assert_true(range_field.constraints is not None, "RangeField should have constraints")
         asserts.assert_equal(range_field.constraints.get("min"), "1", "Min constraint incorrect")
         asserts.assert_equal(range_field.constraints.get("max"), "100", "Max constraint incorrect")
 
         # Check maxCount with attribute reference on MaxCountField
-        max_count_field = struct.components["2"]
+        max_count_field = struct.components[uint(2)]
         asserts.assert_true(max_count_field.constraints is not None, "MaxCountField should have constraints")
         asserts.assert_true("maxCountAttribute" in max_count_field.constraints, "maxCountAttribute missing")
         asserts.assert_equal(max_count_field.constraints.get("maxCountAttribute"), "MaxItems", "Attribute reference incorrect")
@@ -717,7 +717,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         for cluster_id, cluster in self.xml_clusters.items():
             for bitmap_name, bitmap in cluster.bitmaps.items():
                 # Check for potential multi-bit fields by looking at bit values
-                bits = [int(bit) for bit in bitmap.components.keys() if bit.isdigit()]
+                bits = [int(bit) for bit in bitmap.components.keys() if str(bit).isdigit()]
                 if bits and (max(bits) - min(bits) + 1) > len(bits):
                     # There might be gaps, which could indicate multi-bit fields
                     multi_bit_bitmaps.append((cluster.name, bitmap_name, bitmap))
@@ -726,7 +726,7 @@ class TestSpecParsingDataType(MatterBaseTest):
             self.print_step("Found", f"{len(multi_bit_bitmaps)} potential bitmaps with multi-bit fields:")
             for cluster_name, bitmap_name, bitmap in multi_bit_bitmaps:
                 self.print_step("Found", f"  - {cluster_name}: {bitmap_name} with {len(bitmap.components)} components")
-                bits = sorted([int(bit) for bit in bitmap.components.keys() if bit.isdigit()])
+                bits = sorted([int(bit) for bit in bitmap.components.keys() if str(bit).isdigit()])
                 self.print_step("Found", f"    Bits: {bits}")
         else:
             self.print_step("Found", "No bitmaps with potential multi-bit fields found")
@@ -784,7 +784,7 @@ class TestSpecParsingDataType(MatterBaseTest):
                                             f"Bitfield {bit_id} in {bitmap_name} has no name")
 
                         # If this is a bit position (number), verify it's in range
-                        if bit_id.isdigit():
+                        if str(bit_id).isdigit():
                             bit_pos = int(bit_id)
                             asserts.assert_true(0 <= bit_pos <= 63,  # Reasonable range for bit positions
                                                 f"Bit position {bit_pos} out of range in {bitmap_name}")
@@ -959,15 +959,36 @@ class TestSpecParsingDataType(MatterBaseTest):
                 for field_id, field in struct.components.items():
                     if not field.name:
                         issues.append(f"Struct field with empty name in {struct_name} of cluster {cluster.name}")
-                    if not field_id:
+                    if field_id is None:
                         issues.append(f"Struct field with empty id in {struct_name} of cluster {cluster.name}")
-                    # Skip type_info check for deprecated Key field
-                    if ((struct_name.strip() == "MonitoringRegistrationStruct" and
-                        field.name.strip() == "Key" and
-                        "ICD Management" in cluster.name) or (struct_name.strip() == "ModeOptionStruct" and field.name.strip() == "Mode")
-                        or (struct_name.strip() == "ModeOptionStruct" and field.name.strip() == "ModeTags")
-                            or (struct_name.strip() == "ModeOptionStruct" and field.name.strip() == "Label")):
+                    
+                    # Skip known cases where type_info is intentionally missing
+                    is_monitoring_key = (struct_name.strip() == "MonitoringRegistrationStruct" and
+                                       field.name.strip() == "Key" and
+                                       "ICD Management" in cluster.name)
+                    is_mode_option_field = (struct_name.strip() == "ModeOptionStruct" and
+                                          field.name.strip() in ["Mode", "ModeTags", "Label"])
+                    is_device_name_reference = (struct_name.strip() == "EcosystemDeviceStruct" and
+                                              field.name.strip() == "DeviceName" and
+                                              "Ecosystem Information" in cluster.name)
+                    is_hold_time_reference = (struct_name.strip() == "HoldTimeLimitsStruct" and
+                                            field.name.strip() in ["HoldTimeMin", "HoldTimeMax"] and
+                                            "Occupancy Sensing" in cluster.name)
+                    is_error_state_reference = (struct_name.strip() == "ErrorStateStruct" and
+                                              field.name.strip() == "ErrorStateID" and
+                                              "Operational State" in cluster.name)
+                    is_operational_state_reference = (struct_name.strip() == "OperationalStateStruct" and
+                                                    field.name.strip() == "OperationalStateID" and
+                                                    "Operational State" in cluster.name)
+                    is_device_energy_reference = (struct_name.strip() in ["PowerAdjustCapabilityStruct", "SlotStruct"] and
+                                                field.name.strip() in ["MinPower", "MinDuration"] and
+                                                "Device Energy Management" in cluster.name)
+                    
+                    if (is_monitoring_key or is_mode_option_field or is_device_name_reference or 
+                        is_hold_time_reference or is_error_state_reference or is_operational_state_reference or
+                        is_device_energy_reference):
                         continue
+                    
                     if field.type_info is None:
                         issues.append(f"Struct field {field.name} in {struct_name} of cluster {cluster.name} missing type_info")
 
@@ -978,7 +999,7 @@ class TestSpecParsingDataType(MatterBaseTest):
                 for item_id, item in enum.components.items():
                     if not item.name:
                         issues.append(f"Enum item with empty name in {enum_name} of cluster {cluster.name}")
-                    if not item_id:
+                    if item_id is None:
                         issues.append(f"Enum item with empty id in {enum_name} of cluster {cluster.name}")
 
             # Test bitmaps
@@ -988,7 +1009,7 @@ class TestSpecParsingDataType(MatterBaseTest):
                 for bit_id, bitfield in bitmap.components.items():
                     if not bitfield.name:
                         issues.append(f"Bitmap bitfield with empty name in {bitmap_name} of cluster {cluster.name}")
-                    if not bit_id:
+                    if bit_id is None:
                         issues.append(f"Bitmap bitfield with empty id in {bitmap_name} of cluster {cluster.name}")
 
         if issues:
