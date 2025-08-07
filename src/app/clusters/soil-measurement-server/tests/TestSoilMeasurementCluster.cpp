@@ -20,18 +20,13 @@
 
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/SoilMeasurement/Metadata.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/ReadOnlyBuffer.h>
-
 #include <clusters/SoilMeasurement/Attributes.h>
-#include <lib/core/TLV.h>
-#include <lib/core/TLVDebug.h>
-#include <lib/core/TLVUtilities.h>
+#include <clusters/SoilMeasurement/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 
 namespace {
 
@@ -47,7 +42,7 @@ const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistur
     { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
 };
 
-const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
+const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
     .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
     .measured         = true,
     .minMeasuredValue = 0,
@@ -56,25 +51,34 @@ const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type
         kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
 };
 
+class SoilMeasurementClusterTest : public SoilMeasurementCluster
+{
+public:
+    using SoilMeasurementCluster::SoilMeasurementCluster;
+
+    SoilMoistureMeasurementLimits::TypeInfo::Type GetSoilMoistureMeasurementLimits() const
+    {
+        return mSoilMoistureMeasurementLimits;
+    }
+
+    SoilMoistureMeasuredValue::TypeInfo::Type GetSoilMoistureMeasuredValue() const { return mSoilMoistureMeasuredValue; }
+};
+
 } // namespace
 
 TEST_F(TestSoilMeasurementCluster, AttributeTest)
 {
     {
         EndpointId endpoint = 1;
-        SoilMeasurementCluster soilMeasurement(endpoint);
-
-        ASSERT_EQ(soilMeasurement.Init(kDefaultSoilMoistureMeasurementLimits), CHIP_NO_ERROR);
+        SoilMeasurementClusterTest soilMeasurement(endpoint, kDefaultSoilMoistureMeasurementLimits);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(soilMeasurement.Attributes(ConcreteClusterPath(endpoint, SoilMeasurement::Id), attributesBuilder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
         ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ SoilMeasurement::Attributes::SoilMoistureMeasuredValue::kMetadataEntry }),
-                  CHIP_NO_ERROR);
+        ASSERT_EQ(expectedAttributes.AppendElements({ SoilMoistureMeasurementLimits::kMetadataEntry }), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedAttributes.AppendElements({ SoilMoistureMeasuredValue::kMetadataEntry }), CHIP_NO_ERROR);
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
     }
 }
@@ -83,23 +87,24 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
 {
     {
         EndpointId endpoint = 1;
-        SoilMeasurementCluster soilMeasurement(endpoint);
+        SoilMeasurementClusterTest soilMeasurement(endpoint, kDefaultSoilMoistureMeasurementLimits);
 
-        ASSERT_EQ(soilMeasurement.Init(kDefaultSoilMoistureMeasurementLimits), CHIP_NO_ERROR);
+        SoilMoistureMeasuredValue::TypeInfo::Type measuredValue;
+        measuredValue.SetNull();
+        ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
 
-        SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type measuredValue = 50;
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(endpoint, measuredValue), CHIP_NO_ERROR);
+        measuredValue = 50;
+        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_NO_ERROR);
         ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
 
         measuredValue = 101;
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(endpoint, measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
         measuredValue = -1;
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(endpoint, measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
         measuredValue.SetNull();
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(endpoint, measuredValue), CHIP_NO_ERROR);
-        ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
+        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
 
@@ -107,9 +112,7 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasurementLimits)
 {
     {
         EndpointId endpoint = 1;
-        SoilMeasurementCluster soilMeasurement(endpoint);
-
-        ASSERT_EQ(soilMeasurement.Init(kDefaultSoilMoistureMeasurementLimits), CHIP_NO_ERROR);
+        SoilMeasurementClusterTest soilMeasurement(endpoint, kDefaultSoilMoistureMeasurementLimits);
 
         const auto & measurementLimits = soilMeasurement.GetSoilMoistureMeasurementLimits();
         ASSERT_EQ(measurementLimits.measurementType, kDefaultSoilMoistureMeasurementLimits.measurementType);

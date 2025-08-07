@@ -26,8 +26,7 @@ namespace Clusters {
 namespace SoilMeasurement {
 
 CHIP_ERROR
-SetSoilMoistureMeasuredValue(chip::EndpointId endpoint,
-                             const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
+SetSoilMoistureMeasuredValue(const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
 } // namespace SoilMeasurement
 } // namespace Clusters

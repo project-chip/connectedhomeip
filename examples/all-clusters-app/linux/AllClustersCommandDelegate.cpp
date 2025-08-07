@@ -968,7 +968,7 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, D
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
     }
 
-    SoilMeasurement::SetSoilMoistureMeasuredValue(endpointId, soilMoisture);
+    SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)

@@ -16,48 +16,32 @@
  */
 #pragma once
 
-#include <app/AttributeValueEncoder.h>
-#include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/data-model-provider/MetadataTypes.h>
-#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/SoilMeasurement/ClusterId.h>
-#include <clusters/SoilMeasurement/Enums.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <platform/DeviceInfoProvider.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
+using namespace chip::app::Clusters::SoilMeasurement::Attributes;
+
 class SoilMeasurementCluster : public DefaultServerCluster
 {
 public:
-    SoilMeasurementCluster(EndpointId endpointId);
-
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    SoilMeasurementCluster(EndpointId endpointId,
+                           const SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // Attributes handling for cluster
-    SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type GetSoilMoistureMeasurementLimits();
-    SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type GetSoilMoistureMeasuredValue();
-
     CHIP_ERROR
-    SetSoilMoistureMeasuredValue(
-        EndpointId endpointId,
-        const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
-
-    CHIP_ERROR
-    Init(const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits);
+    SetSoilMoistureMeasuredValue(const SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
 protected:
-    SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mSoilMoistureMeasurementLimits;
-    SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type mSoilMoistureMeasuredValue;
+    const SoilMoistureMeasurementLimits::TypeInfo::Type mSoilMoistureMeasurementLimits;
+    SoilMoistureMeasuredValue::TypeInfo::Type mSoilMoistureMeasuredValue;
 };
 
 } // namespace Clusters
