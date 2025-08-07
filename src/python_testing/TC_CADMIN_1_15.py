@@ -43,6 +43,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 from mdns_discovery.mdns_discovery import MdnsDiscovery
 from mobly import asserts
 
+
 class TC_CADMIN_1_15(MatterBaseTest):
     async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
         if expectedErrCode == 0x00:

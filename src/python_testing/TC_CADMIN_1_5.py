@@ -43,6 +43,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
 
+
 class TC_CADMIN_1_5(CADMINBaseTest):
 
     async def commission_on_network(self, setup_code: int, discriminator: int, expected_error: int = 0):
