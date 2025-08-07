@@ -447,6 +447,7 @@ class ChipDeviceControllerBase():
         # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
         self._ChipStack = builtins.chipStack  # type: ignore[attr-defined]
         self._dmLib: typing.Any = None
+        self._isActive = False
 
         self._InitLib()
 
@@ -457,7 +458,6 @@ class ChipDeviceControllerBase():
         self.devCtrl = devCtrl
         self.name = name
         self._fabricCheckNodeId = -1
-        self._isActive = False
 
         # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
         self._Cluster = ChipClusters(builtins.chipStack)  # type: ignore[attr-defined]
