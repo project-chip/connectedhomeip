@@ -37,12 +37,13 @@
 
 import logging
 
-from chip.ChipDeviceCtrl import TransportPayloadCapability
-from chip.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.webrtc import PeerConnection, WebRTCManager
 from mobly import asserts
 from test_plan_support import commission_if_required
+
+from matter.ChipDeviceCtrl import TransportPayloadCapability
+from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.webrtc import PeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_5(MatterBaseTest):
@@ -119,7 +120,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         webrtc_peer.set_remote_offer(remote_offer_sdp)
 
         self.step(3)
-        local_answer = webrtc_peer.get_local_answer()
+        local_answer = await webrtc_peer.get_local_answer()
         await self.send_single_cmd(
             cmd=WebRTCTransportRequestor.Commands.Answer(webRTCSessionID=session_id, sdp=local_answer),
             endpoint=endpoint,

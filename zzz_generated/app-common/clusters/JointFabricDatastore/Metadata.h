@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -88,6 +89,23 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace NodeEndpointList
+constexpr std::array<DataModel::AttributeEntry, 14> kMandatoryMetadata = {
+    AnchorRootCA::kMetadataEntry,
+    AnchorNodeID::kMetadataEntry,
+    AnchorVendorID::kMetadataEntry,
+    FriendlyName::kMetadataEntry,
+    GroupKeySetList::kMetadataEntry,
+    GroupList::kMetadataEntry,
+    NodeList::kMetadataEntry,
+    AdminList::kMetadataEntry,
+    Status::kMetadataEntry,
+    EndpointGroupIDList::kMetadataEntry,
+    EndpointBindingList::kMetadataEntry,
+    NodeKeySetList::kMetadataEntry,
+    NodeACLList::kMetadataEntry,
+    NodeEndpointList::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

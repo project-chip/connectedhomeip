@@ -3066,8 +3066,16 @@ AVSM.S.A0026=1
 AVSM.S.A0027=1
 AVSM.S.A0028=1
 
-# Meter Identification
+# Commodity Metering
+#Server
+COMMTR.S=1
 
+#Attributes
+COMMTR.S.A0000=1
+COMMTR.S.A0001=1
+COMMTR.S.A0002=1
+
+# Meter Identification
 #Server
 MTRID.S=1
 

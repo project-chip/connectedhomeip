@@ -45,12 +45,13 @@ import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Set
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status as StatusEnum
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status as StatusEnum
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.utils import CommissioningBuildingBlocks
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic
 #       to some internal behavior assumptions of the SDK we are making relative to the write to

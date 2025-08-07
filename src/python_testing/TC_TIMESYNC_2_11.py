@@ -40,14 +40,15 @@ import time
 import typing
 from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
-from chip.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from matter.tlv import uint
 
 
 class TC_TIMESYNC_2_11(MatterBaseTest):
@@ -65,7 +66,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         """
         Waits for the DSTStatus event to be received and validates its contents.
 
-        This function waits for the DSTStatus event to be received via the given callback. 
+        This function waits for the DSTStatus event to be received via the given callback.
         It verifies that the event type is correct and that the field DSTOffsetAcive matches the expected value.
 
         Parameters:

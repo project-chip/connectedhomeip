@@ -141,7 +141,7 @@ int main(int argc, char * argv[])
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        printf("EchoServer failed, err:%s\n", chip::ErrorStr(err));
+        printf("EchoServer failed, err: %s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
 
