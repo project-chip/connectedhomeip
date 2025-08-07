@@ -25,7 +25,7 @@ CHIP_ERROR EndpointInterfaceRegistry::Register(EndpointInterfaceRegistration & e
     VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);              // Should not be part of another list
     VerifyOrReturnError(entry.endpointInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be null
     VerifyOrReturnError(entry.endpointEntry.id != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT); // Should not be invalid ID
-    VerifyOrReturnError(Get(entry.endpointEntry.id) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID); // Check for duplicates
+    VerifyOrReturnError(Get(entry.endpointEntry.id) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);       // Check for duplicates
 
     entry.next     = mRegistrations;
     mRegistrations = &entry;

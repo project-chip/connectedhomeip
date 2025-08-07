@@ -25,10 +25,10 @@ TEST(TestSpanEndpoint, InstantiateWithAllParameters)
                                                { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
 
     auto endpoint = SpanEndpoint::Builder()
-                      .SetClientClusters(Span<const chip::ClusterId>(clientClusters))
-                      .SetSemanticTags(Span<const SemanticTag>(semanticTags))
-                      .SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes))
-                      .Build();
+                        .SetClientClusters(Span<const chip::ClusterId>(clientClusters))
+                        .SetSemanticTags(Span<const SemanticTag>(semanticTags))
+                        .SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes))
+                        .Build();
 
     ReadOnlyBufferBuilder<chip::ClusterId> clientBuilder;
     ASSERT_EQ(endpoint.ClientClusters(clientBuilder), CHIP_NO_ERROR);
@@ -59,7 +59,7 @@ TEST(TestSpanEndpoint, SetAndGetSemanticTags)
 {
     const SemanticTag semanticTags[] = { { .mfgCode = chip::VendorId::TestVendor1, .namespaceID = 1, .tag = 1 },
                                          { .mfgCode = chip::VendorId::TestVendor2, .namespaceID = 2, .tag = 2 } };
-    auto endpoint = SpanEndpoint::Builder().SetSemanticTags(Span<const SemanticTag>(semanticTags)).Build();
+    auto endpoint                    = SpanEndpoint::Builder().SetSemanticTags(Span<const SemanticTag>(semanticTags)).Build();
     ReadOnlyBufferBuilder<SemanticTag> builder;
     ASSERT_EQ(endpoint.SemanticTags(builder), CHIP_NO_ERROR);
     auto retrievedTags = builder.TakeBuffer();
@@ -73,7 +73,7 @@ TEST(TestSpanEndpoint, SetAndGetDeviceTypes)
 {
     const DeviceTypeEntry deviceTypes[] = { { .deviceTypeId = 100, .deviceTypeRevision = 1 },
                                             { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
-    auto endpoint = SpanEndpoint::Builder().SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes)).Build();
+    auto endpoint                       = SpanEndpoint::Builder().SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes)).Build();
     ReadOnlyBufferBuilder<DeviceTypeEntry> builder;
     ASSERT_EQ(endpoint.DeviceTypes(builder), CHIP_NO_ERROR);
     auto retrievedDeviceTypes = builder.TakeBuffer();
@@ -85,10 +85,10 @@ TEST(TestSpanEndpoint, SetAndGetDeviceTypes)
 TEST(TestSpanEndpoint, BuildWithEmptySpans)
 {
     auto endpoint = SpanEndpoint::Builder()
-                      .SetClientClusters(Span<const chip::ClusterId>())
-                      .SetSemanticTags(Span<const SemanticTag>())
-                      .SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>())
-                      .Build();
+                        .SetClientClusters(Span<const chip::ClusterId>())
+                        .SetSemanticTags(Span<const SemanticTag>())
+                        .SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>())
+                        .Build();
 
     // Test SetClientClusters with an empty span
     ReadOnlyBufferBuilder<chip::ClusterId> clientBuilder;

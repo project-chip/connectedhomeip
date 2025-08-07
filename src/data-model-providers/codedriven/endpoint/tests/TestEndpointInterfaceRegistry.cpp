@@ -207,7 +207,7 @@ TEST(TestEndpointInterfaceRegistry, StressTestRegistration)
     endpoints_storage.reserve(kNumProviders);
     for (int i = 0; i < kNumProviders; ++i)
     {
-        EndpointId id     = static_cast<EndpointId>(i + 1);
+        EndpointId id = static_cast<EndpointId>(i + 1);
         endpoints_storage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
         ids.push_back(id);
         registrations.emplace_back(*endpoints_storage.back(), DataModel::EndpointEntry{ .id = id });

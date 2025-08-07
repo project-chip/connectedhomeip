@@ -46,7 +46,6 @@ namespace app {
 class SpanEndpoint : public EndpointInterface
 {
 public:
-
     // TODO: Add a class description here.
     /**
      * @brief Builder class for constructing a SpanEndpoint.
