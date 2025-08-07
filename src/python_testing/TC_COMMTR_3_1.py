@@ -43,7 +43,6 @@
 """Define Matter test case TC_COMMTR_3_1."""
 
 import logging
-import time
 
 import test_plan_support
 from mobly import asserts
@@ -75,34 +74,37 @@ class TC_COMMTR_3_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
 
         steps = [
             TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
-                     "TestEventTriggersEnabled must be True."),
-            TestStep("3", "TH sends TestEventTrigger command Test Event Clear", "Status code must be SUCCESS."),
-            TestStep("4", "TH establishes a subscription to MeteredQuantity attribute.",
+            TestStep("2", """Set up a subscription to the Commodity Metering cluster attributes:
+                     - MinIntervalFloor: 0
+                     - MaxIntervalCeiling: 10""",
                      "Subscription is established successfully."),
-            TestStep("5", "TH reads MeteredQuantity attribute and saves value as metered_quantity.", """
-                     - DUT replies a list of MeteredQuantityStruct entries;
-                     - Value is saved as metered_quantity."""),
-            TestStep("6", "TH sends TestEventTrigger command Fake Value Update Test Event", "Status code must be SUCCESS."),
-            TestStep("7", "TH awaits a ReportDataMessage containing MeteredQuantity attribute.", """
-                     - Verify that the report on change is received;
-                     - Value does not match the metered_quantity value."""),
-            TestStep("8", "TH reads MeteredQuantity attribute and saves the initial value as saved.", """
-                     - DUT replies a list of MeteredQuantityStruct entries;
-                     - Value is saved as metered_quantity."""),
-            TestStep("9", "TH sends TestEventTrigger command Fake Value Update Test Event", "Status code must be SUCCESS."),
-            TestStep("10", "TH awaits a ReportDataMessage containing MeteredQuantity attribute.", """
-                     - Verify that the report on change is received;
-                     - Value does not match the metered_quantity value."""),
-            TestStep("11", "TH reads MeteredQuantity attribute and saves the initial value as saved.", """
-                     - DUT replies a list of MeteredQuantityStruct entries;
-                     - Value is saved as metered_quantity."""),
-            TestStep("12", "TH sends TestEventTrigger command to General Diagnostics Cluster for Update Test Event Clear",
+            TestStep("3", "TH reads MeteredQuantity attribute.", """
+                     - DUT replies a list of MeteredQuantityStruct entries or null;
+                     - Value is saved as MeteredQuantityValue."""),
+            TestStep("4", "TH reads MeteredQuantityTimestamp attribute.", """
+                     - DUT replies a epoch-s value, or null;
+                     - Value is saved as MeteredQuantityTimestampValue."""),
+            TestStep("5", "TH reads TariffUnit attribute.", """
+                     - DUT replies a TariffUnitEnum value or null;
+                     - Value is saved as TariffUnitValue."""),
+            TestStep("6", "TH reads MaximumMeteredQuantities attribute.", """
+                     - DUT replies a uint16 value or null;
+                     - Value is saved as MaxMeteredQuantitiesValue."""),
+            TestStep("7", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.", "Values is True."),
+            TestStep("8", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY 
+                     and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.""",
                      "Status code must be SUCCESS."),
-            TestStep("13", "TH awaits a ReportDataMessage containing MeteredQuantity attribute.", """
-                     - Verify that the report on change is received;
-                     - Value does not match the metered_quantity value."""),
-            TestStep("14", "TH removes the subscription to MeteredQuantity attribute.", "Subscription is removed successfully."),
+            TestStep("9", "TH awaits a MeteredQuantity attribute with 10s timeout.",
+                     "Verify the report is received and the value does not match the MeteredQuantityValue."),
+            TestStep("10", "TH awaits a MeteredQuantityTimestamp attribute with 10s timeout.",
+                     "Verify the report is received and the value does not match the MeteredQuantityTimestampValue."),
+            TestStep("11", "TH awaits a TariffUnit attribute with 10s timeout.",
+                     "Verify the report is received and the value does not match the TariffUnitValue."),
+            TestStep("12", "TH awaits a MaximumMeteredQuantities attribute with 10s timeout.",
+                     """Verify the report is received and the value does not match the MaxMeteredQuantitiesValue."""),
+            TestStep("13", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY and 
+                     EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Test Event Clear.""", "Status code must be SUCCESS."),
+            TestStep("14", "TH removes the subscription the Commodity Metering cluster.", "Subscription is removed successfully."),
         ]
 
         return steps
@@ -120,68 +122,61 @@ class TC_COMMTR_3_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
         # commissioning
 
         self.step("2")
-        # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster, expected to be True
-        await self.check_test_event_triggers_enabled()
-
-        self.step("3")
-        await self.send_test_event_trigger_clear()
-        time.sleep(3)  # Wait for the DUT to process the event and update attributes after sending the test event trigger.
-
-        self.step("4")
         # TH establishes a subscription to MeteredQuantity attribute.
         subscription_handler = AttributeSubscriptionHandler(cluster, cluster.Attributes.MeteredQuantity)
         await subscription_handler.start(self.default_controller, self.dut_node_id,
                                          endpoint,
                                          min_interval_sec=0,
-                                         max_interval_sec=30, keepSubscriptions=True)
+                                         max_interval_sec=10, keepSubscriptions=True)
+
+        self.step("3")
+        # TH reads MeteredQuantity attribute and saves value as metered_quantity.
+        MeteredQuantityValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                              attribute=cluster.Attributes.MeteredQuantity)
+
+        self.step("4")
+        # TH reads MeteredQuantity attribute and saves value as metered_quantity.
+        MeteredQuantityTimestampValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                                       attribute=cluster.Attributes.MeteredQuantityTimestamp)
 
         self.step("5")
         # TH reads MeteredQuantity attribute and saves value as metered_quantity.
-        metered_quantity = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                          attribute=cluster.Attributes.MeteredQuantity)
+        TariffUnitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                         attribute=cluster.Attributes.TariffUnit)
 
         self.step("6")
-        # TH sends TestEventTrigger command Fake Value Update Test Event, expected to be SUCCESS
-        await self.send_test_event_trigger_fake_value_update()
+        # TH reads MeteredQuantity attribute and saves value as metered_quantity.
+        MaxMeteredQuantitiesValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                                   attribute=cluster.Attributes.MaximumMeteredQuantities)
 
         self.step("7")
-        # TH awaits a ReportDataMessage containing MeteredQuantity attribute
-        # Verify that the report on change is received
-        # Value does not match the metered_quantity value
-        reported_value = subscription_handler.get_last_report()
-        asserts.assert_not_equal(reported_value, metered_quantity, "Reported value should be different from saved value")
+        # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. It must be True.
+        self.check_test_event_triggers_enabled()
 
         self.step("8")
-        # TH reads MeteredQuantity attribute and saves value as metered_quantity
-        metered_quantity = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                          attribute=cluster.Attributes.MeteredQuantity)
+        # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY
+        # and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.
+        await self.send_test_event_trigger_attrs_value_update()
 
         self.step("9")
-        # TH sends TestEventTrigger command Fake Value Update Test Event, expected to be SUCCESS
-        await self.send_test_event_trigger_fake_value_update()
+        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeteredQuantity,
+                              "MeteredQuantity", MeteredQuantityValue)
 
         self.step("10")
-        # TH awaits a ReportDataMessage containing MeteredQuantity attribute
-        # Verify that the report on change is received
-        # Value does not match the metered_quantity value
-        reported_value = subscription_handler.get_last_report()
-        asserts.assert_not_equal(reported_value, metered_quantity, "Reported value should be different from saved value")
+        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeteredQuantityTimestamp,
+                              "MeteredQuantityTimestamp", MeteredQuantityTimestampValue)
 
         self.step("11")
-        # TH reads MeteredQuantity attribute and saves value as metered_quantity
-        metered_quantity = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                          attribute=cluster.Attributes.MeteredQuantity)
+        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.TariffUnit, "TariffUnit", TariffUnitValue)
 
         self.step("12")
-        # TH sends TestEventTrigger command for Test Event Clear, expected SUCCESS
-        await self.send_test_event_trigger_clear()
+        self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MaximumMeteredQuantities,
+                              "MaximumMeteredQuantities", MaxMeteredQuantitiesValue)
 
         self.step("13")
-        # TH awaits a ReportDataMessage containing MeteredQuantity attribute
-        # Verify that the report on change is received
-        # Value does not match the metered_quantity value
-        reported_value = subscription_handler.get_last_report()
-        asserts.assert_not_equal(reported_value, metered_quantity, "Reported value should be different from saved value")
+        # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY
+        # and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Test Event Clear.
+        self.send_test_event_trigger_clear()
 
         self.step("14")
         # TH removes the subscription to MeteredQuantity attribute.

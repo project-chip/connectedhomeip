@@ -18,7 +18,10 @@
 import logging
 import time
 
+from mobly import asserts
+
 import matter.clusters as Clusters
+from matter.clusters import ClusterObjects
 from matter.testing import matter_asserts
 
 logger = logging.getLogger(__name__)
@@ -29,7 +32,7 @@ class CommodityMeteringTestBaseHelper:
     test_event_fake_data = 0x0b07000000000000
     test_event_clear = 0x0b07000000000001
 
-    async def send_test_event_trigger_fake_value_update(self, t_wait=5):
+    async def send_test_event_trigger_attrs_value_update(self, t_wait=5):
         await self.send_test_event_triggers(eventTrigger=self.test_event_fake_data)
         time.sleep(t_wait)
 
@@ -44,3 +47,11 @@ class CommodityMeteringTestBaseHelper:
         matter_asserts.assert_list_element_type(
             struct.tariffComponentIDs, int, "TariffComponentIDs attribute must contain int elements")
         matter_asserts.assert_valid_int64(struct.quantity, 'Quantity')
+
+    async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> None:
+
+        try:
+            asserts.assert_not_equal(reports[attribute], saved_value,
+                                     "Reported value should be different from saved value")
+        except KeyError as err:
+            asserts.fail(f"There is not reports for attribute {attribute_name}:\n{err}")
