@@ -105,27 +105,27 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportProviderServer::Invo
     {
     case Commands::SolicitOffer::Id: {
         Commands::SolicitOffer::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
         return HandleSolicitOffer(*handler, req);
     }
     case Commands::ProvideOffer::Id: {
         Commands::ProvideOffer::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
         return HandleProvideOffer(*handler, req);
     }
     case Commands::ProvideAnswer::Id: {
         Commands::ProvideAnswer::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
         return HandleProvideAnswer(*handler, req);
     }
     case Commands::ProvideICECandidates::Id: {
         Commands::ProvideICECandidates::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
         return HandleProvideICECandidates(*handler, req);
     }
     case Commands::EndSession::Id: {
         Commands::EndSession::DecodableType req;
-        ReturnValueOnFailure(req.Decode(input_arguments, accessingFabricIndex), Status::InvalidCommand);
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
         return HandleEndSession(*handler, req);
     }
     default:
