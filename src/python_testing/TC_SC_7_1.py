@@ -77,7 +77,11 @@ class TC_SC_7_1(MatterBaseTest):
                 _trusted_root_test_step(2),
                 TestStep(3, "TH compares the discriminators from the provided setup codes", "Discriminators do not match")]
 
-    # TODO: Need a pics or something to limit this to devices that have a factory-provided matter setup code (as opposed to a field upgradable device / device with a custom commissioning where this test won't apply)
+    def pics_TC_SC_7_1(self):
+        # Testers can use either the QR or manual code, but this test is gated on manual because the manual pairing code is required
+        # per 5.7.6. Onboarding Payload Inclusion (Manual Pairing Code, QR Code, NFC Tag), so devices that have a QR code will always
+        # have a manual code, and thus be required to run this test.
+        return ['MCORE.DD.MANUAL_PC']
 
     @async_test_body
     async def test_TC_SC_7_1(self):
