@@ -78,7 +78,7 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
 
             # Validate 'outputType'
             asserts.assert_true(hasattr(output, "outputType"), "'outputType' field is missing")
-            asserts.assert_true(isinstance(output.outputType, int), "'outputType' should be an  integer")
+            asserts.assert_true(isinstance(output.outputType, int), "'outputType' should be an integer")
             asserts.assert_true(0 <= output.outputType <= 255,
                                 f"'outputType' should be in enum8 range (0-255), got {output.outputType}")
 
