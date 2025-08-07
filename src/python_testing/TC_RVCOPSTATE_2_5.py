@@ -39,11 +39,12 @@ import asyncio
 import enum
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
+                                           type_matches)
 
 
 class RvcStatusEnum(enum.IntEnum):

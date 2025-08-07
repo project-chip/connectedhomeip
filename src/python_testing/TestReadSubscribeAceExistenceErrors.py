@@ -39,11 +39,12 @@ import copy
 import logging
 from typing import Type, Union
 
-import chip.clusters as Clusters
-from chip.exceptions import ChipStackError
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts  # type: ignore
+
+import matter.clusters as Clusters
+from matter.exceptions import ChipStackError
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
