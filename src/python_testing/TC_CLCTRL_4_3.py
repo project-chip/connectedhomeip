@@ -372,7 +372,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
                 self.step("5o")
                 if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                    logging.info("LatchControlModes Bit 1 is 0, skipping steps 5p")
+                    logging.info("LatchControlModes Bit 1 is 0, skipping step 5p")
                     self.skip_step("5p")
                 else:
                     self.step("5p")
@@ -527,9 +527,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 self.step("8d")
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
-                    logging.info(f"MoveTo command with Latch = {current_latch} sent successfully")
+                    asserts.fail(f"MoveTo command with Latch = {current_latch} should have failed but succeeded.")
                 except InteractionModelError as e:
-                    logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
+                    logging.info(f"MoveTo command with Latch = {current_latch} failed as expected: {e}")
                     asserts.assert_equal(e.status, Status.InvalidInState,
                                          f"Expected InvalidInState status for MoveTo with Latch = {current_latch}, but got: {e}")
 
@@ -540,9 +540,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 self.step("8f")
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
-                    logging.info(f"MoveTo command with Latch = {current_latch} sent successfully")
+                    asserts.fail(f"MoveTo command with Latch = {current_latch} should have failed but succeeded.")
                 except InteractionModelError as e:
-                    logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
+                    logging.info(f"MoveTo command with Latch = {current_latch} failed as expected: {e}")
                     asserts.assert_equal(e.status, Status.InvalidInState,
                                          f"Expected InvalidInState status for MoveTo with Latch = {current_latch}, but got: {e}")
 
