@@ -636,7 +636,7 @@ class ChipDeviceControllerBase():
         self._isActive = False
 
     def ShutdownAll(self):
-        ''' 
+        '''
         Shut down all active controllers and reclaim any used resources.
         '''
         #
@@ -839,7 +839,7 @@ class ChipDeviceControllerBase():
         '''
         Establish a PASE session over BLE.
 
-        Warning: This method attempts to establish a new PASE session, even if an open session already exists. 
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists.
         For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
 
         Args:
@@ -859,7 +859,7 @@ class ChipDeviceControllerBase():
         '''
         Establish a PASE session over IP.
 
-        Warning: This method attempts to establish a new PASE session, even if an open session already exists. 
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists.
         For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
 
         Args:
@@ -880,7 +880,7 @@ class ChipDeviceControllerBase():
         '''
         Establish a PASE session using setUpCode.
 
-        Warning: This method attempts to establish a new PASE session, even if an open session already exists. 
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists.
         For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
 
         Args:
@@ -984,7 +984,7 @@ class ChipDeviceControllerBase():
         Check the test commissioner Pase connection sucess.
 
         Args:
-            nodeid (int): Node id of the device.
+            nodeid (int): Node ID of the device.
 
         Returns:
             bool: True if test commissioner Pase connection success, False if not.
@@ -993,10 +993,10 @@ class ChipDeviceControllerBase():
 
     def ResolveNode(self, nodeid):
         '''
-        Resove Node id.
+        Resolve node ID.
 
         Args:
-            nodeid (int): Node id of the device.
+            nodeid (int): Node ID of the device.
         '''
         self.CheckIsActive()
 
@@ -1007,7 +1007,7 @@ class ChipDeviceControllerBase():
         Get the address and port.
 
         Args:
-            nodeid (int): Node id of the device.
+            nodeid (int): Node ID of the device.
 
         Returns:
             tuple: The address and port if no error occurs or None on failure.
@@ -1017,17 +1017,17 @@ class ChipDeviceControllerBase():
         address = create_string_buffer(64)
         port = c_uint16(0)
 
-        # Intentially return None instead of raising exceptions on error
         error = self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetAddressAndPort(
                 self.devCtrl, nodeid, address, 64, pointer(port))
         )
 
+        # Intentionally return None instead of raising exceptions on error
         return (address.value.decode(), port.value) if error == 0 else None
 
     async def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None,
                                           stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
-        ''' 
+        '''
         Discover commissionable nodes via DNS-SD with specified filters.
         Supported filters are:
 
@@ -1121,12 +1121,12 @@ class ChipDeviceControllerBase():
         )
 
     class CommissioningWindowPasscode(enum.IntEnum):
-        kOriginalSetupCode = 0,
-        kTokenWithRandomPin = 1,
+        kOriginalSetupCode = 0
+        kTokenWithRandomPin = 1
 
     async def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
                                       discriminator: int, option: CommissioningWindowPasscode) -> CommissioningParameters:
-        ''' 
+        '''
         Opens a commissioning window on the device with the given nodeid.
 
         Args:
@@ -1137,7 +1137,7 @@ class ChipDeviceControllerBase():
                 Ignored if option == 0
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095
                 Ignored if option == 0
-            option (int): 
+            option (int):
                 0 = kOriginalSetupCode
                 1 = kTokenWithRandomPIN
 
@@ -2532,7 +2532,7 @@ class ChipDeviceControllerBase():
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
-    ''' 
+    '''
     The ChipDeviceCommissioner binding, named as ChipDeviceController
     '''
     # TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
@@ -2803,7 +2803,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Instructs the auto-commissioner to perform a matching fabric check before commissioning.
 
         Args:
-            check (bool): Validation fabric before commissioning. 
+            check (bool): Validation fabric before commissioning.
 
         Raises:
             ChipStackError: On failure.
