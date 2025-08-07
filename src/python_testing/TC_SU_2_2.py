@@ -181,13 +181,6 @@ class TC_SU_2_2(MatterBaseTest):
         th2 = th1_fabric_admin.NewController(nodeId=th2_node_id, useTestCommissioner=True)
         th2_fabric_id = th2.fabricId
 
-        # DELETE
-        # th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        # th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th1.fabricId)
-        # th2 = th2_fabric_admin.NewController(nodeId=th2_node_id, useTestCommissioner=True)
-        # th2_fabric_id = th2.fabricId
-        # DELETE
-
         logger.info(f'Step #1.1 - TH2 (Provider) NodeID th2_node_id: {th2_node_id}')           # NodeID = 1
         logger.info(f'Step #1.1 - TH2 (Provider)  h2.nodeId: {th2.nodeId}')           # NodeID = 1
         logger.info(f'Step #1.1 - TH2 (Provider) th2.fabricId: {th2_fabric_id}')       # FabricID = 1
@@ -207,13 +200,6 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
 
         logger.info('Step #1.3 - Commissioning DUT with TH2')
-        # resp = await th2.CommissionOnNetwork(
-        #     nodeId=th2_node_id,
-        #     setupPinCode=setup_pin_code,
-        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-        #     filter=long_discriminator)
-        # logger.info(f'Step #1.3 - TH2 Commissioning response: {resp}')
-
         resp = await th2.CommissionOnNetwork(
             nodeId=1,
             setupPinCode=20202021,    # CHECK VALUE FROM PROVIDER -----------------------------
