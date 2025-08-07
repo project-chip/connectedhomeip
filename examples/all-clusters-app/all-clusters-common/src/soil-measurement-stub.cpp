@@ -42,21 +42,25 @@ const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurem
 
 LazyRegisteredServerCluster<SoilMeasurementCluster> gServer;
 
-} // namespace
+constexpr EndpointId kEndpointWithSoilMeasurement = 1;
 
-// This cluster is only enabled for endpoint 1.
-#define VerifyEndpoint(endpoint)                                                                                                   \
-    if (endpoint != 1)                                                                                                             \
-    {                                                                                                                              \
-        ChipLogError(AppServer, "SoilMeasurement cluster invalid endpoint");                                                       \
-        return;                                                                                                                    \
+bool ValidEndpointForSoilMeasurement(EndpointId endpoint)
+{
+    if (endpoint != kEndpointWithSoilMeasurement)
+    {
+        ChipLogError(AppServer, "SoilMeasurement cluster invalid endpoint");
+        return false;
     }
+    return true;
+}
+
+} // namespace
 
 void emberAfSoilMeasurementClusterServerInitCallback(EndpointId endpoint) {}
 
 void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    VerifyEndpoint(endpoint);
+    VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
 
     gServer.Create(endpoint, kDefaultSoilMoistureMeasurementLimits);
 
@@ -69,7 +73,7 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
 
 void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)
 {
-    VerifyEndpoint(endpoint);
+    VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)

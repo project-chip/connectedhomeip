@@ -37,8 +37,6 @@ struct TestSoilMeasurementCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-namespace {
-
 const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
     { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
 };
@@ -52,7 +50,9 @@ const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurem
         kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
 };
 
-class SoilMeasurementClusterTest : public SoilMeasurementCluster
+constexpr EndpointId kEndpointWithSoilMeasurement = 1;
+
+class SoilMeasurementClusterLocal : public SoilMeasurementCluster
 {
 public:
     using SoilMeasurementCluster::SoilMeasurementCluster;
@@ -70,11 +70,12 @@ public:
 TEST_F(TestSoilMeasurementCluster, AttributeTest)
 {
     {
-        EndpointId endpoint = 1;
-        SoilMeasurementClusterTest soilMeasurement(endpoint, kDefaultSoilMoistureMeasurementLimits);
+        SoilMeasurementClusterLocal soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(soilMeasurement.Attributes(ConcreteClusterPath(endpoint, SoilMeasurement::Id), attributesBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            soilMeasurement.Attributes(ConcreteClusterPath(kEndpointWithSoilMeasurement, SoilMeasurement::Id), attributesBuilder),
+            CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
         ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
@@ -87,8 +88,7 @@ TEST_F(TestSoilMeasurementCluster, AttributeTest)
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
 {
     {
-        EndpointId endpoint = 1;
-        SoilMeasurementClusterTest soilMeasurement(endpoint, kDefaultSoilMoistureMeasurementLimits);
+        SoilMeasurementClusterLocal soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits);
 
         SoilMoistureMeasuredValue::TypeInfo::Type measuredValue;
         measuredValue.SetNull();
@@ -112,8 +112,7 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasurementLimits)
 {
     {
-        EndpointId endpoint = 1;
-        SoilMeasurementClusterTest soilMeasurement(endpoint, kDefaultSoilMoistureMeasurementLimits);
+        SoilMeasurementClusterLocal soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits);
 
         const auto & measurementLimits = soilMeasurement.GetSoilMoistureMeasurementLimits();
         ASSERT_EQ(measurementLimits.measurementType, kDefaultSoilMoistureMeasurementLimits.measurementType);
@@ -133,5 +132,3 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasurementLimits)
         ASSERT_FALSE(accuracyRange.fixedTypical.HasValue());
     }
 }
-
-} // namespace
