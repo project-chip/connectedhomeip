@@ -74,8 +74,8 @@ public:
     void SetUp() override
     {
         AppContext::SetUp();
-        mOldProvider =
-            chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&chip::TestDataModel::DispatchTestDataModel::Instance());
+        mOldProvider = chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(
+            &chip::TestDataModel::DispatchTestDataModel::Instance());
         factoryInitParams.listenPort               = 88;
         factoryInitParams.fabricTable              = nullptr;
         factoryInitParams.fabricIndependentStorage = &factoryStorage;
@@ -130,7 +130,8 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
 
     // Initialize the ember side server logic
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
 
     // Set initials params of factoryInitParams
     factoryInitParams.sessionKeystore   = &keystore;
