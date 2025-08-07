@@ -167,37 +167,49 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'Step #1.0 - DUT/TH1 FabricID: {th1_fabric_id}')              # FabricID = 1
 
         # ------------------------------------------------------------------------------------
-        # Step # 1.1 - Commissioning TH2 (OTA Provider) using TH1 controller
+        # Step 1.1 - Setup TH2 (Provider) in same fabric
         # ------------------------------------------------------------------------------------
 
         # Setup TH2 controller (Provider)
         # 1.1 Establishing TH2 controller - TH2, NodeID=1, Fabric=1
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=th1.fabricId)
-        th2 = th2_fabric_admin.NewController(nodeId=1, useTestCommissioner=True)
+        th2_node_id = 1
+        th2 = th2_fabric_admin.NewController(nodeId=th2_node_id, useTestCommissioner=True)
         th2_fabric_id = th2.fabricId
-        th2_node_id = th2.nodeId
 
         logger.info(f'Step #1.1 - TH2 (Provider) NodeID: {th2_node_id}')           # NodeID = 1
         logger.info(f'Step #1.1 - TH2 (Provider) FabricID: {th2_fabric_id}')       # FabricID = 1
+
+        # ------------------------------------------------------------------------------------
+        # Step 1.2 - Open commissioning window on DUT (via TH1)
+        # ------------------------------------------------------------------------------------
 
         params = await self.open_commissioning_window(th1, th1_node_id)
         setup_pin_code = params.commissioningParameters.setupPinCode
         long_discriminator = params.randomDiscriminator
         # setup_qr_code = params.commissioningParameters.setupQRCode
-        logger.info(f'Step #1.1: Commissioning window opened: {vars(params)}')
+        logger.info(f'Step #1.2: Commissioning window opened: {vars(params)}')
 
-        logger.info('Step #1.1 - Commissioning DUT with TH3...')
+        # ------------------------------------------------------------------------------------
+        # Step # 1.3 - Commissioning TH2 (OTA Provider) using TH1 controller
+        # ------------------------------------------------------------------------------------
+
+        logger.info('Step #1.3 - Commissioning DUT with TH2')
         resp = await th2.CommissionOnNetwork(
             nodeId=th2_node_id,
             setupPinCode=setup_pin_code,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=long_discriminator)
-        logger.info(f'Step #1.1 - TH2 Commissioning response: {resp}')
+        logger.info(f'Step #1.3 - TH2 Commissioning response: {resp}')
 
         # ------------------------------------------------------------------------------------
-        # Step # 1.1 - Check Fabrics
+        # Step # 1.4 - Check Fabrics
         # ------------------------------------------------------------------------------------
+
+        cluster = Clusters.Objects.OperationalCredentials
+        attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
+        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th1, endpoint=0, cluster=cluster, attribute=attribute)
 
         # Read TH1 fabrics
         th1_fabrics = await th1.ReadAttribute(
@@ -205,7 +217,11 @@ class TC_SU_2_2(MatterBaseTest):
             attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True
         )
-        logger.info(f"Step #1.1 - TH1 Fabrics: {th1_fabrics[0]}")
+        # logger.info(f"Step #1.4 - TH1 Fabrics: {th1_fabrics[0]}")
+        th1_fabric_data = list(th1_fabrics[0].values())[0]  # Obtiene el objeto OperationalCredentials
+        for f in th1_fabric_data.fabrics:
+            logger.info(
+                f"Step #1.4 - TH1 Fabric -> FabricID: {f.fabricID}, NodeID: {f.nodeID}, VendorID: {f.vendorID}, FabricIndex: {f.fabricIndex}")
 
         # Read TH2 fabrics
         th2_fabrics = await th2.ReadAttribute(
@@ -213,10 +229,14 @@ class TC_SU_2_2(MatterBaseTest):
             attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True
         )
-        logger.info(f"Step #1.1 - TH2 Fabrics: {th2_fabrics[0]}")
+        # logger.info(f"Step #1.4 - TH2 Fabrics: {th2_fabrics[0]}")
+        th2_fabric_data = list(th2_fabrics[0].values())[0]
+        for f in th2_fabric_data.fabrics:
+            logger.info(
+                f"Step #1.4 - TH2 Fabric -> FabricID: {f.fabricID}, NodeID: {f.nodeID}, VendorID: {f.vendorID}, FabricIndex: {f.fabricIndex}")
 
         # ------------------------------------------------------------------------------------
-        # Step #1.2 - Read the current OTA providers on the DUT (TH1),
+        # Step #1.5 - Read the current OTA providers on the DUT (TH1),
         # create a ProviderLocation structure pointing to TH2 as the OTA provider,
         # and write this updated provider list back to the DUT (TH1)
         # ------------------------------------------------------------------------------------
@@ -226,7 +246,7 @@ class TC_SU_2_2(MatterBaseTest):
             dev_ctrl=th1,
             cluster=self.cluster_otar,
             attribute=self.cluster_otar.Attributes.DefaultOTAProviders)
-        logger.info(f'Step #1.2 - Read actaul DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
+        logger.info(f'Step #1.5 - Read actaul DefaultOTAProviders value on DUT (TH1): {actual_otap_info}')
 
         # Create the ProviderLocation struct for TH2 (the OTA Provider) (NodeID=1, Fabric=1)
         provider_th2_for_fabric1 = self.cluster_otar.Structs.ProviderLocation(
@@ -234,23 +254,23 @@ class TC_SU_2_2(MatterBaseTest):
             endpoint=0,
             fabricIndex=th1.fabricId           # FabricId from TH1 (the DUT)
         )
-        logger.info(f'Step #1.2 - ProviderLocation to write: {provider_th2_for_fabric1}')
+        logger.info(f'Step #1.5 - ProviderLocation to write: {provider_th2_for_fabric1}')
 
         # Create the DefaultOTAProviders attribute with the OTA provider list
         attr = self.cluster_otar.Attributes.DefaultOTAProviders(value=[provider_th2_for_fabric1])
-        logger.info(f'Step #1.2 - Attribute to write: {attr}')
+        logger.info(f'Step #1.5 - Attribute to write: {attr}')
 
         # Write the DefaultOTAProviders attribute to the DUT (TH1)
         resp = await th1.WriteAttribute(
             attributes=[(0, attr)],
             nodeid=th1_node_id,
         )
-        logger.info(f'Step #1.2 - Write DefaultOTAProviders response: {resp}')
+        logger.info(f'Step #1.5 - Write DefaultOTAProviders response: {resp}')
         # Verify write succeeded (response code 0)
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
 
         # ------------------------------------------------------------------------------------
-        # Step # 1.3 - ACLs on DUT (TH1) to allow access from Provider (TH2)
+        # Step # 1.6 - ACLs on DUT (TH1) to allow access from Provider (TH2)
         # ------------------------------------------------------------------------------------
 
         # TH1: Requestor (DUT)
@@ -294,11 +314,7 @@ class TC_SU_2_2(MatterBaseTest):
         # Group all three ACL entries and write them on TH1 (DUT)
         acls_on_th1 = [acl_admin_provider, acl_view_provider, acl_operate_provider]
         resp = await self.write_acl(th1, th1_node_id, acls_on_th1)
-        logger.info(f'Step #1.3 - Wrote ACLs on DUT (TH1) to allow access from Provider (TH2): {resp}')
-
-        # # Read ACL
-        # acls_read_th1 = await self.read_acl(th1)
-        # logger.info(f'Step #1.3 - ACLs on TH1 after write: {acls_read_th1}')
+        logger.info(f'Step #1.6 - Wrote ACLs on DUT (TH1) to allow access from Provider (TH2): {resp}')
 
         # ACL on TH2 to allow TH1 to operate OTA Provider cluster and view attributes
 
@@ -335,16 +351,13 @@ class TC_SU_2_2(MatterBaseTest):
         # Group all ACL entries and write them on TH2 (Provider)
         acls_on_th2 = [acl_admin_requestor, acl_view_requestor, acl_operate_requestor]
         resp = await self.write_acl(th2, th2_node_id, acls_on_th2)
-        logger.info(f'Step #1.3 - Wrote ACLs on Provider (TH2) to allow access from DUT (TH1): {resp}')
-        # # Read ACL
-        # acls_read_th2 = await self.read_acl(th2)
-        # logger.info(f"Step #1.3 - ACLs on TH2 after write: {acls_read_th2}")
+        logger.info(f'Step #1.6 - Wrote ACLs on Provider (TH2) to allow access from DUT (TH1): {resp}')
 
         # ------------------------------------------------------------------------------------
-        # Step # 1.4 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT/Requestor)
+        # Step # 1.7 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT/Requestor)
         # ------------------------------------------------------------------------------------
 
-        logger.info("Step #1.4 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT)")
+        logger.info("Step #1.7 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT)")
         cmd = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=th2.nodeId,
             vendorID=0xFFF1,
@@ -352,17 +365,18 @@ class TC_SU_2_2(MatterBaseTest):
             metadataForNode=None,
             endpoint=0
         )
-        logger.info(f"Step #1.4 - cmd AnnounceOTAProvider: {cmd}")
+        logger.info(f"Step #1.7 - cmd AnnounceOTAProvider: {cmd}")
 
-        logger.info(f'Step #1.4 - Sending AnnounceOTAProvider to node: {th1_node_id}, should be: {self.dut_node_id}')
+        logger.info(f'Step #1.7 - Sending AnnounceOTAProvider to node: {th1_node_id}, should be: {self.dut_node_id}')
         resp = await self.send_single_cmd(
             dev_ctrl=th2,
             node_id=self.dut_node_id,
             cmd=cmd
         )
-        logger.info(f"Step #1.4 - Sent AnnounceOTAProvider to DUT, response: {resp}")
+        logger.info(f"Step #1.7 - Sent AnnounceOTAProvider to DUT, response: {resp}")
 
-        # # TODO: Need to make it work from here
+
+        # # # TODO: Need to make it work from here
         # logger.info("Step #1.5 - ArmFailSafe")
         # cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(
         #     expiryLengthSeconds=60,
