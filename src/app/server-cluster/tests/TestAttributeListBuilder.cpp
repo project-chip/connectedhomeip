@@ -15,6 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/MetadataTypes.h"
+#include "app/server-cluster/OptionalAttributes.h"
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -54,7 +56,7 @@ TEST_F(TestAttributeListBuilder, Append)
         };
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(AttributeListBuilder(builder).Append(Span(mandatory), {}), CHIP_NO_ERROR);
+        ASSERT_EQ(AttributeListBuilder(builder).Append(Span(mandatory), {}, {}), CHIP_NO_ERROR);
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
@@ -69,13 +71,15 @@ TEST_F(TestAttributeListBuilder, Append)
         const AttributeEntry optional2_meta(11, kNoFlags, Access::Privilege::kView, std::nullopt);
         const AttributeEntry optional3_meta(12, kNoFlags, Access::Privilege::kView, std::nullopt);
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-            { .enabled = true, .metadata = optional1_meta },
-            { .enabled = false, .metadata = optional2_meta },
-            { .enabled = true, .metadata = optional3_meta },
+        const AttributeEntry optionalEntries[] = {
+            optional1_meta,
+            optional2_meta,
+            optional3_meta,
         };
-        ASSERT_EQ(AttributeListBuilder(builder).Append({}, Span(optionalEntries)), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AttributeEntry> builder;
+        ASSERT_EQ(AttributeListBuilder(builder).Append({}, Span(optionalEntries), AttributeBits().ForceSet<10>().ForceSet<12>()),
+                  CHIP_NO_ERROR);
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
@@ -93,11 +97,12 @@ TEST_F(TestAttributeListBuilder, Append)
         const AttributeEntry optional2_meta(11, kNoFlags, Access::Privilege::kView, std::nullopt);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
-        const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-            { .enabled = true, .metadata = optional1_meta },
-            { .enabled = false, .metadata = optional2_meta },
+        const AttributeEntry optionalEntries[] = {
+            optional1_meta,
+            optional2_meta,
         };
-        ASSERT_EQ(AttributeListBuilder(builder).Append(Span(mandatory), Span(optionalEntries)), CHIP_NO_ERROR);
+        ASSERT_EQ(AttributeListBuilder(builder).Append(Span(mandatory), Span(optionalEntries), AttributeBits().ForceSet<10>()),
+                  CHIP_NO_ERROR);
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
@@ -109,7 +114,7 @@ TEST_F(TestAttributeListBuilder, Append)
     // No attributes
     {
         ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(AttributeListBuilder(builder).Append({}, {}), CHIP_NO_ERROR);
+        ASSERT_EQ(AttributeListBuilder(builder).Append({}, {}, {}), CHIP_NO_ERROR);
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
         ASSERT_EQ(result.size(), global_attribute_count);

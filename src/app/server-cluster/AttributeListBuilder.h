@@ -16,11 +16,10 @@
  */
 #pragma once
 
+#include "OptionalAttributes.h"
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
-
-#include <initializer_list>
 
 namespace chip {
 namespace app {
@@ -38,24 +37,14 @@ class AttributeListBuilder
 public:
     AttributeListBuilder(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) : mBuilder(builder) {}
 
-    struct OptionalAttributeEntry
-    {
-        bool enabled;                               // Is this optional attribute enabled?
-        const DataModel::AttributeEntry & metadata; // Metadata for the attribute
-    };
-
-    /// Appends the given attributes to the builder.
-    ///
-    /// It is very common to have a set of mandatory and a set of optional attributes for a
-    /// cluster. This method allows for a single call to set up all of the given attributes in `builder`:
-    ///   - mandatoryAttributes
-    ///   - optionalAttributes IF AND ONLY IF they are enabled
-    ///   - all of `GlobalAttributes()`
+    /// appends the given attributes to the builder.
+    /// Optional attributes are only appended if the given `enabledOptionalAttributes` has them set
     CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                      Span<const OptionalAttributeEntry> optionalAttributes);
+                      Span<const DataModel::AttributeEntry> optionalAttributes, const AttributeBits & enabledOptionalAttributes);
 
 private:
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & mBuilder;
+
 };
 
 } // namespace app

@@ -143,7 +143,7 @@ CHIP_ERROR WebRTCTransportProviderServer::Attributes(const ConcreteClusterPath &
                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryAttributes), Span<AttributeListBuilder::OptionalAttributeEntry>());
+    return listBuilder.Append(Span(kMandatoryAttributes), {}, {});
 }
 
 // Helper functions

@@ -18,24 +18,28 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributes.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/GeneralFaults.h>
 
+namespace chip::app {
+
+ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, TotalOperationalHours);
+ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, BootReason);
+ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, ActiveHardwareFaults);
+ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, ActiveRadioFaults);
+ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, ActiveNetworkFaults);
+
+// NOTE: Uptime is optional in the XML, however mandatory since revision 2.
+
+} // namespace chip::app
+
 namespace chip {
 namespace app {
 namespace Clusters {
-
-struct GeneralDiagnosticsEnabledAttributes
-{
-    bool enableTotalOperationalHours : 1;
-    bool enableBootReason : 1;
-    bool enableActiveHardwareFaults : 1;
-    bool enableActiveRadioFaults : 1;
-    bool enableActiveNetworkFaults : 1;
-};
 
 struct GeneralDiagnosticsFunctionsConfig
 {
@@ -46,8 +50,11 @@ struct GeneralDiagnosticsFunctionsConfig
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    GeneralDiagnosticsCluster(const GeneralDiagnosticsEnabledAttributes & enabledAttributes) :
-        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), mEnabledAttributes(enabledAttributes)
+    GeneralDiagnosticsCluster(const ClusterAttributeBits<GeneralDiagnostics::Id> & enabledAttributes) :
+        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
+        mEnabledAttributes(AttributeBits(enabledAttributes)
+                               // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
+                               .ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -118,17 +125,16 @@ public:
     }
 
 private:
-    const GeneralDiagnosticsEnabledAttributes mEnabledAttributes;
+    const AttributeBits mEnabledAttributes;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
-    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsEnabledAttributes & enabledAttributes,
+    GeneralDiagnosticsClusterFullConfigurable(const ClusterAttributeBits<GeneralDiagnostics::Id> & enabledAttributes,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(enabledAttributes),
-        mFunctionConfig(functionsConfig)
+        GeneralDiagnosticsCluster(enabledAttributes), mFunctionConfig(functionsConfig)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,

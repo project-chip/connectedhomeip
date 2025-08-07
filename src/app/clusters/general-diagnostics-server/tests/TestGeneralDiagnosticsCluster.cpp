@@ -33,6 +33,7 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using namespace chip::app::DataModel;
 
 template <class T>
@@ -64,13 +65,7 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
-    const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableTotalOperationalHours = false,
-        .enableBootReason            = false,
-        .enableActiveHardwareFaults  = false,
-        .enableActiveRadioFaults     = false,
-        .enableActiveNetworkFaults   = false,
-    };
+    const ClusterAttributeBits<GeneralDiagnostics::Id> enabledAttributes;
 
     GeneralDiagnosticsCluster cluster(enabledAttributes);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -92,13 +87,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         class NullProvider : public DeviceLayer::DiagnosticDataProvider
         {
         };
-        const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-            .enableTotalOperationalHours = false,
-            .enableBootReason            = false,
-            .enableActiveHardwareFaults  = false,
-            .enableActiveRadioFaults     = false,
-            .enableActiveNetworkFaults   = false,
-        };
+        const ClusterAttributeBits<GeneralDiagnostics::Id> enabledAttributes;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
         GeneralDiagnosticsCluster cluster(enabledAttributes);
 
@@ -179,13 +168,12 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         };
 
         // Enable all the optional attributes
-        const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-            .enableTotalOperationalHours = true,
-            .enableBootReason            = true,
-            .enableActiveHardwareFaults  = true,
-            .enableActiveRadioFaults     = true,
-            .enableActiveNetworkFaults   = true,
-        };
+        const ClusterAttributeBits<GeneralDiagnostics::Id> enabledAttributes = ClusterAttributeBits<GeneralDiagnostics::Id>()
+                                                                                   .Set<TotalOperationalHours::Id>(true)
+                                                                                   .Set<BootReason::Id>(true)
+                                                                                   .Set<ActiveHardwareFaults::Id>(true)
+                                                                                   .Set<ActiveRadioFaults::Id>(true)
+                                                                                   .Set<ActiveNetworkFaults::Id>(true);
 
         ScopedDiagnosticsProvider<AllProvider> nullProvider;
         GeneralDiagnosticsCluster cluster(enabledAttributes);

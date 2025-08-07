@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/server-cluster/OptionalAttributes.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
@@ -41,7 +42,7 @@ namespace Clusters {
 class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public SoftwareDiagnostics::SoftwareFaultListener
 {
 public:
-    SoftwareDiagnosticsServerCluster(const SoftwareDiagnosticsEnabledAttributes & enabledAttributes) :
+    SoftwareDiagnosticsServerCluster(const ClusterAttributeBits<SoftwareDiagnostics::Id> & enabledAttributes) :
         DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(enabledAttributes)
     {}
 
