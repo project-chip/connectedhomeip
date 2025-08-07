@@ -160,7 +160,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
         .provider           = *this,
         .storage            = *mPersistentStorageDelegate,
         .attributeStorage   = *GetAttributePersistenceProvider(), // guaranteed set up by the above logic
-        .interactionContext = *mContext,
+        .interactionContext = *mContext,                          // NOLINT(bugprone-unchecked-optional-access): emplaced above
     });
 }
 
