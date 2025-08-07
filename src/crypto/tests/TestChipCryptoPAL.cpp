@@ -2942,6 +2942,8 @@ TEST_F(TestChipCryptoPAL, TestVIDPID_x509Extraction)
         // VID and PID not present cases:
         { sTestCert_PAA_NoVID_Cert, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
         { kOpCertNoVID, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
+        { ByteSpan(), false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_ERROR_INVALID_ARGUMENT },
+
     };
 
     for (const auto & testCase : kTestCases)

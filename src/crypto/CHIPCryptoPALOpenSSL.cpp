@@ -2273,9 +2273,9 @@ CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSp
 
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
-    ASN1_OBJECT * commonNameObj = OBJ_txt2obj("2.5.4.3", 1);
-    ASN1_OBJECT * matterVidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
-    ASN1_OBJECT * matterPidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
+    ASN1_OBJECT * commonNameObj = nullptr;
+    ASN1_OBJECT * matterVidObj  = nullptr;
+    ASN1_OBJECT * matterPidObj  = nullptr;
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     X509 * x509certificate             = nullptr;
@@ -2284,7 +2284,11 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     int x509EntryCountIdx              = 0;
     AttestationCertVidPid vidpidFromCN;
 
-    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!certificate.empty() && CanCastTo<long>(certificate.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    commonNameObj = OBJ_txt2obj("2.5.4.3", 1);
+    matterVidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
+    matterPidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
 
     x509certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
