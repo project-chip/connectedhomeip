@@ -690,8 +690,11 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommand)
     reader.Init(buffer->Start(), buffer->DataLength());
     DataModel::InvokeRequest request = { .path = ConcreteCommandPath(1, 10, 1) };
     auto result                      = mProvider.InvokeCommand(request, reader, nullptr);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_NO_ERROR);
+    EXPECT_TRUE(result.has_value());
+    if (result.has_value())
+    {
+        EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_NO_ERROR);
+    }
     EXPECT_EQ(testCluster.mLastInvokeRequest.path, request.path);
 }
 
@@ -784,9 +787,9 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
 
     ConcreteAttributePath path(1, 10, 1);
     mProvider.ListAttributeWriteNotification(path, DataModel::ListWriteOperation::kListWriteSuccess);
-    EXPECT_TRUE(testCluster.mLastListWriteOpPath.has_value());
+    ASSERT_TRUE(testCluster.mLastListWriteOpPath.has_value());
     EXPECT_EQ(testCluster.mLastListWriteOpPath.value(), path);
-    EXPECT_TRUE(testCluster.mLastListWriteOpType.has_value());
+    ASSERT_TRUE(testCluster.mLastListWriteOpType.has_value());
     EXPECT_EQ(testCluster.mLastListWriteOpType.value(), DataModel::ListWriteOperation::kListWriteSuccess);
 }
 
@@ -872,7 +875,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
 
     DataModel::InvokeRequest requestUnsupportedEndpoint = { .path = ConcreteCommandPath(5, 10, 1) };
     auto result                                         = mProvider.InvokeCommand(requestUnsupportedEndpoint, reader, nullptr);
-    EXPECT_TRUE(result.has_value());
+    ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
 }
 
@@ -890,7 +893,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
 
     DataModel::InvokeRequest requestUnsupportedCluster = { .path = ConcreteCommandPath(1, 99, 1) };
     auto result                                        = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
-    EXPECT_TRUE(result.has_value());
+    ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
 }
 
