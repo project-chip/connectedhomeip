@@ -204,6 +204,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
     // Free opCertStore and engine before finish
     opCertStore.Finish();
     engine->Shutdown();
+    sProvider.Finish();
 }
 
 // Add more test cases as needed to cover different scenarios
