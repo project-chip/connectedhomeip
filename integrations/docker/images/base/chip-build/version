@@ -1,1 +1,1 @@
-145 : [Silabs] Fixing Silabs Docker with latest SDKs
+158 : [Android] Fix android NDK path in vscode image

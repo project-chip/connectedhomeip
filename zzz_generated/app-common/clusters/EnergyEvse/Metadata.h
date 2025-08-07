@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -114,6 +115,19 @@ namespace SessionEnergyDischarged {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SessionEnergyDischarged::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SessionEnergyDischarged
+constexpr std::array<DataModel::AttributeEntry, 10> kMandatoryMetadata = {
+    State::kMetadataEntry,
+    SupplyState::kMetadataEntry,
+    FaultState::kMetadataEntry,
+    ChargingEnabledUntil::kMetadataEntry,
+    CircuitCapacity::kMetadataEntry,
+    MinimumChargeCurrent::kMetadataEntry,
+    MaximumChargeCurrent::kMetadataEntry,
+    SessionID::kMetadataEntry,
+    SessionDuration::kMetadataEntry,
+    SessionEnergyCharged::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -155,6 +169,28 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace ClearTargets
 
 } // namespace Commands
+
+namespace Events {
+namespace EVConnected {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EVConnected
+namespace EVNotDetected {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EVNotDetected
+namespace EnergyTransferStarted {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EnergyTransferStarted
+namespace EnergyTransferStopped {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EnergyTransferStopped
+namespace Fault {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Fault
+namespace RFID {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RFID
+
+} // namespace Events
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -75,6 +76,12 @@ namespace StartUpCurrentLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpCurrentLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace StartUpCurrentLevel
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    CurrentLevel::kMetadataEntry,
+    Options::kMetadataEntry,
+    OnLevel::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -117,6 +124,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace MoveToClosestFrequency
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace LevelControl
 } // namespace Clusters
 } // namespace app

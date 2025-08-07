@@ -29,6 +29,9 @@
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/DataModelHandler.h>
@@ -37,9 +40,6 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -106,12 +106,11 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
         BitFlags<DataModel::AttributeQualityFlags>{}
             .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
             .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
-        RequiredPrivilege::ForReadAttribute(attributePath),
-        attribute.IsReadOnly() ? std::nullopt : std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)));
+        attribute.IsReadable() ? std::make_optional(RequiredPrivilege::ForReadAttribute(attributePath)) : std::nullopt,
+        attribute.IsWritable() ? std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)) : std::nullopt);
 
     // NOTE: we do NOT provide additional info for:
-    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
-    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
+    //    - IsExternal/IsAutomaticallyPersisted is not used by IM handling
     //    - Several specification flags are not available (reportable, quieter reporting,
     //      fixed, source attribution)
 
@@ -164,6 +163,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     return mRegistry.SetContext(ServerClusterContext{
         .provider           = this,
         .storage            = mPersistentStorageDelegate,
+        .attributeStorage   = GetAttributePersistenceProvider(),
         .interactionContext = &mContext,
     });
 }
@@ -279,7 +279,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     //
     // To allow cluster implementations to be incrementally converted to storing their own data versions,
     // instead of relying on the out-of-band emberAfDataVersionStorage, first check for clusters that are
-    // using the new data version storage and are registered via ServerClusterInterfaceRegistry, then fill
+    // using the new data version storage and are registered via SingleEndpointServerClusterRegistry, then fill
     // in the data versions for the rest via the out-of-band mechanism.
 
     // assume the clusters on endpoint does not change in between these two loops

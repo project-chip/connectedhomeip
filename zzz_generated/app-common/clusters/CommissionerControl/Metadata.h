@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -24,6 +25,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedDeviceCategor
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kManage,
                                                           std::nullopt);
 } // namespace SupportedDeviceCategories
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    SupportedDeviceCategories::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -38,6 +43,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CommissionNode::
 } // namespace CommissionNode
 
 } // namespace Commands
+
+namespace Events {
+namespace CommissioningRequestResult {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kManage };
+} // namespace CommissioningRequestResult
+
+} // namespace Events
 } // namespace CommissionerControl
 } // namespace Clusters
 } // namespace app

@@ -40,13 +40,14 @@ import random
 import tempfile
 from configparser import ConfigParser
 
-import chip.clusters as Clusters
-import chip.tlv
-from chip import CertificateAuthority
-from chip.storage import PersistentStorage
-from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.tlv
+from matter import CertificateAuthority
+from matter.storage import PersistentStorage
+from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_JCM_1_1(MatterBaseTest):
@@ -123,7 +124,8 @@ class TC_JCM_1_1(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -182,7 +184,8 @@ class TC_JCM_1_1(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -284,7 +287,7 @@ class TC_JCM_1_1(MatterBaseTest):
             nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFD0001) in JF-Admin NOC on Ecoystem A
-        noc_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
+        noc_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
         _admin_cat_found = False
         _anchor_cat_found = False
         for _tag, _value in noc_tlv_data['Any'][6]:
@@ -297,7 +300,7 @@ class TC_JCM_1_1(MatterBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
         asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
         # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
-        icac_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
+        icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
         _found = False
         for _tag, _value in icac_tlv_data['Any'][6]:
             if _tag == 8 and _value == 'jf-anchor-icac':
@@ -308,7 +311,7 @@ class TC_JCM_1_1(MatterBaseTest):
             nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFD0001) in JF-Admin NOC on Ecoystem A
-        noc_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
+        noc_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
         _admin_cat_found = False
         _anchor_cat_found = False
         for _tag, _value in noc_tlv_data['Any'][6]:
@@ -321,7 +324,7 @@ class TC_JCM_1_1(MatterBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
         asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
         # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
-        icac_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
+        icac_tlv_data = matter.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
         _found = False
         for _tag, _value in icac_tlv_data['Any'][6]:
             if _tag == 8 and _value == 'jf-anchor-icac':
@@ -396,6 +399,10 @@ class TC_JCM_1_1(MatterBaseTest):
             int('0xFFFFFFFD'+self.ecoBCATs, 16),
             response[0][Clusters.AccessControl].acl[0].subjects[0],
             "EcoA Server App Subjects field has wrong value")
+
+        # Shutdown the Python Controllers started at the beginning of this script
+        devCtrlEcoA.Shutdown()
+        devCtrlEcoB.Shutdown()
 
 
 if __name__ == "__main__":

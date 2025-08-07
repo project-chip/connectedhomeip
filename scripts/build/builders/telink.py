@@ -16,7 +16,6 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
-from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -120,8 +119,11 @@ class TelinkBoard(Enum):
     TLSR9528A = auto()
     TLSR9528A_RETENTION = auto()
     TL3218X = auto()
+    TL3218X_ML3M = auto()
     TL3218X_RETENTION = auto()
     TL7218X = auto()
+    TL7218X_ML7G = auto()
+    TL7218X_ML7M = auto()
     TL7218X_RETENTION = auto()
 
     def GnArgName(self):
@@ -135,10 +137,16 @@ class TelinkBoard(Enum):
             return 'tlsr9528a_retention'
         elif self == TelinkBoard.TL3218X:
             return 'tl3218x'
+        elif self == TelinkBoard.TL3218X_ML3M:
+            return 'tl3218x_ml3m'
         elif self == TelinkBoard.TL3218X_RETENTION:
             return 'tl3218x_retention'
         elif self == TelinkBoard.TL7218X:
             return 'tl7218x'
+        elif self == TelinkBoard.TL7218X_ML7G:
+            return 'tl7218x_ml7g'
+        elif self == TelinkBoard.TL7218X_ML7M:
+            return 'tl7218x_ml7m'
         elif self == TelinkBoard.TL7218X_RETENTION:
             return 'tl7218x_retention'
         else:

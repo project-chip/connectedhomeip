@@ -42,14 +42,16 @@ import typing
 from dataclasses import dataclass
 from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipUtility
-from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipUtility
+from matter.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing import matter_asserts
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +135,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         return steps
 
     async def _get_command_status(self, cmd: ClusterCommand):
-        """Return the status of the executed command. By default the status is 0x0 unless a different 
+        """Return the status of the executed command. By default the status is 0x0 unless a different
         status on InteractionModel is returned. For this test we consider the status 0x0 as not succesfull."""
         cmd_status = Status.Success
         try:
@@ -242,7 +244,7 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # Subscribe to Notify Event
         self.step(11)
-        event_callback = EventChangeCallback(Clusters.RefrigeratorAlarm)
+        event_callback = EventSubscriptionHandler(expected_cluster=Clusters.RefrigeratorAlarm)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
                                    self.get_endpoint(1))

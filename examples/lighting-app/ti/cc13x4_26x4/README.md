@@ -34,16 +34,16 @@ the Texas Instruments devices.
 
 ## Device UI
 
-| Action                                           | Functionality                          |
-| ------------------------------------------------ | -------------------------------------- |
-| Left Button (`BTN-1`) Press (less than 1000 ms)  | Light is turned on                     |
-| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                          |
-| Right Button (`BTN-2`) Press (less than 1000 ms) | Light is turned off                    |
-| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)     |
-| Red LED Solid On State                           | Light is turned on                     |
-| Red LED Off State                                | Light is turned off                    |
-| Green LED Blinking State                         | Identify Trigger Effect in progress    |
-| Green LED Off State                              | No Identify Trigger Effect in progress |
+| Action                                           | Functionality                             |
+| ------------------------------------------------ | ----------------------------------------- |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | Light is turned on                        |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                             |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Light is turned off                       |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | Matter BLE Advertisement (Enable/Disable) |
+| Red LED Solid On State                           | Light is turned on                        |
+| Red LED Off State                                | Light is turned off                       |
+| Green LED Blinking State                         | Identify Trigger Effect in progress       |
+| Green LED Off State                              | No Identify Trigger Effect in progress    |
 
 When the device has LIT ICD functionality and DSLS functionality enabled
 (`chip_enable_icd_lit` and `chip_enable_icd_dsls` set to true in args.gni), the

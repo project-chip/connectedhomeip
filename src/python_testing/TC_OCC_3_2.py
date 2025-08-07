@@ -43,10 +43,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                         await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OCC_3_2(MatterBaseTest):
@@ -114,7 +115,7 @@ class TC_OCC_3_2(MatterBaseTest):
         logging.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
 
         # min interval = 0, and max interval = 30 seconds
-        attrib_listener = ClusterAttributeChangeAccumulator(Clusters.Objects.OccupancySensing)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=Clusters.Objects.OccupancySensing)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
 
         # add Namepiped to assimilate the manual sensor untrigger here
@@ -141,8 +142,8 @@ class TC_OCC_3_2(MatterBaseTest):
                 prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state changed.")
 
         self.step("3d")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
-                                  1], timeout_sec=post_prompt_settle_delay_seconds)
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.Occupancy, sequence=[
+            1], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("4a")
         if attributes.HoldTime.attribute_id not in attribute_list:
@@ -165,8 +166,8 @@ class TC_OCC_3_2(MatterBaseTest):
         await self.write_single_attribute(attributes.HoldTime(hold_time_max))
 
         self.step("4d")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id,
-                                  attribute=cluster.Attributes.HoldTime, sequence=[hold_time_max], timeout_sec=post_prompt_settle_delay_seconds)
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.HoldTime, sequence=[
+                                                  hold_time_max], timeout_sec=post_prompt_settle_delay_seconds)
 
 
 if __name__ == "__main__":
