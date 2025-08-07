@@ -44,7 +44,7 @@ void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    gServer.Create(ClusterAttributeBits<SoftwareDiagnosticsLogic>()
+    gServer.Create(SupportedAttributes<SoftwareDiagnosticsLogic>()
                        .Set<ThreadMetrics::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, ThreadMetrics::Id))
                        .Set<CurrentHeapFree::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapFree::Id))
                        .Set<CurrentHeapUsed::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapUsed::Id))

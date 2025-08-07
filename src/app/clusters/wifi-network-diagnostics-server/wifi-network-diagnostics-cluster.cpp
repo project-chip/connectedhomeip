@@ -33,13 +33,13 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 // our internal implementation
 namespace chip::app {
 
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, BeaconLostCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, OverrunCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, BeaconRxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketMulticastRxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketUnicastRxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketMulticastTxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketUnicastTxCount);
+MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, BeaconLostCount);
+MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, OverrunCount);
+MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, BeaconRxCount);
+MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketMulticastRxCount);
+MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketUnicastRxCount);
+MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketMulticastTxCount);
+MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketUnicastTxCount);
 
 } // namespace chip::app
 
@@ -129,7 +129,7 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
         CurrentMaxRate::kMetadataEntry,         //
     };
 
-    ClusterAttributeBits<WiFiDiagnosticsServerLogic> enabledAttributes(mLogic.GetEnabledAttributes());
+    SupportedAttributes<WiFiDiagnosticsServerLogic> enabledAttributes(mLogic.GetEnabledAttributes());
 
     if (featureFlags.Has(Feature::kErrorCounts))
     {

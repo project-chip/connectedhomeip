@@ -29,10 +29,10 @@ namespace Clusters {
 class SoftwareDiagnosticsLogic;
 };
 
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, ThreadMetrics);
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapFree);
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapUsed);
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapHighWatermark);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, ThreadMetrics);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapFree);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapUsed);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapHighWatermark);
 
 } // namespace chip::app
 
@@ -44,7 +44,7 @@ namespace Clusters {
 class SoftwareDiagnosticsLogic
 {
 public:
-    SoftwareDiagnosticsLogic(const ClusterAttributeBits<SoftwareDiagnosticsLogic> & enabledAttributes) :
+    SoftwareDiagnosticsLogic(const SupportedAttributes<SoftwareDiagnosticsLogic> & enabledAttributes) :
         mEnabledAttributes(enabledAttributes)
     {}
     virtual ~SoftwareDiagnosticsLogic() = default;
@@ -79,7 +79,7 @@ public:
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
 private:
-    const AttributeBits mEnabledAttributes;
+    const AttributeSet mEnabledAttributes;
 };
 
 } // namespace Clusters

@@ -40,7 +40,7 @@ public:
     /// appends the given attributes to the builder.
     /// Optional attributes are only appended if the given `enabledOptionalAttributes` has them set
     CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
-                      Span<const DataModel::AttributeEntry> optionalAttributes, const AttributeBits & enabledOptionalAttributes);
+                      Span<const DataModel::AttributeEntry> optionalAttributes, const AttributeSet & enabledOptionalAttributes);
 
 private:
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & mBuilder;

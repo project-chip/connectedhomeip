@@ -29,7 +29,7 @@ namespace Clusters {
 class WiFiDiagnosticsServerLogic;
 } // namespace Clusters
 
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, CurrentMaxRate);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, CurrentMaxRate);
 
 } // namespace chip::app
 
@@ -39,10 +39,10 @@ class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                               const ClusterAttributeBits<WiFiDiagnosticsServerLogic> & enabledAttributes,
+                               const SupportedAttributes<WiFiDiagnosticsServerLogic> & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes),
-        mFeatureFlags(featureFlags)
+        mEndpointId(endpointId),
+        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }
@@ -90,12 +90,12 @@ public:
     // Getter methods for private members
     EndpointId GetEndpointId() const { return mEndpointId; }
     const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
-    const AttributeBits & GetEnabledAttributes() const { return mEnabledAttributes; }
+    const AttributeSet & GetEnabledAttributes() const { return mEnabledAttributes; }
 
 private:
     EndpointId mEndpointId;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
-    const AttributeBits mEnabledAttributes;
+    const AttributeSet mEnabledAttributes;
     const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
 };
 

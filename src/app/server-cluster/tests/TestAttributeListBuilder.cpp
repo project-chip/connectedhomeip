@@ -78,7 +78,7 @@ TEST_F(TestAttributeListBuilder, Append)
         };
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(AttributeListBuilder(builder).Append({}, Span(optionalEntries), AttributeBits().ForceSet<10>().ForceSet<12>()),
+        ASSERT_EQ(AttributeListBuilder(builder).Append({}, Span(optionalEntries), AttributeSet().ForceSet<10>().ForceSet<12>()),
                   CHIP_NO_ERROR);
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
@@ -101,7 +101,7 @@ TEST_F(TestAttributeListBuilder, Append)
             optional1_meta,
             optional2_meta,
         };
-        ASSERT_EQ(AttributeListBuilder(builder).Append(Span(mandatory), Span(optionalEntries), AttributeBits().ForceSet<10>()),
+        ASSERT_EQ(AttributeListBuilder(builder).Append(Span(mandatory), Span(optionalEntries), AttributeSet().ForceSet<10>()),
                   CHIP_NO_ERROR);
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();

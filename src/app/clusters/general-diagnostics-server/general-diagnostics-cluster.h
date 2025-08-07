@@ -32,11 +32,11 @@ class GeneralDiagnosticsCluster;
 
 } // namespace Clusters
 
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, TotalOperationalHours);
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, BootReason);
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveHardwareFaults);
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveRadioFaults);
-ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveNetworkFaults);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, TotalOperationalHours);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, BootReason);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveHardwareFaults);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveRadioFaults);
+MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveNetworkFaults);
 
 // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
 } // namespace chip::app
@@ -54,9 +54,9 @@ struct GeneralDiagnosticsFunctionsConfig
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    GeneralDiagnosticsCluster(const ClusterAttributeBits<GeneralDiagnosticsCluster> & enabledAttributes) :
+    GeneralDiagnosticsCluster(const SupportedAttributes<GeneralDiagnosticsCluster> & enabledAttributes) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mEnabledAttributes(AttributeBits(enabledAttributes)
+        mEnabledAttributes(AttributeSet(enabledAttributes)
                                // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
                                .ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
     {}
@@ -129,14 +129,14 @@ public:
     }
 
 private:
-    const AttributeBits mEnabledAttributes;
+    const AttributeSet mEnabledAttributes;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
-    GeneralDiagnosticsClusterFullConfigurable(const ClusterAttributeBits<GeneralDiagnosticsCluster> & enabledAttributes,
+    GeneralDiagnosticsClusterFullConfigurable(const SupportedAttributes<GeneralDiagnosticsCluster> & enabledAttributes,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
         GeneralDiagnosticsCluster(enabledAttributes),
         mFunctionConfig(functionsConfig)

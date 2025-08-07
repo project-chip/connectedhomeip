@@ -19,15 +19,15 @@
 #include <lib/core/DataModelTypes.h>
 
 /// Marks the given cluster/attributeid as settable in
-/// `ClusterAttributeBits<cluster>`
+/// `SupportedAttributes<CONTAINER>`
 ///
 /// At this point this is NOT automatic as cluster implementations should
 /// define what optional attributes they support
 ///
 /// This should be in the `namespace chip::app`
-#define ATTRIBUTE_BITS_MARK_OPTIONAL(container, cluster, attribute)                                                                           \
+#define MARK_ATTRIBUTE_SUPPORTED(container, cluster, attribute)                                                                    \
     template <>                                                                                                                    \
-    struct IsOptionalAttribute<container, (Clusters::cluster::Attributes::attribute::Id)>                            \
+    struct IsOptionalAttribute<container, (Clusters::cluster::Attributes::attribute::Id)>                                          \
     {                                                                                                                              \
         static constexpr bool isOptional = true;                                                                                   \
     }
@@ -51,31 +51,31 @@ struct IsOptionalAttribute
 /// by one.
 ///
 /// The implementation of the class generally is a wrapper over a bitset with a
-/// `IsSet()` method. Configurations should use the ClusterAttributeBits<...> class.
-class AttributeBits
+/// `IsSet()` method. Configurations should use the SupportedAttributes<...> class.
+class AttributeSet
 {
 public:
-    AttributeBits()                                        = default;
-    AttributeBits(const AttributeBits & other)             = default;
-    AttributeBits(AttributeBits && other)                  = default;
-    AttributeBits & operator=(const AttributeBits & other) = default;
-    AttributeBits & operator=(AttributeBits && other)      = default;
+    AttributeSet()                                       = default;
+    AttributeSet(const AttributeSet & other)             = default;
+    AttributeSet(AttributeSet && other)                  = default;
+    AttributeSet & operator=(const AttributeSet & other) = default;
+    AttributeSet & operator=(AttributeSet && other)      = default;
 
     constexpr bool IsSet(AttributeId id) const { return (mSetBits & (1u << id)) != 0; }
 
     /// Exposes a "force attribute bit set" without extra validation,
     /// so that clusters can enforce specific bits to be set.
     ///
-    /// This is NOT intended as a generic set, use `ClusterAttributeBits` to configure values.
+    /// This is NOT intended as a generic set, use `SupportedAttributes` to configure values.
     template <AttributeId id>
-    constexpr AttributeBits & ForceSet()
+    constexpr AttributeSet & ForceSet()
     {
         static_assert(id < 32, "Attribute ID must be settable");
         return Set(id, true);
     }
 
 protected:
-    constexpr AttributeBits & Set(AttributeId id, bool value = true)
+    constexpr AttributeSet & Set(AttributeId id, bool value = true)
     {
         if (value)
         {
@@ -92,7 +92,7 @@ private:
     uint32_t mSetBits = 0;
 };
 
-/// A specialization of AttributeBits that provides checked
+/// A specialization of AttributeSet that provides checked
 /// calls to `Set`.
 ///
 /// Specifically it requires that attributes are marked as 'known optional' by cluster
@@ -107,38 +107,38 @@ private:
 ///      class GeneralDiagnosticsCluster;
 ///    } // namespace Clusters
 ///
-///    ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, TotalOperationalHours);
-///    ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, BootReason);
-///    ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveHardwareFaults);
+///    MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, TotalOperationalHours);
+///    MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, BootReason);
+///    MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveHardwareFaults);
 ///    } // namespace chip::app
 ///
 /// After this, one can:
 ///
-///   ClusterAttributeBits<GeneralDiagnosticsCluster>()
+///   SupportedAttributes<GeneralDiagnosticsCluster>()
 ///      .Set<GeneralDiagnostics::Attributes::TotalOperationalHours::Id>()
 ///      .Set<GeneralDiagnostics::Attributes::BootReason::Id>();
 ///
 /// Clusters implementaions then can store a
-///   Constructor(ClusterAttributeBits<...> enabled) : mEnabledAttributes(enabled) {...}
+///   Constructor(SupportedAttributes<...> enabled) : mEnabledAttributes(enabled) {...}
 ///
 /// where:
-///   const AttributeBits mEnabledAttributes;
+///   const AttributeSet mEnabledAttributes;
 ///
 ///
 ///
 template <typename CONTAINER>
-class ClusterAttributeBits : public AttributeBits
+class SupportedAttributes : public AttributeSet
 {
 public:
-    ClusterAttributeBits(const AttributeBits & initialValue) : AttributeBits(initialValue) {}
-    ClusterAttributeBits() = default;
+    SupportedAttributes(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
+    SupportedAttributes() = default;
 
     template <uint32_t ATTRIBUTE_ID>
-    constexpr ClusterAttributeBits & Set(bool value = true)
+    constexpr SupportedAttributes & Set(bool value = true)
     {
         static_assert(ATTRIBUTE_ID < 32, "Cluster attribute bits supports attributes up to 31");
         static_assert(IsOptionalAttribute<CONTAINER, ATTRIBUTE_ID>::isOptional, "attribute MUST be optional");
-        (void) AttributeBits::Set(ATTRIBUTE_ID, value);
+        (void) AttributeSet::Set(ATTRIBUTE_ID, value);
         return *this;
     }
 };
