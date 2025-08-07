@@ -5,7 +5,7 @@
 // It will instatiate all metadata for the selected cluster commands, even unused commands.
 //
 // If used without parameters it will instatiate metadata
-// for all clusters and might inccur a big overhead.
+// for all clusters and might incur a big overhead.
 //
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once

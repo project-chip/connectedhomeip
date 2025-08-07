@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -34,6 +35,9 @@ namespace CurrentChannel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentChannel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentChannel
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 

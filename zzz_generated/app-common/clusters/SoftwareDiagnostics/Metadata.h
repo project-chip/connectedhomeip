@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -39,6 +40,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHeapHighWaterma
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace CurrentHeapHighWatermark
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 

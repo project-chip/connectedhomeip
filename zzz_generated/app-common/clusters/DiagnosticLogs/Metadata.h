@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -13,28 +14,33 @@
 
 namespace chip {
 namespace app {
-namespace Clusters {
-namespace DiagnosticLogs {
+    namespace Clusters {
+        namespace DiagnosticLogs {
 
-inline constexpr uint32_t kRevision = 1;
+            inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 5;
+            namespace Attributes {
+                inline constexpr uint32_t kMetadataCount = 5;
 
-} // namespace Attributes
+                constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
-namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
+                };
 
-namespace RetrieveLogsRequest {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RetrieveLogsRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
-} // namespace RetrieveLogsRequest
+            } // namespace Attributes
 
-} // namespace Commands
+            namespace Commands {
+                inline constexpr uint32_t kMetadataCount = 1;
 
-namespace Events {} // namespace Events
-} // namespace DiagnosticLogs
-} // namespace Clusters
+                namespace RetrieveLogsRequest {
+                    inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RetrieveLogsRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                        Access::Privilege::kOperate);
+                } // namespace RetrieveLogsRequest
+
+            } // namespace Commands
+
+            namespace Events {
+            } // namespace Events
+        } // namespace DiagnosticLogs
+    } // namespace Clusters
 } // namespace app
 } // namespace chip

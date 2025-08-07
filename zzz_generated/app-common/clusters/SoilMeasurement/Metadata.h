@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -31,6 +32,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SoilMoistureMeasuredVa
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace SoilMoistureMeasuredValue
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    SoilMoistureMeasurementLimits::kMetadataEntry,
+    SoilMoistureMeasuredValue::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

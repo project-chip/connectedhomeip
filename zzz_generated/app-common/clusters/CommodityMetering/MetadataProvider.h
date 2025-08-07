@@ -27,8 +27,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityMet
             return MeteredQuantity::kMetadataEntry;
         case MeteredQuantityTimestamp::Id:
             return MeteredQuantityTimestamp::kMetadataEntry;
-        case MeasurementType::Id:
-            return MeasurementType::kMetadataEntry;
+        case TariffUnit::Id:
+            return TariffUnit::kMetadataEntry;
         case MaximumMeteredQuantities::Id:
             return MaximumMeteredQuantities::kMetadataEntry;
         default:

@@ -133,8 +133,8 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
         BitFlags<DataModel::AttributeQualityFlags>{}
             .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
             .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
-        RequiredPrivilege::ForReadAttribute(attributePath),
-        attribute.IsReadOnly() ? std::nullopt : std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)));
+        attribute.IsReadable() ? std::make_optional(RequiredPrivilege::ForReadAttribute(attributePath)) : std::nullopt,
+        attribute.IsWritable() ? std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)) : std::nullopt);
 
     // TODO: Set additional flags:
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)

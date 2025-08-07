@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -116,6 +117,19 @@ namespace SessionEnergyDischarged {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SessionEnergyDischarged::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SessionEnergyDischarged
+constexpr std::array<DataModel::AttributeEntry, 10> kMandatoryMetadata = {
+    State::kMetadataEntry,
+    SupplyState::kMetadataEntry,
+    FaultState::kMetadataEntry,
+    ChargingEnabledUntil::kMetadataEntry,
+    CircuitCapacity::kMetadataEntry,
+    MinimumChargeCurrent::kMetadataEntry,
+    MaximumChargeCurrent::kMetadataEntry,
+    SessionID::kMetadataEntry,
+    SessionDuration::kMetadataEntry,
+    SessionEnergyCharged::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
