@@ -66,15 +66,11 @@ class MdnsDiscovery:
 
         Attributes:
             interfaces (list[str]): IPv6 interfaces used for discovery.
-            _azc (AsyncZeroconf): Zeroconf manager instance.
             _discovered_services (dict): Stores results of service discovery.
             _event (asyncio.Event): Event used to synchronize async discovery.
         """
         # List of IPv6 addresses to use for mDNS discovery.
         self.interfaces = get_host_ipv6_addresses()
-
-        # An instance of Zeroconf to manage mDNS operations.
-        self._azc = AsyncZeroconf(interfaces=self.interfaces)
 
         # A dictionary to store discovered services.
         self._discovered_services = {}
@@ -377,17 +373,18 @@ class MdnsDiscovery:
                     the discovery process.
         """
         logger.info("Discovering all available mDNS service types...")
-        try:
-            service_types = list(set(await wait_for(AsyncZeroconfServiceTypes.async_find(aiozc=self._azc, interfaces=self.interfaces), timeout=discovery_timeout_sec)))
-        except TimeoutError:
-            logger.info(f"mDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
-            service_types = []
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
+            try:
+                service_types = list(set(await wait_for(AsyncZeroconfServiceTypes.async_find(aiozc=azc, interfaces=self.interfaces), timeout=discovery_timeout_sec)))
+            except TimeoutError:
+                logger.info(f"mDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
+                service_types = []
 
-        if log_output:
-            logger.info(
-                "\n\nDiscovered mDNS service types:\n%s\n", "\n".join(f"  - {s}" for s in service_types))
+            if log_output:
+                logger.info(
+                    "\n\nDiscovered mDNS service types:\n%s\n", "\n".join(f"  - {s}" for s in service_types))
 
-        return service_types
+            return service_types
 
     async def get_commissionable_subtypes(self,
                                           discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
@@ -469,61 +466,62 @@ class MdnsDiscovery:
         self._discovered_services = {}
         self._last_discovery_time = time.time()
 
-        aiobrowser = AsyncServiceBrowser(
-            zeroconf=self._azc.zeroconf, type_=types, handlers=[self._on_service_state_change]
-        )
+        async with AsyncZeroconf(interfaces=self.interfaces) as azc:
+            aiobrowser = AsyncServiceBrowser(
+                zeroconf=azc.zeroconf, type_=types, handlers=[self._on_service_state_change]
+            )
 
-        # Background monitor to end discovery early after
-        # a period of silence (inactivity, no new services)
-        create_task(self._monitor_discovery_silence(silence_threshold=2))
+            # Background monitor to end discovery early after
+            # a period of silence (inactivity, no new services)
+            create_task(self._monitor_discovery_silence(silence_threshold=2))
 
-        try:
-            # Wait for either the silence timeout (triggered by the background monitor)
-            # or the full discovery timeout to elapse, whichever comes first
-            await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
-        except TimeoutError:
-            logger.info("mDNS browse finished after %d seconds", discovery_timeout_sec)
-        finally:
-            logger.info("Stopping mDNS browse and cleaning up")
-            self._event.set()
-            await aiobrowser.async_cancel()
+            try:
+                # Wait for either the silence timeout (triggered by the background monitor)
+                # or the full discovery timeout to elapse, whichever comes first
+                await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
+            except TimeoutError:
+                logger.info("mDNS browse finished after %d seconds", discovery_timeout_sec)
+            finally:
+                logger.info("Stopping mDNS browse and cleaning up")
+                self._event.set()
+                await aiobrowser.async_cancel()
 
-        if log_output:
-            self._log_output()
-
-        # Log discovery stats
-        services_count = sum(len(ptr_list) for ptr_list in self._discovered_services.values())
-        types_count = len(self._discovered_services)
-        logger.info(f"Discovered {services_count} mDNS service(s) across {types_count} service type(s)")
-
-        # If service querying is enabled, perform controlled parallel queries to
-        # retrieve service information (TXT, SRV, A/AAAA) for each discovered PTR
-        # record. This is helpful when many PTR records are found, as it prevents
-        # system overload by limiting concurrent mDNS queries.
-        if query_service:
-            logger.info("Querying service information for discovered services...")
-            semaphore = Semaphore(5)  # Limit to 5 concurrent queries
-
-            async def limited_query(ptr):
-                async with semaphore:
-                    await self._query_service_info(
-                        service_type=ptr.service_type,
-                        service_name=ptr.service_name,
-                        append_results=True,
-                        log_output=log_output
-                    )
-
-            tasks = []
-            for ptr_list in self._discovered_services.values():
-                for ptr in ptr_list:
-                    tasks.append(limited_query(ptr))
-
-            self._discovered_services = {}
-
-            await gather(*tasks)
-
-            if append_results and log_output:
+            if log_output:
                 self._log_output()
+
+            # Log discovery stats
+            services_count = sum(len(ptr_list) for ptr_list in self._discovered_services.values())
+            types_count = len(self._discovered_services)
+            logger.info(f"Discovered {services_count} mDNS service(s) across {types_count} service type(s)")
+
+            # If service querying is enabled, perform controlled parallel queries to
+            # retrieve service information (TXT, SRV, A/AAAA) for each discovered PTR
+            # record. This is helpful when many PTR records are found, as it prevents
+            # system overload by limiting concurrent mDNS queries.
+            if query_service:
+                logger.info("Querying service information for discovered services...")
+                semaphore = Semaphore(5)  # Limit to 5 concurrent queries
+
+                async def limited_query(ptr):
+                    async with semaphore:
+                        await self._query_service_info(
+                            service_type=ptr.service_type,
+                            service_name=ptr.service_name,
+                            append_results=True,
+                            log_output=log_output
+                        )
+
+                tasks = []
+                for ptr_list in self._discovered_services.values():
+                    for ptr in ptr_list:
+                        tasks.append(limited_query(ptr))
+
+                self._discovered_services = {}
+
+                await gather(*tasks)
+
+                if append_results and log_output:
+                    self._log_output()
 
     # Private methods
     def _on_service_state_change(
