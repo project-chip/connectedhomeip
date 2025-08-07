@@ -634,7 +634,7 @@ class MdnsDiscovery:
             logger.error(f"Service record information {rec_types} for '{service_name}' not found.")
             return None
 
-    async def _monitor_discovery_silence(self, silence_threshold: float):
+    async def _monitor_discovery_silence(self, silence_threshold: float) -> None:
         """
         Monitor service discovery and end it after a period of inactivity (silence).
 
@@ -666,7 +666,7 @@ class MdnsDiscovery:
                 self._event.set()
                 break
 
-    def _log_output(self) -> str:
+    def _log_output(self) -> None:
         """
         Converts the discovered services to a JSON string and logs it.
 
