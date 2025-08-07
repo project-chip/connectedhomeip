@@ -20,15 +20,9 @@
 
 #include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace SoilMeasurement {
+namespace chip::app::Clusters::SoilMeasurement {
 
 CHIP_ERROR
 SetSoilMoistureMeasuredValue(const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
-} // namespace SoilMeasurement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::SoilMeasurement

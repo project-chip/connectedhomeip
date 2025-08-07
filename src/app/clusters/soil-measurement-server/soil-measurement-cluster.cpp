@@ -17,16 +17,13 @@
 #include "soil-measurement-cluster.h"
 #include <clusters/SoilMeasurement/Metadata.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
+namespace chip::app::Clusters {
 
-using namespace chip::app::Clusters::SoilMeasurement::Attributes;
+using namespace SoilMeasurement::Attributes;
 
 SoilMeasurementCluster::SoilMeasurementCluster(
     EndpointId endpointId, const SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits) :
-    DefaultServerCluster({ endpointId, SoilMeasurement::Id }),
-    mSoilMoistureMeasurementLimits(soilMoistureMeasurementLimits)
+    DefaultServerCluster({ endpointId, SoilMeasurement::Id }), mSoilMoistureMeasurementLimits(soilMoistureMeasurementLimits)
 {
     mSoilMoistureMeasuredValue.SetNull();
 }
@@ -80,6 +77,4 @@ SoilMeasurementCluster::SetSoilMoistureMeasuredValue(const SoilMoistureMeasuredV
     return CHIP_NO_ERROR;
 }
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters

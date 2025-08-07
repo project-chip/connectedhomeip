@@ -19,17 +19,14 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <platform/DeviceInfoProvider.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-
-using namespace chip::app::Clusters::SoilMeasurement::Attributes;
+namespace chip::app::Clusters {
 
 class SoilMeasurementCluster : public DefaultServerCluster
 {
 public:
-    SoilMeasurementCluster(EndpointId endpointId,
-                           const SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits);
+    SoilMeasurementCluster(
+        EndpointId endpointId,
+        const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -37,13 +34,12 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR
-    SetSoilMoistureMeasuredValue(const SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
+    SetSoilMoistureMeasuredValue(
+        const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
 protected:
-    const SoilMoistureMeasurementLimits::TypeInfo::Type mSoilMoistureMeasurementLimits;
-    SoilMoistureMeasuredValue::TypeInfo::Type mSoilMoistureMeasuredValue;
+    const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mSoilMoistureMeasurementLimits;
+    SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type mSoilMoistureMeasuredValue;
 };
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters

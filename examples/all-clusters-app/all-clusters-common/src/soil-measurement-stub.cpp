@@ -26,6 +26,7 @@ using namespace chip::app::Clusters::SoilMeasurement;
 using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 
 namespace {
+
 const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
     { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
 };
@@ -41,6 +42,8 @@ const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurem
 
 LazyRegisteredServerCluster<SoilMeasurementCluster> gServer;
 
+} // namespace
+
 // This cluster is only enabled for endpoint 1.
 #define VerifyEndpoint(endpoint)                                                                                                   \
     if (endpoint != 1)                                                                                                             \
@@ -48,8 +51,6 @@ LazyRegisteredServerCluster<SoilMeasurementCluster> gServer;
         ChipLogError(AppServer, "SoilMeasurement cluster invalid endpoint");                                                       \
         return;                                                                                                                    \
     }
-
-} // namespace
 
 void emberAfSoilMeasurementClusterServerInitCallback(EndpointId endpoint) {}
 
@@ -81,10 +82,7 @@ void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)
 
 void MatterSoilMeasurementPluginServerShutdownCallback() {}
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace SoilMeasurement {
+namespace chip::app::Clusters::SoilMeasurement {
 
 CHIP_ERROR
 SetSoilMoistureMeasuredValue(const SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
@@ -92,7 +90,4 @@ SetSoilMoistureMeasuredValue(const SoilMoistureMeasuredValue::TypeInfo::Type & s
     return gServer.Cluster().SetSoilMoistureMeasuredValue(soilMoistureMeasuredValue);
 }
 
-} // namespace SoilMeasurement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::SoilMeasurement
