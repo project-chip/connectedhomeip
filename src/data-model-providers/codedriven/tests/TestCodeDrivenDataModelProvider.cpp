@@ -330,36 +330,21 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverEndpoints)
 {
     // Create 3 SpanEndpoints with different IDs
     // EP1
-    auto build_pair1 = SpanEndpoint::Builder(endpointEntry1.id)
-                           .SetComposition(endpointEntry1.compositionPattern)
-                           .SetParentId(endpointEntry1.parentId)
-                           .Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair1));
-    auto ep1Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair1)));
+    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
     // EP2
-    auto build_pair2 = SpanEndpoint::Builder(endpointEntry2.id)
-                           .SetComposition(endpointEntry2.compositionPattern)
-                           .SetParentId(endpointEntry2.parentId)
-                           .Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair2));
-    auto ep2Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair2)));
+    auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
     // EP3
-    auto build_pair3 = SpanEndpoint::Builder(endpointEntry3.id)
-                           .SetComposition(endpointEntry3.compositionPattern)
-                           .SetParentId(endpointEntry3.parentId)
-                           .Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair3));
-    auto ep3Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair3)));
+    auto endpoint3 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
-    mEndpointStorage.push_back(std::move(ep1Provider));
+    mEndpointStorage.push_back(std::move(endpoint1));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-    mEndpointStorage.push_back(std::move(ep2Provider));
+    mEndpointStorage.push_back(std::move(endpoint2));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry2));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-    mEndpointStorage.push_back(std::move(ep3Provider));
+    mEndpointStorage.push_back(std::move(endpoint3));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry3));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -380,10 +365,8 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverEndpoints)
 
 TEST_F(TestCodeDrivenDataModelProvider, IterateOverServerClusters)
 {
-    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -413,12 +396,10 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverClientClusters)
 {
     static const ClusterId sClientClustersArray[] = { clientClusterId1, clientClusterId2 };
 
-    auto build_pair =
-        SpanEndpoint::Builder(endpointEntry1.id).SetClientClusters(Span<const ClusterId>(sClientClustersArray)).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
+    auto endpoint = std::make_unique<SpanEndpoint>(
+        SpanEndpoint::Builder().SetClientClusters(Span<const ClusterId>(sClientClustersArray)).Build());
 
-    mEndpointStorage.push_back(std::move(epProvider));
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -435,11 +416,10 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverTags)
 {
     static const SemanticTag sSemanticTagsArray[] = { semanticTag1, semanticTag2 };
 
-    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id).SetSemanticTags(Span<const SemanticTag>(sSemanticTagsArray)).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
+    auto endpoint = std::make_unique<SpanEndpoint>(
+        SpanEndpoint::Builder().SetSemanticTags(Span<const SemanticTag>(sSemanticTagsArray)).Build());
 
-    mEndpointStorage.push_back(std::move(epProvider));
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -465,12 +445,10 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverDeviceTypes)
         sDeviceTypesData[i].deviceTypeRevision = static_cast<uint8_t>((i % 255) + 1);
     }
 
-    auto build_pair =
-        SpanEndpoint::Builder(endpointEntry1.id).SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>(sDeviceTypesData)).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
+    auto endpoint = std::make_unique<SpanEndpoint>(
+        SpanEndpoint::Builder().SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>(sDeviceTypesData)).Build());
 
-    mEndpointStorage.push_back(std::move(epProvider));
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -488,25 +466,19 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverDeviceTypes)
 
 TEST_F(TestCodeDrivenDataModelProvider, AddAndRemoveEndpoints)
 {
-    auto build_pair1 = SpanEndpoint::Builder(endpointEntry1.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair1));
-    auto ep1Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair1)));
+    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
-    auto build_pair2 = SpanEndpoint::Builder(endpointEntry2.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair2));
-    auto ep2Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair2)));
+    auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
-    auto build_pair3 = SpanEndpoint::Builder(endpointEntry3.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair3));
-    auto ep3Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair3)));
+    auto endpoint3 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
-    mEndpointStorage.push_back(std::move(ep1Provider));
+    mEndpointStorage.push_back(std::move(endpoint1));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-    mEndpointStorage.push_back(std::move(ep2Provider));
+    mEndpointStorage.push_back(std::move(endpoint2));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry2));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-    mEndpointStorage.push_back(std::move(ep3Provider));
+    mEndpointStorage.push_back(std::move(endpoint3));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry3));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -531,13 +503,11 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
     static const DataModel::DeviceTypeEntry deviceTypesArray[] = { { .deviceTypeId = 0x7001, .deviceTypeRevision = 1 },
                                                                    { .deviceTypeId = 0x7002, .deviceTypeRevision = 2 } };
 
-    auto build_pair = SpanEndpoint::Builder(endpointEntry4.id)
+    SpanEndpoint ep = SpanEndpoint::Builder()
                           .SetClientClusters(chip::Span<const ClusterId>(clientClustersArray))
                           .SetSemanticTags(chip::Span<const SemanticTag>(semanticTagsArray))
                           .SetDeviceTypes(chip::Span<const DataModel::DeviceTypeEntry>(deviceTypesArray))
                           .Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    SpanEndpoint ep = std::move(std::get<SpanEndpoint>(build_pair));
 
     EndpointInterfaceRegistration registration(ep, endpointEntry4);
     ASSERT_EQ(localProvider.AddEndpoint(registration), CHIP_NO_ERROR);
@@ -553,13 +523,11 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
 
 TEST_F(TestCodeDrivenDataModelProvider, EndpointWithEmptyStaticData)
 {
-    auto build_pair = SpanEndpoint::Builder(endpointEntry4.id)
+    SpanEndpoint ep = SpanEndpoint::Builder()
                           .SetClientClusters(Span<const ClusterId>())
                           .SetSemanticTags(Span<const SemanticTag>())
                           .SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>())
                           .Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    SpanEndpoint ep = std::move(std::get<SpanEndpoint>(build_pair));
     EndpointInterfaceRegistration registration(ep, endpointEntry4);
     ASSERT_EQ(mProvider.AddEndpoint(registration), CHIP_NO_ERROR);
 }
@@ -569,10 +537,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupIsCalledWhenAddingToStarte
     CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
-    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -590,10 +556,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupNotCalledWhenAddingToNonSt
 {
     CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
 
-    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -615,10 +579,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownIsCalledWhenRemovingFromS
     CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
-    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -638,10 +600,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownNotCalledWhenRemovingFrom
 {
     CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
 
-    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -657,10 +617,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownNotCalledWhenRemovingFrom
 
 TEST_F(TestCodeDrivenDataModelProvider, ServerClustersMultiPath)
 {
-    auto build_pair = SpanEndpoint::Builder(endpointEntry3.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry3));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
@@ -677,11 +635,10 @@ TEST_F(TestCodeDrivenDataModelProvider, ServerClustersMultiPath)
 
 TEST_F(TestCodeDrivenDataModelProvider, ReadAttribute)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -696,11 +653,10 @@ TEST_F(TestCodeDrivenDataModelProvider, ReadAttribute)
 
 TEST_F(TestCodeDrivenDataModelProvider, WriteAttribute)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -719,11 +675,10 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttribute)
 
 TEST_F(TestCodeDrivenDataModelProvider, InvokeCommand)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -742,11 +697,10 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommand)
 
 TEST_F(TestCodeDrivenDataModelProvider, IterateOverAttributes)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -762,11 +716,10 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverAttributes)
 
 TEST_F(TestCodeDrivenDataModelProvider, IterateOverAcceptedCommands)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -782,11 +735,10 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverAcceptedCommands)
 
 TEST_F(TestCodeDrivenDataModelProvider, IterateOverGeneratedCommands)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -802,11 +754,10 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverGeneratedCommands)
 
 TEST_F(TestCodeDrivenDataModelProvider, GetEventInfo)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -821,11 +772,10 @@ TEST_F(TestCodeDrivenDataModelProvider, GetEventInfo)
 
 TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -842,11 +792,10 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
 
 TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -863,12 +812,10 @@ TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
 
 TEST_F(TestCodeDrivenDataModelProvider, Shutdown)
 {
-    auto build_pair = SpanEndpoint::Builder(endpointEntry1.id).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair));
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     auto registration =
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry());
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 });
     ASSERT_EQ(mProvider.AddEndpoint(*registration), CHIP_NO_ERROR);
     mOwnedRegistrations.push_back(std::move(registration));
 
@@ -882,11 +829,10 @@ TEST_F(TestCodeDrivenDataModelProvider, Shutdown)
 
 TEST_F(TestCodeDrivenDataModelProvider, ReadAttributeOnInvalidPath)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     uint32_t readValue;
@@ -896,11 +842,10 @@ TEST_F(TestCodeDrivenDataModelProvider, ReadAttributeOnInvalidPath)
 
 TEST_F(TestCodeDrivenDataModelProvider, WriteAttributeOnInvalidPath)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     uint32_t valueToWrite = 123;
@@ -915,11 +860,10 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveNonExistentEndpoint)
 
 TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
@@ -934,11 +878,10 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
 
 TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
 {
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
@@ -953,20 +896,16 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
 
 TEST_F(TestCodeDrivenDataModelProvider, SingleServerClusterInterfaceWithMultipleClustersAndMultipleEndpoints)
 {
-    auto build_pair1 = SpanEndpoint::Builder(1).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair1));
-    auto ep1Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair1)));
-    mEndpointStorage.push_back(std::move(ep1Provider));
+    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint1));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
-    auto build_pair2 = SpanEndpoint::Builder(2).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_pair2));
-    auto ep2Provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair2)));
-    mEndpointStorage.push_back(std::move(ep2Provider));
+    auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint2));
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
+        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 2 }));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     static MockServerCluster multiPathCluster({ { 1, 10 }, { 2, 30 } }, 1, {});
@@ -995,115 +934,25 @@ TEST_F(TestCodeDrivenDataModelProvider, SingleServerClusterInterfaceWithMultiple
     }
 }
 
-TEST_F(TestCodeDrivenDataModelProvider, AddEndpointWithkInvalidEndpointIdAssignsIncreasingNewId)
+TEST_F(TestCodeDrivenDataModelProvider, AddEndpointWithKInvalidId)
 {
-    auto ep0_builder = SpanEndpoint::Builder(0).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(ep0_builder));
-    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(ep0_builder))));
+    auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+
     mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ kInvalidEndpointId }));
-    EndpointInterfaceRegistration * registrationEp0 = mOwnedRegistrations.back().get();
-
-    auto ep1_builder = SpanEndpoint::Builder(1).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(ep1_builder));
-    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(ep1_builder))));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ kInvalidEndpointId }));
-    EndpointInterfaceRegistration * registrationEp1 = mOwnedRegistrations.back().get();
-
-    EXPECT_EQ(mProvider.AddEndpoint(*registrationEp0), CHIP_NO_ERROR);
-    EXPECT_EQ(mProvider.AddEndpoint(*registrationEp1), CHIP_NO_ERROR);
-
-    EXPECT_EQ(registrationEp0->GetEndpointEntry().id, 0);
-    EXPECT_EQ(registrationEp1->GetEndpointEntry().id, 1);
-
-    mProvider.Shutdown();
-}
-
-TEST_F(TestCodeDrivenDataModelProvider, AddClusterForNonExistentEndpoint)
-{
-    static MockServerCluster testCluster({ 99, 10 }, 1, {});
-    static ServerClusterRegistration registration(testCluster);
-    EXPECT_EQ(mProvider.AddCluster(registration), CHIP_ERROR_INVALID_ARGUMENT);
-}
-
-TEST_F(TestCodeDrivenDataModelProvider, AddDuplicateCluster)
-{
-    auto build_pair = SpanEndpoint::Builder(1).Build();
-    auto epProvider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_pair)));
-    mEndpointStorage.push_back(std::move(epProvider));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), mEndpointStorage.back()->GetEndpointEntry()));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
-
-    static MockServerCluster testCluster({ 1, 10 }, 1, {});
-    static ServerClusterRegistration registration1(testCluster);
-    static ServerClusterRegistration registration2(testCluster);
-
-    EXPECT_EQ(mProvider.AddCluster(registration1), CHIP_NO_ERROR);
-    EXPECT_EQ(mProvider.AddCluster(registration2), CHIP_ERROR_DUPLICATE_KEY_ID);
-}
-
-TEST_F(TestCodeDrivenDataModelProvider, RemoveNonExistentCluster)
-{
-    MockServerCluster testCluster({ 1, 10 }, 1, {});
-    EXPECT_EQ(mProvider.RemoveCluster(&testCluster), CHIP_ERROR_NOT_FOUND);
-}
-
-TEST_F(TestCodeDrivenDataModelProvider, AddNullCluster)
-{
-    class TestServerClusterRegistration : public ServerClusterRegistration
-    {
-    public:
-        TestServerClusterRegistration() : ServerClusterRegistration(mNullCluster)
-        {
-            const_cast<ServerClusterInterface *&>(serverClusterInterface) = nullptr;
-        }
-
-    private:
-        MockServerCluster mNullCluster{ { 1, 1 }, 1, {} };
-    };
-
-    TestServerClusterRegistration registration;
-    EXPECT_EQ(mProvider.AddCluster(registration), CHIP_ERROR_INVALID_ARGUMENT);
-}
-
-TEST_F(TestCodeDrivenDataModelProvider, AddEndpointWithValidUserId)
-{
-    auto ep_builder = SpanEndpoint::Builder(5).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(ep_builder));
-    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(ep_builder))));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ 5 }));
+        std::make_unique<EndpointInterfaceRegistration>(*endpoint, DataModel::EndpointEntry{ kInvalidEndpointId }));
     EndpointInterfaceRegistration * registration = mOwnedRegistrations.back().get();
 
-    EXPECT_EQ(mProvider.AddEndpoint(*registration), CHIP_NO_ERROR);
-    EXPECT_EQ(registration->GetEndpointEntry().id, 5);
-
-    // Verify that the next available ID is updated correctly.
-    auto next_ep_builder = SpanEndpoint::Builder(0).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(next_ep_builder));
-    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(next_ep_builder))));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ kInvalidEndpointId }));
-    EndpointInterfaceRegistration * next_registration = mOwnedRegistrations.back().get();
-
-    EXPECT_EQ(mProvider.AddEndpoint(*next_registration), CHIP_NO_ERROR);
-    EXPECT_EQ(next_registration->GetEndpointEntry().id, 6);
+    EXPECT_EQ(mProvider.AddEndpoint(*registration), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, AddDuplicateEndpointId)
 {
-    auto ep1_builder = SpanEndpoint::Builder(1).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(ep1_builder));
-    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(ep1_builder))));
+    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ 1 }));
     EndpointInterfaceRegistration * registration1 = mOwnedRegistrations.back().get();
 
-    auto ep2_builder = SpanEndpoint::Builder(1).Build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(ep2_builder));
-    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(ep2_builder))));
+    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ 1 }));
     EndpointInterfaceRegistration * registration2 = mOwnedRegistrations.back().get();

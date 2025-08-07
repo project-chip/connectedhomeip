@@ -21,8 +21,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 
-#include <variant>
-
 namespace chip {
 namespace app {
 
@@ -48,27 +46,26 @@ namespace app {
 class SpanEndpoint : public EndpointInterface
 {
 public:
+
+    // TODO: Add a class description here.
+    /**
+     * @brief Builder class for constructing a SpanEndpoint.
+     *
+     * This class provides a way to set the client clusters, semantic tags,
+     * and device types of the SpanEndpoint.
+     */
     class Builder
     {
     public:
-        explicit Builder(EndpointId id);
+        explicit Builder() = default;
 
-        Builder & SetComposition(DataModel::EndpointCompositionPattern composition);
-        Builder & SetParentId(EndpointId parentId);
         Builder & SetClientClusters(Span<const ClusterId> clientClusters);
         Builder & SetSemanticTags(Span<const SemanticTag> semanticTags);
         Builder & SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
-        // Builds the SpanEndpoint.
-        // Returns a std::variant containing either the successfully built SpanEndpoint
-        // or a CHIP_ERROR if the build failed (e.g., due to invalid arguments).
-        // Callers should check the variant's active alternative before use.
-        std::variant<SpanEndpoint, CHIP_ERROR> Build();
+        SpanEndpoint Build();
 
     private:
-        EndpointId mEndpointId;
-        DataModel::EndpointCompositionPattern mComposition = DataModel::EndpointCompositionPattern::kFullFamily;
-        EndpointId mParentId                               = kInvalidEndpointId;
         Span<const ClusterId> mClientClusters;
         Span<const SemanticTag> mSemanticTags;
         Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
@@ -85,8 +82,6 @@ public:
     SpanEndpoint(SpanEndpoint &&)             = default;
     SpanEndpoint & operator=(SpanEndpoint &&) = default;
 
-    const DataModel::EndpointEntry & GetEndpointEntry() const override { return mEndpointEntry; }
-
     // Iteration methods
     CHIP_ERROR SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const override;
     CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const override;
@@ -94,13 +89,10 @@ public:
 
 private:
     // Private constructor for Builder
-    SpanEndpoint(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
-                 Span<const ClusterId> clientClusters, Span<const SemanticTag> semanticTags,
+    SpanEndpoint(Span<const ClusterId> clientClusters, Span<const SemanticTag> semanticTags,
                  Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
     // Iteration methods
-    // GetEndpointEntry is already public
-    DataModel::EndpointEntry mEndpointEntry;
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     Span<const SemanticTag> mSemanticTags;
     Span<const ClusterId> mClientClusters;

@@ -89,8 +89,8 @@ public:
         }
         bool operator==(const Iterator & other) const { return mCurrent == other.mCurrent; }
         bool operator!=(const Iterator & other) const { return mCurrent != other.mCurrent; }
-        EndpointInterface * operator*() { return mCurrent->endpointInterface; }
-        EndpointInterface * operator->() { return mCurrent->endpointInterface; }
+        EndpointInterfaceRegistration & operator*() { return *mCurrent; }
+        EndpointInterfaceRegistration * operator->() { return mCurrent; }
 
     private:
         EndpointInterfaceRegistration * mCurrent;

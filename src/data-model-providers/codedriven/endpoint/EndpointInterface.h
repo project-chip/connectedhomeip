@@ -41,8 +41,6 @@ public:
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
-    virtual const DataModel::EndpointEntry & GetEndpointEntry() const = 0;
-
     virtual CHIP_ERROR SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const = 0;
 
     virtual CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const = 0;

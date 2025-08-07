@@ -27,20 +27,6 @@ namespace chip {
 namespace app {
 
 // Builder implementation
-SpanEndpoint::Builder::Builder(EndpointId id) : mEndpointId(id) {}
-
-SpanEndpoint::Builder & SpanEndpoint::Builder::SetComposition(DataModel::EndpointCompositionPattern composition)
-{
-    mComposition = composition;
-    return *this;
-}
-
-SpanEndpoint::Builder & SpanEndpoint::Builder::SetParentId(EndpointId parentId)
-{
-    mParentId = parentId;
-    return *this;
-}
-
 SpanEndpoint::Builder & SpanEndpoint::Builder::SetClientClusters(Span<const ClusterId> clientClusters)
 {
     mClientClusters = clientClusters;
@@ -59,14 +45,9 @@ SpanEndpoint::Builder & SpanEndpoint::Builder::SetDeviceTypes(Span<const DataMod
     return *this;
 }
 
-std::variant<SpanEndpoint, CHIP_ERROR> SpanEndpoint::Builder::Build()
+SpanEndpoint SpanEndpoint::Builder::Build()
 {
-    if (mEndpointId == kInvalidEndpointId)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return SpanEndpoint(mEndpointId, mComposition, mParentId, mClientClusters, mSemanticTags, mDeviceTypes);
+    return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes);
 }
 
 CHIP_ERROR
@@ -86,11 +67,10 @@ CHIP_ERROR SpanEndpoint::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) 
 }
 
 // Private constructor for Builder
-SpanEndpoint::SpanEndpoint(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
-                           Span<const ClusterId> clientClusters, Span<const SemanticTag> semanticTags,
+SpanEndpoint::SpanEndpoint(Span<const ClusterId> clientClusters, Span<const SemanticTag> semanticTags,
                            Span<const DataModel::DeviceTypeEntry> deviceTypes) :
-    mEndpointEntry({ id, parentId, composition }),
-    mDeviceTypes(deviceTypes), mSemanticTags(semanticTags), mClientClusters(clientClusters)
+    mDeviceTypes(deviceTypes),
+    mSemanticTags(semanticTags), mClientClusters(clientClusters)
 {}
 
 } // namespace app

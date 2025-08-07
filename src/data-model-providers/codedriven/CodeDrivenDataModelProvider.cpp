@@ -30,6 +30,9 @@ namespace app {
 
 CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
+    // Server clusters require a valid persistent storage delegate
+    VerifyOrReturnError(mPersistentStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
 
     mServerClusterContext.emplace(ServerClusterContext({
@@ -103,16 +106,16 @@ CHIP_ERROR CodeDrivenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataMode
 {
     // TODO: Add a size() method to EndpointInterfaceRegistry to avoid iterating twice.
     size_t count = 0;
-    for (const auto * endpoint : mEndpointInterfaceRegistry)
+    for (const auto & registration : mEndpointInterfaceRegistry)
     {
-        (void) endpoint; // Silence unused variable warning
+        (void) registration; // Silence unused variable warning
         count++;
     }
 
     ReturnErrorOnFailure(out.EnsureAppendCapacity(count));
-    for (const auto * endpoint : mEndpointInterfaceRegistry)
+    for (const auto & registration : mEndpointInterfaceRegistry)
     {
-        ReturnErrorOnFailure(out.Append(endpoint->GetEndpointEntry()));
+        ReturnErrorOnFailure(out.Append(registration.GetEndpointEntry()));
     }
     return CHIP_NO_ERROR;
 }
@@ -177,14 +180,14 @@ CHIP_ERROR CodeDrivenDataModelProvider::ServerClusters(EndpointId endpointId,
 CHIP_ERROR CodeDrivenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & out)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
     return serverCluster->GeneratedCommands(path, out);
 }
 CHIP_ERROR CodeDrivenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & out)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
     return serverCluster->AcceptedCommands(path, out);
 }
 
@@ -192,14 +195,14 @@ CHIP_ERROR CodeDrivenDataModelProvider::Attributes(const ConcreteClusterPath & p
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & out)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
     return serverCluster->Attributes(path, out);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
-    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
     return serverCluster->EventInfo(path, eventInfo);
 }
 
@@ -215,24 +218,15 @@ void CodeDrivenDataModelProvider::Temporary_ReportAttributeChanged(const Attribu
 
 CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistration & registration)
 {
-    VerifyOrReturnError(registration.endpointInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(registration.endpointEntry.id != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (registration.endpointEntry.id == kInvalidEndpointId)
+    // If the endpoint ID is already in use, return an error.
+    if (mEndpointInterfaceRegistry.Get(registration.endpointEntry.id) != nullptr)
     {
-        registration.endpointEntry.id = mNextAvailableEndpointId;
-    }
-    else if (registration.endpointEntry.id < mNextAvailableEndpointId)
-    {
-        // If the endpoint ID is already in use, return an error.
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
-    ReturnErrorOnFailure(mEndpointInterfaceRegistry.Register(registration));
-
-    // Update the next available endpoint ID
-    mNextAvailableEndpointId = std::max(mNextAvailableEndpointId, static_cast<EndpointId>(registration.endpointEntry.id + 1));
-
-    return CHIP_NO_ERROR;
+    return mEndpointInterfaceRegistry.Register(registration);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId)
@@ -245,12 +239,6 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId)
 CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & entry)
 {
     VerifyOrReturnError(entry.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (const auto & path : entry.serverClusterInterface->GetPaths())
-    {
-        // Ensure the endpoint for each path is already registered.
-        VerifyOrReturnError(GetEndpointInterface(path.mEndpointId) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    }
 
     ReturnErrorOnFailure(mServerClusterRegistry.Register(entry));
 

@@ -37,13 +37,16 @@ namespace app {
  * clusters, attributes, commands) dynamically at runtime. It manages a list of EndpointInterface
  * objects, each representing an endpoint on the device.
  *
- * Expected Usage:
- * 1. Instantiate an EndpointInterface and EndpointInterfaceRegistration.
- * 2. Instantiate a ServerClusterInterface and ServerClusterRegistration.
+ * The typical usage pattern by the application is as follows:
+ * 1. Instantiate EndpointInterface(s) and EndpointInterfaceRegistration(s).
+ * 2. Instantiate ServerClusterInterface(s) and ServerClusterRegistration(s).
  * 2. Create an instance of CodeDrivenDataModelProvider.
- * 3. Add the EndpointInterfaceRegistration to the CodeDrivenDataModelProvider using AddEndpoint().
- * 4. Add the ServerClusterInterfaceRegistration to the CodeDrivenDataModelProvider using AddCluster().
+ * 3. Register those EndpointInterfaceRegistration(s) to the CodeDrivenDataModelProvider using AddEndpoint().
+ * 4. Register those ServerClusterInterfaceRegistration(s) to the CodeDrivenDataModelProvider using AddCluster().
  * 5. Call Startup() on the CodeDrivenDataModelProvider.
+ *
+ * TODO: Notify composition changes when the provider is started up and endpoints are added/removed in runtime.
+ *       For now, applications are responsible for handling composition changes and calling markDirty() when needed.
  *
  * Lifecycle:
  * - The CodeDrivenDataModelProvider stores raw pointers to EndpointInterface and ServerClusterInterface.
@@ -92,22 +95,16 @@ public:
      * The EndpointInterface within the `registration` must be valid (i.e.,
      * `registration.endpointInterface` must not be nullptr).
      *
-     * Endpoint ID behavior:
-     * - If `registration.endpointId` is set to `kInvalidEndpointId`, the provider will assign a new ID
-     *   based on `mNextAvailableEndpointId`. This ID starts at 0 and increments with each new endpoint added.
-     * - If the user provides a `registration.endpointId` that's valid
-     *   (i.e. `registration.endpointId >= mNextAvailableEndpointId`), it will use the provided ID and update
-     *   `mNextAvailableEndpointId` to be `registration.endpointId + 1`.
-     * - If `registration.endpointId` is set to an endpoint ID already in use
-     *   (i.e., `registration.endpointId < mNextAvailableEndpointId`), it will return an error.
+     * - If `registration.endpointId` is set to an endpoint ID already in use, it will return an error.
      *
      * @param registration The registration object for the endpoint, containing the
      *                     EndpointInterface and its ID. The registration object must
      *                     outlive the provider.
      * @return CHIP_NO_ERROR on success.
      *         CHIP_ERROR_INVALID_ARGUMENT if registration.next is not nullptr or
-     *                                     registration.endpointInterface is nullptr.
-     *         CHIP_ERROR_DUPLICATE_KEY_ID if `registration.endpointId` < `mNextAvailableEndpointId`.
+     *                                     registration.endpointInterface is nullptr or
+     *                                     registration.endpointId is kInvalidEndpointId.
+     *         CHIP_ERROR_DUPLICATE_KEY_ID if `registration.endpointId` is already in use.
      */
     CHIP_ERROR AddEndpoint(EndpointInterfaceRegistration & registration);
     CHIP_ERROR RemoveEndpoint(EndpointId endpointId);
@@ -135,7 +132,6 @@ private:
     ServerClusterInterfaceRegistry mServerClusterRegistry;
     std::optional<ServerClusterContext> mServerClusterContext;
     PersistentStorageDelegate * mPersistentStorageDelegate;
-    EndpointId mNextAvailableEndpointId = 0;
 };
 
 } // namespace app
