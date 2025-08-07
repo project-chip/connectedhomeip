@@ -25,8 +25,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/GeneralFaults.h>
 
-// NOTE: Uptime is optional in the XML, however mandatory since revision 2.
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -40,16 +38,19 @@ struct GeneralDiagnosticsFunctionsConfig
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    using SupportedAttributes = chip::app::SupportedAttributes<
-        GeneralDiagnostics::Attributes::TotalOperationalHours::Id, GeneralDiagnostics::Attributes::BootReason::Id,
-        GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id, GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,
-        GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id>;
+    using SupportedAttributes =
+        chip::app::SupportedAttributes<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
+                                       GeneralDiagnostics::Attributes::BootReason::Id,            //
+                                       GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
+                                       GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
+                                       GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id    //
+                                       // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
+                                       //       it will be forced as mandatory by the cluster constructor
+                                       >;
 
     GeneralDiagnosticsCluster(const SupportedAttributes & enabledAttributes) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mEnabledAttributes(AttributeSet(enabledAttributes)
-                               // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
-                               .ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
+        mEnabledAttributes(AttributeSet(enabledAttributes).ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -129,8 +130,7 @@ class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsClust
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::SupportedAttributes & enabledAttributes,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(enabledAttributes),
-        mFunctionConfig(functionsConfig)
+        GeneralDiagnosticsCluster(enabledAttributes), mFunctionConfig(functionsConfig)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
