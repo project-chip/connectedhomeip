@@ -31,6 +31,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
+static constexpr uint16_t kMaxEndpointId   = 65534;
 
 using namespace chip;
 using namespace chip::app;
@@ -273,6 +274,10 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), Status::InvalidCommand,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing videoStreamID and audioStreamID",
                      mEndpointId));
+    VerifyOrReturnValue(transportOptions.endpointID <= kMaxEndpointId, Status::ConstraintError,
+                        ChipLogError(Zcl,
+                                     "Transport Options verification from command data[ep=%d]: EndpointID field Constraint Error",
+                                     mEndpointId));
 
     VerifyOrReturnValue(transportOptions.url.size() >= kMinUrlLength && transportOptions.url.size() <= kMaxUrlLength,
                         Status::ConstraintError,
@@ -509,6 +514,28 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     });
 
     // Todo: TLSEndpointID Validation
+
+    TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
+    if (mTLSClientManagementDelegate != nullptr)
+    {
+        Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
+            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
+
+        // Todo: Not Verifying the TLSEndpointID as tls certificate management is not implemented yet
+        //  VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
+        //      ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
+        //      mEndpointId); auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+        //      handler.AddClusterSpecificFailure(commandPath, status);
+        //      return std::nullopt;
+        //  });
+    }
+    else
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mEndpointId);
+        auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
+    }
 
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 

@@ -19,6 +19,7 @@
 #pragma once
 
 #include "push-av-stream-transport-delegate.h"
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 
 namespace chip {
 namespace app {
@@ -27,6 +28,9 @@ namespace PushAvStreamTransport {
 
 /// Sets the given delegate on an endpoint configured via code-generation
 void SetDelegate(chip::EndpointId endpointId, PushAvStreamTransportDelegate * delegate);
+
+/// Sets the given TLS Client Management delegate on an endpoint configured via code-generation
+void SetTLSClientManagementDelegate(chip::EndpointId endpointId, TlsClientManagementDelegate * delegate);
 
 } // namespace PushAvStreamTransport
 } // namespace Clusters
