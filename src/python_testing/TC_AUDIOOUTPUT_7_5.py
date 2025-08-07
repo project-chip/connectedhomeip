@@ -27,13 +27,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+
 import chip.clusters as Clusters
-from chip.testing.matter_testing import (
-    MatterBaseTest,
-    TestStep,
-    default_matter_test_main,
-    async_test_body
-)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
