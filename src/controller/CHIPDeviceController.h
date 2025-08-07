@@ -795,6 +795,8 @@ public:
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
+    void ContinueCommissioningOverOperationalNetwork();
+
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
     DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
@@ -836,6 +838,8 @@ public:
                                          /* fireAndForget = */ true);
     }
 
+    bool IsNFCCommissioning() { return mNFCCommissioning; }
+
 protected:
     // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
     // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
@@ -868,6 +872,9 @@ private:
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
     Optional<System::Clock::Timeout> mCommissioningStepTimeout; // Note: For multi-interaction steps this is per interaction
+
+    bool mNFCCommissioning = false;
+
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
 
