@@ -174,6 +174,8 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
 
         dParams.controllerVendorId = chip::VendorId::TestVendor1;
         EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupController(dParams, device), CHIP_NO_ERROR);
+        // SetupCommissioner is expected to fail because dParams does not have a pairingDelegate,
+        // which is required for a commissioner.
         EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(dParams, commissioner), CHIP_ERROR_INVALID_ARGUMENT);
 
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
