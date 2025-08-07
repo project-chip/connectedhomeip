@@ -178,7 +178,8 @@ class TC_SU_2_2(MatterBaseTest):
         th2 = th2_fabric_admin.NewController(nodeId=th2_node_id, useTestCommissioner=True)
         th2_fabric_id = th2.fabricId
 
-        logger.info(f'Step #1.1 - TH2 (Provider) NodeID: {th2_node_id}')           # NodeID = 1
+        logger.info(f'Step #1.1 - TH2 (Provider) NodeID th2_node_id: {th2_node_id}')           # NodeID = 1
+        logger.info(f'Step #1.1 - TH2 (Provider)  nodeId: {th2.nodeId}')           # NodeID = 1
         logger.info(f'Step #1.1 - TH2 (Provider) FabricID: {th2_fabric_id}')       # FabricID = 1
 
         # ------------------------------------------------------------------------------------
@@ -276,9 +277,10 @@ class TC_SU_2_2(MatterBaseTest):
         # TH1: Requestor (DUT)
         # TH2: Provider
 
-        logger.info(f'Step #1.3 - TH1 fabricId: {th1.fabricId}, nodeId: {th1.nodeId}')
-        logger.info(f'Step #1.3 - TH2 fabricId: {th2.fabricId}, nodeId: {th2.nodeId}')
-        logger.info(f'Step #1.3 - th1_node_id: {th1_node_id}')
+        logger.info(f'Step #1.6 - TH1 fabricId: {th1.fabricId}, th1.nodeId: {th1.nodeId}')
+        logger.info(f'Step #1.6 - TH2 fabricId: {th2.fabricId}, th2.nodeId: {th2.nodeId}')
+        logger.info(f'Step #1.6 - th1_node_id: {th1_node_id}')
+        logger.info(f'Step #1.6 - th2_node_id: {th2_node_id}')
 
         # ACL on TH1 (DUT) to allow TH2 to operate OTA Requestor cluster and view attributes
 
@@ -367,6 +369,24 @@ class TC_SU_2_2(MatterBaseTest):
         )
         logger.info(f"Step #1.7 - cmd AnnounceOTAProvider: {cmd}")
 
+        resp = await th2.GetConnectedDevice(self.dut_node_id, allowPASE=False)
+        logger.info(f"Step #1.7 - test GetConnectedDevice response: {resp}")
+
+        logger.info("Step #1.7 - Force test read response")
+        resp = await th2.ReadAttribute(
+            self.dut_node_id,
+            [(Clusters.BasicInformation, Clusters.BasicInformation.Attributes.ProductID)]
+        )
+        logger.info(f"Step #1.7 - test read response: {resp}")
+
+        # resp = await self.read_single_attribute_check_success(
+        #     cluster=Clusters.BasicInformation,
+        #     attribute=Clusters.BasicInformation.Attributes.VendorID,
+        #     dev_ctrl=th2,
+        #     node_id=self.dut_node_id,
+        #     endpoint=0
+        # )
+
         logger.info(f'Step #1.7 - Sending AnnounceOTAProvider to node: {th1_node_id}, should be: {self.dut_node_id}')
         resp = await self.send_single_cmd(
             dev_ctrl=th2,
@@ -374,7 +394,6 @@ class TC_SU_2_2(MatterBaseTest):
             cmd=cmd
         )
         logger.info(f"Step #1.7 - Sent AnnounceOTAProvider to DUT, response: {resp}")
-
 
         # # # TODO: Need to make it work from here
         # logger.info("Step #1.5 - ArmFailSafe")
