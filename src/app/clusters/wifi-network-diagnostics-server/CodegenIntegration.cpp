@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
 #include <app/server-cluster/OptionalAttributes.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
@@ -83,7 +84,7 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     // and do not properly support secondary network interfaces or per-endpoint diagnostics.
     // See issue:#40317
     gServers[arrayIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
-                                ClusterAttributeBits<WiFiNetworkDiagnostics::Id>().Set<CurrentMaxRate::Id>(
+                                ClusterAttributeBits<WiFiDiagnosticsServerLogic>().Set<CurrentMaxRate::Id>(
                                     IsAttributeEnabled(endpointId, CurrentMaxRate::Id)),
                                 BitFlags<WiFiNetworkDiagnostics::Feature>(rawFeatureMap));
 

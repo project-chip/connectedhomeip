@@ -25,9 +25,9 @@
 /// define what optional attributes they support
 ///
 /// This should be in the `namespace chip::app`
-#define ATTRIBUTE_BITS_MARK_OPTIONAL(cluster, attribute)                                                                           \
+#define ATTRIBUTE_BITS_MARK_OPTIONAL(container, cluster, attribute)                                                                           \
     template <>                                                                                                                    \
-    struct IsOptionalAttribute<(Clusters::cluster::Id), (Clusters::cluster::Attributes::attribute::Id)>                            \
+    struct IsOptionalAttribute<container, (Clusters::cluster::Attributes::attribute::Id)>                            \
     {                                                                                                                              \
         static constexpr bool isOptional = true;                                                                                   \
     }
@@ -36,7 +36,7 @@ namespace chip {
 namespace app {
 
 /// By default we assume all attributes are NOT optional
-template <ClusterId CLUSTER, AttributeId ID>
+template <typename CONTAINER, AttributeId ID>
 struct IsOptionalAttribute
 {
     static constexpr bool isOptional = false;
@@ -100,16 +100,21 @@ private:
 ///
 /// Example usage:
 ///
-///    // First declare attibutes are optional
+///    // First declare attibutes are optional. Tie them to a class.
+///
 ///    namespace chip::app {
-///    ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, TotalOperationalHours);
-///    ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, BootReason);
-///    ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, ActiveHardwareFaults);
+///    namespace Clusters {
+///      class GeneralDiagnosticsCluster;
+///    } // namespace Clusters
+///
+///    ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, TotalOperationalHours);
+///    ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, BootReason);
+///    ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveHardwareFaults);
 ///    } // namespace chip::app
 ///
 /// After this, one can:
 ///
-///   ClusterAttributeBits<GeneralDiagnostics::Id>()
+///   ClusterAttributeBits<GeneralDiagnosticsCluster>()
 ///      .Set<GeneralDiagnostics::Attributes::TotalOperationalHours::Id>()
 ///      .Set<GeneralDiagnostics::Attributes::BootReason::Id>();
 ///
@@ -121,7 +126,7 @@ private:
 ///
 ///
 ///
-template <uint32_t CLUSTER_ID>
+template <typename CONTAINER>
 class ClusterAttributeBits : public AttributeBits
 {
 public:
@@ -132,7 +137,7 @@ public:
     constexpr ClusterAttributeBits & Set(bool value = true)
     {
         static_assert(ATTRIBUTE_ID < 32, "Cluster attribute bits supports attributes up to 31");
-        static_assert(IsOptionalAttribute<CLUSTER_ID, ATTRIBUTE_ID>::isOptional, "attribute MUST be optional");
+        static_assert(IsOptionalAttribute<CONTAINER, ATTRIBUTE_ID>::isOptional, "attribute MUST be optional");
         (void) AttributeBits::Set(ATTRIBUTE_ID, value);
         return *this;
     }

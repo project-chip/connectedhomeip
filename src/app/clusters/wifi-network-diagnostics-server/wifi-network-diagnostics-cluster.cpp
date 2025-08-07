@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h"
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
@@ -32,13 +33,13 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 // our internal implementation
 namespace chip::app {
 
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, BeaconLostCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, OverrunCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, BeaconRxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, PacketMulticastRxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, PacketUnicastRxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, PacketMulticastTxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, PacketUnicastTxCount);
+ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, BeaconLostCount);
+ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, OverrunCount);
+ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, BeaconRxCount);
+ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketMulticastRxCount);
+ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketUnicastRxCount);
+ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketMulticastTxCount);
+ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketUnicastTxCount);
 
 } // namespace chip::app
 
@@ -128,7 +129,7 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
         CurrentMaxRate::kMetadataEntry,         //
     };
 
-    ClusterAttributeBits<WiFiNetworkDiagnostics::Id> enabledAttributes(mLogic.GetEnabledAttributes());
+    ClusterAttributeBits<WiFiDiagnosticsServerLogic> enabledAttributes(mLogic.GetEnabledAttributes());
 
     if (featureFlags.Has(Feature::kErrorCounts))
     {

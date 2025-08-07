@@ -25,23 +25,24 @@
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
+namespace Clusters {
+class WiFiDiagnosticsServerLogic;
+} // namespace Clusters
 
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, CurrentMaxRate);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, CurrentMaxRate);
 
 } // namespace chip::app
 
-namespace chip {
-namespace app {
-namespace Clusters {
+namespace chip::app::Clusters {
 
 class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                               const ClusterAttributeBits<WiFiNetworkDiagnostics::Id> & enabledAttributes,
+                               const ClusterAttributeBits<WiFiDiagnosticsServerLogic> & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mEndpointId(endpointId),
-        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes),
+        mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }
@@ -98,6 +99,4 @@ private:
     const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
 };
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters

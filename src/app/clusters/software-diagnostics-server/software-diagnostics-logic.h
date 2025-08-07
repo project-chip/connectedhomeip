@@ -25,11 +25,14 @@
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
+namespace Clusters {
+class SoftwareDiagnosticsLogic;
+};
 
-ATTRIBUTE_BITS_MARK_OPTIONAL(SoftwareDiagnostics, ThreadMetrics);
-ATTRIBUTE_BITS_MARK_OPTIONAL(SoftwareDiagnostics, CurrentHeapFree);
-ATTRIBUTE_BITS_MARK_OPTIONAL(SoftwareDiagnostics, CurrentHeapUsed);
-ATTRIBUTE_BITS_MARK_OPTIONAL(SoftwareDiagnostics, CurrentHeapHighWatermark);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, ThreadMetrics);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapFree);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapUsed);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapHighWatermark);
 
 } // namespace chip::app
 
@@ -41,7 +44,7 @@ namespace Clusters {
 class SoftwareDiagnosticsLogic
 {
 public:
-    SoftwareDiagnosticsLogic(const ClusterAttributeBits<SoftwareDiagnostics::Id> & enabledAttributes) :
+    SoftwareDiagnosticsLogic(const ClusterAttributeBits<SoftwareDiagnosticsLogic> & enabledAttributes) :
         mEnabledAttributes(enabledAttributes)
     {}
     virtual ~SoftwareDiagnosticsLogic() = default;

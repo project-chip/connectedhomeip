@@ -26,15 +26,19 @@
 #include <platform/GeneralFaults.h>
 
 namespace chip::app {
+namespace Clusters {
 
-ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, TotalOperationalHours);
-ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, BootReason);
-ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, ActiveHardwareFaults);
-ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, ActiveRadioFaults);
-ATTRIBUTE_BITS_MARK_OPTIONAL(GeneralDiagnostics, ActiveNetworkFaults);
+class GeneralDiagnosticsCluster;
+
+} // namespace Clusters
+
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, TotalOperationalHours);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, BootReason);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveHardwareFaults);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveRadioFaults);
+ATTRIBUTE_BITS_MARK_OPTIONAL(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveNetworkFaults);
 
 // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
-
 } // namespace chip::app
 
 namespace chip {
@@ -50,7 +54,7 @@ struct GeneralDiagnosticsFunctionsConfig
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    GeneralDiagnosticsCluster(const ClusterAttributeBits<GeneralDiagnostics::Id> & enabledAttributes) :
+    GeneralDiagnosticsCluster(const ClusterAttributeBits<GeneralDiagnosticsCluster> & enabledAttributes) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mEnabledAttributes(AttributeBits(enabledAttributes)
                                // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
@@ -132,7 +136,7 @@ private:
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
-    GeneralDiagnosticsClusterFullConfigurable(const ClusterAttributeBits<GeneralDiagnostics::Id> & enabledAttributes,
+    GeneralDiagnosticsClusterFullConfigurable(const ClusterAttributeBits<GeneralDiagnosticsCluster> & enabledAttributes,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
         GeneralDiagnosticsCluster(enabledAttributes),
         mFunctionConfig(functionsConfig)
