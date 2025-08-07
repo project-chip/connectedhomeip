@@ -128,7 +128,8 @@ class TC_SU_2_8(MatterBaseTest):
             endpoint=endpoint
         )
 
-        await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
+        resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
+        logging.info(f"AnnounceOTAProvider response: {resp}.")
         logging.info(f"AnnounceOTAProvider sent from node {controller.nodeId} to DUT.")
 
     async def wait_for_valid_update_state(self, endpoint: int, valid_states: set):
@@ -164,7 +165,7 @@ class TC_SU_2_8(MatterBaseTest):
         # Commissioning TH1 (CLI) and TH2 (python test)
         self.step(0)
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = 0  # self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
         controller = self.default_controller  # TH1
         fabric_id_th2 = controller.fabricId + 1
@@ -210,7 +211,7 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info("Commissioning OTA Provider 2 to TH2")
 
-        await controller.CommissionOnNetwork(  # Is this ok?
+        await th2.CommissionOnNetwork(  # Is this ok?
             nodeId=provider_node_id_2,
             setupPinCode=provider_passcode_2,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
