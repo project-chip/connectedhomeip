@@ -217,7 +217,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         features.Set(WiFiNetworkDiagnostics::Feature::kErrorCounts);
         features.Set(WiFiNetworkDiagnostics::Feature::kPacketCounts);
         WiFiDiagnosticsServerCluster cluster(kRootEndpointId, allProvider,
-                                             SupportedAttributes<WiFiDiagnosticsServerLogic>().Set<CurrentMaxRate::Id>(), features);
+                                             WiFiDiagnosticsServerLogic::SupportedAttributes().Set<CurrentMaxRate::Id>(), features);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), commandsBuilder),

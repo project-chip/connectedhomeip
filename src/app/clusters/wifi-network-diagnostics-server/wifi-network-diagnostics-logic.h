@@ -20,26 +20,27 @@
 
 #include <app/AttributeValueEncoder.h>
 #include <app/server-cluster/OptionalAttributes.h>
+#include <clusters/WiFiNetworkDiagnostics/Attributes.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/DiagnosticDataProvider.h>
-
-namespace chip::app {
-namespace Clusters {
-class WiFiDiagnosticsServerLogic;
-} // namespace Clusters
-
-MARK_ATTRIBUTE_SUPPORTED(Clusters::WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, CurrentMaxRate);
-
-} // namespace chip::app
 
 namespace chip::app::Clusters {
 
 class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
+    using SupportedAttributes = chip::app::SupportedAttributes<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,
+                                                               WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,
+                                                               WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,
+                                                               WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,
+                                                               WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id,
+                                                               WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,
+                                                               WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id,
+                                                               WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id>;
+
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                               const SupportedAttributes<WiFiDiagnosticsServerLogic> & enabledAttributes,
+                               const SupportedAttributes & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
         mEndpointId(endpointId),
         mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)

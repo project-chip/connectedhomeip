@@ -18,29 +18,27 @@
 
 #include <lib/core/DataModelTypes.h>
 
-/// Marks the given cluster/attributeid as settable in
-/// `SupportedAttributes<CONTAINER>`
-///
-/// At this point this is NOT automatic as cluster implementations should
-/// define what optional attributes they support
-///
-/// This should be in the `namespace chip::app`
-#define MARK_ATTRIBUTE_SUPPORTED(container, cluster, attribute)                                                                    \
-    template <>                                                                                                                    \
-    struct IsOptionalAttribute<container, (Clusters::cluster::Attributes::attribute::Id)>                                          \
-    {                                                                                                                              \
-        static constexpr bool isOptional = true;                                                                                   \
-    }
-
 namespace chip {
 namespace app {
+namespace Internal {
 
-/// By default we assume all attributes are NOT optional
-template <typename CONTAINER, AttributeId ID>
-struct IsOptionalAttribute
+// Compile-time helper to check if an ID is in a list of IDs.
+template <AttributeId T, AttributeId... Ts>
+struct IsOneOf;
+
+template <AttributeId T, AttributeId Head, AttributeId... Tail>
+struct IsOneOf<T, Head, Tail...>
 {
-    static constexpr bool isOptional = false;
+    static constexpr bool value = (T == Head) || IsOneOf<T, Tail...>::value;
 };
+
+template <AttributeId T>
+struct IsOneOf<T>
+{
+    static constexpr bool value = false;
+};
+
+} // namespace Internal
 
 /// It is very common that a class has optional attributes. Such optional attributes
 /// need checking for and also affect what attributes are being returned by
@@ -92,41 +90,35 @@ private:
     uint32_t mSetBits = 0;
 };
 
-/// A specialization of AttributeSet that provides checked
-/// calls to `Set`.
+/// A specialization of AttributeSet that provides checked calls to `Set`.
 ///
-/// Specifically it requires that attributes are marked as 'known optional' by cluster
-/// implementations.
+/// Specifically it requires that attributes are declared as part of the template
+/// parameter pack.
 ///
 /// Example usage:
 ///
-///    // First declare attibutes are optional. Tie them to a class.
+///    namespace chip::app::Clusters::GeneralDiagnostics {
 ///
-///    namespace chip::app {
-///    namespace Clusters {
-///      class GeneralDiagnosticsCluster;
-///    } // namespace Clusters
+///    using SupportedAttributes = chip::app::SupportedAttributes<
+///        Attributes::TotalOperationalHours::Id,
+///        Attributes::BootReason::Id,
+///        Attributes::ActiveHardwareFaults::Id
+///    >;
 ///
-///    MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, TotalOperationalHours);
-///    MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, BootReason);
-///    MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveHardwareFaults);
-///    } // namespace chip::app
+///    } // namespace chip::app::Clusters::GeneralDiagnostics
 ///
 /// After this, one can:
 ///
-///   SupportedAttributes<GeneralDiagnosticsCluster>()
+///   GeneralDiagnostics::SupportedAttributes()
 ///      .Set<GeneralDiagnostics::Attributes::TotalOperationalHours::Id>()
 ///      .Set<GeneralDiagnostics::Attributes::BootReason::Id>();
 ///
-/// Clusters implementaions then can store a
-///   Constructor(SupportedAttributes<...> enabled) : mEnabledAttributes(enabled) {...}
+/// Cluster implementations can then store a
+///   Constructor(const GeneralDiagnostics::SupportedAttributes& enabled) : mEnabledAttributes(enabled) {...}
 ///
 /// where:
 ///   const AttributeSet mEnabledAttributes;
-///
-///
-///
-template <typename CONTAINER>
+template <AttributeId... OptionalAttributeIds>
 class SupportedAttributes : public AttributeSet
 {
 public:
@@ -137,7 +129,7 @@ public:
     constexpr SupportedAttributes & Set(bool value = true)
     {
         static_assert(ATTRIBUTE_ID < 32, "Cluster attribute bits supports attributes up to 31");
-        static_assert(IsOptionalAttribute<CONTAINER, ATTRIBUTE_ID>::isOptional, "attribute MUST be optional");
+        static_assert(Internal::IsOneOf<ATTRIBUTE_ID, OptionalAttributeIds...>::value, "attribute MUST be optional");
         (void) AttributeSet::Set(ATTRIBUTE_ID, value);
         return *this;
     }

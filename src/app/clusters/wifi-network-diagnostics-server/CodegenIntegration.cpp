@@ -84,7 +84,7 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     // and do not properly support secondary network interfaces or per-endpoint diagnostics.
     // See issue:#40317
     gServers[arrayIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
-                                SupportedAttributes<WiFiDiagnosticsServerLogic>().Set<CurrentMaxRate::Id>(
+                                WiFiDiagnosticsServerLogic::SupportedAttributes().Set<CurrentMaxRate::Id>(
                                     IsAttributeEnabled(endpointId, CurrentMaxRate::Id)),
                                 BitFlags<WiFiNetworkDiagnostics::Feature>(rawFeatureMap));
 

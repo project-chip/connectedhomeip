@@ -29,20 +29,6 @@ using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
 
-// mark flags controller by features as "optional" for them to stay settable in
-// our internal implementation
-namespace chip::app {
-
-MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, BeaconLostCount);
-MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, OverrunCount);
-MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, BeaconRxCount);
-MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketMulticastRxCount);
-MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketUnicastRxCount);
-MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketMulticastTxCount);
-MARK_ATTRIBUTE_SUPPORTED(WiFiDiagnosticsServerLogic, WiFiNetworkDiagnostics, PacketUnicastTxCount);
-
-} // namespace chip::app
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -129,7 +115,16 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
         CurrentMaxRate::kMetadataEntry,         //
     };
 
-    SupportedAttributes<WiFiDiagnosticsServerLogic> enabledAttributes(mLogic.GetEnabledAttributes());
+    chip::app::SupportedAttributes<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,         //
+                                   WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,        //
+                                   WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,           //
+                                   WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,          //
+                                   WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, //
+                                   WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,   //
+                                   WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, //
+                                   WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id    //
+                                   >
+        enabledAttributes(mLogic.GetEnabledAttributes());
 
     if (featureFlags.Has(Feature::kErrorCounts))
     {
@@ -178,3 +173,4 @@ std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::Invok
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+

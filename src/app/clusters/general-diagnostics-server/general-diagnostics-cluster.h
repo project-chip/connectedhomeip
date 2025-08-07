@@ -25,21 +25,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/GeneralFaults.h>
 
-namespace chip::app {
-namespace Clusters {
-
-class GeneralDiagnosticsCluster;
-
-} // namespace Clusters
-
-MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, TotalOperationalHours);
-MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, BootReason);
-MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveHardwareFaults);
-MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveRadioFaults);
-MARK_ATTRIBUTE_SUPPORTED(Clusters::GeneralDiagnosticsCluster, GeneralDiagnostics, ActiveNetworkFaults);
-
 // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
-} // namespace chip::app
 
 namespace chip {
 namespace app {
@@ -54,7 +40,12 @@ struct GeneralDiagnosticsFunctionsConfig
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    GeneralDiagnosticsCluster(const SupportedAttributes<GeneralDiagnosticsCluster> & enabledAttributes) :
+    using SupportedAttributes = chip::app::SupportedAttributes<
+        GeneralDiagnostics::Attributes::TotalOperationalHours::Id, GeneralDiagnostics::Attributes::BootReason::Id,
+        GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id, GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,
+        GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id>;
+
+    GeneralDiagnosticsCluster(const SupportedAttributes & enabledAttributes) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mEnabledAttributes(AttributeSet(enabledAttributes)
                                // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
@@ -136,10 +127,9 @@ private:
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
-    GeneralDiagnosticsClusterFullConfigurable(const SupportedAttributes<GeneralDiagnosticsCluster> & enabledAttributes,
+    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::SupportedAttributes & enabledAttributes,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(enabledAttributes),
-        mFunctionConfig(functionsConfig)
+        GeneralDiagnosticsCluster(enabledAttributes), mFunctionConfig(functionsConfig)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
@@ -153,3 +143,4 @@ private:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+

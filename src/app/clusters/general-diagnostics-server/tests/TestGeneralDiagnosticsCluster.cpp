@@ -65,7 +65,7 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
-    const SupportedAttributes<GeneralDiagnosticsCluster> enabledAttributes;
+    const GeneralDiagnosticsCluster::SupportedAttributes enabledAttributes;
 
     GeneralDiagnosticsCluster cluster(enabledAttributes);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -87,7 +87,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         class NullProvider : public DeviceLayer::DiagnosticDataProvider
         {
         };
-        const SupportedAttributes<GeneralDiagnosticsCluster> enabledAttributes;
+        const GeneralDiagnosticsCluster::SupportedAttributes enabledAttributes;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
         GeneralDiagnosticsCluster cluster(enabledAttributes);
 
@@ -168,7 +168,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         };
 
         // Enable all the optional attributes
-        const SupportedAttributes<GeneralDiagnosticsCluster> enabledAttributes = SupportedAttributes<GeneralDiagnosticsCluster>()
+        const GeneralDiagnosticsCluster::SupportedAttributes enabledAttributes = GeneralDiagnosticsCluster::SupportedAttributes()
                                                                                      .Set<TotalOperationalHours::Id>()
                                                                                      .Set<BootReason::Id>()
                                                                                      .Set<ActiveHardwareFaults::Id>()

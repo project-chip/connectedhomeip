@@ -19,22 +19,11 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/OptionalAttributes.h>
+#include <clusters/SoftwareDiagnostics/Attributes.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/DiagnosticDataProvider.h>
-
-namespace chip::app {
-namespace Clusters {
-class SoftwareDiagnosticsLogic;
-};
-
-MARK_ATTRIBUTE_SUPPORTED(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, ThreadMetrics);
-MARK_ATTRIBUTE_SUPPORTED(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapFree);
-MARK_ATTRIBUTE_SUPPORTED(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapUsed);
-MARK_ATTRIBUTE_SUPPORTED(Clusters::SoftwareDiagnosticsLogic, SoftwareDiagnostics, CurrentHeapHighWatermark);
-
-} // namespace chip::app
 
 namespace chip {
 namespace app {
@@ -44,9 +33,12 @@ namespace Clusters {
 class SoftwareDiagnosticsLogic
 {
 public:
-    SoftwareDiagnosticsLogic(const SupportedAttributes<SoftwareDiagnosticsLogic> & enabledAttributes) :
-        mEnabledAttributes(enabledAttributes)
-    {}
+    using SupportedAttributes = chip::app::SupportedAttributes<SoftwareDiagnostics::Attributes::ThreadMetrics::Id,
+                                                               SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
+                                                               SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id,
+                                                               SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
+
+    SoftwareDiagnosticsLogic(const SupportedAttributes & enabledAttributes) : mEnabledAttributes(enabledAttributes) {}
     virtual ~SoftwareDiagnosticsLogic() = default;
 
     CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapFree(out); }
