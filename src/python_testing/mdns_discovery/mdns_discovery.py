@@ -617,7 +617,7 @@ class MdnsDiscovery:
             if is_discovered:
                 logger.info(f"Service record information {rec_types} for '{service_name}' / '{service_type}' discovered.")
 
-                # Convert discovred service info into MdnsServiceInfo object
+                # Convert discovered service info into MdnsServiceInfo object
                 mdns_service_info = MdnsServiceInfo(service_info)
 
                 # Add service to discovered services
