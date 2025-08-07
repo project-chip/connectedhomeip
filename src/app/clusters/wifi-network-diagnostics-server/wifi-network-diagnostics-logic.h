@@ -18,28 +18,30 @@
 
 #pragma once
 
+#include "app/server-cluster/OptionalAttributes.h"
 #include <app/AttributeValueEncoder.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/DiagnosticDataProvider.h>
 
+namespace chip::app {
+
+ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, CurrentMaxRate);
+
+} // namespace chip::app
+
 namespace chip {
 namespace app {
 namespace Clusters {
-
-struct WiFiNetworkDiagnosticsEnabledAttributes
-{
-    bool enableCurrentMaxRate : 1;
-};
 
 class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                               const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
+                               const ClusterAttributeBits<WiFiNetworkDiagnostics::Id> & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mEndpointId(endpointId),
-        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes),
+        mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }
@@ -87,12 +89,12 @@ public:
     // Getter methods for private members
     EndpointId GetEndpointId() const { return mEndpointId; }
     const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
-    const WiFiNetworkDiagnosticsEnabledAttributes & GetEnabledAttributes() const { return mEnabledAttributes; }
+    const AttributeBits & GetEnabledAttributes() const { return mEnabledAttributes; }
 
 private:
     EndpointId mEndpointId;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
-    const WiFiNetworkDiagnosticsEnabledAttributes mEnabledAttributes;
+    const AttributeBits mEnabledAttributes;
     const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
 };
 

@@ -28,6 +28,8 @@ using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
 
+// mark flags controller by features as "optional" for them to stay settable in
+// our internal implementation
 namespace chip::app {
 
 ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, BeaconLostCount);
@@ -37,7 +39,6 @@ ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, PacketMulticastRxCount);
 ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, PacketUnicastRxCount);
 ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, PacketMulticastTxCount);
 ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, PacketUnicastTxCount);
-ATTRIBUTE_BITS_MARK_OPTIONAL(WiFiNetworkDiagnostics, CurrentMaxRate);
 
 } // namespace chip::app
 
@@ -127,7 +128,7 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
         CurrentMaxRate::kMetadataEntry,         //
     };
 
-    ClusterAttributeBits<WiFiNetworkDiagnostics::Id> enabledAttributes;
+    ClusterAttributeBits<WiFiNetworkDiagnostics::Id> enabledAttributes(mLogic.GetEnabledAttributes());
 
     if (featureFlags.Has(Feature::kErrorCounts))
     {
@@ -143,8 +144,6 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
         enabledAttributes.Set<PacketUnicastRxCount::Id>();
         enabledAttributes.Set<PacketUnicastTxCount::Id>();
     }
-    enabledAttributes.Set<CurrentMaxRate::Id>(mLogic.GetEnabledAttributes().enableCurrentMaxRate);
-
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), enabledAttributes);
 }
 
