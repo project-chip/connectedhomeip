@@ -165,6 +165,7 @@ COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 
 struct TariffUpdateCtx
 {
+    DataModel::Nullable<uint32_t> & TariffStartTimestamp;
     /* DayEntryIDs */
     std::unordered_set<uint32_t> DayEntryKeyIDs; /* Master - IDs of all given DayEntry items */
 
@@ -183,7 +184,7 @@ struct TariffUpdateCtx
     BitMask<Feature> mFeature;
 
     uint32_t TariffUpdateTimestamp;
-    uint32_t TariffStartTimestamp;
+    //uint32_t TariffStartTimestamp;
 };
 
 /**
@@ -222,25 +223,27 @@ public:
      */
     void TariffDataUpdate(uint32_t aNowTimestamp)
     {
-        TariffUpdateCtx UpdCtx = { .mFeature = mFeature, .TariffUpdateTimestamp = aNowTimestamp };
+        TariffUpdateCtx UpdCtx = { .TariffStartTimestamp = GetStartDate_MgmtObj().GetNewValue(), .mFeature = mFeature, .TariffUpdateTimestamp = aNowTimestamp };
+        bool is_success = false;
 
-        if (!TariffDataUpd_Init(UpdCtx))
+        if (!(is_success = TariffDataUpd_Init(UpdCtx)))
         {
             ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to internal inconsistencies");
         }
-        else if (!TariffDataUpd_CrossValidator(UpdCtx))
+        else if (!(is_success = TariffDataUpd_CrossValidator(UpdCtx)))
         {
             ChipLogError(NotSpecified, "EGW-CTC: New tariff data rejected due to some cross-fields inconsistencies");
         }
         else {
-            if (UpdCtx.TariffStartTimestamp > UpdCtx.TariffUpdateTimestamp)
+            if (!UpdCtx.TariffStartTimestamp.IsNull() && 
+                (UpdCtx.TariffStartTimestamp.Value() > UpdCtx.TariffUpdateTimestamp))
             {
                 DelayedTariffUpdateIsActive = true;
                 return;
             }
         }
 
-        TariffDataUpd_Finish();
+        TariffDataUpd_Finish(is_success);
     }
 
     void TryToactivateDelayedTariff(uint32_t now)
@@ -252,7 +255,7 @@ public:
 
         if (now >= GetStartDate_MgmtObj().GetNewValue().Value())
         {
-            TariffDataUpd_Finish();
+            TariffDataUpd_Finish(true);
             DelayedTariffUpdateIsActive = false;
         }
     }
@@ -307,12 +310,12 @@ private:
 
     virtual bool TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx) { return true; }
 
-    void TariffDataUpd_Finish()
+    void TariffDataUpd_Finish(bool is_success)
     {
         std::vector<AttributeId> UpdatedAttrIds;
 
 #define X(attrName, attrType) \
-        if (m##attrName##_MgmtObj.UpdateFinish());                      \
+        if (m##attrName##_MgmtObj.UpdateFinish(is_success))                       \
         {                                                               \
             UpdatedAttrIds.push_back(m##attrName##_MgmtObj.GetAttrId());  \
         }

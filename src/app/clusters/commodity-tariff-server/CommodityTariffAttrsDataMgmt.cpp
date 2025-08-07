@@ -166,8 +166,11 @@ CHIP_ERROR TariffUnitDataClass::Validate(const ValueType & aValue) const
 
 CHIP_ERROR StartDateDataClass::Validate(const ValueType & aValue) const
 {
-    VerifyOrReturnError((aValue.IsNull() || (static_cast<TariffUpdateCtx *>(mAuxData)->TariffUpdateTimestamp <= aValue.Value())),
+    if (!aValue.IsNull() && aValue.Value() != 0)
+    {
+        VerifyOrReturnError((static_cast<TariffUpdateCtx *>(mAuxData)->TariffUpdateTimestamp <= aValue.Value()),
             CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -813,8 +816,19 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
     auto & newList   = aValue.Value();
     bool isFirstItem = true;
     Nullable<uint32_t> previousStartDate;
+
+    TariffUpdateCtx * ctx = static_cast<TariffUpdateCtx *>(mAuxData);
+
     std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs =
-        static_cast<TariffUpdateCtx *>(mAuxData)->CalendarPeriodsDayPatternIDs;
+        ctx->CalendarPeriodsDayPatternIDs;
+
+    auto & tariffStartDate = ctx->TariffStartTimestamp;
+
+    if (tariffStartDate.IsNull())
+    {
+        // StartDate is Null - tariff is unavailable;
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     for (const auto & item : newList)
     {
@@ -835,9 +849,23 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
         // Special handling for first item
         if (isFirstItem)
         {
+            if (tariffStartDate.Value() == 0 && (!item.startDate.IsNull() && item.startDate.Value() > 0))
+            {
+                ChipLogError(NotSpecified, "The first StartDate in CalendarPeriods can't have a value if the StartDate of tariff is 0");
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            else if (tariffStartDate.Value() > 0 && (item.startDate.IsNull() || item.startDate.Value() == 0) )
+            {
+                ChipLogError(NotSpecified, "The first StartDate in CalendarPeriods can't be not set if the StartDate of tariff is specified");
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            else
+            {
+                previousStartDate = item.startDate;
+            }
+
             isFirstItem = false;
             // First item can have null StartDate
-            previousStartDate = item.startDate;
             continue;
         }
 

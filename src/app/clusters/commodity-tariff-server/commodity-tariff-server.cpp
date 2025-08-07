@@ -276,13 +276,12 @@ void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aU
         AttributeUpdCb(attr_id);
     }
 
-    if (is_erased)
-    {
-        DeinitCurrentAttrs();
-        return;
-    }
+    DeinitCurrentAttrs();
 
-    InitCurrentAttrs();
+    if (!is_erased)
+    {
+        InitCurrentAttrs();;
+    }
 }
 
 namespace Utils {
@@ -337,21 +336,28 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
 
     if (!aCtx.mTariffProvider->GetCalendarPeriods().IsNull())
     {
-        for (const auto & period : aCtx.mTariffProvider->GetCalendarPeriods().Value())
+        const Structs::CalendarPeriodStruct::Type * period = nullptr;
+
+        for (const auto & entry : aCtx.mTariffProvider->GetCalendarPeriods().Value())
         {
-            if (period.startDate.IsNull() ||
-                ((period.startDate.Value() >= DayStartTS) && (period.startDate.Value() < (DayStartTS + kSecondsPerDay))))
+            period = &entry;
+            if (entry.startDate.Value() >= DayStartTS && entry.startDate.Value() < (DayStartTS + kSecondsPerDay))
             {
-                for (const auto & patternID : period.dayPatternIDs)
+                break;
+            }
+        }
+
+        if (period != nullptr)
+        {
+            for (const auto & patternID : period->dayPatternIDs)
+            {
+                auto * pattern = GetCurrNextItemsById<Structs::DayPatternStruct::Type>(aCtx.DayPatternsMap, patternID).first;
+                if ((pattern != nullptr) && pattern->daysOfWeek.Has(GetDayOfWeek(timestamp)))
                 {
-                    auto * pattern = GetCurrNextItemsById<Structs::DayPatternStruct::Type>(aCtx.DayPatternsMap, patternID).first;
-                    if ((pattern != nullptr) && pattern->daysOfWeek.Has(GetDayOfWeek(timestamp)))
-                    {
-                        defaultDay.date        = DayStartTS;
-                        defaultDay.dayType     = DayTypeEnum::kStandard;
-                        defaultDay.dayEntryIDs = pattern->dayEntryIDs;
-                        break;
-                    }
+                    defaultDay.date        = DayStartTS;
+                    defaultDay.dayType     = DayTypeEnum::kStandard;
+                    defaultDay.dayEntryIDs = pattern->dayEntryIDs;
+                    break;
                 }
             }
         }
@@ -456,78 +462,63 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
-
-    // Use DataModel::List with manual memory management
-    DataModel::List<Structs::TariffComponentStruct::Type> tempList;
-    Structs::TariffComponentStruct::Type* tempArray = nullptr;
-    DataModel::Nullable<CharSpan>* labelCopies = nullptr;
+    std::vector<Structs::TariffComponentStruct::Type> tempVector;
 
     if (period == nullptr)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-
+    const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
     const size_t componentCount = period->tariffComponentIDs.size();
-    if (componentCount > 0) {
-        tempArray = static_cast<Structs::TariffComponentStruct::Type*>(
-            Platform::MemoryCalloc(componentCount, sizeof(Structs::TariffComponentStruct::Type)));
-        labelCopies = static_cast<DataModel::Nullable<CharSpan>*>(
-            Platform::MemoryCalloc(componentCount, sizeof(DataModel::Nullable<CharSpan>)));
-        
-        if (!tempArray || !labelCopies) {
-            Platform::MemoryFree(tempArray);
-            Platform::MemoryFree(labelCopies);
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
 
-    tempList = DataModel::List<Structs::TariffComponentStruct::Type>(tempArray, componentCount);
-
-    for (size_t i = 0; i < componentCount; ++i) {
-        const uint32_t entryID = period->tariffComponentIDs[i];
+    tempVector.reserve(componentCount);
+    
+    for (const auto & entryID : componentIDs)
+    {
+        Structs::TariffComponentStruct::Type entry;
         auto current = GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(aCtx.TariffComponentsMap, entryID).first;
-        if (current == nullptr) {
+        if (current == nullptr)
+        {
             err = CHIP_ERROR_NOT_FOUND;
             break;
         }
-
-        tempArray[i] = *current;
-        if (current->label.HasValue()) {
-            if (!current->label.Value().IsNull()) {
-                const CharSpan & srcLabelSpan = current->label.Value().Value();
-                if (!CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(srcLabelSpan, labelCopies[i], srcLabelSpan.size())) {
-                    err = CHIP_ERROR_NO_MEMORY;
-                    break;
+        entry = *current;
+        if (current->label.HasValue())
+        {
+            DataModel::Nullable<chip::CharSpan> tmpNullLabel;
+            tmpNullLabel.SetNull();
+            if (!current->label.Value().IsNull())
+            {
+                chip::CharSpan srcLabelSpan = current->label.Value().Value();
+                if (!CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
+                                                                          srcLabelSpan.size()))
+                {
+                    return CHIP_ERROR_NO_MEMORY;
                 }
             }
-            tempArray[i].label = MakeOptional(labelCopies[i]);
+            entry.label = MakeOptional(tmpNullLabel);
         }
+        tempVector.push_back(entry);
     }
 
     if (err == CHIP_NO_ERROR)
     {
-        err = mgmtObj.SetNewValue(MakeNullable(tempList));
+        err = mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempVector.data(), tempVector.size())));
 
         if (err == CHIP_NO_ERROR)
         {
             err = mgmtObj.UpdateBegin(nullptr);
 
-            if (mgmtObj.UpdateFinish()) // Success path
+            if (mgmtObj.UpdateFinish(err == CHIP_NO_ERROR)) // Success path
             {
                 aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
             }
         }
     }
-
-    // Cleanup if we still own the data
-    if (!tempList.empty()) {
-        for (size_t i = 0; i < componentCount; ++i) {
-            if (labelCopies && !labelCopies[i].IsNull() && !labelCopies[i].Value().empty()) {
-                Platform::MemoryFree(const_cast<char*>(labelCopies[i].Value().data()));
-            }
-        }
-        Platform::MemoryFree(tempArray);
-        Platform::MemoryFree(labelCopies);
+    else
+    {
+        for (auto & entry : tempVector)
+            mgmtObj.CleanupExtEntry(entry);
     }
 
     return err;
@@ -563,7 +554,6 @@ void Instance::InitCurrentAttrs()
 void Instance::UpdateCurrentAttrs()
 {
     uint32_t now = GetCurrentTimestamp();
-    bool daysUpdIsNeeded = false;
 
     if (!now)
     {
@@ -571,25 +561,22 @@ void Instance::UpdateCurrentAttrs()
         return;
     }
 
-    const uint32_t secondsSinceMidnight = now % kSecondsPerDay;
-    daysUpdIsNeeded = (secondsSinceMidnight < kSecondsPerMinute) ? true : false;
+    if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
+    {
+        ChipLogError(NotSpecified, "The tariff is not active");
+        return;
+    }
 
-    if (daysUpdIsNeeded)
+    do
     { 
         DataModel::Nullable<Structs::DayStruct::Type> Day;
-        if (mCurrentDay.IsNull())
+
+        Day.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now));
+        // Find current day
+        if (Utils::DayIsValid(&Day.Value()))
         {
-            Day.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now));
-            // Find current day
-            if (Utils::DayIsValid(&Day.Value()))
-            {
-                SetCurrentDay(Day);
-            }
-        }
-        else
-        {
-            // Move next day to current
-            SetCurrentDay(mNextDay);
+            ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day date: %u", Day.Value().date);
+            SetCurrentDay(Day);
         }
 
         if (mCurrentDay.IsNull())
@@ -602,9 +589,10 @@ void Instance::UpdateCurrentAttrs()
         Day = Utils::FindDay(mServerTariffAttrsCtx, now + kSecondsPerDay);
         if (Utils::DayIsValid(&Day.Value()))
         {
+            ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day date: %u", Day.Value().date);
             SetNextDay(Day);
         }
-    }
+    } while (0);
 
     do {
         uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);

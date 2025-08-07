@@ -900,10 +900,11 @@ public:
 
     /**
      * @brief the function performs a correct completion of the value update process
+     * @param aUpdateAllow allows the upper level of the application to determine the need to update the attribute value.
      * @return The return value indicates that the stored value has changed.
      * @note Performs cleanup and resets to idle state
      */
-    bool UpdateFinish()
+    bool UpdateFinish(bool aUpdateAllow)
     {
         bool ret = false;
         /* Skip if the attribute object has no new attached data */
@@ -912,7 +913,7 @@ public:
             return false;
         }
 
-        if ((mUpdateState == UpdateState::kValidated) && (HasChanged()))
+        if (aUpdateAllow && (mUpdateState == UpdateState::kValidated) && (HasChanged()))
         {
             if (HasValue())
             {
