@@ -20,9 +20,10 @@ import xml.etree.ElementTree as ElementTree
 import zipfile
 
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_namespaces, parse_namespace, 
+from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_namespaces, parse_namespace,
                                        get_data_model_directory, DataModelLevel)
 from mobly import asserts
+
 
 class TestSpecParsingNamespace(MatterBaseTest):
     def setup_class(self):
@@ -62,7 +63,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
         asserts.assert_equal(namespace.id, self.namespace_id, "Incorrect namespace ID")
         asserts.assert_equal(namespace.name, self.namespace_name, "Incorrect namespace name")
         asserts.assert_equal(len(namespace.tags), len(self.tags), "Incorrect number of tags")
-        
+
         for tag_id, tag_name in self.tags.items():
             asserts.assert_true(tag_id in namespace.tags, f"Tag ID 0x{tag_id:04X} not found")
             asserts.assert_equal(namespace.tags[tag_id].name, tag_name, f"Incorrect name for tag 0x{tag_id:04X}")
@@ -123,7 +124,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
                                0, "1.4 dir contains less namespaces than 1.3")
 
         # Complete namespace version checks for 1.3, 1.4, 1.4.1, 1.4.2, known differences and relationships:
-        # 1.3: has Common Position 
+        # 1.3: has Common Position
         # 1.4/1.4.1: removed Common Position, added Common Area/Landmark/Relative Position
         # 1.4.2: added back Common Position, kept new ones from 1.4/1.4.1
 
@@ -215,7 +216,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
             # Verify that every XML file in the namespace directory was processed
             top = get_data_model_directory(dm_path, DataModelLevel.kNamespace)
-            
+
             # Count XML files in the directory
             xml_file_count = 0
             if isinstance(top, zipfile.Path):
@@ -225,10 +226,11 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
             # Verify that the number of namespaces parsed matches the number of XML files
             asserts.assert_equal(
-                len(namespaces), 
-                xml_file_count, 
+                len(namespaces),
+                xml_file_count,
                 f"Version {version}: Expected {xml_file_count} XML files to be parsed, but got {len(namespaces)} namespaces"
             )
+
 
 if __name__ == "__main__":
     default_matter_test_main()
