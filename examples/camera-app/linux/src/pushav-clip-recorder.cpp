@@ -30,6 +30,10 @@ extern "C" {
 #include <libavutil/timestamp.h>
 }
 
+#ifndef LIBAVCODEC_VERSION_INT
+#error "LIBAVCODEC_VERSION_INT not defined. Please use a version of FFmpeg/libavcodec that defines this macro."
+#endif
+
 #define IS_H264_FRAME_NALU_HEAD(frame)                                                                                             \
     (((frame)[0] == 0x00) && ((frame)[1] == 0x00) && (((frame)[2] == 0x01) || (((frame)[2] == 0x00) && ((frame)[3] == 0x01))))
 
@@ -391,8 +395,18 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
             Stop();
             return -1;
         }
+
         mAudioEncoderContext->sample_rate = mAudioInfo.mSampleRate;
+
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(59, 37, 100)
+        ChipLogProgress(Camera, "PushAVClipRecorder using FFMPEG version < 5.1");
+        mAudioEncoderContext->channels       = mAudioInfo.mChannels;
+        mAudioEncoderContext->channel_layout = static_cast<uint64_t>(av_get_default_channel_layout(mAudioEncoderContext->channels));
+#else
+        ChipLogProgress(Camera, "PushAVClipRecorder using FFMPEG version >= 5.1");
         av_channel_layout_default(&mAudioEncoderContext->ch_layout, mAudioInfo.mChannels);
+#endif
+
         mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
         mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
         mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
