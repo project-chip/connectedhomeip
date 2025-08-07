@@ -430,8 +430,8 @@ class ClusterParser:
                 continue
             try:
                 name = xml_field.attrib['name']
-                id = xml_field.attrib[component_tags[component_type].id_attrib]
-            except KeyError:
+                id = uint(int(xml_field.attrib[component_tags[component_type].id_attrib], 0))
+            except (KeyError, ValueError):
                 p = ProblemNotice("Spec XML Parsing", location=location,
                                   severity=ProblemSeverity.WARNING, problem=f"Struct field in {struct_name} with no id or name")
                 self._problems.append(p)
@@ -934,7 +934,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             enums = deepcopy(base.enums)
             enums.update(c.enums)
             bitmaps = deepcopy(base.bitmaps)
-            enums.update(c.bitmaps)
+            bitmaps.update(c.bitmaps)
             unknown_commands = deepcopy(base.unknown_commands)
             for cmd in c.unknown_commands:
                 if cmd.id in accepted_commands.keys() and cmd.name == accepted_commands[uint(cmd.id)].name:
