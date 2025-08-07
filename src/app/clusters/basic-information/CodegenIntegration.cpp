@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/endpoint-config-api.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/static-cluster-config/BasicInformation.h>
@@ -53,18 +54,25 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
 
     BasicInformationCluster::Instance().OptionalAttributes() =
         BitFlags<OptionalBasicInformationAttributes>()
-            .Set(OptionalBasicInformationAttributes::kManufacturingDate, IsAttributeEnabledOnSomeEndpoint(ManufacturingDate::Id))
-            .Set(OptionalBasicInformationAttributes::kPartNumber, IsAttributeEnabledOnSomeEndpoint(PartNumber::Id))
-            .Set(OptionalBasicInformationAttributes::kProductURL, IsAttributeEnabledOnSomeEndpoint(ProductURL::Id))
-            .Set(OptionalBasicInformationAttributes::kProductLabel, IsAttributeEnabledOnSomeEndpoint(ProductLabel::Id))
-            .Set(OptionalBasicInformationAttributes::kSerialNumber, IsAttributeEnabledOnSomeEndpoint(SerialNumber::Id))
+            .Set(OptionalBasicInformationAttributes::kManufacturingDate,
+                 emberAfContainsAttribute(endpointId, BasicInformation::Id, ManufacturingDate::Id))
+            .Set(OptionalBasicInformationAttributes::kPartNumber,
+                 emberAfContainsAttribute(endpointId, BasicInformation::Id, PartNumber::Id))
+            .Set(OptionalBasicInformationAttributes::kProductURL,
+                 emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductURL::Id))
+            .Set(OptionalBasicInformationAttributes::kProductLabel,
+                 emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductLabel::Id))
+            .Set(OptionalBasicInformationAttributes::kSerialNumber,
+                 emberAfContainsAttribute(endpointId, BasicInformation::Id, SerialNumber::Id))
             .Set(OptionalBasicInformationAttributes::kLocalConfigDisabled,
-                 IsAttributeEnabledOnSomeEndpoint(LocalConfigDisabled::Id))
-            .Set(OptionalBasicInformationAttributes::kReachable, IsAttributeEnabledOnSomeEndpoint(Reachable::Id))
-            .Set(OptionalBasicInformationAttributes::kProductAppearance, IsAttributeEnabledOnSomeEndpoint(ProductAppearance::Id))
+                 emberAfContainsAttribute(endpointId, BasicInformation::Id, LocalConfigDisabled::Id))
+            .Set(OptionalBasicInformationAttributes::kReachable,
+                 emberAfContainsAttribute(endpointId, BasicInformation::Id, Reachable::Id))
+            .Set(OptionalBasicInformationAttributes::kProductAppearance,
+                 emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductAppearance::Id))
             // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this
             .Set(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose,
-                 !IsAttributeEnabledOnSomeEndpoint(UniqueID::Id));
+                 !emberAfContainsAttribute(endpointId, BasicInformation::Id, UniqueID::Id));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gRegistration);
     if (err != CHIP_NO_ERROR)
