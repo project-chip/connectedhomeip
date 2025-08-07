@@ -58,15 +58,16 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
             .Set<ActiveNetworkFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveNetworkFaults::Id));
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-    const GeneralDiagnosticsFunctionsConfig functionsConfig{
-    /*
-    Only consider real time if time sync cluster is actually enabled. If it's not
-    enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-    */
+    const GeneralDiagnosticsFunctionsConfig functionsConfig
+    {
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
         .enablePosixTime = true,
 #else
-        .enablePosixTime = false,
+        .enablePosixTime      = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
         .enablePayloadSnaphot = true,

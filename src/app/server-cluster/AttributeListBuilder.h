@@ -44,7 +44,6 @@ public:
 
 private:
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & mBuilder;
-
 };
 
 } // namespace app
