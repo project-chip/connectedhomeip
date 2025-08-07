@@ -67,13 +67,14 @@ import os
 import random
 import tempfile
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.apps import IcdAppServerSubprocess
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.apps import IcdAppServerSubprocess
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0

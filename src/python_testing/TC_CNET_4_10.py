@@ -17,12 +17,13 @@
 
 import logging
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.clusters.Types import NullValue
-from chip.testing.decorators import has_feature, run_if_endpoint_matches
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 # Thread TLV Type mapping for operational dataset parsing
 THREAD_TLV_TYPE_MAP = {
@@ -89,17 +90,17 @@ class TC_CNET_4_10(MatterBaseTest):
            in the --thread-dataset-hex command-line argument.
         4. TH can communicate with the DUT on the commissioned network.
 
-    Example usage: 
+    Example usage:
         To run the test case, use the following command:
 
         ```bash
-        python src/python_testing/TC_CNET_4_10.py --commissioning-method ble-thread --discriminator 3840 --passcode 20202021 \ 
+        python src/python_testing/TC_CNET_4_10.py --commissioning-method ble-thread --discriminator 3840 --passcode 20202021 \
         --endpoint <endpoint_value> --thread-dataset-hex <dataset_value>
         ```
 
-        Where `<endpoint_value>` should be replaced with the actual endpoint number 
+        Where `<endpoint_value>` should be replaced with the actual endpoint number
         for the Network Commissioning cluster on the DUT, and
-        `dataset_value` should be replaced with the operational dataset of the DUT in hexadecimal format. 
+        `dataset_value` should be replaced with the operational dataset of the DUT in hexadecimal format.
         The Extended PAN ID will be automatically extracted from the provided dataset.
     """
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -39,6 +40,12 @@ namespace PowerThreshold {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerThreshold::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PowerThreshold
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    MeterType::kMetadataEntry,
+    PointOfDelivery::kMetadataEntry,
+    MeterSerialNumber::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
