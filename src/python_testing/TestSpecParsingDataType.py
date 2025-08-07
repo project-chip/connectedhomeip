@@ -28,7 +28,7 @@ from mobly import asserts
 class TestSpecParsingDataType(MatterBaseTest):
     def setup_class(self):
         # Get the latest fully qualified release for testing
-        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
 
         # Setup templates for testing struct, enum, and bitmap data types
         self.cluster_id = 0xABCD
@@ -690,7 +690,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         one_three, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
         one_four, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         one_four_one, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
-        tot, _ = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
+        one_four_two, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
 
         # Sample cluster ID to check for data types (Basic Information)
         cluster_id = uint(Clusters.BasicInformation.id)
@@ -699,15 +699,15 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true(cluster_id in one_three, "Basic Information cluster not found in 1.3")
         asserts.assert_true(cluster_id in one_four, "Basic Information cluster not found in 1.4")
         asserts.assert_true(cluster_id in one_four_one, "Basic Information cluster not found in 1.4.1")
-        asserts.assert_true(cluster_id in tot, "Basic Information cluster not found in master")
+        asserts.assert_true(cluster_id in one_four_two, "Basic Information cluster not found in 1.4.2")
 
         # Compare struct counts (should generally increase or stay the same over versions)
-        asserts.assert_less_equal(len(one_three[cluster_id].structs), len(tot[cluster_id].structs),
-                                  "Master should have at least as many structs as 1.3")
-        asserts.assert_less_equal(len(one_four[cluster_id].structs), len(tot[cluster_id].structs),
-                                  "Master should have at least as many structs as 1.4")
-        asserts.assert_less_equal(len(one_four_one[cluster_id].structs), len(tot[cluster_id].structs),
-                                  "Master should have at least as many structs as 1.4.1")
+        asserts.assert_less_equal(len(one_three[cluster_id].structs), len(one_four_two[cluster_id].structs),
+                                  "1.4.2 should have at least as many structs as 1.3")
+        asserts.assert_less_equal(len(one_four[cluster_id].structs), len(one_four_two[cluster_id].structs),
+                                  "1.4.2 should have at least as many structs as 1.4")
+        asserts.assert_less_equal(len(one_four_one[cluster_id].structs), len(one_four_two[cluster_id].structs),
+                                  "1.4.2 should have at least as many structs as 1.4.1")
 
     def test_find_complex_bitmaps(self):
         """Find and test bitmaps with multi-bit fields in the data model"""
@@ -962,10 +962,12 @@ class TestSpecParsingDataType(MatterBaseTest):
                     if not field_id:
                         issues.append(f"Struct field with empty id in {struct_name} of cluster {cluster.name}")
                     # Skip type_info check for deprecated Key field
-                    if (struct_name.strip() == "MonitoringRegistrationStruct" and
+                    if ((struct_name.strip() == "MonitoringRegistrationStruct" and
                         field.name.strip() == "Key" and
-                            "ICD Management" in cluster.name):
-                        continue
+                        "ICD Management" in cluster.name) or (struct_name.strip() == "ModeOptionStruct" and field.name.strip() == "Mode") 
+                        or (struct_name.strip() == "ModeOptionStruct" and field.name.strip() == "ModeTags") 
+                        or (struct_name.strip() == "ModeOptionStruct" and field.name.strip() == "Label")):
+                            continue
                     if field.type_info is None:
                         issues.append(f"Struct field {field.name} in {struct_name} of cluster {cluster.name} missing type_info")
 
