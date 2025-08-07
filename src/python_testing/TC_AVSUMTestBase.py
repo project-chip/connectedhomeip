@@ -17,9 +17,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
 
@@ -213,6 +214,14 @@ class AVSUMTestBase:
     async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
         cluster = Clusters.Objects.CameraAvStreamManagement
         attrs = cluster.Attributes
+
+        # Check if video stream has already been allocated
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attrs.AllocatedVideoStreams
+        )
+        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        if len(aAllocatedVideoStreams) > 0:
+            return aAllocatedVideoStreams[0].videoStreamID
 
         # Check for watermark and OSD features
         feature_map = await self.read_avstr_attribute_expect_success(endpoint, attrs.FeatureMap)

@@ -17,9 +17,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +78,7 @@ class AVSMTestBase:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-    async def precondition_one_allocated_audio_stream(self):
+    async def precondition_one_allocated_audio_stream(self, streamUsage: Globals.Enums.StreamUsageEnum = None):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
@@ -106,10 +108,15 @@ class AVSMTestBase:
         )
         logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+        if streamUsage:
+            asserts.assert_in(streamUsage, aStreamUsagePriorities,
+                              f"{Globals.Enums.StreamUsageEnum(streamUsage).name} is not a supported stream usage")
+        else:
+            streamUsage = aStreamUsagePriorities[0]
 
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=streamUsage,
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
@@ -125,7 +132,7 @@ class AVSMTestBase:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-    async def precondition_one_allocated_video_stream(self):
+    async def precondition_one_allocated_video_stream(self, streamUsage: Globals.Enums.StreamUsageEnum = None):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
@@ -173,9 +180,14 @@ class AVSMTestBase:
 
         try:
             asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+            if streamUsage:
+                asserts.assert_in(streamUsage, aStreamUsagePriorities,
+                                  f"{Globals.Enums.StreamUsageEnum(streamUsage).name} is not a supported stream usage")
+            else:
+                streamUsage = aStreamUsagePriorities[0]
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=streamUsage,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
