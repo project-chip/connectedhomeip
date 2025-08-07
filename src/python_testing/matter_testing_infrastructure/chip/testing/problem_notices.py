@@ -129,10 +129,8 @@ class DeviceTypePathLocation:
 @dataclass
 class NamespacePathLocation:
     """Location in a namespace definition"""
-
-    def __init__(self, namespace_id: Optional[int] = None, tag_id: Optional[int] = None):
-        self.namespace_id = namespace_id
-        self.tag_id = tag_id
+    namespace_id: Optional[int] = None
+    tag_id: Optional[int] = None
 
     def __str__(self) -> str:
         result = "Namespace"

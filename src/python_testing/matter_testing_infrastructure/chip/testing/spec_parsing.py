@@ -22,11 +22,10 @@ import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 from importlib.abc import Traversable
 from typing import Callable, Optional, Union
-import os
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
@@ -148,10 +147,9 @@ XML namespaces and XML Tags dataclass implementation below this line
 @dataclass
 class XmlNamespace:
     """Represents a namespace definition from XML"""
-    def __init__(self):
-        self.id: int = 0
-        self.name: str = ""
-        self.tags: dict[int, XmlTag] = {}
+    id: int = 0
+    name: str = ""
+    tags: dict[int, 'XmlTag'] = field(default_factory=dict)
 
     def __str__(self) -> str:
         tags_str = '\n  '.join(f"{tag_id:04X}: {tag.name}" 
@@ -161,10 +159,9 @@ class XmlNamespace:
 @dataclass
 class XmlTag:
     """Represents a tag within a namespace"""
-    def __init__(self):
-        self.id: int = 0
-        self.name: str = ""
-        self.description: Optional[str] = None
+    id: int = 0
+    name: str = ""
+    description: Optional[str] = None
 
     def __str__(self) -> str:
         desc = f" - {self.description}" if self.description else ""
@@ -173,7 +170,6 @@ class XmlTag:
 """
 XML namespaces and XML Tags implementation above this line
 """
-
 @dataclass
 class XmlDeviceType:
     name: str
