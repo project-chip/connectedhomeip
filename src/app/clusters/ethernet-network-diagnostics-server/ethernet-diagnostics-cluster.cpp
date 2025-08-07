@@ -60,8 +60,8 @@ CHIP_ERROR EncodeU64Value(uint64_t value, CHIP_ERROR readError, AttributeValueEn
 
 EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
                                                                    const EthernetDiagnosticsEnabledAttributes & enabledAttributes) :
-    DefaultServerCluster({ kRootEndpointId, EthernetNetworkDiagnostics::Id }), mProvider(provider),
-    mEnabledAttributes(enabledAttributes)
+    DefaultServerCluster({ kRootEndpointId, EthernetNetworkDiagnostics::Id }),
+    mProvider(provider), mEnabledAttributes(enabledAttributes)
 {}
 
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
