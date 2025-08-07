@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import shlex
 from enum import Enum, auto
@@ -153,6 +154,33 @@ class AndroidBuilder(Builder):
         self.app = app
         self.profile = profile
 
+    def _get_sdk_manager_paths(self):
+        """Get list of possible SDK manager paths for Android SDK compatibility."""
+        return [
+            os.path.join(os.environ["ANDROID_HOME"], "cmdline-tools", "latest", "bin", "sdkmanager"),  # modern Android SDK
+            os.path.join(os.environ["ANDROID_HOME"], "cmdline-tools", "10.0", "bin", "sdkmanager"),    # specific version
+            os.path.join(os.environ["ANDROID_HOME"], "tools", "bin", "sdkmanager")                     # legacy Android SDK
+        ]
+
+    def _find_sdk_manager(self, for_purpose="validation"):
+        """Find a valid SDK manager executable from possible paths."""
+        sdk_manager_paths = self._get_sdk_manager_paths()
+
+        sdk_manager = None
+        checked_details = []
+        for path in sdk_manager_paths:
+            exists = os.path.isfile(path)
+            executable = os.access(path, os.X_OK) if exists else False
+            checked_details.append(f"{path} (exists: {exists}, executable: {executable})")
+            logging.debug(f"Checking SDK manager path for {for_purpose}: {path} - exists: {exists}, executable: {executable}")
+
+            if exists and executable:
+                sdk_manager = path
+                logging.info(f"Found SDK manager for {for_purpose} at: {sdk_manager}")
+                break
+
+        return sdk_manager, checked_details
+
     def validate_build_environment(self):
         for k in ["ANDROID_NDK_HOME", "ANDROID_HOME"]:
             if k not in os.environ:
@@ -161,23 +189,16 @@ class AndroidBuilder(Builder):
                 )
 
         # SDK manager must be runnable to 'accept licenses'
-        sdk_manager = os.path.join(
-            os.environ["ANDROID_HOME"], "tools", "bin", "sdkmanager"
-        )
+        # Check multiple possible SDK manager locations for Android SDK compatibility
+        sdk_manager, checked_details = self._find_sdk_manager("validation")
 
-        # New SDK manager at cmdline-tools/10.0/bin/
-        new_sdk_manager = os.path.join(
-            os.environ["ANDROID_HOME"], "cmdline-tools", "10.0", "bin", "sdkmanager"
-        )
-        if not (
-            os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)
-        ) and not (
-            os.path.isfile(new_sdk_manager) and os.access(
-                new_sdk_manager, os.X_OK)
-        ):
+        if not sdk_manager:
+            logging.error("SDK manager not found in any expected location")
+            for detail in checked_details:
+                logging.error(f"  {detail}")
             raise Exception(
-                "'%s' and '%s' is not executable by the current user"
-                % (sdk_manager, new_sdk_manager)
+                "SDK manager not found in any expected location. Checked: %s"
+                % "; ".join(checked_details)
             )
 
         # In order to accept a license, the licenses folder is updated with the hash of the
@@ -411,27 +432,15 @@ class AndroidBuilder(Builder):
 
             self._Execute(gn_gen, title="Generating " + self.identifier)
 
-            new_sdk_manager = os.path.join(
-                os.environ["ANDROID_HOME"],
-                "cmdline-tools",
-                "10.0",
-                "bin",
-                "sdkmanager",
-            )
-            if os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK):
+            sdk_manager_for_licenses, _ = self._find_sdk_manager("license acceptance")
+
+            if sdk_manager_for_licenses:
                 self._Execute(
-                    ["bash", "-c", "yes | %s --licenses >/dev/null" %
-                        new_sdk_manager],
-                    title="Accepting NDK licenses @ cmdline-tools",
+                    ["bash", "-c", "yes | %s --licenses >/dev/null" % sdk_manager_for_licenses],
+                    title="Accepting NDK licenses using: %s" % sdk_manager_for_licenses,
                 )
             else:
-                sdk_manager = os.path.join(
-                    os.environ["ANDROID_HOME"], "tools", "bin", "sdkmanager"
-                )
-                self._Execute(
-                    ["bash", "-c", "yes | %s --licenses >/dev/null" % sdk_manager],
-                    title="Accepting NDK licenses @ tools",
-                )
+                logging.warning("No SDK manager found for license acceptance - licenses may need to be accepted manually")
 
     def stripSymbols(self):
         output_libs_dir = os.path.join(
