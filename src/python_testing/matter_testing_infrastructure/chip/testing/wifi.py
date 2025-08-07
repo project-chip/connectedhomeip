@@ -150,6 +150,18 @@ async def connect_wifi_mac(ssid: str, password: str) -> Optional[subprocess.Comp
         )
         await asyncio.sleep(WIFI_WAIT_SECONDS)
 
+        # Verify connection
+        check_result = await asyncio.to_thread(
+            subprocess.run,
+            ["networksetup", "-getairportnetwork", interface],
+            capture_output=True,
+            text=True
+        )
+        if ssid in check_result.stdout:
+            logger.info(f" --- connect_wifi_mac: Successfully connected to '{ssid}'")
+        else:
+            logger.warning(f" --- connect_wifi_mac: Could not confirm WiFi connection to '{ssid}'")
+
     except subprocess.CalledProcessError as e:
         logger.error(f" --- connect_wifi_mac: Error connecting with networksetup: {e.stderr.strip()}")
     except Exception as e:
