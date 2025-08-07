@@ -43,7 +43,7 @@ import chip.clusters as Clusters
 from chip.clusters.Attribute import EventPriority
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -265,7 +265,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 response = await self.send_single_cmd(endpoint=self.app_cluster_endpoint, timedRequestTimeoutMs=1000,
                                                       cmd=cluster.Commands.GetCredentialStatus(
                                                           credential=credentials_struct))
-                asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
+                asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
                                     "Unexpected return type for GetCredentialStatus")
                 asserts.assert_true(response.credentialExists == credential_exists,
                                     "Error when executing GetCredentialStatus command, credentialExists={}".format(
@@ -296,7 +296,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     userIndex=userIndex),
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
-                asserts.assert_true(type_matches(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
+                asserts.assert_true(matchers.is_type(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                                     "Unexpected return type for SetCredential")
                 asserts.assert_true(response.status == expected_status,
                                     "Error sending SetCredential command, status={}".format(str(response.status)))

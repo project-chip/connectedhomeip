@@ -44,7 +44,7 @@ import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.conversions import hex_from_bytes
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -204,13 +204,13 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
         self.step(2)
         attestation_resp = await self.send_single_cmd(cmd=opcreds.Commands.AttestationRequest(attestationNonce=nonce))
-        asserts.assert_true(type_matches(attestation_resp, opcreds.Commands.AttestationResponse),
+        asserts.assert_true(matchers.is_type(attestation_resp, opcreds.Commands.AttestationResponse),
                             "DUT returned invalid response to AttestationRequest")
 
         self.step("3a")
         type = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
         dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
-        asserts.assert_true(type_matches(dac_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_dac = dac_resp.certificate
         asserts.assert_less_equal(len(der_dac), 600, "Returned DAC is > 600 bytes")
@@ -224,7 +224,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         self.step("3b")
         type = opcreds.Enums.CertificateChainTypeEnum.kPAICertificate
         pai_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
-        asserts.assert_true(type_matches(pai_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(pai_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_pai = pai_resp.certificate
         asserts.assert_less_equal(len(der_pai), 600, "Returned PAI is > 600 bytes")

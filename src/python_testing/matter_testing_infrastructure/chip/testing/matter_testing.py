@@ -476,7 +476,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         desired_type = attribute.attribute_type.Type
         type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
         read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = type_matches(attr_ret, desired_type)
+        type_ok = matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
@@ -1045,14 +1045,14 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
                 if accept_function(wildcard, e)]
     return matching
 
-
 # TODO(#37537): Remove these temporary aliases after transition period
-type_matches = matchers.is_type
-utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
-utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
-utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
-compare_time = timeoperations.compare_time
-get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
+# type_matches = matchers.is_type
+# utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
+# utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
+# utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
+# compare_time = timeoperations.compare_time
+# get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
+# the commented out were modified
 bytes_from_hex = conversions.bytes_from_hex
 hex_from_bytes = conversions.hex_from_bytes
 id_str = conversions.format_decimal_and_hex
