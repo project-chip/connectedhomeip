@@ -50,10 +50,14 @@ async def establish_session(devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, pa
     elif isinstance(parameter, commissioning.PaseOverIPParameters):
         device = await devCtrl.DiscoverCommissionableNodes(filterType=discovery.FilterType.LONG_DISCRIMINATOR,
                                                            filter=parameter.long_discriminator, stopOnFirst=True)
+        selected_address = None
         if not device:
             raise ValueError("No commissionable device found")
-        selected_address = None
-        for ip in device[0].addresses:
+        if isinstance(device, list):
+            single_device = device[0]
+        else:
+            single_device = device
+        for ip in single_device.addresses:
             if ipaddress.ip_address(ip).is_link_local:
                 # TODO(erjiaqing): To connect a device using link local address requires an interface identifier,
                 # however, the link local address returned from DiscoverCommissionableNodes does not have an
