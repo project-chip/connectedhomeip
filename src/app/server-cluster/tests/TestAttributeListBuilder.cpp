@@ -17,11 +17,11 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/data-model-provider/MetadataTypes.h>
-#include <app/server-cluster/OptionalAttributes.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributes.h>
 
 #include <cstdlib>
 #include <optional>
