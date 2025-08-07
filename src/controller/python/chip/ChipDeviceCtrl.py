@@ -2437,9 +2437,15 @@ class ChipDeviceControllerBase():
                 c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.argtypes = [
-                c_void_p, c_void_p, c_uint64, c_uint16, c_uint16, c_uint32, c_uint16]
-            self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.restype = PyChipError
+            try:
+                # NOTE: Joint Fabric is an optional feature in the Matter SDK core library.
+                #       Build with CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1 to enable it.
+                self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.argtypes = [
+                    c_void_p, c_void_p, c_uint64, c_uint16, c_uint16, c_uint32, c_uint16]
+                self._dmLib.pychip_DeviceController_OpenJointCommissioningWindow.restype = PyChipError
+            except AttributeError:
+                LOGGER.warning("Joint Fabric support is not available in this Matter SDK build. "
+                               "OpenJointCommissioningWindow will not be available.")
 
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
