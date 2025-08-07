@@ -45,7 +45,7 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 };
 
 constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry,
+    CurrentSessions::kMetadataEntry,
 };
 
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
