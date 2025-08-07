@@ -12,7 +12,7 @@ RUN set -x \
     && cd zephyr-silabs \
     && git checkout 7cfc27d9dc7f24f28d4b375b80abaac22eac31c3 \
     # Initialize west with the specific commit of the zephyr-silabs repository
-    # This commit corresponds to the version of the Zephyr SDK used in the project  
+    # This commit corresponds to the version of the Zephyr SDK used in the project
     && cd ../ \
     && west init -l ./zephyr-silabs  \
     && west update \
