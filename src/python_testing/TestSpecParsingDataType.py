@@ -961,34 +961,34 @@ class TestSpecParsingDataType(MatterBaseTest):
                         issues.append(f"Struct field with empty name in {struct_name} of cluster {cluster.name}")
                     if field_id is None:
                         issues.append(f"Struct field with empty id in {struct_name} of cluster {cluster.name}")
-                    
+
                     # Skip known cases where type_info is intentionally missing
                     is_monitoring_key = (struct_name.strip() == "MonitoringRegistrationStruct" and
-                                       field.name.strip() == "Key" and
-                                       "ICD Management" in cluster.name)
+                                         field.name.strip() == "Key" and
+                                         "ICD Management" in cluster.name)
                     is_mode_option_field = (struct_name.strip() == "ModeOptionStruct" and
-                                          field.name.strip() in ["Mode", "ModeTags", "Label"])
+                                            field.name.strip() in ["Mode", "ModeTags", "Label"])
                     is_device_name_reference = (struct_name.strip() == "EcosystemDeviceStruct" and
-                                              field.name.strip() == "DeviceName" and
-                                              "Ecosystem Information" in cluster.name)
+                                                field.name.strip() == "DeviceName" and
+                                                "Ecosystem Information" in cluster.name)
                     is_hold_time_reference = (struct_name.strip() == "HoldTimeLimitsStruct" and
-                                            field.name.strip() in ["HoldTimeMin", "HoldTimeMax"] and
-                                            "Occupancy Sensing" in cluster.name)
+                                              field.name.strip() in ["HoldTimeMin", "HoldTimeMax"] and
+                                              "Occupancy Sensing" in cluster.name)
                     is_error_state_reference = (struct_name.strip() == "ErrorStateStruct" and
-                                              field.name.strip() == "ErrorStateID" and
-                                              "Operational State" in cluster.name)
+                                                field.name.strip() == "ErrorStateID" and
+                                                "Operational State" in cluster.name)
                     is_operational_state_reference = (struct_name.strip() == "OperationalStateStruct" and
-                                                    field.name.strip() == "OperationalStateID" and
-                                                    "Operational State" in cluster.name)
+                                                      field.name.strip() == "OperationalStateID" and
+                                                      "Operational State" in cluster.name)
                     is_device_energy_reference = (struct_name.strip() in ["PowerAdjustCapabilityStruct", "SlotStruct"] and
-                                                field.name.strip() in ["MinPower", "MinDuration"] and
-                                                "Device Energy Management" in cluster.name)
-                    
-                    if (is_monitoring_key or is_mode_option_field or is_device_name_reference or 
+                                                  field.name.strip() in ["MinPower", "MinDuration"] and
+                                                  "Device Energy Management" in cluster.name)
+
+                    if (is_monitoring_key or is_mode_option_field or is_device_name_reference or
                         is_hold_time_reference or is_error_state_reference or is_operational_state_reference or
-                        is_device_energy_reference):
+                            is_device_energy_reference):
                         continue
-                    
+
                     if field.type_info is None:
                         issues.append(f"Struct field {field.name} in {struct_name} of cluster {cluster.name} missing type_info")
 
