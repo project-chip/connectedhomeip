@@ -438,7 +438,7 @@ class MdnsDiscovery:
                             purposes. Defaults to False.
             service_types (Optional[List[str]]): Specific service types to discover (e.g., ['_matterc._udp.local.']).
             all_services (bool): If True, discovers all available mDNS services.
-            query_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
+            query_service (bool): If True, queries the service info for each of the discovered service names, defaults to True.
             append_results (bool): If True, appends the results to `self._discovered_services` without clearing previous entries.
                                    If False, clears `self._discovered_services` before storing the new result.
                                    This argument only takes effect when 'query_service' is True, as it's meant to be passed down
