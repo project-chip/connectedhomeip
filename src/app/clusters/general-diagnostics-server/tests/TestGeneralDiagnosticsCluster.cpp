@@ -169,11 +169,11 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         // Enable all the optional attributes
         const ClusterAttributeBits<GeneralDiagnostics::Id> enabledAttributes = ClusterAttributeBits<GeneralDiagnostics::Id>()
-                                                                                   .Set<TotalOperationalHours::Id>(true)
-                                                                                   .Set<BootReason::Id>(true)
-                                                                                   .Set<ActiveHardwareFaults::Id>(true)
-                                                                                   .Set<ActiveRadioFaults::Id>(true)
-                                                                                   .Set<ActiveNetworkFaults::Id>(true);
+                                                                                   .Set<TotalOperationalHours::Id>()
+                                                                                   .Set<BootReason::Id>()
+                                                                                   .Set<ActiveHardwareFaults::Id>()
+                                                                                   .Set<ActiveRadioFaults::Id>()
+                                                                                   .Set<ActiveNetworkFaults::Id>();
 
         ScopedDiagnosticsProvider<AllProvider> nullProvider;
         GeneralDiagnosticsCluster cluster(enabledAttributes);
