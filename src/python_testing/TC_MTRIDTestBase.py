@@ -18,10 +18,11 @@
 import logging
 import time
 
-from chip.clusters import ClusterObjects, Globals
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
 from mobly import asserts
+
+from matter.clusters import ClusterObjects, Globals
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
 
 logger = logging.getLogger(__name__)
 
