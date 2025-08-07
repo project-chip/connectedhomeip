@@ -25,7 +25,8 @@ namespace {
 
 using namespace chip;
 
-// Don't warn/error on self assignments in these tests.
+// Don't warn/error on self assignments in these tests, since
+// we're explicitly testing that self-assignments behave correctly.
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
