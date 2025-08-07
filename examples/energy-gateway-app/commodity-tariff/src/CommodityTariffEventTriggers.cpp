@@ -137,6 +137,7 @@ void SetTestEventTrigger_TimeShift24h()
     if (instance)
     {
         instance->TariffTimeTrackingSetOffset(kSecondsPerDay);
+        instance->TariffTimeAttrsSync();
     }
 }
 
@@ -151,12 +152,18 @@ void SetTestEventTrigger_TimeShift4h()
     if (instance)
     {    
         instance->TariffTimeTrackingSetOffset(kSecondsPer4hr);
+        instance->TariffTimeAttrsSync();
     }
 }
 
 void SetTestEventTrigger_TimeShiftDisable()
 {
+    CommodityTariffInstance * instance = GetCommodityTariffInstance();
 
+    if (instance)
+    {    
+        instance->TariffTimeTrackingSetOffset(0);
+    }
 }
 
 bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)

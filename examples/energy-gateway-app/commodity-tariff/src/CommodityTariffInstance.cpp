@@ -43,8 +43,9 @@ using DayStructType               = DayStruct::Type;
 using DayPatternStructType        = DayPatternStruct::Type;
 using CalendarPeriodStructType    = CalendarPeriodStruct::Type;
 
-static constexpr uint32_t TimerPollInterval = 30;
+static constexpr uint32_t kTimerPollIntervalInSec = 30;
 static uint32_t TimestampNow = 0;
+static uint32_t TestTimeOverlay = 0;
 
 CHIP_ERROR CommodityTariffInstance::Init()
 {
@@ -53,13 +54,13 @@ CHIP_ERROR CommodityTariffInstance::Init()
 
 uint32_t CommodityTariffInstance::GetCurrentTimestamp()
 {
-    return TimestampNow;
+    return TimestampNow + TestTimeOverlay;
 }
 
 void CommodityTariffInstance::ScheduleTariffTimeUpdate()
 {
     DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(TimerPollInterval * 1000),
+        System::Clock::Milliseconds32(kTimerPollIntervalInSec * 1000),
         [](System::Layer *, void * context) {
             static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb();
         },
@@ -69,8 +70,8 @@ void CommodityTariffInstance::ScheduleTariffTimeUpdate()
 void CommodityTariffInstance::TariffTimeUpdCb()
 {
     GetDelegate()->TryToactivateDelayedTariff(TimestampNow);
+    TimestampNow += kTimerPollIntervalInSec;
     TariffTimeAttrsSync();
-    TimestampNow += TimerPollInterval;
     ScheduleTariffTimeUpdate();
 }
 
@@ -83,7 +84,13 @@ void CommodityTariffInstance::ActivateTariffTimeTracking(uint32_t timestamp)
 
 void CommodityTariffInstance::TariffTimeTrackingSetOffset(uint32_t offset)
 {
-    TimestampNow += offset;
+    if (offset)
+    {
+        TestTimeOverlay += offset;
+        return;
+    }
+
+    TestTimeOverlay = 0;
 }
 
 void CommodityTariffInstance::Shutdown()
