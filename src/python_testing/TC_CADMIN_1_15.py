@@ -35,7 +35,7 @@ import logging
 import random
 from typing import Optional
 
-from mdns_discovery.mdns_discovery import MdnsDiscovery
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 
 import matter.clusters as Clusters
