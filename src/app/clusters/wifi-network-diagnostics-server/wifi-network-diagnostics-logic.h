@@ -40,8 +40,8 @@ public:
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const ClusterAttributeBits<WiFiNetworkDiagnostics::Id> & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes),
-        mFeatureFlags(featureFlags)
+        mEndpointId(endpointId),
+        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }
