@@ -214,14 +214,6 @@ HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & c
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace {
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
-    GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
-    GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
-    GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
-};
-}
 
 CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 {
@@ -333,9 +325,16 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
         { mEnabledAttributes.enableActiveHardwareFaults, GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry },
         { mEnabledAttributes.enableActiveRadioFaults, GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry },
         { mEnabledAttributes.enableActiveNetworkFaults, GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry },
+        /*
+         * Enforcing UpTime to always be added here because it is a mandatory attribute for
+         * revision 2 and beyond, but is left as optional in the XML for now for backwards
+         * compatibility. This allows us to still use the code generated mandatory attributes
+         * and have support for UpTime.
+         */
+        { true, GeneralDiagnostics::Attributes::UpTime::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
+    return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path,

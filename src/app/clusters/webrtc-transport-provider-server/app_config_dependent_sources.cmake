@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
+# These are the things that BUILD.gn dependencies would pull
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/webrtc-transport-provider-server.cpp"
-    "${CLUSTER_DIR}/webrtc-transport-provider-server.h"
+    "${CLUSTER_DIR}/webrtc-transport-provider-cluster.cpp"
+    "${CLUSTER_DIR}/webrtc-transport-provider-cluster.h"
 )
