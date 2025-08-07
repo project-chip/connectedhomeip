@@ -32,7 +32,7 @@ COPY --from=nrf /opt/NordicSemiconductor/nRF5_tools /opt/NordicSemiconductor/nRF
 COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrfconnect
 
 COPY --from=android /opt/android/sdk /opt/android/sdk
-COPY --from=android /opt/android/android-ndk-r23c /opt/android/android-ndk-r23c
+COPY --from=android /opt/android/android-ndk-r28c /opt/android/android-ndk-r28c
 COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 
 COPY --from=psoc6 /opt/Tools/ModusToolbox /opt/Tools/ModusToolbox
@@ -107,7 +107,7 @@ RUN set -x \
 ENV PATH=$PATH:/usr/lib/kotlinc/bin
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
-ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
+ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r28c
 ENV CY_TOOLS_PATHS="/opt/Tools/ModusToolbox/tools_3.2"
 ENV SILABS_BOARD=BRD4186C
 # Keep GSDK_ROOT name until rename transition to SISDK is completed

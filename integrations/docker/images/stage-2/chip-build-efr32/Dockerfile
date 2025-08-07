@@ -41,11 +41,10 @@ RUN git clone --depth=1 --single-branch --branch=v3.5.0 https://github.com/Silic
 # SLC-cli install
 # TODO: figure out a way to make this a fixed version. Currently a moving target.
 
-# TODO uncomment once logging issue is fixed 40472
-# RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
-#     unzip ./slc_cli_linux.zip -d /tmp && \
-#     rm ./slc_cli_linux.zip \
-#     && : # last line
+RUN wget https://www.silabs.com/documents/public/software/slc_cli_linux.zip && \
+    unzip ./slc_cli_linux.zip -d /tmp && \
+    rm ./slc_cli_linux.zip \
+    && : # last line
 
 # Final SDK container for compiling using Silabs SDK
 FROM ghcr.io/project-chip/chip-build:${VERSION}
@@ -72,11 +71,9 @@ ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk/
-# TODO issue 40472
-# ENV PATH="${PATH}:/opt/silabs/slc_cli/"
+ENV PATH="${PATH}:/opt/silabs/slc_cli/"
 
 COPY --from=build /tmp/simplicity_sdk /opt/silabs/simplicity_sdk
 COPY --from=build /tmp/wiseconnect-wifi-bt-sdk/ /opt/silabs/wiseconnect-wifi-bt-sdk/
 COPY --from=build /tmp/wifi_sdk /opt/silabs/wifi_sdk
-# TODO issue 40472
-# COPY --from=build /tmp/slc_cli /opt/silabs/slc_cli
+COPY --from=build /tmp/slc_cli /opt/silabs/slc_cli
