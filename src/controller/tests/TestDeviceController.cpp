@@ -29,7 +29,7 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
-using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
+using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 
 namespace {
 
@@ -58,7 +58,7 @@ public:
         return mFabricTable.Init(initParams);
     }
 
-    FabricTable & GetFabricTable() { return mFabricTable; }
+    chip::FabricTable & GetFabricTable() { return mFabricTable; }
 
 private:
     chip::FabricTable mFabricTable;
@@ -75,14 +75,14 @@ public:
     {
         AppContext::SetUp();
         mOldProvider =
-            InteractionModelEngine::GetInstance()->SetDataModelProvider(&chip::TestDataModel::DispatchTestDataModel::Instance());
+            chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&chip::TestDataModel::DispatchTestDataModel::Instance());
         factoryInitParams.listenPort               = 88;
         factoryInitParams.fabricTable              = nullptr;
         factoryInitParams.fabricIndependentStorage = &factoryStorage;
     }
     void TearDown() override
     {
-        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
         if (provider != nullptr)
         {
@@ -117,20 +117,20 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
     FabricTableHolder fHolder;
     chip::TestPersistentStorageDelegate sStorageDelegate;
 
-    Credentials::GroupDataProviderImpl sProvider(5, 8);
+    chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
     sessionStorage.Init(&storage);
 
     // Initialize Group Data Provider
     sProvider.SetStorageDelegate(&sStorageDelegate);
     sProvider.SetSessionKeystore(&keystore);
     sProvider.Init();
-    Credentials::SetGroupDataProvider(&sProvider);
+    chip::Credentials::SetGroupDataProvider(&sProvider);
 
     EXPECT_EQ(fHolder.Init(), CHIP_NO_ERROR);
 
     // Initialize the ember side server logic
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     // Set initials params of factoryInitParams
     factoryInitParams.sessionKeystore   = &keystore;
@@ -171,7 +171,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        dParams.controllerVendorId = VendorId::TestVendor1;
+        dParams.controllerVendorId = chip::VendorId::TestVendor1;
         EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupController(dParams, device), CHIP_NO_ERROR);
         EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(dParams, commissioner), CHIP_ERROR_INVALID_ARGUMENT);
 

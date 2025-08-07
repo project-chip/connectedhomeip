@@ -20,9 +20,6 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 
-using namespace chip;
-using namespace chip::app;
-
 namespace chip {
 
 namespace TestDataModel {
@@ -30,7 +27,7 @@ namespace TestDataModel {
 // TODO:(#36837) implementing its own provider instead of using "CodegenDataModelProvider"
 // TestServerCommandDispatch should provide its own dedicated data model provider rather than using CodegenDataModelProvider
 // provider. This class exists solely for one specific test scenario, on a temporary basis.
-class DispatchTestDataModel : public CodegenDataModelProvider
+class DispatchTestDataModel : public app::CodegenDataModelProvider
 {
 public:
     static DispatchTestDataModel & Instance()
@@ -42,7 +39,7 @@ public:
     // The Startup method initializes the data model provider with a given context.
     // This approach ensures that the test relies on a more controlled and explicit data model provider
     // rather than depending on the code-generated one with undefined modifications.
-    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override
+    CHIP_ERROR Startup(app::DataModel::InteractionModelContext context) override
     {
         ReturnErrorOnFailure(CodegenDataModelProvider::Startup(context));
         return CHIP_NO_ERROR;
