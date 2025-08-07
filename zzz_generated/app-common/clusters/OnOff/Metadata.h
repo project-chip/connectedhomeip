@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -39,6 +40,10 @@ namespace StartUpOnOff {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpOnOff::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace StartUpOnOff
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    OnOff::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
