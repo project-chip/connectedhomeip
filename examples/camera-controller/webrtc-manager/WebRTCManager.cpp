@@ -18,8 +18,8 @@
 
 #include "WebRTCManager.h"
 
-#include <app/dynamic_server/AccessControl.h>
 #include <commands/interactive/InteractiveCommands.h>
+#include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
@@ -39,8 +39,9 @@ namespace {
 constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
 constexpr int kVideoBitRate         = 3000;
 
-constexpr const char * kStreamGstDestIp    = "127.0.0.1";
-constexpr uint16_t kVideoStreamGstDestPort = 5000;
+constexpr const char * kStreamGstDestIp                      = "127.0.0.1";
+constexpr uint16_t kVideoStreamGstDestPort                   = 5000;
+constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
@@ -85,7 +86,7 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 
 } // namespace
 
-WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate) {}
+WebRTCManager::WebRTCManager() {}
 
 WebRTCManager::~WebRTCManager()
 {
@@ -94,8 +95,15 @@ WebRTCManager::~WebRTCManager()
 
 void WebRTCManager::Init()
 {
-    dynamic_server::InitAccessControl();
-    mWebRTCRequestorServer.Init();
+    Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
+
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT,
+                     kWebRTCRequesterDynamicEndpointId, err.Format());
+    }
 }
 
 CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args)
@@ -250,7 +258,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     chip::ScopedNodeId peerId(nodeId, fabricIndex);
 
-    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRequestorServer);
+    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRegisteredServerCluster.Cluster());
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
@@ -343,6 +351,13 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    // At least one of Video Stream ID and Audio Stream ID has to be present
+    if (!videoStreamId.HasValue() && !audioStreamId.HasValue())
+    {
+        ChipLogError(Zcl, "One of VideoStreamID or AudioStreamID must be present");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     // Store the stream ID for the callback
     if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
     {
@@ -361,14 +376,20 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
     return err;
 }
 
-CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage)
+CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage, Optional<app::DataModel::Nullable<uint16_t>> videoStreamId,
+                                       Optional<app::DataModel::Nullable<uint16_t>> audioStreamId)
 {
     ChipLogProgress(Camera, "Sending SolicitOffer command to the peer device");
 
-    CHIP_ERROR err = mWebRTCProviderClient.SolicitOffer(streamUsage, kWebRTCRequesterDynamicEndpointId,
-                                                        MakeOptional(DataModel::NullNullable), // "Null" for video
-                                                        MakeOptional(DataModel::NullNullable)  // "Null" for audio
-    );
+    // At least one of Video Stream ID and Audio Stream ID has to be present
+    if (!videoStreamId.HasValue() && !audioStreamId.HasValue())
+    {
+        ChipLogError(Zcl, "One of VideoStreamID or AudioStreamID must be present");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    CHIP_ERROR err =
+        mWebRTCProviderClient.SolicitOffer(streamUsage, kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId);
 
     if (err != CHIP_NO_ERROR)
     {

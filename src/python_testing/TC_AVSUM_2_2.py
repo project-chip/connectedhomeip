@@ -38,11 +38,12 @@
 
 import random
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
@@ -161,7 +162,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             if canbemadebusy:
                 self.step(10)
                 # Busy response check
-                if not self.is_ci:
+                if not self.is_pics_sdk_ci_only:
                     self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
                     await self.send_mptz_set_pan_position_command(endpoint, newPan, expected_status=Status.Busy)
             else:

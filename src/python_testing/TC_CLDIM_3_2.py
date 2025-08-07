@@ -37,12 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
@@ -126,7 +127,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("2b")
         if not is_latching_supported:
             logging.info("MotionLatching Feature is not supported. Skipping remaining steps.")
-            self.skip_all_remaining_steps("2c")
+            self.mark_all_remaining_steps_skipped("2c")
             return
 
         # STEP 2c: Read LimitRange attribute if supported
@@ -141,7 +142,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 2e: Establish wildcard subscription to all attributes"
         self.step("2e")
-        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureDimension)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # STEP 2f: Read CurrentState attribute
@@ -166,7 +167,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
-                        endpoint=endpoint
+                        endpoint=endpoint, timedRequestTimeoutMs=1000
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -198,7 +199,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
                 asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
@@ -218,7 +219,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -240,7 +241,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.Step(
                         direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=1),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
                 asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
@@ -252,7 +253,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
                 asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
@@ -279,7 +280,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected status returned")

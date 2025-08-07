@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -67,6 +68,10 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace AvailableTextTracks
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    CurrentState::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -129,6 +134,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(DeactivateTextTr
 } // namespace DeactivateTextTrack
 
 } // namespace Commands
+
+namespace Events {
+namespace StateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateChanged
+
+} // namespace Events
 } // namespace MediaPlayback
 } // namespace Clusters
 } // namespace app

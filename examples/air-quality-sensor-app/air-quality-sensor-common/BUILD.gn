@@ -14,8 +14,14 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 
 chip_data_model("air-quality-sensor-common") {
   zap_file = "air-quality-sensor-app.zap"
+  if (chip_enable_icd_lit) {
+    zap_file = "icd-lit-air-quality-sensor-app.zap"
+  } else {
+    zap_file = "air-quality-sensor-app.zap"
+  }
   is_server = true
 }

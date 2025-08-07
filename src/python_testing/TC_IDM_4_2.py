@@ -38,15 +38,16 @@ import copy
 import logging
 import time
 
-import chip.clusters as Clusters
-from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import AttributePath, TypedAttributePath
-from chip.exceptions import ChipStackError
-from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeChangeCallback
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import AttributePath, TypedAttributePath
+from matter.exceptions import ChipStackError
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 '''
 Category:
@@ -523,7 +524,8 @@ class TC_IDM_4_2(MatterBaseTest):
         subscription_timeout_sec = sub_cr1_update_value.GetSubscriptionTimeoutMs() / 1000
 
         # Set Attribute Update Callback
-        node_label_update_cb = AttributeChangeCallback(node_label_attr)
+        node_label_update_cb = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation, expected_attribute=node_label_attr)
         sub_cr1_update_value.SetAttributeUpdateCallback(node_label_update_cb)
 
         # Update attribute value
@@ -533,7 +535,7 @@ class TC_IDM_4_2(MatterBaseTest):
             [(0, node_label_attr(value=new_node_label_write))]
         )
 
-        node_label_update_cb.wait_for_report()
+        node_label_update_cb.wait_for_attribute_report()
 
         # Save the time that the report is received
         t_update_sec = time.time()

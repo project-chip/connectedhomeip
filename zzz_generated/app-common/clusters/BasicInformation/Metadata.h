@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -115,6 +116,25 @@ namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
+constexpr std::array<DataModel::AttributeEntry, 16> kMandatoryMetadata = {
+    DataModelRevision::kMetadataEntry,
+    VendorName::kMetadataEntry,
+    VendorID::kMetadataEntry,
+    ProductName::kMetadataEntry,
+    ProductID::kMetadataEntry,
+    NodeLabel::kMetadataEntry,
+    Location::kMetadataEntry,
+    HardwareVersion::kMetadataEntry,
+    HardwareVersionString::kMetadataEntry,
+    SoftwareVersion::kMetadataEntry,
+    SoftwareVersionString::kMetadataEntry,
+    UniqueID::kMetadataEntry,
+    CapabilityMinima::kMetadataEntry,
+    SpecificationVersion::kMetadataEntry,
+    MaxPathsPerInvoke::kMetadataEntry,
+    ConfigurationVersion::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -125,6 +145,22 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MfgSpecificPing:
 } // namespace MfgSpecificPing
 
 } // namespace Commands
+
+namespace Events {
+namespace StartUp {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StartUp
+namespace ShutDown {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ShutDown
+namespace Leave {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Leave
+namespace ReachableChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ReachableChanged
+
+} // namespace Events
 } // namespace BasicInformation
 } // namespace Clusters
 } // namespace app

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -64,10 +65,16 @@ namespace LevelValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LevelValue
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    MeasurementMedium::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
 } // namespace Clusters
 } // namespace app

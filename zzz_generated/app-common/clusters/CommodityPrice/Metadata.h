@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -36,6 +37,12 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(PriceForecast::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace PriceForecast
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    TariffUnit::kMetadataEntry,
+    Currency::kMetadataEntry,
+    CurrentPrice::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -50,6 +57,13 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace GetDetailedForecastRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace PriceChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PriceChange
+
+} // namespace Events
 } // namespace CommodityPrice
 } // namespace Clusters
 } // namespace app

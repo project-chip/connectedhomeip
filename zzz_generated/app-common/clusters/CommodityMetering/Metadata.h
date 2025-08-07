@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -34,10 +35,24 @@ namespace TariffUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TariffUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TariffUnit
+namespace MaximumMeteredQuantities {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantities::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace MaximumMeteredQuantities
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    MeteredQuantity::kMetadataEntry,
+    MeteredQuantityTimestamp::kMetadataEntry,
+    TariffUnit::kMetadataEntry,
+    MaximumMeteredQuantities::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace CommodityMetering
 } // namespace Clusters
 } // namespace app

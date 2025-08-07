@@ -56,7 +56,6 @@ public:
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
 
     bool IsReadyToMove() override;
-    bool IsManualLatchingNeeded() override;
     ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;

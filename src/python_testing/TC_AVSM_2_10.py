@@ -37,12 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
@@ -159,6 +160,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             asserts.assert_greater(
                 captureSnapshotResponse.resolution.height, 0, "Image height returned by CaptureSnapshotResponse is <= 0"
             )
+            if not self.is_pics_sdk_ci_only:
+                self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
             # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
             logger.error(f"Snapshot capture is not supported: {e}")
@@ -200,6 +203,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             asserts.assert_greater(
                 captureSnapshotResponse.resolution.height, 0, "Image height returned by CaptureSnapshotResponse is <= 0"
             )
+            if not self.is_pics_sdk_ci_only:
+                self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
             # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
             logger.error(f"Snapshot capture is not supported: {e}")

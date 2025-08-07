@@ -166,20 +166,20 @@ Davis, CA 95616, USA
           <allowed value="16"/>
         </constraint>
       </field>
-      <field id="1" name="Priority" type="MessagePriorityEnum" default="0">
+      <field id="1" name="Priority" type="MessagePriorityEnum">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="MessageControl" type="MessageControlBitmap" default="0">
+      <field id="2" name="MessageControl" type="MessageControlBitmap">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="StartTime" type="epoch-s" default="0">
+      <field id="3" name="StartTime" type="epoch-s">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="Duration" type="uint64" default="0">
+      <field id="4" name="Duration" type="uint64">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -191,7 +191,7 @@ Davis, CA 95616, USA
           <maxLength value="256"/>
         </constraint>
       </field>
-      <field id="6" name="Responses" type="list" default="empty">
+      <field id="6" name="Responses" type="list">
         <entry type="MessageResponseOptionStruct"/>
         <access fabricSensitive="true"/>
         <mandatoryConform>
@@ -205,7 +205,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Messages" type="list" default="empty">
+    <attribute id="0x0000" name="Messages" type="list">
       <entry type="MessageStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform/>
@@ -213,7 +213,7 @@ Davis, CA 95616, USA
         <maxCount value="8"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="ActiveMessageIDs" type="list" default="empty">
+    <attribute id="0x0001" name="ActiveMessageIDs" type="list">
       <entry type="message-id"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
@@ -232,17 +232,17 @@ Davis, CA 95616, USA
           <allowed value="16"/>
         </constraint>
       </field>
-      <field id="1" name="Priority" type="MessagePriorityEnum" default="0">
+      <field id="1" name="Priority" type="MessagePriorityEnum">
         <mandatoryConform/>
       </field>
-      <field id="2" name="MessageControl" type="MessageControlBitmap" default="0">
+      <field id="2" name="MessageControl" type="MessageControlBitmap">
         <mandatoryConform/>
       </field>
-      <field id="3" name="StartTime" type="epoch-s" default="0">
+      <field id="3" name="StartTime" type="epoch-s">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="Duration" type="uint64" default="0">
+      <field id="4" name="Duration" type="uint64">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -252,7 +252,7 @@ Davis, CA 95616, USA
           <maxLength value="256"/>
         </constraint>
       </field>
-      <field id="6" name="Responses" type="list" default="empty">
+      <field id="6" name="Responses" type="list">
         <entry type="MessageResponseOptionStruct"/>
         <mandatoryConform>
           <feature name="RESP"/>
@@ -304,13 +304,13 @@ Davis, CA 95616, USA
           <allowed value="16"/>
         </constraint>
       </field>
-      <field id="1" name="ResponseID" type="uint32" default="null">
+      <field id="1" name="ResponseID" type="uint32">
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
       </field>
-      <field id="2" name="Reply" type="string" default="null">
+      <field id="2" name="Reply" type="string">
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="RPLY"/>
@@ -319,7 +319,7 @@ Davis, CA 95616, USA
           <maxLength value="256"/>
         </constraint>
       </field>
-      <field id="3" name="FutureMessagesPreference" type="FutureMessagePreferenceEnum" default="null">
+      <field id="3" name="FutureMessagesPreference" type="FutureMessagePreferenceEnum">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>

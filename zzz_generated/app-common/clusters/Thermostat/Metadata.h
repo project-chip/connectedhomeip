@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-inline constexpr uint32_t kRevision = 7;
+inline constexpr uint32_t kRevision = 9;
 
 namespace Attributes {
 namespace LocalTemperature {
@@ -297,6 +298,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    LocalTemperature::kMetadataEntry,
+    ControlSequenceOfOperation::kMetadataEntry,
+    SystemMode::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -339,6 +346,34 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::I
 } // namespace AtomicRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace SystemModeChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SystemModeChange
+namespace LocalTemperatureChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LocalTemperatureChange
+namespace OccupancyChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OccupancyChange
+namespace SetpointChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SetpointChange
+namespace RunningStateChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RunningStateChange
+namespace RunningModeChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RunningModeChange
+namespace ActiveScheduleChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ActiveScheduleChange
+namespace ActivePresetChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ActivePresetChange
+
+} // namespace Events
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
