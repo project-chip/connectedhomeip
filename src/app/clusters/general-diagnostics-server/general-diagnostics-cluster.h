@@ -130,7 +130,8 @@ class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsClust
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::SupportedAttributes & enabledAttributes,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(enabledAttributes), mFunctionConfig(functionsConfig)
+        GeneralDiagnosticsCluster(enabledAttributes),
+        mFunctionConfig(functionsConfig)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
