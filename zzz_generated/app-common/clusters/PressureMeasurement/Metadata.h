@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -55,6 +56,12 @@ namespace Scale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Scale::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Scale
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    MeasuredValue::kMetadataEntry,
+    MinMeasuredValue::kMetadataEntry,
+    MaxMeasuredValue::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
