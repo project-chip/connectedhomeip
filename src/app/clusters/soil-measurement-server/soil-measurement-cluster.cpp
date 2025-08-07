@@ -33,19 +33,6 @@ CHIP_ERROR SoilMeasurementCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // VerifyOrReturnError(context.attributeStorage != nullptr, CHIP_INVALID_ARGUMENT);
-
-    SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type measuredValue;
-    MutableByteSpan measuredValueBytes(reinterpret_cast<uint8_t *>(&measuredValue), sizeof(measuredValue));
-    CHIP_ERROR error = context.attributeStorage->ReadValue(
-        { mPath.mEndpointId, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id }, measuredValueBytes);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        measuredValue.SetNull();
-    }
-
-    mSoilMoistureMeasuredValue = measuredValue;
     return CHIP_NO_ERROR;
 }
 
@@ -90,10 +77,16 @@ SoilMeasurementCluster::SetSoilMoistureMeasuredValue(
 {
     if (mSoilMoistureMeasuredValue != soilMoistureMeasuredValue)
     {
+        if (!soilMoistureMeasuredValue.IsNull())
+        {
+            VerifyOrReturnError(soilMoistureMeasuredValue.Value() >= mSoilMoistureMeasurementLimits.minMeasuredValue &&
+                                    soilMoistureMeasuredValue.Value() <= mSoilMoistureMeasurementLimits.maxMeasuredValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+        }
+
         mSoilMoistureMeasuredValue = soilMoistureMeasuredValue;
 
-        MatterReportingAttributeChangeCallback(endpointId, SoilMeasurement::Id,
-                                               SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id);
+        NotifyAttributeChanged(SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -111,7 +104,7 @@ SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type SoilMeasu
 }
 
 CHIP_ERROR
-SoilMeasurementCluster::SetSoilMoistureMeasurementLimits(
+SoilMeasurementCluster::Init(
     const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits)
 {
     mSoilMoistureMeasurementLimits = soilMoistureMeasurementLimits;

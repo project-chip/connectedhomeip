@@ -65,7 +65,7 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
     {
         VerifyOrDie(emberAfContainsServer(endpoint, SoilMeasurement::Id) == true);
 
-        gServer.Cluster().SetSoilMoistureMeasurementLimits(kDefaultSoilMoistureMeasurementLimits);
+        gServer.Cluster().Init(kDefaultSoilMoistureMeasurementLimits);
     }
 }
 
