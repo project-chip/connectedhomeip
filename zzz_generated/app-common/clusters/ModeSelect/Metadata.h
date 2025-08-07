@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -44,6 +45,13 @@ namespace OnMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OnMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace OnMode
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    Description::kMetadataEntry,
+    StandardNamespace::kMetadataEntry,
+    SupportedModes::kMetadataEntry,
+    CurrentMode::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
