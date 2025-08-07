@@ -30,7 +30,7 @@ from typing import Any, Optional
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
-from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.ChipDeviceCtrl import ChipDeviceController, TLVJsonConverter
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.testing.conformance import ConformanceException
 from chip.testing.matter_testing import MatterTestConfig, ProblemNotice
@@ -126,6 +126,13 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     return matter_json_dict
 
 
+def JsonToMatterTlv(json_filename: str) -> dict[int, Any]:
+    converter = TLVJsonConverter()
+    with open(json_filename, "r") as fin:
+        json_tlv = json.load(fin)
+        return converter.convert_dump_to_cache(json_tlv)
+
+
 class BasicCompositionTests:
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
@@ -169,6 +176,19 @@ class BasicCompositionTests:
     async def setup_class_helper(self, allow_pase: bool = True):
         dev_ctrl = self.default_controller
         self.problems: list[ProblemNotice] = []
+        self.test_from_file = self.user_params.get("test_from_file", None)
+
+        def log_test_start():
+            logging.info("###########################################################")
+            logging.info("Start of actual tests")
+            logging.info("###########################################################")
+
+        if self.test_from_file:
+            cache = JsonToMatterTlv(self.test_from_file)
+            self.endpoints = cache.GetUpdatedAttributeCache()
+            self.endpoints_tlv = cache.attributeTLVCache
+            log_test_start()
+            return
 
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
@@ -206,9 +226,7 @@ class BasicCompositionTests:
 
         self.dump_wildcard(dump_device_composition_path)
 
-        logging.info("###########################################################")
-        logging.info("Start of actual tests")
-        logging.info("###########################################################")
+        log_test_start()
 
         arl_data = arls_populated(self.endpoints_tlv)
         asserts.assert_false(
