@@ -30,14 +30,13 @@ namespace chip::app::Clusters {
 class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
-    using SupportedAttributes = chip::app::SupportedAttributes<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,
-                                                               WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,
-                                                               WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,
-                                                               WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,
-                                                               WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id,
-                                                               WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,
-                                                               WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id,
-                                                               WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id>;
+    using SupportedAttributes = chip::app::SupportedAttributes<
+        WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id, WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,
+        WiFiNetworkDiagnostics::Attributes::OverrunCount::Id, WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,
+        WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id,
+        WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,
+        WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id,
+        WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id>;
 
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const SupportedAttributes & enabledAttributes,

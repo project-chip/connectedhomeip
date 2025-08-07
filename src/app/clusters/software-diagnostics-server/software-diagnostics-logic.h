@@ -33,10 +33,9 @@ namespace Clusters {
 class SoftwareDiagnosticsLogic
 {
 public:
-    using SupportedAttributes = chip::app::SupportedAttributes<SoftwareDiagnostics::Attributes::ThreadMetrics::Id,
-                                                               SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
-                                                               SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id,
-                                                               SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
+    using SupportedAttributes = chip::app::SupportedAttributes<
+        SoftwareDiagnostics::Attributes::ThreadMetrics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
+        SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
 
     SoftwareDiagnosticsLogic(const SupportedAttributes & enabledAttributes) : mEnabledAttributes(enabledAttributes) {}
     virtual ~SoftwareDiagnosticsLogic() = default;
