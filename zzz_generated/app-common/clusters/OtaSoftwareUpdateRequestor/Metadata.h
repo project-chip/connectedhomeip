@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -37,6 +38,13 @@ namespace UpdateStateProgress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UpdateStateProgress::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace UpdateStateProgress
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    DefaultOTAProviders::kMetadataEntry,
+    UpdatePossible::kMetadataEntry,
+    UpdateState::kMetadataEntry,
+    UpdateStateProgress::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

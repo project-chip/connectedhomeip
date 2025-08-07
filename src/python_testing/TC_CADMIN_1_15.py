@@ -35,14 +35,13 @@ import logging
 import random
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.ChipDeviceCtrl import CommissioningParameters
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mdns_discovery.mdns_discovery import MdnsDiscovery
 from mobly import asserts
-
 
 class TC_CADMIN_1_15(MatterBaseTest):
     async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:

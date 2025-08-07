@@ -38,11 +38,12 @@
 import logging
 from dataclasses import dataclass
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 Cluster = Clusters.Objects.IcdManagement
 Commands = Cluster.Commands

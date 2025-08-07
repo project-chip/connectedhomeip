@@ -68,7 +68,7 @@ def get_host_ipv6_addresses():
                     results.append(base_addr)
 
     if not results:
-        logger.info("Returning Zeroconf's interface defualts")
+        logger.info("Returning Zeroconf's interface defaults")
         return InterfaceChoice.All
 
     logger.info(f"Discovered IPv6 addresses: {results}")
