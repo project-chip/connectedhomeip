@@ -295,7 +295,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             logging.info(f"CurrentLatch: {current_latch}")
 
             self.step("5c")
-            if not current_latch:
+            if False == current_latch:
                 logging.info("CurrentLatch is False, skipping Latch = False preparation steps")
                 self.mark_step_range_skipped("5d", "5h")
             else:
@@ -364,7 +364,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 current_latch = overall_current_state.latch
 
             self.step("5n")
-            if not current_latch:
+            if False == current_latch:
                 logging.info("CurrentLatch is False, skipping steps 5o to 5s")
                 self.mark_step_range_skipped("5o", "5s")
             else:
