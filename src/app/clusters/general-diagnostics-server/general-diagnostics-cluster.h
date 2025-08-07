@@ -143,4 +143,3 @@ private:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-

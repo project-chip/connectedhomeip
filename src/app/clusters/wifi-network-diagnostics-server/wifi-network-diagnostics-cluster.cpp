@@ -173,4 +173,3 @@ std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::Invok
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
