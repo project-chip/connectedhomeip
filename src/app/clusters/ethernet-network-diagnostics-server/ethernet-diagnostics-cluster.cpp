@@ -35,45 +35,6 @@ using namespace chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
 
 namespace {
 
-CHIP_ERROR ReadPHYRate(DeviceLayer::DiagnosticDataProvider & provider, AttributeValueEncoder & encoder)
-{
-    EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo::Type pHYRate;
-    auto value = EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
-
-    if (provider.GetEthPHYRate(value) == CHIP_NO_ERROR)
-    {
-        pHYRate.SetNonNull(value);
-    }
-
-    return encoder.Encode(pHYRate);
-}
-
-CHIP_ERROR ReadFullDuplex(DeviceLayer::DiagnosticDataProvider & provider, AttributeValueEncoder & encoder)
-{
-    EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo::Type fullDuplex;
-    bool value = false;
-
-    if (provider.GetEthFullDuplex(value) == CHIP_NO_ERROR)
-    {
-        fullDuplex.SetNonNull(value);
-    }
-
-    return encoder.Encode(fullDuplex);
-}
-
-CHIP_ERROR ReadCarrierDetect(DeviceLayer::DiagnosticDataProvider & provider, AttributeValueEncoder & encoder)
-{
-    EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
-    bool value = false;
-
-    if (provider.GetEthCarrierDetect(value) == CHIP_NO_ERROR)
-    {
-        carrierDetect.SetNonNull(value);
-    }
-
-    return encoder.Encode(carrierDetect);
-}
-
 constexpr BitFlags<EthernetNetworkDiagnostics::Feature>
 GetFeatureMap(const EthernetDiagnosticsEnabledAttributes & enabledAttributes)
 {
@@ -99,8 +60,8 @@ CHIP_ERROR EncodeU64Value(uint64_t value, CHIP_ERROR readError, AttributeValueEn
 
 EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
                                                                    const EthernetDiagnosticsEnabledAttributes & enabledAttributes) :
-    DefaultServerCluster({ kRootEndpointId, EthernetNetworkDiagnostics::Id }),
-    mProvider(provider), mEnabledAttributes(enabledAttributes)
+    DefaultServerCluster({ kRootEndpointId, EthernetNetworkDiagnostics::Id }), mProvider(provider),
+    mEnabledAttributes(enabledAttributes)
 {}
 
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -112,12 +73,39 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
 
     switch (request.path.mAttributeId)
     {
-    case EthernetNetworkDiagnostics::Attributes::PHYRate::Id:
-        return ReadPHYRate(mProvider, encoder);
-    case EthernetNetworkDiagnostics::Attributes::FullDuplex::Id:
-        return ReadFullDuplex(mProvider, encoder);
-    case EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id:
-        return ReadCarrierDetect(mProvider, encoder);
+    case EthernetNetworkDiagnostics::Attributes::PHYRate::Id: {
+        EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo::Type pHYRate;
+        auto phyRateValue = EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
+
+        if (mProvider.GetEthPHYRate(phyRateValue) == CHIP_NO_ERROR)
+        {
+            pHYRate.SetNonNull(phyRateValue);
+        }
+
+        return encoder.Encode(pHYRate);
+    }
+    case EthernetNetworkDiagnostics::Attributes::FullDuplex::Id: {
+        EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo::Type fullDuplex;
+        bool duplexValue = false;
+
+        if (mProvider.GetEthFullDuplex(duplexValue) == CHIP_NO_ERROR)
+        {
+            fullDuplex.SetNonNull(value);
+        }
+
+        return encoder.Encode(fullDuplex);
+    }
+    case EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id: {
+        EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
+        bool carrierDetectValue = false;
+
+        if (mProvider.GetEthCarrierDetect(carrierDetectValue) == CHIP_NO_ERROR)
+        {
+            carrierDetect.SetNonNull(carrierDetectValue);
+        }
+
+        return encoder.Encode(carrierDetect);
+    }
     case EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id:
         err = mProvider.GetEthTimeSinceReset(value);
         break;
