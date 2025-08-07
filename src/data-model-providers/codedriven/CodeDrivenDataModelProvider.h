@@ -55,7 +55,7 @@ namespace app {
 class CodeDrivenDataModelProvider : public DataModel::Provider
 {
 public:
-    CodeDrivenDataModelProvider(PersistentStorageDelegate * delegate = nullptr) : mPersistentStorageDelegate(delegate) {}
+    CodeDrivenDataModelProvider(PersistentStorageDelegate & delegate) : mPersistentStorageDelegate(delegate) {}
 
     /* DataModel::Provider implementation */
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
@@ -131,7 +131,7 @@ private:
     EndpointInterfaceRegistry mEndpointInterfaceRegistry;
     ServerClusterInterfaceRegistry mServerClusterRegistry;
     std::optional<ServerClusterContext> mServerClusterContext;
-    PersistentStorageDelegate * mPersistentStorageDelegate;
+    PersistentStorageDelegate & mPersistentStorageDelegate;
 };
 
 } // namespace app

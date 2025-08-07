@@ -243,7 +243,7 @@ protected:
     std::vector<std::unique_ptr<SpanEndpoint>> mEndpointStorage;                     // To keep providers alive
     std::vector<std::unique_ptr<EndpointInterfaceRegistration>> mOwnedRegistrations; // To keep registration objects alive
 
-    TestCodeDrivenDataModelProvider() : mProvider(&mServerClusterTestContext.StorageDelegate())
+    TestCodeDrivenDataModelProvider() : mProvider(mServerClusterTestContext.StorageDelegate())
     {
         EXPECT_EQ(mProvider.Startup(mContext), CHIP_NO_ERROR);
     }
@@ -494,7 +494,7 @@ TEST_F(TestCodeDrivenDataModelProvider, AddAndRemoveEndpoints)
 
 TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
 {
-    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     static const ClusterId clientClustersArray[]               = { 0xD001, 0xD002 };
@@ -534,7 +534,7 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithEmptyStaticData)
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupIsCalledWhenAddingToStartedProvider)
 {
-    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
@@ -554,7 +554,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupIsCalledWhenAddingToStarte
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupNotCalledWhenAddingToNonStartedProviderThenCalledOnProviderStartup)
 {
-    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
@@ -576,7 +576,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupNotCalledWhenAddingToNonSt
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownIsCalledWhenRemovingFromStartedProvider)
 {
-    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
@@ -598,7 +598,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownIsCalledWhenRemovingFromS
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownNotCalledWhenRemovingFromNonStartedProvider)
 {
-    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));

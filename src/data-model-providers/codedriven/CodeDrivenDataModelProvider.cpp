@@ -30,14 +30,11 @@ namespace app {
 
 CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
-    // Server clusters require a valid persistent storage delegate
-    VerifyOrReturnError(mPersistentStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
 
     mServerClusterContext.emplace(ServerClusterContext({
         .provider           = this,
-        .storage            = mPersistentStorageDelegate,
+        .storage            = &mPersistentStorageDelegate,
         .interactionContext = &mContext,
     }));
 
