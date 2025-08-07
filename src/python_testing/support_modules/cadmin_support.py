@@ -30,12 +30,12 @@ from typing import Any, Optional
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
+import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import CommissioningParameters
-import matter.clusters as Clusters
-from matter.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, AttributeMatcher
+from matter.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
 
 
 class CommissioningWindowOption(IntEnum):
