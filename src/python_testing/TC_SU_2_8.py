@@ -241,11 +241,13 @@ class TC_SU_2_8(MatterBaseTest):
         if fabric_id_th2 == controller.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {controller.fabricId} and TH2: {fabric_id_th2}.")
 
+        # Write provider 1 as default and not provider 2
         await self.write_ota_providers(controller=controller, providers=[provider_th1], endpoint=endpoint)
         # await self.write_ota_providers(controller=th2, providers=[provider_th2], endpoint=endpoint)
 
-        await self.announce_provider(controller=controller, provider_node_id=dut_node_id, vendor_id=vendor_id, endpoint=endpoint)
-        await self.announce_provider(controller=th2, provider_node_id=dut_node_id, vendor_id=vendor_id, endpoint=endpoint)
+        # Announcing provider 2 and not provider 1
+        # await self.announce_provider(controller=controller, provider_node_id=provider_node_id_1, vendor_id=vendor_id, endpoint=endpoint)
+        await self.announce_provider(controller=th2, provider_node_id=provider_node_id_2, vendor_id=vendor_id, endpoint=endpoint)
 
         # TH1/OTA-P does not respond with QueryImageResponse.
         self.step(2)
