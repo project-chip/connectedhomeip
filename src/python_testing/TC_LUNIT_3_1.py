@@ -1,3 +1,10 @@
+import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
+from chip.interaction_model import Status
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -9,7 +16,7 @@
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
@@ -31,13 +38,6 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_attribute, has_cluster,
-                                         run_if_endpoint_matches)
-from mobly import asserts
 
 
 class TC_LUNIT_3_1(MatterBaseTest):
@@ -83,7 +83,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_cluster(Clusters.UnitLocalization) and has_attribute(Clusters.UnitLocalization.Attributes.TemperatureUnit))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.UnitLocalization) and decorators.has_attribute(Clusters.UnitLocalization.Attributes.TemperatureUnit))
     async def test_TC_LUNIT_3_1(self):
 
         endpoint = self.get_endpoint(default=0)
@@ -163,4 +163,4 @@ class TC_LUNIT_3_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

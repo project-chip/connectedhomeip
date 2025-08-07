@@ -1,3 +1,11 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+from TC_AVSUMTestBase import AVSUMTestBase
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -35,13 +43,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-from TC_AVSUMTestBase import AVSUMTestBase
-
 
 class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
 
@@ -72,7 +73,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_cluster(Clusters.CameraAvSettingsUserLevelManagement))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.CameraAvSettingsUserLevelManagement))
     async def test_TC_AVSUM_2_1(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
@@ -218,4 +219,4 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -31,9 +31,9 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
+from chip.testing import decorators
 from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, has_attribute, has_cluster, has_feature,
-                                         run_if_endpoint_matches, run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
+from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.runner import MockTestRunner
 from mobly import asserts
 
@@ -44,7 +44,7 @@ def get_clusters(endpoints: list[int]) -> Attribute.AsyncReadTransaction.ReadRes
     # We're JUST populating the globals here because that's all that matters for this particular test
     feature_map = c.Bitmaps.Feature.kLighting
     # Only supported attributes - globals and OnOff. This isn't a compliant device. Doesn't matter for this test.
-    attribute_list = [attr.FeatureMap.attribute_id, attr.AttributeList.attribute_id,
+    attribute_list = [attr.FeatureMap.attribute_id, attr.AttributeList.attribute_id
                       attr.AcceptedCommandList.attribute_id, attr.GeneratedCommandList.attribute_id, attr.OnOff.attribute_id]
     accepted_commands = [c.Commands.Off, c.Commands.On]
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
@@ -118,7 +118,7 @@ class TestDecorators(MatterBaseTest):
         check_endpoints(has_timesync, False, "TimeSynchronization Cluster")
         check_endpoints(has_timesync_utc, False, "UTC attribute")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_endpoints(self):
         has_onoff = has_cluster(Clusters.OnOff)
         has_onoff_onoff = has_attribute(Clusters.OnOff.Attributes.OnOff)
@@ -132,85 +132,85 @@ class TestDecorators(MatterBaseTest):
         msg = "Unexpected evaluation of should_run_test_on_endpoint"
         for e in all_endpoints:
             self.matter_test_config.endpoint = e
-            should_run = await should_run_test_on_endpoint(self, has_onoff)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_onoff)
             asserts.assert_true(should_run, msg)
 
-            should_run = await should_run_test_on_endpoint(self, has_onoff_onoff)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_onoff_onoff)
             asserts.assert_true(should_run, msg)
 
-            should_run = await should_run_test_on_endpoint(self, has_onoff_ontime)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_onoff_ontime)
             asserts.assert_false(should_run, msg)
 
-            should_run = await should_run_test_on_endpoint(self, has_timesync)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_timesync)
             asserts.assert_false(should_run, msg)
 
-            should_run = await should_run_test_on_endpoint(self, has_timesync_utc)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_timesync_utc)
             asserts.assert_false(should_run, msg)
 
     # This test should be run once per endpoint
-    @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.OnOff))
     async def test_endpoint_cluster_yes(self):
         pass
 
     # This test should be skipped since this cluster isn't on any endpoint
-    @run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization))
     async def test_endpoint_cluster_no(self):
         pass
 
     # This test should be run once per endpoint
-    @run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OnOff))
+    @decorators.run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OnOff))
     async def test_endpoint_attribute_yes(self):
         pass
 
     # This test should be skipped since this attribute isn't on the supported cluster
-    @run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
+    @decorators.run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
     async def test_endpoint_attribute_supported_cluster_no(self):
         pass
 
     # This test should be skipped since this attribute is part of an unsupported cluster
-    @run_if_endpoint_matches(has_attribute(Clusters.TimeSynchronization.Attributes.Granularity))
+    @decorators.run_if_endpoint_matches(has_attribute(Clusters.TimeSynchronization.Attributes.Granularity))
     async def test_endpoint_attribute_unsupported_cluster_no(self):
         pass
 
     # This test should be run once per endpoint
-    @run_if_endpoint_matches(has_feature(Clusters.OnOff, Clusters.OnOff.Bitmaps.Feature.kLighting))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.OnOff, Clusters.OnOff.Bitmaps.Feature.kLighting))
     async def test_endpoint_feature_yes(self):
         pass
 
     # This test should be skipped since this attribute is part of an unsupported cluster
-    @run_if_endpoint_matches(has_feature(Clusters.TimeSynchronization, Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.TimeSynchronization, Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient))
     async def test_endpoint_feature_unsupported_cluster_no(self):
         pass
 
     # This test should be run since both are present
-    @run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OnOff) and has_cluster(Clusters.OnOff))
+    @decorators.run_if_endpoint_matches(has_attribute(Clusters.OnOff.Attributes.OnOff) and has_cluster(Clusters.OnOff))
     async def test_endpoint_boolean_yes(self):
         pass
 
     # This test should be skipped since we have an OnOff cluster, but no Time sync
-    @run_if_endpoint_matches(has_cluster(Clusters.OnOff) and has_cluster(Clusters.TimeSynchronization))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.OnOff) and has_cluster(Clusters.TimeSynchronization))
     async def test_endpoint_boolean_no(self):
         pass
 
-    @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.OnOff))
     async def test_fail_on_ep0(self):
         if self.matter_test_config.endpoint == 0:
             asserts.fail("Expected failure")
 
-    @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.OnOff))
     async def test_fail_on_ep1(self):
         if self.matter_test_config.endpoint == 1:
             asserts.fail("Expected failure")
 
-    @run_on_singleton_matching_endpoint(has_cluster(Clusters.OnOff))
+    @decorators.run_on_singleton_matching_endpoint(has_cluster(Clusters.OnOff))
     async def test_run_on_singleton_matching_endpoint(self):
         pass
 
-    @run_on_singleton_matching_endpoint(has_cluster(Clusters.OnOff))
+    @decorators.run_on_singleton_matching_endpoint(has_cluster(Clusters.OnOff))
     async def test_run_on_singleton_matching_endpoint_failure(self):
         asserts.fail("Expected failure")
 
-    @run_on_singleton_matching_endpoint(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
+    @decorators.run_on_singleton_matching_endpoint(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
     async def test_no_run_on_singleton_matching_endpoint(self):
         pass
 

@@ -1,3 +1,12 @@
+import ipaddress
+from datetime import timedelta
+
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.testing import decorators, runner, timeoperations
+from chip.testing.matter_testing import MatterBaseTest
+from mobly import asserts
+
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -9,7 +18,7 @@
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
@@ -36,23 +45,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import ipaddress
-from datetime import timedelta
-
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster,
-                                         run_if_endpoint_matches)
-from chip.testing.timeoperations import utc_time_in_matter_epoch
-from mobly import asserts
-
 
 class TC_TIMESYNC_2_1(MatterBaseTest):
     async def read_ts_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=None, cluster=cluster, attribute=attribute)
 
-    @run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization) and has_attribute(Clusters.TimeSynchronization.Attributes.TimeSource))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.TimeSynchronization) and decorators.has_attribute(Clusters.TimeSynchronization.Attributes.TimeSource))
     async def test_TC_TIMESYNC_2_1(self):
         attributes = Clusters.TimeSynchronization.Attributes
         features = await self.read_ts_attribute_expect_success(attribute=attributes.FeatureMap)
@@ -100,7 +99,6 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                     is_ip_addr = True
                 except ipaddress.AddressValueError:
                     is_ip_addr = False
-                    pass
                 asserts.assert_true(is_web_addr or is_ip_addr, "Returned DefaultNTP value is not a IP address or web address")
 
         self.print_step(6, "Read TimeZone")
@@ -143,7 +141,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                 toleranace = timedelta(minutes=10)
             else:
                 toleranace = timedelta(minutes=1)
-            delta_us = abs(utc_dut - utc_time_in_matter_epoch())
+            delta_us = abs(utc_dut - timeoperations.utc_time_in_matter_epoch())
             delta = timedelta(microseconds=delta_us)
             asserts.assert_less_equal(delta, toleranace, "UTC time is not within tolerance of TH")
 
@@ -191,4 +189,4 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

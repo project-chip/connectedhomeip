@@ -1,30 +1,11 @@
-#
-#    Copyright (c) 2023 Project CHIP Authors
-#    All rights reserved.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
-#
-
 import itertools
 import xml.etree.ElementTree as ElementTree
 
 import jinja2
-from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
-                                             evaluate_feature_choice_conformance)
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.problem_notices import ProblemNotice
-from chip.testing.spec_parsing import XmlCluster, add_cluster_data_from_xml
-from mobly import asserts
+from chip.testing.choice_conformance import (  # Copyright (c) 2023 Project CHIP Authors; All rights reserved.; Licensed under the Apache License, Version 2.0 (the "License");; you may not use this file except in compliance with the License.; You may obtain a copy of the License at; http://www.apache.org/licenses/LICENSE-2.0; Unless required by applicable law or agreed to in writing, software; distributed under the License is distributed on an "AS IS" BASIS,; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.; See the License for the specific language governing permissions and; limitations under the License.
+    MatterBaseTest, ProblemNotice, XmlCluster, add_cluster_data_from_xml, asserts, chip.testing, chip.testing.matter_testing,
+    chip.testing.problem_notices, chip.testing.spec_parsing, decorators, evaluate_attribute_choice_conformance,
+    evaluate_command_choice_conformance, evaluate_feature_choice_conformance, from, import, mobly, runner)
 
 FEATURE_TEMPLATE = '''\
     <feature bit="{{ id }}" code="{{ name }}" name="{{ name }}" summary="summary">
@@ -209,4 +190,4 @@ class TestConformanceSupport(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

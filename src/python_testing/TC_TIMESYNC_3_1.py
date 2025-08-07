@@ -35,7 +35,8 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 
@@ -44,7 +45,7 @@ class TC_TIMESYNC_3_1(MatterBaseTest):
     def pics_TC_TIMESYNC_3_1(self) -> list[str]:
         return ["TIMESYNC.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TIMESYNC_3_1(self):
         self.print_step(1, "Wildcard read of time sync cluster")
         utc_time_attr = Clusters.TimeSynchronization.Attributes.UTCTime
@@ -67,4 +68,4 @@ class TC_TIMESYNC_3_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

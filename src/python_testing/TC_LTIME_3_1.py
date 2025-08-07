@@ -1,3 +1,11 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.interaction_model import Status
+from chip.testing import decorators, matter_asserts, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -34,15 +42,6 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===""
-
-
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
 
 
 class TC_LTIME_3_1(MatterBaseTest):
@@ -85,7 +84,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         ]
         return steps
 
-    @run_if_endpoint_matches(has_cluster(Clusters.TimeFormatLocalization))
+    @decorators.run_if_endpoint_matches(Clusters.TimeFormatLocalization)
     async def test_TC_LTIME_3_1(self):
         self.endpoint = self.get_endpoint(default=0)
         self.cluster = Clusters.TimeFormatLocalization
@@ -184,4 +183,4 @@ class TC_LTIME_3_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

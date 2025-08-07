@@ -46,7 +46,8 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 # Commissioning stage numbers - we should find a better way to match these to the C++ code
@@ -95,7 +96,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         time.sleep(1)
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CGEN_2_4(self):
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
@@ -182,4 +183,4 @@ class TC_CGEN_2_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

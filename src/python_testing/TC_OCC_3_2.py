@@ -44,8 +44,9 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -83,7 +84,7 @@ class TC_OCC_3_2(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OCC_3_2(self):
         endpoint_id = self.get_endpoint()
         node_id = self.dut_node_id
@@ -170,4 +171,4 @@ class TC_OCC_3_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

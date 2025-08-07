@@ -41,7 +41,8 @@ import string
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing import decorators, matchers, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from drlk_2_x_common import DRLK_COMMON
 from mobly import asserts
 
@@ -207,7 +208,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                                                   endpoint=self.app_cluster_endpoint,
                                                   timedRequestTimeoutMs=1000)
 
-            asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetUserResponse),
+            asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetUserResponse),
                                 "Unexpected return type for GetUserResponse")
             asserts.assert_true(response.userIndex == userindex,
                                 "Error when executing GetUserResponse command, userIndex={}".format(
@@ -243,7 +244,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             response = await self.send_single_cmd(endpoint=self.app_cluster_endpoint, timedRequestTimeoutMs=1000,
                                                   cmd=drlkcluster.Commands.GetCredentialStatus(
                                                       credential=credentials_struct))
-            asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
+            asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
                                 "Unexpected return type for GetCredentialStatus")
             asserts.assert_true(response.credentialExists == credential_exists,
                                 "Error when executing GetCredentialStatus command, credentialExists={}".format(
@@ -279,7 +280,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 userIndex=userIndex),
                 endpoint=self.app_cluster_endpoint,
                 timedRequestTimeoutMs=1000)
-            asserts.assert_true(type_matches(response, drlkcluster.Commands.SetCredentialResponse),
+            asserts.assert_true(matchers.is_type(response, drlkcluster.Commands.SetCredentialResponse),
                                 "Unexpected return type for SetCredential")
             asserts.assert_equal(response.userIndex, NullValue)
             if (statuscode != custom_status_code):
@@ -351,7 +352,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             logging.exception(f"Got exception when performing SetAliroReaderConfig {e}")
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DRLK_2_9(self):
 
         self.Attrib = 0
@@ -804,4 +805,4 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
 
 if __name__ == '__main__':
-    default_matter_test_main()
+    runner.default_matter_test_main()

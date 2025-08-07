@@ -43,7 +43,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
@@ -80,7 +81,7 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_EEM_2_1(self):
 
         self.step("1")
@@ -125,4 +126,4 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

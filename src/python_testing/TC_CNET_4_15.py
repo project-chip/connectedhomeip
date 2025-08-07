@@ -1,3 +1,10 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -16,12 +23,6 @@
 #
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
-
-import logging
-
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from mobly import asserts
 
 
 class TC_CNET_4_15(MatterBaseTest):
@@ -43,8 +44,8 @@ class TC_CNET_4_15(MatterBaseTest):
     def pics_TC_CNET_4_15(self):
         return ['CNET.S.F00(WI)']
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
-                                         Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.NetworkCommissioning,
+                                                               Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_15(self):
         cnet = Clusters.NetworkCommissioning
 
@@ -121,4 +122,4 @@ class TC_CNET_4_15(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

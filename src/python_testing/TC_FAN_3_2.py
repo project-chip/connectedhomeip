@@ -1,3 +1,4 @@
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -43,9 +44,10 @@ from typing import Any
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_asserts import assert_valid_uint8
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -247,7 +249,7 @@ class TC_FAN_3_2(MatterBaseTest):
     def pics_TC_FAN_3_2(self) -> list[str]:
         return ["FAN.S.F00"]
 
-    @run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kMultiSpeed))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kMultiSpeed))
     async def test_TC_FAN_3_2(self):
         # Setup
         self.endpoint = self.get_endpoint(default=1)
@@ -278,4 +280,4 @@ class TC_FAN_3_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -42,7 +42,8 @@ import chip.discovery as Discovery
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from chip.tlv import TLVReader, TLVWriter
 from mobly import asserts
 
@@ -81,7 +82,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
             asserts.assert_true(False, 'Failed to open commissioning window')
         return (longDiscriminator, params)
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OPCREDS_3_1(self):
         opcreds = Clusters.OperationalCredentials
         # Create TH1
@@ -642,4 +643,4 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

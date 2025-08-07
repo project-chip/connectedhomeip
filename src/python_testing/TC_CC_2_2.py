@@ -1,3 +1,14 @@
+import logging
+import time
+
+import chip.clusters as Clusters
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.testing import decorators, runner
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+from test_plan_support import commission_if_required, read_attribute, verify_success
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -35,16 +46,6 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-import logging
-import time
-
-import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-from test_plan_support import commission_if_required, read_attribute, verify_success
 
 
 class TC_CC_2_3(MatterBaseTest):
@@ -134,7 +135,7 @@ class TC_CC_2_3(MatterBaseTest):
                          "The third entry in _reportedRemainingTimeValuesList_ is equal to 0")
                 ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.ColorControl))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.ColorControl))
     async def test_TC_CC_2_2(self):
         gather_time = 20
 
@@ -337,4 +338,4 @@ class TC_CC_2_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

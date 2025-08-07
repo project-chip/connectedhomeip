@@ -52,8 +52,9 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
@@ -164,7 +165,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DEM_2_2(self):
         # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""
@@ -386,4 +387,4 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

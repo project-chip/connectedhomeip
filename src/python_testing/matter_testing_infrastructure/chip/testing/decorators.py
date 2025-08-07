@@ -68,7 +68,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
         EP3, cluster E
 
         And the following test specification:
-        @run_if_endpoint_matches(has_cluster(Clusters.D))
+        @decorators.run_if_endpoint_matches(has_cluster(Clusters.D))
         test_mytest(self):
             ...
 
@@ -130,7 +130,7 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
         EP3, cluster D without attribute d
 
         And the following test specification:
-        @run_if_endpoint_matches(has_attribute(Clusters.D.Attributes.d))
+        @decorators.run_if_endpoint_matches(has_attribute(Clusters.D.Attributes.d))
         test_mytest(self):
             ...
 
@@ -190,7 +190,7 @@ def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction
         EP3, cluster D without command d
 
         And the following test specification:
-        @run_if_endpoint_matches(has_command(Clusters.D.Commands.d))
+        @decorators.run_if_endpoint_matches(has_command(Clusters.D.Commands.d))
         test_mytest(self):
             ...
 
@@ -233,7 +233,7 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
         EP3: cluster D without feature F0
 
         And the following test specification:
-        @run_if_endpoint_matches(has_feature(Clusters.D.Bitmaps.Feature.F0))
+        @decorators.run_if_endpoint_matches(has_feature(Clusters.D.Bitmaps.Feature.F0))
         test_mytest(self):
             ...
 
@@ -295,6 +295,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
         def matching_runner(self: "MatterBaseTest", *args, **kwargs):
             # Import locally to avoid circular dependency
             from chip.testing.matter_testing import MatterBaseTest
+
             assert isinstance(self, MatterBaseTest)
 
             runner_with_timeout = asyncio.wait_for(
@@ -337,7 +338,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
         EP3, cluster E
 
         And the following test specification:
-        @run_if_endpoint_matches(has_cluster(Clusters.D))
+        @decorators.run_if_endpoint_matches(has_cluster(Clusters.D))
         test_mytest(self):
             ...
 

@@ -1,3 +1,14 @@
+from typing import Union
+
+import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
+from chip.clusters.Types import Nullable, NullValue
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from chip.tlv import uint
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -9,7 +20,7 @@
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
@@ -33,16 +44,6 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-from typing import Union
-
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import Nullable, NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches,
-                                         type_matches)
-from chip.tlv import uint
-from mobly import asserts
 
 
 class TC_TLSCLIENT_1_1(MatterBaseTest):
@@ -63,14 +64,14 @@ class TC_TLSCLIENT_1_1(MatterBaseTest):
             result = await self.send_single_cmd(cmd=Clusters.TlsClientManagement.Commands.ProvisionEndpoint(hostname=hostname, port=port, caid=caid, ccdid=ccdid),
                                                 endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-            asserts.assert_true(type_matches(result, Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse),
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse),
                                 "Unexpected return type for ProvisionEndpoint")
             return result
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
             return e
 
-    @run_if_endpoint_matches(has_cluster(Clusters.TlsClientManagement))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.TlsClientManagement))
     async def test_TC_TLSCLIENT_1_1(self):
 
         endpoint = self.get_endpoint(default=1)
@@ -84,4 +85,4 @@ class TC_TLSCLIENT_1_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

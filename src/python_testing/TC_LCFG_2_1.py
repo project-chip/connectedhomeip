@@ -1,3 +1,14 @@
+import logging
+import random
+
+import chip.clusters as Clusters
+import langcodes
+from chip.interaction_model import Status
+from chip.testing import decorators, runner
+from chip.testing.matter_asserts import assert_non_empty_string
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -35,16 +46,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import random
-
-import chip.clusters as Clusters
-import langcodes
-from chip.interaction_model import Status
-from chip.testing.matter_asserts import assert_non_empty_string
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-
 
 class Test_TC_LCFG_2_1(MatterBaseTest):
     def pics_TC_LCFG_2_1(self) -> list[str]:
@@ -66,7 +67,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
             TestStep(5, "TH reads ActiveLocale")
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.LocalizationConfiguration))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.LocalizationConfiguration))
     async def test_TC_LCFG_2_1(self):
 
         endpoint = self.get_endpoint(default=0)
@@ -160,4 +161,4 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -39,9 +39,31 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from chip.testing.matter_testing import CustomCommissioningParameters, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import CustomCommissioningParameters, TestStep
 from mobly import asserts
-from support_modules.cadmin_support import CADMINBaseTest
+from support_modules.cadmin_support import CADMINBaseTest, CADMINSupport
+
+
+class TC_CADMIN_1_9(MatterBaseTest):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.support = CADMINSupport(self)
+
+    async def OpenCommissioningWindow(self) -> CommissioningParameters:
+        try:
+            cluster = Clusters.GeneralCommissioning
+            attribute = cluster.Attributes.BasicCommissioningInfo
+            duration = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
+            return await self.support.open_commissioning_window(
+                th=self.th1,
+                timeout=duration.maxCumulativeFailsafeSeconds,
+                node_id=self.dut_node_id,
+                discriminator=self.discriminator
+            )
+        except Exception as e:
+            logging.exception('Error running OpenCommissioningWindow %s', e)
+            asserts.assert_true(False, 'Failed to open commissioning window')
 
 
 class TC_CADMIN_1_9(CADMINBaseTest):
@@ -100,7 +122,7 @@ class TC_CADMIN_1_9(CADMINBaseTest):
     def pics_TC_CADMIN_1_9(self) -> list[str]:
         return ["CADMIN.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CADMIN_1_9(self):
         self.step(1)
 
@@ -130,4 +152,4 @@ class TC_CADMIN_1_9(CADMINBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

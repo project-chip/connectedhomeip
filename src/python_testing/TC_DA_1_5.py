@@ -40,8 +40,8 @@ import random
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.conversions import hex_from_bytes
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing import conversions, decorators, matchers, runner
+from chip.testing.matter_testing import MatterBaseTest
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
@@ -54,7 +54,7 @@ from pyasn1_modules import rfc2986, rfc3279, rfc5480
 
 
 class TC_DA_1_5(MatterBaseTest):
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DA_1_5(self):
 
         opcreds = Clusters.Objects.OperationalCredentials
@@ -70,7 +70,7 @@ class TC_DA_1_5(MatterBaseTest):
         self.print_step(3, "Send CertificateChainRequest for DAC")
         certtype = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
         dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=certtype))
-        asserts.assert_true(type_matches(dac_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "Certificate request returned incorrect type")
         der_dac = dac_resp.certificate
         # This throws an exception for a non-x509 cert
@@ -141,7 +141,7 @@ class TC_DA_1_5(MatterBaseTest):
         # Verify csr_nonce_returned is octet string of length 32
         try:
             # csr_nonce_returned is an octet string if it can be converted to an int
-            int(hex_from_bytes(csr_nonce_returned), 16)
+            int(conversions.hex_from_bytes(csr_nonce_returned), 16)
         except ValueError:
             asserts.fail("Returned CSR nonce is not an octet string")
 
@@ -152,8 +152,8 @@ class TC_DA_1_5(MatterBaseTest):
 
         self.print_step(7, "Verify signature")
         baselen = curve_by_name("NIST256p").baselen
-        attestation_raw_r = int(hex_from_bytes(nocsr_attestation_signature_raw[:baselen]), 16)
-        attestation_raw_s = int(hex_from_bytes(nocsr_attestation_signature_raw[baselen:]), 16)
+        attestation_raw_r = int(conversions.hex_from_bytes(nocsr_attestation_signature_raw[:baselen]), 16)
+        attestation_raw_s = int(conversions.hex_from_bytes(nocsr_attestation_signature_raw[baselen:]), 16)
 
         nocsr_attestation = utils.encode_dss_signature(attestation_raw_r, attestation_raw_s)
 
@@ -230,4 +230,4 @@ class TC_DA_1_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

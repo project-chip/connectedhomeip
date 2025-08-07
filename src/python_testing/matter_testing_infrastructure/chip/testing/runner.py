@@ -1,3 +1,27 @@
+import asyncio
+import importlib
+import logging
+import os
+import sys
+import typing
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import TYPE_CHECKING, Optional
+from unittest.mock import MagicMock
+
+import chip.testing.global_stash as global_stash
+from chip.clusters import Attribute
+from chip.testing import decorators
+from chip.testing.commissioning import CommissionDeviceTest
+from chip.testing.matter_test_config import MatterTestConfig
+from chip.testing.matter_testing import MatterStackState, _find_test_class, default_matter_test_main, parse_matter_test_args
+from chip.tracing import TracingContext
+from matter_yamltests.hooks import TestRunnerHooks
+from mobly import signals
+from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
+from mobly.test_runner import TestRunner
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -15,41 +39,12 @@
 #    limitations under the License.
 #
 
-# Add new imports for argument parsing functions
-import argparse
-import asyncio
-import importlib
-import json
-import logging
-import os
-import pathlib
-import re
-import sys
-import typing
-from binascii import unhexlify
-from dataclasses import asdict as dataclass_asdict
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
-from itertools import chain
-from pathlib import Path
-from typing import Any, List, Optional, Tuple
-from unittest.mock import MagicMock
-
-import chip.testing.global_stash as global_stash
-from chip.clusters import Attribute
-# Add imports for argument parsing dependencies
-from chip.testing.pics import read_pics_from_file
-from mobly import signals, utils
-from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
-from mobly.test_runner import TestRunner
 
 try:
-    from matter_yamltests.hooks import TestRunnerHooks
 except ImportError:
     class TestRunnerHooks:
         pass
 try:
-    from chip.tracing import TracingContext
 except ImportError:
     class TracingContext:
         def __enter__(self):
@@ -61,10 +56,8 @@ except ImportError:
         def StartFromString(self, destination):
             pass
 
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from chip.testing.matter_test_config import MatterTestConfig
 
 _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 
@@ -336,10 +329,11 @@ def default_matter_test_main():
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.runner import default_matter_test_main
+      from chip.testing import runner
+
       ...
       if __name__ == '__main__':
-        default_matter_test_main()
+        runner.default_matter_test_main()
     """
 
     matter_test_config = parse_matter_test_args()
@@ -395,22 +389,19 @@ def run_tests_no_exit(
     """
 
     # Lazy import to avoid circular dependency
-    from typing import TYPE_CHECKING
 
     from chip.testing.matter_stack_state import MatterStackState
     if TYPE_CHECKING:
-        from chip.testing.commissioning import CommissionDeviceTest
     else:
         CommissionDeviceTest = None  # Initial placeholder
 
     # Actual runtime import
     if CommissionDeviceTest is None:
-        from chip.testing.commissioning import CommissionDeviceTest
 
-    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
-    #       Mobly deep copies the user params before passing them to the test class and the event
-    # loop is not serializable. So, we are setting the event loop as a test
-    # class member.
+        # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
+        #       Mobly deep copies the user params before passing them to the test class and the event
+        # loop is not serializable. So, we are setting the event loop as a test
+        # class member.
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 
@@ -596,7 +587,6 @@ class MockTestRunner():
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: 'MatterTestConfig' = None):
-        from chip.testing.matter_test_config import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
 

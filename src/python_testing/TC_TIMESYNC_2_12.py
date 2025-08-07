@@ -43,9 +43,9 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
+from chip.testing import decorators, matchers, runner, timeoperations
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
-from chip.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from chip.testing.matter_testing import MatterBaseTest
 from chip.tlv import uint
 from mobly import asserts
 
@@ -78,10 +78,10 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
             AssertionError: If no event is received in time, the type is incorrect or the values do not match.
         """
 
-        timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
+        timeout = timeoperations.get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
             ret = cb.get_event_from_queue(block=True, timeout=timeout)
-            asserts.assert_true(type_matches(received_value=ret.Data,
+            asserts.assert_true(matchers.is_type(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.TimeZoneStatus), "Incorrect type received for event")
             asserts.assert_equal(ret.Data.offset, expected_offset, "Unexpected offset returned")
             asserts.assert_equal(ret.Data.name, expected_name, "Unexpected name returned")
@@ -91,7 +91,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
     def pics_TC_TIMESYNC_2_12(self) -> list[str]:
         return ["TIMESYNC.S.F00"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TIMESYNC_2_12(self):
 
         self.endpoint = 0
@@ -105,7 +105,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 
@@ -126,10 +126,10 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         asserts.assert_greater_equal(tz_list_size, 1, "Invalid tz list size")
 
         self.print_step(5, "TH sets two TZ items if dst_list_size > 1")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
+        th_utc = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
         tz_first = tz_struct(offset=3600, validAt=0, name="Not/Real")
         if tz_list_size > 1:
-            valid_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+            valid_second = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
             tz_second = tz_struct(offset=7200, validAt=valid_second, name="Un/Real")
             tz = [tz_first, tz_second]
             await self.send_set_time_zone_cmd(tz)
@@ -151,7 +151,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
         self.print_step(10, "If tz_list_size > 1, TH waits until th_utc + 15s")
         if tz_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+            time.sleep(timeoperations.get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(11, "If tz_list_size > 1, TH reads LocalTime")
         if tz_list_size > 1:
@@ -172,4 +172,4 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

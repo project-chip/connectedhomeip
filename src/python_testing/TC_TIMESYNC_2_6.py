@@ -40,7 +40,8 @@ import typing
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 
 
@@ -58,12 +59,11 @@ class TC_TIMESYNC_2_6(MatterBaseTest):
             asserts.assert_true(False, "Unexpected SetDefaultNTP command success")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")
-            pass
 
     def pics_TC_TIMESYNC_2_6(self) -> list[str]:
         return ["TIMESYNC.S.F01"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TIMESYNC_2_6(self):
 
         # Time sync is required to be on endpoint 0 if it is present
@@ -140,4 +140,4 @@ class TC_TIMESYNC_2_6(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

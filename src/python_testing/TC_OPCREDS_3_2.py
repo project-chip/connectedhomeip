@@ -36,12 +36,12 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
-from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
-                               verify_commissioning_successful, verify_success)
+from test_plan_support import (chip.testing, commission_from_existing, commission_if_required, decorators, from, import,
+                               read_attribute, remove_fabric, runner, verify_commissioning_successful, verify_success)
 
 
 def verify_fabric(controller: str) -> str:
@@ -75,7 +75,7 @@ class TC_OPCREDS_3_2(MatterBaseTest):
                     'fabric_index_CR3', 'CR1'), verify_success()),
                 ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OPCREDS_3_2(self):
         opcreds = Clusters.OperationalCredentials
 
@@ -209,4 +209,4 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -39,9 +39,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing import decorators, runner
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
+from chip.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -66,7 +66,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
     def steps_TC_CLDIM_3_2(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done", is_commissioning=True)
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If MotionLatching feature is not supported, skip remaining steps"),
             TestStep("2c", "Read LimitRange attribute"),
@@ -102,7 +102,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CLDIM_3_2(self):
         endpoint = self.get_endpoint(default=1)
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
@@ -296,4 +296,4 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

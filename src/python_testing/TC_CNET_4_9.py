@@ -1,3 +1,13 @@
+import logging
+
+import chip.clusters as Clusters
+import test_plan_support
+from chip.clusters.Types import NullValue
+from chip.testing import decorators, runner
+from chip.testing.matter_asserts import is_valid_bool_value
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -9,21 +19,11 @@
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-import logging
-
-import chip.clusters as Clusters
-import test_plan_support
-from chip.clusters.Types import NullValue
-from chip.testing.matter_asserts import is_valid_bool_value
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches,
-                                         type_matches)
-from mobly import asserts
 
 
 class TC_CNET_4_9(MatterBaseTest):
@@ -102,7 +102,7 @@ class TC_CNET_4_9(MatterBaseTest):
     def pics_TC_CNET_4_9(self):
         return ['CNET.S']
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
         ssid = self.get_wifi_ssid()
         credentials = self.get_credentials()
@@ -116,7 +116,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters)
@@ -178,7 +178,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # Verify that DUT sends NetworkConfigResponse to command with the following fields:
         # NetworkingStatus is success
-        asserts.assert_true(type_matches(result, Clusters.NetworkCommissioning.Commands.NetworkConfigResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.NetworkCommissioning.Commands.NetworkConfigResponse),
                             "Unexpected value returned from RemoveNetwork")
         asserts.assert_equal(result.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Network status was not successful")
@@ -253,7 +253,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TTH reads Networks attribute from the DUT on the current endpoint
@@ -279,7 +279,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to the value provided in the `--wifi-ssid` parameter and Breadcrumb field set to 1
@@ -288,7 +288,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends NetworkConfigResponse to command with the following fields: NetworkingStatus is success
-        asserts.assert_true(type_matches(result, Clusters.NetworkCommissioning.Commands.NetworkConfigResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.NetworkCommissioning.Commands.NetworkConfigResponse),
                             "Unexpected value returned from RemoveNetwork")
         asserts.assert_equal(result.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Network status was not successful")
@@ -309,7 +309,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TH reads Networks attribute from the DUT on the current endpoint
@@ -334,7 +334,7 @@ class TC_CNET_4_9(MatterBaseTest):
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
         result = await self.send_single_cmd(cmd=cmd)
 
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TH sends the AddOrUpdateWiFiNetwork command to the DUT
@@ -358,4 +358,4 @@ class TC_CNET_4_9(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

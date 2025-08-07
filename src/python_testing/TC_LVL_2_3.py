@@ -1,3 +1,13 @@
+import logging
+import time
+
+import chip.clusters as Clusters
+import test_plan_support
+from chip.testing import decorators, runner
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -36,15 +46,6 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-import logging
-import time
-
-import chip.clusters as Clusters
-import test_plan_support
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
 
 
 class TC_LVL_2_3(MatterBaseTest):
@@ -94,7 +95,7 @@ class TC_LVL_2_3(MatterBaseTest):
                          "The third entry in reportedRemainingTimeValuesList is equal to 0")
                 ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.LevelControl))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.LevelControl))
     async def test_TC_LVL_2_3(self):
         # Commissioning - already done
         self.step(1)
@@ -213,4 +214,4 @@ class TC_LVL_2_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -40,8 +40,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable
 from chip.commissioning import ROOT_ENDPOINT_ID
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, matter_asserts, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 
@@ -69,7 +69,7 @@ class TC_CGEN_2_5(MatterBaseTest):
             TestStep(12, "TH reads from the DUT the attribute TCAcknowledgementsRequired."),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CGEN_2_5(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
@@ -194,4 +194,4 @@ class TC_CGEN_2_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

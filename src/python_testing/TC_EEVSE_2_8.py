@@ -1,3 +1,12 @@
+import logging
+
+import chip.clusters as Clusters
+from chip.clusters.Types import Nullable
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+from TC_EEVSE_Utils import EEVSEBaseTestHelper
+
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -40,13 +49,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from mobly import asserts
-from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
@@ -79,7 +81,7 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
 
         return steps
 
-    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kPlugAndCharge))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(cluster, cluster.Bitmaps.Feature.kPlugAndCharge))
     async def test_TC_EEVSE_2_8(self):
 
         self.step("1")
@@ -102,4 +104,4 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

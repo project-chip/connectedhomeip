@@ -40,7 +40,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing import decorators, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
@@ -66,7 +67,7 @@ class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_WebRTCProvider_2_4(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
@@ -255,4 +256,4 @@ class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()
