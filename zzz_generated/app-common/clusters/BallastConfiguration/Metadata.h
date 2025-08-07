@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -75,6 +76,11 @@ namespace LampBurnHoursTripPoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LampBurnHoursTripPoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace LampBurnHoursTripPoint
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    PhysicalMinLevel::kMetadataEntry, PhysicalMaxLevel::kMetadataEntry, MinLevel::kMetadataEntry,
+    MaxLevel::kMetadataEntry,         LampQuantity::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
