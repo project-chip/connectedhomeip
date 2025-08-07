@@ -182,11 +182,11 @@ class TC_CADMIN_1_15(MatterBaseTest):
         }
 
         op_services = []
+        services = await mdns.get_operational_services(log_output=True)
         for th, compressed_id in compressed_fabric_ids.items():
             instance_name = self.get_instance_name(compressed_id)
             operational_service_name = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
 
-            services = await mdns.get_operational_services(log_output=True)
             service = next(
                 (s for s in services if s.service_name == operational_service_name),
                 None
