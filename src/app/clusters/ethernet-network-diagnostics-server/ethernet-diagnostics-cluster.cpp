@@ -186,7 +186,7 @@ CHIP_ERROR EthernetDiagnosticsServerCluster::AcceptedCommands(const ConcreteClus
 CHIP_ERROR EthernetDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
                                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mEnabledAttributes.enableCarrierDetect, CarrierDetect::kMetadataEntry },
         { mEnabledAttributes.enableErrCount, CollisionCount::kMetadataEntry },
         { mEnabledAttributes.enableFullDuplex, FullDuplex::kMetadataEntry },
