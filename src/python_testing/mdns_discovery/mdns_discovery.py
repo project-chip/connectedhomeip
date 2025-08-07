@@ -608,14 +608,13 @@ class MdnsDiscovery:
                 azc.zeroconf,
                 discovery_timeout_sec * 1000)
 
-            # Remove service listener and unblock waiters
+            # Remove service listener
             await azc.async_remove_service_listener(service_listener)
-            self._event.set()
 
             if is_discovered:
                 logger.info(f"Service record information {rec_types} for '{service_name}' / '{service_type}' discovered.")
 
-                # Convert discovred service info into MdnsServiceInfo object
+                # Convert discovered service info into MdnsServiceInfo object
                 mdns_service_info = MdnsServiceInfo(service_info)
 
                 # Add service to discovered services
