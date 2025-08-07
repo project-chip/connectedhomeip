@@ -59,12 +59,14 @@ async def connect_wifi_linux(ssid: str, password: str) -> Optional[subprocess.Co
     result = None
     try:
         # Activates Wi-Fi in case it is deactivated
-        subprocess.run(["nmcli", "radio", "wifi", "on"], check=False)
+        await asyncio.to_thread(subprocess.run, ["nmcli", "radio", "wifi", "on"], check=False)
 
         # Detects the active Wi-Fi interface
-        interface_result = subprocess.run(
+        interface_result = await asyncio.to_thread(
+            subprocess.run,
             ["nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device"],
-            capture_output=True, text=True
+            capture_output=True,
+            text=True
         )
         interface = None
         for line in interface_result.stdout.strip().splitlines():
@@ -73,21 +75,25 @@ async def connect_wifi_linux(ssid: str, password: str) -> Optional[subprocess.Co
                 interface = parts[0]
                 if parts[2] == "connected":
                     # Disconnecting interface
-                    subprocess.run(["nmcli", "device", "disconnect", interface], check=False)
+                    await asyncio.to_thread(subprocess.run, ["nmcli", "device", "disconnect", interface], check=False)
                 break
 
         # Let's try to connect
-        result = subprocess.run(
+        result = await asyncio.to_thread(
+            subprocess.run,
             ["nmcli", "d", "wifi", "connect", ssid, "password", password],
-            capture_output=True, text=True
+            capture_output=True,
+            text=True
         )
         # wait the connection to be ready
         await asyncio.sleep(WIFI_WAIT_SECONDS)
 
         # Let's verify it is connected
-        check = subprocess.run(
+        check = await asyncio.to_thread(
+            subprocess.run,
             ["nmcli", "-t", "-f", "ACTIVE,SSID", "dev", "wifi"],
-            capture_output=True, text=True
+            capture_output=True,
+            text=True
         )
         if any(line.startswith("yes:" + ssid) for line in check.stdout.splitlines()):
             logger.info(f" --- connect_wifi_linux: Successfully connected to '{ssid}'")
@@ -120,9 +126,11 @@ async def connect_wifi_mac(ssid: str, password: str) -> Optional[subprocess.Comp
     result = None
     try:
         # Get the Wi-Fi interface
-        interface_result = subprocess.run(
+        interface_result = await asyncio.to_thread(
+            subprocess.run,
             ["/usr/sbin/networksetup", "-listallhardwareports"],
-            capture_output=True, text=True
+            capture_output=True,
+            text=True
         )
         interface = "en0"   # 'en0' is by default
         for block in interface_result.stdout.split("\n\n"):
@@ -133,10 +141,13 @@ async def connect_wifi_mac(ssid: str, password: str) -> Optional[subprocess.Comp
                         break
 
         logger.info(f" --- connect_wifi_mac: Using interface: {interface}")
-        result = subprocess.run([
-            "networksetup",
-            "-setairportnetwork", interface, ssid, password
-        ], check=True, capture_output=True, text=True)
+        result = await asyncio.to_thread(
+            subprocess.run,
+            ["networksetup", "-setairportnetwork", interface, ssid, password],
+            check=True,
+            capture_output=True,
+            text=True
+        )
         await asyncio.sleep(WIFI_WAIT_SECONDS)
 
     except subprocess.CalledProcessError as e:

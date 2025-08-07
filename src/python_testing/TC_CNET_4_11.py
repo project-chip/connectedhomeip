@@ -270,7 +270,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         response = await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS*2
         )
         asserts.assert_equal(
             response.errorCode,
