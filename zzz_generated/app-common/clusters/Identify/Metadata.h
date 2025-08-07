@@ -20,7 +20,6 @@ namespace Identify {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 7;
 
 namespace IdentifyTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(IdentifyTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -39,7 +38,6 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 2;
 
 namespace Identify {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Identify::Id, BitFlags<DataModel::CommandQualityFlags>(),

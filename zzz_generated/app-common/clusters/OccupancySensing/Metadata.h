@@ -20,7 +20,6 @@ namespace OccupancySensing {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 19;
 
 namespace Occupancy {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Occupancy::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -97,10 +96,7 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 
 } // namespace Attributes
 
-namespace Commands {
-inline constexpr uint32_t kMetadataCount = 0;
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace OccupancyChanged {

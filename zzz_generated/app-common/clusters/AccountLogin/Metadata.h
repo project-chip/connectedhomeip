@@ -20,7 +20,6 @@ namespace AccountLogin {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 5;
 
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
@@ -29,7 +28,6 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 3;
 
 namespace GetSetupPIN {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(

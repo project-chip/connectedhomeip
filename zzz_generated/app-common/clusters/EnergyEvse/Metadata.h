@@ -20,7 +20,6 @@ namespace EnergyEvse {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 28;
 
 namespace State {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(State::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -134,7 +133,6 @@ constexpr std::array<DataModel::AttributeEntry, 10> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 7;
 
 namespace Disable {
 inline constexpr DataModel::AcceptedCommandEntry

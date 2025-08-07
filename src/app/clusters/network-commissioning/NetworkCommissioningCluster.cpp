@@ -202,7 +202,7 @@ CHIP_ERROR NetworkCommissioningCluster::GeneratedCommands(const ConcreteClusterP
     using namespace NetworkCommissioning::Commands;
     using NetworkCommissioning::Feature;
 
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kMetadataCount));
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kAcceptedCommandsCount));
 
     if (mLogic.Features().HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {

@@ -20,7 +20,6 @@ namespace LevelControl {
 inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 19;
 
 namespace CurrentLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -88,7 +87,6 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 9;
 
 namespace MoveToLevel {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MoveToLevel::Id, BitFlags<DataModel::CommandQualityFlags>(),

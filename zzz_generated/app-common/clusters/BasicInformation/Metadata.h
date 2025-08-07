@@ -20,7 +20,6 @@ namespace BasicInformation {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 29;
 
 namespace DataModelRevision {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(DataModelRevision::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -141,7 +140,6 @@ constexpr std::array<DataModel::AttributeEntry, 16> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
 
 namespace MfgSpecificPing {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MfgSpecificPing::Id, BitFlags<DataModel::CommandQualityFlags>(),

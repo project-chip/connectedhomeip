@@ -20,7 +20,6 @@ namespace PumpConfigurationAndControl {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 28;
 
 namespace MaxPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPressure::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -127,10 +126,7 @@ constexpr std::array<DataModel::AttributeEntry, 7> kMandatoryMetadata = {
 
 } // namespace Attributes
 
-namespace Commands {
-inline constexpr uint32_t kMetadataCount = 0;
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace SupplyVoltageLow {

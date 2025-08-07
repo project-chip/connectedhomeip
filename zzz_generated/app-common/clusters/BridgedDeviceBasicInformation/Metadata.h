@@ -20,7 +20,6 @@ namespace BridgedDeviceBasicInformation {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 23;
 
 namespace VendorName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(VendorName::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -103,7 +102,6 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
 
 namespace KeepActive {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(KeepActive::Id, BitFlags<DataModel::CommandQualityFlags>(),

@@ -20,7 +20,6 @@ namespace TemperatureControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 11;
 
 namespace TemperatureSetpoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -56,7 +55,6 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
 
 namespace SetTemperature {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetTemperature::Id, BitFlags<DataModel::CommandQualityFlags>(),

@@ -20,7 +20,6 @@ namespace KeypadInput {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 5;
 
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
@@ -29,7 +28,6 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
 
 namespace SendKey {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SendKey::Id, BitFlags<DataModel::CommandQualityFlags>(),

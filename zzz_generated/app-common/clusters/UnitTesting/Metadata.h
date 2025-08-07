@@ -20,7 +20,6 @@ namespace UnitTesting {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 95;
 
 namespace Boolean {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Boolean::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -491,7 +490,6 @@ constexpr std::array<DataModel::AttributeEntry, 85> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 28;
 
 namespace Test {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Test::Id, BitFlags<DataModel::CommandQualityFlags>(),

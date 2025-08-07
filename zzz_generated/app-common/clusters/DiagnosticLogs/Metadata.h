@@ -14,33 +14,30 @@
 
 namespace chip {
 namespace app {
-    namespace Clusters {
-        namespace DiagnosticLogs {
+namespace Clusters {
+namespace DiagnosticLogs {
 
-            inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 1;
 
-            namespace Attributes {
-                inline constexpr uint32_t kMetadataCount = 5;
+namespace Attributes {
 
-                constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
-                };
+};
 
-            } // namespace Attributes
+} // namespace Attributes
 
-            namespace Commands {
-                inline constexpr uint32_t kMetadataCount = 1;
+namespace Commands {
 
-                namespace RetrieveLogsRequest {
-                    inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RetrieveLogsRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                        Access::Privilege::kOperate);
-                } // namespace RetrieveLogsRequest
+namespace RetrieveLogsRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RetrieveLogsRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
+} // namespace RetrieveLogsRequest
 
-            } // namespace Commands
+} // namespace Commands
 
-            namespace Events {
-            } // namespace Events
-        } // namespace DiagnosticLogs
-    } // namespace Clusters
+namespace Events {} // namespace Events
+} // namespace DiagnosticLogs
+} // namespace Clusters
 } // namespace app
 } // namespace chip

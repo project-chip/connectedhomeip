@@ -20,7 +20,6 @@ namespace MediaInput {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 7;
 
 namespace InputList {
 inline constexpr DataModel::AttributeEntry
@@ -40,7 +39,6 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 4;
 
 namespace SelectInput {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SelectInput::Id, BitFlags<DataModel::CommandQualityFlags>(),

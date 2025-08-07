@@ -20,7 +20,6 @@ namespace ProxyValid {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 5;
 
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
@@ -28,10 +27,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 } // namespace Attributes
 
-namespace Commands {
-inline constexpr uint32_t kMetadataCount = 0;
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
 } // namespace ProxyValid

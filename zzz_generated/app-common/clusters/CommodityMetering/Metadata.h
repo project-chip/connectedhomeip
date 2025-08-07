@@ -20,7 +20,6 @@ namespace CommodityMetering {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 9;
 
 namespace MeteredQuantity {
 inline constexpr DataModel::AttributeEntry
@@ -52,10 +51,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 
 } // namespace Attributes
 
-namespace Commands {
-inline constexpr uint32_t kMetadataCount = 0;
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
 } // namespace CommodityMetering

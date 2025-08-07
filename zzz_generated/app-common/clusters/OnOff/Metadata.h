@@ -20,7 +20,6 @@ namespace OnOff {
 inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 10;
 
 namespace OnOff {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OnOff::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -50,7 +49,6 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 6;
 
 namespace Off {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Off::Id, BitFlags<DataModel::CommandQualityFlags>(),

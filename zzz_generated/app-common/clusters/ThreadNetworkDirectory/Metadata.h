@@ -20,7 +20,6 @@ namespace ThreadNetworkDirectory {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 8;
 
 namespace PreferredExtendedPanID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PreferredExtendedPanID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -45,7 +44,6 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 3;
 
 namespace AddNetwork {
 inline constexpr DataModel::AcceptedCommandEntry

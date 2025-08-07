@@ -20,7 +20,6 @@ namespace UnitLocalization {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 7;
 
 namespace TemperatureUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -38,10 +37,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 } // namespace Attributes
 
-namespace Commands {
-inline constexpr uint32_t kMetadataCount = 0;
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
 } // namespace UnitLocalization

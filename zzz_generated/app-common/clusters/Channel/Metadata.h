@@ -20,7 +20,6 @@ namespace Channel {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 8;
 
 namespace ChannelList {
 inline constexpr DataModel::AttributeEntry
@@ -42,7 +41,6 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 6;
 
 namespace ChangeChannel {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeChannel::Id, BitFlags<DataModel::CommandQualityFlags>(),

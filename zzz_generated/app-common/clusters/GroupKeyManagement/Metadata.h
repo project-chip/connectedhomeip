@@ -20,7 +20,6 @@ namespace GroupKeyManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 9;
 
 namespace GroupKeyMap {
 inline constexpr DataModel::AttributeEntry
@@ -51,7 +50,6 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 4;
 
 namespace KeySetWrite {
 inline constexpr DataModel::AcceptedCommandEntry

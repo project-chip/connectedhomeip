@@ -20,7 +20,6 @@ namespace JointFabricAdministrator {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 6;
 
 namespace AdministratorFabricIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(AdministratorFabricIndex::Id,
@@ -35,7 +34,6 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 6;
 
 namespace ICACCSRRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ICACCSRRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),

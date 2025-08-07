@@ -20,7 +20,6 @@ namespace WebRTCTransportProvider {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 6;
 
 namespace CurrentSessions {
 inline constexpr DataModel::AttributeEntry
@@ -36,7 +35,6 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 5;
 
 namespace SolicitOffer {
 inline constexpr DataModel::AcceptedCommandEntry

@@ -20,7 +20,6 @@ namespace Chime {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 8;
 
 namespace InstalledChimeSounds {
 inline constexpr DataModel::AttributeEntry
@@ -46,7 +45,6 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
 
 namespace PlayChimeSound {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PlayChimeSound::Id, BitFlags<DataModel::CommandQualityFlags>(),

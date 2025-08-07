@@ -20,7 +20,6 @@ namespace GeneralCommissioning {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 18;
 
 namespace Breadcrumb {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Breadcrumb::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -86,7 +85,6 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 4;
 
 namespace ArmFailSafe {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ArmFailSafe::Id, BitFlags<DataModel::CommandQualityFlags>(),

@@ -20,7 +20,6 @@ namespace ActivatedCarbonFilterMonitoring {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 11;
 
 namespace Condition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Condition::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -56,7 +55,6 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
 
 namespace ResetCondition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCondition::Id, BitFlags<DataModel::CommandQualityFlags>(),

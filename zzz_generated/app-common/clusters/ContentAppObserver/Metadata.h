@@ -20,7 +20,6 @@ namespace ContentAppObserver {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 5;
 
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
@@ -29,7 +28,6 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
 
 namespace ContentAppMessage {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ContentAppMessage::Id, BitFlags<DataModel::CommandQualityFlags>(),

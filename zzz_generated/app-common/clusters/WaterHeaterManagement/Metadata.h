@@ -20,7 +20,6 @@ namespace WaterHeaterManagement {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 11;
 
 namespace HeaterTypes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HeaterTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -56,7 +55,6 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 2;
 
 namespace Boost {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Boost::Id, BitFlags<DataModel::CommandQualityFlags>(),

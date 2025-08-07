@@ -20,7 +20,6 @@ namespace ApplicationLauncher {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 7;
 
 namespace CatalogList {
 inline constexpr DataModel::AttributeEntry
@@ -38,7 +37,6 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 3;
 
 namespace LaunchApp {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(LaunchApp::Id, BitFlags<DataModel::CommandQualityFlags>(),

@@ -20,7 +20,6 @@ namespace LaundryDryerControls {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 7;
 
 namespace SupportedDrynessLevels {
 inline constexpr DataModel::AttributeEntry
@@ -40,10 +39,7 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 
 } // namespace Attributes
 
-namespace Commands {
-inline constexpr uint32_t kMetadataCount = 0;
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
 } // namespace LaundryDryerControls

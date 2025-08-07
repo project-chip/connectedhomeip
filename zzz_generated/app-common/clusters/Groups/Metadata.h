@@ -20,7 +20,6 @@ namespace Groups {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 6;
 
 namespace NameSupport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NameSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -34,7 +33,6 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 6;
 
 namespace AddGroup {
 inline constexpr DataModel::AcceptedCommandEntry

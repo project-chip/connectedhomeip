@@ -20,7 +20,6 @@ namespace PowerSource {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 37;
 
 namespace Status {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Status::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -171,10 +170,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 
 } // namespace Attributes
 
-namespace Commands {
-inline constexpr uint32_t kMetadataCount = 0;
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace WiredFaultChange {

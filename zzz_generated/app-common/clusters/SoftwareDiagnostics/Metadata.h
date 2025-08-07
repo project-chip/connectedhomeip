@@ -20,7 +20,6 @@ namespace SoftwareDiagnostics {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 9;
 
 namespace ThreadMetrics {
 inline constexpr DataModel::AttributeEntry
@@ -47,7 +46,6 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 1;
 
 namespace ResetWatermarks {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetWatermarks::Id, BitFlags<DataModel::CommandQualityFlags>(),

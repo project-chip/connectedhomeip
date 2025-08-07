@@ -20,7 +20,6 @@ namespace ValveConfigurationAndControl {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 16;
 
 namespace OpenDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OpenDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -75,7 +74,6 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 2;
 
 namespace Open {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Open::Id, BitFlags<DataModel::CommandQualityFlags>(),

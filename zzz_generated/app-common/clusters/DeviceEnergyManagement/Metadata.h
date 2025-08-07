@@ -20,7 +20,6 @@ namespace DeviceEnergyManagement {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-inline constexpr uint32_t kMetadataCount = 13;
 
 namespace ESAType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ESAType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -64,7 +63,6 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
-inline constexpr uint32_t kMetadataCount = 8;
 
 namespace PowerAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PowerAdjustRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
