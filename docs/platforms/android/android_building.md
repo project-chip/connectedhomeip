@@ -15,18 +15,18 @@ There are following Apps on Android
 
 <hr>
 
-- [Building Android](#building-android)
-  - [Source files](#source-files)
-  - [Requirements for building](#requirements-for-building)
-    - [Linux](#linux)
-    - [MacOS](#macos)
-    - [ABIs and TARGET\_CPU](#abis-and-target_cpu)
-    - [Gradle \& JDK Version](#gradle--jdk-version)
-    - [Kotlin Version](#kotlin-version)
-  - [Preparing for build](#preparing-for-build)
-  - [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
-  - [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
-  - [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
+-   [Building Android](#building-android)
+    -   [Source files](#source-files)
+    -   [Requirements for building](#requirements-for-building)
+        -   [Linux](#linux)
+        -   [MacOS](#macos)
+        -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
+        -   [Gradle \& JDK Version](#gradle--jdk-version)
+        -   [Kotlin Version](#kotlin-version)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
+    -   [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
+    -   [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
 
 <hr>
 
@@ -59,8 +59,8 @@ downloaded.
        10.0
     2. Apply
 4. Install SDK 34:
-    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 14.0 (Upside Down Cake)
-       API Level 34
+    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 14.0 (Upside Down
+       Cake) API Level 34
     2. Apply
 5. Install Emulator:
     1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
@@ -98,7 +98,8 @@ architecture:
 
 ### Gradle & JDK Version
 
-All Android projects utilize Gradle plugin version 8.5.1, Gradle version 8.7 and JDK version 17.0.
+All Android projects utilize Gradle plugin version 8.5.1, Gradle version 8.7 and
+JDK version 17.0.
 
 For developer using java 17 in MacOS, the JAVA can be configured as follows via
 `sdkman`:
