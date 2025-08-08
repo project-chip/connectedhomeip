@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -359,6 +360,36 @@ private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
 };
 
+class TestTlsClientManagementDelegate : public TlsClientManagementDelegate
+{
+
+public:
+    CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
+                                             EndpointStructType & endpoint) const
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    Protocols::InteractionModel::ClusterStatusCode
+    ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
+                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID)
+    {
+        return ClusterStatusCode(Status::Success);
+    }
+
+    Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                    uint16_t endpointID, EndpointStructType & endpoint) const
+    {
+        return Status::Success;
+    }
+
+    Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                                 uint16_t endpointID)
+    {
+        return ClusterStatusCode(Status::Success);
+    }
+};
+
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
 {
 public:
@@ -579,6 +610,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -591,6 +623,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
 
     // Set the delegate to the server logic
     server.GetLogic().SetDelegate(1, &mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(1, &tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -955,6 +988,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -964,6 +998,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
 
     // Set the delegate to the server logic
     server.GetLogic().SetDelegate(1, &mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(1, &tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -1283,6 +1318,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -1291,6 +1327,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     commandData.transportOptions = transportOptions;
 
     server.GetLogic().SetDelegate(1, &mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(1, &tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
 
