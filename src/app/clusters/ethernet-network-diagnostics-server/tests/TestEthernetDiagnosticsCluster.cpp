@@ -112,8 +112,9 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         };
 
         ResetCountsProvider resetCountsProvider;
-        EthernetDiagnosticsServerCluster cluster(resetCountsProvider, { EthernetNetworkDiagnostics::Feature::kPacketCounts },
-                                                 enabledAttributes);
+        EthernetDiagnosticsServerCluster cluster(
+            resetCountsProvider,
+            BitFlags<EthernetNetworkDiagnostics::Feature>{ EthernetNetworkDiagnostics::Feature::kPacketCounts }, enabledAttributes);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
@@ -198,9 +199,9 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         };
 
         AllProvider allProvider;
-        EthernetDiagnosticsServerCluster cluster(allProvider,
-                                                 { EthernetNetworkDiagnostics::Feature::kPacketCounts,
-                                                   EthernetNetworkDiagnostics::Feature::kErrorCounts } enabledAttributes);
+        EthernetDiagnosticsServerCluster cluster(
+            allProvider, { EthernetNetworkDiagnostics::Feature::kPacketCounts, EthernetNetworkDiagnostics::Feature::kErrorCounts },
+            enabledAttributes);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
