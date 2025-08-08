@@ -38,11 +38,11 @@ import logging
 import random
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # These below variables are used to test the AccessControl cluster
