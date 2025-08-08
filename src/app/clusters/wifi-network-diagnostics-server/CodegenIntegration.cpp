@@ -17,6 +17,8 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -70,9 +72,6 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     {
         return;
     }
-    const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-        .enableCurrentMaxRate = IsAttributeEnabled(endpointId, Attributes::CurrentMaxRate::Id),
-    };
 
     uint32_t rawFeatureMap;
     if (FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
@@ -80,10 +79,13 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         ChipLogError(AppServer, "Failed to get feature map for endpoint %u, defaulting to 0", endpointId);
         rawFeatureMap = 0;
     }
+
     // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
     // and do not properly support secondary network interfaces or per-endpoint diagnostics.
     // See issue:#40317
-    gServers[arrayIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(), enabledAttributes,
+    gServers[arrayIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
+                                WiFiDiagnosticsServerLogic::OptionalAttributeSet().Set<CurrentMaxRate::Id>(
+                                    IsAttributeEnabled(endpointId, CurrentMaxRate::Id)),
                                 BitFlags<WiFiNetworkDiagnostics::Feature>(rawFeatureMap));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());

@@ -26,6 +26,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics;
+using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 
 // for fixed endpoint, this file is ever only included IF general diagnostics is enabled and that MUST happen only on endpoint 0
 // the static assert is skipped in case of dynamic endpoints.
@@ -47,16 +48,14 @@ LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == kRootEndpointId);
-    const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableTotalOperationalHours =
-            emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::TotalOperationalHours::Id),
-        .enableBootReason = emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::BootReason::Id),
-        .enableActiveHardwareFaults =
-            emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::ActiveHardwareFaults::Id),
-        .enableActiveRadioFaults = emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::ActiveRadioFaults::Id),
-        .enableActiveNetworkFaults =
-            emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, Attributes::ActiveNetworkFaults::Id),
-    };
+
+    GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
+        GeneralDiagnosticsCluster::OptionalAttributeSet()
+            .Set<TotalOperationalHours::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, TotalOperationalHours::Id))
+            .Set<BootReason::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, BootReason::Id))
+            .Set<ActiveHardwareFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveHardwareFaults::Id))
+            .Set<ActiveRadioFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveRadioFaults::Id))
+            .Set<ActiveNetworkFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveNetworkFaults::Id));
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
     const GeneralDiagnosticsFunctionsConfig functionsConfig
@@ -65,22 +64,20 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
         Only consider real time if time sync cluster is actually enabled. If it's not
         enabled, this avoids likelihood of frequently reporting unusable unsynched time.
         */
-        .enablePosixTime =
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
-            true,
+        .enablePosixTime = true,
 #else
-            false,
+        .enablePosixTime      = false,
 #endif
-        .enablePayloadSnaphot =
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-            true,
+        .enablePayloadSnaphot = true,
 #else
-            false,
+        .enablePayloadSnaphot = false,
 #endif
     };
-    gServer.Create(enabledAttributes, functionsConfig);
+    gServer.Create(optionalAttributeSet, functionsConfig);
 #else
-    gServer.Create(enabledAttributes);
+    gServer.Create(optionalAttributeSet);
 #endif
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
