@@ -45,7 +45,7 @@ TEST_F(TestGroupKeyManagementCluster, CompileTest)
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GroupKeyManagement::Id }), BitFlags<ClusterQualityFlags>());
 }
 
-TEST_F(TestGroupKeyManagementCluster, CommandsTest) 
+TEST_F(TestGroupKeyManagementCluster, CommandsTest)
 {
     GroupKeyManagementCluster cluster;
     ConcreteClusterPath groupKeyManagementPath = ConcreteClusterPath(kRootEndpointId, GroupKeyManagement::Id);
@@ -82,7 +82,7 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
     ASSERT_EQ(generatedCommands[1], GroupKeyManagement::Commands::KeySetReadResponse::Id);
 }
 
-TEST_F(TestGroupKeyManagementCluster, AttributesTest) 
+TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 {
     GroupKeyManagementCluster cluster;
     ConcreteClusterPath groupKeyManagementPath = ConcreteClusterPath(kRootEndpointId, GroupKeyManagement::Id);
