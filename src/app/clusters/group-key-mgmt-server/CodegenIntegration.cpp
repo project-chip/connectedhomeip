@@ -17,7 +17,7 @@
 
 #include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
 #include <app/static-cluster-config/GroupKeyManagement.h>
-#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -29,7 +29,6 @@ static_assert((GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.
                GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
               GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
-namespace {
 LazyRegisteredServerCluster<GroupKeyManagementCluster> gServer;
 
 void emberAfGroupKeyManagementClusterInitCallback(EndpointId endpointId)
@@ -60,4 +59,3 @@ void emberAfGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
 void MatterGroupKeyManagementPluginServerInitCallback() {}
 
 void MatterGroupKeyManagementPluginServerShutdownCallback() {}
-}

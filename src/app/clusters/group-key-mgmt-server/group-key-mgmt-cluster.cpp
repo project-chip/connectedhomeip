@@ -143,26 +143,40 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCo
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) 
 {
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
+    
+    /*
+     * Fetch provider and fabric before command handling. Provider needed for many of the key set 
+     * functions and the fabric index is needed for the GroupKeyManagement Decode function.
+    */
+    if (!GetProviderAndFabric(handler, request.path, &provider, &fabric))
+    {
+        // Command will already have status populated from validation.
+        return std::nullopt;
+    }
+    FabricIndex fabric_index = fabric->GetFabricIndex();
+    
     switch (request.path.mCommandId)
     {
     case GroupKeyManagement::Commands::KeySetWrite::Id: {
         GroupKeyManagement::Commands::KeySetWrite::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
         return HandleKeySetWrite(handler, request.path, request_data);
     }
     case GroupKeyManagement::Commands::KeySetRead::Id: {
         GroupKeyManagement::Commands::KeySetRead::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
         return HandleKeySetRead(handler, request.path, request_data);
     }
     case GroupKeyManagement::Commands::KeySetRemove::Id: {
         GroupKeyManagement::Commands::KeySetRemove::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
         return HandleKeySetRemove(handler, request.path, request_data);
     }
     case GroupKeyManagement::Commands::KeySetReadAllIndices::Id: {
         GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
         return HandleKeySetReadAllIndices(handler, request.path, request_data);
     }
     default:
@@ -202,7 +216,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
 DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) {
     switch(request.path.mAttributeId){
-        case GroupKeyManagement::Attributes::GroupKeyMap: {
+        case GroupKeyMap::Id: {
             // TODO: wrap this call in NotifyAttributeChangedIfSuccess() 
             return WriteGroupKeyMap(request.path, decoder);
         }
