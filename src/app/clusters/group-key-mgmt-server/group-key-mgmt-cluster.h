@@ -21,8 +21,6 @@
 #include <app/server/Server.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
-#include <platform/DiagnosticDataProvider.h>
-#include <platform/GeneralFaults.h>
 
 namespace chip {
 namespace app {
