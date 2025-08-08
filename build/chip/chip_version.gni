@@ -33,11 +33,10 @@ template("gen_sdk_version") {
     directory = invoker.directory
 
     # Check if we are inside a repository
-    is_git_repository = exec_script(
-      "${chip_root}/build/chip/check_path.py",
-      [rebase_path("${chip_root}/.git/logs/HEAD", root_build_dir)],
-      "value"
-    )
+    is_git_repository = exec_script("${chip_root}/build/chip/check_path.py",
+                                    [ rebase_path("${chip_root}/.git/logs/HEAD",
+                                                  root_build_dir) ],
+                                    "value")
 
     if (is_git_repository) {
       inputs = [ "${chip_root}/.git/logs/HEAD" ]
