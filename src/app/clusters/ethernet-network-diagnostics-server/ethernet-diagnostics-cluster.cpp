@@ -83,7 +83,7 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
 
         if (mProvider.GetEthFullDuplex(duplexValue) == CHIP_NO_ERROR)
         {
-            fullDuplex.SetNonNull(value);
+            fullDuplex.SetNonNull(duplexValue);
         }
 
         return encoder.Encode(fullDuplex);
