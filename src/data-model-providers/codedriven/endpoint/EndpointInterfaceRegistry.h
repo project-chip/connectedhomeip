@@ -37,15 +37,20 @@ namespace app {
 struct EndpointInterfaceRegistration
 {
     EndpointInterface * const endpointInterface;
+    DataModel::EndpointEntry endpointEntry;
     EndpointInterfaceRegistration * next;
 
-    constexpr EndpointInterfaceRegistration(EndpointInterface & interface, EndpointInterfaceRegistration * next_item = nullptr) :
-        endpointInterface(&interface), next(next_item)
+    EndpointInterfaceRegistration(EndpointInterface & interface, DataModel::EndpointEntry entry,
+                                  EndpointInterfaceRegistration * next_item = nullptr) :
+        endpointInterface(&interface),
+        endpointEntry(entry), next(next_item)
     {}
     EndpointInterfaceRegistration(EndpointInterfaceRegistration && other) = default;
 
     EndpointInterfaceRegistration(const EndpointInterfaceRegistration & other)             = delete;
     EndpointInterfaceRegistration & operator=(const EndpointInterfaceRegistration & other) = delete;
+
+    DataModel::EndpointEntry GetEndpointEntry() const { return endpointEntry; }
 };
 
 /**
@@ -82,8 +87,8 @@ public:
         }
         bool operator==(const Iterator & other) const { return mCurrent == other.mCurrent; }
         bool operator!=(const Iterator & other) const { return mCurrent != other.mCurrent; }
-        EndpointInterface * operator*() { return mCurrent->endpointInterface; }
-        EndpointInterface * operator->() { return mCurrent->endpointInterface; }
+        EndpointInterfaceRegistration & operator*() { return *mCurrent; }
+        EndpointInterfaceRegistration * operator->() { return mCurrent; }
 
     private:
         EndpointInterfaceRegistration * mCurrent;
