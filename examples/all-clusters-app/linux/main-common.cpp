@@ -52,8 +52,6 @@
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
-#include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
@@ -75,14 +73,6 @@ using namespace chip::app;
 using namespace chip::DeviceLayer;
 
 using chip::Protocols::InteractionModel::Status;
-
-static constexpr uint8_t kMaxProvisioned = 254;
-
-static Clusters::Tls::CertificateTableImpl gCertificateTableInstance;
-namespace chip::app::Clusters {
-TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance(gCertificateTableInstance);
-}
-
 namespace {
 
 LowPowerManager sLowPowerManager;
@@ -95,8 +85,6 @@ Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
 Clusters::PushAvStreamTransport::PushAvStreamTransportManager gPushAvStreamTransportManager;
-static Clusters::TlsClientManagementServer gTlsClientManagementClusterServerInstance = Clusters::TlsClientManagementServer(
-    EndpointId(1), Clusters::TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisioned);
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon   = 7;
@@ -312,15 +300,4 @@ Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clust
 
     // Finally we just do not support external attributes in all-clusters at this point
     return Status::Failure;
-}
-
-void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
-{
-    gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    gTlsClientManagementClusterServerInstance.Init();
-}
-
-void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
-{
-    gTlsClientManagementClusterServerInstance.Finish();
 }

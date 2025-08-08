@@ -23,6 +23,8 @@
 #include <tls-client-management-instance.h>
 #include <vector>
 
+static constexpr uint8_t kMaxProvisioned = 254;
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -151,4 +153,20 @@ ClusterStatusCode TlsClientManagementCommandDelegate::RemoveProvisionedEndpointB
     mProvisioned.erase(i);
 
     return ClusterStatusCode(Status::Success);
+}
+
+static CertificateTableImpl gCertificateTableInstance;
+TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance(gCertificateTableInstance);
+static TlsClientManagementServer gTlsClientManagementClusterServerInstance = TlsClientManagementServer(
+    EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisioned);
+
+void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
+{
+    gCertificateTableInstance.SetEndpoint(EndpointId(1));
+    gTlsClientManagementClusterServerInstance.Init();
+}
+
+void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
+{
+    gTlsClientManagementClusterServerInstance.Finish();
 }

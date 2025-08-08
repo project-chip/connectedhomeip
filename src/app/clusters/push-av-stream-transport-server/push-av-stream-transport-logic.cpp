@@ -521,13 +521,14 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
             commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
 
-        // Todo: Not Verifying the TLSEndpointID as tls certificate management is not implemented yet
-        //  VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
-        //      ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
-        //      mEndpointId); auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-        //      handler.AddClusterSpecificFailure(commandPath, status);
-        //      return std::nullopt;
-        //  });
+        // Todo: Not Returning on Error as tls certificate management is not implemented yet
+        VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
+                         mEndpointId);
+            auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+            //  handler.AddClusterSpecificFailure(commandPath, status);
+            //  return std::nullopt;
+        });
     }
     else
     {
