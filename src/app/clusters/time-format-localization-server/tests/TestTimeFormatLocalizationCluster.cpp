@@ -259,7 +259,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
         EXPECT_EQ(clusterSim.GetActiveCalendarType(), TimeFormatLocalization::CalendarTypeEnum::kChinese);
 
         // Test valid writes
-        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr, &testAttrProvider), 
+        EXPECT_EQ(clusterSim.setHourFormat(TimeFormatLocalization::HourFormatEnum::k12hr, &testAttrProvider),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(clusterSim.GetHourFormat(), TimeFormatLocalization::HourFormatEnum::k12hr);
 

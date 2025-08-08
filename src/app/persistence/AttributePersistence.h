@@ -64,7 +64,7 @@ public:
         }
 
         value = decodedValue;
-        
+
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
 

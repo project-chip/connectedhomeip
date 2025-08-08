@@ -34,7 +34,7 @@ public:
     FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return nullptr; };
     UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; };
     SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; };
-    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override 
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override
     {
         return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
     }
@@ -63,7 +63,7 @@ protected:
     public:
         SupportedCalendarTypesIteratorImpl() = default;
         size_t Count() override { return kNumSupportedCalendarTypes; }
-        bool Next(CalendarType & output) override 
+        bool Next(CalendarType & output) override
         {
             static const CalendarType kAllSupportedCalendarTypes[kNumSupportedCalendarTypes] = {
                 app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian,

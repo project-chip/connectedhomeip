@@ -76,7 +76,7 @@ void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistencePro
     // Try to read existing calendar type from persistence
     AttributePersistence attrPersistence {*attrProvider};
 
-    attrPersistence.LoadNativeEndianValue<CalendarTypeEnum>({ kRootEndpointId, TimeFormatLocalization::Id, 
+    attrPersistence.LoadNativeEndianValue<CalendarTypeEnum>({ kRootEndpointId, TimeFormatLocalization::Id,
         TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType, kDefaultCalendarType);
 
     // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
@@ -94,7 +94,7 @@ void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvi
     VerifyOrReturn(attrProvider != nullptr);
     AttributePersistence attrPersistence {*attrProvider};
 
-    attrPersistence.LoadNativeEndianValue<HourFormatEnum>({ kRootEndpointId, TimeFormatLocalization::Id, 
+    attrPersistence.LoadNativeEndianValue<HourFormatEnum>({ kRootEndpointId, TimeFormatLocalization::Id,
         TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat, kDefaultHourFormat);
 
 }
@@ -166,7 +166,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const 
     case TimeFormatLocalization::Attributes::HourFormat::Id: {
         CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue(
             { kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, decoder, mHourFormat);
-        return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success 
+        return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
                                      : Protocols::InteractionModel::Status::ConstraintError;
     }
 
@@ -187,7 +187,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const 
         CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue(
             { kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, decoder, mCalendarType);
 
-        return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success 
+        return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
                                      : Protocols::InteractionModel::Status::WriteIgnored;
     }
 
