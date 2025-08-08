@@ -525,7 +525,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
                          mEndpointId);
-            auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
+            // auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
             //  handler.AddClusterSpecificFailure(commandPath, status);
             //  return std::nullopt;
         });
