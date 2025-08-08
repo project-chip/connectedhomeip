@@ -20,7 +20,7 @@ import zipfile
 
 from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from matter.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
-                                       parse_namespace)
+                                         parse_namespace)
 from matter.testing.problem_notices import ProblemNotice, ProblemSeverity, NamespacePathLocation
 from jinja2 import Template
 from mobly import asserts
@@ -371,9 +371,9 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
             # We expect no validation problems for these versions of the spec files
             asserts.assert_equal(
-                len(all_problems), 
-                0, 
-                f"Validation problems found in namespace XML files for version {version}:\n" + 
+                len(all_problems),
+                0,
+                f"Validation problems found in namespace XML files for version {version}:\n" +
                 "\n".join(f"  - {p.problem}" for p in all_problems)
             )
 
