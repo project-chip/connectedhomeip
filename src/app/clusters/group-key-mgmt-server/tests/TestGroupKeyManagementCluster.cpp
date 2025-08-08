@@ -58,19 +58,19 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
 
     ASSERT_EQ(acceptedCommands[0].commandId, GroupKeyManagement::Commands::KeySetWrite::Id);
     ASSERT_EQ(acceptedCommands[0].GetInvokePrivilege(),
-                GroupKeyManagement::Commands::KeySetWrite::kMetadataEntry.GetInvokePrivilege());
+              GroupKeyManagement::Commands::KeySetWrite::kMetadataEntry.GetInvokePrivilege());
 
     ASSERT_EQ(acceptedCommands[1].commandId, GroupKeyManagement::Commands::KeySetRead::Id);
     ASSERT_EQ(acceptedCommands[1].GetInvokePrivilege(),
-                GroupKeyManagement::Commands::KeySetRead::kMetadataEntry.GetInvokePrivilege());
+              GroupKeyManagement::Commands::KeySetRead::kMetadataEntry.GetInvokePrivilege());
 
     ASSERT_EQ(acceptedCommands[2].commandId, GroupKeyManagement::Commands::KeySetRemove::Id);
     ASSERT_EQ(acceptedCommands[2].GetInvokePrivilege(),
-                GroupKeyManagement::Commands::KeySetRemove::kMetadataEntry.GetInvokePrivilege());
+              GroupKeyManagement::Commands::KeySetRemove::kMetadataEntry.GetInvokePrivilege());
 
     ASSERT_EQ(acceptedCommands[3].commandId, GroupKeyManagement::Commands::KeySetReadAllIndices::Id);
     ASSERT_EQ(acceptedCommands[3].GetInvokePrivilege(),
-                GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry.GetInvokePrivilege());
+              GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry.GetInvokePrivilege());
 
     // Check required generated commands are present
     ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
@@ -93,10 +93,9 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
     ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
-    //There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
-    ASSERT_EQ(expectedBuilder.AppendElements(GroupKeyManagement::Attributes::kMandatoryMetadata),
-                CHIP_NO_ERROR);
+    // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
+    ASSERT_EQ(expectedBuilder.AppendElements(GroupKeyManagement::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
-}
+} // namespace
