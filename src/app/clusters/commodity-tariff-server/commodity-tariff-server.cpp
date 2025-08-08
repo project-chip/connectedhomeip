@@ -278,6 +278,17 @@ void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aU
 
     DeinitCurrentAttrs();
 
+    if ( mDelegate.GetTariffUnit().IsNull() ||
+         mDelegate.GetStartDate().IsNull() ||
+         mDelegate.GetTariffInfo().IsNull() ||
+         mDelegate.GetDayEntries().IsNull() ||
+         mDelegate.GetTariffPeriods().IsNull() ||
+         mDelegate.GetTariffComponents().IsNull() )
+    {
+        ChipLogError(NotSpecified, "Seems the new tariff is unavailable - skip the current/next attrs init");
+        return;
+    }
+
     if (!is_erased)
     {
         InitCurrentAttrs();;
@@ -337,13 +348,21 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
     if (!aCtx.mTariffProvider->GetCalendarPeriods().IsNull())
     {
         const Structs::CalendarPeriodStruct::Type * period = nullptr;
+        bool first_item = true;
 
-        for (const auto & entry : aCtx.mTariffProvider->GetCalendarPeriods().Value())
-        {
-            period = &entry;
-            if (entry.startDate.Value() >= DayStartTS && entry.startDate.Value() < (DayStartTS + kSecondsPerDay))
-            {
-                break;
+        for (const auto& entry : aCtx.mTariffProvider->GetCalendarPeriods().Value()) {
+            if ( first_item && aCtx.mTariffProvider->GetStartDate().Value() == 0 &&
+                 (entry.startDate.IsNull() || entry.startDate.Value() == 0) ) {
+                period = &entry;  // Use this entry as fallback
+                first_item = false;
+                continue;         // Keep looking for a better match
+            }
+
+            // Check if entry matches our target day
+            const auto entryStart = entry.startDate.Value();
+            if (entryStart >= DayStartTS && entryStart < (DayStartTS + kSecondsPerDay)) {
+                period = &entry;  // Found perfect match
+                break;            // No need to continue searching
             }
         }
 
@@ -554,10 +573,9 @@ void Instance::InitCurrentAttrs()
 void Instance::UpdateCurrentAttrs()
 {
     uint32_t now = GetCurrentTimestamp();
-
     if (!now)
     {
-        ChipLogError(NotSpecified, "The timestamp value cant be zero!");
+        ChipLogError(NotSpecified, "The timestamp value can't be zero!");
         return;
     }
 
@@ -567,91 +585,98 @@ void Instance::UpdateCurrentAttrs()
         return;
     }
 
-    do
-    { 
-        DataModel::Nullable<Structs::DayStruct::Type> Day;
+    // Update day information
+    UpdateDayInformation(now);
+    
+    // Update day entry information
+    UpdateDayEntryInformation(now);
+}
 
-        Day.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now));
-        // Find current day
-        if (Utils::DayIsValid(&Day.Value()))
+void Instance::UpdateDayInformation(uint32_t now)
+{
+    DataModel::Nullable<Structs::DayStruct::Type> currentDay;
+    DataModel::Nullable<Structs::DayStruct::Type> nextDay;
+
+    currentDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now));
+
+    // Find current day
+    if (!Utils::DayIsValid(&currentDay.Value()))
+    {
+        ChipLogError(NotSpecified, "The mCurrentDay can't be Null if tariff is active!");
+        return;
+    }
+
+    ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
+    SetCurrentDay(currentDay);
+
+    nextDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now + kSecondsPerDay));
+    
+    if (Utils::DayIsValid(&nextDay.Value()))
+    {
+        ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day date: %u", nextDay.Value().date);
+        SetNextDay(nextDay);
+    }
+}
+
+void Instance::UpdateDayEntryInformation(uint32_t now)
+{
+    if (mCurrentDay.IsNull())
+    {
+        return;
+    }
+
+    const uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);
+    uint16_t currentEntryMinutesRemain = 0;
+    auto& currentDayEntryIDs = mCurrentDay.Value().dayEntryIDs;
+
+    auto [currentEntry, nextEntry] = Utils::FindDayEntry(
+        mServerTariffAttrsCtx, currentDayEntryIDs, minutesSinceMidnight, &currentEntryMinutesRemain);
+
+    // Handle current day entry
+    DataModel::Nullable<Structs::DayEntryStruct::Type> tmpDayEntry;
+    DataModel::Nullable<uint32_t> tmpDate;
+
+    if (currentEntry != nullptr)
+    {
+        tmpDayEntry.SetNonNull(*currentEntry);
+        tmpDate.SetNonNull(mCurrentDay.Value().date);
+        
+        if (CHIP_NO_ERROR != Utils::UpdateTariffComponentAttrsDayEntryById(
+                this, mServerTariffAttrsCtx, currentEntry->dayEntryID, mCurrentTariffComponents_MgmtObj))
         {
-            ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day date: %u", Day.Value().date);
-            SetCurrentDay(Day);
+            ChipLogError(NotSpecified, "Unable to update the CurrentTariffComponents attribute!");
         }
+        ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
+    }
 
-        if (mCurrentDay.IsNull())
+    SetCurrentDayEntry(tmpDayEntry);
+    SetCurrentDayEntryDate(tmpDate);
+
+    // Handle next day entry
+    tmpDayEntry.SetNull();
+    tmpDate.SetNull();
+
+    if (nextEntry != nullptr)
+    {
+        tmpDayEntry.SetNonNull(*nextEntry);
+        if (CHIP_NO_ERROR != Utils::UpdateTariffComponentAttrsDayEntryById(
+                this, mServerTariffAttrsCtx, nextEntry->dayEntryID, mNextTariffComponents_MgmtObj))
         {
-            // Something went wrong! The attribute can't be Null if tariff is active
-            ChipLogError(NotSpecified, "The mCurrentDay can't be Null if tariff is active!");
-            return;
+            ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
         }
+        ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
+    }
 
-        Day = Utils::FindDay(mServerTariffAttrsCtx, now + kSecondsPerDay);
-        if (Utils::DayIsValid(&Day.Value()))
-        {
-            ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day date: %u", Day.Value().date);
-            SetNextDay(Day);
-        }
-    } while (0);
+    SetNextDayEntry(tmpDayEntry);
 
-    do {
-        uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);
-        uint16_t CurrentEntryMinutesRemain      = 0;
-        auto & mCurrentDayEntryIDs    = mCurrentDay.Value().dayEntryIDs;
-        DataModel::Nullable<Structs::DayEntryStruct::Type> tmpDayEntry;
-        DataModel::Nullable<uint32_t> tmpDate;
-        auto [current, next] =
-            Utils::FindDayEntry(mServerTariffAttrsCtx, mCurrentDayEntryIDs, minutesSinceMidnight, &CurrentEntryMinutesRemain);
-
-        tmpDayEntry.SetNull();
-        tmpDate.SetNull();
-
-        if (current != nullptr)
-        {
-            tmpDayEntry.SetNonNull(*current);
-            tmpDate.SetNonNull(mCurrentDay.Value().date);
-            if (CHIP_NO_ERROR !=
-                Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, current->dayEntryID,
-                                                              mCurrentTariffComponents_MgmtObj))
-            {
-                ChipLogError(NotSpecified, "Unable to update the CurrentTariffComponents attribute!");
-            }
-            ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
-        }
-
-        SetCurrentDayEntry(tmpDayEntry);
-        SetCurrentDayEntryDate(tmpDate);
-
-        tmpDayEntry.SetNull();
-        tmpDate.SetNull();
-
-        if (next != nullptr)
-        {
-            tmpDayEntry.SetNonNull(*next);
-            if (CHIP_NO_ERROR !=
-                Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, next->dayEntryID,
-                                                              mNextTariffComponents_MgmtObj))
-            {
-                ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
-            }
-            ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
-        }
-
-        SetNextDayEntry(tmpDayEntry);
-
-        if (CurrentEntryMinutesRemain > 0)
-        {
-            if ((CurrentEntryMinutesRemain >= (kDayEntryDurationLimit - minutesSinceMidnight)) && !mNextDay.IsNull())
-            {
-                tmpDate.SetNonNull(mNextDay.Value().date);
-            }
-            else
-            {
-                tmpDate.SetNonNull(mCurrentDay.Value().date);
-            }
-            SetNextDayEntryDate(tmpDate);
-        }
-    } while (0);
+    // Set next day entry date if needed
+    if (currentEntryMinutesRemain > 0)
+    {
+        tmpDate.SetNonNull((currentEntryMinutesRemain >= (kDayEntryDurationLimit - minutesSinceMidnight)) && !mNextDay.IsNull()
+            ? mNextDay.Value().date
+            : mCurrentDay.Value().date);
+        SetNextDayEntryDate(tmpDate);
+    }
 }
 
 void Instance::DeinitCurrentAttrs()

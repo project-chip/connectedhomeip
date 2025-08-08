@@ -443,6 +443,8 @@ private:
     // Current attrs (time depended) update methods
     void InitCurrentAttrs();
     void UpdateCurrentAttrs();
+    void UpdateDayInformation(uint32_t now);
+    void UpdateDayEntryInformation(uint32_t now);
     void DeinitCurrentAttrs();
 
 protected:
