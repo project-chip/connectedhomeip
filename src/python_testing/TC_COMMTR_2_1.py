@@ -76,30 +76,16 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
 
         steps = [
             TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
-                     "TestEventTriggersEnabled must be True"),
-            TestStep("3", "TH reads MaximumMeteredQuantities attribute", """
+            TestStep("2", "TH reads MaximumMeteredQuantities attribute", """
                      - DUT replies a null value or a uint16 value;
                      - Store value as MaxMeteredQuantities."""),
-            TestStep("4", "TH reads MeteredQuantity attribute", """
+            TestStep("3", "TH reads MeteredQuantity attribute", """
                      - DUT replies Null or a list of MeteredQuantityStruct entries.
                      - Verify that the list length less or equal MaxMeteredQuantities from step 3;
-                     - Verify that the TariffComponentIDs field is a list with length less or equal 128;
+                     - Verify that the TariffComponentIDs field is a list of uint32 values with length less or equal 128;
                      - Verify that the Quantity field has int64 type;"""),
-            TestStep("5", "TH reads MeteredQuantityTimestamp attribute", "DUT replies a null value or epoch-s type."),
-            TestStep("6", "TH reads TariffUnit attribute", "DUT replies a null value or TariffUnitEnum type."),
-            TestStep("7", "TH sends TestEventTrigger command Fake Value Update Test Event", "Status code must be SUCCESS."),
-            TestStep("8", "TH reads MeteredQuantityTimestamp attribute", "DUT replies an epoch-s value."),
-            TestStep("9", "TH reads TariffUnit attribute", "DUT replies a TariffUnitEnum value."),
-            TestStep("10", "TH reads MaximumMeteredQuantities attribute", """
-                     - DUT replies a uint16 value;
-                     - Value saved as MaxMeteredQuantities."""),
-            TestStep("11", "TH reads MeteredQuantity attribute", """
-                     - DUT replies a list of MeteredQuantityStruct entries.
-                     - Verify that the list length less or equal MaxMeteredQuantities from step 10;
-                     - Verify that the TariffComponentIDs field is a list with length less or equal 128;
-                     - Verify that the Quantity field has int64 type;"""),
-            TestStep("12", "TH sends TestEventTrigger command for Test Event Clear", "Status code must be SUCCESS."),
+            TestStep("4", "TH reads MeteredQuantityTimestamp attribute", "DUT replies a null value or epoch-s type."),
+            TestStep("5", "TH reads TariffUnit attribute", "DUT replies a null value or TariffUnitEnum value in range 0-1."),
         ]
 
         return steps
@@ -114,16 +100,12 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
         # commissioning
 
         self.step("2")
-        # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster, expected to be True
-        await self.check_test_event_triggers_enabled()
-
-        self.step("3")
         # Read MaximumMeteredQuantities attribute, expected to be Null or uint16
         self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
         if self.MaximumMeteredQuantities is not NullValue:
             matter_asserts.assert_valid_uint16(self.MaximumMeteredQuantities, 'MaximumMeteredQuantities must be uint16')
 
-        self.step("4")
+        self.step("3")
         # Read MeteredQuantity attribute, expected to be Null or list of MeteredQuantityStruct entries.
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeteredQuantity
@@ -135,8 +117,10 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
                                        max_length=self.MaximumMeteredQuantities)
             matter_asserts.assert_list_element_type(
                 val, cluster.Structs.MeteredQuantityStruct, "MeteredQuantity attribute must contain MeteredQuantityStruct elements")
+            for item in val:
+                await self.checkMeteredQuantityStruct(struct=item)
 
-        self.step("5")
+        self.step("4")
         # Read MeteredQuantityTimestamp attribute, expected to be Null or epoch-s
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeteredQuantityTimestamp
@@ -144,52 +128,13 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
         if val is not NullValue:
             matter_asserts.assert_valid_uint32(val, 'MeteredQuantityTimestamp')
 
-        self.step("6")
+        self.step("5")
         # Read TariffUnit attribute, expected to be Null or TariffUnitEnum
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
         if val is not NullValue:
             asserts.assert_is_instance(
                 val, Globals.Enums.TariffUnitEnum, "TariffUnit attribute must return a TariffUnitEnum")
-
-        self.step("7")
-        # TH sends TestEventTrigger command Fake Value Update Test Event, expected SUCCESS
-        await self.send_test_event_trigger_fake_value_update()
-
-        self.step("8")
-        # Read MeteredQuantityTimestamp attribute, expected to be uint32
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeteredQuantityTimestamp)
-        asserts.assert_not_equal(val, NullValue, "MeteredQuantityTimestamp must not be NullValue")
-        matter_asserts.assert_valid_uint32(val, 'MeteredQuantityTimestamp must be uint32')
-
-        self.step("9")
-        # Read TariffUnit attribute, expected to be TariffUnitEnum
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
-        asserts.assert_not_equal(val, NullValue, "TariffUnit must not be NullValue")
-        matter_asserts.assert_valid_enum(
-            val, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
-
-        self.step("10")
-        # Read MaximumMeteredQuantities attribute, expected to be uint16
-        self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
-        asserts.assert_not_equal(self.MaximumMeteredQuantities, NullValue, "MaximumMeteredQuantities must not be NullValue")
-        matter_asserts.assert_valid_uint16(self.MaximumMeteredQuantities, 'MaximumMeteredQuantities must be uint16')
-
-        self.step("11")
-        # Read MeteredQuantity attribute, expected to be list of MeteredQuantityStruct
-        # Length of the list must be less than or equal to 128
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeteredQuantity)
-
-        if val is not NullValue:
-            matter_asserts.assert_list(val, "MeteredQuantity attribute must return a list",
-                                       max_length=self.MaximumMeteredQuantities)
-            matter_asserts.assert_list_element_type(
-                val, cluster.Structs.MeteredQuantityStruct, "MeteredQuantity attribute must contain MeteredQuantityStruct elements")
-            for item in val:
-                await self.checkMeteredQuantityStruct(struct=item)
-
-        self.step("12")
-        # TH sends TestEventTrigger command for Test Event Clear, expected SUCCESS
-        await self.send_test_event_trigger_clear()
+            matter_asserts.assert_int_in_range(val, 0, 1, "TariffUnit must be in range 0 - 1")
 
 
 if __name__ == "__main__":
