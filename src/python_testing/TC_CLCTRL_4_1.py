@@ -716,7 +716,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         if CurrentPosition == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
             logging.info("CurrentPosition is FullyClosed, skipping steps 10c to 10d")
             self.mark_step_range_skipped("10c", "10d")
-            return
         else:
             logging.info("CurrentPosition is not FullyClosed, proceeding to steps 10c and 10d")
 
