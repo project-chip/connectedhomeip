@@ -1036,7 +1036,6 @@ OnOffSwitchConfiguration
 OnPlatformEvent
 onwards
 OO
-openiotsdk
 openjdk
 OpenOCD
 OpenSSL
