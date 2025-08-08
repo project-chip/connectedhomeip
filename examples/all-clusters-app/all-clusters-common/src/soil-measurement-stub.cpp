@@ -56,8 +56,6 @@ bool ValidEndpointForSoilMeasurement(EndpointId endpoint)
 
 } // namespace
 
-void emberAfSoilMeasurementClusterServerInitCallback(EndpointId endpoint) {}
-
 void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
@@ -83,8 +81,6 @@ void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)
 
     gServer.Destroy();
 }
-
-void MatterSoilMeasurementPluginServerShutdownCallback() {}
 
 namespace chip::app::Clusters::SoilMeasurement {
 
