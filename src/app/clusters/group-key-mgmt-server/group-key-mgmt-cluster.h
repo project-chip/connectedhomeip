@@ -54,30 +54,6 @@ public:
     // TODO: Once there is MCSP support, this may need to change.
     static constexpr bool IsMCSPSupported() { return false; }
 
-private:
-    CHIP_ERROR ReadGroupKeyMap(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
-    CHIP_ERROR ReadGroupTable(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadMaxGroupsPerFabric(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadMaxGroupKeysPerFabric(AttributeValueEncoder & aEncoder);
-
-    bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo);
-
-    Protocols::InteractionModel::Status ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData);
-    
-    std::optional<DataModel::ActionReturnStatus> HandleKeySetWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData);
-
-    std::optional<DataModel::ActionReturnStatus> HandleKeySetRead(chip::app::CommandHandler * commandObj, 
-        const chip::app::ConcreteCommandPath & commandPath, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData);
-
-    std::optional<DataModel::ActionReturnStatus> HandleKeySetRemove(chip::app::CommandHandler * commandObj, 
-        const chip::app::ConcreteCommandPath & commandPath, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData);
-
-    std::optional<DataModel::ActionReturnStatus> HandleKeySetReadAllIndices(chip::app::CommandHandler * commandObj, 
-        const chip::app::ConcreteCommandPath & commandPath, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData);
-    
 };
 }
 }
