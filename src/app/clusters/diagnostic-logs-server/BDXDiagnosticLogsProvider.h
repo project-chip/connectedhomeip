@@ -58,6 +58,15 @@ public:
      */
     void HandleTransferSessionOutput(bdx::TransferSession::OutputEvent & event) override;
 
+    /**
+     * This method returns a singleton instance of this class.
+     */
+    static BDXDiagnosticLogsProvider & GetInstance()
+    {
+        static BDXDiagnosticLogsProvider instance;
+        return instance;
+    }
+
     bool IsBusy() const { return mInitialized; }
 
     void OnExchangeClosing(Messaging::ExchangeContext * ec) override;
