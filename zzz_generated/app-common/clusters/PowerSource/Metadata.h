@@ -20,6 +20,7 @@ namespace PowerSource {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Status {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Status::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

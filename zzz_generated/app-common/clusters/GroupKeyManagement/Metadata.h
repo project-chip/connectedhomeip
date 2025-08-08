@@ -20,6 +20,7 @@ namespace GroupKeyManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace GroupKeyMap {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(GroupKeyMap::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -49,6 +50,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace KeySetWrite {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(KeySetWrite::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),

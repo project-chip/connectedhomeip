@@ -20,6 +20,7 @@ namespace UnitTesting {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Boolean {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Boolean::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -489,6 +490,7 @@ constexpr std::array<DataModel::AttributeEntry, 85> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Test {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Test::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

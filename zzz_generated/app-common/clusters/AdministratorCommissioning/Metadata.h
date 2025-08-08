@@ -20,6 +20,7 @@ namespace AdministratorCommissioning {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace WindowStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WindowStatus::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -42,6 +43,7 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace OpenCommissioningWindow {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(OpenCommissioningWindow::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),

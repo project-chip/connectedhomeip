@@ -20,6 +20,7 @@ namespace CameraAvStreamManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MaxConcurrentEncoders {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxConcurrentEncoders::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -213,6 +214,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AudioStreamAllocate {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AudioStreamAllocate::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

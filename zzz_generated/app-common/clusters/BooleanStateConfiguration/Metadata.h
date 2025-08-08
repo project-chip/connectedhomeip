@@ -20,6 +20,7 @@ namespace BooleanStateConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace CurrentSensitivityLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentSensitivityLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -60,6 +61,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SuppressAlarm {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SuppressAlarm::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

@@ -20,6 +20,7 @@ namespace ClosureControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace CountdownTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CountdownTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -57,6 +58,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Stop {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Stop::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

@@ -20,6 +20,7 @@ namespace ColorControl {
 inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
+
 namespace CurrentHue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentHue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -243,6 +244,7 @@ constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace MoveToHue {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MoveToHue::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

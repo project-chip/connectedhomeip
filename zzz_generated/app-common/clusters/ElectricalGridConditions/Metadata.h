@@ -20,6 +20,7 @@ namespace ElectricalGridConditions {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace LocalGenerationAvailable {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LocalGenerationAvailable::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,

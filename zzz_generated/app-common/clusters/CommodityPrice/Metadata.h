@@ -20,6 +20,7 @@ namespace CommodityPrice {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace TariffUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TariffUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -47,6 +48,7 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace GetDetailedPriceRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(GetDetailedPriceRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);

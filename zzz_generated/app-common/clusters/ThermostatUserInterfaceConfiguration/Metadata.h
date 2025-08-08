@@ -20,6 +20,7 @@ namespace ThermostatUserInterfaceConfiguration {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace TemperatureDisplayMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureDisplayMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);

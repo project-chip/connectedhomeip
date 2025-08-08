@@ -20,6 +20,7 @@ namespace ScenesManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SceneTableSize {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SceneTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -39,6 +40,7 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AddScene {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(AddScene::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),

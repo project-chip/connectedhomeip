@@ -20,6 +20,7 @@ namespace NetworkCommissioning {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace MaxNetworks {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxNetworks::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kAdminister, std::nullopt);
@@ -76,6 +77,7 @@ constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ScanNetworks {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ScanNetworks::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);

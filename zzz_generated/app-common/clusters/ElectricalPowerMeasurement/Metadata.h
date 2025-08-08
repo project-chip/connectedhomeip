@@ -20,6 +20,7 @@ namespace ElectricalPowerMeasurement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace PowerMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

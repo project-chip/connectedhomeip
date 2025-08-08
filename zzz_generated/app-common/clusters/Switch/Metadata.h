@@ -20,6 +20,7 @@ namespace Switch {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace NumberOfPositions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfPositions::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

@@ -20,6 +20,7 @@ namespace FanControl {
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
+
 namespace FanMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(FanMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -79,6 +80,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Step {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Step::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

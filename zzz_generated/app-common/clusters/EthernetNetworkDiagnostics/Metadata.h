@@ -20,6 +20,7 @@ namespace EthernetNetworkDiagnostics {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace PHYRate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PHYRate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -63,6 +64,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ResetCounts {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCounts::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

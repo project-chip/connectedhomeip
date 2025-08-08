@@ -20,6 +20,7 @@ namespace WebRTCTransportProvider {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace CurrentSessions {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(CurrentSessions::Id,
@@ -34,6 +35,7 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SolicitOffer {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(SolicitOffer::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),

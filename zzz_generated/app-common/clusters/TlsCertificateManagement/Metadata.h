@@ -20,6 +20,7 @@ namespace TlsCertificateManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MaxRootCertificates {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxRootCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -51,6 +52,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ProvisionRootCertificate {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ProvisionRootCertificate::Id,

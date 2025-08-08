@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/EnergyEvse/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -182,41 +183,30 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kAcceptedCommandsCount));
 
-    for (auto && cmd : {
-             Disable::Id,
-             EnableCharging::Id,
-         })
-    {
-        VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-    }
+    ReturnErrorOnFailure(builder.AppendElements({ Disable::kMetadataEntry, EnableCharging::kMetadataEntry }));
 
     if (HasFeature(Feature::kV2x))
     {
-        VerifyOrExit(callback(EnableDischarging::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(EnableDischarging::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kChargingPreferences))
     {
-        for (auto && cmd : {
-                 SetTargets::Id,
-                 GetTargets::Id,
-                 ClearTargets::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(
+            builder.AppendElements({ SetTargets::kMetadataEntry, GetTargets::kMetadataEntry, ClearTargets::kMetadataEntry }));
     }
 
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
-        callback(StartDiagnostics::Id, context);
+        ReturnErrorOnFailure(builder.Append(StartDiagnostics::kMetadataEntry));
     }
 
-exit:
     return CHIP_NO_ERROR;
 }
 

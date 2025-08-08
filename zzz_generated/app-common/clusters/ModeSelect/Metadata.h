@@ -20,6 +20,7 @@ namespace ModeSelect {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace Description {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Description::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -56,6 +57,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ChangeToMode {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

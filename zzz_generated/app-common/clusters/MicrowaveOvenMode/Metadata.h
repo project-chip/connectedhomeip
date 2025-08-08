@@ -20,6 +20,7 @@ namespace MicrowaveOvenMode {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SupportedModes {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),

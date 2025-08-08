@@ -20,6 +20,7 @@ namespace MeterIdentification {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MeterType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeterType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

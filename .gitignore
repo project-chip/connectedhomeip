@@ -49,6 +49,10 @@ __pycache__
 *.py[cod]
 *.egg-info
 
+# Python generated modules
+scripts/py_matter_yamltests/build/
+scripts/py_matter_idl/build/
+
 # Doxygen outputs
 docs/html
 

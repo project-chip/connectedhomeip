@@ -20,6 +20,7 @@ namespace FaultInjection {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };
@@ -27,6 +28,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace FailAtFault {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(FailAtFault::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

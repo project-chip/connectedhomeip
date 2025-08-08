@@ -20,6 +20,7 @@ namespace OtaSoftwareUpdateProvider {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };
@@ -27,6 +28,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace QueryImage {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(QueryImage::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
