@@ -27,12 +27,17 @@ declare_args() {
   # CHIP extra version string.
   chip_version_extra = ""
 }
-
 template("gen_sdk_version") {
   action("gen_${target_name}") {
     filename = invoker.filename
     directory = invoker.directory
-    is_git_repository = path_exists("${chip_root}/.git/logs/HEAD")
+
+    # Check if we are inside a repository
+    is_git_repository = exec_script(
+      "${chip_root}/build/chip/check_path.py",
+      [rebase_path("${chip_root}/.git/logs/HEAD", root_build_dir)],
+      "value"
+    )
 
     if (is_git_repository) {
       inputs = [ "${chip_root}/.git/logs/HEAD" ]
