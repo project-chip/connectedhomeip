@@ -38,7 +38,7 @@ from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLo
                                             EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 from matter.tlv import uint
 
-# Type alias for improved readability
+# Type alias maintained for constants access; actual values are ints at runtime
 ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
 _PRIVILEGE_STR = {
@@ -50,17 +50,17 @@ _PRIVILEGE_STR = {
 }
 
 
-def to_access_code(privilege: ACCESS_CONTROL_PRIVILEGE_ENUM) -> str:
+def to_access_code(privilege: int) -> str:
     return _PRIVILEGE_STR.get(privilege, "")
 
 
-def get_access_privilege_or_unknown(access_value: Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]) -> ACCESS_CONTROL_PRIVILEGE_ENUM:
+def get_access_privilege_or_unknown(access_value: Optional[int]) -> int:
     """
     Returns the given access_value if not None, otherwise returns the default unknown privilege.
     """
     if access_value is not None:
         return access_value
-    return ACCESS_CONTROL_PRIVILEGE_ENUM(0)  # kUnknownEnumValue
+    return ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
 
 
 class SpecParsingException(Exception):
@@ -86,8 +86,8 @@ class XmlAttribute:
     name: str
     datatype: str
     conformance: ConformanceCallable
-    read_access: ACCESS_CONTROL_PRIVILEGE_ENUM
-    write_access: ACCESS_CONTROL_PRIVILEGE_ENUM
+    read_access: int
+    write_access: int
     write_optional: bool
 
     def access_string(self):
@@ -106,7 +106,7 @@ class XmlCommand:
     id: int
     name: str
     conformance: ConformanceCallable
-    privilege: ACCESS_CONTROL_PRIVILEGE_ENUM
+    privilege: int
 
     def __str__(self):
         return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)} privilege: {str(self.privilege)}'
@@ -240,7 +240,7 @@ class ClusterParser:
     def __init__(self, cluster: ElementTree.Element, cluster_id: Optional[uint], name: str):
         self._problems: list[ProblemNotice] = []
         self._cluster = cluster
-        self._cluster_id: Optional[uint] = cluster_id
+        self._cluster_id = cluster_id
         self._name = name
 
         self._derived = None
@@ -352,23 +352,23 @@ class ClusterParser:
             return False
         return access_xml.attrib['write'] == 'optional'
 
-    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: ConformanceCallable) -> tuple[Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]]:
+    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: ConformanceCallable) -> tuple[Optional[int], Optional[int], Optional[int]]:
         ''' Returns a tuple of access types for read / write / invoke'''
-        def str_to_access_type(privilege_str: str) -> ACCESS_CONTROL_PRIVILEGE_ENUM:
+        def str_to_access_type(privilege_str: str) -> int:
             if privilege_str == 'view':
-                return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kView)
+                return ACCESS_CONTROL_PRIVILEGE_ENUM.kView
             if privilege_str == 'operate':
-                return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate)
+                return ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate
             if privilege_str == 'manage':
-                return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kManage)
+                return ACCESS_CONTROL_PRIVILEGE_ENUM.kManage
             if privilege_str == 'admin':
-                return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kAdminister)
+                return ACCESS_CONTROL_PRIVILEGE_ENUM.kAdminister
             # We don't know what this means, for now, assume no access and mark a warning
 
             location = get_location_from_element(element_xml, self._cluster_id)
             self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                                 severity=ProblemSeverity.WARNING, problem=f'Unknown access type {privilege_str}'))
-            return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
+            return ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
 
         if access_xml is None:
             # Derived clusters can inherit their access from the base and that's fine, so don't add an error
@@ -388,18 +388,15 @@ class ClusterParser:
         try:
             read_access = str_to_access_type(access_xml.attrib['readPrivilege'])
         except KeyError:
-            read_access = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
-                                      ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
+            read_access = ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
         try:
             write_access = str_to_access_type(access_xml.attrib['writePrivilege'])
         except KeyError:
-            write_access = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
-                                       ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
+            write_access = ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
         try:
             invoke_access = str_to_access_type(access_xml.attrib['invokePrivilege'])
         except KeyError:
-            invoke_access = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
-                                        ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
+            invoke_access = ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
 
         return (read_access, write_access, invoke_access)
 
@@ -443,7 +440,7 @@ class ClusterParser:
         for id in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
             attributes[uint(id)] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
-            ), read_access=typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kView), write_access=typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue), write_optional=False)
+            ), read_access=ACCESS_CONTROL_PRIVILEGE_ENUM.kView, write_access=ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue, write_optional=False)
         return attributes
 
     def get_command_type(self, element: ElementTree.Element) -> CommandType:
@@ -621,7 +618,10 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     # If it's a prebuilt directory, build the path based on the version and data model level
     zip_file_traversable = pkg_resources.files(importlib.import_module('matter.testing')).joinpath(
         'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
-    zip_root = zipfile.Path(typing.cast(pathlib.Path, zip_file_traversable))
+    # Convert Traversable to a real ZipFile for typing compatibility
+    with zip_file_traversable.open('rb') as f:  # type: ignore[attr-defined]
+        zf = zipfile.ZipFile(f)
+        zip_root = zipfile.Path(zf)
     path_inside_zip = zip_root / data_model_level.dirname
 
     return path_inside_zip
@@ -721,10 +721,8 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # Remove this workaround when https://github.com/csa-data-model/projects/issues/330 is fixed
     temp_control_id = uint(Clusters.TemperatureControl.id)
     if temp_control_id in clusters and not clusters[temp_control_id].attributes:
-        view = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
-                           ACCESS_CONTROL_PRIVILEGE_ENUM.kView)
-        none = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
-                           ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
+        view = ACCESS_CONTROL_PRIVILEGE_ENUM.kView
+        none = ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
         clusters[temp_control_id].attributes = {
             uint(0x00): XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
             uint(0x01): XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
@@ -749,9 +747,9 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
                                     conformance_support.attribute(schedules_id, schedules_name)])
 
         clusters[thermostat_id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
-            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance, privilege=typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate))
+            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance, privilege=ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate)
         clusters[thermostat_id].generated_commands[atomic_response_cmd_id] = XmlCommand(
-            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate))
+            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate)
         clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
         clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
 

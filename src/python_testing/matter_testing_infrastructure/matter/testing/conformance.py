@@ -459,6 +459,7 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
 
     Raises:
         BasicConformanceException: If element has children or is not a recognized basic type
+        ConformanceException: If a basic element is malformed (e.g. missing required attributes)
     """
     if list(element):
         raise BasicConformanceException("parse_basic_callable_from_xml called for XML element with children")
