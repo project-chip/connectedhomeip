@@ -40,31 +40,12 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                             AttributeValueDecoder & decoder)
 {
-    switch (request.path.mAttributeId)
+    auto result = mLogic.WriteAttribute(request, mContext->attributeStorage, decoder);
+    if (result == Protocols::InteractionModel::Status::Success)
     {
-    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
-        TimeFormatLocalization::CalendarTypeEnum tCalendar;
-        ReturnErrorOnFailure(decoder.Decode(tCalendar));
-        auto result = mLogic.setActiveCalendarType(tCalendar, mContext->attributeStorage, decoder);
-        if (result == Protocols::InteractionModel::Status::Success)
-        {
-            NotifyAttributeChanged(TimeFormatLocalization::Attributes::ActiveCalendarType::Id);
-        }
-        return result;
+        NotifyAttributeChanged(request.path.mAttributeId);
     }
-    case TimeFormatLocalization::Attributes::HourFormat::Id: {
-        TimeFormatLocalization::HourFormatEnum tHour;
-        ReturnErrorOnFailure(decoder.Decode(tHour));
-        auto result = mLogic.setHourFormat(tHour, mContext->attributeStorage, decoder);
-        if (result == Protocols::InteractionModel::Status::Success)
-        {
-            NotifyAttributeChanged(TimeFormatLocalization::Attributes::HourFormat::Id);
-        }
-        return result;
-    }
-    default: 
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
+    return result;
 }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

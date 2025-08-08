@@ -158,45 +158,46 @@ TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveC
     return mCalendarType;
 }
 
-DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFormatLocalization::HourFormatEnum rHour, AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                               AttributePersistenceProvider * attrProvider,
+                                                                               AttributeValueDecoder & decoder)
 {
     VerifyOrReturnValue(attrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
-
     AttributePersistence attrPersistence {*attrProvider};
 
-    CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, 
-        decoder, mHourFormat);
-
-    return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success : Protocols::InteractionModel::Status::ConstraintError;
-}
-
-DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar, AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder)
-{
-    VerifyOrReturnValue(attrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
-    // TODO: Confirm error values for this operation.
-    if (!mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
+    switch (request.path.mAttributeId)
     {
+    case TimeFormatLocalization::Attributes::HourFormat::Id: {
+        CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue(
+            { kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, decoder, mHourFormat);
+        return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success 
+                                     : Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
+        if (!mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
+        {
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        }
+
+        TimeFormatLocalization::CalendarTypeEnum newCalendar;
+        ReturnErrorOnFailure(decoder.Decode(newCalendar));
+
+        if (!IsSupportedCalendarType(newCalendar))
+        {
+            return Protocols::InteractionModel::Status::ConstraintError;
+        }
+
+        CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue(
+            { kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, decoder, mCalendarType);
+
+        return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success 
+                                     : Protocols::InteractionModel::Status::WriteIgnored;
+    }
+
+    default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-
-    // Verify that the requested value is in the supported calendars.
-    if (!IsSupportedCalendarType(rCalendar))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-
-    AttributePersistence attrPersistence {*attrProvider};
-
-    // Now try to write the value using the AttributeProvider.
-    CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, 
-        decoder, mCalendarType);
-
-    if (result == CHIP_NO_ERROR)
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    return Protocols::InteractionModel::Status::WriteIgnored;
 }
 
 TimeFormatLocalization::HourFormatEnum TimeFormatLocalizationLogic::GetHourFormat() const

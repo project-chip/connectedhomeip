@@ -20,6 +20,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <clusters/TimeFormatLocalization/Enums.h>
 #include <lib/core/CHIPError.h>
@@ -50,8 +51,9 @@ public:
     // Attributes handling for cluster
     TimeFormatLocalization::HourFormatEnum GetHourFormat() const;
     TimeFormatLocalization::CalendarTypeEnum GetActiveCalendarType() const;
-    DataModel::ActionReturnStatus setHourFormat(TimeFormatLocalization::HourFormatEnum rHour, AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder);
-    DataModel::ActionReturnStatus setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar, AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder);
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                               AttributePersistenceProvider * attrProvider,
+                                               AttributeValueDecoder & decoder);
     CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) const;
 
