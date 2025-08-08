@@ -99,7 +99,7 @@ RUN set -x \
     expect \
     telnet \
     srecord \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
