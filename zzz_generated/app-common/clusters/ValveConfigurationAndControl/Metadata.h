@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -63,6 +64,11 @@ namespace LevelStep {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelStep::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LevelStep
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry, RemainingDuration::kMetadataEntry,
+    CurrentState::kMetadataEntry, TargetState::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
