@@ -26,8 +26,9 @@ class JFARpc
 {
 public:
     virtual ~JFARpc() {}
-    virtual CHIP_ERROR GetICACCSRForJF(MutableByteSpan & icacCSR) = 0;
-    virtual void CloseStreams()                                   = 0;
+    virtual CHIP_ERROR GetICACCSRForJF(MutableByteSpan & icacCSR)                                                              = 0;
+    virtual CHIP_ERROR GetCrossSignedIcacForJF(uint64_t anchorFabricId, ByteSpan & icacCSR, MutableByteSpan & crossSignedICAC) = 0;
+    virtual void CloseStreams()                                                                                                = 0;
 };
 
 } // namespace chip

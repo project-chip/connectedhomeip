@@ -551,12 +551,20 @@ constexpr uint32_t kDefaultChannelId = 1;
 
 struct RequestOptionsContext
 {
-    RequestOptionsContext(uint64_t fabricId, TransactionType transactionType) :
-        mAnchorFabricId(fabricId), mTransactionType(transactionType)
-    {}
+    RequestOptionsContext(uint64_t fabricId, TransactionType transactionType, const uint8_t * requestBytes,
+                          size_t requestBytesSize) :
+        mAnchorFabricId(fabricId),
+        mTransactionType(transactionType)
+    {
+        ByteSpan request{ requestBytes, requestBytesSize };
+        CopySpanToMutableSpan(request, requestSpan);
+    }
 
     uint64_t mAnchorFabricId;
     TransactionType mTransactionType;
+
+    uint8_t mRequestBytes[kMaxDERCertLength] = { 0 };
+    MutableByteSpan requestSpan{ mRequestBytes, kMaxDERCertLength };
 };
 
 ::pw_rpc::nanopb::JointFabric::Client rpcClient(chip::rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
@@ -613,7 +621,7 @@ static void GenerateReplyWork(intptr_t arg)
     ::pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> call;
 
     RequestOptionsContext * request = reinterpret_cast<RequestOptionsContext *>(arg);
-    VerifyOrExit(request, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
+    VerifyOrExit(request != nullptr, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
     VerifyOrExit(pkiProviderCredentialIssuer, ChipLogError(JointFabric, "GenerateReplyWork: no PKI provider"));
 
     switch (request->mTransactionType)
@@ -623,6 +631,18 @@ static void GenerateReplyWork(intptr_t arg)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(JointFabric, "GenerateIcacCsr failed");
+        }
+        break;
+    }
+    case TransactionType::TransactionType_CROSS_SIGNED_ICAC: {
+        ByteSpan icacCsr{ request->requestSpan.data(), request->requestSpan.size() };
+        FabricId anchorFabricId = request->mAnchorFabricId;
+
+        err = (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))
+                  ->CrossSignICAC(icacCsr, anchorFabricId, generatedCertificate);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "CrossSignICAC: failed");
         }
         break;
     }
@@ -653,7 +673,8 @@ void OnGetStreamOnNext(const RequestOptions & requestOptions)
     ChipLogProgress(JointFabric, "OnGetStreamOnNext, fabricId: %ld", requestOptions.anchor_fabric_id);
 
     RequestOptionsContext * options =
-        Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type);
+        Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type,
+                                             requestOptions.request_bytes.bytes, requestOptions.request_bytes.size);
 
     if (options)
     {
@@ -706,10 +727,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             Credentials::P256PublicKeySpan adminICACPKSpan;
 
             memset(&request, 0, sizeof(request));
-            request.node_id                      = nodeId;
-            request.jcm                          = mJCM.ValueOr(false);
-            JCMDeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
-            JCMTrustVerificationInfo & info      = commissioner.GetTrustVerificationInfo();
+            request.node_id                           = nodeId;
+            request.jcm                               = mJCM.ValueOr(false);
+            JCMDeviceCommissioner & commissioner      = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
+            JCMTrustVerificationInfo & info           = commissioner.GetTrustVerificationInfo();
+            request.peerAdminJFAdminClusterEndpointId = info.adminEndpointId;
+
             /* extract and save the public key of the peer Admin ICAC */
             err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.Span(), adminICACPKSpan);
             if (err != CHIP_NO_ERROR)
