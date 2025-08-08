@@ -226,23 +226,31 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
 
 uint16_t WebRTCTransportProviderServer::GenerateSessionId()
 {
-    static uint16_t lastSessionId = 1;
+    static uint16_t lastSessionId = 0;
+    uint16_t candidateId          = 0;
 
-    do
+    // Try at most kMaxSessionId+1 attempts to find a free ID
+    // This ensures we never loop infinitely even if all IDs are somehow in use
+    for (uint16_t attempts = 0; attempts <= kMaxSessionId; attempts++)
     {
-        uint16_t candidateId = lastSessionId++;
+        candidateId = lastSessionId++;
 
         // Handle wrap-around per spec
         if (lastSessionId > kMaxSessionId)
         {
-            lastSessionId = 1;
+            lastSessionId = 0;
         }
 
         if (FindSession(candidateId) == nullptr)
         {
             return candidateId;
         }
-    } while (true);
+    }
+
+    // This should never happen in practice since we support 65534 sessions
+    // and typical applications will have far fewer active sessions
+    ChipLogError(Zcl, "All session IDs are in use!");
+    chipDie();
 }
 
 // Command Handlers
