@@ -53,8 +53,6 @@
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <memory>
-
 #include <string.h>
 
 namespace chip {
