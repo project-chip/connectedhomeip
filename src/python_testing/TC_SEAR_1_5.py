@@ -98,7 +98,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                              expected_response,
                              f"Command response ({ret.status}) doesn't match the expected one")
 
-    def TC_SEAR_1_5(self) -> list[str]:
+    def pics_TC_SEAR_1_5(self) -> list[str]:
         return ["SEAR.S", "SEAR.S.C02.Rsp"]
 
     @async_test_body
@@ -106,6 +106,9 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+
+        if not await self.command_guard(endpoint=self.endpoint, command=Clusters.ServiceArea.Commands.SkipArea):
+            asserts.fail("Skip Area Response command needs to be supported to run this test")
 
         self.print_step(1, "Commissioning, already done")
 
@@ -163,7 +166,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         if not self.check_pics("SEAR.S.M.VALID_STATE_FOR_SKIP"):
             return
 
-        if self.check_pics("SEAR.S.A0005"):
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress):
             old_progress_list = await self.read_progress(step=9)
             asserts.assert_true(len(old_progress_list) > 0, f"len of Progress({len(old_progress_list)}) should not be zero)")
 
@@ -171,7 +174,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         asserts.assert_true(len(selected_areas) > 0, "SelectedAreas is empty")
 
         old_current_area = NullValue
-        if self.check_pics("SEAR.S.A0003"):
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.CurrentArea):
             old_current_area = await self.read_current_area(step=11)
 
             self.print_step("12", "")
@@ -185,7 +188,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                     if not self.is_ci:
                         self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-                if self.check_pics("SEAR.S.A0005"):
+                if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress):
                     new_progress_list = await self.read_progress(step=15)
                     asserts.assert_true(len(new_progress_list) > 0,
                                         f"len of Progress({len(new_progress_list)}) should not be zero)")
@@ -226,7 +229,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                     self.print_step("17", "")
                     return
 
-        if not self.check_pics("SEAR.S.A0005"):
+        if not await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress):
             return
 
         if self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):

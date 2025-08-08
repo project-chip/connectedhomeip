@@ -55,7 +55,7 @@ class TC_SEAR_1_4(MatterBaseTest):
         cluster = Clusters.Objects.ServiceArea
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    def TC_SEAR_1_4(self) -> list[str]:
+    def pics_TC_SEAR_1_4(self) -> list[str]:
         return ["SEAR.S"]
 
     @async_test_body
