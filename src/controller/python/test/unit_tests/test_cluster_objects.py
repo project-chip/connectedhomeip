@@ -2,9 +2,9 @@ import typing
 import unittest
 from dataclasses import dataclass
 
-import chip.ChipUtility
-from chip.clusters import ClusterObjects
-from chip.tlv import TLVReader, TLVWriter, uint
+import matter.ChipUtility
+from matter.clusters import ClusterObjects
+from matter.tlv import TLVReader, TLVWriter, uint
 
 '''
 This file contains tests for checking if the cluster object can generate correct TLV data.
@@ -38,7 +38,7 @@ def _encode_from_native_and_then_decode(data,
 class TestClusterObjects(unittest.TestCase):
     @dataclass
     class C(ClusterObjects.ClusterObject):
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def descriptor(cls) -> ClusterObjects.ClusterObjectDescriptor:
             return ClusterObjects.ClusterObjectDescriptor(
                 Fields=[
@@ -62,7 +62,7 @@ class TestClusterObjects(unittest.TestCase):
 
     @dataclass
     class StructWithArray(ClusterObjects.ClusterObject):
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def descriptor(cls) -> ClusterObjects.ClusterObjectDescriptor:
             return ClusterObjects.ClusterObjectDescriptor(
                 Fields=[
@@ -88,7 +88,7 @@ class TestClusterObjects(unittest.TestCase):
 
     @dataclass
     class StructWithEmbeddedStructAndString(ClusterObjects.ClusterObject):
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def descriptor(cls) -> ClusterObjects.ClusterObjectDescriptor:
             return ClusterObjects.ClusterObjectDescriptor(
                 Fields=[
@@ -121,7 +121,7 @@ class TestClusterObjects(unittest.TestCase):
 
     @dataclass
     class StructWithArrayOfStructWithArray(ClusterObjects.ClusterObject):
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def descriptor(cls) -> ClusterObjects.ClusterObjectDescriptor:
             return ClusterObjects.ClusterObjectDescriptor(
                 Fields=[
@@ -189,15 +189,15 @@ class TestClusterObjects(unittest.TestCase):
 
 class TestAttributeDescriptor(unittest.TestCase):
     class IntAttribute(ClusterObjects.ClusterAttributeDescriptor):
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def attribute_type(cls) -> ClusterObjects.ClusterObjectFieldDescriptor:
             return ClusterObjects.ClusterObjectFieldDescriptor(Type=int)
 
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def cluster_id(cls) -> int:
             return 0x00000000
 
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def attribute_id(cls) -> int:
             return 0x00000000
 
@@ -212,15 +212,15 @@ class TestAttributeDescriptor(unittest.TestCase):
         self.assertEqual(res, 42)
 
     class StructAttribute(ClusterObjects.ClusterAttributeDescriptor):
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def attribute_type(cls) -> ClusterObjects.ClusterObjectFieldDescriptor:
             return ClusterObjects.ClusterObjectFieldDescriptor(Type=TestClusterObjects.C)
 
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def cluster_id(cls) -> int:
             return 0x00000000
 
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def attribute_id(cls) -> int:
             return 0x00000000
 
@@ -235,15 +235,15 @@ class TestAttributeDescriptor(unittest.TestCase):
         self.assertEqual(res, TestClusterObjects.C(X=42, Y=24))
 
     class ArrayAttribute(ClusterObjects.ClusterAttributeDescriptor):
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def attribute_type(cls) -> ClusterObjects.ClusterObjectFieldDescriptor:
             return ClusterObjects.ClusterObjectFieldDescriptor(Type=typing.List[int])
 
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def cluster_id(cls) -> int:
             return 0x00000000
 
-        @chip.ChipUtility.classproperty
+        @matter.ChipUtility.classproperty
         def attribute_id(cls) -> int:
             return 0x00000000
 
