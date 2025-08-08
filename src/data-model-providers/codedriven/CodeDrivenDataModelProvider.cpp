@@ -38,7 +38,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
         .interactionContext = &mContext,
     }));
 
-    // Startup all registered server clusters
+    // Start up all registered server clusters
     bool had_failure = false;
     for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
     {
@@ -239,7 +239,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & e
 
     ReturnErrorOnFailure(mServerClusterRegistry.Register(entry));
 
-    // Startup the cluster if the provider has been started (i.e. context exists).
+    // Start up the cluster if the provider has been started (i.e. context exists).
     VerifyOrReturnError(mServerClusterContext.has_value(), CHIP_NO_ERROR);
     return entry.serverClusterInterface->Startup(*mServerClusterContext);
 }

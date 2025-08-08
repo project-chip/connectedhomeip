@@ -45,7 +45,7 @@ namespace app {
  * 4. Register those ServerClusterInterfaceRegistration(s) to the CodeDrivenDataModelProvider using AddCluster().
  * 5. Call Startup() on the CodeDrivenDataModelProvider.
  *
- * TODO: Notify composition changes when the provider is started up and endpoints are added/removed in runtime.
+ * TODO: Notify composition changes when the provider is started up and endpoints are added/removed at runtime.
  *       For now, applications are responsible for handling composition changes and calling markDirty() when needed.
  *
  * Lifecycle:
@@ -116,7 +116,8 @@ public:
      *   - paths MUST NOT be part of any other ServerClusterInterface (i.e. only a single
      *     registration for a given `endpointId/clusterId` path)
      *   - endpointId of all paths must already be registered in the provider
-     *   - The LIFETIME of entry must outlive the provider (or the entry must be unregistered)
+     *   - The LIFETIME of entry must outlive the provider (or the entry must be unregistered
+     *     via RemoveCluster before it goes away)
      */
     CHIP_ERROR AddCluster(ServerClusterRegistration & entry);
     CHIP_ERROR RemoveCluster(ServerClusterInterface * entry);
