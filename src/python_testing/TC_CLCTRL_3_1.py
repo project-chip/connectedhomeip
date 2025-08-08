@@ -112,7 +112,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             TestStep("6a", "TH sends command MoveTo to DUT with Position = MoveToFullyOpen"),
             TestStep("6b", "Wait until the TH receives a subscription report for the OverallCurrentState attribute"),
             TestStep("6c", "TH sends command MoveTo to DUT with Position = MoveToFullyClosed"),
-            TestStep("6d", "If attribute is supported on the cluster, TH reads from the DUT the MainState attribute"),
+            TestStep("6d", "TH reads from the DUT the MainState attribute"),
             TestStep("6e", "TH sends command Calibrate to DUT"),
         ]
         return steps
@@ -400,14 +400,13 @@ class TC_CLCTRL_3_1(MatterBaseTest):
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
             pass
 
-        # STEP 6d: If attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+        # STEP 6d: TH reads from the DUT the MainState attribute
         self.step("6d")
 
-        if attributes.MainState.attribute_id in attribute_list:
-            mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            # Check if the MainState attribute has the expected values
-            asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kMoving,
-                                 "MainState is not in the expected state")
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kMoving,
+                             "MainState is not in the expected state")
 
         # STEP 6e: TH sends command Calibrate to DUT
         self.step("6e")
