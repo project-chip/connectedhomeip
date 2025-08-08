@@ -17,10 +17,10 @@
 import logging
 import xml.etree.ElementTree as ElementTree
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import ClusterParser, DataTypeEnum, PrebuiltDataModelDirectory, build_xml_clusters
-from chip.tlv import uint
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.spec_parsing import ClusterParser, DataTypeEnum, PrebuiltDataModelDirectory, build_xml_clusters
+from matter.tlv import uint
 from jinja2 import Template
 from mobly import asserts
 
