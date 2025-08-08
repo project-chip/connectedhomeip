@@ -168,14 +168,32 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                      "Receive SUCCESS response from the DUT"),
             TestStep("8f", "Send MoveTo command with Latch = CurrentLatch, when CurrentLatch is False and LatchControlModes Bit 1 = 0",
                      "Receive INVALID_IN_STATE response from the DUT"),
-            TestStep("9a", "Check PS feature support", "Skip steps 9b and 9c if the PS feature is not supported"),
-            TestStep("9b", "Read the OverallCurrentState attribute",
+            TestStep("9a", "Check PS feature support", "Skip steps 9b and 9i if the PS feature is not supported"),
+            TestStep("9b", "Preparing Latch-State: If the LT feature is not supported, skip steps 9c to 9g"),
+            TestStep("9c", "If LatchControlModes Bit 1 = 0, skip step 9d"),
+            TestStep("9d", "Send MoveTo command with Latch = False",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep("9e", "If LatchControlModes Bit 1 = 1, skip step 9f"),
+            TestStep("9f", "Unlatch the device manually",
+                     "Wait for user input to confirm the device is unlatched"),
+            TestStep("9g", "Wait until a subscription report with OverallCurrentState.Latch is received",
+                     "OverallCurrentState.Latch should be False"),
+            TestStep("9h", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Position field is saved as CurrentPosition"),
-            TestStep("9c", "Send MoveTo command with Position = CurrentPosition", "Receive SUCCESS response from the DUT"),
-            TestStep("10a", "Check SP feature support", "Skip steps 10b and 10c if the PS feature is not supported"),
-            TestStep("10b", "Read the OverallCurrentState attribute",
+            TestStep("9i", "Send MoveTo command with Position = CurrentPosition", "Receive SUCCESS response from the DUT"),
+            TestStep("10a", "Check SP feature support", "Skip steps 10b and 10i if the PS feature is not supported"),
+            TestStep("10b", "Preparing Latch-State: If the LT feature is not supported, skip steps 10c to 10g"),
+            TestStep("10c", "If LatchControlModes Bit 1 = 0, skip step 10d"),
+            TestStep("10d", "Send MoveTo command with Latch = False",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep("10e", "If LatchControlModes Bit 1 = 1, skip step 10f"),
+            TestStep("10f", "Unlatch the device manually",
+                     "Wait for user input to confirm the device is unlatched"),
+            TestStep("10g", "Wait until a subscription report with OverallCurrentState.Latch is received",
+                     "OverallCurrentState.Latch should be False"),
+            TestStep("10h", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Speed field is saved as CurrentSpeed"),
-            TestStep("10c", "Send MoveTo command with Speed = CurrentSPeed", "Receive SUCCESS response from the DUT"),
+            TestStep("10i", "Send MoveTo command with Speed = CurrentSpeed", "Receive SUCCESS response from the DUT"),
         ]
         return steps
 
@@ -309,7 +327,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     self.step("5g")
                     self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched")
 
-                else:
+                if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                     self.step("5e")
                     logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
@@ -584,12 +602,46 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
         self.step("9a")
         if is_position_supported:
+            
             self.step("9b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = overall_current_state.position
-            logging.info(f"CurrentPosition: {current_position}")
-
+            current_latch: bool = overall_current_state.latch if overall_current_state is not NullValue else NullValue
+            logging.info(f"current_speed: {current_speed}, current_latch: {current_latch}")
+            
             self.step("9c")
+            if is_latching_supported and current_latch is True:
+                logging.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
+
+                self.step("9d")
+                # Check if LatchControlModes Bit 1 is 0
+                if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                    self.skip_step("9e")
+                    self.step("9f")
+                    logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")
+                    self.step("9g")
+                    self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched")
+
+                if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                    self.step("9e")
+                    logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
+
+                    try:
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
+                    except InteractionModelError as e:
+                        asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
+
+                    self.step("9f")                    
+                    self.skip_step("9g")
+
+                self.step("9h")
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
+                logging.info("CurrentLatch is now False")
+            else:
+                logging.info("Skipping steps 9d to 9h as Latching feature is not supported or CurrentLatch is False")
+                self.mark_step_range_skipped("9d", "9h")
+
+            self.step("9i")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=current_position), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Position = CurrentPosition sent successfully")
@@ -597,19 +649,54 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 logging.error(f"MoveTo command with Position = CurrentPosition failed: {e}")
                 asserts.assert_equal(e.status, Status.Success,
                                      f"Expected Success status for MoveTo with Position = CurrentPosition, but got: {e}")
-
+            sub_handler.reset()
         else:
-            self.skip_step("9b")
-            self.skip_step("9c")
+            logging.info("Skipping steps 9b to 9i as Positioning feature is not supported")
+            self.mark_step_range_skipped("9b", "9i")
 
         self.step("10a")
         if is_speed_supported:
+            
             self.step("10b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = overall_current_state.speed
-            logging.info(f"CurrentSpeed: {current_speed}")
+            current_latch = overall_current_state.latch if overall_current_state is not NullValue else NullValue
+            logging.info(f"current_speed: {current_speed}, current_latch: {current_latch}")
 
             self.step("10c")
+            if is_latching_supported and current_latch is True:
+                logging.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
+
+                self.step("10d")
+                # Check if LatchControlModes Bit 1 is 0
+                if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                    self.skip_step("10e")
+                    self.step("10f")
+                    logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")
+                    self.step("10g")
+                    self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched")
+
+                if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                    self.step("10e")
+                    logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
+
+                    try:
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
+                    except InteractionModelError as e:
+                        asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
+
+                    self.step("10f")
+                    self.skip_step("10g")
+
+                self.step("10h")
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
+                logging.info("CurrentLatch is now False")
+                
+            else:
+                logging.info("Skipping steps 10d to 10h as Latching feature is not supported")
+                self.mark_step_range_skipped("10d", "10h")
+
+            self.step("10i")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(speed=current_speed), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Speed = CurrentSpeed sent successfully")
@@ -618,8 +705,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success,
                                      f"Expected Success status for MoveTo with Speed = CurrentSpeed, but got: {e}")
         else:
-            self.skip_step("10b")
-            self.skip_step("10c")
+            logging.info("Skipping steps 10b to 10i as Speed feature is not supported")
+            self.mark_step_range_skipped("10b", "10i")
 
 
 if __name__ == "__main__":
