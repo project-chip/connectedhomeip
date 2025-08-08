@@ -38,12 +38,13 @@
 import queue
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 
 
 class TC_TIMESYNC_2_13(MatterBaseTest):

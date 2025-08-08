@@ -86,6 +86,10 @@ public:
     PascalBuffer(PascalBuffer &&)      = default;
     PascalBuffer(const PascalBuffer &) = default;
 
+    /// Interprets the given data as the pascal string content.
+    ///
+    /// Note that this references the given data in place. Data lifetime must
+    /// exceed the PascalBuffer lifetime.
     template <size_t N>
     PascalBuffer(T (&data)[N]) : mData(data), mMaxSize(N - PREFIX_LEN)
     {
@@ -93,9 +97,12 @@ public:
         static_assert(N <= kInvalidLength);
     }
 
-    /// Allocates a pascal buffer of the given size.
+    /// Uses an existing buffer for the pascal string, represented as a span.
     ///
-    /// buffer_size includes the prefix and must be at least PREFIX_LEN.
+    /// The size of the span includes the prefix and must be at least PREFIX_LEN (this is NOT checked).
+    ///
+    /// Note that this references the given buffer in place. The buffer that the span
+    /// points to must have a lifetime that exceeds the PascalBuffer lifetime.
     PascalBuffer(Span<T> data) : mData(data.data()), mMaxSize(static_cast<LengthType>(data.size() - PREFIX_LEN)) {}
 
     /// Returns the content of the pascal string.

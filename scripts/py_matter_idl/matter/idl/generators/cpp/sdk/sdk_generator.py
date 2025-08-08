@@ -85,6 +85,10 @@ def response_struct(s: Struct) -> bool:
     return s.code is not None
 
 
+def is_optional(attribute: Attribute) -> bool:
+    return attribute.definition.is_optional
+
+
 class SdkGenerator(CodeGenerator):
     """
     Generation of cpp code for application implementation for matter.
@@ -102,6 +106,7 @@ class SdkGenerator(CodeGenerator):
         self.jinja_env.filters['name_for_id_usage'] = name_for_id_usage
         self.jinja_env.tests['global_attribute'] = global_attribute
         self.jinja_env.tests['response_struct'] = response_struct
+        self.jinja_env.tests['is_optional'] = is_optional
 
     def internal_render_all(self):
         """

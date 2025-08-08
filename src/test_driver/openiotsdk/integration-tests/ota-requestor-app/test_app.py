@@ -19,12 +19,13 @@ import logging
 import os
 import re
 
-import chip.interaction_model
 import pytest
-from chip.clusters.Objects import OtaSoftwareUpdateRequestor
-from chip.clusters.Types import NullValue
 from common.utils import (connect_device, disconnect_device, discover_device, get_setup_payload, send_zcl_command,
                           write_zcl_attribute)
+
+import matter.interaction_model
+from matter.clusters.Objects import OtaSoftwareUpdateRequestor
+from matter.clusters.Types import NullValue
 
 log = logging.getLogger(__name__)
 
@@ -152,7 +153,7 @@ def test_update_ctrl(device, controller, ota_provider, softwareVersion):
                                    [{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [requestorNodeId], "targets": NullValue},
                                     {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": NullValue, "targets": [{"cluster": 41, "endpoint": NullValue, "deviceType": NullValue}]}])
     assert err == 0
-    assert res[0].Status == chip.interaction_model.Status.Success
+    assert res[0].Status == matter.interaction_model.Status.Success
 
     ota_provider.set_verbose(False)
 
