@@ -236,9 +236,6 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             # TH sends GoHome command to the DUT
             self.step("8")
 
-            # TODO:  add this idle mode set to test plan, as RVC must be idle for GoHome to be performed successfully
-            await self.send_change_to_mode_with_check(idle_mode, RvcStatusEnum.Success)
-
             await self.send_go_home_cmd_with_check(Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
             await self.read_operational_state_with_check(Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger)
 
