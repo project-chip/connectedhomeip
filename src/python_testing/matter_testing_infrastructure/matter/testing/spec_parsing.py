@@ -33,8 +33,9 @@ from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_
                                         ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory,
                                         optional, or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation, NamespacePathLocation,
-                                            EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
+from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                            EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemLocation,
+                                            ProblemNotice, ProblemSeverity)
 from matter.tlv import uint
 
 _PRIVILEGE_STR = {

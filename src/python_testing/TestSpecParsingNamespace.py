@@ -17,14 +17,15 @@
 
 import xml.etree.ElementTree as ElementTree
 import zipfile
+from importlib.abc import Traversable
 
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from matter.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
-                                         parse_namespace)
-from matter.testing.problem_notices import ProblemNotice, ProblemSeverity, NamespacePathLocation
 from jinja2 import Template
 from mobly import asserts
-from importlib.abc import Traversable
+
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.problem_notices import NamespacePathLocation, ProblemNotice, ProblemSeverity
+from matter.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
+                                         parse_namespace)
 
 
 class TestSpecParsingNamespace(MatterBaseTest):
