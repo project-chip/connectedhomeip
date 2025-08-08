@@ -33,8 +33,7 @@ class CommodityMeteringTestBaseHelper:
     test_event_clear = 0x0b07000000000001
 
     async def send_test_event_trigger_attrs_value_update(self, t_wait=5):
-        await self.send_test_event_triggers(eventTrigger=self.test_event_fake_data)
-        time.sleep(t_wait)
+        await asyncio.sleep(t_wait)
 
     async def send_test_event_trigger_clear(self, t_wait=5):
         await self.send_test_event_triggers(eventTrigger=self.test_event_clear)
