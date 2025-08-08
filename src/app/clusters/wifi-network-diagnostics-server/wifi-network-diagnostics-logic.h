@@ -90,12 +90,12 @@ public:
     // Getter methods for private members
     EndpointId GetEndpointId() const { return mEndpointId; }
     const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
-    const AttributeSet & GetEnabledAttributes() const { return mEnabledAttributes; }
+    const SupportedAttributes & GetEnabledAttributes() const { return mEnabledAttributes; }
 
 private:
     EndpointId mEndpointId;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
-    const AttributeSet mEnabledAttributes;
+    const SupportedAttributes mEnabledAttributes;
     const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
 };
 

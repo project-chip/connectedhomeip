@@ -70,7 +70,7 @@ public:
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
 private:
-    const AttributeSet mEnabledAttributes;
+    const SupportedAttributes mEnabledAttributes;
 };
 
 } // namespace Clusters

@@ -48,9 +48,9 @@ public:
                                        //       it will be forced as mandatory by the cluster constructor
                                        >;
 
-    GeneralDiagnosticsCluster(const SupportedAttributes & enabledAttributes) :
+    GeneralDiagnosticsCluster(SupportedAttributes enabledAttributes) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mEnabledAttributes(AttributeSet(enabledAttributes).ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
+        mEnabledAttributes(enabledAttributes.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -121,7 +121,7 @@ public:
     }
 
 private:
-    const AttributeSet mEnabledAttributes;
+    const SupportedAttributes mEnabledAttributes;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
@@ -130,8 +130,7 @@ class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsClust
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::SupportedAttributes & enabledAttributes,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(enabledAttributes),
-        mFunctionConfig(functionsConfig)
+        GeneralDiagnosticsCluster(enabledAttributes), mFunctionConfig(functionsConfig)
     {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
