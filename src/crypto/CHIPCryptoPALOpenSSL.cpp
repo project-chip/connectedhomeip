@@ -2277,10 +2277,11 @@ public:
     ScopedASN1Object(const char * string, int no_name) : obj(OBJ_txt2obj(string, no_name)) {}
     ~ScopedASN1Object() { ASN1_OBJECT_free(obj); }
 
+    explicit operator bool() const { return obj != nullptr; }
+    ASN1_OBJECT * Get() const { return obj; }
+
     ScopedASN1Object(const ScopedASN1Object &)             = delete;
     ScopedASN1Object & operator=(const ScopedASN1Object &) = delete;
-
-    ASN1_OBJECT * Get() { return obj; }
 
 private:
     ASN1_OBJECT * obj = nullptr;
@@ -2289,8 +2290,13 @@ private:
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
     ScopedASN1Object commonNameObj("2.5.4.3", 1);
+    VerifyOrReturnError(commonNameObj, CHIP_ERROR_NO_MEMORY);
+
     ScopedASN1Object matterVidObj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
+    VerifyOrReturnError(matterVidObj, CHIP_ERROR_NO_MEMORY);
+
     ScopedASN1Object matterPidObj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
+    VerifyOrReturnError(matterPidObj, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     X509 * x509certificate             = nullptr;
