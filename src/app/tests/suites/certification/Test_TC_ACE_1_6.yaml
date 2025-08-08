@@ -17,6 +17,7 @@ name: 49.1.6. [TC-ACE-1.6] Group auth mode
 PICS:
     - MCORE.ROLE.COMMISSIONEE
     - G.S
+    - GRPKEY.S
 
 config:
     nodeId: 0x12344321
