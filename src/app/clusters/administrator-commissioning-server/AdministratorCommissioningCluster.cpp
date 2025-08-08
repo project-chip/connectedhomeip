@@ -99,7 +99,12 @@ CHIP_ERROR AdministratorCommissioningCluster::Attributes(const ConcreteClusterPa
 {
 
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(AdministratorCommissioning::Attributes::kMandatoryMetadata), {}, {});
+
+    // NOTE: this INTENTIONALLY calls the "optionalAttributesArray" version of the Append here
+    //       to force linkage of that method. This results in slightly more flash usage, however
+    //       it allows us to evaluate size implications for complex clusters that cannot use
+    //       OptionalAttributeSet overloads.
+    return listBuilder.Append(Span(AdministratorCommissioning::Attributes::kMandatoryMetadata), {});
 }
 
 std::optional<DataModel::ActionReturnStatus> AdministratorCommissioningWithBasicCommissioningWindowCluster::InvokeCommand(

@@ -47,6 +47,26 @@ public:
     CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
                       Span<const DataModel::AttributeEntry> optionalAttributes, const AttributeSet & enabledOptionalAttributes);
 
+
+    struct OptionalAttributeEntry
+    {
+        bool enabled;                               // Is this optional attribute enabled?
+        const DataModel::AttributeEntry & metadata; // Metadata for the attribute
+    };
+
+    /// Appends the given attributes to the builder.
+    ///
+    /// It is very common to have a set of mandatory and a set of optional attributes for a
+    /// cluster. This method allows for a single call to set up all of the given attributes in `builder`:
+    ///   - mandatoryAttributes
+    ///   - optionalAttributes IF AND ONLY IF they are enabled
+    ///   - all of `GlobalAttributes()`
+    ///
+    /// NOTE: initializing separate OptionalAttributeEntry often costs flash. Prefer using AttributeSet if possible
+    ///       (historically shown to consume less flash)
+    CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
+                      Span<const OptionalAttributeEntry> optionalAttributes);
+
 private:
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & mBuilder;
 };
