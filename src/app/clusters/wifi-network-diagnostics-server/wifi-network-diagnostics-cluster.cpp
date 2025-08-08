@@ -115,6 +115,8 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
         CurrentMaxRate::kMetadataEntry,         //
     };
 
+    // Full attribute set, to combine real "optional" attributes but also
+    // attributes controlled by feature flags.
     chip::app::OptionalAttributeSet<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,         //
                                     WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,        //
                                     WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,           //

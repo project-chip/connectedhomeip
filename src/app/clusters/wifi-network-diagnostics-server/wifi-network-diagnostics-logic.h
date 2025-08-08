@@ -30,19 +30,15 @@ namespace chip::app::Clusters {
 class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
-    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
-        WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id, WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,
-        WiFiNetworkDiagnostics::Attributes::OverrunCount::Id, WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,
-        WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id,
-        WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,
-        WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id,
-        WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id>;
+    // NOTE: this set is smaller than the full optional attributes supported by diagnostics
+    //       as other attributes are controlled by feature flags
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id>;
 
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const OptionalAttributeSet & optionalAttributeSet,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mEndpointId(endpointId),
-        mDiagnosticProvider(diagnosticProvider), mOptionalAttributeSet(optionalAttributeSet), mFeatureFlags(featureFlags)
+        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mOptionalAttributeSet(optionalAttributeSet),
+        mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }
