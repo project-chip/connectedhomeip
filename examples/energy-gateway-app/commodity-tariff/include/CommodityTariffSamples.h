@@ -422,63 +422,56 @@ static constexpr size_t kCount = 2;
 const TariffDataSet kTariffPresets[] = {
     // Sample 1
     {
-        .TariffInfo = DataModel::MakeNullable(Sample1::TariffInfo()),
-        
         .TariffUnit = DataModel::Nullable<Globals::TariffUnitEnum>(Globals::TariffUnitEnum::kKWh),
         .StartDate =  DataModel::Nullable<uint32_t>(0),
         .DefaultRandomizationOffset = DataModel::Nullable<int16_t>(0),
         .DefaultRandomizationType = DataModel::Nullable<DayEntryRandomizationTypeEnum>(DayEntryRandomizationTypeEnum::kNone),
-
+        .TariffInfo = DataModel::MakeNullable(Sample1::TariffInfo()),
         .DayEntries = DataModel::MakeNullable(DataModel::List<Structs::DayEntryStruct::Type>(
             Sample1::DayEntries,
             std::size(Sample1::DayEntries)
         )),
-        
         .DayPatterns = DataModel::MakeNullable(DataModel::List<Structs::DayPatternStruct::Type>(
            Sample1::DayPatterns,
-            std::size(TariffDataSamples::Sample1::DayPatterns))),
-          
-        .CalendarPeriods = DataModel::MakeNullable(DataModel::List<Structs::CalendarPeriodStruct::Type>(
-           Sample1::CalendarPeriods,
-            std::size(TariffDataSamples::Sample1::CalendarPeriods))),
-        .IndividualDays = DataModel::MakeNullable(DataModel::List<Structs::DayStruct::Type>(
-           Sample1::IndividualDays,
-            std::size(TariffDataSamples::Sample1::IndividualDays))),
+            std::size(Sample1::DayPatterns))),
         .TariffComponents = DataModel::MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(
            Sample1::TariffComponents,
             std::size(Sample1::TariffComponents))),
         .TariffPeriods = DataModel::MakeNullable(DataModel::List<Structs::TariffPeriodStruct::Type>(
            Sample1::TariffPeriods,
             std::size(Sample1::TariffPeriods))),
-
+        .IndividualDays = DataModel::MakeNullable(DataModel::List<Structs::DayStruct::Type>(
+           Sample1::IndividualDays,
+            std::size(Sample1::IndividualDays))),
+        .CalendarPeriods = DataModel::MakeNullable(DataModel::List<Structs::CalendarPeriodStruct::Type>(
+           Sample1::CalendarPeriods,
+            std::size(Sample1::CalendarPeriods))),
         .TariffTestTimestamp = 1733011200, //01-Dec-2024
     },
     // Sample 2
     {
-        .TariffInfo = DataModel::MakeNullable(Sample2::TariffInfo()),
-
         .TariffUnit = DataModel::Nullable<Globals::TariffUnitEnum>(Globals::TariffUnitEnum::kKWh),
         .StartDate =  DataModel::Nullable<uint32_t>(0),
         .DefaultRandomizationOffset = DataModel::Nullable<int16_t>(0),
         .DefaultRandomizationType = DataModel::Nullable<DayEntryRandomizationTypeEnum>(DayEntryRandomizationTypeEnum::kNone),
+        .TariffInfo = DataModel::MakeNullable(Sample2::TariffInfo()),
         .DayEntries = DataModel::MakeNullable(DataModel::List<Structs::DayEntryStruct::Type>(
             Sample2::DayEntries,
             std::size(Sample2::DayEntries)
         )),
         .DayPatterns = DataModel::MakeNullable(DataModel::List<Structs::DayPatternStruct::Type>(
            Sample2::DayPatterns,
-            std::size(TariffDataSamples::Sample2::DayPatterns))),
-        .CalendarPeriods = DataModel::MakeNullable(DataModel::List<Structs::CalendarPeriodStruct::Type>(
-           Sample2::CalendarPeriods,
-            std::size(TariffDataSamples::Sample2::CalendarPeriods))),
-        .IndividualDays = NullOptional, // No individual days in sample 2
+            std::size(Sample2::DayPatterns))),
         .TariffComponents = DataModel::MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(
            Sample2::TariffComponents,
-            std::size(TariffDataSamples::Sample2::TariffComponents))),
+            std::size(Sample2::TariffComponents))),
         .TariffPeriods = DataModel::MakeNullable(DataModel::List<Structs::TariffPeriodStruct::Type>(
            Sample2::TariffPeriods,
-            std::size(TariffDataSamples::Sample2::TariffPeriods))),
-
+            std::size(Sample2::TariffPeriods))),
+        .IndividualDays = NullOptional, // No individual days in sample 2
+        .CalendarPeriods = DataModel::MakeNullable(DataModel::List<Structs::CalendarPeriodStruct::Type>(
+           Sample2::CalendarPeriods,
+            std::size(Sample2::CalendarPeriods))),
         .TariffTestTimestamp = 1748736000, //01-Jun-2025
     }
 };
