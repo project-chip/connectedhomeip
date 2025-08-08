@@ -68,21 +68,25 @@ void emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     }
 
     const EthernetDiagnosticsEnabledAttributes enabledAttributes{
-        .enableCarrierDetect = IsAttributeEnabled(endpointId, Attributes::CarrierDetect::Id),
-        .enableFullDuplex    = IsAttributeEnabled(endpointId, Attributes::FullDuplex::Id),
-        .enablePacketCount   = IsAttributeEnabled(endpointId, Attributes::PacketRxCount::Id) ||
-            IsAttributeEnabled(endpointId, Attributes::PacketTxCount::Id),
+        .enableCarrierDetect  = IsAttributeEnabled(endpointId, Attributes::CarrierDetect::Id),
+        .enableFullDuplex     = IsAttributeEnabled(endpointId, Attributes::FullDuplex::Id),
         .enablePHYRate        = IsAttributeEnabled(endpointId, Attributes::PHYRate::Id),
         .enableTimeSinceReset = IsAttributeEnabled(endpointId, Attributes::TimeSinceReset::Id),
-        .enableErrCount       = IsAttributeEnabled(endpointId, Attributes::TxErrCount::Id) ||
-            IsAttributeEnabled(endpointId, Attributes::CollisionCount::Id) ||
-            IsAttributeEnabled(endpointId, Attributes::OverrunCount::Id),
     };
+
+    BitFlags<EthernetNetworkDiagnostics::Feature> enabledFeatures;
+    enabledFeatures.Set(EthernetNetworkDiagnostics::Feature::kPacketCounts,
+                        IsAttributeEnabled(endpointId, Attributes::PacketRxCount::Id) ||
+                            IsAttributeEnabled(endpointId, Attributes::PacketTxCount::Id));
+    enabledFeatures.Set(EthernetNetworkDiagnostics::Feature::kErrorCounts,
+                        IsAttributeEnabled(endpointId, Attributes::TxErrCount::Id) ||
+                            IsAttributeEnabled(endpointId, Attributes::CollisionCount::Id) ||
+                            IsAttributeEnabled(endpointId, Attributes::OverrunCount::Id));
 
     // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
     // and do not properly support secondary network interfaces or per-endpoint diagnostics.
     // See issue:#40175
-    gServers[arrayIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), enabledAttributes);
+    gServers[arrayIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), enabledFeatures, enabledAttributes);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)

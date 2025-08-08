@@ -32,10 +32,8 @@ struct EthernetDiagnosticsEnabledAttributes
 {
     bool enableCarrierDetect : 1;
     bool enableFullDuplex : 1;
-    bool enablePacketCount : 1;
     bool enablePHYRate : 1;
     bool enableTimeSinceReset : 1;
-    bool enableErrCount : 1;
 };
 
 /// Integration of Ethernet network diagnostics within the Matter data model
@@ -44,6 +42,7 @@ class EthernetDiagnosticsServerCluster : public DefaultServerCluster
 {
 public:
     EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
+                                     const BitFlags<EthernetNetworkDiagnostics::Feature> mEnabledFeatures,
                                      const EthernetDiagnosticsEnabledAttributes & enabledAttributes);
 
     // Server cluster implementation
@@ -60,6 +59,7 @@ public:
 
 private:
     DeviceLayer::DiagnosticDataProvider & mProvider;
+    const BitFlags<EthernetNetworkDiagnostics::Feature> mEnabledFeatures;
     const EthernetDiagnosticsEnabledAttributes mEnabledAttributes;
 };
 

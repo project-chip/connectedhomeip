@@ -35,14 +35,6 @@ using namespace chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
 
 namespace {
 
-constexpr BitFlags<EthernetNetworkDiagnostics::Feature>
-GetFeatureMap(const EthernetDiagnosticsEnabledAttributes & enabledAttributes)
-{
-    return BitFlags<EthernetNetworkDiagnostics::Feature>()
-        .Set(EthernetNetworkDiagnostics::Feature::kPacketCounts, enabledAttributes.enablePacketCount)
-        .Set(EthernetNetworkDiagnostics::Feature::kErrorCounts, enabledAttributes.enableErrCount);
-}
-
 CHIP_ERROR EncodeU64Value(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
 {
     if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -58,10 +50,11 @@ CHIP_ERROR EncodeU64Value(uint64_t value, CHIP_ERROR readError, AttributeValueEn
 
 } // anonymous namespace
 
-EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
-                                                                   const EthernetDiagnosticsEnabledAttributes & enabledAttributes) :
-    DefaultServerCluster({ kRootEndpointId, EthernetNetworkDiagnostics::Id }),
-    mProvider(provider), mEnabledAttributes(enabledAttributes)
+EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(
+    DeviceLayer::DiagnosticDataProvider & provider, const BitFlags<EthernetNetworkDiagnostics::Feature> enabledFeatures,
+    const EthernetDiagnosticsEnabledAttributes & enabledAttributes) :
+    DefaultServerCluster({ kRootEndpointId, EthernetNetworkDiagnostics::Id }), mProvider(provider),
+    mEnabledFeatures(enabledFeatures), mEnabledAttributes(enabledAttributes)
 {}
 
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -125,7 +118,7 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         err = mProvider.GetEthOverrunCount(value);
         break;
     case Globals::Attributes::FeatureMap::Id:
-        return encoder.Encode(GetFeatureMap(mEnabledAttributes).Raw());
+        return encoder.Encode(mEnabledFeatures);
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(EthernetNetworkDiagnostics::kRevision);
     default:
@@ -156,10 +149,8 @@ EthernetDiagnosticsServerCluster::InvokeCommand(const DataModel::InvokeRequest &
 CHIP_ERROR EthernetDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    BitFlags<EthernetNetworkDiagnostics::Feature> featureMap = GetFeatureMap(mEnabledAttributes);
-
-    if (featureMap.Has(EthernetNetworkDiagnostics::Feature::kPacketCounts) ||
-        featureMap.Has(EthernetNetworkDiagnostics::Feature::kErrorCounts))
+    if (mEnabledFeatures.Has(EthernetNetworkDiagnostics::Feature::kPacketCounts) ||
+        mEnabledFeatures.Has(EthernetNetworkDiagnostics::Feature::kErrorCounts))
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
             EthernetNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry
@@ -174,16 +165,19 @@ CHIP_ERROR EthernetDiagnosticsServerCluster::AcceptedCommands(const ConcreteClus
 CHIP_ERROR EthernetDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
                                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
+    bool hasErrorCounts  = mEnabledFeatures.Has(EthernetNetworkDiagnostics::Feature::kErrorCounts);
+    bool hasPacketCounts = mEnabledFeatures.Has(EthernetNetworkDiagnostics::Feature::kPacketCounts);
+
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mEnabledAttributes.enableCarrierDetect, CarrierDetect::kMetadataEntry },
-        { mEnabledAttributes.enableErrCount, CollisionCount::kMetadataEntry },
         { mEnabledAttributes.enableFullDuplex, FullDuplex::kMetadataEntry },
-        { mEnabledAttributes.enableErrCount, OverrunCount::kMetadataEntry },
-        { mEnabledAttributes.enablePacketCount, PacketRxCount::kMetadataEntry },
-        { mEnabledAttributes.enablePacketCount, PacketTxCount::kMetadataEntry },
         { mEnabledAttributes.enablePHYRate, PHYRate::kMetadataEntry },
         { mEnabledAttributes.enableTimeSinceReset, TimeSinceReset::kMetadataEntry },
-        { mEnabledAttributes.enableErrCount, TxErrCount::kMetadataEntry },
+        { hasErrorCounts, OverrunCount::kMetadataEntry },
+        { hasErrorCounts, CollisionCount::kMetadataEntry },
+        { hasErrorCounts, TxErrCount::kMetadataEntry },
+        { hasPacketCounts, PacketRxCount::kMetadataEntry },
+        { hasPacketCounts, PacketTxCount::kMetadataEntry },
     };
 
     AttributeListBuilder listBuilder(builder);
