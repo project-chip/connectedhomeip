@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -158,6 +159,13 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(EndpointList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace EndpointList
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    Status::kMetadataEntry,
+    Order::kMetadataEntry,
+    Description::kMetadataEntry,
+    EndpointList::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
