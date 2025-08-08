@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     rsync \
     swig \
     && rm -rf /var/lib/apt/lists/ \
@@ -68,5 +68,10 @@ RUN set -x \
     && : # last line
 
 ENV ANDROID_HOME=/opt/android/sdk
+<<<<<<< HEAD
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+=======
+ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r28c
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+>>>>>>> 188dec4245 (bump android docker with java 17 support (#40500))
