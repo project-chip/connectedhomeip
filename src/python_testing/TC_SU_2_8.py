@@ -132,7 +132,7 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info(f"AnnounceOTAProvider response: {resp}.")
         logging.info(f"AnnounceOTAProvider sent from node {controller.nodeId} to DUT.")
 
-    async def wait_for_valid_update_state(self, endpoint: int, valid_states: set):
+    async def wait_for_valid_update_state(self, endpoint: int, valid_states):
         """
         Poll UpdateState until it enters a valid one.
         """
@@ -151,7 +151,7 @@ class TC_SU_2_8(MatterBaseTest):
 
             logging.info(f"[{elapsed}s] UpdateState = {state.name}.")
 
-            if state in valid_states:
+            if state == valid_states:
                 return state
 
             time.sleep(interval)
@@ -196,12 +196,14 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info("Commissioning OTA Provider 1 to TH1")
 
-        await controller.CommissionOnNetwork(  # Is this ok?
+        resp = await controller.CommissionOnNetwork(
             nodeId=provider_node_id_1,
             setupPinCode=provider_passcode_1,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_discriminator_1
         )
+
+        logging.info(f"Commissioning response: {resp}.")
 
         # Commissioning Provider-TH2
 
@@ -211,15 +213,17 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info("Commissioning OTA Provider 2 to TH2")
 
-        await th2.CommissionOnNetwork(  # Is this ok?
+        resp = await th2.CommissionOnNetwork(
             nodeId=provider_node_id_2,
             setupPinCode=provider_passcode_2,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_discriminator_2
         )
 
+        logging.info(f"Commissioning response: {resp}.")
+
         await self.configure_acl_permissions(controller, endpoint)
-        await self.configure_acl_permissions(th2, endpoint)  # Is this ok?
+        await self.configure_acl_permissions(th2, endpoint)
 
         # DUT sends a QueryImage command to TH1/OTA-P.
         self.step(1)
@@ -261,7 +265,11 @@ class TC_SU_2_8(MatterBaseTest):
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnUserConsent
         }
 
-        await self.wait_for_valid_update_state(endpoint, valid_states)
+        valid_states = list(valid_states)
+
+        await self.wait_for_valid_update_state(endpoint, valid_states[0])
+
+        await self.wait_for_valid_update_state(endpoint, valid_states[1])
 
 
 if __name__ == "__main__":
