@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
+@class MTRMetrics;
 
 typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTRDeviceStateUnknown = 0,
@@ -471,7 +472,6 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_AVAILABLE(ios(17.6), macos(14.
  *
  */
 - (void)deviceConfigurationChanged:(MTRDevice *)device MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
-
 @end
 
 @interface MTRDevice (Deprecated)
