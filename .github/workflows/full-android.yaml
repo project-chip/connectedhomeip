@@ -32,9 +32,6 @@ jobs:
     full_android:
         name: Run
 
-        env:
-            JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64/
-
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
