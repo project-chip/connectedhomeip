@@ -122,17 +122,18 @@ public:
     CHIP_ERROR AddCluster(ServerClusterRegistration & entry);
     CHIP_ERROR RemoveCluster(ServerClusterInterface * entry);
 
+private:
+    EndpointInterfaceRegistry mEndpointInterfaceRegistry;
+    ServerClusterInterfaceRegistry mServerClusterRegistry;
+    std::optional<ServerClusterContext> mServerClusterContext;
+    PersistentStorageDelegate & mPersistentStorageDelegate;
+
     /// Return the interface registered for the given endpoint ID or nullptr if one does not exist
     EndpointInterface * GetEndpointInterface(EndpointId endpointId);
 
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * GetServerClusterInterface(const ConcreteClusterPath & path);
 
-private:
-    EndpointInterfaceRegistry mEndpointInterfaceRegistry;
-    ServerClusterInterfaceRegistry mServerClusterRegistry;
-    std::optional<ServerClusterContext> mServerClusterContext;
-    PersistentStorageDelegate & mPersistentStorageDelegate;
 };
 
 } // namespace app

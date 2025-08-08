@@ -87,8 +87,8 @@ public:
 
 private:
     // Private constructor for Builder
-    SpanEndpoint(Span<const ClusterId> clientClusters, Span<const SemanticTag> semanticTags,
-                 Span<const DataModel::DeviceTypeEntry> deviceTypes);
+    SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
+                 const Span<const DataModel::DeviceTypeEntry> & deviceTypes);
 
     // Iteration methods
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;

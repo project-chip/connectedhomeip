@@ -67,8 +67,8 @@ CHIP_ERROR SpanEndpoint::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) 
 }
 
 // Private constructor for Builder
-SpanEndpoint::SpanEndpoint(Span<const ClusterId> clientClusters, Span<const SemanticTag> semanticTags,
-                           Span<const DataModel::DeviceTypeEntry> deviceTypes) :
+SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
+                           const Span<const DataModel::DeviceTypeEntry> & deviceTypes) :
     mDeviceTypes(deviceTypes),
     mSemanticTags(semanticTags), mClientClusters(clientClusters)
 {}

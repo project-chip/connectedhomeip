@@ -40,9 +40,7 @@ struct EndpointInterfaceRegistration
     DataModel::EndpointEntry endpointEntry;
     EndpointInterfaceRegistration * next;
 
-    EndpointInterfaceRegistration(EndpointInterface & interface,
-                                  DataModel::EndpointEntry entry            = { kInvalidEndpointId, kInvalidEndpointId,
-                                                                                DataModel::EndpointCompositionPattern::kFullFamily },
+    EndpointInterfaceRegistration(EndpointInterface & interface, DataModel::EndpointEntry entry,
                                   EndpointInterfaceRegistration * next_item = nullptr) :
         endpointInterface(&interface),
         endpointEntry(entry), next(next_item)
