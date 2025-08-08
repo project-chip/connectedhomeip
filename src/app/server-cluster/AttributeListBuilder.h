@@ -40,7 +40,7 @@ public:
     /// Constructs a list of cluster attributes, typically for responding to a
     /// `ServerClusterInterface::Attributes` call.
     ///
-    /// It allows for one calkl that will add to the buffer all of:
+    /// It allows for one call that will add to the buffer all of:
     ///   - mandatoryAttributes (all of them)
     ///   - optionalAttributes IF AND ONLY IF enabledOptionalAttributes is set for them
     ///   - GlobalAttributes()  (all of them)
