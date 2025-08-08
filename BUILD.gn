@@ -24,6 +24,11 @@ import("$dir_pw_build/python.gni")
 import("$dir_pw_build/python_dist.gni")
 import("$dir_pw_build/python_venv.gni")
 
+declare_args() {
+  # Value to passed to the c/c++ compiler wrapper.
+  cc_wrapper = ""
+}
+
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
 
