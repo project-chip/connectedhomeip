@@ -62,6 +62,31 @@ ADDED,224,"chip::app::WriteHandler::CheckWriteAllowed(chip::Access::SubjectDescr
 
 ```
 
+The diff can also export a sankey data for the differences. Example run:
+
+```
+# Running via `uv` from https://github.com/astral-sh/uv ensures packages are loaded and is generally fast
+# sankey-rules are optional and are of the form:
+#   match "<regex>" to <group_name> "color" colorstr
+# where the color part is optional
+#
+# Example used rules.txt:
+#
+#  match "::k(MetadataEntry|MandatoryAttributes)" to "Metadata"
+#  match "chip::app::Clusters::BasicInformationCluster" to "BasicInfoCluster" color magenta
+#  match "AttributePersistence" to Persistence
+#  match "Event" to Events color blue
+#  match "chip::app::Clusters::" to Clusters color yellow
+#
+uv run --script ./scripts/tools/binary_elf_size_diff.py                                                   \
+   out/branch-builds/migrate_basic_info_to_code/stm32-stm32wb5mm-dk-light/chip-stm32-lighting-example.elf \
+   out/branch-builds/better_scripts/stm32-stm32wb5mm-dk-light/chip-stm32-lighting-example.elf             \
+   --output sankey                                                                                        \
+   --sankey-rules out/rules.txt
+```
+
+![image](./elf_size_example.png)
+
 ## Looking at assembly code
 
 For general tests, the [Godbolt compiler explorer](https://godbolt.org) is a

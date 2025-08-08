@@ -36,13 +36,14 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):

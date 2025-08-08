@@ -48,13 +48,13 @@ config CHIP_APP_BLE_MANAGER
 if CHIP_APP_BLE_MANAGER
     choice CHIP_APP_BLE_MANAGER_SELECTION
         prompt "Select Application BLE Manager"
-        
+
         config CHIP_APP_BLE_MANAGER_CUSTOM
             bool "App Custom BLE Manager"
             depends on CHIP_CUSTOM_BLE_ADV_DATA && CHIP_DEVICE_USE_ZEPHYR_BLE
             help
                 Enable application custom BLE manager.
-        
+
         config CHIP_APP_BLE_MANAGER_EMPTY
             bool "App BLE Manager Empty"
             help
@@ -164,7 +164,7 @@ if  CHIP_APP_BUTTON
             Enable application custom button behavior.
 
     config CHIP_APP_BUTTON_BLE
-        bool "App Button BLE" 
+        bool "App Button BLE"
         select CHIP_APP_BUTTON_WITH_TIMER
         help
             Enable application custom button behavior for BLE.
@@ -186,6 +186,7 @@ config CHIP_APP_OPERATIONAL_KEYSTORE
 if CHIP_APP_OPERATIONAL_KEYSTORE
     choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
         prompt "Select Operation Keystore Implementation"
+        default CHIP_APP_OPERATIONAL_KEYSTORE_SE05X if CHIP_SE05X
         default CHIP_APP_OPERATIONAL_KEYSTORE_S200
 
         config CHIP_APP_OPERATIONAL_KEYSTORE_S200
@@ -197,6 +198,11 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
             bool "Operation Keystore Empty"
             help
                 Enable application Operational keystore empty implementation.
+
+        config CHIP_APP_OPERATIONAL_KEYSTORE_SE05X
+            bool "Operation Keystore SE05X"
+            help
+                Enable application Operational keystore SE05X implementation.
 
     endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
 endif # CHIP_APP_OPERATIONAL_KEYSTORE
@@ -228,7 +234,7 @@ if CHIP_APP_OTA_REQUESTOR
             depends on !APP_FREERTOS_OS
             help
                 Enable OTA Requestor Initiator for Zephyr OS application.
-    
+
     endchoice # CHIP_APP_OTA_REQUESTOR_INITIATOR_SELECTION
 
     config CHIP_APP_PLATFORM_OTA_UTILS
@@ -328,6 +334,7 @@ config CHIP_APP_QUEUE_TICKS_TO_WAIT
 
 config APP_TASK_STACK_SIZE
     int "App Task Stack Size"
+    default 9000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
     default 6144
     help
         Set the stack size for the application task in bytes.

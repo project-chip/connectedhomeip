@@ -51,26 +51,27 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
 
-import chip.clusters as Clusters
 import cv2
 import requests
 from mobly import asserts
+
+import matter.clusters as Clusters
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 try:
-    from chip.testing.basic_composition import BasicCompositionTests
-    from chip.testing.matter_stack_state import MatterStackState
-    from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
+    from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.matter_stack_state import MatterStackState
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from chip.testing.basic_composition import BasicCompositionTests
-    from chip.testing.matter_stack_state import MatterStackState
-    from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
+    from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.matter_stack_state import MatterStackState
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
 
 try:
     import fetch_paa_certs_from_dcl

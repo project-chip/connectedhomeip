@@ -41,12 +41,14 @@ import operator
 from enum import Enum
 from typing import Any
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_asserts import assert_valid_uint8
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_asserts import assert_valid_uint8
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 
 class OrderEnum(Enum):

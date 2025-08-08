@@ -262,7 +262,7 @@ On the Ecosystem B Joint Fabric Controller application
 -   Open Joint Commissioning Window on JF Admin App of Ecosystem B
 
 ```
->>> jcm open-joint-commissioning-window 11 1 400 1000 1261
+>>> pairing open-joint-commissioning-window 11 1 400 1000 1261
 ```
 
 Check for the following logs on the jf-admin-app side:

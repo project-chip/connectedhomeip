@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -46,6 +47,11 @@ namespace OperationalError {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OperationalError::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OperationalError
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    PhaseList::kMetadataEntry,        CurrentPhase::kMetadataEntry,     OperationalStateList::kMetadataEntry,
+    OperationalState::kMetadataEntry, OperationalError::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

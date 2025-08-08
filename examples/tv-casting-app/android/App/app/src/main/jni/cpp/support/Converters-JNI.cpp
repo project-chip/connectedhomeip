@@ -79,7 +79,8 @@ jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr)
         return nullptr;
     }
 
-    return env->NewObject(jMatterErrorClass, jMatterErrorConstructor, inErr.AsInteger(), nullptr);
+    // Explicitly cast to jlong for JNI: Java ctor expects long (64-bit), ensures correct arg size on 32-bit platforms
+    return env->NewObject(jMatterErrorClass, jMatterErrorConstructor, static_cast<jlong>(inErr.AsInteger()), nullptr);
 }
 
 jobject convertEndpointFromCppToJava(matter::casting::memory::Strong<core::Endpoint> endpoint)

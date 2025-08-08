@@ -39,9 +39,10 @@ import os
 import tempfile
 
 import websockets
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 SERVER_URI = "ws://localhost:9002"
 

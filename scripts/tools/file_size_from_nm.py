@@ -14,12 +14,22 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "click",
+#     "cxxfilt",
+#     "coloredlogs",
+#     "pandas",
+#     "plotly",
+# ]
+# ///
+#
 # Displays a treemap code size as read by `nm` over a binary
 #
 # Example call:
 #
-# scripts/tools/file_size_from_nm.py \
+# uv run --script ./scripts/tools/file_size_from_nm.py \
 #     --max-depth 5                  \
 #     out/nrf-nrf52840dk-light-data-model-enabled/nrfconnect/zephyr/zephyr.elf
 #
@@ -33,13 +43,6 @@
 #   in the entire "src". We have duplicated file names for which we do not have a
 #   good way to disambiguate
 #
-
-# Requires:
-#    click
-#    cxxfilt
-#    coloredlogs
-#    pandas
-#    plotly
 
 import fnmatch
 import logging

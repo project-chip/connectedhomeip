@@ -37,14 +37,15 @@
 
 import logging
 
-from chip.ChipDeviceCtrl import TransportPayloadCapability
-from chip.clusters import Objects, WebRTCTransportProvider
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.webrtc import PeerConnection, WebRTCManager
 from mobly import asserts
 from TC_WEBRTC_Utils import WebRTCTestHelper
 from test_plan_support import commission_if_required
+
+from matter.ChipDeviceCtrl import TransportPayloadCapability
+from matter.clusters import Objects, WebRTCTransportProvider
+from matter.clusters.Types import NullValue
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.webrtc import PeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_1(MatterBaseTest, WebRTCTestHelper):

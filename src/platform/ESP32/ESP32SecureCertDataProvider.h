@@ -43,8 +43,10 @@ public:
     CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override;
     CHIP_ERROR GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen) override;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     // GetRotatingDeviceIdUniqueId from GenericDeviceInstanceInfoProvider
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 };
 
 } // namespace DeviceLayer
