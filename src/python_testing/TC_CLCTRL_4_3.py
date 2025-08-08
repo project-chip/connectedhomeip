@@ -157,21 +157,17 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                      "Receive CONSTRAINT_ERROR response from the DUT"),
             TestStep("7d", "If the SP feature is supported, send MoveTo command with Position = MoveToFullyClosed and Speed = 4",
                      "Receive CONSTRAINT_ERROR response from the DUT"),
-            TestStep("8a", "Check LT feature support", "Skip steps 8b to 8j if the LT feature is not supported"),
+            TestStep("8a", "Check LT feature support", "Skip steps 8b to 8f if the LT feature is not supported"),
             TestStep("8b", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Latching field is saved as CurrentLatch"),
-            TestStep("8c", "Preparing Latch-State: If CurrentLatch is True and LatchControlModes Bit 0 = 1, skip step 8d"),
-            TestStep("8d", "Send MoveTo command with Latch = CurrentLatch",
-                     "Receive INVALID_IN_STATE response from the DUT"),
-            TestStep("8e", "If CurrentLatch is False and LatchControlModes Bit 1 = 1, skip step 8f"),
-            TestStep("8f", "Send MoveTo command with Latch = CurrentLatch",
-                     "Receive INVALID_IN_STATE response from the DUT"),
-            TestStep("8g", "If CurrentLatch is True and LatchControlModes Bit 0 = 0, skip step 8h"),
-            TestStep("8h", "Send MoveTo command with Latch = CurrentLatch",
+            TestStep("8c", "Send MoveTo command with Latch = CurrentLatch, when CurrentLatch is True and LatchControlModes Bit 0 = 1",
                      "Receive SUCCESS response from the DUT"),
-            TestStep("8i", "If CurrentLatch is False and LatchControlModes Bit 1 = 0, skip step 8j"),
-            TestStep("8j", "Send MoveTo command with Latch = CurrentLatch",
+            TestStep("8d", "Send MoveTo command with Latch = CurrentLatch, when CurrentLatch is True and LatchControlModes Bit 0 = 0",
+                     "Receive INVALID_IN_STATE response from the DUT"),
+            TestStep("8e", "Send MoveTo command with Latch = CurrentLatch, when CurrentLatch is False and LatchControlModes Bit 1 = 1",
                      "Receive SUCCESS response from the DUT"),
+            TestStep("8f", "Send MoveTo command with Latch = CurrentLatch, when CurrentLatch is False and LatchControlModes Bit 1 = 0",
+                     "Receive INVALID_IN_STATE response from the DUT"),
             TestStep("9a", "Check PS feature support", "Skip steps 9b and 9c if the PS feature is not supported"),
             TestStep("9b", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Position field is saved as CurrentPosition"),
@@ -518,67 +514,73 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
         self.step("8a")
         if is_latching_supported:
+            
             self.step("8b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_latch = overall_current_state.latch
             logging.info(f"CurrentLatch: {current_latch}")
 
-            self.step("8c")
-            if current_latch and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
-                self.skip_step("8d")
+            if current_latch is True and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
+                self.step("8c")
+                logging.info("CurrentLatch is True and LatchControlModes Bit 0 = 1, sending MoveTo command with Latch = CurrentLatch")
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    logging.info("MoveTo command with Latch = CurrentLatch sent successfully")
+                except InteractionModelError as e:
+                    logging.error(f"MoveTo command with Latch = CurrentLatch failed: {e}")
+                    asserts.assert_equal(e.status, Status.Success,
+                                         f"Expected Success status for MoveTo with Latch = CurrentLatch, but got: {e}")
             else:
+                logging.info("CurrentLatch is False or LatchControlModes Bit 0 = 0, skipping step 8c")
+                self.skip_step("8c")
+                
+            if current_latch is True and not (latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching):
                 self.step("8d")
+                logging.info("CurrentLatch is True and LatchControlModes Bit 0 = 0, sending MoveTo command with Latch = CurrentLatch")
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
-                    asserts.fail(f"MoveTo command with Latch = {current_latch} should have failed but succeeded.")
+                    logging.error("MoveTo command with Latch = CurrentLatch should have failed but succeeded")
+                    asserts.assert_true(False, "MoveTo command with Latch = CurrentLatch should have failed but succeeded")
                 except InteractionModelError as e:
-                    logging.info(f"MoveTo command with Latch = {current_latch} failed as expected: {e}")
+                    logging.info(f"Exception caught for MoveTo with Latch = CurrentLatch: {e}")
                     asserts.assert_equal(e.status, Status.InvalidInState,
-                                         f"Expected InvalidInState status for MoveTo with Latch = {current_latch}, but got: {e}")
-
-            self.step("8e")
-            if not current_latch and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-                self.skip_step("8f")
+                                         f"Expected INVALID_IN_STATE for MoveTo with Latch = CurrentLatch but got: {e}")
             else:
+                logging.info("CurrentLatch is False or LatchControlModes Bit 0 = 1, skipping step 8d")
+                self.skip_step("8d")
+                
+            if current_latch is False and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                self.step("8e")
+                logging.info("CurrentLatch is False and LatchControlModes Bit 1 = 1, sending MoveTo command with Latch = CurrentLatch")
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
+                    logging.info("MoveTo command with Latch = CurrentLatch sent successfully")
+                except InteractionModelError as e:
+                    logging.error(f"MoveTo command with Latch = CurrentLatch failed: {e}")
+                    asserts.assert_equal(e.status, Status.Success,
+                                         f"Expected Success status for MoveTo with Latch = CurrentLatch, but got: {e}")
+            else:
+                logging.info("CurrentLatch is True or LatchControlModes Bit 1 = 0, skipping step 8e")
+                self.skip_step("8e")
+            
+            if current_latch is False and not (latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching):
                 self.step("8f")
+                logging.info("CurrentLatch is False and LatchControlModes Bit 1 = 0, sending MoveTo command with Latch = CurrentLatch")
                 try:
                     await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
-                    asserts.fail(f"MoveTo command with Latch = {current_latch} should have failed but succeeded.")
+                    logging.error("MoveTo command with Latch = CurrentLatch should have failed but succeeded")
+                    asserts.assert_true(False, "MoveTo command with Latch = CurrentLatch should have failed but succeeded")
                 except InteractionModelError as e:
-                    logging.info(f"MoveTo command with Latch = {current_latch} failed as expected: {e}")
+                    logging.info(f"Exception caught for MoveTo with Latch = CurrentLatch: {e}")
                     asserts.assert_equal(e.status, Status.InvalidInState,
-                                         f"Expected InvalidInState status for MoveTo with Latch = {current_latch}, but got: {e}")
-
-            self.step("8g")
-            if current_latch and not (latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching):
-                self.skip_step("8h")
+                                         f"Expected INVALID_IN_STATE for MoveTo with Latch = CurrentLatch but got: {e}")
             else:
-                self.step("8h")
-                try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
-                    logging.info(f"MoveTo command with Latch = {current_latch} sent successfully")
-                except InteractionModelError as e:
-                    logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
-                    asserts.assert_equal(e.status, Status.Success,
-                                         f"Expected Success status for MoveTo with Latch = {current_latch}, but got: {e}")
-
-            self.step("8i")
-            if not current_latch and not (latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching):
-                self.skip_step("8j")
-            else:
-                self.step("8j")
-                try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=current_latch), timedRequestTimeoutMs=1000)
-                    logging.info(f"MoveTo command with Latch = {current_latch} sent successfully")
-                except InteractionModelError as e:
-                    logging.error(f"MoveTo command with Latch = {current_latch} failed: {e}")
-                    asserts.assert_equal(e.status, Status.Success,
-                                         f"Expected Success status for MoveTo with Latch = {current_latch}, but got: {e}")
-            sub_handler.reset()
+                logging.info("CurrentLatch is True or LatchControlModes Bit 1 = 1, skipping step 8f")
+                self.skip_step("8f")
 
         else:
-            logging.info("Skipping steps 8b to 8j as Latching feature is not supported")
-            self.mark_step_range_skipped("8b", "8j")
+            logging.info("Skipping steps 8b to 8f as Latching feature is not supported")
+            self.mark_step_range_skipped("8b", "8f")
 
         self.step("9a")
         if is_position_supported:
