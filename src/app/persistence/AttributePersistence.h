@@ -43,30 +43,11 @@ public:
     ///
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
-    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
     bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
     {
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
     }
-
-    template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
-    bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
-    {
-        using UnderlyingType = std::underlying_type_t<T>;
-        UnderlyingType underlyingValue = static_cast<UnderlyingType>(value);
-        const UnderlyingType underlyingLoadFailure = static_cast<UnderlyingType>(valueOnLoadFailure);
-        bool success = InternalRawLoadNativeEndianValue(path, &underlyingValue, &underlyingLoadFailure, sizeof(UnderlyingType));
-        if(success)
-        {
-            value = static_cast<T>(underlyingValue);
-        }
-        else
-        {
-            value = valueOnLoadFailure;
-        }
-        return success;
-    }
-
 
     /// Performs all the steps of:
     ///   - decode the given raw data

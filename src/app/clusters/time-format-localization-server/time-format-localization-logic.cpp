@@ -79,8 +79,6 @@ void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistencePro
     attrPersistence.LoadNativeEndianValue<CalendarTypeEnum>({ kRootEndpointId, TimeFormatLocalization::Id, 
         TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType, kDefaultCalendarType);
 
-    ChipLogError(Zcl, "Initial value for Calendar: %d", (int)mCalendarType);
-
     // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
     // If initial value is not one of the allowed values, pick one valid value and write it.
     CalendarTypeEnum validCalendar = kDefaultCalendarType;
@@ -98,8 +96,6 @@ void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvi
 
     attrPersistence.LoadNativeEndianValue<HourFormatEnum>({ kRootEndpointId, TimeFormatLocalization::Id, 
         TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat, kDefaultHourFormat);
-
-    ChipLogError(Zcl, "Initial value for Hour: %d", (int)mHourFormat);
 
 }
 

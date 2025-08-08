@@ -63,7 +63,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
         return mLogic.GetSupportedCalendarTypes(encoder);
     
     case TimeFormatLocalization::Attributes::FeatureMap::Id: 
-        return encoder.Encode(mLogic.GetFeatureMap().Raw());
+        return encoder.Encode(mLogic.GetFeatureMap());
     
     case TimeFormatLocalization::Attributes::ClusterRevision::Id: 
         return encoder.Encode(TimeFormatLocalization::kRevision);
