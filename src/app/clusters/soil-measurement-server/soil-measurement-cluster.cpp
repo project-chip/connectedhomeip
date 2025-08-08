@@ -15,6 +15,7 @@
  */
 
 #include "soil-measurement-cluster.h"
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/SoilMeasurement/Metadata.h>
 
 namespace chip::app::Clusters {
@@ -23,8 +24,7 @@ using namespace SoilMeasurement::Attributes;
 
 SoilMeasurementCluster::SoilMeasurementCluster(
     EndpointId endpointId, const SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits) :
-    DefaultServerCluster({ endpointId, SoilMeasurement::Id }),
-    mSoilMoistureMeasurementLimits(soilMoistureMeasurementLimits)
+    DefaultServerCluster({ endpointId, SoilMeasurement::Id }), mSoilMoistureMeasurementLimits(soilMoistureMeasurementLimits)
 {
     mSoilMoistureMeasuredValue.SetNull();
 }
@@ -50,14 +50,8 @@ DataModel::ActionReturnStatus SoilMeasurementCluster::ReadAttribute(const DataMo
 CHIP_ERROR SoilMeasurementCluster::Attributes(const ConcreteClusterPath & path,
                                               ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    // Ensure capacity just in case
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(2 + DefaultServerCluster::GlobalAttributes().size()));
-    // Mandatory attributes
-    ReturnErrorOnFailure(builder.Append(SoilMoistureMeasurementLimits::kMetadataEntry));
-    ReturnErrorOnFailure(builder.Append(SoilMoistureMeasuredValue::kMetadataEntry));
-
-    // Finally, the global attributes
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(SoilMeasurement::Attributes::kMandatoryMetadata), {});
 }
 
 CHIP_ERROR

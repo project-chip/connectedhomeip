@@ -19,6 +19,7 @@
 #include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/SoilMeasurement/Attributes.h>
 #include <clusters/SoilMeasurement/Metadata.h>
@@ -72,16 +73,14 @@ TEST_F(TestSoilMeasurementCluster, AttributeTest)
     {
         SoilMeasurementClusterLocal soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(
-            soilMeasurement.Attributes(ConcreteClusterPath(kEndpointWithSoilMeasurement, SoilMeasurement::Id), attributesBuilder),
-            CHIP_NO_ERROR);
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+        ASSERT_EQ(soilMeasurement.Attributes(ConcreteClusterPath(kEndpointWithSoilMeasurement, SoilMeasurement::Id), attributes),
+                  CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
-        ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ SoilMoistureMeasurementLimits::kMetadataEntry }), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ SoilMoistureMeasuredValue::kMetadataEntry }), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
+        AttributeListBuilder listBuilder(expected);
+        ASSERT_EQ(listBuilder.Append(Span(SoilMeasurement::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
+        ASSERT_TRUE(Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
     }
 }
 
