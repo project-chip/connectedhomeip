@@ -24,8 +24,7 @@ using namespace SoilMeasurement::Attributes;
 
 SoilMeasurementCluster::SoilMeasurementCluster(
     EndpointId endpointId, const SoilMoistureMeasurementLimits::TypeInfo::Type & soilMoistureMeasurementLimits) :
-    DefaultServerCluster({ endpointId, SoilMeasurement::Id }),
-    mSoilMoistureMeasurementLimits(soilMoistureMeasurementLimits)
+    DefaultServerCluster({ endpointId, SoilMeasurement::Id }), mSoilMoistureMeasurementLimits(soilMoistureMeasurementLimits)
 {
     mSoilMoistureMeasuredValue.SetNull();
 }
@@ -60,11 +59,12 @@ SoilMeasurementCluster::SetSoilMoistureMeasuredValue(const SoilMoistureMeasuredV
 {
     VerifyOrReturnError(mSoilMoistureMeasuredValue != soilMoistureMeasuredValue, CHIP_NO_ERROR);
 
-    VerifyOrReturnError(!soilMoistureMeasuredValue.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    VerifyOrReturnError(soilMoistureMeasuredValue.Value() >= mSoilMoistureMeasurementLimits.minMeasuredValue &&
-                            soilMoistureMeasuredValue.Value() <= mSoilMoistureMeasurementLimits.maxMeasuredValue,
-                        CHIP_ERROR_INVALID_ARGUMENT);
+    if (!soilMoistureMeasuredValue.IsNull())
+    {
+        VerifyOrReturnError(soilMoistureMeasuredValue.Value() >= mSoilMoistureMeasurementLimits.minMeasuredValue &&
+                                soilMoistureMeasuredValue.Value() <= mSoilMoistureMeasurementLimits.maxMeasuredValue,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     mSoilMoistureMeasuredValue = soilMoistureMeasuredValue;
 

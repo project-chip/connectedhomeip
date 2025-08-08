@@ -104,7 +104,8 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
         ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
         measuredValue.SetNull();
-        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+        ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_NO_ERROR);
+        ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
     }
 }
 
