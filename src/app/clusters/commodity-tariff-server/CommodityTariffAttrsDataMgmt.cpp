@@ -159,84 +159,19 @@ static bool OptionalNullableStructsAreEqual(const Optional<DataModel::Nullable<T
 
 }; // namespace CommonUtilities
 
-CHIP_ERROR TariffUnitDataClass::Validate(const ValueType & aValue) const
-{
-    return CHIP_NO_ERROR;
-}
-
+/*
 CHIP_ERROR StartDateDataClass::Validate(const ValueType & aValue) const
 {
     if (!aValue.IsNull() && aValue.Value() != 0)
     {
-        VerifyOrReturnError((static_cast<TariffUpdateCtx *>(mAuxData)->TariffUpdateTimestamp <= aValue.Value()),
+        VerifyOrReturnError((static_cast<TariffUpdateCtx *>(aCtx)->TariffUpdateTimestamp <= aValue.Value()),
             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DefaultRandomizationOffsetDataClass::Validate(const ValueType & aValue) const
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DefaultRandomizationTypeDataClass::Validate(const ValueType & aValue) const
-{
-    return CHIP_NO_ERROR;
-}
+}*/
 
 // TariffInfoDataClass
-
-CHIP_ERROR TariffInfoDataClass::Validate(const ValueType & aValue) const
-{
-    // The tariff info is always required (cannot be null)
-    if (aValue.IsNull())
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    const PayloadType & newValue = aValue.Value();
-    auto * ctx                   = static_cast<TariffUpdateCtx *>(mAuxData);
-
-    // Validate string lengths (if fields are provided)
-    VerifyOrReturnError(newValue.tariffLabel.IsNull() || newValue.tariffLabel.Value().size() <= kTariffInfoMaxLabelLength,
-                        CHIP_ERROR_INVALID_ARGUMENT);
-
-    VerifyOrReturnError(newValue.providerName.IsNull() || newValue.providerName.Value().size() <= kTariffInfoMaxProviderLength,
-                        CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Validate enum values
-    if (!newValue.blockMode.IsNull())
-    {
-        VerifyOrReturnError(EnsureKnownEnumValue(newValue.blockMode.Value()) != BlockModeEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    // Handle currency validation based on pricing feature
-    const bool pricingEnabled = CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPricing);
-
-    if (pricingEnabled)
-    {
-        // Pricing enabled - currency must be provided (null or non-null)
-        VerifyOrReturnError(newValue.currency.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-
-        // If non-null, validate contents
-        if (!newValue.currency.Value().IsNull())
-        {
-            const auto & currency = newValue.currency.Value().Value();
-            VerifyOrReturnError(currency.currency < kMaxCurrencyValue, CHIP_ERROR_INVALID_ARGUMENT);
-        }
-        // Else: null is valid when pricing enabled
-    }
-    else
-    {
-        // Pricing disabled - currency must not be provided at all
-        VerifyOrReturnError(!newValue.currency.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 bool TariffInfoDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
     if (!CommonUtilities::OptionalNullableStructsAreEqual(source.currency, destination.currency))
@@ -246,23 +181,6 @@ bool TariffInfoDataClass::CompareStructValue(const PayloadType & source, const P
 
     return (source.tariffLabel != destination.tariffLabel || source.providerName != destination.providerName ||
             source.blockMode != destination.blockMode);
-}
-
-void TariffInfoDataClass::CleanupStructValue(PayloadType & aValue)
-{
-    if (!aValue.tariffLabel.IsNull() && aValue.tariffLabel.Value().data())
-    {
-        MemoryFree(const_cast<char *>(aValue.tariffLabel.Value().data()));
-        aValue.tariffLabel.SetNull();
-    }
-
-    if (!aValue.providerName.IsNull() && aValue.providerName.Value().data())
-    {
-        MemoryFree(const_cast<char *>(aValue.providerName.Value().data()));
-        aValue.providerName.SetNull();
-    }
-
-    aValue.currency.ClearValue();
 }
 
 // DayEntriesDataClass
@@ -292,58 +210,11 @@ static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, 
 }
 } // namespace DayEntriesDataClass_Utils
 
-CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const
-{
-    // Required field check
-    if (aValue.IsNull())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    const auto & newList = aValue.Value();
-    auto * ctx           = static_cast<TariffUpdateCtx *>(mAuxData);
-
-    // Validate list length
-    if (newList.size() == 0 || newList.size() > kDayEntriesAttrMaxLength)
-    {
-        ChipLogError(NotSpecified, "Incorrect DayEntries length");
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
-    }
-
-    // Validate each entry
-    for (const auto & item : newList)
-    {
-        // Check for duplicate IDs
-        if (!ctx->DayEntryKeyIDs.insert(item.dayEntryID).second)
-        {
-            ChipLogError(NotSpecified, "Duplicate dayEntryID found");
-            return CHIP_ERROR_DUPLICATE_KEY_ID;
-        }
-
-        // Validate entry contents
-        CHIP_ERROR entryErr = DayEntriesDataClass_Utils::ValidateListEntry(item, ctx);
-        if (entryErr != CHIP_NO_ERROR)
-        {
-            return entryErr;
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
     using chip::app::Clusters::CommodityTariff::Structs::operator!=;
 
     return source != destination;
-}
-
-void DayEntriesDataClass::CleanupStructValue(PayloadType & aValue)
-{
-    aValue.duration.ClearValue();
-
-    aValue.randomizationOffset.ClearValue();
-    aValue.randomizationType.ClearValue();
 }
 
 // DayPatternsDataClass
@@ -363,55 +234,6 @@ static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue
 }
 } // namespace DayPatternsDataClass_Utils
 
-CHIP_ERROR DayPatternsDataClass::Validate(const ValueType & aValue) const
-{
-    if (aValue.IsNull())
-    {
-        return CHIP_NO_ERROR; // Assuming null is valid for day patterns
-    }
-
-    const auto & newList   = aValue.Value();
-    auto * ctx             = static_cast<TariffUpdateCtx *>(mAuxData);
-    uint8_t daysOfWeekMask = 0;
-
-    // Validate list length
-    if (newList.size() == 0 || newList.size() > kDayPatternsAttrMaxLength)
-    {
-        ChipLogError(NotSpecified, "Incorrect dayPatterns length");
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
-    }
-
-    // Validate each pattern
-    for (const auto & item : newList)
-    {
-        if (!ctx->DayPatternKeyIDs.insert(item.dayPatternID).second)
-        {
-            ChipLogError(NotSpecified, "Duplicate dayPatternID found");
-            return CHIP_ERROR_DUPLICATE_KEY_ID;
-        }
-
-        daysOfWeekMask |= item.daysOfWeek.Raw();
-
-        CHIP_ERROR entryErr = DayPatternsDataClass_Utils::ValidateListEntry(item, ctx->DayPatternsDayEntryIDs);
-        if (entryErr != CHIP_NO_ERROR)
-        {
-            return entryErr;
-        }
-    }
-
-    // Validate week coverage
-    const bool isValidSingleRotatingDay = (!daysOfWeekMask && newList.size() == 1);
-    const bool isValidFullWeekCoverage  = (daysOfWeekMask == kFullWeekMask);
-
-    if (!(isValidSingleRotatingDay || isValidFullWeekCoverage))
-    {
-        ChipLogError(NotSpecified, "Invalid day pattern coverage");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 bool DayPatternsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
     if ((source.dayPatternID != destination.dayPatternID) || (source.daysOfWeek.Raw() != destination.daysOfWeek.Raw()))
@@ -420,11 +242,6 @@ bool DayPatternsDataClass::CompareStructValue(const PayloadType & source, const 
     }
 
     return (source.dayEntryIDs != destination.dayEntryIDs);
-}
-
-void DayPatternsDataClass::CleanupStructValue(PayloadType & aValue)
-{
-    CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
 }
 
 // TariffPeriodsDataClass
@@ -478,55 +295,10 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
 }
 } // namespace TariffPeriodsDataClass_Utils
 
-CHIP_ERROR TariffPeriodsDataClass::Validate(const ValueType & aValue) const
-{
-    // Required field check
-    if (aValue.IsNull())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    const auto & newList = aValue.Value();
-    auto * ctx           = static_cast<TariffUpdateCtx *>(mAuxData);
-    std::map<uint32_t, std::unordered_set<uint32_t>> tariffComponentsMap;
-
-    // Validate list length
-    if (newList.size() == 0 || newList.size() > kTariffPeriodsAttrMaxLength)
-    {
-        ChipLogError(NotSpecified, "Incorrect TariffPeriods length");
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
-    }
-
-    // Validate each period
-    for (const auto & item : newList)
-    {
-        CHIP_ERROR entryErr = TariffPeriodsDataClass_Utils::ValidateListEntry(
-            item, ctx->TariffPeriodsDayEntryIDs, ctx->TariffPeriodsTariffComponentIDs, tariffComponentsMap);
-
-        if (entryErr != CHIP_NO_ERROR)
-        {
-            return entryErr;
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 bool TariffPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
     return (source.tariffComponentIDs != destination.tariffComponentIDs || source.dayEntryIDs != destination.dayEntryIDs ||
             source.label != destination.label);
-}
-
-void TariffPeriodsDataClass::CleanupStructValue(PayloadType & aValue)
-{
-    if (!aValue.label.IsNull() && aValue.label.Value().data())
-    {
-        MemoryFree(const_cast<char *>(aValue.label.Value().data()));
-        aValue.label.SetNull();
-    }
-    CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
-    CommonUtilities::CleanUpIDs(aValue.tariffComponentIDs);
 }
 
 // TariffComponentsDataClass
@@ -641,42 +413,6 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
 }
 } // namespace TariffComponentsDataClass_Utils
 
-CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType & aValue) const
-{
-    // Required field check
-    if (aValue.IsNull())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    const auto & newList = aValue.Value();
-    auto * ctx           = static_cast<TariffUpdateCtx *>(mAuxData);
-
-    // Validate list length
-    if (newList.size() == 0 || newList.size() > kTariffComponentsAttrMaxLength)
-    {
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
-    }
-
-    // Validate each component
-    for (const auto & item : newList)
-    {
-        if (!ctx->TariffComponentKeyIDs.insert(item.tariffComponentID).second)
-        {
-            ChipLogError(NotSpecified, "Duplicate tariffComponentID found");
-            return CHIP_ERROR_DUPLICATE_KEY_ID;
-        }
-
-        CHIP_ERROR entryErr = TariffComponentsDataClass_Utils::ValidateListEntry(item, ctx);
-        if (entryErr != CHIP_NO_ERROR)
-        {
-            return entryErr;
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 bool TariffComponentsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
 
@@ -721,24 +457,259 @@ bool TariffComponentsDataClass::CompareStructValue(const PayloadType & source, c
     return !(source.threshold == destination.threshold);
 }
 
-void TariffComponentsDataClass::CleanupStructValue(PayloadType & aValue)
+bool IndividualDaysDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-
-    if (aValue.label.HasValue() && !aValue.label.Value().IsNull())
-    {
-        MemoryFree(const_cast<char *>(aValue.label.Value().Value().data()));
-        aValue.label.ClearValue();
-    }
-
-    aValue.price.ClearValue();
-    aValue.friendlyCredit.ClearValue();
-    aValue.auxiliaryLoad.ClearValue();
-    aValue.peakPeriod.ClearValue();
-    aValue.powerThreshold.ClearValue();
+    using chip::app::Clusters::CommodityTariff::Structs::operator!=;
+    return (source != destination);
 }
 
-// IndividualDaysDataClass
-CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
+// CalendarPeriodsDataClass
+
+bool CalendarPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
+{
+    return (source.startDate != destination.startDate || source.dayPatternIDs != destination.dayPatternIDs);
+}
+
+namespace chip {
+namespace app {
+namespace CommodityTariffAttrsDataMgmt {
+
+using namespace CommodityTariffConsts;
+using namespace chip::app::Clusters::CommodityTariff::Structs;
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<TariffUnitEnum>>(const DataModel::Nullable<TariffUnitEnum>& aValue, void * aCtx)
+{
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<uint32_t>>(const DataModel::Nullable<uint32_t>& aValue, void * aCtx)
+{ return CHIP_NO_ERROR; }
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<int16_t>>(const DataModel::Nullable<int16_t>& aValue, void * aCtx)
+{ return CHIP_NO_ERROR; }
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<DayEntryRandomizationTypeEnum>>(const DataModel::Nullable<DayEntryRandomizationTypeEnum>& aValue, void * aCtx)
+{ return CHIP_NO_ERROR; }
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<TariffInformationStruct::Type>>(const DataModel::Nullable<TariffInformationStruct::Type>& aValue, void * aCtx)
+{
+    // The tariff info is always required (cannot be null)
+    if (aValue.IsNull())
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    const TariffInformationStruct::Type & newValue = aValue.Value();
+    auto * ctx                   = static_cast<TariffUpdateCtx *>(aCtx);
+
+    // Validate string lengths (if fields are provided)
+    VerifyOrReturnError(newValue.tariffLabel.IsNull() || newValue.tariffLabel.Value().size() <= kTariffInfoMaxLabelLength,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrReturnError(newValue.providerName.IsNull() || newValue.providerName.Value().size() <= kTariffInfoMaxProviderLength,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Validate enum values
+    if (!newValue.blockMode.IsNull())
+    {
+        VerifyOrReturnError(EnsureKnownEnumValue(newValue.blockMode.Value()) != BlockModeEnum::kUnknownEnumValue,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Handle currency validation based on pricing feature
+    const bool pricingEnabled = CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPricing);
+
+    if (pricingEnabled)
+    {
+        // Pricing enabled - currency must be provided (null or non-null)
+        VerifyOrReturnError(newValue.currency.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // If non-null, validate contents
+        if (!newValue.currency.Value().IsNull())
+        {
+            const auto & currency = newValue.currency.Value().Value();
+            VerifyOrReturnError(currency.currency < kMaxCurrencyValue, CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        // Else: null is valid when pricing enabled
+    }
+    else
+    {
+        // Pricing disabled - currency must not be provided at all
+        VerifyOrReturnError(!newValue.currency.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>(const DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>& aValue, void * aCtx)
+{
+    // Required field check
+    if (aValue.IsNull())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    const auto & newList = aValue.Value();
+    auto * ctx           = static_cast<TariffUpdateCtx *>(aCtx);
+
+    // Validate list length
+    if (newList.size() == 0 || newList.size() > kDayEntriesAttrMaxLength)
+    {
+        ChipLogError(NotSpecified, "Incorrect DayEntries length");
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
+
+    // Validate each entry
+    for (const auto & item : newList)
+    {
+        // Check for duplicate IDs
+        if (!ctx->DayEntryKeyIDs.insert(item.dayEntryID).second)
+        {
+            ChipLogError(NotSpecified, "Duplicate dayEntryID found");
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
+
+        // Validate entry contents
+        CHIP_ERROR entryErr = DayEntriesDataClass_Utils::ValidateListEntry(item, ctx);
+        if (entryErr != CHIP_NO_ERROR)
+        {
+            return entryErr;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>(const DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>& aValue, void * aCtx)
+{
+    if (aValue.IsNull())
+    {
+        return CHIP_NO_ERROR; // Assuming null is valid for day patterns
+    }
+
+    const auto & newList   = aValue.Value();
+    auto * ctx             = static_cast<TariffUpdateCtx *>(aCtx);
+    uint8_t daysOfWeekMask = 0;
+
+    // Validate list length
+    if (newList.size() == 0 || newList.size() > kDayPatternsAttrMaxLength)
+    {
+        ChipLogError(NotSpecified, "Incorrect dayPatterns length");
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
+
+    // Validate each pattern
+    for (const auto & item : newList)
+    {
+        if (!ctx->DayPatternKeyIDs.insert(item.dayPatternID).second)
+        {
+            ChipLogError(NotSpecified, "Duplicate dayPatternID found");
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
+
+        daysOfWeekMask |= item.daysOfWeek.Raw();
+
+        CHIP_ERROR entryErr = DayPatternsDataClass_Utils::ValidateListEntry(item, ctx->DayPatternsDayEntryIDs);
+        if (entryErr != CHIP_NO_ERROR)
+        {
+            return entryErr;
+        }
+    }
+
+    // Validate week coverage
+    const bool isValidSingleRotatingDay = (!daysOfWeekMask && newList.size() == 1);
+    const bool isValidFullWeekCoverage  = (daysOfWeekMask == kFullWeekMask);
+
+    if (!(isValidSingleRotatingDay || isValidFullWeekCoverage))
+    {
+        ChipLogError(NotSpecified, "Invalid day pattern coverage");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>(const DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>& aValue, void * aCtx)
+{
+    // Required field check
+    if (aValue.IsNull())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    const auto & newList = aValue.Value();
+    auto * ctx           = static_cast<TariffUpdateCtx *>(aCtx);
+
+    // Validate list length
+    if (newList.size() == 0 || newList.size() > kTariffComponentsAttrMaxLength)
+    {
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
+
+    // Validate each component
+    for (const auto & item : newList)
+    {
+        if (!ctx->TariffComponentKeyIDs.insert(item.tariffComponentID).second)
+        {
+            ChipLogError(NotSpecified, "Duplicate tariffComponentID found");
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
+
+        CHIP_ERROR entryErr = TariffComponentsDataClass_Utils::ValidateListEntry(item, ctx);
+        if (entryErr != CHIP_NO_ERROR)
+        {
+            return entryErr;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>(const DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>& aValue, void * aCtx)
+{
+    // Required field check
+    if (aValue.IsNull())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    const auto & newList = aValue.Value();
+    auto * ctx           = static_cast<TariffUpdateCtx *>(aCtx);
+    std::map<uint32_t, std::unordered_set<uint32_t>> tariffComponentsMap;
+
+    // Validate list length
+    if (newList.size() == 0 || newList.size() > kTariffPeriodsAttrMaxLength)
+    {
+        ChipLogError(NotSpecified, "Incorrect TariffPeriods length");
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
+
+    // Validate each period
+    for (const auto & item : newList)
+    {
+        CHIP_ERROR entryErr = TariffPeriodsDataClass_Utils::ValidateListEntry(
+            item, ctx->TariffPeriodsDayEntryIDs, ctx->TariffPeriodsTariffComponentIDs, tariffComponentsMap);
+
+        if (entryErr != CHIP_NO_ERROR)
+        {
+            return entryErr;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayStruct::Type>>>(const DataModel::Nullable<DataModel::List<DayStruct::Type>>& aValue, void * aCtx)
 {
     // Early return for null case (valid)
     if (aValue.IsNull())
@@ -747,7 +718,7 @@ CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
     }
 
     const auto & newList  = aValue.Value();
-    auto * ctx            = static_cast<TariffUpdateCtx *>(mAuxData);
+    auto * ctx            = static_cast<TariffUpdateCtx *>(aCtx);
     uint32_t previousDate = 0;
 
     // Validate list length
@@ -792,20 +763,8 @@ CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
     return CHIP_NO_ERROR;
 }
 
-bool IndividualDaysDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-{
-    using chip::app::Clusters::CommodityTariff::Structs::operator!=;
-    return (source != destination);
-}
-
-void IndividualDaysDataClass::CleanupStructValue(PayloadType & aValue)
-{
-    CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
-}
-
-// CalendarPeriodsDataClass
-
-CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
+template <>
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>(const DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>& aValue, void * aCtx)
 {
     // If calendar is null, it's always valid
     if (aValue.IsNull())
@@ -817,7 +776,7 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
     bool isFirstItem = true;
     Nullable<uint32_t> previousStartDate;
 
-    TariffUpdateCtx * ctx = static_cast<TariffUpdateCtx *>(mAuxData);
+    TariffUpdateCtx * ctx = static_cast<TariffUpdateCtx *>(aCtx);
 
     std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs =
         ctx->CalendarPeriodsDayPatternIDs;
@@ -889,12 +848,313 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
     return CHIP_NO_ERROR;
 }
 
-bool CalendarPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
+template <>
+CHIP_ERROR CopyData<TariffInformationStruct::Type>(const TariffInformationStruct::Type & input, TariffInformationStruct::Type & output)
 {
-    return (source.startDate != destination.startDate || source.dayPatternIDs != destination.dayPatternIDs);
+    output.tariffLabel.SetNull();
+    output.providerName.SetNull();
+    output.currency.ClearValue();
+    output.blockMode.SetNull();
+
+    if (!input.tariffLabel.IsNull())
+    {
+        if (!SpanCopier<char>::Copy(input.tariffLabel.Value(), output.tariffLabel, input.tariffLabel.Value().size()))
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    if (!input.providerName.IsNull())
+    {
+        if (!SpanCopier<char>::Copy(input.providerName.Value(), output.providerName, input.providerName.Value().size()))
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    if (input.currency.HasValue())
+    {
+        output.currency.Emplace();
+        if (input.currency.Value().IsNull())
+        {
+            output.currency.Value().SetNull();
+        }
+        else
+        {
+            output.currency.Value().SetNonNull(input.currency.Value().Value());
+        }
+    }
+
+    if (!input.blockMode.IsNull())
+    {
+        output.blockMode.SetNonNull(input.blockMode.Value());
+    }
+
+    return CHIP_NO_ERROR;
 }
 
-void CalendarPeriodsDataClass::CleanupStructValue(PayloadType & aValue)
+template <>
+CHIP_ERROR CopyData<DayEntryStruct::Type>(const DayEntryStruct::Type & input, DayEntryStruct::Type & output)
+{
+    output.dayEntryID = input.dayEntryID;
+    output.startTime = input.startTime;
+    
+    output.duration.ClearValue();
+    if (input.duration.HasValue())
+    {
+        output.duration.SetValue(input.duration.Value());
+    }
+    
+    output.randomizationOffset.ClearValue();
+    if (input.randomizationOffset.HasValue())
+    {
+        output.randomizationOffset.SetValue(input.randomizationOffset.Value());
+    }
+    
+    output.randomizationType.ClearValue();
+    if (input.randomizationType.HasValue())
+    {
+        output.randomizationType.SetValue(input.randomizationType.Value());
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Type & input, TariffComponentStruct::Type & output)
+{
+    output.tariffComponentID = input.tariffComponentID;
+    
+    output.price.ClearValue();
+    if (input.price.HasValue())
+    {
+        output.price.Emplace();
+        output.price.Value().SetNull();
+        if (!input.price.Value().IsNull())
+        {
+            auto & priceInput = input.price.Value().Value();            
+            TariffPriceStruct::Type tmp_price;
+
+            tmp_price.priceType = priceInput.priceType;
+            
+            if (priceInput.price.HasValue())
+            {
+                tmp_price.price.SetValue(priceInput.price.Value());
+            }
+            
+            if (priceInput.priceLevel.HasValue())
+            {
+                tmp_price.priceLevel.SetValue(priceInput.priceLevel.Value());
+            }
+
+            output.price.Value().SetNonNull(tmp_price);
+        }
+    }
+    
+    output.friendlyCredit.ClearValue();
+    if (input.friendlyCredit.HasValue())
+    {
+        output.friendlyCredit.SetValue(input.friendlyCredit.Value());
+    }
+    
+    output.auxiliaryLoad.ClearValue();
+    if (input.auxiliaryLoad.HasValue())
+    {
+        output.auxiliaryLoad.Emplace();
+        output.auxiliaryLoad.Value().number = input.auxiliaryLoad.Value().number;
+        output.auxiliaryLoad.Value().requiredState = input.auxiliaryLoad.Value().requiredState;
+    }
+    
+    output.peakPeriod.ClearValue();
+    if (input.peakPeriod.HasValue())
+    {
+        output.peakPeriod.Emplace();
+        output.peakPeriod.Value().severity = input.peakPeriod.Value().severity;
+        output.peakPeriod.Value().peakPeriod = input.peakPeriod.Value().peakPeriod;
+    }
+    
+    output.powerThreshold.ClearValue();
+    if (input.powerThreshold.HasValue())
+    {
+        output.powerThreshold.Emplace();
+        output.powerThreshold.Value() = input.powerThreshold.Value();
+    }
+    
+    output.threshold.SetNull();
+    if (!input.threshold.IsNull())
+    {
+        output.threshold.SetNonNull(input.threshold.Value());
+    }
+    
+    output.label.ClearValue();
+    if (input.label.HasValue())
+    {
+        output.label.Emplace();
+        output.label.Value().SetNull();
+        if (!input.label.Value().IsNull())
+        {
+            if (!SpanCopier<char>::Copy(
+                input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()))
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+    }
+    
+    output.predicted.ClearValue();
+    if (input.predicted.HasValue())
+    {
+        output.predicted.SetValue(input.predicted.Value());
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<TariffPeriodStruct::Type>(const TariffPeriodStruct::Type & input, TariffPeriodStruct::Type & output)
+{
+    output.label.SetNull();
+    if (!input.label.IsNull())
+    {
+        if (!SpanCopier<char>::Copy(
+            input.label.Value(), output.label, input.label.Value().size()))
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+    
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kTariffPeriodItemMaxIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()), output.tariffComponentIDs, kTariffPeriodItemMaxIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<DayPatternStruct::Type>(const DayPatternStruct::Type & input, DayPatternStruct::Type & output)
+{
+    output.dayPatternID = input.dayPatternID;
+    output.daysOfWeek = input.daysOfWeek;
+    
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kDayPatternItemMaxDayEntryIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<DayStruct::Type>(const DayStruct::Type & input, DayStruct::Type & output)
+{
+    output.date = input.date;
+    output.dayType = input.dayType;
+    
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kDayStructItemMaxDayEntryIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR CopyData<CalendarPeriodStruct::Type>(const CalendarPeriodStruct::Type & input, CalendarPeriodStruct::Type & output)
+{
+    output.startDate.SetNull();
+    if (!input.startDate.IsNull())
+    {
+        output.startDate.SetNonNull(input.startDate.Value());
+    }
+    
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayPatternIDs.data(), input.dayPatternIDs.size()), output.dayPatternIDs, kCalendarPeriodItemMaxDayPatternIDs))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    
+    return CHIP_NO_ERROR;
+}
+
+template <>
+void CleanupStructValue<TariffInformationStruct::Type>(TariffInformationStruct::Type& aValue)
+{
+    if (!aValue.tariffLabel.IsNull() && aValue.tariffLabel.Value().data())
+    {
+        Platform::MemoryFree(const_cast<char*>(aValue.tariffLabel.Value().data()));
+        aValue.tariffLabel.SetNull();
+    }
+
+    if (!aValue.providerName.IsNull() && aValue.providerName.Value().data())
+    {
+        Platform::MemoryFree(const_cast<char*>(aValue.providerName.Value().data()));
+        aValue.providerName.SetNull();
+    }
+
+    aValue.currency.ClearValue();
+}
+
+template <>
+void CleanupStructValue<DayEntryStruct::Type>(DayEntryStruct::Type& aValue)
+{
+    aValue.duration.ClearValue();
+    aValue.randomizationOffset.ClearValue();
+    aValue.randomizationType.ClearValue();
+}
+
+template <>
+void CleanupStructValue<TariffPeriodStruct::Type>(TariffPeriodStruct::Type& aValue)
+{
+    if (!aValue.label.IsNull() && aValue.label.Value().data())
+    {
+        Platform::MemoryFree(const_cast<char*>(aValue.label.Value().data()));
+        aValue.label.SetNull();
+    }
+    CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
+    CommonUtilities::CleanUpIDs(aValue.tariffComponentIDs);
+}
+
+template <>
+void CleanupStructValue<TariffComponentStruct::Type>(TariffComponentStruct::Type& aValue)
+{
+
+    if (aValue.label.HasValue() && !aValue.label.Value().IsNull())
+    {
+        MemoryFree(const_cast<char *>(aValue.label.Value().Value().data()));
+        aValue.label.ClearValue();
+    }
+
+    aValue.price.ClearValue();
+    aValue.friendlyCredit.ClearValue();
+    aValue.auxiliaryLoad.ClearValue();
+    aValue.peakPeriod.ClearValue();
+    aValue.powerThreshold.ClearValue();
+}
+
+
+template <>
+void CleanupStructValue<DayPatternStruct::Type>(DayPatternStruct::Type& aValue)
+{
+    CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
+}
+
+template <>
+void CleanupStructValue<DayStruct::Type>(DayStruct::Type& aValue)
+{
+    CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
+}
+
+template <>
+void CleanupStructValue<CalendarPeriodStruct::Type>(CalendarPeriodStruct::Type& aValue)
 {
     CommonUtilities::CleanUpIDs(aValue.dayPatternIDs);
 }
+
+} // namespace CommodityTariffAttrsDataMgmt
+} // namespace app
+} // namespace chip

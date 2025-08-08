@@ -41,8 +41,6 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
-
 /**
  * @defgroup tariff_attributes Commodity Tariff Attribute Definitions
  * @{
@@ -135,9 +133,6 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
     public:                                                                                                                        \
         attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
         ~attrName##DataClass() override = default;                                                                                 \
-                                                                                                                                   \
-    protected:                                                                                                                     \
-        CHIP_ERROR Validate(const ValueType & aValue) const override;                                                              \
     };
 COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
 #undef X
@@ -148,15 +143,9 @@ COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
     public:                                                                                                                        \
         attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
         ~attrName##DataClass() override = default;                                                                                 \
-        void CleanupExtEntry(PayloadType & entry)                                                                                  \
-        {                                                                                                                          \
-            CleanupStructValue(entry);                                                                                             \
-        }                                                                                                                          \
                                                                                                                                    \
     protected:                                                                                                                     \
-        CHIP_ERROR Validate(const ValueType & aValue) const override;                                                              \
         bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const override;                       \
-        void CleanupStructValue(PayloadType & aValue) override;                                                                    \
     };
 COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 #undef X

@@ -537,7 +537,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     else
     {
         for (auto & entry : tempVector)
-            mgmtObj.CleanupExtEntry(entry);
+            mgmtObj.CleanupExtListEntry(entry);
     }
 
     return err;
