@@ -61,5 +61,10 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
     if (gSoilMeasurementInstance)
     {
         gSoilMeasurementInstance->Init(kDefaultSoilMoistureMeasurementLimits);
+        CHIP_ERROR err = gSoilMeasurementInstance->SetSoilMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to set initial soil measurement value: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 }
