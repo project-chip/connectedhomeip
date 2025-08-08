@@ -22,11 +22,9 @@ import sys
 import graphviz
 from rich.console import Console
 
-import matter.clusters as Clusters
-
-# Add the path to python_testing folder, in order to be able to import from matter.testing.matter_testing
-sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
+from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
+from matter.testing.taglist_and_topology_test import build_tree_for_graph
 
 console = None
 maxClusterNameLength = 30
@@ -163,46 +161,104 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
     if endpoint != 0:
         # Create link to endpoints in the parts list
         for part in partsListFromWildcardRead:
-            graph.edge(f"ep{endpoint}", f"ep{part}", ltail=f"cluster_{endpoint}", minlen=f"{numberOfRowsInEndpoint}")
+            graph.edge(f"ep{endpoint}", f"ep{part}", ltail=f"cluster_EP{endpoint}",
+                       lhead=f'cluster_EP{part}', minlen=f"{numberOfRowsInEndpoint}")
+
+
+def create_graph(wildcardResponse, xml_device_types):
+
+    # Create console to print
+    global console
+    console = Console()
+
+    # Perform wildcard read to get all attributes from device
+    console.print("[blue]Capturing data from device")
+
+    # Creating graph object
+    deviceGraph = graphviz.Digraph()
+    deviceGraph.attr(style="rounded", splines="line", compound="true")
+
+    console.print("[blue]Generating graph")
+    # Loop through each endpoint in the response from the wildcard read
+    tree, problems = build_tree_for_graph(wildcardResponse)
+    if problems:
+        console.print("Found problems parsing topology:")
+        for p in problems:
+            console.print(p)
+            return
+
+    subgraph = {}
+    currentAggregator = deviceGraph
+
+    def create_subgraph(endpoint: int):
+        nonlocal currentAggregator
+        if tree[endpoint].is_aggregator_or_root:
+            # For aggregators, just open a container
+            print(f"adding aggregator on EP {endpoint}")
+            with currentAggregator.subgraph(name=f'cluster_EP{endpoint}') as subgraph[endpoint]:
+                currentAggregator = subgraph[endpoint]
+                for c in tree[endpoint].children:
+                    create_subgraph(c)
+        else:
+            print(f"adding tree on EP {endpoint}")
+            # normal tree, this will appear in its nearest container, but the children are created external
+            with currentAggregator.subgraph(name=f'cluster_EP{endpoint}') as subgraph[endpoint]:
+                CreateEndpointGraph(deviceGraph, subgraph[endpoint],
+                                    tree[endpoint].endpoint, wildcardResponse, xml_device_types)
+            for c in tree[endpoint].children:
+                create_subgraph(c)
+
+    create_subgraph(0)
+
+    vid = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID]
+    pid = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductID]
+    software_version = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
+    deviceGraph.save(f'matter_device_graph_0x{vid:4X}_0x{pid:4X}_{software_version}.dot')
 
 
 class TC_MatterDeviceGraph(MatterBaseTest):
     @async_test_body
     async def test_matter_device_graph(self):
 
-        # Create console to print
-        global console
-        console = Console()
 
-        # Run descriptor validation test
-        dev_ctrl = self.default_controller
+<< << << < HEAD: src/tools/device-graph/matter-device-graph.py
 
-        # Perform wildcard read to get all attributes from device
-        console.print("[blue]Capturing data from device")
-        wildcardResponse = await dev_ctrl.ReadAttribute(self.dut_node_id, [('*')])
-        # console.print(wildcardResponse)
+# Create console to print
+global console
+console = Console()
 
-        # Creating graph object
-        deviceGraph = graphviz.Digraph()
-        deviceGraph.attr(style="rounded", splines="line", compound="true")
+# Run descriptor validation test
+dev_ctrl = self.default_controller
 
-        console.print("[blue]Generating graph")
-        # Loop through each endpoint in the response from the wildcard read
-        for endpoint in wildcardResponse:
+# Perform wildcard read to get all attributes from device
+console.print("[blue]Capturing data from device")
+wildcardResponse = await dev_ctrl.ReadAttribute(self.dut_node_id, [('*')])
+# console.print(wildcardResponse)
 
-            if endpoint == 0:
-                with deviceGraph.subgraph(name='cluster_rootnode') as rootNodeSection:
-                    CreateEndpointGraph(deviceGraph, rootNodeSection, endpoint, wildcardResponse)
-            else:
-                with deviceGraph.subgraph(name='cluster_endpoints') as endpointsSection:
-                    with endpointsSection.subgraph(name=f'cluster_{endpoint}') as endpointSection:
-                        CreateEndpointGraph(deviceGraph, endpointSection, endpoint, wildcardResponse)
+# Creating graph object
+deviceGraph = graphviz.Digraph()
+ deviceGraph.attr(style="rounded", splines="line", compound="true")
 
-        deviceGraph.save(f'{sys.path[0]}/matter-device-graph.dot')
+  console.print("[blue]Generating graph")
+   # Loop through each endpoint in the response from the wildcard read
+   for endpoint in wildcardResponse:
 
-        deviceDataFile = open(f'{sys.path[0]}/matter-device-data.txt', 'w')
-        deviceDataFile.write(pprint.pformat((wildcardResponse)))
-        deviceDataFile.close()
+        if endpoint == 0:
+            with deviceGraph.subgraph(name='cluster_rootnode') as rootNodeSection:
+                CreateEndpointGraph(deviceGraph, rootNodeSection, endpoint, wildcardResponse)
+        else:
+            with deviceGraph.subgraph(name='cluster_endpoints') as endpointsSection:
+                with endpointsSection.subgraph(name=f'cluster_{endpoint}') as endpointSection:
+                    CreateEndpointGraph(deviceGraph, endpointSection, endpoint, wildcardResponse)
+
+    deviceGraph.save(f'{sys.path[0]}/matter-device-graph.dot')
+
+    deviceDataFile = open(f'{sys.path[0]}/matter-device-data.txt', 'w')
+    deviceDataFile.write(pprint.pformat((wildcardResponse)))
+    deviceDataFile.close()
+== == == =
+create_graph(self.endpoints, self.xml_device_types)
+>>>>>> > 091d31b870(Update drawing script to use parser): src/tools/device-graph/matter_device_graph.py
 
 
 if __name__ == "__main__":
