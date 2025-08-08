@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace GeneralCommissioning {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 18;
+
 namespace Breadcrumb {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Breadcrumb
@@ -59,6 +63,10 @@ inline constexpr AttributeId Id = 0x0000000A;
 namespace NetworkRecoveryReason {
 inline constexpr AttributeId Id = 0x0000000B;
 } // namespace NetworkRecoveryReason
+
+namespace IsCommissioningWithoutPower {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace IsCommissioningWithoutPower
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

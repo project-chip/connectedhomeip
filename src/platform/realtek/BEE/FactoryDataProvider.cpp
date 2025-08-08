@@ -120,6 +120,7 @@ CHIP_ERROR FactoryDataProvider::Init()
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "ReadFactoryData failed!");
+            free(buffer);
             return err;
         }
         err = decoder.DecodeFactoryData(buffer, &mFactoryData, factorydata_len);
@@ -141,6 +142,7 @@ CHIP_ERROR FactoryDataProvider::Init()
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "DecodeFactoryData failed!");
+            free(buffer);
             return err;
         }
 
@@ -635,6 +637,14 @@ exit:
         ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", mFactoryData.dii.mfg_date.value);
     }
     return err;
+}
+
+CHIP_ERROR FactoryDataProvider::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)

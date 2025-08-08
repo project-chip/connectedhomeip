@@ -32,7 +32,7 @@ COPY --from=nrf /opt/NordicSemiconductor/nRF5_tools /opt/NordicSemiconductor/nRF
 COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrfconnect
 
 COPY --from=android /opt/android/sdk /opt/android/sdk
-COPY --from=android /opt/android/android-ndk-r23c /opt/android/android-ndk-r23c
+COPY --from=android /opt/android/android-ndk-r28c /opt/android/android-ndk-r28c
 COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 
 COPY --from=psoc6 /opt/Tools/ModusToolbox /opt/Tools/ModusToolbox
@@ -107,7 +107,7 @@ RUN set -x \
 ENV PATH=$PATH:/usr/lib/kotlinc/bin
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
-ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
+ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r28c
 ENV CY_TOOLS_PATHS="/opt/Tools/ModusToolbox/tools_3.2"
 ENV SILABS_BOARD=BRD4186C
 # Keep GSDK_ROOT name until rename transition to SISDK is completed
@@ -129,7 +129,7 @@ ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.22.0
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.17.0
+ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk/toolchains/latest
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
 ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.0
@@ -140,7 +140,7 @@ ENV NXP_SDK_PATH=/opt/nxp
 # NOTE: This directory is NOT persistent.
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 
-ENV TIZEN_VERSION=8.0
+ENV TIZEN_VERSION=9.0
 ENV TIZEN_SDK_ROOT=/opt/tizen-sdk
 ENV TIZEN_SDK_TOOLCHAIN=$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
 ENV TIZEN_SDK_SYSROOT=$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core

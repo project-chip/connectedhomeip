@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -23,6 +24,10 @@ namespace NameSupport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NameSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NameSupport
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    NameSupport::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -60,6 +65,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace AddGroupIfIdentifying
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Groups
 } // namespace Clusters
 } // namespace app

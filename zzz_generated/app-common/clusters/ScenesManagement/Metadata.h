@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -29,6 +30,11 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace FabricSceneInfo
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    SceneTableSize::kMetadataEntry,
+    FabricSceneInfo::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -75,6 +81,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace CopyScene
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ScenesManagement
 } // namespace Clusters
 } // namespace app

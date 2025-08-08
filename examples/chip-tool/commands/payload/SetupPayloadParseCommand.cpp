@@ -116,6 +116,14 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
                     }
                     humanFlags.Add("Wi-Fi PAF");
                 }
+                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kNFC))
+                {
+                    if (!humanFlags.Empty())
+                    {
+                        humanFlags.Add(", ");
+                    }
+                    humanFlags.Add("NFC");
+                }
             }
             else
             {

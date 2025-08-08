@@ -119,6 +119,9 @@ void CommissioningWindowManager::Shutdown()
 void CommissioningWindowManager::ResetState()
 {
     mUseECM = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    mJCM = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     mECMDiscriminator = 0;
     mECMIterations    = 0;
@@ -390,6 +393,16 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds32
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+CHIP_ERROR CommissioningWindowManager::OpenJointCommissioningWindow(Seconds32 commissioningTimeout, uint16_t discriminator,
+                                                                    Spake2pVerifier & verifier, uint32_t iterations, ByteSpan salt,
+                                                                    FabricIndex fabricIndex, VendorId vendorId)
+{
+    mJCM = true;
+    return OpenEnhancedCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt, fabricIndex, vendorId);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 void CommissioningWindowManager::CloseCommissioningWindow()
 {
     if (IsCommissioningWindowOpen())
@@ -450,7 +463,11 @@ Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() cons
     switch (mWindowStatus)
     {
     case CommissioningWindowStatusEnum::kEnhancedWindowOpen:
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        return mJCM ? Dnssd::CommissioningMode::kEnabledJointFabric : Dnssd::CommissioningMode::kEnabledEnhanced;
+#else
         return Dnssd::CommissioningMode::kEnabledEnhanced;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case CommissioningWindowStatusEnum::kBasicWindowOpen:
         return Dnssd::CommissioningMode::kEnabledBasic;
     default:

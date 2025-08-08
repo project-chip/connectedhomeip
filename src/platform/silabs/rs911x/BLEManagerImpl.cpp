@@ -494,7 +494,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "sl_bt_connection_close() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "sl_bt_connection_close() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -587,7 +587,7 @@ void BLEManagerImpl::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -743,7 +743,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
 exit:
     // TODO: Add MapBLEError to return the correct error code
-    ChipLogError(DeviceLayer, "StartAdvertising() End error: %s", ErrorStr(err));
+    ChipLogError(DeviceLayer, "StartAdvertising() End error: %" CHIP_ERROR_FORMAT, err.Format());
     return err;
 }
 
@@ -925,7 +925,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(const SilabsBleWrapper::sl_wfx_msg_t 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -955,7 +955,7 @@ void BLEManagerImpl::HandleRXCharWrite(const SilabsBleWrapper::sl_wfx_msg_t & ev
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
