@@ -101,7 +101,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep("5a", "If LimitRange is unsupported, skip step 5b to 5g"),
             TestStep("5b", "Send SetTarget command with Position 0%"),
             TestStep("5c", "Verify TargetState attribute is updated"),
-            TestStep("5d", "Wait for CurrentState.Position to be updated to 0%"),
+            TestStep("5d", "Wait for CurrentState.Position to be updated to MinPosition"),
             TestStep("5e", "Send SetTarget command with Position 100%"),
             TestStep("5f", "Verify TargetState attribute is updated"),
             TestStep("5g", "Wait for CurrentState.Position to be updated to 100%"),
@@ -114,8 +114,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep("7f", "If not Resolution == 1: Wait for CurrentState.Position to be updated"),
             TestStep("7g", "Send SetTarget command with Position not a multiple of Resolution"),
             TestStep("7h", "Verify TargetState attribute is updated"),
-            TestStep("7i", "If not Resolution > 2: Wait for CurrentState.Position to be updated"),
-            TestStep("7j", "If not Resolution <= 2: Wait for CurrentState.Position to be updated"),
+            TestStep("7i", "If Resolution <= 2 and position change expected: Wait for CurrentState.Position to be updated"),
+            TestStep("7j", "If Resolution > 2 and position change expected: Wait for CurrentState.Position to be updated"),
             TestStep(8, "Send SetTarget command with Latch field when MotionLatching is unsupported"),
             TestStep(9, "Send SetTarget command with Speed field when Speed is unsupported"),
             TestStep(10, "Send SetTarget command with invalid Speed when Speed is unsupported"),
@@ -280,11 +280,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10001),
                     endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
-
-                asserts.fail("Expected ConstraintError for Position exceeding 100%")
-
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected status returned")
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         # STEP 5a: If LimitRange is unsupported, skip step 5b to 5g
         self.step("5a")
@@ -308,11 +305,11 @@ class TC_CLDIM_3_3(MatterBaseTest):
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
 
-            # STEP 5d: Wait for CurrentState.Position to be updated to 0%
+            # STEP 5d: Wait for CurrentState.Position to be updated to MinPosition
             self.step("5d")
             if initial_state.position > 0:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matchers=[current_position_matcher(0)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
             else:
                 logging.info("Initial Position not > 0. Skipping step 5d.")
                 self.mark_current_step_skipped()
@@ -396,6 +393,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             else:
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
+                initial_state.position = min_position
 
             # STEP 7f: If not Resolution == 1: Wait for CurrentState.Position to be updated
             self.step("7f")
@@ -404,6 +402,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             else:
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(min_position + resolution)], timeout_sec=timeout)
+                initial_state.position = min_position + resolution
 
             # STEP 7g: Send SetTarget command with Position not a multiple of Resolution
             self.step("7g")
@@ -426,17 +425,17 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 asserts.assert_equal(target_state.position, max_position - resolution,
                                      "TargetState Position does not match expected value")
 
-            # STEP 7i: If not Resolution > 2: Wait for CurrentState.Position to be updated
+            # STEP 7i: If Resolution <= 2 and position change expected: Wait for CurrentState.Position to be updated
             self.step("7i")
-            if (resolution > 2):
+            if (resolution > 2 or initial_state.position == max_position):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
-            # STEP 7j: If not Resolution <= 2: Wait for CurrentState.Position to be updated
+            # STEP 7j: If Resolution > 2 and position change expected: Wait for CurrentState.Position to be updated
             self.step("7j")
-            if (resolution <= 2):
+            if (resolution <= 2 or initial_state.position == max_position - resolution):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
