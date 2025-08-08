@@ -491,11 +491,9 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     }
 
     const Dnssd::CommissionNodeData & nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
-    if (nodeData.commissioningMode == 0)
-    {
-        ChipLogProgress(Controller, "Discovered device does not have an open commissioning window.");
-        return false;
-    }
+
+    VerifyOrReturnError(mCommissioner != nullptr, false);
+    VerifyOrReturnError(mCommissioner->HasValidCommissioningMode(nodeData), false);
 
     // Check whether this matches one of our setup payloads.
     for (auto & payload : mSetupPayloads)
