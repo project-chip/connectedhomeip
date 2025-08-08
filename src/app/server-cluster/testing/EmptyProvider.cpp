@@ -23,11 +23,6 @@ using Protocols::InteractionModel::Status;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 
-CHIP_ERROR EmptyProvider::Shutdown()
-{
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR EmptyProvider::Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder)
 {
     return CHIP_NO_ERROR;

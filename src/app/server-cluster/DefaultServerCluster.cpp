@@ -103,7 +103,7 @@ void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
     IncreaseDataVersion();
 
     VerifyOrReturn(mContext != nullptr);
-    mContext->interactionContext->dataModelChangeListener->MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
+    mContext->interactionContext.dataModelChangeListener.MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
 }
 
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const ConcreteClusterPath &) const

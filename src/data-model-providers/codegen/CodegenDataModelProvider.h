@@ -95,6 +95,10 @@ protected:
     virtual void InitDataModelForTesting();
 
 private:
+    // Context is available after startup and cleared in shutdown.
+    // This has a value for as long as we assume the context is valid.
+    std::optional<DataModel::InteractionModelContext> mContext;
+
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
     uint16_t mEndpointIterationHint = 0;

@@ -49,7 +49,7 @@ public:
     void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override
     {
         VerifyOrReturn(mContext != nullptr);
-        (void) mContext->interactionContext->eventsGenerator->GenerateEvent(softwareFault, kRootEndpointId);
+        (void) mContext->interactionContext.eventsGenerator.GenerateEvent(softwareFault, kRootEndpointId);
     }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
