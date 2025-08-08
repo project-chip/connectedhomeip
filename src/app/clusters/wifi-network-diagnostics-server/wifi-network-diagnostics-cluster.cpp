@@ -116,14 +116,14 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
     };
 
     chip::app::OptionalAttributeSet<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,         //
-                                   WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,        //
-                                   WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,           //
-                                   WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,          //
-                                   WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, //
-                                   WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,   //
-                                   WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, //
-                                   WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id    //
-                                   >
+                                    WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,        //
+                                    WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,           //
+                                    WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,          //
+                                    WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, //
+                                    WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,   //
+                                    WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, //
+                                    WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id    //
+                                    >
         optionalAttributeSet(mLogic.GetOptionalAttributeSet());
 
     if (featureFlags.Has(Feature::kErrorCounts))

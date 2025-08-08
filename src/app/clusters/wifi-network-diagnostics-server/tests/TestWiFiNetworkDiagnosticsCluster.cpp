@@ -216,8 +216,8 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         BitFlags<WiFiNetworkDiagnostics::Feature> features;
         features.Set(WiFiNetworkDiagnostics::Feature::kErrorCounts);
         features.Set(WiFiNetworkDiagnostics::Feature::kPacketCounts);
-        WiFiDiagnosticsServerCluster cluster(kRootEndpointId, allProvider,
-                                             WiFiDiagnosticsServerLogic::OptionalAttributeSet().Set<CurrentMaxRate::Id>(), features);
+        WiFiDiagnosticsServerCluster cluster(
+            kRootEndpointId, allProvider, WiFiDiagnosticsServerLogic::OptionalAttributeSet().Set<CurrentMaxRate::Id>(), features);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), commandsBuilder),

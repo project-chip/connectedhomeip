@@ -168,12 +168,13 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         };
 
         // Enable all the optional attributes
-        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet = GeneralDiagnosticsCluster::OptionalAttributeSet()
-                                                                                     .Set<TotalOperationalHours::Id>()
-                                                                                     .Set<BootReason::Id>()
-                                                                                     .Set<ActiveHardwareFaults::Id>()
-                                                                                     .Set<ActiveRadioFaults::Id>()
-                                                                                     .Set<ActiveNetworkFaults::Id>();
+        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
+            GeneralDiagnosticsCluster::OptionalAttributeSet()
+                .Set<TotalOperationalHours::Id>()
+                .Set<BootReason::Id>()
+                .Set<ActiveHardwareFaults::Id>()
+                .Set<ActiveRadioFaults::Id>()
+                .Set<ActiveNetworkFaults::Id>();
 
         ScopedDiagnosticsProvider<AllProvider> nullProvider;
         GeneralDiagnosticsCluster cluster(optionalAttributeSet);

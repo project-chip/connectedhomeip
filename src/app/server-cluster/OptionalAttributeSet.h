@@ -114,7 +114,8 @@ private:
 ///      .Set<GeneralDiagnostics::Attributes::BootReason::Id>();
 ///
 /// Cluster implementations can then store a
-///   Constructor(const GeneralDiagnostics::OptionalAttributeSet& optionalAttributeSet) : mOptionalAttributeSet(optionalAttributeSet) {...}
+///   Constructor(const GeneralDiagnostics::OptionalAttributeSet& optionalAttributeSet) :
+///   mOptionalAttributeSet(optionalAttributeSet) {...}
 ///
 /// where:
 ///   const AttributeSet mOptionalAttributeSet;

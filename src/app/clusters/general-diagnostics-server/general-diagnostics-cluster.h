@@ -40,13 +40,13 @@ class GeneralDiagnosticsCluster : public DefaultServerCluster
 public:
     using OptionalAttributeSet =
         chip::app::OptionalAttributeSet<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
-                                       GeneralDiagnostics::Attributes::BootReason::Id,            //
-                                       GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
-                                       GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
-                                       GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id    //
-                                       // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
-                                       //       it will be forced as mandatory by the cluster constructor
-                                       >;
+                                        GeneralDiagnostics::Attributes::BootReason::Id,            //
+                                        GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
+                                        GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
+                                        GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id    //
+                                        // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
+                                        //       it will be forced as mandatory by the cluster constructor
+                                        >;
 
     GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),

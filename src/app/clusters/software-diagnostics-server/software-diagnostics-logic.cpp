@@ -110,7 +110,8 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
         Attributes::CurrentHeapHighWatermark::kMetadataEntry, //
     };
 
-    return listBuilder.Append(Span(SoftwareDiagnostics::Attributes::kMandatoryMetadata), Span(optionalEntries), mOptionalAttributeSet);
+    return listBuilder.Append(Span(SoftwareDiagnostics::Attributes::kMandatoryMetadata), Span(optionalEntries),
+                              mOptionalAttributeSet);
 }
 
 } // namespace Clusters
