@@ -90,6 +90,7 @@ ASR
 AssertionError
 AST
 ASYNC
+AsyncZeroconfServiceTypes
 ATL
 ATLs
 atomics
@@ -421,6 +422,7 @@ DevKitC
 DevKitM
 devtype
 df
+dff
 dfe
 DFILE
 dfu
@@ -695,6 +697,7 @@ HydrogenSulphideConcentrationMeasurement
 IasAce
 IasWd
 iaszone
+IB
 ibb
 ICA
 ICAC
@@ -1687,6 +1690,7 @@ zclwrite
 ZephyrConfig
 zephyrproject
 zhengyaohan
+Zeroconf
 Zigbee
 zigbeealliance
 zigbeethread
