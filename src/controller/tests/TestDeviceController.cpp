@@ -201,10 +201,8 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
         DeviceControllerFactory::GetInstance().Shutdown();
     }
-    // Free opCertStore and engine before finish
-    opCertStore.Finish();
+
     engine->Shutdown();
-    sProvider.Finish();
 }
 
 // Add more test cases as needed to cover different scenarios
