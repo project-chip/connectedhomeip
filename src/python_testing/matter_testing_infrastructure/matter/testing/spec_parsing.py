@@ -35,7 +35,7 @@ from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemLocation,
-                                            ProblemNotice, ProblemSeverity)
+                                            ProblemNotice, ProblemSeverity, UnknownProblemLocation)
 from matter.tlv import uint
 
 _PRIVILEGE_STR = {
