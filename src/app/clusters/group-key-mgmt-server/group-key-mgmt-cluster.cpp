@@ -35,14 +35,6 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace {
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    GroupKeyManagement::Attributes::GroupKeyMap::kMetadataEntry,
-    GroupKeyManagement::Attributes::GroupTable::kMetadataEntry,
-    GroupKeyManagement::Attributes::MaxGroupsPerFabric::kMetadataEntry,
-    GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::kMetadataEntry,
-};
-}
 
 struct GroupTableCodec
 {
@@ -227,8 +219,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const Da
 
 CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) {
     AttributeListBuilder listBuilder(builder);
-    // TODO: remove the hard coded mandatory attributes and use the code generated ones
-    return listBuilder.Append(Span(kMandatoryAttributes), Span<const AttributeListBuilder::OptionalAttributeEntry>());
+    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata), Span<const AttributeListBuilder::OptionalAttributeEntry>());
 }
 
 CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
