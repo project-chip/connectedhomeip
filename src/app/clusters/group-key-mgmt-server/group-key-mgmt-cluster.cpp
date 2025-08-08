@@ -622,13 +622,13 @@ namespace Clusters {
 
 std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) 
+                                                               CommandHandler * handler)
 {
     Credentials::GroupDataProvider * provider = nullptr;
     const FabricInfo * fabric                 = nullptr;
-    
+
     /*
-     * Fetch provider and fabric before command handling. Provider needed for many of the key set 
+     * Fetch provider and fabric before command handling. Provider needed for many of the key set
      * functions and the fabric index is needed for the GroupKeyManagement Decode function.
     */
     if (!GetProviderAndFabric(handler, request.path, &provider, &fabric))
@@ -637,7 +637,7 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCo
         return std::nullopt;
     }
     const FabricIndex fabric_index = fabric->GetFabricIndex();
-    
+
     switch (request.path.mCommandId)
     {
     case GroupKeyManagement::Commands::KeySetWrite::Id: {
@@ -698,7 +698,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const Da
                                                  AttributeValueDecoder & decoder) {
     switch(request.path.mAttributeId){
         case GroupKeyMap::Id: {
-            // TODO: wrap this call in NotifyAttributeChangedIfSuccess() 
+            // TODO: wrap this call in NotifyAttributeChangedIfSuccess()
             return WriteGroupKeyMap(request.path, decoder);
         }
         default:
@@ -713,7 +713,7 @@ CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & pat
 
 CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) {
-    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { 
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
         Commands::KeySetWrite::kMetadataEntry,
         Commands::KeySetRead::kMetadataEntry,
         Commands::KeySetRemove::kMetadataEntry,
@@ -721,7 +721,7 @@ CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath
     };
     return builder.ReferenceExisting(kAcceptedCommands);
 }
-    
+
 CHIP_ERROR GroupKeyManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) {
     static constexpr CommandId kGeneratedCommands[] = {
         Commands::KeySetReadAllIndicesResponse::Id,
