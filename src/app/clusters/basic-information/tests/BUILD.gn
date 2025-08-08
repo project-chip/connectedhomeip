@@ -12,17 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
-)
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/BasicInformationCluster.cpp"
-    "${CLUSTER_DIR}/BasicInformationCluster.h"
-)
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestBasicInformationCluster"
+
+  test_sources = [ "TestBasicInformationCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/basic-information",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
+  ]
+}

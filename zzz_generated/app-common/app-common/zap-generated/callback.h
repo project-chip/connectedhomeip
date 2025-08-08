@@ -6988,12 +6988,6 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData);
 /**
- * @brief Basic Information Cluster MfgSpecificPing Command callback (from client)
- */
-bool emberAfBasicInformationClusterMfgSpecificPingCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::DecodableType & commandData);
-/**
  * @brief OTA Software Update Requestor Cluster AnnounceOTAProvider Command callback (from client)
  */
 bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
