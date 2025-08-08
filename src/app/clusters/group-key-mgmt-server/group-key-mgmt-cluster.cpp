@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,10 +32,7 @@ using namespace chip::app::Clusters::GroupKeyManagement::Attributes;
 using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-
+namespace {
 struct GroupTableCodec
 {
     static constexpr TLV::Tag TagFabric()
@@ -131,117 +128,7 @@ struct KeySetReadAllIndicesResponse
     }
 };
 
-std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) 
-{
-    Credentials::GroupDataProvider * provider = nullptr;
-    const FabricInfo * fabric                 = nullptr;
-    
-    /*
-     * Fetch provider and fabric before command handling. Provider needed for many of the key set 
-     * functions and the fabric index is needed for the GroupKeyManagement Decode function.
-    */
-    if (!GetProviderAndFabric(handler, request.path, &provider, &fabric))
-    {
-        // Command will already have status populated from validation.
-        return std::nullopt;
-    }
-    FabricIndex fabric_index = fabric->GetFabricIndex();
-    
-    switch (request.path.mCommandId)
-    {
-    case GroupKeyManagement::Commands::KeySetWrite::Id: {
-        GroupKeyManagement::Commands::KeySetWrite::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
-        return HandleKeySetWrite(handler, request.path, request_data);
-    }
-    case GroupKeyManagement::Commands::KeySetRead::Id: {
-        GroupKeyManagement::Commands::KeySetRead::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
-        return HandleKeySetRead(handler, request.path, request_data);
-    }
-    case GroupKeyManagement::Commands::KeySetRemove::Id: {
-        GroupKeyManagement::Commands::KeySetRemove::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
-        return HandleKeySetRemove(handler, request.path, request_data);
-    }
-    case GroupKeyManagement::Commands::KeySetReadAllIndices::Id: {
-        GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
-        return HandleKeySetReadAllIndices(handler, request.path, request_data);
-    }
-    default:
-        return Protocols::InteractionModel::Status::UnsupportedCommand;
-    }
-}
-
-DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                       AttributeValueEncoder & encoder)
-{
-    switch (request.path.mAttributeId)
-    {
-        case GroupKeyManagement::Attributes::ClusterRevision::Id:
-            return encoder.Encode(GroupKeyManagement::kRevision);
-        case Attributes::FeatureMap::Id: {
-            uint32_t features = 0;
-            if (IsMCSPSupported())
-            {
-                // TODO: Once there is MCSP support, this will need to add the
-                // right feature bit.
-            }
-            return encoder.Encode(features);
-        }
-        case GroupKeyManagement::Attributes::GroupKeyMap::Id:
-            return ReadGroupKeyMap(encoder);
-        case GroupKeyManagement::Attributes::GroupTable::Id:
-            return ReadGroupTable(encoder);
-        case GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id:
-            return ReadMaxGroupsPerFabric(encoder);
-        case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
-            return ReadMaxGroupKeysPerFabric(encoder);
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedCommand;
-    }
-}
-
-DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                 AttributeValueDecoder & decoder) {
-    switch(request.path.mAttributeId){
-        case GroupKeyMap::Id: {
-            // TODO: wrap this call in NotifyAttributeChangedIfSuccess() 
-            return WriteGroupKeyMap(request.path, decoder);
-        }
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedWrite;
-    }
-}
-
-CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) {
-    AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata), Span<const AttributeListBuilder::OptionalAttributeEntry>());
-}
-
-CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) {
-    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { 
-        Commands::KeySetWrite::kMetadataEntry,
-        Commands::KeySetRead::kMetadataEntry,
-        Commands::KeySetRemove::kMetadataEntry,
-        Commands::KeySetReadAllIndices::kMetadataEntry,
-    };
-    return builder.ReferenceExisting(kAcceptedCommands);
-}
-    
-CHIP_ERROR GroupKeyManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) {
-    static constexpr CommandId kGeneratedCommands[] = {
-        Commands::KeySetReadAllIndicesResponse::Id,
-        Commands::KeySetReadResponse::Id,
-    };
-    return builder.ReferenceExisting(kGeneratedCommands);
-}
-
-CHIP_ERROR GroupKeyManagementCluster::ReadGroupKeyMap(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadGroupKeyMap(AttributeValueEncoder & aEncoder)
 {
     auto provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
@@ -280,7 +167,7 @@ CHIP_ERROR GroupKeyManagementCluster::ReadGroupKeyMap(AttributeValueEncoder & aE
     return err;
 }
 
-CHIP_ERROR GroupKeyManagementCluster::WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     auto fabric_index = aDecoder.AccessingFabricIndex();
     auto provider     = GetGroupDataProvider();
@@ -339,7 +226,7 @@ CHIP_ERROR GroupKeyManagementCluster::WriteGroupKeyMap(const ConcreteDataAttribu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GroupKeyManagementCluster::ReadGroupTable(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadGroupTable(AttributeValueEncoder & aEncoder)
 {
     auto provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
@@ -373,21 +260,21 @@ CHIP_ERROR GroupKeyManagementCluster::ReadGroupTable(AttributeValueEncoder & aEn
     return err;
 }
 
-CHIP_ERROR GroupKeyManagementCluster::ReadMaxGroupsPerFabric(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadMaxGroupsPerFabric(AttributeValueEncoder & aEncoder)
 {
     auto * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
     return aEncoder.Encode(provider->GetMaxGroupsPerFabric());
 }
 
-CHIP_ERROR GroupKeyManagementCluster::ReadMaxGroupKeysPerFabric(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadMaxGroupKeysPerFabric(AttributeValueEncoder & aEncoder)
 {
     auto * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
     return aEncoder.Encode(provider->GetMaxGroupKeysPerFabric());
 }
 
-bool GroupKeyManagementCluster::GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                           Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
 {
     VerifyOrDie(commandObj != nullptr);
@@ -417,7 +304,7 @@ bool GroupKeyManagementCluster::GetProviderAndFabric(chip::app::CommandHandler *
 }
 
 Status
-GroupKeyManagementCluster::ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
+ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
 {
     // SPEC: If the EpochKey0 field is null or its associated EpochStartTime0 field is null, then this command SHALL fail with an
     // INVALID_COMMAND status code responded to the client.
@@ -531,19 +418,11 @@ GroupKeyManagementCluster::ValidateKeySetWriteArguments(const chip::app::Cluster
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKeySetWrite(
+std::optional<DataModel::ActionReturnStatus> HandleKeySetWrite(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData,
+    Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
-    Credentials::GroupDataProvider * provider = nullptr;
-    const FabricInfo * fabric                 = nullptr;
-
-    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
-    {
-        // Command will already have status populated from validation.
-        return std::nullopt;
-    }
-
     // Pre-validate all complex data dependency assumptions about the epoch keys
     Status status = ValidateKeySetWriteArguments(commandData);
     if (status != Status::Success)
@@ -562,7 +441,7 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKe
         return std::nullopt;
     }
 
-    if (!IsMCSPSupported() &&
+    if (!GroupKeyManagementCluster::IsMCSPSupported() &&
         commandData.groupKeySet.groupKeySecurityPolicy == GroupKeySecurityPolicyEnum::kCacheAndSync)
     {
         // When CacheAndSync is not supported in the FeatureMap of this cluster,
@@ -633,19 +512,11 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKe
 
 }
 
-std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKeySetRead(
+std::optional<DataModel::ActionReturnStatus> HandleKeySetRead(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData)
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData,
+    Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
-    Credentials::GroupDataProvider * provider = nullptr;
-    const FabricInfo * fabric                 = nullptr;
-
-    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
-    {
-        // Command will already have status populated from validation.
-        return std::nullopt;
-    }
-
     FabricIndex fabricIndex = fabric->GetFabricIndex();
     GroupDataProvider::KeySet keyset;
     if (CHIP_NO_ERROR != provider->GetKeySet(fabricIndex, commandData.groupKeySetID, keyset))
@@ -697,20 +568,12 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKe
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKeySetRemove(
+std::optional<DataModel::ActionReturnStatus> HandleKeySetRemove(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData)
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData,
+    Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 
 {
-    Credentials::GroupDataProvider * provider = nullptr;
-    const FabricInfo * fabric                 = nullptr;
-
-    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
-    {
-        // Command will already have status populated from validation.
-        return std::nullopt;
-    }
-
     if (commandData.groupKeySetID == GroupDataProvider::kIdentityProtectionKeySetId)
     {
         // SPEC: This command SHALL fail with an INVALID_COMMAND status code back to the initiator if the GroupKeySetID being
@@ -734,19 +597,11 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKe
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKeySetReadAllIndices(
+std::optional<DataModel::ActionReturnStatus> HandleKeySetReadAllIndices(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData)
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData,
+    Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
-    Credentials::GroupDataProvider * provider = nullptr;
-    const FabricInfo * fabric                 = nullptr;
-
-    if (!GetProviderAndFabric(commandObj, commandPath, &provider, &fabric))
-    {
-        // Command will already have status populated from validation.
-        return std::nullopt;
-    }
-
     FabricIndex fabricIndex = fabric->GetFabricIndex();
     auto keysIt             = provider->IterateKeySets(fabricIndex);
     if (nullptr == keysIt)
@@ -758,6 +613,121 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::HandleKe
     commandObj->AddResponse(commandPath, KeySetReadAllIndicesResponse(keysIt));
     keysIt->Release();
     return std::nullopt;
+}
+}
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) 
+{
+    Credentials::GroupDataProvider * provider = nullptr;
+    const FabricInfo * fabric                 = nullptr;
+    
+    /*
+     * Fetch provider and fabric before command handling. Provider needed for many of the key set 
+     * functions and the fabric index is needed for the GroupKeyManagement Decode function.
+    */
+    if (!GetProviderAndFabric(handler, request.path, &provider, &fabric))
+    {
+        // Command will already have status populated from validation.
+        return std::nullopt;
+    }
+    const FabricIndex fabric_index = fabric->GetFabricIndex();
+    
+    switch (request.path.mCommandId)
+    {
+    case GroupKeyManagement::Commands::KeySetWrite::Id: {
+        GroupKeyManagement::Commands::KeySetWrite::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
+        return HandleKeySetWrite(handler, request.path, request_data, provider, fabric);
+    }
+    case GroupKeyManagement::Commands::KeySetRead::Id: {
+        GroupKeyManagement::Commands::KeySetRead::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
+        return HandleKeySetRead(handler, request.path, request_data, provider, fabric);
+    }
+    case GroupKeyManagement::Commands::KeySetRemove::Id: {
+        GroupKeyManagement::Commands::KeySetRemove::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
+        return HandleKeySetRemove(handler, request.path, request_data, provider, fabric);
+    }
+    case GroupKeyManagement::Commands::KeySetReadAllIndices::Id: {
+        GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabric_index));
+        return HandleKeySetReadAllIndices(handler, request.path, request_data, provider, fabric);
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+}
+
+DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                       AttributeValueEncoder & encoder)
+{
+    switch (request.path.mAttributeId)
+    {
+        case GroupKeyManagement::Attributes::ClusterRevision::Id:
+            return encoder.Encode(GroupKeyManagement::kRevision);
+        case Attributes::FeatureMap::Id: {
+            uint32_t features = 0;
+            if (IsMCSPSupported())
+            {
+                // TODO: Once there is MCSP support, this will need to add the
+                // right feature bit.
+            }
+            return encoder.Encode(features);
+        }
+        case GroupKeyManagement::Attributes::GroupKeyMap::Id:
+            return ReadGroupKeyMap(encoder);
+        case GroupKeyManagement::Attributes::GroupTable::Id:
+            return ReadGroupTable(encoder);
+        case GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id:
+            return ReadMaxGroupsPerFabric(encoder);
+        case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
+            return ReadMaxGroupKeysPerFabric(encoder);
+        default:
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+}
+
+DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) {
+    switch(request.path.mAttributeId){
+        case GroupKeyMap::Id: {
+            // TODO: wrap this call in NotifyAttributeChangedIfSuccess() 
+            return WriteGroupKeyMap(request.path, decoder);
+        }
+        default:
+            return Protocols::InteractionModel::Status::UnsupportedWrite;
+    }
+}
+
+CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) {
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata), Span<const AttributeListBuilder::OptionalAttributeEntry>());
+}
+
+CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) {
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { 
+        Commands::KeySetWrite::kMetadataEntry,
+        Commands::KeySetRead::kMetadataEntry,
+        Commands::KeySetRemove::kMetadataEntry,
+        Commands::KeySetReadAllIndices::kMetadataEntry,
+    };
+    return builder.ReferenceExisting(kAcceptedCommands);
+}
+    
+CHIP_ERROR GroupKeyManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) {
+    static constexpr CommandId kGeneratedCommands[] = {
+        Commands::KeySetReadAllIndicesResponse::Id,
+        Commands::KeySetReadResponse::Id,
+    };
+    return builder.ReferenceExisting(kGeneratedCommands);
 }
 
 }
