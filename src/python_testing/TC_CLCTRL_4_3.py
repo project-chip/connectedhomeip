@@ -607,7 +607,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = overall_current_state.position
             current_latch: bool = overall_current_state.latch if overall_current_state is not NullValue else NullValue
-            logging.info(f"current_speed: {current_speed}, current_latch: {current_latch}")
+            logging.info(f"current_position: {current_position}, current_latch: {current_latch}")
             
             self.step("9c")
             if is_latching_supported and current_latch is True:
