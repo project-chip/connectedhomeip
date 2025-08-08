@@ -18,10 +18,10 @@
 #include <app/clusters/time-format-localization-server/time-format-localization-logic.h>
 
 #include <app/EventLogging.h>
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/TimeFormatLocalization/Metadata.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/TimeFormatLocalization/Metadata.h>
 
 using namespace chip::app::Clusters::TimeFormatLocalization;
 using namespace chip::app::Clusters::TimeFormatLocalization::Attributes;
@@ -74,10 +74,11 @@ void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistencePro
     VerifyOrReturn(attrProvider != nullptr);
 
     // Try to read existing calendar type from persistence
-    AttributePersistence attrPersistence {*attrProvider};
+    AttributePersistence attrPersistence{ *attrProvider };
 
-    attrPersistence.LoadNativeEndianValue<CalendarTypeEnum>({ kRootEndpointId, TimeFormatLocalization::Id,
-        TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType, kDefaultCalendarType);
+    attrPersistence.LoadNativeEndianValue<CalendarTypeEnum>(
+        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType,
+        kDefaultCalendarType);
 
     // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
     // If initial value is not one of the allowed values, pick one valid value and write it.
@@ -86,17 +87,16 @@ void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistencePro
     {
         mCalendarType = validCalendar;
     }
-
 }
 
 void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvider * attrProvider)
 {
     VerifyOrReturn(attrProvider != nullptr);
-    AttributePersistence attrPersistence {*attrProvider};
+    AttributePersistence attrPersistence{ *attrProvider };
 
-    attrPersistence.LoadNativeEndianValue<HourFormatEnum>({ kRootEndpointId, TimeFormatLocalization::Id,
-        TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat, kDefaultHourFormat);
-
+    attrPersistence.LoadNativeEndianValue<HourFormatEnum>(
+        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
+        kDefaultHourFormat);
 }
 
 CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const
@@ -155,11 +155,11 @@ TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveC
 }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                               AttributePersistenceProvider * attrProvider,
-                                                                               AttributeValueDecoder & decoder)
+                                                                          AttributePersistenceProvider * attrProvider,
+                                                                          AttributeValueDecoder & decoder)
 {
     VerifyOrReturnValue(attrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
-    AttributePersistence attrPersistence {*attrProvider};
+    AttributePersistence attrPersistence{ *attrProvider };
 
     switch (request.path.mAttributeId)
     {
@@ -167,7 +167,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const 
         CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue(
             { kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, decoder, mHourFormat);
         return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                     : Protocols::InteractionModel::Status::ConstraintError;
+                                       : Protocols::InteractionModel::Status::ConstraintError;
     }
 
     case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
@@ -188,7 +188,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const 
             { kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, decoder, mCalendarType);
 
         return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                     : Protocols::InteractionModel::Status::WriteIgnored;
+                                       : Protocols::InteractionModel::Status::WriteIgnored;
     }
 
     default:
@@ -206,8 +206,8 @@ CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataMod
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-        {mFeatures.Has(Feature::kCalendarFormat), ActiveCalendarType::kMetadataEntry},
-        {mFeatures.Has(Feature::kCalendarFormat), SupportedCalendarTypes::kMetadataEntry}
+        { mFeatures.Has(Feature::kCalendarFormat), ActiveCalendarType::kMetadataEntry },
+        { mFeatures.Has(Feature::kCalendarFormat), SupportedCalendarTypes::kMetadataEntry }
     };
 
     return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));

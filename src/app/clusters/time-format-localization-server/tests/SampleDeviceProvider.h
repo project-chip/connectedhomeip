@@ -16,9 +16,9 @@
  */
 #pragma once
 
+#include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
 #include <platform/DeviceInfoProvider.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,7 +46,7 @@ protected:
         UserLabelIteratorImpl() = default;
         size_t Count() override { return 0; }
         bool Next(UserLabelType & output) override { return false; }
-        void Release() override {  }
+        void Release() override {}
     };
 
     class SupportedLocalesIteratorImpl : public SupportedLocalesIterator
@@ -55,7 +55,7 @@ protected:
         SupportedLocalesIteratorImpl() = default;
         size_t Count() override { return 0; }
         bool Next(CharSpan & output) override { return false; }
-        void Release() override {  }
+        void Release() override {}
     };
 
     class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
@@ -85,7 +85,10 @@ protected:
 
     CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; };
     CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override { return CHIP_NO_ERROR; };
-    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; };
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override
+    {
+        return CHIP_NO_ERROR;
+    };
     CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; };
 };
 

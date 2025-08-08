@@ -170,10 +170,7 @@ TEST_F(TestTimeFormatLocalizationCluster, WriteAttributes)
     class TestAttributeProvider : public AttributePersistenceProvider
     {
     public:
-        TestAttributeProvider()
-        {
-            Reset();
-        }
+        TestAttributeProvider() { Reset(); }
 
         void Reset()
         {

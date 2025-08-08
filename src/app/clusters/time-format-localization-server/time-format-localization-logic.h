@@ -34,14 +34,13 @@ namespace Clusters {
 class TimeFormatLocalizationLogic
 {
 public:
-    static constexpr TimeFormatLocalization::CalendarTypeEnum kDefaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+    static constexpr TimeFormatLocalization::CalendarTypeEnum kDefaultCalendarType =
+        TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
     static constexpr TimeFormatLocalization::HourFormatEnum kDefaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
-    static constexpr size_t kMaxExpectedAttributeCount = 3;
+    static constexpr size_t kMaxExpectedAttributeCount                         = 3;
 
     TimeFormatLocalizationLogic(BitFlags<TimeFormatLocalization::Feature> features) :
-        mFeatures(features),
-        mHourFormat(kDefaultHourFormat),
-        mCalendarType(kDefaultCalendarType) {};
+        mFeatures(features), mHourFormat(kDefaultHourFormat), mCalendarType(kDefaultCalendarType){};
     virtual ~TimeFormatLocalizationLogic() = default;
 
     void Startup(AttributePersistenceProvider * attrStorage);
@@ -52,8 +51,7 @@ public:
     TimeFormatLocalization::HourFormatEnum GetHourFormat() const;
     TimeFormatLocalization::CalendarTypeEnum GetActiveCalendarType() const;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                               AttributePersistenceProvider * attrProvider,
-                                               AttributeValueDecoder & decoder);
+                                                 AttributePersistenceProvider * attrProvider, AttributeValueDecoder & decoder);
     CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) const;
 
