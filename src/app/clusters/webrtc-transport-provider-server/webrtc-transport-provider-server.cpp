@@ -224,7 +224,7 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
     return session;
 }
 
-uint16_t WebRTCTransportProviderServer::GenerateSessionId()
+CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessionId)
 {
     static uint16_t lastSessionId = 0;
     uint16_t candidateId          = 0;
@@ -243,14 +243,14 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionId()
 
         if (FindSession(candidateId) == nullptr)
         {
-            return candidateId;
+            outSessionId = candidateId;
+            return CHIP_NO_ERROR;
         }
     }
 
-    // This should never happen in practice since we support 65534 sessions
-    // and typical applications will have far fewer active sessions
-    ChipLogError(Zcl, "All session IDs are in use!");
-    chipDie();
+    // All session IDs are in use
+    ChipLogError(Zcl, "All session IDs are in use! Cannot generate new session ID.");
+    return CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED;
 }
 
 // Command Handlers
@@ -345,7 +345,15 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
     // Prepare the arguments for the delegate.
     Delegate::OfferRequestArgs args;
-    args.sessionId             = GenerateSessionId();
+    uint16_t sessionId;
+    CHIP_ERROR err = GenerateSessionId(sessionId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot generate session ID");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        return;
+    }
+    args.sessionId             = sessionId;
     args.streamUsage           = req.streamUsage;
     args.videoStreamId         = req.videoStreamID;
     args.audioStreamId         = req.audioStreamID;
@@ -554,8 +562,16 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // Generate new sessiond id
-        args.sessionId = GenerateSessionId();
+        // Generate new session id
+        uint16_t sessionId;
+        err = GenerateSessionId(sessionId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot generate session ID");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+            return;
+        }
+        args.sessionId = sessionId;
     }
 
     args.streamUsage           = req.streamUsage;
