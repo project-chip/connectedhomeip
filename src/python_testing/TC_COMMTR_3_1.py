@@ -130,22 +130,22 @@ class TC_COMMTR_3_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
                                          max_interval_sec=10, keepSubscriptions=True)
 
         self.step("3")
-        # TH reads MeteredQuantity attribute and saves value as metered_quantity.
+        # TH reads MeteredQuantity attribute and saves value as MeteredQuantityValue.
         MeteredQuantityValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                               attribute=cluster.Attributes.MeteredQuantity)
 
         self.step("4")
-        # TH reads MeteredQuantity attribute and saves value as metered_quantity.
+        # TH reads MeteredQuantity attribute and saves value as MeteredQuantityTimestampValue.
         MeteredQuantityTimestampValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                                        attribute=cluster.Attributes.MeteredQuantityTimestamp)
 
         self.step("5")
-        # TH reads MeteredQuantity attribute and saves value as metered_quantity.
+        # TH reads MeteredQuantity attribute and saves value as TariffUnitValue.
         TariffUnitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                          attribute=cluster.Attributes.TariffUnit)
 
         self.step("6")
-        # TH reads MeteredQuantity attribute and saves value as metered_quantity.
+        # TH reads MeteredQuantity attribute and saves value as MaxMeteredQuantitiesValue.
         MaxMeteredQuantitiesValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                                    attribute=cluster.Attributes.MaximumMeteredQuantities)
 
