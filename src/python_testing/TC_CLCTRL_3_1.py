@@ -35,7 +35,7 @@
 
 import logging
 
-from chip.clusters.Types import NullValue
+from matter.clusters.Types import NullValue
 from mobly import asserts
 
 import matter.clusters as Clusters
