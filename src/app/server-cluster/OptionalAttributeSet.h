@@ -48,6 +48,9 @@ struct IsOneOf<T>
 /// within a 32-bit bitset as most attributes start with low IDs and are incremented
 /// by one.
 ///
+/// NOTE: this will NOT work for all possible attributes/clusters, only for clusters
+///       whose optionnal attributes all have IDs under 32.
+///
 /// The implementation of the class generally is a wrapper over a bitset with a
 /// `IsSet()` method. Configurations should use the OptionalAttributeSet<...> class.
 class AttributeSet
@@ -59,6 +62,11 @@ public:
     AttributeSet & operator=(const AttributeSet & other) = default;
     AttributeSet & operator=(AttributeSet && other)      = default;
 
+    // Checks if an attribute ID is set.
+    //
+    // NOTE: this does NOT validate that the ID is < 32 because all the Set functions
+    //       generally are asserted on this (forceset as well as subclasses).
+    //       This MUST be called with id < 32.
     constexpr bool IsSet(AttributeId id) const { return (mSetBits & (1u << id)) != 0; }
 
     /// Exposes a "force attribute bit set" without extra validation,
@@ -94,6 +102,10 @@ private:
 ///
 /// Specifically it requires that attributes are declared as part of the template
 /// parameter pack.
+///
+/// NOTE: this will NOT work for all possible attributes/clusters, only for clusters
+///       whose optional attributes all have IDs under 32. Static asserts are in place
+///       to ensure that arguments to the template are valid.
 ///
 /// Example usage:
 ///
