@@ -27,7 +27,7 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
                                            type_matches)
 from matter.testing.pics import parse_pics, parse_pics_xml
-from matter.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
+from matter.testing.taglist_and_topology_test import (TagProblem, build_tree_for_graph, create_device_type_list_for_root, create_device_type_lists,
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from matter.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
@@ -206,7 +206,8 @@ class TestMatterTestingSupport(MatterBaseTest):
         secs = get_wait_seconds_from_set_time(th_utc, 15)
         asserts.assert_equal(secs, 14)
 
-    def create_example_topology(self):
+    @staticmethod
+    def create_example_topology():
         """Creates a limited example of a wildcard read that contains only the descriptor cluster parts list and device types"""
         def create_endpoint(parts_list: list[uint], device_types: list[uint]):
             endpoint = {}
@@ -215,7 +216,9 @@ class TestMatterTestingSupport(MatterBaseTest):
                 device_types_structs.append(Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type, revision=1))
             endpoint[Clusters.Descriptor] = {Clusters.Descriptor.Attributes.PartsList: parts_list,
                                              Clusters.Descriptor.Attributes.DeviceTypeList: device_types_structs,
-                                             Clusters.Descriptor.Attributes.FeatureMap: 0}
+                                             Clusters.Descriptor.Attributes.FeatureMap: 0,
+                                             Clusters.Descriptor.Attributes.ServerList: [],
+                                             Clusters.Descriptor.Attributes.ClientList: []}
             return endpoint
 
         endpoints = {}
@@ -257,12 +260,16 @@ class TestMatterTestingSupport(MatterBaseTest):
         endpoints[19] = create_endpoint([], [1])
         endpoints[20] = create_endpoint([], [1])
         endpoints[21] = create_endpoint([], [1])
+        endpoints[0][Clusters.BasicInformation] = {}
+        endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID] = 0xFFF1
+        endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductID] = 0x8000
+        endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion] = 1
 
         return endpoints
 
     def test_cycle_detection_and_splitting(self):
         # Example topology has no cycles
-        endpoints = self.create_example_topology()
+        endpoints = TestMatterTestingSupport.create_example_topology()
         flat, tree = separate_endpoint_types(endpoints)
         asserts.assert_equal(len(flat), len(set(flat)), "Duplicate endpoints found in flat list")
         asserts.assert_equal(len(tree), len(set(tree)), "Duplicate endpoints found in tree list")
@@ -324,7 +331,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         asserts.assert_equal(problems, [2, 3, 4, 5, 9, 10, 13, 14, 16, 17, 20])
 
     def test_flat_list(self):
-        endpoints = self.create_example_topology()
+        endpoints = TestMatterTestingSupport.create_example_topology()
         # check the aggregator endpoint to ensure it's ok - aggregator is on 11
         asserts.assert_true(flat_list_ok(11, endpoints), "Incorrect failure on flat list")
         # Remove one of the sub-children endpoints from the parts list - it should fail
@@ -332,14 +339,14 @@ class TestMatterTestingSupport(MatterBaseTest):
         asserts.assert_false(flat_list_ok(11, endpoints), "Incorrect pass on flat list missing a part list entry")
 
     def test_get_all_children(self):
-        endpoints = self.create_example_topology()
+        endpoints = TestMatterTestingSupport.create_example_topology()
         asserts.assert_equal(get_all_children(2, endpoints), {1, 3, 4, 5, 9}, "Child list for ep2 is incorrect")
         asserts.assert_equal(get_all_children(6, endpoints), {7, 8}, "Child list for ep6 is incorrect")
         asserts.assert_equal(get_all_children(13, endpoints), {12, 14, 15, 16}, "Child list for ep13 is incorrect")
         asserts.assert_equal(get_all_children(17, endpoints), {18, 19}, "Child list for ep17 is incorrect")
 
     def test_get_tree_roots(self):
-        endpoints = self.create_example_topology()
+        endpoints = TestMatterTestingSupport.create_example_topology()
         _, tree = separate_endpoint_types(endpoints)
         asserts.assert_equal(find_tree_roots(tree, endpoints), {2, 6, 13, 17}, "Incorrect tree root list")
 
@@ -360,7 +367,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         # 17 - 18
         #    - 19
 
-        endpoints = self.create_example_topology()
+        endpoints = TestMatterTestingSupport.create_example_topology()
         # First test, everything in every tree has the same device type, so the device lists
         # should contain all the device endpoints
         _, tree = separate_endpoint_types(endpoints)
@@ -580,7 +587,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         # There are 4 direct children of root 0
         # node 2, node 6 and node 10 all have device ID 1
         # node 11 is an aggregator
-        endpoints = self.create_example_topology()
+        endpoints = TestMatterTestingSupport.create_example_topology()
         expected = {2, 6, 10, 11}
         direct = get_direct_children_of_root(endpoints)
         asserts.assert_equal(expected, direct, 'Incorrect list of direct children returned from root')
@@ -676,6 +683,58 @@ class TestMatterTestingSupport(MatterBaseTest):
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.1"), "foo")
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.2"), "bar")
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.JSON"), {"key": "value"})
+
+    def test_build_tree(self):
+        # Root node is 0
+        # We have two trees in the root node and two trees in the aggregator
+        # 2 - 1
+        #   - 3 - 4
+        #       - 5 - 9
+        # 6 - 7
+        #   - 8
+        # 10
+        # 11 (aggregator - all remaining are under it)
+        # 13 - 12
+        #    - 14 - 15
+        #         - 16
+        # 17 - 18
+        #    - 19
+        # 20
+        # 21
+
+        endpoints = TestMatterTestingSupport.create_example_topology()
+        tree, problems = build_tree_for_graph(endpoints)
+        all_endpoints = range(0, 22)
+        asserts.assert_equal(len(problems), 0, "Problems reported on correct example tree")
+        asserts.assert_equal(set(all_endpoints), set(tree.keys()), "Some endpoints were missing from the returned tree")
+
+        tree_roots = [2, 6, 10, 13, 17, 20, 21]
+        for i in all_endpoints:
+            asserts.assert_equal(tree[i].is_tree_root, i in tree_roots, f"Root node marking for endpoint {i} is incorrect")
+
+        aggregator_endpoints = [0, 11]
+        for i in all_endpoints:
+            asserts.assert_equal(tree[i].is_aggregator_or_root, i in aggregator_endpoints,
+                                 f"Aggregator marking for endpoint {i} is incorrect")
+
+        for i in all_endpoints:
+            asserts.assert_equal(tree[i].endpoint, i, f"Incorrect endpoint number for endpoint {i}")
+
+        direct_children: dict[int, list[int]] = {}
+        direct_children[0] = [2, 6, 10, 11]
+        direct_children[2] = [1, 3]
+        direct_children[3] = [4, 5]
+        direct_children[5] = [9]
+        direct_children[6] = [7, 8]
+        direct_children[11] = [13, 17, 20, 21]
+        direct_children[13] = [12, 14]
+        direct_children[14] = [15, 16]
+        direct_children[17] = [18, 19]
+        for i in all_endpoints:
+            if i in direct_children.keys():
+                asserts.assert_equal(tree[i].children, direct_children[i], f"Incorrect children for endpoint {i}")
+            else:
+                asserts.assert_equal(tree[i].children, [], f"Incorrect children for endpoint {i}")
 
 
 if __name__ == "__main__":
