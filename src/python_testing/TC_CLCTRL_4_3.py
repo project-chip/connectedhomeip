@@ -533,7 +533,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
         self.step("8a")
         if is_latching_supported:
-            
+
             self.step("8b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_latch = overall_current_state.latch
@@ -552,7 +552,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 logging.info("CurrentLatch is False or LatchControlModes Bit 0 = 0, skipping step 8c")
                 self.skip_step("8c")
-                
+
             if current_latch is True and not (latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching):
                 self.step("8d")
                 logging.info("CurrentLatch is True and LatchControlModes Bit 0 = 0, sending MoveTo command with Latch = CurrentLatch")
@@ -567,7 +567,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 logging.info("CurrentLatch is False or LatchControlModes Bit 0 = 1, skipping step 8d")
                 self.skip_step("8d")
-                
+
             if current_latch is False and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 self.step("8e")
                 logging.info("CurrentLatch is False and LatchControlModes Bit 1 = 1, sending MoveTo command with Latch = CurrentLatch")
@@ -581,7 +581,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 logging.info("CurrentLatch is True or LatchControlModes Bit 1 = 0, skipping step 8e")
                 self.skip_step("8e")
-            
+
             if current_latch is False and not (latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching):
                 self.step("8f")
                 logging.info("CurrentLatch is False and LatchControlModes Bit 1 = 0, sending MoveTo command with Latch = CurrentLatch")
@@ -603,13 +603,13 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
         self.step("9a")
         if is_position_supported:
-            
+
             self.step("9b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = overall_current_state.position
             current_latch: bool = overall_current_state.latch if overall_current_state is not NullValue else NullValue
             logging.info(f"current_position: {current_position}, current_latch: {current_latch}")
-            
+
             self.step("9c")
             if is_latching_supported and current_latch is True:
                 logging.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
@@ -632,7 +632,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
-                    self.step("9f")                    
+                    self.step("9f")
                     self.skip_step("9g")
 
                 self.step("9h")
@@ -657,7 +657,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
         self.step("10a")
         if is_speed_supported:
-            
+
             self.step("10b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = overall_current_state.speed
@@ -692,7 +692,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 self.step("10h")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
                 logging.info("CurrentLatch is now False")
-                
+
             else:
                 logging.info("Skipping steps 10d to 10h as Latching feature is not supported")
                 self.mark_step_range_skipped("10d", "10h")
