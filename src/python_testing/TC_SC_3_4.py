@@ -40,10 +40,11 @@
 # === END CI TEST ARGUMENTS ===
 
 
-from chip.exceptions import ChipStackError
-from chip.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter.exceptions import ChipStackError
+from matter.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 CHIP_ERROR_CODES = {
     "CHIP_ERROR_INVALID_CASE_PARAMETER": 0x54,

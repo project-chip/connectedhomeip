@@ -20,11 +20,11 @@ import logging
 import random
 import re
 
-from chip import discovery, exceptions
-from chip.clusters import Attribute as ClusterAttribute
-from chip.clusters import Objects as GeneratedObjects
-from chip.interaction_model import delegate as IM
-from chip.setup_payload import SetupPayload
+from matter import discovery, exceptions
+from matter.clusters import Attribute as ClusterAttribute
+from matter.clusters import Objects as GeneratedObjects
+from matter.interaction_model import delegate as IM
+from matter.setup_payload import SetupPayload
 
 log = logging.getLogger(__name__)
 
