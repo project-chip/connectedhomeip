@@ -47,7 +47,6 @@ public:
     CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
                       Span<const DataModel::AttributeEntry> optionalAttributes, const AttributeSet & enabledOptionalAttributes);
 
-
     struct OptionalAttributeEntry
     {
         bool enabled;                               // Is this optional attribute enabled?
