@@ -53,6 +53,8 @@
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <memory>
+
 #include <string.h>
 
 namespace chip {
@@ -2271,11 +2273,26 @@ CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSp
     return ExtractRawDNFromX509Cert(false, certificate, issuer);
 }
 
+class ScopedASN1Object
+{
+public:
+    ScopedASN1Object(const char * string, int no_name) : obj(OBJ_txt2obj(string, no_name)) {}
+    ~ScopedASN1Object() { ASN1_OBJECT_free(obj); }
+
+    ScopedASN1Object(const ScopedASN1Object &)             = delete;
+    ScopedASN1Object & operator=(const ScopedASN1Object &) = delete;
+
+    ASN1_OBJECT * Get() { return obj; }
+
+private:
+    ASN1_OBJECT * obj = nullptr;
+};
+
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
-    ASN1_OBJECT * commonNameObj = nullptr;
-    ASN1_OBJECT * matterVidObj  = nullptr;
-    ASN1_OBJECT * matterPidObj  = nullptr;
+    ScopedASN1Object commonNameObj("2.5.4.3", 1);
+    ScopedASN1Object matterVidObj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
+    ScopedASN1Object matterPidObj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     X509 * x509certificate             = nullptr;
@@ -2285,10 +2302,6 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     AttestationCertVidPid vidpidFromCN;
 
     VerifyOrExit(!certificate.empty() && CanCastTo<long>(certificate.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    commonNameObj = OBJ_txt2obj("2.5.4.3", 1);
-    matterVidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
-    matterPidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
 
     x509certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -2304,15 +2317,15 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
 
         DNAttrType attrType = DNAttrType::kUnspecified;
-        if (OBJ_cmp(object, commonNameObj) == 0)
+        if (OBJ_cmp(object, commonNameObj.Get()) == 0)
         {
             attrType = DNAttrType::kCommonName;
         }
-        else if (OBJ_cmp(object, matterVidObj) == 0)
+        else if (OBJ_cmp(object, matterVidObj.Get()) == 0)
         {
             attrType = DNAttrType::kMatterVID;
         }
-        else if (OBJ_cmp(object, matterPidObj) == 0)
+        else if (OBJ_cmp(object, matterPidObj.Get()) == 0)
         {
             attrType = DNAttrType::kMatterPID;
         }
@@ -2339,9 +2352,6 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     }
 
 exit:
-    ASN1_OBJECT_free(commonNameObj);
-    ASN1_OBJECT_free(matterVidObj);
-    ASN1_OBJECT_free(matterPidObj);
     X509_free(x509certificate);
 
     return err;
