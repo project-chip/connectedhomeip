@@ -37,8 +37,8 @@ public:
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const OptionalAttributeSet & optionalAttributeSet,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mOptionalAttributeSet(optionalAttributeSet),
-        mFeatureFlags(featureFlags)
+        mEndpointId(endpointId),
+        mDiagnosticProvider(diagnosticProvider), mOptionalAttributeSet(optionalAttributeSet), mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }
