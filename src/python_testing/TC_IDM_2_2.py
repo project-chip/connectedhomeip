@@ -40,15 +40,15 @@ import asyncio
 import copy
 import logging
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import AttributePath
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing import global_attribute_ids
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import AttributePath
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing import global_attribute_ids
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
