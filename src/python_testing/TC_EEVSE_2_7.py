@@ -166,7 +166,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("17b", "TH reads from the DUT the BatteryCapacity",
                      "Value has to be null."),
             TestStep("18", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
-                     "Verify DUT responds w/ status SUCCESS(0x00)\nNOTE: in this step, the vehicle has NOT provided StateOfCharge so the EVSE will fallback to using AddedEnergy to attempt to charge the vehicle. NextChargeTargetTime and NextChargeRequiredEnergy should be the values from step 10 above.  NextChargeStartTime should be non null to indicate it is going to charge in the future. NextChargeRequiredEnergy should be non null to indicate AddedEnergy based charging and NextChargeTargetSoC should be null."),
+                     "Verify DUT responds w/ status SUCCESS(0x00)\nNOTE: in this step, the vehicle has NOT provided StateOfCharge so the EVSE will fallback to using AddedEnergy to attempt to charge the vehicle. NextChargeTargetTime and NextChargeRequiredEnergy should be the values from step 11 above.  NextChargeStartTime should be non null to indicate it is going to charge in the future. NextChargeRequiredEnergy should be non null to indicate AddedEnergy based charging and NextChargeTargetSoC should be null."),
             TestStep("18a", "TH reads from the DUT the NextChargeStartTime",
                      "Value has to be less than the value of TargetTime."),
             TestStep("18b", "TH reads from the DUT the NextChargeTargetTime",
