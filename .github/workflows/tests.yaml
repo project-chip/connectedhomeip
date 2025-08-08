@@ -376,8 +376,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Save ccache
-              # iif: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
-              if: always()
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
@@ -518,8 +517,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Save ccache
-              # iif: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
-              if: always()
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
@@ -864,8 +862,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Save ccache
-              if: always()  
-              # iif: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
@@ -958,8 +955,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Save ccache
-              if: always()
-              # iif: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
