@@ -37,8 +37,13 @@ class AttributeListBuilder
 public:
     AttributeListBuilder(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) : mBuilder(builder) {}
 
-    /// appends the given attributes to the builder.
-    /// Optional attributes are only appended if the given `enabledOptionalAttributes` has them set
+    /// Constructs a list of cluster attributes, typically for responding to a
+    /// `ServerClusterInterface::Attributes` call.
+    ///
+    /// It allows for one calkl that will add to the buffer all of:
+    ///   - mandatoryAttributes (all of them)
+    ///   - optionalAttributes IF AND ONLY IF enabledOptionalAttributes is set for them
+    ///   - GlobalAttributes()  (all of them)
     CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
                       Span<const DataModel::AttributeEntry> optionalAttributes, const AttributeSet & enabledOptionalAttributes);
 
