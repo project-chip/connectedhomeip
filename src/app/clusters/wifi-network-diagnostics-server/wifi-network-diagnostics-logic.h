@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/AttributeValueEncoder.h>
-#include <app/server-cluster/OptionalAttributes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/WiFiNetworkDiagnostics/Attributes.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <lib/core/DataModelTypes.h>
@@ -30,7 +30,7 @@ namespace chip::app::Clusters {
 class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
-    using SupportedAttributes = chip::app::SupportedAttributes<
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
         WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id, WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,
         WiFiNetworkDiagnostics::Attributes::OverrunCount::Id, WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,
         WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id,
@@ -39,10 +39,10 @@ public:
         WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id>;
 
     WiFiDiagnosticsServerLogic(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                               const SupportedAttributes & enabledAttributes,
+                               const OptionalAttributeSet & optionalAttributeSet,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
         mEndpointId(endpointId),
-        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+        mDiagnosticProvider(diagnosticProvider), mOptionalAttributeSet(optionalAttributeSet), mFeatureFlags(featureFlags)
     {
         mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
     }
@@ -90,12 +90,12 @@ public:
     // Getter methods for private members
     EndpointId GetEndpointId() const { return mEndpointId; }
     const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
-    const SupportedAttributes & GetEnabledAttributes() const { return mEnabledAttributes; }
+    const OptionalAttributeSet & GetOptionalAttributeSet() const { return mOptionalAttributeSet; }
 
 private:
     EndpointId mEndpointId;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
-    const SupportedAttributes mEnabledAttributes;
+    const OptionalAttributeSet mOptionalAttributeSet;
     const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
 };
 

@@ -16,7 +16,7 @@
  */
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
-#include <app/server-cluster/OptionalAttributes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -44,7 +44,7 @@ void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    gServer.Create(SoftwareDiagnosticsLogic::SupportedAttributes()
+    gServer.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet()
                        .Set<ThreadMetrics::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, ThreadMetrics::Id))
                        .Set<CurrentHeapFree::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapFree::Id))
                        .Set<CurrentHeapUsed::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapUsed::Id))

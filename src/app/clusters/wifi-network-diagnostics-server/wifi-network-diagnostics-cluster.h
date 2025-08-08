@@ -20,7 +20,7 @@
 
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/OptionalAttributes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/WiFiNetworkDiagnostics/ClusterId.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -32,10 +32,10 @@ class WiFiDiagnosticsServerCluster : public DefaultServerCluster
 {
 public:
     WiFiDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                                 const WiFiDiagnosticsServerLogic::SupportedAttributes & enabledAttributes,
+                                 const WiFiDiagnosticsServerLogic::OptionalAttributeSet & optionalAttributeSet,
                                  BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
         DefaultServerCluster({ endpointId, WiFiNetworkDiagnostics::Id }),
-        mLogic(endpointId, diagnosticProvider, enabledAttributes, featureFlags)
+        mLogic(endpointId, diagnosticProvider, optionalAttributeSet, featureFlags)
     {}
 
     // Server cluster implementation

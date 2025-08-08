@@ -87,7 +87,7 @@ CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & e
 
 CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mEnabledAttributes.IsSet(Attributes::CurrentHeapHighWatermark::Id) &&
+    if (mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) &&
         DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetWatermarks::kMetadataEntry };
@@ -110,7 +110,7 @@ CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel:
         Attributes::CurrentHeapHighWatermark::kMetadataEntry, //
     };
 
-    return listBuilder.Append(Span(SoftwareDiagnostics::Attributes::kMandatoryMetadata), Span(optionalEntries), mEnabledAttributes);
+    return listBuilder.Append(Span(SoftwareDiagnostics::Attributes::kMandatoryMetadata), Span(optionalEntries), mOptionalAttributeSet);
 }
 
 } // namespace Clusters

@@ -21,7 +21,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAttributeListBuilder.cpp",
     "TestDefaultServerCluster.cpp",
-    "TestOptionalAttributes.cpp",
+    "TestOptionalAttributeSet.cpp",
     "TestServerClusterInterfaceRegistry.cpp",
     "TestSingleEndpointServerClusterRegistry.cpp",
   ]

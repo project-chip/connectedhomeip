@@ -20,7 +20,7 @@
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/OptionalAttributes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -217,7 +217,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         features.Set(WiFiNetworkDiagnostics::Feature::kErrorCounts);
         features.Set(WiFiNetworkDiagnostics::Feature::kPacketCounts);
         WiFiDiagnosticsServerCluster cluster(kRootEndpointId, allProvider,
-                                             WiFiDiagnosticsServerLogic::SupportedAttributes().Set<CurrentMaxRate::Id>(), features);
+                                             WiFiDiagnosticsServerLogic::OptionalAttributeSet().Set<CurrentMaxRate::Id>(), features);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), commandsBuilder),

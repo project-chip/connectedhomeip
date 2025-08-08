@@ -49,8 +49,8 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == kRootEndpointId);
 
-    GeneralDiagnosticsCluster::SupportedAttributes enabledAttributes =
-        GeneralDiagnosticsCluster::SupportedAttributes()
+    GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
+        GeneralDiagnosticsCluster::OptionalAttributeSet()
             .Set<TotalOperationalHours::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, TotalOperationalHours::Id))
             .Set<BootReason::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, BootReason::Id))
             .Set<ActiveHardwareFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveHardwareFaults::Id))
@@ -75,9 +75,9 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
         .enablePayloadSnaphot = false,
 #endif
     };
-    gServer.Create(enabledAttributes, functionsConfig);
+    gServer.Create(optionalAttributeSet, functionsConfig);
 #else
-    gServer.Create(enabledAttributes);
+    gServer.Create(optionalAttributeSet);
 #endif
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());

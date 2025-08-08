@@ -115,7 +115,7 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
         CurrentMaxRate::kMetadataEntry,         //
     };
 
-    chip::app::SupportedAttributes<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,         //
+    chip::app::OptionalAttributeSet<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,         //
                                    WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,        //
                                    WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,           //
                                    WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,          //
@@ -124,23 +124,23 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
                                    WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, //
                                    WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id    //
                                    >
-        enabledAttributes(mLogic.GetEnabledAttributes());
+        optionalAttributeSet(mLogic.GetOptionalAttributeSet());
 
     if (featureFlags.Has(Feature::kErrorCounts))
     {
-        enabledAttributes.Set<BeaconLostCount::Id>();
-        enabledAttributes.Set<OverrunCount::Id>();
+        optionalAttributeSet.Set<BeaconLostCount::Id>();
+        optionalAttributeSet.Set<OverrunCount::Id>();
     }
 
     if (featureFlags.Has(Feature::kPacketCounts))
     {
-        enabledAttributes.Set<BeaconRxCount::Id>();
-        enabledAttributes.Set<PacketMulticastRxCount::Id>();
-        enabledAttributes.Set<PacketMulticastTxCount::Id>();
-        enabledAttributes.Set<PacketUnicastRxCount::Id>();
-        enabledAttributes.Set<PacketUnicastTxCount::Id>();
+        optionalAttributeSet.Set<BeaconRxCount::Id>();
+        optionalAttributeSet.Set<PacketMulticastRxCount::Id>();
+        optionalAttributeSet.Set<PacketMulticastTxCount::Id>();
+        optionalAttributeSet.Set<PacketUnicastRxCount::Id>();
+        optionalAttributeSet.Set<PacketUnicastTxCount::Id>();
     }
-    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), enabledAttributes);
+    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet);
 }
 
 CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,

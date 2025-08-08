@@ -49,7 +49,7 @@ struct IsOneOf<T>
 /// by one.
 ///
 /// The implementation of the class generally is a wrapper over a bitset with a
-/// `IsSet()` method. Configurations should use the SupportedAttributes<...> class.
+/// `IsSet()` method. Configurations should use the OptionalAttributeSet<...> class.
 class AttributeSet
 {
 public:
@@ -64,7 +64,7 @@ public:
     /// Exposes a "force attribute bit set" without extra validation,
     /// so that clusters can enforce specific bits to be set.
     ///
-    /// This is NOT intended as a generic set, use `SupportedAttributes` to configure values.
+    /// This is NOT intended as a generic set, use `OptionalAttributeSet` to configure values.
     template <AttributeId id>
     constexpr AttributeSet & ForceSet()
     {
@@ -99,7 +99,7 @@ private:
 ///
 ///    namespace chip::app::Clusters::GeneralDiagnostics {
 ///
-///    using SupportedAttributes = chip::app::SupportedAttributes<
+///    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
 ///        Attributes::TotalOperationalHours::Id,
 ///        Attributes::BootReason::Id,
 ///        Attributes::ActiveHardwareFaults::Id
@@ -109,24 +109,24 @@ private:
 ///
 /// After this, one can:
 ///
-///   GeneralDiagnostics::SupportedAttributes()
+///   GeneralDiagnostics::OptionalAttributeSet()
 ///      .Set<GeneralDiagnostics::Attributes::TotalOperationalHours::Id>()
 ///      .Set<GeneralDiagnostics::Attributes::BootReason::Id>();
 ///
 /// Cluster implementations can then store a
-///   Constructor(const GeneralDiagnostics::SupportedAttributes& enabled) : mEnabledAttributes(enabled) {...}
+///   Constructor(const GeneralDiagnostics::OptionalAttributeSet& optionalAttributeSet) : mOptionalAttributeSet(optionalAttributeSet) {...}
 ///
 /// where:
-///   const AttributeSet mEnabledAttributes;
+///   const AttributeSet mOptionalAttributeSet;
 template <AttributeId... OptionalAttributeIds>
-class SupportedAttributes : public AttributeSet
+class OptionalAttributeSet : public AttributeSet
 {
 public:
-    SupportedAttributes(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
-    SupportedAttributes() = default;
+    OptionalAttributeSet(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
+    OptionalAttributeSet() = default;
 
     template <uint32_t ATTRIBUTE_ID>
-    constexpr SupportedAttributes & Set(bool value = true)
+    constexpr OptionalAttributeSet & Set(bool value = true)
     {
         static_assert(ATTRIBUTE_ID < 32, "Cluster attribute bits supports attributes up to 31");
         static_assert(Internal::IsOneOf<ATTRIBUTE_ID, OptionalAttributeIds...>::value, "attribute MUST be optional");

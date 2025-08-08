@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/server-cluster/OptionalAttributes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <lib/core/DataModelTypes.h>
 #include <pw_unit_test/framework.h>
 
@@ -25,7 +25,7 @@ using namespace chip::app;
 
 namespace {
 
-TEST(TestOptionalAttributes, TestAttributeSet)
+TEST(TestOptionalAttributeSet, TestAttributeSet)
 {
     AttributeSet set;
 
@@ -44,9 +44,9 @@ TEST(TestOptionalAttributes, TestAttributeSet)
     EXPECT_TRUE(set.IsSet(3));
 }
 
-TEST(TestOptionalAttributes, TestSupportedAttributes)
+TEST(TestOptionalAttributeSet, TestOptionalAttributeSet)
 {
-    using Supported = SupportedAttributes<1, 3, 5, 7>;
+    using Supported = OptionalAttributeSet<1, 3, 5, 7>;
 
     Supported supported;
 
@@ -70,9 +70,9 @@ TEST(TestOptionalAttributes, TestSupportedAttributes)
     EXPECT_FALSE(supported.IsSet(4));
 }
 
-TEST(TestOptionalAttributes, TestEmptySupportedAttributes)
+TEST(TestOptionalAttributeSet, TestEmptyOptionalAttributeSet)
 {
-    using Supported = SupportedAttributes<>;
+    using Supported = OptionalAttributeSet<>;
 
     Supported supported;
 

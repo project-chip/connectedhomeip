@@ -65,9 +65,9 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
-    const GeneralDiagnosticsCluster::SupportedAttributes enabledAttributes;
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
 
-    GeneralDiagnosticsCluster cluster(enabledAttributes);
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
@@ -75,7 +75,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
         .enablePayloadSnaphot = true,
     };
 
-    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(enabledAttributes, functionsConfig);
+    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(optionalAttributeSet, functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }
@@ -87,9 +87,9 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         class NullProvider : public DeviceLayer::DiagnosticDataProvider
         {
         };
-        const GeneralDiagnosticsCluster::SupportedAttributes enabledAttributes;
+        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
-        GeneralDiagnosticsCluster cluster(enabledAttributes);
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet);
 
         // Check required accepted commands are present
         ConcreteClusterPath generalDiagnosticsPath = ConcreteClusterPath(kRootEndpointId, GeneralDiagnostics::Id);
@@ -168,7 +168,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         };
 
         // Enable all the optional attributes
-        const GeneralDiagnosticsCluster::SupportedAttributes enabledAttributes = GeneralDiagnosticsCluster::SupportedAttributes()
+        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet = GeneralDiagnosticsCluster::OptionalAttributeSet()
                                                                                      .Set<TotalOperationalHours::Id>()
                                                                                      .Set<BootReason::Id>()
                                                                                      .Set<ActiveHardwareFaults::Id>()
@@ -176,7 +176,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                                                                                      .Set<ActiveNetworkFaults::Id>();
 
         ScopedDiagnosticsProvider<AllProvider> nullProvider;
-        GeneralDiagnosticsCluster cluster(enabledAttributes);
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet);
 
         // Check mandatory commands are present
         ConcreteClusterPath generalDiagnosticsPath = ConcreteClusterPath(kRootEndpointId, GeneralDiagnostics::Id);

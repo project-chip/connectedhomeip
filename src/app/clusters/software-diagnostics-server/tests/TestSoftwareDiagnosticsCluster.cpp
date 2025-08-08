@@ -106,7 +106,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         };
 
         ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
-        SoftwareDiagnosticsLogic diag(SoftwareDiagnosticsLogic::SupportedAttributes().Set<CurrentHeapHighWatermark::Id>());
+        SoftwareDiagnosticsLogic diag(SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<CurrentHeapHighWatermark::Id>());
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
@@ -156,7 +156,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         };
 
         ScopedDiagnosticsProvider<AllProvider> allProvider;
-        SoftwareDiagnosticsLogic diag(SoftwareDiagnosticsLogic::SupportedAttributes()
+        SoftwareDiagnosticsLogic diag(SoftwareDiagnosticsLogic::OptionalAttributeSet()
                                           .Set<ThreadMetrics::Id>()
                                           .Set<CurrentHeapFree::Id>()
                                           .Set<CurrentHeapUsed::Id>()

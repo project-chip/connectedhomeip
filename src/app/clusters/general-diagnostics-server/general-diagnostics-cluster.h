@@ -18,7 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/OptionalAttributes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
@@ -38,8 +38,8 @@ struct GeneralDiagnosticsFunctionsConfig
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    using SupportedAttributes =
-        chip::app::SupportedAttributes<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
+    using OptionalAttributeSet =
+        chip::app::OptionalAttributeSet<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
                                        GeneralDiagnostics::Attributes::BootReason::Id,            //
                                        GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
                                        GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
@@ -48,9 +48,9 @@ public:
                                        //       it will be forced as mandatory by the cluster constructor
                                        >;
 
-    GeneralDiagnosticsCluster(SupportedAttributes enabledAttributes) :
+    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mEnabledAttributes(enabledAttributes.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
+        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -121,16 +121,16 @@ public:
     }
 
 private:
-    const SupportedAttributes mEnabledAttributes;
+    const OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
-    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::SupportedAttributes & enabledAttributes,
+    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(enabledAttributes),
+        GeneralDiagnosticsCluster(optionalAttributeSet),
         mFunctionConfig(functionsConfig)
     {}
 

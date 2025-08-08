@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/server-cluster/OptionalAttributes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
