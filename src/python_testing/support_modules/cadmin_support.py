@@ -152,7 +152,7 @@ class CADMINBaseTest(MatterBaseTest):
             # Interpret integers/enums: 0 == closed, 1 == open, 2 = Busy
             if isinstance(report_value, int):
                 return report_value != 0
-            
+
             # Fall back: best-effort equality/semantics
             name = getattr(report_value, "name", None)
             if isinstance(name, str):
@@ -176,7 +176,8 @@ class CADMINBaseTest(MatterBaseTest):
                     current_status = await self.get_window_status(th=th)
                     is_open_now = report_indicates_open(current_status)
                     if is_open_now == is_open_expected:
-                        logging.info(f"✅ Window status observed via read as {status_name} (interpreted={is_open_now}, raw={current_status})")
+                        logging.info(
+                            f"✅ Window status observed via read as {status_name} (interpreted={is_open_now}, raw={current_status})")
                         return True
                 except Exception as e:
                     logging.debug(f"WindowStatus read failed, retrying: {e}")
