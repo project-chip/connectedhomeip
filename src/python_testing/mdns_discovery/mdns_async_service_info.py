@@ -117,6 +117,8 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
             while not self._is_complete:
                 now = current_time_millis()
+
+                # Deadline reached before record was found
                 if now >= deadline_ms:
                     return False
 
