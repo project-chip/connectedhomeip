@@ -30,7 +30,7 @@ from mdns_discovery.service_listeners.mdns_service_listener import MdnsServiceLi
 from mdns_discovery.utils.net_utils import get_host_ipv6_addresses
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncZeroconf, AsyncZeroconfServiceTypes
-from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT
+from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT, _TYPES
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +39,7 @@ DISCOVERY_TIMEOUT_SEC = 15
 SERVICE_LISTENER_TIMEOUT_SEC = 5
 QUERY_TIMEOUT_SEC = 10
 DISCOVERY_SILENCE_THRESHOLD_SEC = 2
-
 QUERY_RECORD_TYPES = {_TYPE_SRV, _TYPE_TXT, _TYPE_A, _TYPE_AAAA}
-DNS_TYPE_MAP = {_TYPE_SRV: "SRV", _TYPE_TXT: "TXT", _TYPE_A: "A", _TYPE_AAAA: "AAAA"}
 
 
 class MdnsDiscovery:
@@ -610,7 +608,7 @@ class MdnsDiscovery:
             Optional[MdnsServiceInfo]: A fully resolved service instance containing details such as host address, port,
             and associated TXT records, or None if the service could not be resolved.
         """
-        rec_types = "(" + ", ".join(DNS_TYPE_MAP.get(t, str(t)) for t in query_record_types) + ")"
+        rec_types = "(" + ", ".join(_TYPES.get(t, str(t)).upper() for t in query_record_types) + ")"
 
         async with AsyncZeroconf(interfaces=self.interfaces) as azc:
 
