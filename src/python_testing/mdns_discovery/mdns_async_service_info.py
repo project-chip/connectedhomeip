@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
-from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _LISTENER_TIME, _FLAGS_QR_QUERY, _MDNS_PORT, _TYPE_AAAA
+from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_AAAA
 
 
 class MdnsAsyncServiceInfo(ServiceInfo):
