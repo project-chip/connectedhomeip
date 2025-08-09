@@ -48,6 +48,7 @@ import base64
 import logging
 import random
 from time import sleep
+from datetime import datetime
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
@@ -63,6 +64,11 @@ nonce = random.randbytes(32)
 
 
 class TC_CADMIN(CADMINBaseTest):
+    @property
+    def default_timeout(self) -> int:
+        # Allow sufficient time for 180s window + skew + processing
+        return 300
+
     async def combined_commission_val_steps(self, commission_type: str):
         """
         Combined test function for commissioning tests.
@@ -180,15 +186,46 @@ class TC_CADMIN(CADMINBaseTest):
             await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
 
             self.step(9)
-            # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
-            await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=180, iteration=1000, discriminator=0, option=1)
-            results = await self.support.monitor_commissioning_window_closure_with_subscription(
+            # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM and monitors until the window closes to verify window timing
+            # Subscribe first to avoid missing reports, then open window and monitor closure
+            params, window_status_accumulator = await self.open_commissioning_window_with_subscription_monitoring(
                 th=self.th2,
+                timeout=180,
                 node_id=self.dut_node_id,
-                expected_duration_seconds=180
+                discriminator=0
             )
-            asserts.assert_true(results['window_closed'], "Window should have closed")
-            asserts.assert_true(results['timing_valid'], "Window should have closed within timing constraints")
+            # Monitor for closure with skew and buffer
+            start_time = datetime.now()
+            clock_skew_ms = self.calculate_clock_skew_factor(180)
+            max_allowed_duration = 180 + (clock_skew_ms / 1000)
+            timeout_buffer_sec = 2
+            monitoring_timeout = max_allowed_duration + timeout_buffer_sec
+            try:
+                window_closed = await self.wait_for_window_status_change(
+                    window_status_accumulator=window_status_accumulator,
+                    is_open_expected=False,
+                    timeout_sec=monitoring_timeout,
+                    th=self.th2,
+                    node_id=self.dut_node_id
+                )
+                end_time = datetime.now()
+                actual_duration = (end_time - start_time).total_seconds() if window_closed else None
+                timing_valid = window_closed and (actual_duration is not None) and (actual_duration <= max_allowed_duration)
+                results = {
+                    'window_closed': window_closed,
+                    'expected_duration_seconds': 180,
+                    'actual_duration_seconds': actual_duration,
+                    'clock_skew_ms': clock_skew_ms,
+                    'max_allowed_duration_seconds': max_allowed_duration,
+                    'timing_valid': timing_valid,
+                    'start_time': start_time,
+                    'end_time': end_time if window_closed else None
+                }
+                self.log_timing_results(results, test_step="9")
+                asserts.assert_true(results['window_closed'], "Window should have closed")
+                asserts.assert_true(results['timing_valid'], "Window should have closed within timing constraints")
+            finally:
+                await window_status_accumulator.cancel()
 
             self.step(10)
             # TH_CR2 opens a commissioning window on DUT_CE using ECM

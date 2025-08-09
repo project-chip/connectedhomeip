@@ -34,8 +34,8 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.interaction_model import Status
-from matter.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest
 
 
 class CommissioningWindowOption(IntEnum):
@@ -93,9 +93,9 @@ class CADMINBaseTest(MatterBaseTest):
         node_id: int,
         min_interval_sec: int = 0,
         max_interval_sec: int = 30
-    ) -> ClusterAttributeChangeAccumulator:
+    ) -> AttributeSubscriptionHandler:
         """
-        Create a subscription to WindowStatus attribute using ClusterAttributeChangeAccumulator.
+        Create a subscription to WindowStatus attribute using AttributeSubscriptionHandler.
 
         Args:
             th: Controller to use
@@ -104,11 +104,11 @@ class CADMINBaseTest(MatterBaseTest):
             max_interval_sec: Maximum reporting interval in seconds
 
         Returns:
-            ClusterAttributeChangeAccumulator for WindowStatus
+            AttributeSubscriptionHandler for WindowStatus
         """
-        window_status_accumulator = ClusterAttributeChangeAccumulator(
-            Clusters.AdministratorCommissioning,
-            Clusters.AdministratorCommissioning.Attributes.WindowStatus
+        window_status_accumulator = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.AdministratorCommissioning,
+            expected_attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus
         )
 
         await window_status_accumulator.start(
@@ -116,15 +116,16 @@ class CADMINBaseTest(MatterBaseTest):
             min_interval_sec=min_interval_sec,
             max_interval_sec=max_interval_sec
         )
-
-        logging.info(f"Created WindowStatus subscription for node {node_id}")
+        logging.debug(f"WindowStatus subscription created for node {node_id}")
         return window_status_accumulator
 
     async def wait_for_window_status_change(
         self,
-        window_status_accumulator: ClusterAttributeChangeAccumulator,
+        window_status_accumulator: AttributeSubscriptionHandler,
         is_open_expected: bool,
-        timeout_sec: float = 10.0
+        timeout_sec: float = 10.0,
+        th: Optional[ChipDeviceCtrl] = None,
+        node_id: Optional[int] = None
     ) -> bool:
         """
         Wait for window status to change to expected value.
@@ -133,31 +134,62 @@ class CADMINBaseTest(MatterBaseTest):
             window_status_accumulator: The subscription accumulator
             is_open_expected: Expected window status (False=closed, True=open)
             timeout_sec: Timeout in seconds
+            th: Optional controller for active polling fallback
+            node_id: Optional node id for active polling fallback
 
         Returns:
             True if status changed to expected value, False if timeout
         """
         status_name = "CLOSED" if not is_open_expected else "OPEN"
-        logging.info(f"Waiting for window status to change to {status_name} (status={is_open_expected})")
-        logging.info(f"Timeout set to: {timeout_sec}s")
 
-        status_match = AttributeMatcher.from_callable(
-            f"WindowStatus is {is_open_expected}",
-            lambda report: report.value == is_open_expected
-        )
+        end_time = asyncio.get_event_loop().time() + timeout_sec
+        expected_attribute = Clusters.AdministratorCommissioning.Attributes.WindowStatus
 
-        try:
-            window_status_accumulator.await_all_expected_report_matches([status_match], timeout_sec=timeout_sec)
-            logging.info(f"✅ Window status changed to {status_name} (status={is_open_expected})")
-            return True
-        except asyncio.TimeoutError as e:
-            logging.error(f"❌ Timeout waiting for window status {is_open_expected} ({status_name}): {e}")
-            logging.error(f"Timeout occurred after {timeout_sec}s")
-            return False
+        def report_indicates_open(report_value: Any) -> bool:
+            if isinstance(report_value, bool):
+                return report_value
+
+            # Interpret integers/enums: 0 == closed, 1 == open, 2 = Busy
+            if isinstance(report_value, int):
+                return report_value != 0
+            
+            # Fall back: best-effort equality/semantics
+            name = getattr(report_value, "name", None)
+            if isinstance(name, str):
+                upper_name = name.upper()
+                if "CLOSED" in upper_name or "NOT_OPEN" in upper_name:
+                    return False
+                if "OPEN" in upper_name:
+                    return True
+
+        while asyncio.get_event_loop().time() < end_time:
+            # Snapshot of reports
+            reports_by_attribute = window_status_accumulator.attribute_reports
+            reports = reports_by_attribute.get(expected_attribute, [])
+            for report in reports:
+                is_open = report_indicates_open(report.value)
+                if is_open == is_open_expected:
+                    logging.info(f"✅ Window status changed to {status_name} (interpreted={is_open}, raw={report.value})")
+                    return True
+
+                try:
+                    current_status = await self.get_window_status(th=th)
+                    is_open_now = report_indicates_open(current_status)
+                    if is_open_now == is_open_expected:
+                        logging.info(f"✅ Window status observed via read as {status_name} (interpreted={is_open_now}, raw={current_status})")
+                        return True
+                except Exception as e:
+                    logging.debug(f"WindowStatus read failed, retrying: {e}")
+
+            await asyncio.sleep(0.5)
+
+        logging.error(f"❌ Timeout waiting for window status {is_open_expected} ({status_name})")
+        logging.error(f"Timeout occurred after {timeout_sec}s")
+        return False
 
     def log_timing_results(self, results: dict[str, Any], test_step: str = ""):
         """
-        Log timing results prominently for easy visibility in test output.
+        Log timing results for easy visibility in test output.
 
         Args:
             results: Results dictionary from monitor_commissioning_window_closure_with_subscription
@@ -219,7 +251,7 @@ class CADMINBaseTest(MatterBaseTest):
             Dictionary with monitoring results
         """
         start_time = datetime.now()
-        timeout_buffer_sec = 10
+        timeout_buffer_sec = 2
         clock_skew_ms = self.calculate_clock_skew_factor(expected_duration_seconds)
         max_allowed_duration = expected_duration_seconds + (clock_skew_ms / 1000)
         monitoring_timeout = max_allowed_duration + timeout_buffer_sec
@@ -246,7 +278,9 @@ class CADMINBaseTest(MatterBaseTest):
             window_closed = await self.wait_for_window_status_change(
                 window_status_accumulator=window_status_accumulator,
                 is_open_expected=False,
-                timeout_sec=monitoring_timeout
+                timeout_sec=monitoring_timeout,
+                th=th,
+                node_id=node_id
             )
 
             # Calculate actual duration
@@ -299,7 +333,7 @@ class CADMINBaseTest(MatterBaseTest):
         iteration: int = 10000,
         min_interval_sec: int = 0,
         max_interval_sec: int = 30
-    ) -> tuple[CommissioningParameters, ClusterAttributeChangeAccumulator]:
+    ) -> tuple[CommissioningParameters, AttributeSubscriptionHandler]:
         """
         Open a commissioning window and create subscription for monitoring.
 
@@ -316,7 +350,7 @@ class CADMINBaseTest(MatterBaseTest):
             max_interval_sec: Maximum reporting interval for subscription
 
         Returns:
-            Tuple of (CommissioningParameters, ClusterAttributeChangeAccumulator)
+            Tuple of (CommissioningParameters, AttributeSubscriptionHandler)
         """
         # Create subscription first
         window_status_accumulator = await self.create_window_status_subscription(
