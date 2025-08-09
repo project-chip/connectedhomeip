@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
-from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _MDNS_PORT, _TYPE_AAAA
+from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _LISTENER_TIME, _FLAGS_QR_QUERY, _MDNS_PORT, _TYPE_AAAA
 
 
 class MdnsAsyncServiceInfo(ServiceInfo):
@@ -90,7 +90,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
         # Delay before sending the first retry query if the initial query did not complete
         # Shorter delay improves speed without increasing the chance of missing records
-        initial_delay_ms = 50 + randint(0, 30)
+        initial_delay_ms = _LISTENER_TIME + randint(0, 50)
 
         # Minimum delay between subsequent QM retries after the first retry,
         # to prevent duplicate-question suppression by responding devices
