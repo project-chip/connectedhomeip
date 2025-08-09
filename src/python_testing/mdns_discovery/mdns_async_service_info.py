@@ -89,12 +89,11 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         deadline_ms = now + timeout
 
         # Delay before sending the first retry query if the initial query did not complete
-        # Shorter delay improves speed without increasing the chance of missing records
         initial_delay_ms = _LISTENER_TIME + randint(0, 50)
 
         # Minimum delay between subsequent QM retries after the first retry,
         # to prevent duplicate-question suppression by responding devices
-        duplicate_interval_ms = int(_DUPLICATE_QUESTION_INTERVAL)
+        duplicate_interval_ms = _DUPLICATE_QUESTION_INTERVAL
 
         # Linger after completion to catch late SRV/TXT/AAAA/A responses
         # Most devices send these within <200 ms, but we allow extra headroom
