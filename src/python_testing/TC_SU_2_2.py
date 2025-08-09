@@ -335,16 +335,50 @@ class TC_SU_2_2(MatterBaseTest):
         logging.info(f"Step #1.5 - AnnounceOTAProvider sent from node {controller.nodeId} to DUT.")
         logging.info(f"Step #1.5 - Sent AnnounceOTAProvider to DUT, response: {resp}")
 
-        state = await self.read_single_attribute_check_success(
-            node_id=self.dut_node_id,
-            endpoint=0,
-            attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
-            cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
+        # await asyncio.sleep(2)
+
+        logger.info("Step #1.6 - Send QueryImage to check if update is available")
+        cmd_query_image = Clusters.OtaSoftwareUpdateProvider.Commands.QueryImage(
+            vendorID=0xFFF1,
+            productID=0x8001,
+            softwareVersion=0,
+            protocolsSupported=[Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous],
+            hardwareVersion=None,
+            location=None,
+            requestorCanConsent=None,
+            metadataForProvider=None
         )
-        logger.info(f"Step #1.6 - sate, response: {state}")
+        # logger.info(f"Step #1.6 - cmd cmd_query_image: {cmd_query_image}")
+
+        resp = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=provider_node_id,
+            cmd=cmd_query_image,
+            endpoint=0
+        )
+        logger.info(f"Step #1.6 - SendQueryImage Response : {resp}")
+
+        logger.info("Step #1.7 - Verify that QueryImageResponse QueryStatus is UpdateAvailable")
+        asserts.assert_equal(resp.status, Clusters.OtaSoftwareUpdateProvider.Enums.StatusEnum.kUpdateAvailable,
+                             "QueryImageResponse status should be UpdateAvailable")
+        logger.info(f"Step #1.7 - QueryImage Response Status: {resp.status} is UpdateAvailable.")
+
+        # 1.8 Verify that software image transfer from TH/OTA-P to DUT is successful
+        logger.info("Step #1.8 - Verify that software image transfer from TH/OTA-P to DUT is successful")
+        cmd_apply_update = Clusters.OtaSoftwareUpdateProvider.Commands.ApplyUpdateRequest(
+            updateToken=resp.updateToken,  # token recibido en QueryImageResponse
+            newVersion=resp.softwareVersion  # if resp.softwareVersion is not None else 0
+        )
+        logger.info(f"Step #1.8 - cmd_apply_update: {cmd_apply_update}")
+
+        apply_update_resp = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=provider_node_id,
+            cmd=cmd_apply_update,
+            endpoint=0
+        )
+        logger.info(f"Step #1.8 - apply_update_resp Response : {apply_update_resp}")
 
 
-#         # 1.8 Verify that QueryImageResponse QueryStatus is UpdateAvailable
-#         # 1.9 Verify that software image transfer from TH/OTA-P to DUT is successful
 if __name__ == "__main__":
     default_matter_test_main()
