@@ -69,7 +69,6 @@ TCP_PICS_STR = "MCORE.SC.TCP"
 ONE_HOUR_IN_MS = 3600000
 MAX_SAT_VALUE = 65535
 MAX_T_VALUE = 6
-DISCOVERY_TIMEOUT_SEC = 30
 
 
 class TC_SC_4_3(MatterBaseTest):
@@ -288,7 +287,6 @@ class TC_SC_4_3(MatterBaseTest):
         operational_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True
         )
 
@@ -409,7 +407,6 @@ class TC_SC_4_3(MatterBaseTest):
         op_sub_type = self.get_operational_subtype(log_result=True)
         ptr_records = await mdns.get_ptr_records(
             service_types=[op_sub_type],
-            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True,
         )
 
@@ -424,7 +421,6 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(11)
         ptr_records = await mdns.get_ptr_records(
             service_types=[MdnsServiceType.OPERATIONAL.value],
-            discovery_timeout_sec=DISCOVERY_TIMEOUT_SEC,
             log_output=True,
         )
 
