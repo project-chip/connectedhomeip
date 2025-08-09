@@ -1,19 +1,19 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
 }
 
 android {
-    namespace 'com.example.contentapp'
+    namespace 'com.matter.tv.app.api'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.contentapp"
         minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
@@ -22,46 +22,46 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['../app/libs/jniLibs']
-            java.srcDirs = [
-                    'src/main/java',
-            ]
-        }
+    buildFeatures {
+        aidl true
     }
 
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java']
+            aidl.srcDirs = ['src/main/aidl']
+        }
+    }
 }
 
 // Fix task dependencies when using custom build directories
 afterEvaluate {
-    tasks.named("mergeDebugResources").configure {
-        mustRunAfter("packageDebugResources")
-    }
-    tasks.named("mapDebugSourceSetPaths").configure {
-        dependsOn("packageDebugResources")
-    }
-    tasks.named("packageDebugResources").configure {
-        dependsOn(":common-api:generateDebugResValues")
-    }
-    tasks.named("parseDebugLocalResources").configure {
-        mustRunAfter(":common-api:packageDebugResources")
+    tasks.named("compileDebugLibraryResources").configure {
+        mustRunAfter(":platform-app:packageDebugResources")
     }
     tasks.named("extractDeepLinksDebug").configure {
-        mustRunAfter(":common-api:generateDebugResValues")
+        mustRunAfter(":platform-app:generateDebugResValues")
+        mustRunAfter(":content-app:generateDebugResValues")
+    }
+    tasks.named("compileDebugJavaWithJavac").configure {
+        mustRunAfter(":content-app:javaPreCompileDebug")
+    }
+    tasks.named("bundleLibRuntimeToJarDebug").configure {
+        mustRunAfter(":platform-app:compileDebugJavaWithJavac")
+    }
+    tasks.named("bundleLibRuntimeToDirDebug").configure {
+        mustRunAfter(":platform-app:compileDebugJavaWithJavac")
     }
 }
 
 dependencies {
-    implementation project(':common-api')
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
