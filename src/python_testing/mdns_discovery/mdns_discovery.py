@@ -429,7 +429,7 @@ class MdnsDiscovery:
                        all_services: bool = False,
                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                        query_service: bool = False,
-                       query_timeout_sec = QUERY_TIMEOUT_SEC,
+                       query_timeout_sec=QUERY_TIMEOUT_SEC,
                        append_results: bool = False,
                        log_output: bool = False
                        ) -> None:
@@ -463,7 +463,7 @@ class MdnsDiscovery:
         """
         if all_services and service_types:
             raise ValueError("Specify either 'all_services' or 'service_types', not both.")
-        
+
         if service_types is not None and not service_types:
             raise ValueError("`service_types` cannot be an empty list.")
 

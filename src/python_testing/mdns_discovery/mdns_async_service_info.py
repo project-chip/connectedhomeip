@@ -84,7 +84,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         self.async_clear_cache()
 
         now = current_time_millis()
-        
+
         # Absolute cutoff time after which the request stops if incomplete
         deadline_ms = now + timeout
 
