@@ -47,8 +47,8 @@
 import base64
 import logging
 import random
-from time import sleep
 from datetime import datetime
+from time import sleep
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
