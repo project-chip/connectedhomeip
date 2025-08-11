@@ -85,7 +85,7 @@ def main() -> int:
             header.write(content)
 
     output = os.path.join(args.gen_dir, '{}.cpp'.format(args.output))
-    content = HEADER + '#include "MatterSdkVersion.h"\nconst char* const CHIP_SDK_VERSION = "{}";\n'.format(ver)
+    content = HEADER + '#include "{}.h"\nconst char* const CHIP_SDK_VERSION = "{}";\n'.format(args.output, ver)
 
     # Check if the file already exists and has the same content
     if os.path.exists(output):
