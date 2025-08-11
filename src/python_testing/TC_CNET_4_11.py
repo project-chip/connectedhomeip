@@ -248,8 +248,6 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(8)
 
-        # Verify that the TH successfully connects to the DUT
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
         await verify_operational_network(test=self, ssid=wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
@@ -285,13 +283,10 @@ class TC_CNET_4_11(MatterBaseTest):
             connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials),
             timeout=TIMEOUT
         )
-        # Let's wait a couple of seconds to change networks
-        # await asyncio.sleep(WIFI_WAIT_SECONDS)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
         self.step(12)
 
-        # await asyncio.sleep(WIFI_WAIT_SECONDS)
         await verify_operational_network(test=self, ssid=wifi_1st_ap_ssid)
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
@@ -356,8 +351,6 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(17)
 
-        # Verify that the TH successfully connects to the DUT
-        # await asyncio.sleep(WIFI_WAIT_SECONDS)
         await verify_operational_network(test=self, ssid=wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
