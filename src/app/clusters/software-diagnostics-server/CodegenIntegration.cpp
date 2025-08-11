@@ -40,7 +40,7 @@ LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 
 } // namespace
 
-void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
+void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -59,7 +59,7 @@ void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterSoftwareDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
