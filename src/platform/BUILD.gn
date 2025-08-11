@@ -103,7 +103,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     chip_device_config_thread_network_endpoint_id = 0
 
     # Generate MatterSdkVersion.h header file
-    chip_enable_sdk_version = true
+    chip_enable_sdk_version = false
   }
 
   if (chip_stack_lock_tracking == "auto") {
