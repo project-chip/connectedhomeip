@@ -744,6 +744,8 @@
     const EmberAfGenericClusterFunction chipFuncArrayAdministratorCommissioningServer[] = {                                        \
         (EmberAfGenericClusterFunction) emberAfAdministratorCommissioningClusterServerInitCallback,                                \
         (EmberAfGenericClusterFunction) MatterAdministratorCommissioningClusterServerShutdownCallback,                             \
+    const EmberAfGenericClusterFunction chipFuncArrayGroupKeyManagementServer[] = {                                                \
+        (EmberAfGenericClusterFunction) emberAfGroupKeyManagementClusterServerInitCallback,                                        \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
@@ -1198,8 +1200,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(195), \
       .attributeCount = 6, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayGroupKeyManagementServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 56 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 61 ), \
       .eventList = nullptr, \
