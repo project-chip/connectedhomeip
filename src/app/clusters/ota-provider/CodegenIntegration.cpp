@@ -50,7 +50,7 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 
 } // namespace
 
-void emberAfOtaSoftwareUpdateProviderServerClusterInitCallback(EndpointId endpointId)
+void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, arrayIndex))

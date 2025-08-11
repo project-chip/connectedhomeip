@@ -53,7 +53,7 @@ LazyRegisteredServerCluster<ClusterImpl> gServer;
 
 } // namespace
 
-void emberAfAdministratorCommissioningServerClusterInitCallback(EndpointId endpointId)
+void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpointId)
 {
     if (endpointId != kRootEndpointId)
     {

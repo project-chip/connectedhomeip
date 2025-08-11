@@ -53,7 +53,7 @@ bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 }
 
 } // namespace
-void emberAfPushAvStreamTransportServerClusterInitCallback(EndpointId endpointId)
+void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId)
 {
 
     uint16_t arrayIndex = 0;

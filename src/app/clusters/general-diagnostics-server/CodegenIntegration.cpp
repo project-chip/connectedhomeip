@@ -44,7 +44,7 @@ LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 
 } // namespace
 
-void emberAfGeneralDiagnosticsServerClusterInitCallback(EndpointId endpointId)
+void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == kRootEndpointId);
     const GeneralDiagnosticsEnabledAttributes enabledAttributes{
