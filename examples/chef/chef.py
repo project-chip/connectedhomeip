@@ -40,8 +40,13 @@ _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
-_EXCLUDE_DEVICE_FROM_LINUX_CI = [  # These do not compile / deprecated.
-    "noip_rootnode_dimmablelight_bCwGYSDpoe",
+_EXCLUDE_DEVICE_FROM_LINUX_CI = [
+    "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
+    "rootnode_genericswitch_2dfff6e516",  # not actively developed,
+    "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
+    "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
+    "rootnode_onofflight_samplemei",  # not actively developed,
+    "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
@@ -776,6 +781,28 @@ def main() -> int:
                 f"-DCONFIG_CHIP_DEVICE_PRODUCT_NAME='\"{options.pname}\"'")
             nrf_build_cmds.append(
                 f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
+            nrf_build_cmds.append(
+                "-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
+            if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_READ_CLIENT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_LIT_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_CHECK_IN_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_UAT_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_DSLS_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_REPORT_ON_ACTIVE_MODE=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_SIT_SLOW_POLL_LIMIT=5000")
+            else:
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=n")
             nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
 

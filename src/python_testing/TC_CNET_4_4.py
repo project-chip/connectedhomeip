@@ -20,10 +20,11 @@ import random
 import string
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 
 
 class TC_CNET_4_4(MatterBaseTest):
@@ -56,7 +57,7 @@ class TC_CNET_4_4(MatterBaseTest):
         feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
         if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
             logging.info('Device does not support WiFi on endpoint, skipping remaining steps')
-            self.skip_all_remaining_steps(2)
+            self.mark_all_remaining_steps_skipped(2)
             return
 
         self.step(2)

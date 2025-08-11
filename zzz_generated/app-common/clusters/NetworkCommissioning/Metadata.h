@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace MaxNetworks {
@@ -66,6 +67,11 @@ namespace ThreadVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ThreadVersion
+constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
+    MaxNetworks::kMetadataEntry,          Networks::kMetadataEntry,      InterfaceEnabled::kMetadataEntry,
+    LastNetworkingStatus::kMetadataEntry, LastNetworkID::kMetadataEntry, LastConnectErrorValue::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -100,6 +106,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(QueryIdentity::I
 } // namespace QueryIdentity
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace NetworkCommissioning
 } // namespace Clusters
 } // namespace app

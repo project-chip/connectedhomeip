@@ -178,7 +178,6 @@ private:
     bool _IsWiFiStationApplicationControlled();
     bool _IsWiFiStationProvisioned();
     void _ClearWiFiStationProvision();
-    bool _CanStartWiFiScan();
 
     WiFiAPMode _GetWiFiAPMode();
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);

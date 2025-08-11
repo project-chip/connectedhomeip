@@ -35,13 +35,14 @@ import logging
 import random
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import MdnsDiscovery
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.ChipDeviceCtrl import CommissioningParameters
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CADMIN_1_15(MatterBaseTest):
@@ -201,18 +202,14 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
         self.step(12)
         # Verifies TH_CR2 is unable to read the Basic Information Cluster’s NodeLabel attribute of DUT_CE as no longer on network
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await self.read_single_attribute_check_success(
                 dev_ctrl=self.th2,
                 endpoint=0,
                 cluster=Clusters.BasicInformation,
                 attribute=Clusters.BasicInformation.Attributes.NodeLabel
             )
-            asserts.fail("Expected exception not thrown")
-        except ChipStackError as e:
-            # Verify that the DUT returns an "Timeout" status response
-            asserts.assert_equal(e.err, 0x00000032,
-                                 "Expected to timeout as DUT_CE is no longer on network")
+        asserts.assert_equal(cm.exception.err, 0x00000032, "Expected to timeout as DUT_CE is no longer on network")
 
         self.step(13)
         fabrics2 = await self.get_fabrics(th=self.th1)

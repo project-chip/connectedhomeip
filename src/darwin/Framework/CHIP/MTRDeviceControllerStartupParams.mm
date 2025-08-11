@@ -372,6 +372,12 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 - (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
                          uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 {
+    return [self initWithXPCConnectionBlock:xpcConnectionBlock uniqueIdentifier:uniqueIdentifier];
+}
+
+- (instancetype)initWithXPCConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                          uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+{
     if (self = [super _initInternal]) {
         _xpcConnectionBlock = [xpcConnectionBlock copy];
         _uniqueIdentifier = [uniqueIdentifier copy];
@@ -379,6 +385,7 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 
     return self;
 }
+
 @end
 
 @implementation MTRDeviceControllerStartupParamsInternal

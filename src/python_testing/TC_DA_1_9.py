@@ -34,7 +34,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --string-arg app_path:out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
+#       --string-arg app_path:${ALL_CLUSTERS_APP}
 #       --string-arg dac_provider_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
 #       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/revocation-sets
 #       --string-arg app_log_path:/tmp/TC_DA_1_9
@@ -48,9 +48,10 @@ import os
 import signal
 import subprocess
 
-from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter import ChipDeviceCtrl
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_DA_1_9(MatterBaseTest):
@@ -68,7 +69,7 @@ class TC_DA_1_9(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
             DEFAULT_APP_PATH = os.path.join(
-                ROOT_DIR, "out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app")
+                ROOT_DIR, "objdir-clone/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app")
         else:
             ROOT_DIR = "/root"
             DEFAULT_APP_PATH = os.path.join(ROOT_DIR, "apps/chip-all-clusters-app")

@@ -508,9 +508,11 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
+    const uint8_t hciResult            = connEvent->HciResult;
 
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", hciResult);
 
+    mNeedToResetFailSafeTimer = (hciResult == BT_HCI_ERR_REMOTE_USER_TERM_CONN || hciResult == BT_HCI_ERR_CONN_TIMEOUT);
     mGAPConns--;
 
     // If indications were enabled for this connection, record that they are now disabled and
@@ -518,7 +520,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
     if (UnsetSubscribed(connEvent->BtConn))
     {
         CHIP_ERROR disconReason;
-        switch (connEvent->HciResult)
+        switch (hciResult)
         {
         case BT_HCI_ERR_REMOTE_USER_TERM_CONN:
             // Do not treat proper connection termination as an error and exit.

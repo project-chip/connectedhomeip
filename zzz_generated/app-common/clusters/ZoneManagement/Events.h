@@ -48,7 +48,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kZones  = 0,
+    kZone   = 0,
     kReason = 1,
 };
 
@@ -60,7 +60,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const uint16_t> zones;
+    uint16_t zone                       = static_cast<uint16_t>(0);
     ZoneEventTriggeredReasonEnum reason = static_cast<ZoneEventTriggeredReasonEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -73,7 +73,7 @@ public:
     static constexpr EventId GetEventId() { return Events::ZoneTriggered::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
 
-    DataModel::DecodableList<uint16_t> zones;
+    uint16_t zone                       = static_cast<uint16_t>(0);
     ZoneEventTriggeredReasonEnum reason = static_cast<ZoneEventTriggeredReasonEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -84,7 +84,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kZones  = 0,
+    kZone   = 0,
     kReason = 1,
 };
 
@@ -96,7 +96,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const uint16_t> zones;
+    uint16_t zone                     = static_cast<uint16_t>(0);
     ZoneEventStoppedReasonEnum reason = static_cast<ZoneEventStoppedReasonEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -109,7 +109,7 @@ public:
     static constexpr EventId GetEventId() { return Events::ZoneStopped::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
 
-    DataModel::DecodableList<uint16_t> zones;
+    uint16_t zone                     = static_cast<uint16_t>(0);
     ZoneEventStoppedReasonEnum reason = static_cast<ZoneEventStoppedReasonEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

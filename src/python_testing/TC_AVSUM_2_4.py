@@ -35,11 +35,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 
 class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
@@ -163,7 +164,8 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
                     await self.send_move_to_preset_command(endpoint, mptz_presets_dut[0].presetID, expected_status=Status.Busy)
             else:
                 self.skip_step(10)
-            self.skip_all_remaining_steps(11)
+            self.mark_all_remaining_steps_skipped(11)
+            return
         else:
             self.skip_step(6)
             self.skip_step(7)
@@ -202,7 +204,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             if canbemadebusy:
                 self.step(18)
                 # Busy response check
-                if not self.is_ci:
+                if not self.is_pics_sdk_ci_only:
                     self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
                     await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.Busy)
             else:

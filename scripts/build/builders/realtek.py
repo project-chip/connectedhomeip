@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 from enum import Enum, auto
 
@@ -120,7 +119,7 @@ class RealtekBuilder(Builder):
             f"-DBUILD_TARGET={self.board.BoardName}",
             f"-DBUILD_BOARD_TARGET={self.board.BoardName}",
             f"-DOT_CMAKE_NINJA_TARGET={self.app.TargetName}",
-            f"-DMATTER_EXAMPLE_PATH={self.root}/examples/{self.app.ExampleName}/realtek_bee"
+            f"-DMATTER_EXAMPLE_PATH={self.root}/examples/{self.app.ExampleName}/realtek/bee"
         ]
         if self.enable_cli:
             flags.append("-DENABLE_CLI=ON")

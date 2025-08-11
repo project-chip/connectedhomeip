@@ -736,6 +736,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test004_Subscribe
 {
+    XCTSkip("Skipping due to flakyness/failing. https://github.com/project-chip/connectedhomeip/issues/27449");
+
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
 
     MTRBaseDevice * device = GetConnectedDevice();

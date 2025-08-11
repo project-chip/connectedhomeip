@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -64,6 +65,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TestEventTriggersEnabl
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace TestEventTriggersEnabled
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    NetworkInterfaces::kMetadataEntry,
+    RebootCount::kMetadataEntry,
+    TestEventTriggersEnabled::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -82,6 +89,22 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PayloadTestReque
 } // namespace PayloadTestRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace HardwareFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace HardwareFaultChange
+namespace RadioFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RadioFaultChange
+namespace NetworkFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace NetworkFaultChange
+namespace BootReason {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace BootReason
+
+} // namespace Events
 } // namespace GeneralDiagnostics
 } // namespace Clusters
 } // namespace app

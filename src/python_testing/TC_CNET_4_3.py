@@ -37,12 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 
 class TC_CNET_4_3(MatterBaseTest):
@@ -115,7 +116,7 @@ class TC_CNET_4_3(MatterBaseTest):
         self.step(4)
         if not current_cluster_connected:
             logging.info("Current cluster is not connected, skipping all remaining test steps")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped(5)
             return
         interface_enabled = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,

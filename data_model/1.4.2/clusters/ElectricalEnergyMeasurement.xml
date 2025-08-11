@@ -57,10 +57,9 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0091" name="Electrical Energy Measurement Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0091" name="Electrical Energy Measurement Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Added support for apparent and reactive energy measurement"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0091" name="Electrical Energy Measurement"/>
@@ -78,18 +77,6 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="3" code="PERE" name="PeriodicEnergy" summary="Measurements are periodic">
       <optionalConform choice="b" more="true" min="1"/>
-    </feature>
-    <feature bit="4" code="APPE" name="ApparentEnergy" summary="Measurements report apparent energy">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-    </feature>
-    <feature bit="5" code="REAE" name="ReactiveEnergy" summary="Measurements report reactive energy">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -147,43 +134,15 @@ Davis, CA 95616, USA
           <min value="StartSystime + 1"/>
         </constraint>
       </field>
-      <field id="5" name="ApparentEnergy" type="energy-mVAh">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="APPE"/>
-          </mandatoryConform>
-        </otherwiseConform>
-        <constraint>
-          <between>
-            <from value="0"/>
-            <to value="4611686018427387904"/>
-          </between>
-        </constraint>
-      </field>
-      <field id="6" name="ReactiveEnergy" type="energy-mVARh">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <feature name="REAE"/>
-          </mandatoryConform>
-        </otherwiseConform>
-        <constraint>
-          <between>
-            <from value="0"/>
-            <to value="4611686018427387904"/>
-          </between>
-        </constraint>
-      </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Accuracy" type="MeasurementAccuracyStruct">
+    <attribute id="0x0000" name="Accuracy" type="">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="CumulativeEnergyImported" type="EnergyMeasurementStruct" default="null">
+    <attribute id="0x0001" name="CumulativeEnergyImported" type="EnergyMeasurementStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -193,7 +152,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="CumulativeEnergyExported" type="EnergyMeasurementStruct" default="null">
+    <attribute id="0x0002" name="CumulativeEnergyExported" type="EnergyMeasurementStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -203,7 +162,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0003" name="PeriodicEnergyImported" type="EnergyMeasurementStruct" default="null">
+    <attribute id="0x0003" name="PeriodicEnergyImported" type="EnergyMeasurementStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -213,7 +172,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0004" name="PeriodicEnergyExported" type="EnergyMeasurementStruct" default="null">
+    <attribute id="0x0004" name="PeriodicEnergyExported" type="EnergyMeasurementStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>

@@ -124,8 +124,6 @@ private:
     CHIP_ERROR StopDiscoveryOverBLE();
     CHIP_ERROR StartDiscoveryOverDNSSD();
     CHIP_ERROR StopDiscoveryOverDNSSD();
-    CHIP_ERROR StartDiscoveryOverSoftAP();
-    CHIP_ERROR StopDiscoveryOverSoftAP();
     CHIP_ERROR StartDiscoveryOverWiFiPAF();
     CHIP_ERROR StopDiscoveryOverWiFiPAF();
 
@@ -170,7 +168,6 @@ private:
     {
         kBLETransport = 0,
         kIPTransport,
-        kSoftAPTransport,
         kWiFiPAFTransport,
         kTransportTypeCount,
     };

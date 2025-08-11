@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -46,6 +47,9 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedTemperatureLevels
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 
@@ -56,6 +60,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetTemperature::
 } // namespace SetTemperature
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace TemperatureControl
 } // namespace Clusters
 } // namespace app

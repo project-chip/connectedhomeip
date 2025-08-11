@@ -216,6 +216,47 @@ FUZZ_TEST(PayloadDecoder, RunDecodeFuzz).WithDomains(Arbitrary<std::vector<std::
 -   A detailed reference for input domains can be found here:
     [FuzzTest Domain Reference](https://github.com/google/fuzztest/blob/main/doc/domains-reference.md#elementof-domains-element-of).
 
+#### Domain Combinators
+
+-   Domain Combinators: Useful when we have input domains that we want use to
+    create another domain; e.g. construct an object and pass it to the property
+    function.
+-   An example is `Map` documented in FuzzTest's official documentation
+    [Aggregate Combinators#Map](https://github.com/google/fuzztest/blob/main/doc/domains-reference.md#map)
+-   Using a Map, we can take several input domains, pass them into the mapping
+    function, and get a single Domain as output.
+-   An example from the Stack is `AnyValidationContext()` used in
+    `FUZZ_TEST(FuzzCASE, HandleSigma3b)`
+
+#### Seeds and Corpus
+
+-   Using initial seeds is very useful when fuzzing functions that take complex
+    inputs, such as large byte arrays
+-   The fuzzing engine starts by mutating these initial seeds instead of
+    generating completely random inputs
+-   This helps the fuzzing engine explore more realistic and meaningful code
+    paths faster, making it more likely to uncover issues
+
+-   Adding `.WithSeeds()` to the _Input Domains_ within a FUZZ_TEST Macro
+    invocation allow us to use initial seeds.
+-   Two Ways to use `.WithSeeds()`:
+
+    1. **Using variables as inputs**: Examples of this usage are in
+       `FuzzCASE.cpp` in the lambda `SeededEncodedSigma1()` used in the Fuzz
+       Test Case `FUZZ_TEST(FuzzCASE, ParseSigma1_RawPayload)`
+
+    2. **Using files as inputs** with `fuzztest::ReadFilesFromDirectory()`:
+        - Returns a vector of single-element tuples, each containing file
+          content as a string
+        - Use a lambda like `seedProvider` in `FuzzChipCertPW.cpp` to unpack the
+          tuples and extract contents
+        - The lambda should return `std::vector<std::string>` to be used with
+          `std::string` domain as shown below:
+
+    ```cpp
+        FUZZ_TEST(FuzzChipCert, ConvertX509CertToChipCertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
+    ```
+
 ### Running FuzzTests
 
 There are several ways to run the tests:
@@ -302,6 +343,7 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 
 -   After doing this, Screenshot below shows Line #2159 is now reached; We have
     increased our coverage and we are sure that our FuzzTest is more effective:
+-   This approach was used FuzzTest Case `FUZZ_TEST(FuzzCASE, HandleSigma3b)`
 
 ![FuzzBlocker_after](img/fuzzblocker_after.png)
 

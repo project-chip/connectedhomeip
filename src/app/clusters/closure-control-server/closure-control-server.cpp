@@ -85,17 +85,34 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
 
     case Attributes::CurrentErrorList::Id: {
         return aEncoder.EncodeList(
-            [&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR { return logic.GetCurrentErrorList(encoder); });
+            [&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR { return logic.ReadCurrentErrorListAttribute(encoder); });
     }
 
-    case Attributes::OverallState::Id: {
-        typedef DataModel::Nullable<GenericOverallState> T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallState(ret); });
+    case Attributes::OverallCurrentState::Id: {
+        typedef DataModel::Nullable<GenericOverallCurrentState> T;
+        return EncodeRead<T>(aEncoder,
+                             [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallCurrentState(ret); });
     }
 
-    case Attributes::OverallTarget::Id: {
-        typedef DataModel::Nullable<GenericOverallTarget> T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallTarget(ret); });
+    case Attributes::OverallTargetState::Id: {
+        typedef DataModel::Nullable<GenericOverallTargetState> T;
+        return EncodeRead<T>(aEncoder,
+                             [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallTargetState(ret); });
+    }
+
+    case Attributes::LatchControlModes::Id: {
+        typedef BitFlags<LatchControlModesBitmap> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetLatchControlModes(ret); });
+    }
+
+    case Attributes::FeatureMap::Id: {
+        typedef BitFlags<Feature> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
+    }
+
+    case Attributes::ClusterRevision::Id: {
+        typedef Attributes::ClusterRevision::TypeInfo::Type T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetClusterRevision(ret); });
     }
 
     default:

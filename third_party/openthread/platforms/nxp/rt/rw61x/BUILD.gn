@@ -78,7 +78,10 @@ config("openthread_rw61x_config") {
   }
 
   # ot cli configs
-  defines += [ "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1" ]
+  defines += [
+    "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1",
+    "OPENTHREAD_PROJECT_LIB_CONFIG_FILE=\"${nxp_ot_lib_config_file}\"",
+  ]
 
   cflags = [
     "-Wno-shadow",
@@ -104,6 +107,7 @@ source_set("libopenthread-rw61x") {
     "${openthread_nxp_root}/src/common/diag.c",
     "${openthread_nxp_root}/src/common/entropy.c",
     "${openthread_nxp_root}/src/common/logging.c",
+    "${openthread_nxp_root}/src/rw/rw612/platform/reset.c",
   ]
 
   if (chip_enable_wifi && chip_enable_openthread) {
@@ -155,6 +159,8 @@ source_set("libopenthread-rw61x") {
   defines = [
     "OPENTHREAD_FTD=1",
     "OT_PLAT_UART_INSTANCE=3",
+    "OT_NXP_INDEPENDENT_RST=1",  # Adding support for RCP independent reset
+                                 # feature
   ]
 
   public_configs = [ ":openthread_rw61x_config" ]

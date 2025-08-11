@@ -40,11 +40,13 @@ import logging
 import time
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         default_matter_test_main, has_cluster, run_if_endpoint_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
+                                           run_if_endpoint_matches)
 
 
 class TC_FAN_4_1(MatterBaseTest):
@@ -153,7 +155,7 @@ class TC_FAN_4_1(MatterBaseTest):
         wait_s = self.user_params.get('pixit_fan_start_time', 5)
 
         self.step(2)
-        sub = ClusterAttributeChangeAccumulator(fan)
+        sub = AttributeSubscriptionHandler(expected_cluster=fan)
         await sub.start(self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint())
 
         self.step(3)

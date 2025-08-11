@@ -26,6 +26,7 @@
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Messaging {

@@ -239,18 +239,18 @@ public:
 namespace VideoStreamAllocate {
 enum class Fields : uint8_t
 {
-    kStreamUsage      = 0,
-    kVideoCodec       = 1,
-    kMinFrameRate     = 2,
-    kMaxFrameRate     = 3,
-    kMinResolution    = 4,
-    kMaxResolution    = 5,
-    kMinBitRate       = 6,
-    kMaxBitRate       = 7,
-    kMinFragmentLen   = 8,
-    kMaxFragmentLen   = 9,
-    kWatermarkEnabled = 10,
-    kOSDEnabled       = 11,
+    kStreamUsage         = 0,
+    kVideoCodec          = 1,
+    kMinFrameRate        = 2,
+    kMaxFrameRate        = 3,
+    kMinResolution       = 4,
+    kMaxResolution       = 5,
+    kMinBitRate          = 6,
+    kMaxBitRate          = 7,
+    kMinKeyFrameInterval = 8,
+    kMaxKeyFrameInterval = 9,
+    kWatermarkEnabled    = 10,
+    kOSDEnabled          = 11,
 };
 
 struct Type
@@ -266,10 +266,10 @@ public:
     uint16_t maxFrameRate                = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
-    uint32_t minBitRate     = static_cast<uint32_t>(0);
-    uint32_t maxBitRate     = static_cast<uint32_t>(0);
-    uint16_t minFragmentLen = static_cast<uint16_t>(0);
-    uint16_t maxFragmentLen = static_cast<uint16_t>(0);
+    uint32_t minBitRate          = static_cast<uint32_t>(0);
+    uint32_t maxBitRate          = static_cast<uint32_t>(0);
+    uint16_t minKeyFrameInterval = static_cast<uint16_t>(0);
+    uint16_t maxKeyFrameInterval = static_cast<uint16_t>(0);
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
 
@@ -293,10 +293,10 @@ public:
     uint16_t maxFrameRate                = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
-    uint32_t minBitRate     = static_cast<uint32_t>(0);
-    uint32_t maxBitRate     = static_cast<uint32_t>(0);
-    uint16_t minFragmentLen = static_cast<uint16_t>(0);
-    uint16_t maxFragmentLen = static_cast<uint16_t>(0);
+    uint32_t minBitRate          = static_cast<uint32_t>(0);
+    uint32_t maxBitRate          = static_cast<uint32_t>(0);
+    uint16_t minKeyFrameInterval = static_cast<uint16_t>(0);
+    uint16_t maxKeyFrameInterval = static_cast<uint16_t>(0);
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
 

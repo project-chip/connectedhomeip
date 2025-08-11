@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -43,6 +44,11 @@ namespace PendingDatasetTimestamp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PendingDatasetTimestamp::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PendingDatasetTimestamp
+constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
+    BorderRouterName::kMetadataEntry, BorderAgentID::kMetadataEntry,          ThreadVersion::kMetadataEntry,
+    InterfaceEnabled::kMetadataEntry, ActiveDatasetTimestamp::kMetadataEntry, PendingDatasetTimestamp::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
@@ -57,14 +63,18 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace GetPendingDatasetRequest
 namespace SetActiveDatasetRequest {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(SetActiveDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+    kMetadataEntry(SetActiveDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kManage);
 } // namespace SetActiveDatasetRequest
 namespace SetPendingDatasetRequest {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(SetPendingDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+    kMetadataEntry(SetPendingDatasetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kManage);
 } // namespace SetPendingDatasetRequest
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters
 } // namespace app

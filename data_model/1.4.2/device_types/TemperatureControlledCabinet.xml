@@ -104,7 +104,7 @@ Davis, CA 95616, USA
         </attribute>
       </attributes>
     </cluster>
-    <cluster id="0x0052" name="Refrigerator and Temperature Controlled Cabinet Mode" side="server">
+    <cluster id="0x0052" name="Refrigerator And Temperature Controlled Cabinet Mode" side="server">
       <optionalConform>
         <condition name="Cooler"/>
       </optionalConform>

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -52,6 +53,9 @@ namespace SensorFault {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SensorFault::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SensorFault
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 
@@ -66,6 +70,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(EnableDisableAla
 } // namespace EnableDisableAlarm
 
 } // namespace Commands
+
+namespace Events {
+namespace AlarmsStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace AlarmsStateChanged
+namespace SensorFault {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SensorFault
+
+} // namespace Events
 } // namespace BooleanStateConfiguration
 } // namespace Clusters
 } // namespace app

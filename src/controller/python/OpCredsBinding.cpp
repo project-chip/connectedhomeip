@@ -23,8 +23,8 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
-#include "controller/python/chip/crypto/p256keypair.h"
-#include "controller/python/chip/interaction_model/Delegate.h"
+#include "controller/python/matter/crypto/p256keypair.h"
+#include "controller/python/matter/interaction_model/Delegate.h"
 
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
@@ -38,8 +38,8 @@
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <controller/python/chip/commissioning/PlaceholderOperationalCredentialsIssuer.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/commissioning/PlaceholderOperationalCredentialsIssuer.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -65,7 +65,12 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
 
 Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationDelegate(const char * dacRevocationSetPath)
 {
-    VerifyOrReturnValue(dacRevocationSetPath != nullptr, nullptr);
+    if (dacRevocationSetPath == nullptr)
+    {
+        ChipLogError(Controller,
+                     "Received a nullptr dacRevocationSetPath. Using empty string so that attestation checks don't fail!");
+        dacRevocationSetPath = "";
+    }
 
     static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
     testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
@@ -383,6 +388,9 @@ private:
         // "not valid" because attestation verification always fails after entering revocation check step
         case chip::Controller::CommissioningStage::kAttestationVerification:
             return false;
+        case chip::Controller::CommissioningStage::kJCMTrustVerification:
+            // JCM Trust Verification is not supported in Python tests
+            return false;
         default:
             return true;
         }
@@ -536,8 +544,13 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     ChipLogProgress(Support, "Using device attestation PAA trust store path %s.", paaTrustStorePath);
 
     // Initialize device attestation verifier
+    // TODO: Ensure that attestation revocation data is actually provided.
+    chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
     const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
-    chip::Credentials::DeviceAttestationVerifier * dacVerifier        = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+    auto * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+    VerifyOrDie(dacVerifier != nullptr);
+    dacVerifier->EnableVerboseLogs(true);
+
     SetDeviceAttestationVerifier(dacVerifier);
 
     chip::Crypto::P256Keypair ephemeralKey;

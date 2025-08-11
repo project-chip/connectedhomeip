@@ -48,6 +48,13 @@ overrides:
     status: success
     explanation: "PR has been fast tracked, bypassing reviews"
 
+  ############################################################
+  #  Approved by matter-sdk-maintainers
+  ############################################################
+  - if: "'sdk-maintainer-approved' in labels and len(groups.approved.include('sdk-maintainers')) >= 1"
+    status: success
+    explanation: "Approved by SDK maintainer and label is set."
+
 ############################################################
 #  Notifications
 ############################################################
@@ -124,6 +131,14 @@ groups:
       - files.include('*')
     reviewers:
       teams: [reviewers-google]
+    reviews:
+      request: 0 # Do not auto-add
+  shared-reviewers-geo:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [reviewers-geo]
     reviews:
       request: 0 # Do not auto-add
   shared-reviewers-grundfos:
@@ -236,6 +251,23 @@ groups:
       teams: [reviewers-qorvo]
     reviews:
       request: 0 # Do not auto-add
+  shared-reviewers-velux:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [reviewers-velux]
+    reviews:
+      request: 0 # Do not auto-add
+
+  sdk-maintainers:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [matter-sdk-maintainers]
+    reviews:
+      request: 0 # Do not auto-add
 
   ############################################################
   #  Folder specific review requirements. A PR must meet all
@@ -268,7 +300,8 @@ groups:
     type: required
     conditions:
       - "files.include('src/darwin/*').exclude('src/darwin/Framework/CHIP/zap-generated/*') or \
-        files.include('src/platform/Darwin/*')"
+        files.include('src/platform/Darwin/*') or \
+        files.include('examples/darwin-framework-tool/*')"
     reviewers:
       teams: [reviewers-apple]
     reviews:
@@ -292,7 +325,8 @@ groups:
               .exclude('examples/chef/*')\
               .exclude('integrations/cloudbuild/*')\
               .exclude('src/darwin/*')\
-              .exclude('src/platform/Darwin/*') or \
+              .exclude('src/platform/Darwin/*')\
+              .exclude('examples/darwin-framework-tool/*') or \
         files.include('src/darwin/Framework/CHIP/zap-generated/*')"
     requirements:
       - len(groups.approved.include('shared-reviewers-*')) >= 2

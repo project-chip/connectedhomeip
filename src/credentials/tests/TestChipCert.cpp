@@ -1602,6 +1602,82 @@ TEST_F(TestChipCert, TestChipCert_GenerateNOCICA)
     EXPECT_EQ(DecodeChipCert(outCert, certData), CHIP_NO_ERROR);
 }
 
+TEST_F(TestChipCert, TestChipCert_GenerateVidVerificationSignerCert)
+{
+    // Generate a new keypair for cert signing.
+    P256Keypair keypair;
+    EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+
+    uint8_t signed_cert[kMaxDERCertLength];
+
+    uint8_t outCertBuf[kMaxCHIPCertLength];
+    MutableByteSpan outCert(outCertBuf);
+
+    ChipCertificateData certData;
+
+    ChipDN vvs_dn;
+    EXPECT_EQ(vvs_dn.AddAttribute_MatterVidVerificationSignerId(0xEECDABCDABCDABCDull), CHIP_NO_ERROR);
+    ChipDN issuer_dn;
+    EXPECT_EQ(issuer_dn.AddAttribute_MatterRCACId(0x43215678FEDCABCDull), CHIP_NO_ERROR);
+
+    X509CertRequestParams vvs_params = { 1234, 631161876, 729942000, vvs_dn, issuer_dn };
+    P256Keypair vvs_keypair;
+    ASSERT_EQ(vvs_keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+
+    MutableByteSpan signed_cert_span(signed_cert);
+    ASSERT_EQ(NewVidVerificationSignerX509Cert(vvs_params, vvs_keypair.Pubkey(), keypair, signed_cert_span), CHIP_NO_ERROR);
+
+    ASSERT_EQ(ConvertX509CertToChipCert(signed_cert_span, outCert), CHIP_NO_ERROR);
+
+    ASSERT_EQ(DecodeChipCert(outCert, certData), CHIP_NO_ERROR);
+
+    {
+        CertType certType = CertType::kNotSpecified;
+        uint64_t certId   = 0;
+
+        EXPECT_EQ(certData.mSubjectDN.GetCertType(certType), CHIP_NO_ERROR);
+        EXPECT_EQ(certType, CertType::kVidVerificationSigner);
+
+        EXPECT_EQ(certData.mSubjectDN.GetCertChipId(certId), CHIP_NO_ERROR);
+        EXPECT_EQ(certId, 0xEECDABCDABCDABCDull);
+    }
+
+    // Test with FutureExtension.
+    X509CertRequestParams vvs_params2 = { 1234, 631161876, 729942000, vvs_dn, issuer_dn, kSubjectAltNameAsFutureExt };
+    MutableByteSpan signed_cert_span2(signed_cert);
+    EXPECT_EQ(NewVidVerificationSignerX509Cert(vvs_params2, vvs_keypair.Pubkey(), keypair, signed_cert_span2), CHIP_NO_ERROR);
+    outCert = MutableByteSpan(outCertBuf);
+
+    EXPECT_EQ(ConvertX509CertToChipCert(signed_cert_span2, outCert), CHIP_NO_ERROR);
+    EXPECT_EQ(DecodeChipCert(outCert, certData), CHIP_NO_ERROR);
+
+    {
+        CertType certType = CertType::kNotSpecified;
+
+        EXPECT_EQ(certData.mSubjectDN.GetCertType(certType), CHIP_NO_ERROR);
+        EXPECT_EQ(certType, CertType::kVidVerificationSigner);
+    }
+
+    // Test error case: VidVerificationSigner cert subject provided a node ID attribute.
+    vvs_params.SubjectDN.Clear();
+    EXPECT_EQ(vvs_params.SubjectDN.AddAttribute_MatterNodeId(0xABCDABCDABCDABCD), CHIP_NO_ERROR);
+    MutableByteSpan signed_cert_span1(signed_cert);
+    EXPECT_NE(NewVidVerificationSignerX509Cert(vvs_params, vvs_keypair.Pubkey(), keypair, signed_cert_span1), CHIP_NO_ERROR);
+
+    // Test error case: VidVerificationSigner cert subject provided a fabric ID attribute.
+    vvs_params.SubjectDN.Clear();
+    EXPECT_EQ(vvs_params.SubjectDN.AddAttribute_MatterFabricId(0xFAB00000FAB00001), CHIP_NO_ERROR);
+    EXPECT_EQ(NewVidVerificationSignerX509Cert(vvs_params, vvs_keypair.Pubkey(), keypair, signed_cert_span1),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test that serial number cannot be negative.
+    vvs_params.SubjectDN.Clear();
+    EXPECT_EQ(vvs_params.SubjectDN.AddAttribute_MatterVidVerificationSignerId(0xEECDABCDABCDABCD), CHIP_NO_ERROR);
+    vvs_params.SerialNumber = -1;
+    EXPECT_EQ(NewVidVerificationSignerX509Cert(vvs_params, vvs_keypair.Pubkey(), keypair, signed_cert_span1),
+              CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 TEST_F(TestChipCert, TestChipCert_VerifyGeneratedCerts)
 {
     // Generate a new keypair for cert signing

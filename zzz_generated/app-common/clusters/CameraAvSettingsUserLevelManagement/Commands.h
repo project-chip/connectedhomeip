@@ -285,7 +285,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Structs::ViewportStruct::Type viewport;
+    Globals::Structs::ViewportStruct::Type viewport;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -302,7 +302,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Structs::ViewportStruct::DecodableType viewport;
+    Globals::Structs::ViewportStruct::DecodableType viewport;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

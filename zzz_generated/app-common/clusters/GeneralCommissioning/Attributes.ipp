@@ -52,6 +52,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, TCAcknowledgementsRequired);
     case Attributes::TCUpdateDeadline::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, TCUpdateDeadline);
+    case Attributes::RecoveryIdentifier::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, recoveryIdentifier);
+    case Attributes::NetworkRecoveryReason::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, networkRecoveryReason);
+    case Attributes::IsCommissioningWithoutPower::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, isCommissioningWithoutPower);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

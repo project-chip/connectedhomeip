@@ -80,11 +80,35 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="StatusCodeEnum">
-      <item value="0x02" name="VIDNotVerified" summary="ICACCSRRequest command has been invoked by a peer against which Fabric Table VID Verification hasn&apos;t been executed">
-        <mandatoryConform/>
+      <item value="0x02" name="Busy" summary="Could not be completed because another commissioning is in progress">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </item>
-      <item value="0x03" name="InvalidAdministratorFabricIndex" summary="OpenJointCommissioningWindow command has been invoked but the AdministratorFabricIndex field has the value of null.">
-        <mandatoryConform/>
+      <item value="0x03" name="PAKEParameterError" summary="Provided PAKE parameters were incorrectly formatted or otherwise invalid">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="0x04" name="WindowNotOpen" summary="No commissioning window was currently open">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="0x05" name="VIDNotVerified" summary="ICACCSRRequest command has been invoked by a peer against which Fabric Table VID Verification hasn&apos;t been executed">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="0x06" name="InvalidAdministratorFabricIndex" summary="OpenJointCommissioningWindow command has been invoked but the AdministratorFabricIndex field has the value of null">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </item>
     </enum>
     <enum name="TransferAnchorResponseStatusEnum">
@@ -103,7 +127,10 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="AdministratorFabricIndex" type="fabric-idx">
       <access read="true" readPrivilege="admin"/>
       <quality nullable="true"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <constraint>
         <between>
           <from value="1"/>
@@ -115,10 +142,16 @@ Davis, CA 95616, USA
   <commands>
     <command id="0x00" name="ICACCSRRequest" direction="commandToServer" response="ICACCSRResponse">
       <access invokePrivilege="admin"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
     </command>
     <command id="0x01" name="ICACCSRResponse" direction="responseFromServer">
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <field id="0" name="ICACCSR" type="octstr">
         <mandatoryConform/>
         <constraint>
@@ -128,7 +161,10 @@ Davis, CA 95616, USA
     </command>
     <command id="0x02" name="AddICAC" direction="commandToServer" response="ICACResponse">
       <access invokePrivilege="admin"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <field id="1" name="ICACValue" type="octstr">
         <mandatoryConform/>
         <constraint>
@@ -137,14 +173,20 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x03" name="ICACResponse" direction="responseFromServer">
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <field id="0" name="StatusCode" type="ICACResponseStatusEnum">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x04" name="OpenJointCommissioningWindow" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <field id="0" name="CommissioningTimeout" type="uint16">
         <mandatoryConform/>
         <constraint>
@@ -153,6 +195,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="PAKEPasscodeVerifier" type="octstr">
         <mandatoryConform/>
+        <constraint>
+          <allowed value="97"/>
+        </constraint>
       </field>
       <field id="2" name="Discriminator" type="uint16">
         <mandatoryConform/>
@@ -181,21 +226,33 @@ Davis, CA 95616, USA
     </command>
     <command id="0x05" name="TransferAnchorRequest" direction="commandToServer" response="TransferAnchorResponse">
       <access invokePrivilege="admin"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
     </command>
     <command id="0x06" name="TransferAnchorResponse" direction="responseFromServer">
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <field id="0" name="StatusCode" type="TransferAnchorResponseStatusEnum">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x07" name="TransferAnchorComplete" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
     </command>
     <command id="0x08" name="AnnounceJointFabricAdministrator" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <field id="0" name="EndpointID" type="endpoint-no">
         <mandatoryConform/>
       </field>

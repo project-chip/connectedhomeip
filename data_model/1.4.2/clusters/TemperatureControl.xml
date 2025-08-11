@@ -122,7 +122,10 @@ Davis, CA 95616, USA
         <feature name="STEP"/>
       </mandatoryConform>
       <constraint>
-        <max value="MaxTemperature - MinTemperature"/>
+        <between>
+          <from value="1"/>
+          <to value="MaxTemperature - MinTemperature"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0004" name="SelectedTemperatureLevel" type="uint8">

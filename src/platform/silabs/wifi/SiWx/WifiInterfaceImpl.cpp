@@ -372,11 +372,12 @@ sl_status_t SetWifiConfigurations()
     sl_status_t status = SL_STATUS_OK;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    sl_wifi_listen_interval_t sleep_interval = { .listen_interval =
-                                                     chip::ICDConfigurationData::GetInstance().GetSlowPollingInterval().count() };
-    status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
+    sl_wifi_listen_interval_v2_t sleep_interval = {
+        .listen_interval = chip::ICDConfigurationData::GetInstance().GetSlowPollingInterval().count()
+    };
+    status = sl_wifi_set_listen_interval_v2(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
     VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval failed: 0x%lx", status));
+                        ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval_v2 failed: 0x%lx", status));
 
     // This is be triggered on the disconnect use case, providing the amount of TA tries
     // Setting the TA retry to 1 and giving the control to the M4 for improved power efficiency
