@@ -60,7 +60,7 @@ public:
         ReturnErrorOnFailure(decoder.Decode(decodedValue));
         if constexpr (std::is_enum_v<T>)
         {
-            VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
         }
 
         value = decodedValue;

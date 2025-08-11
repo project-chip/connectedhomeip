@@ -184,8 +184,10 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const 
             return Protocols::InteractionModel::Status::ConstraintError;
         }
 
-        CHIP_ERROR result = attrPersistence.DecodeAndStoreNativeEndianValue(
-            { kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, decoder, mCalendarType);
+        // Using WriteAttribute directly so we can check that the decoded value is in the supported list
+        // before storing it.
+        CHIP_ERROR result = attrProvider->WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, HourFormat::Id }, 
+            { reinterpret_cast<const uint8_t *>(&newCalendar), sizeof(newCalendar) });
 
         return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
                                        : Protocols::InteractionModel::Status::WriteIgnored;
