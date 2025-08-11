@@ -302,8 +302,7 @@ bool GetProviderAndFabric(CommandHandler * commandObj, const ConcreteCommandPath
     return true;
 }
 
-Status
-ValidateKeySetWriteArguments(const Commands::KeySetWrite::DecodableType & commandData)
+Status ValidateKeySetWriteArguments(const Commands::KeySetWrite::DecodableType & commandData)
 {
     // SPEC: If the EpochKey0 field is null or its associated EpochStartTime0 field is null, then this command SHALL fail with an
     // INVALID_COMMAND status code responded to the client.
@@ -417,10 +416,9 @@ ValidateKeySetWriteArguments(const Commands::KeySetWrite::DecodableType & comman
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-HandleKeySetWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                  const Commands::KeySetWrite::DecodableType & commandData,
-                  Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
+std::optional<DataModel::ActionReturnStatus> HandleKeySetWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                               const Commands::KeySetWrite::DecodableType & commandData,
+                                                               Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
     // Pre-validate all complex data dependency assumptions about the epoch keys
     Status status = ValidateKeySetWriteArguments(commandData);
@@ -510,10 +508,9 @@ HandleKeySetWrite(CommandHandler * commandObj, const ConcreteCommandPath & comma
     return StatusIB(err).mStatus;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-HandleKeySetRead(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                 const Commands::KeySetRead::DecodableType & commandData,
-                 Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
+std::optional<DataModel::ActionReturnStatus> HandleKeySetRead(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::KeySetRead::DecodableType & commandData,
+                                                              Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
     FabricIndex fabricIndex = fabric->GetFabricIndex();
     GroupDataProvider::KeySet keyset;
@@ -566,10 +563,11 @@ HandleKeySetRead(CommandHandler * commandObj, const ConcreteCommandPath & comman
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-HandleKeySetRemove(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                   const Commands::KeySetRemove::DecodableType & commandData,
-                   Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
+std::optional<DataModel::ActionReturnStatus> HandleKeySetRemove(CommandHandler * commandObj,
+                                                                const ConcreteCommandPath & commandPath,
+                                                                const Commands::KeySetRemove::DecodableType & commandData,
+                                                                Credentials::GroupDataProvider * provider,
+                                                                const FabricInfo * fabric)
 
 {
     if (commandData.groupKeySetID == GroupDataProvider::kIdentityProtectionKeySetId)
@@ -596,10 +594,10 @@ HandleKeySetRemove(CommandHandler * commandObj, const ConcreteCommandPath & comm
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleKeySetReadAllIndices(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::KeySetReadAllIndices::DecodableType & commandData,
-    Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
+std::optional<DataModel::ActionReturnStatus>
+HandleKeySetReadAllIndices(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                           const Commands::KeySetReadAllIndices::DecodableType & commandData,
+                           Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
     FabricIndex fabricIndex = fabric->GetFabricIndex();
     auto keysIt             = provider->IterateKeySets(fabricIndex);
