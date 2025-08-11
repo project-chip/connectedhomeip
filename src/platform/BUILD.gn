@@ -498,6 +498,10 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/system",
     ]
 
+    if (defined(chip_enable_sdk_version)) {
+      public_deps += [ ":matter_sdk_version" ]
+    }
+
     public_configs = [ "${chip_root}/src:includes" ]
   }
 
@@ -664,10 +668,6 @@ if (chip_device_platform != "none") {
       _platform_target = "NuttX"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
-    }
-
-    if (defined(chip_enable_sdk_version)) {
-      public_deps += [ ":matter_sdk_version" ]
     }
 
     public_deps += [ _platform_target ]
