@@ -16,6 +16,7 @@
  */
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -25,6 +26,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
+using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 
 // for fixed endpoint, this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
 // the static assert is skipped in case of dynamic endpoints.
@@ -41,15 +43,13 @@ LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
-    const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics   = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed = emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks =
-            emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, Attributes::CurrentHeapHighWatermark::Id),
-    };
 
-    gServer.Create(enabledAttributes);
+    gServer.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet()
+                       .Set<ThreadMetrics::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, ThreadMetrics::Id))
+                       .Set<CurrentHeapFree::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapFree::Id))
+                       .Set<CurrentHeapUsed::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapUsed::Id))
+                       .Set<CurrentHeapHighWatermark::Id>(
+                           emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapHighWatermark::Id)));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
     if (err != CHIP_NO_ERROR)
