@@ -20,6 +20,7 @@ namespace WakeOnLan {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MACAddress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MACAddress::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
