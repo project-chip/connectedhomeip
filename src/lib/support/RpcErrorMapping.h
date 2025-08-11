@@ -30,7 +30,7 @@ namespace rpc {
  * Provides a 1:1 mapping between RPC error codes and Matter stack error codes.
  *
  * @param status The pw::Status error code from an RPC call.
- * @return Corresponding CHIP_ERROR value.
+ * @return Closest semantic corresponding CHIP_ERROR value (default to CHIP_ERROR_INTERNAL for unrecognized codes).
  */
 static inline CHIP_ERROR MapRpcStatusToChipError(const ::pw::Status & status)
 {
@@ -57,7 +57,7 @@ static inline CHIP_ERROR MapRpcStatusToChipError(const ::pw::Status & status)
     case pw_Status::PW_STATUS_FAILED_PRECONDITION:
         return CHIP_ERROR_INCORRECT_STATE; // No CHIP_ERROR_PRECONDITION_NOT_MET, use INCORRECT_STATE
     case pw_Status::PW_STATUS_ABORTED:
-        return CHIP_ERROR_TRANSACTION_CANCELED; // No CHIP_ERROR_ABORTED, use TRANSACTION_CANCELED;
+        return CHIP_ERROR_TRANSACTION_CANCELED; // No CHIP_ERROR_ABORTED, use TRANSACTION_CANCELED
     case pw_Status::PW_STATUS_OUT_OF_RANGE:
         return CHIP_ERROR_INVALID_ARGUMENT; // No CHIP_ERROR_OUT_OF_RANGE, use INVALID_ARGUMENT
     case pw_Status::PW_STATUS_UNIMPLEMENTED:
