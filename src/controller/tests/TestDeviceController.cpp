@@ -192,6 +192,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         DeviceControllerFactory::GetInstance().Shutdown();
     }
     EXPECT_EQ(fHolder.InitFabricTable(), CHIP_NO_ERROR);
+    factoryInitParams.fabricTable = &fHolder.GetFabricTable();
 
     //
     // Test retain and release system state
