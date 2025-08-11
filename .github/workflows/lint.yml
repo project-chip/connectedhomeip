@@ -141,7 +141,6 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
                      -e py -e cpp -e cc -e c -e h -e hpp -e mm \
                      --known-failure build-matter-wheel.py \
-                     --known-failure py_matter_yamltest_repl_adapter/matter_yamltest_repl_adapter/adapter.py \
                      --known-failure tests/scripts/base.py \
                      --known-failure tests/scripts/cirque_restart_remote_device.py \
                      --known-failure tests/scripts/cluster_objects.py \

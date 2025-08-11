@@ -243,8 +243,8 @@ CONTEXT_SETTINGS = dict(
             'server_arguments': '--interactive',
         },
         'chip-repl': {
-            'adapter': 'matter_yamltest_repl_adapter.adapter',
-            'runner': 'matter_yamltest_repl_adapter.runner',
+            'adapter': 'adapters.repl.adapter',
+            'runner': 'adapters.repl.runner',
         },
     },
     max_content_width=120,
