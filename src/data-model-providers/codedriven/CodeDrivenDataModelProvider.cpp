@@ -35,7 +35,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
     mServerClusterContext.emplace(ServerClusterContext({
         .provider           = this,
         .storage            = &mPersistentStorageDelegate,
-        .interactionContext = &mContext,
+        .interactionContext = &this->mContext,
     }));
 
     // Start up all registered server clusters
