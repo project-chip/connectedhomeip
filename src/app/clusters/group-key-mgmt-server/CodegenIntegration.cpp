@@ -31,7 +31,7 @@ static_assert((GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.
 
 LazyRegisteredServerCluster<GroupKeyManagementCluster> gServer;
 
-void emberAfGroupKeyManagementClusterInitCallback(EndpointId endpointId)
+void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == kRootEndpointId);
     gServer.Create();

@@ -78,6 +78,7 @@ ClustersWithInitFunctions:
     - Color Control
     - General Diagnostics
     - Groups
+    - Group Key Management
     - Identify
     - Level Control
     - Localization Configuration
