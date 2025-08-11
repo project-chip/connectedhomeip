@@ -58,6 +58,16 @@ public:
         return mFabricTable.Init(initParams);
     }
 
+    CHIP_ERROR InitFabricTable()
+    {
+        chip::FabricTable::InitParams initParams;
+        initParams.storage             = &mStorage;
+        initParams.operationalKeystore = &mOpKeyStore;
+        initParams.opCertStore         = &mOpCertStore;
+
+        return mFabricTable.Init(initParams);
+    }
+
     chip::FabricTable & GetFabricTable() { return mFabricTable; }
 
 private:
@@ -181,6 +191,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
         DeviceControllerFactory::GetInstance().Shutdown();
     }
+    EXPECT_EQ(fHolder.InitFabricTable(), CHIP_NO_ERROR);
 
     //
     // Test retain and release system state
@@ -201,8 +212,10 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods)
         EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
         DeviceControllerFactory::GetInstance().Shutdown();
     }
-
+    // Free opCertStore and engine before finish
+    opCertStore.Finish();
     engine->Shutdown();
+    sProvider.Finish();
 }
 
 // Add more test cases as needed to cover different scenarios
