@@ -31,6 +31,7 @@ import logging
 import os
 import re
 import sys
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict, Set
 
@@ -47,7 +48,7 @@ __LOG_LEVELS__ = {
 
 class OrphanChecker:
     def __init__(self):
-        self.gn_data: Dict[str, str] = {}
+        self.gn_data: Dict[str, str] = defaultdict(str)
         self.known_failures: Set[str] = set()
         self.fatal_failures = 0
         self.failures = 0
@@ -59,7 +60,7 @@ class OrphanChecker:
         Will read the entire content of the GN file in memory for future reference.
         """
         logging.debug(f'Adding GN {gn!s} for {gn.parent!s}')
-        self.gn_data[str(gn.parent)] = gn.read_text('utf-8')
+        self.gn_data[str(gn.parent)] += gn.read_text('utf-8')
 
     def AddKnownFailure(self, k: str):
         self.known_failures.add(k)
@@ -114,25 +115,34 @@ class OrphanChecker:
     help='Determines the verbosity of script output',
 )
 @click.option(
-    '--extensions',
+    '--gn-extra',
+    type=click.Path(exists=True, dir_okay=False),
+    multiple=True,
+    help=(
+        'Extra GN files which should be treated as BUILD.gn (e.g. *.gni files '
+        'included by BUILD.gn)'),
+)
+@click.option(
+    '-e', '--extension',
     default=["cpp", "cc", "c", "h", "hpp"],
     type=str, multiple=True,
     help='What file extensions to consider',
 )
 @click.option(
     '--known-failure',
-    type=str, multiple=True,
+    type=click.Path(exists=True, dir_okay=False),
+    multiple=True,
     help='What paths are known to fail',
 )
 @click.option(
     '--skip-dir',
-    type=str,
+    type=click.Path(),
     multiple=True,
     help='Skip a specific sub-directory from checks',
 )
 @click.argument('dirs',
                 type=click.Path(exists=True, file_okay=False, resolve_path=True), nargs=-1)
-def main(log_level, extensions, dirs, known_failure, skip_dir):
+def main(log_level, gn_extra, extension, known_failure, skip_dir, dirs):
     coloredlogs.install(level=__LOG_LEVELS__[log_level],
                         fmt='%(asctime)s %(levelname)-7s %(message)s')
 
@@ -140,8 +150,8 @@ def main(log_level, extensions, dirs, known_failure, skip_dir):
         logging.error("Please provide at least one directory to scan")
         sys.exit(1)
 
-    if not extensions:
-        logging.error("Need at  least one extension")
+    if not extension:
+        logging.error("Need at least one extension")
         sys.exit(1)
 
     checker = OrphanChecker()
@@ -152,11 +162,13 @@ def main(log_level, extensions, dirs, known_failure, skip_dir):
     for directory in dirs:
         for name in Path(directory).rglob("BUILD.gn"):
             checker.AppendGnData(name)
+    for name in gn_extra:
+        checker.AppendGnData(Path(name).absolute())
 
     skip_dir = set(skip_dir)
 
     # Go through all files and check for orphaned (if any)
-    extensions = set(extensions)
+    extensions = set(extension)
     for directory in dirs:
         for path, dirnames, filenames in os.walk(directory):
             if any([s in path for s in skip_dir]):
