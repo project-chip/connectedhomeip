@@ -97,14 +97,20 @@ ClustersWithAttributeChangedFunctions:
     - Thermostat
 
 ClustersWithShutdownFunctions:
+    - Administrator Commissioning
     - Barrier Control
-    - On/Off
-    - Door Lock
-    - Level Control
     - Color Control
+    - Door Lock
+    - General Diagnostics
+    - Level Control
+    - On/Off
+    - OTA Software Update Provider
+    - Push AV Stream Transport
     - Sample MEI
     - Scenes Management
+    - Software Diagnostics
     - Thermostat
+    - Wi-Fi Network Diagnostics
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
