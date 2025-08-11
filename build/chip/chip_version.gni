@@ -53,6 +53,8 @@ template("gen_sdk_version") {
       filename,
       "--gen-dir",
       rebase_path(directory, root_build_dir),
+      "--root",
+      chip_root
     ]
 
     if (is_git_repository) {

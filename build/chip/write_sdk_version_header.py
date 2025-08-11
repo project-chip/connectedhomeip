@@ -50,16 +50,17 @@ def git_version() -> str:
     return subprocess.check_output(cmd).decode("utf-8").strip()
 
 
-def spec_version() -> str:
-    spec_version = "../../SPECIFICATION_VERSION"
-    with open(spec_version, "r") as version:
-        return version.read().strip()
+def spec_version(root) -> str:
+    spec_version_file = os.path.join(root, "SPECIFICATION_VERSION")
+    with open(spec_version_file, "r") as spec_version:
+        return spec_version.read().strip()
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate files with the SDK version.")
     parser.add_argument("--output", required=True, help="Name of the output files")
     parser.add_argument("--gen-dir", required=True, help="Directory where the output file should be created")
+    parser.add_argument("--root", required=True, help="Project root path")
     parser.add_argument("--git", action="store_true", help="Use version obtained from git")
 
     args = parser.parse_args()
@@ -73,7 +74,7 @@ def main() -> int:
             # In case Git is not installed, fall back to version from spec file
             ver = spec_version()
     else:
-        ver = spec_version()
+        ver = spec_version(args.root)
 
     output = os.path.join(args.gen_dir, '{}.h'.format(args.output))
     content = HEADER + '#pragma once\nextern const char* const CHIP_SDK_VERSION;\n'
