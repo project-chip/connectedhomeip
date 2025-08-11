@@ -397,12 +397,6 @@ matter_python_wheel_action("matter-clusters") {
 
   inputs = []
 
-  tests = [
-    "tests/test_cluster_objects.py",
-    "tests/test_generated_cluster_objects.py",
-    "tests/test_tlv.py",
-  ]
-
   py_packages = [
     "matter",
     "matter.clusters",
