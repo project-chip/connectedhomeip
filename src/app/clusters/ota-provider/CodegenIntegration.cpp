@@ -64,7 +64,7 @@ void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(EndpointId endpoi
     }
 }
 
-void emberAfOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId)
+void emberAfOtaSoftwareUpdateProviderClusterServerShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, arrayIndex))

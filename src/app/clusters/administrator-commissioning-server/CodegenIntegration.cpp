@@ -75,7 +75,7 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpo
     }
 }
 
-void emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
+void emberAfAdministratorCommissioningClusterServerShutdownCallback(EndpointId endpointId)
 {
     if (endpointId != kRootEndpointId)
     {

@@ -95,7 +95,7 @@ void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointI
 }
 
 // This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
-void emberAfWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void emberAfWiFiNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!FindEndpointWithLog(endpointId, arrayIndex))

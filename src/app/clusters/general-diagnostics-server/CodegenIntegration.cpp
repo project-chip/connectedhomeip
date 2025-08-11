@@ -91,7 +91,7 @@ void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void emberAfGeneralDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
