@@ -38,6 +38,7 @@ pw_python_package("matter-testing-module") {
   inputs = [ "env_test.yaml" ]
 
   sources = [
+    "chip/testing/matter_testing_defaults.py",
     "matter/testing/__init__.py",
     "matter/testing/apps.py",
     "matter/testing/basic_composition.py",
@@ -54,7 +55,6 @@ pw_python_package("matter-testing-module") {
     "matter/testing/matter_stack_state.py",
     "matter/testing/matter_test_config.py",
     "matter/testing/matter_testing.py",
-    "chip/testing/matter_testing_defaults.py",
     "matter/testing/metadata.py",
     "matter/testing/pics.py",
     "matter/testing/problem_notices.py",
