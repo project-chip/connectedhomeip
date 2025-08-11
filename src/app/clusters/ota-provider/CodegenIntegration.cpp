@@ -37,10 +37,10 @@ LazyRegisteredServerCluster<OtaProviderServer> gServers[kOtaProviderMaxClusterCo
 // Log an error if not found.
 bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 {
-    uint16_t arrayIndex =
+    outArrayIndex =
         emberAfGetClusterServerEndpointIndex(endpointId, OtaSoftwareUpdateProvider::Id, kOtaProviderFixedClusterCount);
 
-    if (arrayIndex >= kOtaProviderMaxClusterCount)
+    if (outArrayIndex >= kOtaProviderMaxClusterCount)
     {
         ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
         return false;
