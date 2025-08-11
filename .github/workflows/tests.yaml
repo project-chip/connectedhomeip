@@ -22,6 +22,18 @@ on:
     pull_request:
     merge_group:
     workflow_dispatch:
+        inputs:
+            disable_ccache:
+                description: 'Disable ccache restore and builds (sets CCACHE_DISABLE=1)'
+                required: false
+                default: 'false'
+                type: choice
+                options: ['false', 'true']
+            cache_suffix:
+                description: 'Optional suffix appended to ccache key to rotate (e.g. short hash)'
+                required: false
+                default: ''
+                type: string
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -43,6 +55,8 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             LSAN_OPTIONS: detect_leaks=1
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -85,6 +99,8 @@ jobs:
               uses: ./.github/actions/setup-ccache
               with:
                 build-variant: ${{ matrix.build_variant }}
+                disable: ${{ env.DISABLE_CCACHE }}
+                cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
 
             - name: Validate that xml are parsable
               # The sub-items being run here are the same as the input XMLs listed
@@ -239,6 +255,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
                   "
             - name: Build Apps
+              id: build_with_cache
+              continue-on-error: true
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
@@ -246,7 +264,7 @@ jobs:
                      "./scripts/build_python.sh \
                         --install_virtual_env out/venv \
                         --include_pytest_deps yes \
-                        --enable-ccache \
+                        $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                      "
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -264,6 +282,36 @@ jobs:
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-energy-management-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+            - name: Retry build without cache on master
+              if: ${{ steps.build_with_cache.outcome == 'failure' && github.ref == 'refs/heads/master' }}
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+              run: |
+                  echo "CCACHE_DISABLE=1" >> $GITHUB_ENV
+                  rm -rf "${{ github.workspace }}/.ccache" || true
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build_python.sh \
+                        --install_virtual_env out/venv \
+                        --include_pytest_deps yes \
+                     "
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
+                        --target linux-x64-all-clusters-${BUILD_VARIANT} \
+                        --target linux-x64-lock-${BUILD_VARIANT} \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT} \
+                        --target linux-x64-ota-requestor-${BUILD_VARIANT} \
+                        --target linux-x64-tv-app-${BUILD_VARIANT} \
+                        --target linux-x64-bridge-${BUILD_VARIANT} \
+                        --target linux-x64-lit-icd-${BUILD_VARIANT} \
+                        --target linux-x64-microwave-oven-${BUILD_VARIIANT} \
+                        --target linux-x64-rvc-${BUILD_VARIANT} \
+                        --target linux-x64-network-manager-${BUILD_VARIANT} \
+                        --target linux-x64-energy-gateway-${BUILD_VARIIANT} \
+                        --target linux-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -376,7 +424,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Save ccache
-              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true' && env.DISABLE_CCACHE != 'true' && env.CCACHE_DISABLE != '1'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
@@ -517,7 +565,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Save ccache
-              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true' && env.DISABLE_CCACHE != 'true' && env.CCACHE_DISABLE != '1'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
