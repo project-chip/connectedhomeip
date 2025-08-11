@@ -27,8 +27,6 @@ import re
 import sys
 import typing
 from binascii import unhexlify
-from chip.testing.matter_testing_defaults import (DEFAULT_ADMIN_VENDOR_ID, DEFAULT_CONTROLLER_NODE_ID, DEFAULT_DUT_NODE_ID,
-                                                  DEFAULT_LOG_PATH, DEFAULT_STORAGE_PATH, DEFAULT_TRUST_ROOT_INDEX)
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -37,6 +35,8 @@ from pathlib import Path
 from typing import Any, List, Optional, Tuple
 from unittest.mock import MagicMock
 
+from chip.testing.matter_testing_defaults import (DEFAULT_ADMIN_VENDOR_ID, DEFAULT_CONTROLLER_NODE_ID, DEFAULT_DUT_NODE_ID,
+                                                  DEFAULT_LOG_PATH, DEFAULT_STORAGE_PATH, DEFAULT_TRUST_ROOT_INDEX)
 # Add imports for argument parsing dependencies
 from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
