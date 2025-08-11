@@ -436,6 +436,8 @@ void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
     VerifyOrReturn(mContext != nullptr);
 
     MATTER_TRACE_INSTANT("OnStartUp", "BasicInfo");
+    ChipLogDetail(Zcl, "Emitting StartUp event");
+
     BasicInformation::Events::StartUp::Type event{ softwareVersion };
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
@@ -446,6 +448,8 @@ void BasicInformationCluster::OnShutDown()
     VerifyOrReturn(mContext != nullptr);
 
     MATTER_TRACE_INSTANT("OnShutDown", "BasicInfo");
+    ChipLogDetail(Zcl, "Emitting ShutDown event");
+
     BasicInformation::Events::ShutDown::Type event;
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
