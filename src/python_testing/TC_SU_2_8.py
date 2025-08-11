@@ -193,16 +193,14 @@ class TC_SU_2_8(MatterBaseTest):
     @async_test_body
     async def test_TC_SU_2_8(self):
 
-        valid_states = {
+        valid_states = [
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnUserConsent
-        }
-
-        valid_states = list(valid_states)
+        ]
 
         # Variables for commissioning TH1-OTA Provider 1
         p1_node = 10
