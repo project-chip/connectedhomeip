@@ -182,7 +182,3 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Invoke
 } // namespace app
 } // namespace chip
 
-void MatterPushAvStreamTransportClusterServerShutdownCallback(chip::EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "Shuting Push AV Stream Transport server cluster on endpoint %d", endpoint);
-}
