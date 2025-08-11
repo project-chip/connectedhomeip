@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from matter.yamltests.adapter import TestAdapter
+
 from .decoder import Decoder
 from .encoder import Encoder
-
-from matter.yamltests.adapter import TestAdapter
 
 
 class Adapter(TestAdapter):
