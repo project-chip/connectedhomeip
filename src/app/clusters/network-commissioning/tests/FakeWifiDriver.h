@@ -74,7 +74,7 @@ public:
 
 private:
     NetworkCommissioningStatusEnum mAddOrUpdateStatus = NetworkCommissioningStatusEnum::kUnknownError;
-    bool mEnabledAllowed = false;
+    bool mEnabledAllowed                              = false;
 };
 
 } // namespace Testing
