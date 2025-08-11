@@ -22,7 +22,7 @@ import shutil
 import subprocess
 from typing import List, Optional
 
-import chip.clusters as Clusters
+import matter.clusters as Clusters
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
