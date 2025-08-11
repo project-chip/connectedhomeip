@@ -15,8 +15,10 @@
 from .decoder import Decoder
 from .encoder import Encoder
 
+from matter.yamltests.adapter import TestAdapter
 
-class Adapter:
+
+class Adapter(TestAdapter):
     def __init__(self, specifications):
         self.encoder = Encoder(specifications)
         self.decoder = Decoder(specifications)

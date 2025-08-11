@@ -15,6 +15,8 @@
 import base64
 import json
 
+from matter.yamltests.adapter import TestAdapter
+
 # These constants represent the vocabulary used for the incoming JSON.
 _CLUSTER_ID = 'clusterId'
 _ENDPOINT_ID = 'endpointId'
@@ -30,7 +32,7 @@ _ATTRIBUTE = 'attribute'
 _WAIT_FOR = 'wait_for'
 
 
-class Adapter:
+class Adapter(TestAdapter):
     def __init__(self, definitions):
         self.encoder = PlaceholderEncoder()
         self.decoder = PlaceholderDecoder(definitions)
