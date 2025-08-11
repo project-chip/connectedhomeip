@@ -202,15 +202,22 @@ class TC_SU_2_8(MatterBaseTest):
             Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnUserConsent
         ]
 
+        # Commissioning constants
+        P1_NODE_ID = 10
+        P1_DISCRIMINATOR = 1111
+        P2_NODE_ID = 11
+        P2_DISCRIMINATOR = 2222
+        OTA_PROVIDER_PASSCODE = 20202021
+
         # Variables for commissioning TH1-OTA Provider 1
-        p1_node = 10
-        p1_disc = 1111
+        p1_node = P1_NODE_ID
+        p1_disc = P1_DISCRIMINATOR
 
         # Variables for commissioning TH2-OTA Provider 2
-        p2_node = 11
-        p2_disc = 2222
+        p2_node = P2_NODE_ID
+        p2_disc = P2_DISCRIMINATOR
 
-        p_pass = 20202021
+        p_pass = OTA_PROVIDER_PASSCODE
 
         # Commissioning TH1-OTA Provider 1 / TH2-OTA Provider 2
         self.step(0)
