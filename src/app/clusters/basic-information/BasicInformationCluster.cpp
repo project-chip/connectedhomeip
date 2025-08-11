@@ -413,8 +413,8 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     AttributePersistence persistence(context.attributeStorage);
 
     (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabel);
-    (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
-                                                   mLocalConfigDisabled, false);
+    (void) persistence.LoadNativeEndianValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+                                             mLocalConfigDisabled, false);
 
     return CHIP_NO_ERROR;
 }
