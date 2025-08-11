@@ -37,13 +37,18 @@ namespace app {
  * clusters, attributes, commands) dynamically at runtime. It manages a list of EndpointInterface
  * objects, each representing an endpoint on the device.
  *
- * The typical usage pattern by the application is as follows:
- * 1. Instantiate EndpointInterface(s) and EndpointInterfaceRegistration(s).
- * 2. Instantiate ServerClusterInterface(s) and ServerClusterRegistration(s).
- * 2. Create an instance of CodeDrivenDataModelProvider.
- * 3. Register those EndpointInterfaceRegistration(s) to the CodeDrivenDataModelProvider using AddEndpoint().
- * 4. Register those ServerClusterInterfaceRegistration(s) to the CodeDrivenDataModelProvider using AddCluster().
+ * The expected usage pattern by the application is as follows:
+ * 1. Instantiate ServerClusterInterface(s) and ServerClusterRegistration(s).
+ * 2. Instantiate EndpointInterface(s) and EndpointInterfaceRegistration(s).
+ * 2. Instantiate the CodeDrivenDataModelProvider.
+ * 3. Register ServerClusterInterfaceRegistration(s) to the CodeDrivenDataModelProvider using AddCluster().
+ * 4. Register EndpointInterfaceRegistration(s) to the CodeDrivenDataModelProvider using AddEndpoint().
+ *    Note: Step 4 MUST come after Step 3 (Endpoint needs to know about its clusters).
  * 5. Call Startup() on the CodeDrivenDataModelProvider.
+ *
+ * Note: if the CodeDrivenDataModelProvider has already been started (runtime change to add/remove Endpoints/Clusters),
+ *       the Startup() method on each ServerClusterInterface will be called when the EndpointInterface is added (Step 4).
+ *       If the provider hasn't been started, the Startup() method will be called when the provider is started (Step 5).
  *
  * TODO: Notify composition changes when the provider is started up and endpoints are added/removed at runtime.
  *       For now, applications are responsible for handling composition changes and calling markDirty() when needed.
@@ -88,38 +93,97 @@ public:
      * @brief Adds an endpoint to the data model provider.
      *
      * This method registers an endpoint, making it part of the device's data model.
+     * If the provider has already been started, this will trigger a Startup() call on
+     * each ServerClusterInterface associated with the endpoint.
      *
-     * The provided `registration` (EndpointInterfaceRegistration) must not already be
-     * part of another list (i.e., `registration.next` must be nullptr).
+     * Prerequisites:
+     *   - It MUST be called after all clusters for the endpoint have been registered with
+     *     AddCluster().
+     *   - The provided `registration` (EndpointInterfaceRegistration) must not already be
+     *     part of another list (i.e., `registration.next` must be nullptr).
+     *   - The EndpointInterface within the `registration` must be valid (i.e.,
+     *     `registration.endpointInterface` must not be nullptr).
+     *   - The `registration.endpointEntry.id` must be valid (not `kInvalidEndpointId` and
+     *     not used by another endpoint).
+     *   - The LIFETIME of `registration` must outlive the provider (or the registration must
+     *     be removed using `RemoveEndpoint` before it goes away).
      *
-     * The EndpointInterface within the `registration` must be valid (i.e.,
-     * `registration.endpointInterface` must not be nullptr).
-     *
-     * - If `registration.endpointId` is set to an endpoint ID already in use, it will return an error.
-     *
-     * @param registration The registration object for the endpoint, containing the
-     *                     EndpointInterface and its ID. The registration object must
-     *                     outlive the provider.
+     * @param registration The registration object for the endpoint, containing a valid
+     *                     EndpointInterface and Endpoint ID.
      * @return CHIP_NO_ERROR on success.
-     *         CHIP_ERROR_INVALID_ARGUMENT if registration.next is not nullptr or
-     *                                     registration.endpointInterface is nullptr or
-     *                                     registration.endpointId is kInvalidEndpointId.
-     *         CHIP_ERROR_DUPLICATE_KEY_ID if `registration.endpointId` is already in use.
+     *         CHIP_ERROR_INVALID_ARGUMENT if `registration.next` is not nullptr or
+     *                                     `registration.endpointInterface` is nullptr or
+     *                                     `registration.endpointEntry.id` is kInvalidEndpointId.
+     *         CHIP_ERROR_DUPLICATE_KEY_ID if `registration.endpointEntry.id` is already in use.
      */
     CHIP_ERROR AddEndpoint(EndpointInterfaceRegistration & registration);
+
+    /**
+     * @brief Removes an endpoint from the data model provider.
+     *
+     * This method unregisters an endpoint, removing it from the device's data model.
+     * If the provider has already been started, this might trigger a Shutdown() call on
+     * each ServerClusterInterface associated with the endpoint.
+     * The Shutdown() call on the associated clusters will ONLY happen if this is the last
+     * endpoint associated with the cluster (i.e. ServerClusterInterface.GetPaths() returns
+     * no paths with valid Endpoint IDs).
+     *
+     * Note: Removing an Endpoint does not remove any clusters associated with the endpoint.
+     *       Those can be removed using RemoveCluster() AFTER the endpoint has been removed.
+
+     * Prerequisites:
+     *   - It MUST be called BEFORE removing associted clusters with RemoveCluster() to guarantee
+     *     the endpoint removal is atomic.
+     *   - The endpoint ID must be valid.
+     *
+     * @param endpointId The ID of the endpoint to remove.
+     * @return CHIP_NO_ERROR on success.
+     *         CHIP_ERROR_NOT_FOUND if no endpoint with the given ID is registered.
+     *         CHIP_ERROR_INVALID_ARGUMENT if endpointId is kInvalidEndpointId.
+     */
     CHIP_ERROR RemoveEndpoint(EndpointId endpointId);
 
-    /* Add a ServerClusterInterface to the Data Model Provider.
+    /**
+     * @brief Add a ServerClusterInterface to the Data Model Provider.
      *
      * Requirements:
      *   - entry MUST NOT be part of any other registration
      *   - paths MUST NOT be part of any other ServerClusterInterface (i.e. only a single
-     *     registration for a given `endpointId/clusterId` path)
-     *   - endpointId of all paths must already be registered in the provider
+     *     registration for a given `endpointId/clusterId` path).
      *   - The LIFETIME of entry must outlive the provider (or the entry must be unregistered
-     *     via RemoveCluster before it goes away)
+     *     via RemoveCluster before it goes away).
+     *   - If the provider has already been started, this method must be called prior to
+     *     calling AddEndpoint() (i.e. the `endpointId` of all paths in `entry.GetPaths()`
+     *     must NOT be registered in the provider yet), otherwise this would cause non-atomic
+     *     changes to an endpoint, which is not allowed.
+     *
+     * @param entry The ServerClusterRegistration containing the cluster to register.
+     * @return CHIP_NO_ERROR on success.
+     *         CHIP_ERROR_INVALID_ARGUMENT if `entry.next` is not `nullptr` or
+     *                                     `entry.serverClusterInterface` is `nullptr` or
+     *                                     `entry.serverClusterInterface.GetPaths()` is empty/invalid.
+     *         CHIP_ERROR_DUPLICATE_KEY_ID if the cluster is already registered.
+     *         CHIP_ERROR_INCORRECT_STATE if the provider has been started and an endpoint for
+     *                                    one of the cluster paths has already been registered.
      */
     CHIP_ERROR AddCluster(ServerClusterRegistration & entry);
+
+    /**
+     * @brief Remove a ServerClusterInterface from the Data Model Provider.
+     *
+     * To avoid violating the requirement of non-atomic changes to endpoints, this SHALL only be
+     * called after the endpoint has been removed using RemoveEndpoint().
+     *
+     * Requirements:
+     *   - entry MUST be valid
+     *   - The `endpointId` of all paths in `entry.GetPaths()` are no longer registered in the provider.
+     *
+     * @param entry The ServerClusterInterface to remove.
+     * @return CHIP_NO_ERROR on success.
+     *         CHIP_ERROR_INVALID_ARGUMENT if `entry` is nullptr.
+     *         CHIP_ERROR_NOT_FOUND if the entry is not registered.
+     *         CHIP_ERROR_INCORRECT_STATE if an endpoint for one of the cluster paths is still registered.
+     */
     CHIP_ERROR RemoveCluster(ServerClusterInterface * entry);
 
 private:

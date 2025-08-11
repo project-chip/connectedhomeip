@@ -58,11 +58,33 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
 
 CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
 {
-    for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
+    bool had_failure = false;
+
+    // Remove all endpoints. This will trigger Shutdown() on associated clusters.
+    while (mEndpointInterfaceRegistry.begin() != mEndpointInterfaceRegistry.end())
     {
-        RemoveCluster(cluster); // This will call Shutdown() on the cluster if needed.
+        if(RemoveEndpoint(mEndpointInterfaceRegistry.begin()->GetEndpointEntry().id) != CHIP_NO_ERROR)
+        {
+            had_failure = true;
+        }
     }
+
+    // Now we're safe to clean up the cluster registry.
+    while (mServerClusterRegistry.AllServerClusterInstances().begin() != mServerClusterRegistry.AllServerClusterInstances().end())
+    {
+        ServerClusterInterface * clusterToRemove = *mServerClusterRegistry.AllServerClusterInstances().begin();
+        if(mServerClusterRegistry.Unregister(clusterToRemove) != CHIP_NO_ERROR)
+        {
+            had_failure = true;
+        }
+    }
+
     mServerClusterContext.reset();
+
+    if (had_failure)
+    {
+        return CHIP_ERROR_HAD_FAILURES;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -223,13 +245,80 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
-    return mEndpointInterfaceRegistry.Register(registration);
+    ReturnErrorOnFailure(mEndpointInterfaceRegistry.Register(registration));
+
+    if (mServerClusterContext.has_value())
+    {
+        // If the provider has been started, we need to check if any clusters on this new endpoint
+        // are now fully resolved and ready for startup.
+        for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
+        {
+            bool clusterIsOnNewEndpoint = false;
+            for (const auto & path : cluster->GetPaths())
+            {
+                if (path.mEndpointId == registration.endpointEntry.id)
+                {
+                    clusterIsOnNewEndpoint = true;
+                    break;
+                }
+            }
+
+            if (clusterIsOnNewEndpoint)
+            {
+                // This cluster is on the new endpoint. Check if all its required endpoints are now registered.
+                bool allEndpointsRegistered = true;
+                for (const auto & path : cluster->GetPaths())
+                {
+                    if (mEndpointInterfaceRegistry.Get(path.mEndpointId) == nullptr)
+                    {
+                        allEndpointsRegistered = false;
+                        break;
+                    }
+                }
+
+                if (allEndpointsRegistered)
+                {
+                    // This was the last endpoint this cluster was waiting for. Start it up.
+                    ReturnErrorOnFailure(cluster->Startup(*mServerClusterContext));
+                }
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId)
 {
-    // Note: This does not remove clusters on this endpoint. The caller is responsible
-    // for removing clusters before removing the endpoint.
+    if (mServerClusterContext.has_value())
+    {
+        // If the provider has been started, we need to check if any clusters on this endpoint
+        // need to be shut down because it's their last registered endpoint.
+        for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
+        {
+            bool clusterIsOnEndpoint = false;
+            int registeredEndpointCount = 0;
+
+            for (const auto & path : cluster->GetPaths())
+            {
+                if (mEndpointInterfaceRegistry.Get(path.mEndpointId) != nullptr)
+                {
+                    registeredEndpointCount++;
+                }
+                if (path.mEndpointId == endpointId)
+                {
+                    clusterIsOnEndpoint = true;
+                }
+            }
+
+            if (clusterIsOnEndpoint && registeredEndpointCount == 1)
+            {
+                // This is the last registered endpoint for this cluster. Shut it down.
+                cluster->Shutdown();
+            }
+        }
+    }
+
     return mEndpointInterfaceRegistry.Unregister(endpointId);
 }
 
@@ -237,25 +326,38 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & e
 {
     VerifyOrReturnError(entry.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(mServerClusterRegistry.Register(entry));
+    if (mServerClusterContext.has_value())
+    {
+        // If the provider has been started, prevent non-atomic changes to an endpoint.
+        // Check if any of the cluster's paths are associated with an already registered endpoint.
+        for (const auto & path : entry.serverClusterInterface->GetPaths())
+        {
+            if (mEndpointInterfaceRegistry.Get(path.mEndpointId) != nullptr)
+            {
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
+        }
+    }
 
-    // Start up the cluster if the provider has been started (i.e. context exists).
-    VerifyOrReturnError(mServerClusterContext.has_value(), CHIP_NO_ERROR);
-    return entry.serverClusterInterface->Startup(*mServerClusterContext);
+    return mServerClusterRegistry.Register(entry);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * cluster)
 {
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(mServerClusterRegistry.Unregister(cluster));
-
     if (mServerClusterContext.has_value())
     {
-        cluster->Shutdown();
+        for (const auto & path : cluster->GetPaths())
+        {
+            if (mEndpointInterfaceRegistry.Get(path.mEndpointId) != nullptr)
+            {
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
+        }
     }
 
-    return CHIP_NO_ERROR;
+    return mServerClusterRegistry.Unregister(cluster);
 }
 
 EndpointInterface * CodeDrivenDataModelProvider::GetEndpointInterface(EndpointId endpointId)
