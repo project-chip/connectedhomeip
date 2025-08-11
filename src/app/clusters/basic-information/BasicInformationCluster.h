@@ -43,7 +43,10 @@ namespace Clusters {
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
-    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }) {}
+    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }) {
+        // Unless told otherwise, unique id is mandatory
+        mEnabledOptionalAttributes.Set<BasicInformation::Attributes::UniqueID::Id>();
+    }
 
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
         BasicInformation::Attributes::ManufacturingDate::Id,       //

@@ -47,6 +47,7 @@
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
@@ -171,15 +172,6 @@ private:
     std::vector<AttributePathParams> mDirtyList;
 };
 
-class TestEventGenerator : public EventsGenerator
-{
-    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
-                             EventNumber & generatedEventNumber) override
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-};
-
 class TestActionContext : public ActionContext
 {
 public:
@@ -204,7 +196,7 @@ public:
     const TestProviderChangeListener & ChangeListener() const { return mChangeListener; }
 
 private:
-    TestEventGenerator mEventGenerator;
+    LogOnlyEvents mEventGenerator;
     TestProviderChangeListener mChangeListener;
     TestActionContext mActionContext;
     TestPersistentStorageDelegate mStorageDelegate;
