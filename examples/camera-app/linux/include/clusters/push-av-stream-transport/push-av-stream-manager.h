@@ -17,16 +17,15 @@
  */
 
 #pragma once
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-#include <app/util/config.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <vector>
-
-#include "camera-device-interface.h"
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+
+#include <camera-device-interface.h>
 #include <media-controller.h>
 #include <pushav-transport.h>
+
 #include <unordered_map>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -47,6 +46,13 @@ struct PushAvStream
 class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 {
 public:
+    PushAvStreamTransportManager() = default;
+    ~PushAvStreamTransportManager();
+
+    void Init();
+    void SetMediaController(MediaController * mediaController);
+    void SetCameraDevice(CameraDeviceInterface * cameraDevice);
+
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
                                                               const uint16_t connectionID);
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID);
@@ -77,12 +83,6 @@ public:
     void OnAttributeChanged(AttributeId attributeId);
     CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections);
     CHIP_ERROR PersistentAttributesLoadedCallback();
-
-    void SetMediaController(MediaController * mediaController);
-    void SetCameraDevice(CameraDeviceInterface * cameraDevice);
-    void Init();
-
-    ~PushAvStreamTransportManager();
 
 private:
     std::vector<PushAvStream> pushavStreams;

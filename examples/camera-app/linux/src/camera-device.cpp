@@ -1232,14 +1232,27 @@ void CameraDevice::InitializeVideoStreams()
 
 void CameraDevice::InitializeAudioStreams()
 {
-    // Create single audio stream with typical supported parameters
-    AudioStream audioStream = { { 1 /* Id */, StreamUsageEnum::kLiveView /* StreamUsage */, AudioCodecEnum::kOpus,
-                                  kMicrophoneMaxChannelCount /* ChannelCount(Max from Spec) */, 48000 /* SampleRate */,
-                                  30000 /* BitRate*/, 24 /* BitDepth */, 0 /* RefCount */ },
-                                false,
-                                nullptr };
+    // Mono stream
+    AudioStream monoStream = { { 1 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus, 1 /* ChannelCount: Mono */,
+                                 48000 /* SampleRate */, 20000 /* BitRate */, 24 /* BitDepth */, 0 /* RefCount */ },
+                               false,
+                               nullptr };
+    mAudioStreams.push_back(monoStream);
 
-    mAudioStreams.push_back(audioStream);
+    // Stereo stream
+    AudioStream stereoStream = { { 2 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus, 2 /* ChannelCount: Stereo */,
+                                   48000 /* SampleRate */, 32000 /* BitRate */, 24 /* BitDepth */, 0 /* RefCount */ },
+                                 false,
+                                 nullptr };
+    mAudioStreams.push_back(stereoStream);
+
+    // Max channel count stream (from spec constant)
+    AudioStream maxChannelStream = { { 3 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus,
+                                       kMicrophoneMaxChannelCount /* Max from Spec */, 48000 /* SampleRate */, 64000 /* BitRate */,
+                                       24 /* BitDepth */, 0 /* RefCount */ },
+                                     false,
+                                     nullptr };
+    mAudioStreams.push_back(maxChannelStream);
 }
 
 void CameraDevice::InitializeSnapshotStreams()
@@ -1272,7 +1285,7 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
     return mWebRTCProviderManager;
 }
 
-PushAvStreamTransportDelegate & CameraDevice::GetPushAVDelegate()
+PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()
 {
     return mPushAVTransportManager;
 }
