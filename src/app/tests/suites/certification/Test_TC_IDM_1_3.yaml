@@ -228,7 +228,7 @@ tests:
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+          `await devCtrl.SendBatchCommands(0x12344321, [matter.clusters.Command.InvokeRequestInfo(1, matter.clusters.OnOff.Commands.Toggle()), matter.clusters.Command.InvokeRequestInfo(2, matter.clusters.OnOff.Commands.Toggle())])`
 
           On TH(all-clusters-app), Verify that the EndpointIDs, CommandIDs, ClusterIDs in the InvokeRequestMessage (as below) matching with the data sent in the above command
 
@@ -291,7 +291,7 @@ tests:
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+          `await devCtrl.SendBatchCommands(0x12344321, [matter.clusters.Command.InvokeRequestInfo(1, matter.clusters.OnOff.Commands.Toggle()), matter.clusters.Command.InvokeRequestInfo(2, matter.clusters.OnOff.Commands.Toggle())])`
 
           * Verify DUT doesn't crash by seeing next step execute.
           * On TH(all-clusters-app), Verify following logs are seen:
@@ -314,7 +314,7 @@ tests:
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+          `await devCtrl.SendBatchCommands(0x12344321, [matter.clusters.Command.InvokeRequestInfo(1, matter.clusters.OnOff.Commands.Toggle()), matter.clusters.Command.InvokeRequestInfo(2, matter.clusters.OnOff.Commands.Toggle())])`
 
           * Verify DUT doesn't crash by seeing next step execute.
           * On TH(all-clusters-app), Verify following logs are seen:
@@ -337,7 +337,7 @@ tests:
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+          `await devCtrl.SendBatchCommands(0x12344321, [matter.clusters.Command.InvokeRequestInfo(1, matter.clusters.OnOff.Commands.Toggle()), matter.clusters.Command.InvokeRequestInfo(2, matter.clusters.OnOff.Commands.Toggle())])`
 
           * Verify DUT doesn't crash by seeing next step execute.
           * On TH(all-clusters-app), Verify following logs are seen:
@@ -356,7 +356,7 @@ tests:
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
 
-          `await devCtrl.SendCommand(0x12344321, 1, chip.clusters.OnOff.Commands.Toggle())`
+          `await devCtrl.SendCommand(0x12344321, 1, matter.clusters.OnOff.Commands.Toggle())`
 
           On TH(all-clusters-app), Verify that we recieves an InvokeRequestMessage that contains a single InvokeRequests
 
