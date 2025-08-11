@@ -35,22 +35,21 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from matter.testing.timeoperations import utc_time_in_matter_epoch
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.interaction_model import InteractionModelError, Status
+import matter.clusters as Clusters
+from mobly import asserts
+from chip.testing import timeoperations
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.interaction_model import InteractionModelError, Status
+import chip.clusters as Clusters
 import typing
 from datetime import timedelta
 
-<<<<<<< HEAD
-=======
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
-from chip.testing import timeoperations
->>>>>>> c22181942f (Commit to refactor utc_time_in_matter_epoch to timeoperations.utc_time_in_matter_epoch.)
-from mobly import asserts
-
-import matter.clusters as Clusters
-from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
-from matter.testing.timeoperations import utc_time_in_matter_epoch
+<< << << < HEAD
+== == == =
+>>>>>> > c22181942f(Commit to refactor utc_time_in_matter_epoch to timeoperations.utc_time_in_matter_epoch.)
 
 
 class TC_TIMESYNC_2_4(MatterBaseTest):

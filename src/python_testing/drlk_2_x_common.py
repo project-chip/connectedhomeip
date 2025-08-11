@@ -25,7 +25,6 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 
 
-
 class DRLK_COMMON:
     async def read_drlk_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.DoorLock

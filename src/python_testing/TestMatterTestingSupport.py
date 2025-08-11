@@ -15,36 +15,35 @@
 #    limitations under the License.
 #
 
+from matter.tlv import uint
+from matter.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from matter.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
+                                                      find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
+                                                      get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+from matter.testing.pics import parse_pics, parse_pics_xml
+from matter.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
+                                           matchers)
+from matter.clusters.Types import Nullable, NullValue
+import matter.clusters as Clusters
+from mobly import asserts, signals
+from chip.tlv import uint
+from chip.testing import timeoperations
+from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
+                                                    find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
+                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+from chip.testing.pics import parse_pics, parse_pics_xml
+from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
+                                         matchers)
+from chip.clusters.Types import Nullable, NullValue
+import chip.clusters as Clusters
 import os
 import time
 import typing
 from datetime import datetime, timedelta, timezone
 
-<<<<<<< HEAD
-=======
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
-                                         matchers)
-from chip.testing.pics import parse_pics, parse_pics_xml
-from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
-                                                    find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
-                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from chip.testing import timeoperations
-from chip.tlv import uint
->>>>>>> c22181942f (Commit to refactor utc_time_in_matter_epoch to timeoperations.utc_time_in_matter_epoch.)
-from mobly import asserts, signals
-
-import matter.clusters as Clusters
-from matter.clusters.Types import Nullable, NullValue
-from matter.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
-                                           matchers)
-from matter.testing.pics import parse_pics, parse_pics_xml
-from matter.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
-                                                      find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
-                                                      get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from matter.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
-from matter.tlv import uint
+<< << << < HEAD
+== == == =
+>>>>>> > c22181942f(Commit to refactor utc_time_in_matter_epoch to timeoperations.utc_time_in_matter_epoch.)
 
 
 def get_raw_type_list():
