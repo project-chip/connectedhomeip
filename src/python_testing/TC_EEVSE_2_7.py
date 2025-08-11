@@ -136,7 +136,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("14", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Set SoC High Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("14a", "TH reads from the DUT the StateOfCharge",
-                     "Value has to be 95 % state of charge."),
+                     "Value has to be 95% state of charge."),
             TestStep("14b", "TH reads from the DUT the BatteryCapacity",
                      "Value has to be 70,000,000 (70kWh)."),
             TestStep("15", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
