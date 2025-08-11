@@ -82,6 +82,7 @@ ClustersWithInitFunctions:
     - On/Off
     - Pump Configuration and Control
     - Thermostat
+    - Time Format Localization
     - Mode Select
     - Sample MEI
     - Scenes Management
@@ -104,6 +105,7 @@ ClustersWithShutdownFunctions:
     - Sample MEI
     - Scenes Management
     - Thermostat
+    - Time Format Localization
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
