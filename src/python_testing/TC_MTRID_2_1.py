@@ -44,12 +44,13 @@
 import logging
 
 import test_plan_support
-from chip.clusters import Globals, MeterIdentification
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
+
+from matter.clusters import Globals, MeterIdentification
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
