@@ -181,4 +181,3 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Invoke
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
