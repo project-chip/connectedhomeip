@@ -282,9 +282,9 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case ClusterRevision::Id:
         if (!mEnabledOptionalAttributes.IsSet(UniqueID::Id))
         {
-            return encoder.Encode<uint32_t>(kRevisionWithoutUniqueId);
+            return encoder.Encode(kRevisionWithoutUniqueId);
         }
-        return encoder.Encode<uint32_t>(BasicInformation::kRevision);
+        return encoder.Encode(BasicInformation::kRevision);
     case NodeLabel::Id:
         return encoder.Encode(mNodeLabel.Content());
     case LocalConfigDisabled::Id:
