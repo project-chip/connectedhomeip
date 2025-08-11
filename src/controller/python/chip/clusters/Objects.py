@@ -48777,6 +48777,16 @@ class PushAvStreamTransport(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class CMAFInterfaceEnum(MatterIntEnum):
+            kInterface1 = 0x00
+            kInterface2DASH = 0x01
+            kInterface2HLS = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class ContainerFormatEnum(MatterIntEnum):
             kCmaf = 0x00
             # All received enum values that are not listed above will be mapped
@@ -48801,6 +48811,8 @@ class PushAvStreamTransport(Cluster):
             kInvalidCombination = 0x06
             kInvalidTriggerType = 0x07
             kInvalidTransportStatus = 0x08
+            kInvalidOptions = 0x09
+            kInvalidStreamUsage = 0x0A
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -48897,16 +48909,24 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="chunkDuration", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="CENCKey", Tag=1, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=2, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="CENCKeyID", Tag=3, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="CMAFInterface", Tag=0, Type=PushAvStreamTransport.Enums.CMAFInterfaceEnum),
+                        ClusterObjectFieldDescriptor(Label="segmentDuration", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="chunkDuration", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sessionGroup", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="trackName", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="CENCKey", Tag=5, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="CENCKeyID", Tag=6, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=7, Type=typing.Optional[bool]),
                     ])
 
+            CMAFInterface: 'PushAvStreamTransport.Enums.CMAFInterfaceEnum' = 0
+            segmentDuration: 'uint' = 0
             chunkDuration: 'uint' = 0
+            sessionGroup: 'uint' = 0
+            trackName: 'str' = ""
             CENCKey: 'typing.Optional[bytes]' = None
-            metadataEnabled: 'typing.Optional[bool]' = None
             CENCKeyID: 'typing.Optional[bytes]' = None
+            metadataEnabled: 'typing.Optional[bool]' = None
 
         @dataclass
         class ContainerOptionsStruct(ClusterObject):
@@ -49077,11 +49097,13 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="activationReason", Tag=1, Type=PushAvStreamTransport.Enums.TriggerActivationReasonEnum),
                         ClusterObjectFieldDescriptor(Label="timeControl", Tag=2, Type=typing.Optional[PushAvStreamTransport.Structs.TransportMotionTriggerTimeControlStruct]),
+                        ClusterObjectFieldDescriptor(Label="userDefined", Tag=3, Type=typing.Optional[bytes]),
                     ])
 
             connectionID: uint = 0
             activationReason: PushAvStreamTransport.Enums.TriggerActivationReasonEnum = 0
             timeControl: typing.Optional[PushAvStreamTransport.Structs.TransportMotionTriggerTimeControlStruct] = None
+            userDefined: typing.Optional[bytes] = None
 
         @dataclass
         class FindTransport(ClusterCommand):
@@ -49094,10 +49116,10 @@ class PushAvStreamTransport(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=typing.Union[Nullable, uint]),
                     ])
 
-            connectionID: typing.Union[None, Nullable, uint] = None
+            connectionID: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class FindTransportResponse(ClusterCommand):
@@ -49647,7 +49669,7 @@ class CommodityTariff(Cluster):
                         ClusterObjectFieldDescriptor(Label="auxiliaryLoad", Tag=3, Type=typing.Optional[CommodityTariff.Structs.AuxiliaryLoadSwitchSettingsStruct]),
                         ClusterObjectFieldDescriptor(Label="peakPeriod", Tag=4, Type=typing.Optional[CommodityTariff.Structs.PeakPeriodStruct]),
                         ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=5, Type=typing.Optional[Globals.Structs.PowerThresholdStruct]),
-                        ClusterObjectFieldDescriptor(Label="threshold", Tag=6, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="threshold", Tag=6, Type=typing.Union[Nullable, int]),
                         ClusterObjectFieldDescriptor(Label="label", Tag=7, Type=typing.Union[None, Nullable, str]),
                         ClusterObjectFieldDescriptor(Label="predicted", Tag=8, Type=typing.Optional[bool]),
                     ])
@@ -49658,7 +49680,7 @@ class CommodityTariff(Cluster):
             auxiliaryLoad: 'typing.Optional[CommodityTariff.Structs.AuxiliaryLoadSwitchSettingsStruct]' = None
             peakPeriod: 'typing.Optional[CommodityTariff.Structs.PeakPeriodStruct]' = None
             powerThreshold: 'typing.Optional[Globals.Structs.PowerThresholdStruct]' = None
-            threshold: 'typing.Union[Nullable, uint]' = NullValue
+            threshold: 'typing.Union[Nullable, int]' = NullValue
             label: 'typing.Union[None, Nullable, str]' = None
             predicted: 'typing.Optional[bool]' = None
 
@@ -52893,7 +52915,7 @@ class CommodityMetering(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="meteredQuantity", Tag=0x00000000, Type=typing.Union[Nullable, typing.List[CommodityMetering.Structs.MeteredQuantityStruct]]),
                 ClusterObjectFieldDescriptor(Label="meteredQuantityTimestamp", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="measurementType", Tag=0x00000002, Type=typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum]),
+                ClusterObjectFieldDescriptor(Label="tariffUnit", Tag=0x00000002, Type=typing.Union[Nullable, Globals.Enums.TariffUnitEnum]),
                 ClusterObjectFieldDescriptor(Label="maximumMeteredQuantities", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -52904,7 +52926,7 @@ class CommodityMetering(Cluster):
 
     meteredQuantity: typing.Union[Nullable, typing.List[CommodityMetering.Structs.MeteredQuantityStruct]] = NullValue
     meteredQuantityTimestamp: typing.Union[Nullable, uint] = NullValue
-    measurementType: typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum] = NullValue
+    tariffUnit: typing.Union[Nullable, Globals.Enums.TariffUnitEnum] = NullValue
     maximumMeteredQuantities: typing.Union[Nullable, uint] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -52985,7 +53007,7 @@ class CommodityMetering(Cluster):
             value: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
-        class MeasurementType(ClusterAttributeDescriptor):
+        class TariffUnit(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000B07
@@ -52996,9 +53018,9 @@ class CommodityMetering(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, Globals.Enums.TariffUnitEnum])
 
-            value: typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum] = NullValue
+            value: typing.Union[Nullable, Globals.Enums.TariffUnitEnum] = NullValue
 
         @dataclass
         class MaximumMeteredQuantities(ClusterAttributeDescriptor):

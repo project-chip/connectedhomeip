@@ -18787,21 +18787,30 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                     newElement_0.transportOptions.containerOptions.containerType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.containerType)];
                     if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.HasValue()) {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = [MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct new];
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.cmafInterface = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CMAFInterface)];
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.segmentDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().segmentDuration];
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions.chunkDuration = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().chunkDuration];
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.sessionGroup = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().sessionGroup];
+                        newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName = AsString(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().trackName);
+                        if (newElement_0.transportOptions.containerOptions.cmafContainerOptions.trackName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
                         if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue()) {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKey.Value());
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKey = nil;
                         }
-                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
-                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
-                        } else {
-                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
-                        }
                         if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue()) {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value());
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.cencKeyID = nil;
+                        }
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = [NSNumber numberWithBool:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().metadataEnabled.Value()];
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
                         }
                     } else {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;
@@ -19423,7 +19432,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                     if (entry_1.threshold.IsNull()) {
                         newElement_1.threshold = nil;
                     } else {
-                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                        newElement_1.threshold = [NSNumber numberWithLongLong:entry_1.threshold.Value()];
                     }
                     if (entry_1.label.HasValue()) {
                         if (entry_1.label.Value().IsNull()) {
@@ -19609,7 +19618,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                     if (entry_1.threshold.IsNull()) {
                         newElement_1.threshold = nil;
                     } else {
-                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                        newElement_1.threshold = [NSNumber numberWithLongLong:entry_1.threshold.Value()];
                     }
                     if (entry_1.label.HasValue()) {
                         if (entry_1.label.Value().IsNull()) {
@@ -19723,7 +19732,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
                     if (entry_1.threshold.IsNull()) {
                         newElement_1.threshold = nil;
                     } else {
-                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                        newElement_1.threshold = [NSNumber numberWithLongLong:entry_1.threshold.Value()];
                     }
                     if (entry_1.label.HasValue()) {
                         if (entry_1.label.Value().IsNull()) {
@@ -20864,8 +20873,8 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         }
         return value;
     }
-    case Attributes::MeasurementType::Id: {
-        using TypeInfo = Attributes::MeasurementType::TypeInfo;
+    case Attributes::TariffUnit::Id: {
+        using TypeInfo = Attributes::TariffUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -20875,7 +20884,7 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.Value())];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
         }
         return value;
     }
