@@ -636,7 +636,7 @@ jobs:
 
             - name: Build linux-x64-air-purifier
               env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test
