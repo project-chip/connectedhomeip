@@ -77,7 +77,7 @@ void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId
     }
 }
 
-void emberAfPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!FindEndpointWithLog(endpointId, arrayIndex))
