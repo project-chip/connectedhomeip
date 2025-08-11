@@ -273,7 +273,7 @@ CHIP_ERROR ReadMaxGroupKeysPerFabric(AttributeValueEncoder & aEncoder)
     return aEncoder.Encode(provider->GetMaxGroupKeysPerFabric());
 }
 
-bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+bool GetProviderAndFabric(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                           Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo)
 {
     VerifyOrDie(commandObj != nullptr);
@@ -303,7 +303,7 @@ bool GetProviderAndFabric(chip::app::CommandHandler * commandObj, const chip::ap
 }
 
 Status
-ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
+ValidateKeySetWriteArguments(const Commands::KeySetWrite::DecodableType & commandData)
 {
     // SPEC: If the EpochKey0 field is null or its associated EpochStartTime0 field is null, then this command SHALL fail with an
     // INVALID_COMMAND status code responded to the client.
@@ -418,8 +418,8 @@ ValidateKeySetWriteArguments(const chip::app::Clusters::GroupKeyManagement::Comm
 }
 
 std::optional<DataModel::ActionReturnStatus>
-HandleKeySetWrite(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                  const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData,
+HandleKeySetWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                  const Commands::KeySetWrite::DecodableType & commandData,
                   Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
     // Pre-validate all complex data dependency assumptions about the epoch keys
@@ -511,8 +511,8 @@ HandleKeySetWrite(chip::app::CommandHandler * commandObj, const chip::app::Concr
 }
 
 std::optional<DataModel::ActionReturnStatus>
-HandleKeySetRead(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                 const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData,
+HandleKeySetRead(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                 const Commands::KeySetRead::DecodableType & commandData,
                  Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
     FabricIndex fabricIndex = fabric->GetFabricIndex();
@@ -567,8 +567,8 @@ HandleKeySetRead(chip::app::CommandHandler * commandObj, const chip::app::Concre
 }
 
 std::optional<DataModel::ActionReturnStatus>
-HandleKeySetRemove(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                   const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData,
+HandleKeySetRemove(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                   const Commands::KeySetRemove::DecodableType & commandData,
                    Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 
 {
@@ -597,8 +597,8 @@ HandleKeySetRemove(chip::app::CommandHandler * commandObj, const chip::app::Conc
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleKeySetReadAllIndices(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData,
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::KeySetReadAllIndices::DecodableType & commandData,
     Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
     FabricIndex fabricIndex = fabric->GetFabricIndex();
