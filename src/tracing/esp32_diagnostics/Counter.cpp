@@ -18,7 +18,7 @@
 
 #include <lib/support/CHIPMemString.h>
 #include <system/SystemClock.h>
-#include <tracing/esp32_diagnostic_trace/Counter.h>
+#include <tracing/esp32_diagnostics/Counter.h>
 
 namespace chip {
 namespace Tracing {

@@ -22,8 +22,8 @@ config("tracing") {
 
 config("diagnostic_config") {
   defines = [
-    "CONFIG_ENABLE_TRACES=1",
-    "CONFIG_ENABLE_METRICS=1",
+    "CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES",
+    "CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS",
   ]
 }
 
@@ -54,7 +54,7 @@ source_set("esp32_diagnostic_tracing") {
   deps = [ ":backend" ]
 }
 
-source_set("esp32_diagnostic_tracing_tests") {
+source_set("esp32_diagnostic_tracing_test_lib") {
   public = [
     "DiagnosticEntry.h",
     "DiagnosticStorage.h",

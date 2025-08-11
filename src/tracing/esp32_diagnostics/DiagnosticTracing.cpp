@@ -19,8 +19,8 @@
 #include <algorithm>
 #include <lib/support/CHIPMemString.h>
 #include <system/SystemClock.h>
-#include <tracing/esp32_diagnostic_trace/Counter.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
+#include <tracing/esp32_diagnostics/Counter.h>
+#include <tracing/esp32_diagnostics/DiagnosticTracing.h>
 
 namespace chip {
 namespace Tracing {
@@ -81,7 +81,6 @@ CHIP_ERROR ESP32Diagnostics::AddFilter(const char * scope)
     VerifyOrReturnError(strlen(scope) > 0, CHIP_ERROR_INVALID_ARGUMENT);
     if (mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end())
     {
-        ChipLogProgress(DeviceLayer, "Filter for scope '%s' already exists", scope);
         return CHIP_NO_ERROR;
     }
     mEnabledFilters[MurmurHash(scope)] = true;
@@ -113,7 +112,7 @@ bool ESP32Diagnostics::IsEnabled(const char * scope)
     return mEnabledFilters.find(MurmurHash(scope)) != mEnabledFilters.end();
 }
 
-#ifdef CONFIG_ENABLE_METRICS
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS
 void ESP32Diagnostics::LogMessageReceived(MessageReceivedInfo & info) {}
 
 void ESP32Diagnostics::LogMessageSend(MessageSendInfo & info) {}
@@ -164,9 +163,9 @@ void ESP32Diagnostics::TraceCounter(const char * label)
     counter.IncreaseCount(label);
     ReturnOnFailure(counter.ReportMetrics(label, mStorageInstance));
 }
-#endif // CONFIG_ENABLE_METRICS
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS
 
-#ifdef CONFIG_ENABLE_TRACES
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
 {
     VerifyOrReturn(IsEnabled(group));
@@ -180,7 +179,7 @@ void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
     VerifyOrReturn(IsEnabled(value));
     ReturnOnFailure(StoreDiagnostics(label, value));
 }
-#endif // CONFIG_ENABLE_TRACES
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES
 
 CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
 {
@@ -188,8 +187,6 @@ CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * g
     VerifyOrReturnError(group != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
-
-    // Create diagnostic entry
     DiagnosticEntry entry;
     Platform::CopyString(entry.label, label);
     Platform::CopyString(entry.stringValue, group);

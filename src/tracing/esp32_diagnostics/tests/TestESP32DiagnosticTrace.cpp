@@ -16,9 +16,9 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticEntry.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
+#include <tracing/esp32_diagnostics/DiagnosticEntry.h>
+#include <tracing/esp32_diagnostics/DiagnosticStorage.h>
+#include <tracing/esp32_diagnostics/DiagnosticTracing.h>
 
 using namespace chip;
 using namespace chip::Tracing;
@@ -260,8 +260,8 @@ TEST(ESP32DiagnosticsTest, AddFilter)
     // Clear default filters for clean testing
     diagnostics.ClearFilters();
 
-    // Initially no scopes should be enabled when no filters are set
-    EXPECT_TRUE(diagnostics.IsEnabled("TestScope")); // All enabled when no filters
+    // Initially all scopes should be enabled when no filters are set
+    EXPECT_TRUE(diagnostics.IsEnabled("TestScope"));
 
     // Add a filter
     CHIP_ERROR err = diagnostics.AddFilter("TestScope");
