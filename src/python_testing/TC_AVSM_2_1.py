@@ -183,6 +183,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd VideoSensorParams: {value}")
             asserts.assert_is_not_none(value, "VideoSensorParams is None")
+            # TODO assert struct fields
 
         self.step(5)
         if self.pics_guard(self.check_pics("AVSM.S.A0003")):
@@ -197,6 +198,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport)
             logger.info(f"Rx'd MinViewport: {value}")
             asserts.assert_is_not_none(value, "MinViewport is None")
+            # TODO assert struct fields
 
         self.step(7)
         if self.pics_guard(self.check_pics("AVSM.S.A0005")):
@@ -205,6 +207,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd RateDistortionTradeOffPoints: {value}")
             asserts.assert_is_not_none(value, "RateDistortionTradeOffPoints is None")
+            # TODO assert struct fields of list
 
         self.step(8)
         if self.pics_guard(self.check_pics("AVSM.S.A0006")):
@@ -221,6 +224,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd MicrophoneCapabilities: {value}")
             asserts.assert_is_not_none(value, "MicrophoneCapabilities is None")
+            # TODO assert struct fields
 
         self.step(10)
         if self.pics_guard(self.check_pics("AVSM.S.A0008")):
@@ -229,6 +233,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd SpeakerCapabilities: {value}")
             asserts.assert_is_not_none(value, "SpeakerCapabilities is None")
+            # TODO assert struct fields
 
         self.step(11)
         if self.pics_guard(self.check_pics("AVSM.S.A0009")):
@@ -237,6 +242,11 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd TwoWayTalkSupport: {value}")
             asserts.assert_is_not_none(value, "TwoWayTalkSupport is None")
+            asserts.assert_less(
+                value,
+                cluster.Enums.TwoWayTalkSupportTypeEnum.kUnknownEnumValue,
+                "TwoWayTalkSupport is not a valid TwoWayTalkSupportTypeEnum",
+            )
 
         self.step(12)
         if self.pics_guard(self.check_pics("AVSM.S.A000A")):
@@ -245,6 +255,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd SnapshotCapabilities: {value}")
             asserts.assert_is_not_none(value, "SnapshotCapabilities is None")
+            # TODO assert struct fields of list
 
         self.step(13)
         if self.pics_guard(self.check_pics("AVSM.S.A000B")):
@@ -277,6 +288,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
             )
             logger.info(f"Rx'd SupportedStreamUsages: {value}")
+            # assert enum values of list
 
         self.step(17)
         if self.pics_guard(self.check_pics("AVSM.S.A000F")):
@@ -285,6 +297,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd AllocatedVideoStreams: {value}")
             asserts.assert_is_not_none(value, "AllocatedVideoStreams is None")
+            # TODO assert struct fields of list
 
         self.step(18)
         if self.pics_guard(self.check_pics("AVSM.S.A0010")):
@@ -293,6 +306,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd AllocatedAudioStreams: {value}")
             asserts.assert_is_not_none(value, "AllocatedAudioStreams is None")
+            # TODO assert struct fields of list
 
         self.step(19)
         if self.pics_guard(self.check_pics("AVSM.S.A0011")):
@@ -301,6 +315,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd AllocatedSnapshotStreams: {value}")
             asserts.assert_is_not_none(value, "AllocatedSnapshotStreams is None")
+            # TODO assert struct fields of list
 
         self.step(20)
         if self.pics_guard(self.check_pics("AVSM.S.A0012")):
@@ -308,6 +323,11 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
             )
             logger.info(f"Rx'd StreamUsagePrioritiesList: {value}")
+            asserts.assert_less(
+                value,
+                Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                "StreamUsagePriorities is not a valid StreamUsageEnum",
+            )
 
         self.step(21)
         if self.pics_guard(self.check_pics("AVSM.S.A0013")):
@@ -338,6 +358,9 @@ class TC_AVSM_2_1(MatterBaseTest):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.NightVision)
             logger.info(f"Rx'd NightVision: {value}")
             asserts.assert_is_not_none(value, "NightVision is None")
+            asserts.assert_less(
+                value, cluster.Enums.TriStateAutoEnum.kUnknownEnumValue, "NightVision is not a valid TriStateAutoEnum"
+            )
 
         self.step(25)
         if self.pics_guard(self.check_pics("AVSM.S.A0017")):
@@ -346,12 +369,16 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd NightVisionIllum: {value}")
             asserts.assert_is_not_none(value, "NightVisionIllum is None")
+            asserts.assert_less(
+                value, cluster.Enums.TriStateAutoEnum.kUnknownEnumValue, "NightVisionIllum is not a valid TriStateAutoEnum"
+            )
 
         self.step(26)
         if self.pics_guard(self.check_pics("AVSM.S.A0018")):
             value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.Viewport)
             logger.info(f"Rx'd Viewport: {value}")
             asserts.assert_is_not_none(value, "Viewport is None")
+            # TODO assert struct fields
 
         self.step(27)
         if self.pics_guard(self.check_pics("AVSM.S.A0019")):
@@ -367,24 +394,27 @@ class TC_AVSM_2_1(MatterBaseTest):
             logger.info(f"Rx'd SpeakerVolumeLevel: {value}")
             asserts.assert_is_not_none(value, "SpeakerVolumeLevel is None")
             matter_asserts.assert_valid_uint8(value, "SpeakerVolumeLevel")
+            # TODO asserts depend on reading SpeakerMaxLevel and SpeakerMinLevel first
 
         self.step(29)
         if self.pics_guard(self.check_pics("AVSM.S.A001B")):
-            value = await self.read_single_attribute_check_success(
+            speakerMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMaxLevel
             )
-            logger.info(f"Rx'd SpeakerMaxLevel: {value}")
-            asserts.assert_is_not_none(value, "SpeakerMaxLevel is None")
-            matter_asserts.assert_valid_uint8(value, "SpeakerMaxLevel")
+            logger.info(f"Rx'd SpeakerMaxLevel: {speakerMaxLevel}")
+            asserts.assert_is_not_none(speakerMaxLevel, "SpeakerMaxLevel is None")
+            matter_asserts.assert_valid_uint8(speakerMaxLevel, "SpeakerMaxLevel")
+            asserts.assert_less_equal(speakerMaxLevel, 254, "SpeakerMaxLevel is > 254")
 
         self.step(30)
         if self.pics_guard(self.check_pics("AVSM.S.A001C")):
-            value = await self.read_single_attribute_check_success(
+            speakerMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMinLevel
             )
-            logger.info(f"Rx'd SpeakerMinLevel: {value}")
-            asserts.assert_is_not_none(value, "SpeakerMinLevel is None")
-            matter_asserts.assert_valid_uint8(value, "SpeakerMinLevel")
+            logger.info(f"Rx'd SpeakerMinLevel: {speakerMinLevel}")
+            asserts.assert_is_not_none(speakerMinLevel, "SpeakerMinLevel is None")
+            matter_asserts.assert_valid_uint8(speakerMinLevel, "SpeakerMinLevel")
+            asserts.assert_less_equal(speakerMinLevel, speakerMaxLevel, "SpeakerMinLevel is > SpeakerMaxLevel")
 
         self.step(31)
         if self.pics_guard(self.check_pics("AVSM.S.A001D")):
@@ -402,24 +432,27 @@ class TC_AVSM_2_1(MatterBaseTest):
             logger.info(f"Rx'd MicrophoneVolumeLevel: {value}")
             asserts.assert_is_not_none(value, "MicrophoneVolumeLevel is None")
             matter_asserts.assert_valid_uint8(value, "MicrophoneVolumeLevel")
+            # TODO asserts depend on reading MicrophoneMaxLevel and MicrophoneMinLevel first
 
         self.step(33)
         if self.pics_guard(self.check_pics("AVSM.S.A001F")):
-            value = await self.read_single_attribute_check_success(
+            microphoneMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMaxLevel
             )
-            logger.info(f"Rx'd MicrophoneMaxLevel: {value}")
-            asserts.assert_is_not_none(value, "MicrophoneMaxLevel is None")
-            matter_asserts.assert_valid_uint8(value, "MicrophoneMaxLevel")
+            logger.info(f"Rx'd MicrophoneMaxLevel: {microphoneMaxLevel}")
+            asserts.assert_is_not_none(microphoneMaxLevel, "MicrophoneMaxLevel is None")
+            matter_asserts.assert_valid_uint8(microphoneMaxLevel, "MicrophoneMaxLevel")
+            asserts.assert_less_equal(microphoneMaxLevel, 254, "MicrophoneMaxLevel is > 254")
 
         self.step(34)
         if self.pics_guard(self.check_pics("AVSM.S.A0020")):
-            value = await self.read_single_attribute_check_success(
+            microphoneMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMinLevel
             )
-            logger.info(f"Rx'd MicrophoneMinLevel: {value}")
-            asserts.assert_is_not_none(value, "MicrophoneMinLevel is None")
-            matter_asserts.assert_valid_uint8(value, "MicrophoneMinLevel")
+            logger.info(f"Rx'd MicrophoneMinLevel: {microphoneMinLevel}")
+            asserts.assert_is_not_none(microphoneMinLevel, "MicrophoneMinLevel is None")
+            matter_asserts.assert_valid_uint8(microphoneMinLevel, "MicrophoneMinLevel")
+            asserts.assert_less_equal(microphoneMinLevel, microphoneMaxLevel, "MicrophoneMinLevel is > MicrophoneMaxLevel")
 
         self.step(35)
         if self.pics_guard(self.check_pics("AVSM.S.A0021")):
@@ -435,6 +468,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             logger.info(f"Rx'd ImageRotation: {value}")
             asserts.assert_is_not_none(value, "ImageRotation is None")
             matter_asserts.assert_valid_uint16(value, "ImageRotation")
+            asserts.assert_less_equal(value, 359, "ImageRotation is > 359")
 
         self.step(37)
         if self.pics_guard(self.check_pics("AVSM.S.A0023")):
@@ -483,6 +517,11 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd StatusLightBrightness: {value}")
             asserts.assert_is_not_none(value, "StatusLightBrightness is None")
+            asserts.assert_less(
+                value,
+                Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
+                "StatusLightBrightness is not a valid ThreeLevelAutoEnum",
+            )
 
 
 if __name__ == "__main__":
