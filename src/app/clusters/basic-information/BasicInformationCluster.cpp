@@ -341,7 +341,9 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case ConfigurationVersion::Id:
         return ReadConfigurationVersion(configManager, encoder);
     case Reachable::Id:
-        return encoder.Encode(true);
+        // On some platforms `true` is defined as a unsigned int and that gets
+        // a ambigous TLVWriter::Put error. Hence the specialization.
+        return encoder.Encode<bool>(true);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
