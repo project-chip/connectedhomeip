@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -64,6 +65,12 @@ namespace MaximumCheckInBackOff {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumCheckInBackOff::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaximumCheckInBackOff
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    IdleModeDuration::kMetadataEntry,
+    ActiveModeDuration::kMetadataEntry,
+    ActiveModeThreshold::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

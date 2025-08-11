@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -31,6 +32,12 @@ namespace TimerState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TimerState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TimerState
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    SetTime::kMetadataEntry,
+    TimeRemaining::kMetadataEntry,
+    TimerState::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
