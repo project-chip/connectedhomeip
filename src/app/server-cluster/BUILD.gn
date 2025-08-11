@@ -19,6 +19,7 @@ source_set("server-cluster") {
     "AttributeListBuilder.h",
     "DefaultServerCluster.cpp",
     "DefaultServerCluster.h",
+    "OptionalAttributeSet.h",
     "ServerClusterContext.h",
     "ServerClusterInterface.cpp",
     "ServerClusterInterface.h",
@@ -34,6 +35,22 @@ source_set("server-cluster") {
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("registry") {
+  sources = [
+    "ServerClusterInterfaceRegistry.cpp",
+    "ServerClusterInterfaceRegistry.h",
+    "SingleEndpointServerClusterRegistry.cpp",
+    "SingleEndpointServerClusterRegistry.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
   ]

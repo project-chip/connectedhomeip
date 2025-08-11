@@ -35,13 +35,14 @@ import logging
 from copy import deepcopy
 from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.native import PyChipError
-from chip.testing.matter_testing import CustomCommissioningParameters, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.native import PyChipError
+from matter.testing.matter_testing import CustomCommissioningParameters, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CADMIN_1_9(CADMINBaseTest):

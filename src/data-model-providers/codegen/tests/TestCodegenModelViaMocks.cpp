@@ -67,6 +67,7 @@
 #include <lib/core/TLVWriter.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
@@ -190,15 +191,14 @@ class CodegenDataModelProviderWithContext : public CodegenDataModelProvider
 public:
     CodegenDataModelProviderWithContext()
     {
-        InteractionModelContext context{
-            .eventsGenerator         = &mEventGenerator,
-            .dataModelChangeListener = &mChangeListener,
-            .actionContext           = &mActionContext,
-        };
-
-        Startup(context);
+        SetPersistentStorageDelegate(&mStorageDelegate);
+        Startup({
+            .eventsGenerator         = mEventGenerator,
+            .dataModelChangeListener = mChangeListener,
+            .actionContext           = mActionContext,
+        });
     }
-    ~CodegenDataModelProviderWithContext() { Shutdown(); }
+    ~CodegenDataModelProviderWithContext() override { Shutdown(); }
 
     TestProviderChangeListener & ChangeListener() { return mChangeListener; }
     const TestProviderChangeListener & ChangeListener() const { return mChangeListener; }
@@ -207,6 +207,7 @@ private:
     TestEventGenerator mEventGenerator;
     TestProviderChangeListener mChangeListener;
     TestActionContext mActionContext;
+    TestPersistentStorageDelegate mStorageDelegate;
 };
 
 class MockAccessControl : public Access::AccessControl::Delegate, public Access::AccessControl::DeviceTypeResolver
@@ -349,11 +350,12 @@ private:
 #define MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(zcl_type) MockAttributeId(zcl_type + 0x1000)
 #define MOCK_ATTRIBUTE_CONFIG_NULLABLE(zcl_type)                                                                                   \
     MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(zcl_type), zcl_type,                                                   \
-                        MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE)
+                        MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE)
 
 #define MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type) MockAttributeId(zcl_type + 0x2000)
 #define MOCK_ATTRIBUTE_CONFIG_NON_NULLABLE(zcl_type)                                                                               \
-    MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type), zcl_type, MATTER_ATTRIBUTE_FLAG_WRITABLE)
+    MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(zcl_type), zcl_type,                                               \
+                        MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE)
 
 // clang-format off
 const MockNodeConfig gTestNodeConfig({
@@ -420,7 +422,7 @@ const MockNodeConfig gTestNodeConfig({
             MockAttributeConfig(
               kReadOnlyAttributeId,
               ZCL_INT32U_ATTRIBUTE_TYPE,
-              MATTER_ATTRIBUTE_FLAG_NULLABLE    // NOTE: explicltly NOT MATTER_ATTRIBUTE_FLAG_WRITABLE
+              MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE   // NOTE: explicitly NOT MATTER_ATTRIBUTE_FLAG_WRITABLE
             )
         }),
         MockClusterConfig(MockClusterId(4), {
@@ -568,7 +570,7 @@ const MockNodeConfig gTestNodeConfig({
 
             // Special case handling
             MockAttributeConfig(kAttributeIdReadOnly, ZCL_INT32S_ATTRIBUTE_TYPE, 0),
-            MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE),
+            MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE ),
         }),
     }),
     MockEndpointConfig(kMockEndpoint4, {

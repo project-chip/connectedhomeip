@@ -53,10 +53,10 @@ class ContextAttributesChangeListener : public AttributesChangedListener
 public:
     ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
     {}
-    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(path); }
+    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
 
 private:
-    DataModel::ProviderChangeListener * mListener;
+    DataModel::ProviderChangeListener & mListener;
 };
 
 /// Attempts to read via an attribute access interface (AAI)
@@ -133,8 +133,8 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
         BitFlags<DataModel::AttributeQualityFlags>{}
             .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
             .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
-        RequiredPrivilege::ForReadAttribute(attributePath),
-        attribute.IsReadOnly() ? std::nullopt : std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)));
+        attribute.IsReadable() ? std::make_optional(RequiredPrivilege::ForReadAttribute(attributePath)) : std::nullopt,
+        attribute.IsWritable() ? std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)) : std::nullopt);
 
     // TODO: Set additional flags:
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
@@ -290,11 +290,7 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
 ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     // Context not initialized. Need to call Startup(context) before writing.
-    if (mContext == nullptr || mContext->interactionContext == nullptr ||
-        mContext->interactionContext->dataModelChangeListener == nullptr)
-    {
-        return Status::InvalidInState;
-    }
+    VerifyOrReturnError(mContext != nullptr, Status::InvalidInState);
 
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
@@ -334,7 +330,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         }
     }
 
-    ContextAttributesChangeListener changeListener(*mContext->interactionContext);
+    ContextAttributesChangeListener changeListener(mContext->interactionContext);
 
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
