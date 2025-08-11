@@ -450,11 +450,8 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Setup Environment
-              # coreutils for stdbuf, ccache for compilation caching
-              run: |
-                  brew install coreutils ccache
-                  # Ensure ccache is in PATH for both Intel and Apple Silicon Macs
-                  echo "/opt/homebrew/bin:/usr/local/bin:$PATH" >> $GITHUB_PATH
+              # coreutils for stdbuf
+              run: brew install coreutils
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
@@ -467,18 +464,7 @@ jobs:
                   platform: darwin
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
-            - name: Setup and Restore Cache
-              id: ccache
-              uses: ./.github/actions/setup-ccache
-              with:
-                build-variant: ${{ matrix.build_variant }}
-
-            - name: Build Python env
-              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
-
             - name: Build Apps
-              env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -495,13 +481,9 @@ jobs:
                         --target darwin-x64-network-manager-${BUILD_VARIANT} \
                         --target darwin-x64-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-x64-energy-management-${BUILD_VARIANT} \
-                        --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
-
-            - name: ccache stats
-              run: ccache -s
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
@@ -564,12 +546,6 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
-            - name: Save ccache
-              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true' && env.DISABLE_CCACHE != 'true' && env.CCACHE_DISABLE != '1'
-              uses: actions/cache/save@v4
-              with:
-                  path: .ccache
-                  key: ${{ env.CCACHE_KEY }}
 
     repl_tests_linux:
         name: REPL Tests - Linux
@@ -933,11 +909,8 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Setup Environment
-              # coreutils for stdbuf, ccache for compilation caching
-              run: |
-                  brew install coreutils ccache
-                  # Ensure ccache is in PATH for both Intel and Apple Silicon Macs
-                  echo "/opt/homebrew/bin:/usr/local/bin:$PATH" >> $GITHUB_PATH
+              # coreutils for stdbuf
+              run: brew install coreutils
             - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
@@ -950,25 +923,15 @@ jobs:
                   platform: darwin
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
-            - name: Setup and Restore Cache
-              id: ccache
-              uses: ./.github/actions/setup-ccache
-              with:
-                build-variant: ${{ matrix.build_variant }}
-
             - name: Build Python REPL and example apps
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target darwin-x64-all-clusters-${BUILD_VARIANT}-test \
                       build \
                       --copy-artifacts-to objdir-clone \
                    "
-            - name: ccache stats
-              run: |
-                ccache -s
-
             - name: Run Tests
               if: false # disable darwin test runs for now as they were very flaky in the past
               run: |
@@ -1002,9 +965,3 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
-            - name: Save ccache
-              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
-              uses: actions/cache/save@v4
-              with:
-                  path: .ccache
-                  key: ${{ env.CCACHE_KEY }}
