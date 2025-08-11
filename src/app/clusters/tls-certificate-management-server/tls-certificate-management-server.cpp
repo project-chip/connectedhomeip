@@ -367,7 +367,7 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
     {
         size_t intermediateSize;
         VerifyOrReturn(detail.intermediateCertificates.Value().ComputeSize(&intermediateSize) == CHIP_NO_ERROR,
-                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
         VerifyOrReturn(intermediateSize <= kMaxIntermediateCertificates,
                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
     }
