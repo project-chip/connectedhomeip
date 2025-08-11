@@ -63,7 +63,7 @@ bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
 } // namespace
 
 // This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
-void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
+void emberAfWiFiNetworkDiagnosticsServerClusterInitCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!FindEndpointWithLog(endpointId, arrayIndex))
