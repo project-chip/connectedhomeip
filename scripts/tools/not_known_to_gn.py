@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 """
 Lists files specific files from a source tree and ensures
 they are covered by GN in some way.
@@ -22,14 +23,15 @@ they are covered by GN in some way.
 contains that word without trying to validate if this is a
 comment or some actual 'source' element.
 
-It is intended as a failsafe to not foget adding source files
+It is intended as a failsafe to not forget adding source files
 to gn.
 """
+
 import logging
 import os
 import re
 import sys
-from pathlib import Path, PurePath
+from pathlib import Path
 from typing import Dict, Set
 
 import click
@@ -51,7 +53,7 @@ class OrphanChecker:
         self.failures = 0
         self.found_failures: Set[str] = set()
 
-    def AppendGnData(self, gn: PurePath):
+    def AppendGnData(self, gn: Path):
         """Adds a GN file to the list of internally known GN data.
 
         Will read the entire content of the GN file in memory for future reference.
@@ -72,7 +74,7 @@ class OrphanChecker:
                 return True
         return False
 
-    def Check(self, top_dir: str, file: PurePath):
+    def Check(self, top_dir: str, file: Path):
         """
         Validates that the given path is somehow referenced in GN files in any
         of the parent sub-directories of the file.
