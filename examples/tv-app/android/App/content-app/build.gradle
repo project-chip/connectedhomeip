@@ -37,7 +37,9 @@ android {
             aidl.srcDirs = ['../common-api/src/main/aidl']
         }
     }
-
+    buildFeatures {
+        aidl = true
+    }
 }
 
 dependencies {
