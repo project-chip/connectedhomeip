@@ -19,7 +19,7 @@
 #pragma once
 
 #include <tracing/backend.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
+#include <tracing/esp32_diagnostics/DiagnosticStorage.h>
 #include <tracing/metric_event.h>
 #include <unordered_map>
 
@@ -38,16 +38,16 @@ public:
     ESP32Diagnostics(const ESP32Diagnostics &)             = delete;
     ESP32Diagnostics & operator=(const ESP32Diagnostics &) = delete;
 
-#ifdef CONFIG_ENABLE_TRACES
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES
     void TraceBegin(const char * label, const char * group) override;
 
     void TraceEnd(const char * label, const char * group) override;
 
     /// Trace a zero-sized event
     void TraceInstant(const char * label, const char * group) override;
-#endif // CONFIG_ENABLE_TRACES
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES
 
-#ifdef CONFIG_ENABLE_METRICS
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS
     void TraceCounter(const char * label) override;
 
     void LogMessageSend(MessageSendInfo &) override;
@@ -57,7 +57,7 @@ public:
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
     void LogMetricEvent(const MetricEvent &) override;
-#endif // CONFIG_ENABLE_METRICS
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS
 
     /*
      * @brief Add a filter to the diagnostic backend. Only traces and metrics with the given scope will be stored while other
@@ -71,7 +71,7 @@ public:
     /*
      * @brief Remove a filter from the diagnostic backend
      * @param scope The scope to remove
-     * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid or does not exist
+     * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid, CHIP_ERROR_INCORRECT_STATE if the filter does not exist
      * @return CHIP_NO_ERROR if the filter was removed successfully
      */
     CHIP_ERROR RemoveFilter(const char * scope);
