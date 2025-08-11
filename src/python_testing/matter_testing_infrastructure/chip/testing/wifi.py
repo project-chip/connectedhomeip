@@ -22,8 +22,9 @@ import shutil
 import subprocess
 from typing import List, Optional
 
-import matter.clusters as Clusters
 from mobly import asserts
+
+import matter.clusters as Clusters
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
