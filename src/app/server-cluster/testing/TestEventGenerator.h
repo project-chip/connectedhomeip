@@ -32,7 +32,8 @@ namespace Test {
 class LogOnlyEvents : public app::DataModel::EventsGenerator
 {
 public:
-    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override {
+    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override
+    {
         mUrgentEventDeliveryCount++;
     }
 
@@ -84,7 +85,7 @@ public:
 
 private:
     uint32_t mUrgentEventDeliveryCount = 0;
-    EventNumber mCurrentEventNumber = 0;
+    EventNumber mCurrentEventNumber    = 0;
     app::EventOptions mLastOptions;
     uint8_t mLastEventEncodeBuffer[128];
     ByteSpan mLastEncodedSpan;

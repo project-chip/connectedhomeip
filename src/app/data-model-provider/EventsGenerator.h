@@ -85,7 +85,6 @@ class EventsGenerator
 public:
     virtual ~EventsGenerator() = default;
 
-
     /// Scnedule event delivery to happen immediately (and synchronously).
     ///
     /// Use when it is imperative that some events are to be delivered because
