@@ -22,13 +22,13 @@ import re
 import shlex
 import sys
 
-from chip import exceptions
-from chip.setup_payload import SetupPayload
+from matter import exceptions
+from matter.setup_payload import SetupPayload
 
 if platform.system() == 'Darwin':
-    from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
+    from matter.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
 elif sys.platform.startswith('linux'):
-    from chip.ChipBluezMgr import BluezManager as BleManager
+    from matter.ChipBluezMgr import BluezManager as BleManager
 
 log = logging.getLogger(__name__)
 
