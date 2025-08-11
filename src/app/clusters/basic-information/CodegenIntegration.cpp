@@ -47,7 +47,7 @@ ServerClusterRegistration gRegistration(BasicInformationCluster::Instance());
 
 } // namespace
 
-void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
+void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -73,7 +73,7 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfBasicInformationClusterShutdownCallback(EndpointId endpointId)
+void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
