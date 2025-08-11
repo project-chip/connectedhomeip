@@ -60,7 +60,7 @@ CHIP_ERROR PushAvStreamTransportServer::Attributes(const ConcreteClusterPath & p
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(PushAvStreamTransport::Attributes::kMandatoryMetadata), {});
+    return listBuilder.Append(Span(PushAvStreamTransport::Attributes::kMandatoryMetadata), {}, {});
 }
 
 CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder)
