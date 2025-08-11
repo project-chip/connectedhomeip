@@ -182,12 +182,16 @@ private:
         uint32_t matterEpoch = 0;
 
         CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            ChipLogError(Support, "UpdAttrs() could not get time");
+            ChipLogDetail(Support, "UpdAttrs() got time: %" PRIu32, matterEpoch);
+            mMeteredQuantityTimestamp.SetNonNull(matterEpoch);
         }
-
-        mMeteredQuantityTimestamp.SetNonNull(matterEpoch);
+        else
+        {
+            ChipLogError(Support, "UpdAttrs() could not get time, setting Null");
+            mMeteredQuantityTimestamp.SetNull();
+        }
 
         if (mTariffUnit.IsNull() || (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh))
         {
