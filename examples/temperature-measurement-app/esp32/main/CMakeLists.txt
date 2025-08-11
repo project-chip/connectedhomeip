@@ -32,10 +32,10 @@ set(SRC_DIRS_LIST
                       "${CHIP_ROOT}/examples/providers"
 )
 
-if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
     list(APPEND PRIV_INCLUDE_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics")
     list(APPEND SRC_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics")
-endif (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+endif (CONFIG_ENABLE_ESP_DIAGNOSTICS)
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
