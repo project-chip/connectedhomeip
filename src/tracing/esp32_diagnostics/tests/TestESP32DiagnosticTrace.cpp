@@ -16,9 +16,9 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticEntry.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
+#include <tracing/esp32_diagnostics/DiagnosticEntry.h>
+#include <tracing/esp32_diagnostics/DiagnosticStorage.h>
+#include <tracing/esp32_diagnostics/DiagnosticTracing.h>
 
 using namespace chip;
 using namespace chip::Tracing;

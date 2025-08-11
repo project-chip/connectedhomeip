@@ -881,7 +881,7 @@ menu "CHIP Device Layer"
     endmenu
 
     menu "Diagnostics Options"
-        config ENABLE_ESP_DIAGNOSTICS_TRACE
+        config ENABLE_ESP_DIAGNOSTICS
             bool "Enable ESP Platform Diagnostics for Matter"
             default n
             help
@@ -891,14 +891,14 @@ menu "CHIP Device Layer"
         config ENABLE_TRACES
             bool "Enable Traces"
             default y
-            depends on ENABLE_ESP_DIAGNOSTICS_TRACE
+            depends on ENABLE_ESP_DIAGNOSTICS
             help
                 Enable Traces for the ESP Platform Diagnostics for Matter.
 
         config ENABLE_METRICS
             bool "Enable Metrics"
             default y
-            depends on ENABLE_ESP_DIAGNOSTICS_TRACE
+            depends on ENABLE_ESP_DIAGNOSTICS
             help
                 Enable Metrics for the ESP Platform Diagnostics for Matter.
     endmenu

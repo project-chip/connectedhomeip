@@ -19,7 +19,7 @@
 #pragma once
 
 #include <tracing/backend.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
+#include <tracing/esp32_diagnostics/DiagnosticStorage.h>
 #include <tracing/metric_event.h>
 #include <unordered_map>
 
@@ -71,7 +71,7 @@ public:
     /*
      * @brief Remove a filter from the diagnostic backend
      * @param scope The scope to remove
-     * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid or does not exist
+     * @return CHIP_ERROR_INVALID_ARGUMENT if the scope is invalid, CHIP_ERROR_INCORRECT_STATE if the filter does not exist
      * @return CHIP_NO_ERROR if the filter was removed successfully
      */
     CHIP_ERROR RemoveFilter(const char * scope);
