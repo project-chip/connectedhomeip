@@ -188,7 +188,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const 
 
         // Using WriteAttribute directly so we can check that the decoded value is in the supported list
         // before storing it.
-        CHIP_ERROR result = attrProvider->WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id }, 
+        CHIP_ERROR result = attrProvider->WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id },
             { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
 
         return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
