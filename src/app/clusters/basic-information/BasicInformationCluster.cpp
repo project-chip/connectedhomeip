@@ -45,7 +45,7 @@ using namespace chip::DeviceLayer;
 namespace {
 
 // Unique ID became mandatory in 4. If we have no unique id, claim revision 3
-inline constexpr uint32_t kRevisionWithoutUniqueId = 2;
+inline constexpr uint32_t kRevisionWithoutUniqueId = 3;
 
 // This is NOT the same as the auto-generated attributes:
 // see comment below about UniqueID (which we make behave as optional)
