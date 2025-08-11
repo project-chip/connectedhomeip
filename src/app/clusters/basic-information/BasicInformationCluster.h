@@ -75,7 +75,7 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // PlatforMmanagerDelegate
+    // PlatformManagerDelegate
     void OnStartUp(uint32_t softwareVersion) override;
     void OnShutDown() override;
 
