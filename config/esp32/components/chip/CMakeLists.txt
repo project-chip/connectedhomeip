@@ -466,6 +466,10 @@ if (CONFIG_ENABLE_ENCRYPTED_OTA)
     list(APPEND matter_requires espressif__esp_encrypted_img)
 endif()
 
+if (CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
+    list(APPEND matter_requires tee_sec_storage)
+endif()
+
 add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
                      REQUIRES ${matter_requires})
 
