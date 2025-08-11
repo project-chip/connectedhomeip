@@ -85,9 +85,8 @@ ClustersWithInitFunctions:
     - On/Off
     - OTA Software Update Provider
     - Pump Configuration and Control
+    - Push AV Stream Transport
     - Time Format Localization
-    - Thermostat
-    - Mode Select
     - Sample MEI
     - Scenes Management
     - Software Diagnostics

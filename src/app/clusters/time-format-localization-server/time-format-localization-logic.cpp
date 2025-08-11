@@ -87,8 +87,6 @@ void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistencePro
     {
         mCalendarType = validCalendar;
     }
-
-    ChipLogError(AppServer, "Initial value for CalendarType %d", (int)mCalendarType);
 }
 
 void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvider * attrProvider)
@@ -99,8 +97,6 @@ void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvi
     attrPersistence.LoadNativeEndianValue<HourFormatEnum>(
         { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
         kDefaultHourFormat);
-
-    ChipLogError(AppServer, "Initial value for CalendarType %d", (int)mHourFormat);
 }
 
 CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const
