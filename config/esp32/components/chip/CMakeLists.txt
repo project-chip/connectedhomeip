@@ -302,7 +302,7 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
-if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
     chip_gn_arg_bool("matter_enable_tracing_support"  "true")
     chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_diagnostic_trace:esp32_diagnostic_tracing\"")
 endif()
@@ -319,7 +319,7 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
 endif()
 
-if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
     target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostic_trace/include")
 endif()
 
@@ -388,7 +388,7 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
 endif()
 
-if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
 endif()
 
