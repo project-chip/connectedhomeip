@@ -15,6 +15,7 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/AttributePathParams.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
@@ -35,7 +36,6 @@
 #include <platform/NetworkCommissioning.h>
 
 #include "FakeWifiDriver.h"
-#include "app/AttributePathParams.h"
 
 namespace {
 
