@@ -94,7 +94,7 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
     // TODO: more tests for ethernet and thread should be added
 }
 
-TEST_F(TestNetworkCommissioningCluster, TestNofigyOnEnableInterface)
+TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
     NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver);
