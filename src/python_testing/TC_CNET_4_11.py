@@ -18,11 +18,12 @@
 import asyncio
 import logging
 
+from matter_testing_infrastructure.chip.testing.wifi import (TIMED_REQUEST_TIMEOUT_MS, TIMEOUT, change_networks, connect_host_wifi,
+                                                             find_network_and_assert, verify_operational_network)
+from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from matter_testing_infrastructure.chip.testing.wifi import (TIMED_REQUEST_TIMEOUT_MS, TIMEOUT, change_networks,
-                                                             connect_host_wifi, find_network_and_assert, verify_operational_network)
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
