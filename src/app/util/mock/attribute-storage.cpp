@@ -556,7 +556,9 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
 }
-
+// WARNING: Ensure that ResetMockNodeConfig() is called after SetMockNodeConfig().
+// When platform unit tests are merged into a single binary,
+// stale MockNodeConfig instances may leak between tests.
 void SetMockNodeConfig(const MockNodeConfig & config)
 {
     metadataStructureGeneration++;

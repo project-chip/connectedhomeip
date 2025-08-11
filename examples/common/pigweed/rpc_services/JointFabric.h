@@ -36,7 +36,6 @@ private:
 
         uint64_t mNodeId;
         bool mJCM;
-
         uint8_t keyRawBytes[kP256_PublicKey_Length] = { 0 };
         P256PublicKey mTrustedIcacPublicKeyBSerialized;
 
