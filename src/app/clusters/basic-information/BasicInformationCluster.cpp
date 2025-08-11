@@ -417,8 +417,11 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     AttributePersistence persistence(context.attributeStorage);
 
     (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabel);
-    (void) persistence.LoadNativeEndianValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
-                                             mLocalConfigDisabled, false);
+    // Specialization because some platforms `#define` true/false as 1/0 and we get;
+    // error: no matching function for call to
+    //   'chip::app::AttributePersistence::LoadNativeEndianValue(<brace-enclosed initializer list>, bool&, int)'
+    (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+                                                   mLocalConfigDisabled, false);
 
     return CHIP_NO_ERROR;
 }
