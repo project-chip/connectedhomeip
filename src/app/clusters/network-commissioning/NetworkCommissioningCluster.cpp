@@ -90,7 +90,7 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const 
     {
         bool value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return mLogic.SetInterfaceEnabled(value);
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, mLogic.SetInterfaceEnabled(value));
     }
 
     return Protocols::InteractionModel::Status::InvalidAction;
