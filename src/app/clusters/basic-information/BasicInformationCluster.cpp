@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,8 +44,8 @@ using namespace chip::DeviceLayer;
 
 namespace {
 
-// fixed size for location strings
-static constexpr size_t kFixedLocationLength = 2;
+// Unique ID became mandatory in 4. If we have no unique id, claim revision 3
+inline constexpr uint32_t kRevisionWithoutUniqueId = 2;
 
 // This is NOT the same as the auto-generated attributes:
 // see comment below about UniqueID (which we make behave as optional)
@@ -70,8 +70,6 @@ constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     // UniqueID::kMetadataEntry,
 
 };
-
-static_assert(sizeof(bool) == 1, "I/O assumption for backwards compatibility");
 
 constexpr size_t kExpectedFixedLocationLength = 2;
 static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
@@ -280,8 +278,12 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode<uint32_t>(0);
+        return encoder.Encode(0u);
     case ClusterRevision::Id:
+        if (!mEnabledOptionalAttributes.IsSet(UniqueID::Id))
+        {
+            return encoder.Encode<uint32_t>(kRevisionWithoutUniqueId);
+        }
         return encoder.Encode<uint32_t>(BasicInformation::kRevision);
     case NodeLabel::Id:
         return encoder.Encode(mNodeLabel.Content());
@@ -337,7 +339,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case ConfigurationVersion::Id:
         return ReadConfigurationVersion(configManager, encoder);
     case Reachable::Id:
-        return encoder.Encode<bool>(true);
+        return encoder.Encode(true);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -354,14 +356,14 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
 {
     using namespace BasicInformation::Attributes;
 
-    AttributePersistence persistence(*mContext->attributeStorage);
+    AttributePersistence persistence(mContext->attributeStorage);
 
     switch (request.path.mAttributeId)
     {
     case Location::Id: {
         CharSpan location;
         ReturnErrorOnFailure(decoder.Decode(location));
-        VerifyOrReturnError(location.size() == kFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
+        VerifyOrReturnError(location.size() == kExpectedFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
         return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
     }
     case NodeLabel::Id: {
@@ -380,24 +382,24 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
 CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-#define OPTIONAL_ATTR(name) { mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name), name::kMetadataEntry }
 
-    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { !mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose),
-          UniqueID::kMetadataEntry },
-        OPTIONAL_ATTR(ManufacturingDate),
-        OPTIONAL_ATTR(PartNumber),
-        OPTIONAL_ATTR(ProductURL),
-        OPTIONAL_ATTR(ProductLabel),
-        OPTIONAL_ATTR(SerialNumber),
-        OPTIONAL_ATTR(LocalConfigDisabled),
-        OPTIONAL_ATTR(Reachable),
-        OPTIONAL_ATTR(ProductAppearance),
+    DataModel::AttributeEntry optionalAttributes[] = {
+        ManufacturingDate::kMetadataEntry,   //
+        PartNumber::kMetadataEntry,          //
+        ProductURL::kMetadataEntry,          //
+        ProductLabel::kMetadataEntry,        //
+        SerialNumber::kMetadataEntry,        //
+        LocalConfigDisabled::kMetadataEntry, //
+        Reachable::kMetadataEntry,           //
+        ProductAppearance::kMetadataEntry,   //
+
+        // Unique because of forced unique functionality for backwards compatibiltiy
+        UniqueID::kMetadataEntry, //
     };
 
     AttributeListBuilder listBuilder(builder);
 
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes));
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), mEnabledOptionalAttributes);
 }
 
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
@@ -408,7 +410,7 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
         PlatformMgr().SetDelegate(this);
     }
 
-    AttributePersistence persistence(*context.attributeStorage);
+    AttributePersistence persistence(context.attributeStorage);
 
     (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabel);
     (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
@@ -433,7 +435,7 @@ void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
 
     MATTER_TRACE_INSTANT("OnStartUp", "BasicInfo");
     BasicInformation::Events::StartUp::Type event{ softwareVersion };
-    mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void BasicInformationCluster::OnShutDown()
@@ -443,7 +445,7 @@ void BasicInformationCluster::OnShutDown()
 
     MATTER_TRACE_INSTANT("OnShutDown", "BasicInfo");
     BasicInformation::Events::ShutDown::Type event;
-    mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 } // namespace chip::app::Clusters
