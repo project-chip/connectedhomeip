@@ -46,6 +46,8 @@ public:
     // methods to be called by python
     void Init();
 
+    void Shutdown();
+
     void InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,
                        OnICECandidatesCallback onICECandidatesCallback, OnEndCallback onEndCallback);
 

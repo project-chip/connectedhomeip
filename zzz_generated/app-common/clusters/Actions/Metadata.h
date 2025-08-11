@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -33,6 +34,11 @@ namespace SetupURL {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SetupURL::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SetupURL
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    ActionList::kMetadataEntry,
+    EndpointLists::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
