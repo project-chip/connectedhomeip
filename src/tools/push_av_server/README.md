@@ -85,6 +85,8 @@ curl --cacert ... --cert ... --key ... -XPOST https://localhost:1234/streams
 ```
 This command creates a new media stream. The key difference here is that the client presents its own certificate to prove its identity. This is called client certificate authentication or mTLS (mutual TLS). It's like a two-way ID check: the client verifies the server's identity (using --cacert), and the server verifies the client's identity (using --cert and --key). The server responds with a unique stream_id for the newly created stream.
 
+
+```sh
 export PUBLISHING_ENDPOINT=https://localhost:1234/streams/1
 This command saves the stream's URL into an environment variable for easy access. This URL is the ingest endpoint—the specific address where the CMAF media segments will be uploaded. The 1 is the stream_id returned by the previous command.
 
