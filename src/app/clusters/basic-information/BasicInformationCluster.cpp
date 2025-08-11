@@ -47,6 +47,8 @@ namespace {
 // fixed size for location strings
 static constexpr size_t kFixedLocationLength = 2;
 
+// This is NOT the same as the auto-generated attributes:
+// see comment below about UniqueID (which we make behave as optional)
 constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     DataModelRevision::kMetadataEntry,
     VendorName::kMetadataEntry,

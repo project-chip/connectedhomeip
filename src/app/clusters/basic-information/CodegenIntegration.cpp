@@ -70,7 +70,10 @@ void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
                  emberAfContainsAttribute(endpointId, BasicInformation::Id, Reachable::Id))
             .Set(OptionalBasicInformationAttributes::kProductAppearance,
                  emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductAppearance::Id))
-            // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this
+
+            // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this:
+            // Specifically builds need to support the "do not build with unique id (make it optional)"
+            // to emulate the test case where UniqueID is missing as it was optional in previous versions of the spec
             .Set(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose,
                  !emberAfContainsAttribute(endpointId, BasicInformation::Id, UniqueID::Id));
 
