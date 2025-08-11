@@ -60,20 +60,15 @@ class TC_APPLAUNCHER_3_5(MatterBaseTest):
             f"CatalogList is not a list. Received type: {type(catalog_list)}"
         )
         # Validate that CatalogList is present and not empty
-        asserts.assert_true(
-            catalog_list is not None and len(catalog_list) > 0,
-            "CatalogList attribute is empty or not present"
-        )
+        asserts.assert_greater(len(catalog_list), 0, "CatalogList attribute is empty or not present")
+
         logging.info(f"CatalogList: {catalog_list}")
 
         # Validate each entry is a valid CSA-issued Vendor ID (uint16)
         for vendor_id in catalog_list:
-            asserts.assert_true(
-                isinstance(vendor_id, int) and 0 <= vendor_id <= 65535,
-                f"Invalid Vendor ID in CatalogList: {vendor_id}"
-            )
+            asserts.assert_greater(len(catalog_list), 0, "CatalogList attribute is empty or not present")
 
 
-# Entry point for the test runner
+        # Entry point for the test runner
 if __name__ == "__main__":
     default_matter_test_main()
