@@ -51,23 +51,12 @@ namespace Internal {
 }
 #endif
 
-/**
- * This implements a function to return an NULL-terminated descriptive C string, associated with the specified, mapped
- * Platform error.
- *
- *  @param[in] aError  The mapped Platform-specific error to describe.
- *
- *  @return A NULL-terminated descriptive C string describing the error.
- */
 const char * DescribePlatformError(CHIP_ERROR aError)
 {
     const int lError = static_cast<int>(aError.GetValue());
     return strerror(lError);
 }
 
-/**
- * Register a text error formatter for Platform errors.
- */
 void RegisterPlatformErrorFormatter()
 {
     static ErrorFormatter sPlatformErrorFormatter = { FormatPlatformError, nullptr };
@@ -75,18 +64,6 @@ void RegisterPlatformErrorFormatter()
     RegisterErrorFormatter(&sPlatformErrorFormatter);
 }
 
-/**
- * Given a platform error, returns a human-readable NULL-terminated C string
- * describing the error.
- *
- * @param[in] buf                   Buffer into which the error string will be placed.
- * @param[in] bufSize               Size of the supplied buffer in bytes.
- * @param[in] err                   The error to be described.
- *
- * @return true                     If a description string was written into the supplied buffer.
- * @return false                    If the supplied error was not a Platform error.
- *
- */
 bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     if (err.IsRange(ChipError::Range::kPlatform))
