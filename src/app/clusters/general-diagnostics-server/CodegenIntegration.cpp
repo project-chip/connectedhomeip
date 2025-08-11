@@ -19,12 +19,14 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
+#include <app/util/util.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics;
+using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 
 // for fixed endpoint, this file is ever only included IF general diagnostics is enabled and that MUST happen only on endpoint 0
 // the static assert is skipped in case of dynamic endpoints.
@@ -41,37 +43,19 @@ LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
 LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 #endif
 
-// compile-time evaluated method if "is <EP>::GeneralDiagnostics::<ATTR>" enabled
-constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
-{
-    for (auto & config : GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig)
-    {
-        if (config.endpointNumber != endpointId)
-        {
-            continue;
-        }
-        for (auto & attr : config.enabledAttributes)
-        {
-            if (attr == attributeId)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
 } // namespace
 
 void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(endpointId == kRootEndpointId);
-    const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableTotalOperationalHours = IsAttributeEnabled(endpointId, Attributes::TotalOperationalHours::Id),
-        .enableBootReason            = IsAttributeEnabled(endpointId, Attributes::BootReason::Id),
-        .enableActiveHardwareFaults  = IsAttributeEnabled(endpointId, Attributes::ActiveHardwareFaults::Id),
-        .enableActiveRadioFaults     = IsAttributeEnabled(endpointId, Attributes::ActiveRadioFaults::Id),
-        .enableActiveNetworkFaults   = IsAttributeEnabled(endpointId, Attributes::ActiveNetworkFaults::Id),
-    };
+
+    GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
+        GeneralDiagnosticsCluster::OptionalAttributeSet()
+            .Set<TotalOperationalHours::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, TotalOperationalHours::Id))
+            .Set<BootReason::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, BootReason::Id))
+            .Set<ActiveHardwareFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveHardwareFaults::Id))
+            .Set<ActiveRadioFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveRadioFaults::Id))
+            .Set<ActiveNetworkFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveNetworkFaults::Id));
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
     const GeneralDiagnosticsFunctionsConfig functionsConfig
@@ -80,22 +64,20 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
         Only consider real time if time sync cluster is actually enabled. If it's not
         enabled, this avoids likelihood of frequently reporting unusable unsynched time.
         */
-        .enablePosixTime =
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
-            true,
+        .enablePosixTime = true,
 #else
-            false,
+        .enablePosixTime      = false,
 #endif
-        .enablePayloadSnaphot =
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-            true,
+        .enablePayloadSnaphot = true,
 #else
-            false,
+        .enablePayloadSnaphot = false,
 #endif
     };
-    gServer.Create(enabledAttributes, functionsConfig);
+    gServer.Create(optionalAttributeSet, functionsConfig);
 #else
-    gServer.Create(enabledAttributes);
+    gServer.Create(optionalAttributeSet);
 #endif
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
