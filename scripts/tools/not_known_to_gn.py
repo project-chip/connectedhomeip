@@ -130,7 +130,7 @@ class OrphanChecker:
 )
 @click.option(
     '--known-failure',
-    type=click.Path(exists=True, dir_okay=False),
+    type=click.Path(dir_okay=False),
     multiple=True,
     help='What paths are known to fail',
 )
