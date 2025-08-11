@@ -221,7 +221,7 @@ jobs:
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             #
-            # Known client-side clusters are allowd to use this only.
+            # Known client-side clusters are allowed to use this only.
             - name: emberAfClusterInit/Shutdown callbacks are for client side use, not server side. Use ClusterServerInit/Shutdown for server clusters
               if: always()
               run: |

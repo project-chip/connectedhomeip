@@ -41,7 +41,7 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 
     if (outArrayIndex >= kOtaProviderMaxClusterCount)
     {
-        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
+        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
         return false;
     }
     return true;
