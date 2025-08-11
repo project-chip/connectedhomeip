@@ -16,7 +16,7 @@
 
 import logging
 
-from chip.clusters import CameraAvStreamManagement
+from matter.clusters import CameraAvStreamManagement
 
 
 class WebRTCTestHelper:

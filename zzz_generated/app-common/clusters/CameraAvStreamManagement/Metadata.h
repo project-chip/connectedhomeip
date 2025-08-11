@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -201,6 +202,13 @@ namespace StatusLightBrightness {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(StatusLightBrightness::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kManage, Access::Privilege::kManage);
 } // namespace StatusLightBrightness
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    MaxContentBufferSize::kMetadataEntry,
+    MaxNetworkBandwidth::kMetadataEntry,
+    SupportedStreamUsages::kMetadataEntry,
+    StreamUsagePriorities::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
