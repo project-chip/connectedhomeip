@@ -64,7 +64,6 @@ jobs:
               # BUILD.gn file
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
-                     src \
                      --skip-dir app/clusters \
                      --skip-dir darwin \
                      --skip-dir include \
@@ -126,12 +125,19 @@ jobs:
                      --known-failure platform/DeviceSafeQueue.h \
                      --known-failure platform/GLibTypeDeleter.h \
                      --known-failure platform/SingletonConfigurationManager.cpp \
+                     src \
                   "
                   # These ARE actually orphaned but due to dynamic-server we have code paths
                   # for them. Keeping them as a list as they still need review ...
                   #   --known-failure app/util/attribute-table.cpp \
                   #   --known-failure app/util/ember-io-storage.cpp \
                   #   --known-failure app/util/attribute-storage.cpp \
+                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
+                     -e py -e matter -e lark -e yaml -e cpp -e java -e kt -e jinja -e proto \
+                     --gn-extra scripts/py_matter_idl/files.gni \
+                     --skip-dir scripts/py_matter_idl/build \
+                     scripts/py_matter_idl \
+                  "
             - name: Check for matter lint errors
               if: always()
               run: |
