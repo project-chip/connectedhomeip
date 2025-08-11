@@ -128,13 +128,18 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
     Reset();
+    mContext.reset();
     mRegistry.ClearContext();
-    return CHIP_NO_ERROR;
+    return DataModel::Provider::Shutdown();
 }
 
 CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
+    // server clusters require a valid persistent storage delegate
+    VerifyOrReturnError(mPersistentStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    mContext.emplace(context);
 
     // Ember NVM requires have a data model provider. attempt to create one if one is not available
     //
@@ -145,26 +150,17 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         ChipLogProgress(DataManagement, "Ember attribute persistence requires setting up");
 #endif
-        if (mPersistentStorageDelegate != nullptr)
-        {
-            ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
-            SetAttributePersistenceProvider(&gDefaultAttributePersistence);
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        }
-        else
-        {
-            ChipLogError(DataManagement, "No storage delegate available, will not set up attribute persistence.");
-#endif
-        }
+        ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
+        SetAttributePersistenceProvider(&gDefaultAttributePersistence);
     }
 
     InitDataModelForTesting();
 
     return mRegistry.SetContext(ServerClusterContext{
-        .provider           = this,
-        .storage            = mPersistentStorageDelegate,
-        .attributeStorage   = GetAttributePersistenceProvider(),
-        .interactionContext = &mContext,
+        .provider           = *this,
+        .storage            = *mPersistentStorageDelegate,
+        .attributeStorage   = *GetAttributePersistenceProvider(), // guaranteed set up by the above logic
+        .interactionContext = *mContext,                          // NOLINT(bugprone-unchecked-optional-access): emplaced above
     });
 }
 
