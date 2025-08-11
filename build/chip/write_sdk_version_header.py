@@ -71,7 +71,7 @@ def main() -> int:
         try:
             ver = git_version()
         except (subprocess.CalledProcessError, FileNotFoundError):
-            # In case Git is not installed, fall back to version from spec file
+            # In case Git is not installed, fall back to version from specification file
             ver = spec_version(args.root)
     else:
         ver = spec_version(args.root)
