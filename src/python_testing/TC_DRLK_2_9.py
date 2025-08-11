@@ -38,7 +38,6 @@ import logging
 import random
 import string
 
-
 from drlk_2_x_common import DRLK_COMMON
 from mobly import asserts
 

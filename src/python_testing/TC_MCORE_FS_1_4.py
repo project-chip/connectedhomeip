@@ -66,7 +66,6 @@ import os
 import random
 import tempfile
 
-
 from mobly import asserts
 
 import matter.clusters as Clusters

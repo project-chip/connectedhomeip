@@ -19,7 +19,9 @@ import logging
 import random
 import string
 import time
+
 from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status

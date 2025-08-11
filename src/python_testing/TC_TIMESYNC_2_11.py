@@ -35,24 +35,26 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from matter.tlv import uint
-from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.interaction_model import InteractionModelError
-from matter.clusters.Types import NullValue
-import matter.clusters as Clusters
-from mobly import asserts
-from chip.testing import timeoperations
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.interaction_model import InteractionModelError
-from chip.clusters.Types import NullValue
-import chip.clusters as Clusters
 import queue
 import time
 import typing
 from datetime import datetime, timedelta, timezone
+
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.interaction_model import InteractionModelError
+from chip.testing import timeoperations
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from matter.tlv import uint
 
 << << << < HEAD
 == == == =

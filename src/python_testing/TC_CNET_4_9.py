@@ -18,15 +18,13 @@
 import logging
 
 import test_plan_support
-
-
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.matter_asserts import is_valid_bool_value
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches,
-                                           matchers)
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, matchers,
+                                           run_if_endpoint_matches)
 
 
 class TC_CNET_4_9(MatterBaseTest):
