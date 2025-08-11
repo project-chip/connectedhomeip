@@ -238,16 +238,19 @@ source "$CHIP_ROOT/scripts/activate.sh"
 #     10.16    // SYSTEM_VERSION_COMPAT is unset or 1
 export SYSTEM_VERSION_COMPAT=0
 
-# Set default crypto to openssl. It will be overridden on Darwin.
-chip_crypto="openssl"
+# Set default crypto to BoringSSL
+chip_crypto="boringssl"
 
 # Disable WebRTC by default only on Darwin due to libdatachannel limitations
 if [[ "$(uname)" == "Darwin" ]]; then
-    chip_crypto="boringssl"
-    if [[ "$enable_webrtc" == "true" ]]; then
-        echo "Warning: WebRTC is not supported on Darwin. Disabling WebRTC to avoid build errors."
-        enable_webrtc="false"
-    fi
+    echo "Warning: WebRTC is not supported on Darwin. Disabling WebRTC to avoid build errors."
+    enable_webrtc="false"
+fi
+
+# If WebRTC is enabled, switch chip_crypto to OpenSSL,
+# because WebRTC depends on OpenSSL, which must be installed and available.
+if [[ "$enable_webrtc" == "true" ]]; then
+    chip_crypto="openssl"
 fi
 
 # Generates ninja files
