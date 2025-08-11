@@ -46,14 +46,14 @@ public:
     BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }) {}
 
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
-        BasicInformation::Attributes::ManufacturingDate::Id,   //
-        BasicInformation::Attributes::PartNumber::Id,          //
-        BasicInformation::Attributes::ProductURL::Id,          //
-        BasicInformation::Attributes::ProductLabel::Id,        //
-        BasicInformation::Attributes::SerialNumber::Id,        //
-        BasicInformation::Attributes::LocalConfigDisabled::Id, //
-        BasicInformation::Attributes::Reachable::Id,           //
-        BasicInformation::Attributes::ProductAppearance::Id,   //
+        BasicInformation::Attributes::ManufacturingDate::Id,       //
+        BasicInformation::Attributes::PartNumber::Id,              //
+        BasicInformation::Attributes::ProductURL::Id,              //
+        BasicInformation::Attributes::ProductLabel::Id,            //
+        BasicInformation::Attributes::SerialNumber::Id,            //
+        BasicInformation::Attributes::LocalConfigDisabled::Id,     //
+        BasicInformation::Attributes::Reachable::Id,               //
+        BasicInformation::Attributes::ProductAppearance::Id,       //
         // Old specification versions had UniqueID as optional, so this
         // appears here even though MANDATORY in the latest spec. We
         // default it enabled (to decrease chances of error)
