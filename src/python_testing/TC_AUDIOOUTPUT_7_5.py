@@ -85,13 +85,13 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
             # Validate 'name'
             asserts.assert_true(hasattr(output, "name"), "'name' field is missing")
             asserts.assert_true(isinstance(output.name, str), "'name' should be a string")
+            logging.info(f"Output Struct - index: {output.index}, outputType: {output.outputType}, name: {output.name}")
 
         # Ensure 'index' values are unique
         asserts.assert_equal(
             len(valid_indices), len(set(valid_indices)),
             "Each 'index' in OutputList must be unique"
         )
-        logging.info(f"Output Struct - index: {output.index}, outputType: {output.outputType}, name: {output.name}")
 
         # Step 3: Read CurrentOutput
         self.step(3)
