@@ -278,7 +278,9 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(0u);
+        // Explicit specialization: TLVWriter.Put has specialization for various types
+        // but fails for `0u` with `unsigned int &` being ambigous.
+        return encoder.Encode<uint32_t>(0);
     case ClusterRevision::Id:
         if (!mEnabledOptionalAttributes.IsSet(UniqueID::Id))
         {
