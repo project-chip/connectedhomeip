@@ -231,6 +231,13 @@ static_library("ESP32") {
     ]
   }
 
+  if (chip_use_esp32_tee_secure_storage) {
+    sources += [
+      "ESP32PersistentStorageOpKeystoreTEE.cpp",
+      "ESP32PersistentStorageOpKeystoreTEE.h",
+    ]
+  }
+
   cflags = [
     "-Wconversion",
     "-Wundef",
