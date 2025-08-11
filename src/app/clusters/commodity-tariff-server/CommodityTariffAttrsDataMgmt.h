@@ -55,29 +55,20 @@ namespace app {
 namespace Clusters {
 namespace Globals {
 namespace Structs {
-
-// CurrencyStruct
-inline bool operator==(const CurrencyStruct::Type & lhs, const CurrencyStruct::Type & rhs)
+namespace CurrencyStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
 {
     return (lhs.currency == rhs.currency) && (lhs.decimalPoints == rhs.decimalPoints);
 }
+} // namespace CurrencyStruct
 
-inline bool operator!=(const CurrencyStruct::Type & lhs, const CurrencyStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
-
-// PowerThresholdStruct
-inline bool operator==(const PowerThresholdStruct::Type & lhs, const PowerThresholdStruct::Type & rhs)
+namespace PowerThresholdStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
 {
     return (lhs.powerThresholdSource == rhs.powerThresholdSource) && (lhs.powerThreshold == rhs.powerThreshold) &&
         (lhs.apparentPowerThreshold == rhs.apparentPowerThreshold);
 }
-
-inline bool operator!=(const PowerThresholdStruct::Type & lhs, const PowerThresholdStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
+} // namespace PowerThresholdStruct
 
 } // namespace Structs
 } // namespace Globals
@@ -85,61 +76,127 @@ inline bool operator!=(const PowerThresholdStruct::Type & lhs, const PowerThresh
 namespace CommodityTariff {
 namespace Structs {
 
-// TariffPriceStruct
-inline bool operator==(const TariffPriceStruct::Type & lhs, const TariffPriceStruct::Type & rhs)
+namespace TariffPriceStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
 {
     return (lhs.priceType == rhs.priceType) && (lhs.price == rhs.price) && (lhs.priceLevel == rhs.priceLevel);
 }
+} // namespace TariffPriceStruct
 
-inline bool operator!=(const TariffPriceStruct::Type & lhs, const TariffPriceStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
-
-// AuxiliaryLoadSwitchSettingsStruct
+namespace AuxiliaryLoadSwitchSettingsStruct {
 inline bool operator==(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs, const AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
 {
     return (lhs.number == rhs.number) && (lhs.requiredState == rhs.requiredState);
 }
-
-inline bool operator!=(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs, const AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
+} // namespace namespace AuxiliaryLoadSwitchSettingsStruct
 
 // PeakPeriodStruct
-inline bool operator==(const PeakPeriodStruct::Type & lhs, const PeakPeriodStruct::Type & rhs)
+namespace PeakPeriodStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
 {
     return (lhs.severity == rhs.severity) && (lhs.peakPeriod == rhs.peakPeriod);
 }
+} // namespace PeakPeriodStruct
 
-inline bool operator!=(const PeakPeriodStruct::Type & lhs, const PeakPeriodStruct::Type & rhs)
+namespace TariffInformationStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
+{
+    return (lhs.currency == rhs.currency) &&
+           (lhs.tariffLabel == rhs.tariffLabel) &&
+           (lhs.providerName == rhs.providerName) &&
+           (lhs.blockMode == rhs.blockMode);
+}
+
+inline bool operator!=(const Type & lhs, const Type & rhs)
 {
     return !(lhs == rhs);
 }
+} // namespace TariffInformationStruct
 
-inline bool operator==(const DayStruct::Type & lhs, const DayStruct::Type & rhs)
+namespace DayStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
 {
     return (lhs.date == rhs.date) && (lhs.dayType == rhs.dayType) && (lhs.dayEntryIDs == rhs.dayEntryIDs);
 }
 
-inline bool operator!=(const DayStruct::Type & lhs, const DayStruct::Type & rhs)
+inline bool operator!=(const Type & lhs, const Type & rhs)
 {
     return !(lhs == rhs);
 }
+} // namespace DayStruct
 
-inline bool operator==(const DayEntryStruct::Type & lhs, const DayEntryStruct::Type & rhs)
+namespace DayEntryStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
 {
     return (lhs.dayEntryID == rhs.dayEntryID) && (lhs.startTime == rhs.startTime) && (lhs.duration == rhs.duration) &&
         (lhs.randomizationOffset == rhs.randomizationOffset) && (lhs.randomizationType == rhs.randomizationType);
 }
 
-inline bool operator!=(const DayEntryStruct::Type & lhs, const DayEntryStruct::Type & rhs)
+inline bool operator!=(const Type & lhs, const Type & rhs)
 {
     return !(lhs == rhs);
 }
+} // namespace DayEntryStruct
 
+namespace DayPatternStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
+{
+    return (lhs.dayPatternID == rhs.dayPatternID) &&
+           (lhs.daysOfWeek.Raw() == rhs.daysOfWeek.Raw()) &&
+           (lhs.dayEntryIDs == rhs.dayEntryIDs);
+}
 
+inline bool operator!=(const Type & lhs, const Type & rhs)
+{
+    return !(lhs == rhs);
+}
+} // namespace DayPatternStruct
+
+namespace TariffComponentStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
+{
+    return (lhs.label == rhs.label) &&
+           (lhs.price == rhs.price) &&
+           (lhs.friendlyCredit == rhs.friendlyCredit) &&
+           (lhs.auxiliaryLoad == rhs.auxiliaryLoad) &&
+           (lhs.peakPeriod == rhs.peakPeriod) &&
+           (lhs.powerThreshold == rhs.powerThreshold) &&
+           (lhs.predicted == rhs.predicted) &&
+           (lhs.threshold == rhs.threshold);
+}
+
+inline bool operator!=(const Type & lhs, const Type & rhs)
+{
+    return !(lhs == rhs);
+}
+} // namespace TariffComponentStruct
+
+namespace TariffPeriodStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
+{
+    return (lhs.tariffComponentIDs == rhs.tariffComponentIDs) &&
+           (lhs.dayEntryIDs == rhs.dayEntryIDs) &&
+           (lhs.label == rhs.label);
+}
+
+inline bool operator!=(const Type & lhs, const Type & rhs)
+{
+    return !(lhs == rhs);
+}
+} // namespace TariffPeriodStruct
+
+namespace CalendarPeriodStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
+{
+    return (lhs.startDate == rhs.startDate) &&
+           (lhs.dayPatternIDs == rhs.dayPatternIDs);
+}
+
+inline bool operator!=(const Type & lhs, const Type & rhs)
+{
+    return !(lhs == rhs);
+}
+} // namespace CalendarPeriodStruct
 
 } // namespace Structs
 } // namespace CommodityTariff
@@ -253,9 +310,6 @@ struct StrToSpan
     }
 };
 
-//using namespace CommodityTariffConsts;
-using namespace chip::app::Clusters::CommodityTariff::Structs;
-
 #define SCALAR_ATTRS                    \
     X(Clusters::Globals::TariffUnitEnum)                  \
     X(uint32_t)                         \
@@ -263,16 +317,16 @@ using namespace chip::app::Clusters::CommodityTariff::Structs;
     X(Clusters::CommodityTariff::DayEntryRandomizationTypeEnum)
 
 #define COMPLEX_ATTRIBUTES                          \
-    X(TariffInformationStruct::Type)               \
-    X(DataModel::List<DayEntryStruct::Type>)        \
-    X(DataModel::List<DayPatternStruct::Type>)      \
-    X(DataModel::List<TariffComponentStruct::Type>) \
-    X(DataModel::List<TariffPeriodStruct::Type>)    \
-    X(DataModel::List<DayStruct::Type>)             \
-    X(DataModel::List<CalendarPeriodStruct::Type>)
+    X(Clusters::CommodityTariff::Structs::TariffInformationStruct::Type)                \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::DayEntryStruct::Type>)        \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::DayPatternStruct::Type>)      \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>) \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type>)    \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::DayStruct::Type>)             \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::CalendarPeriodStruct::Type>)
 
-#define ALL_ATTRIBUTES                                                                                        \
-    SCALAR_ATTRS                                                                                          \
+#define ALL_ATTRIBUTES                                                                   \
+    SCALAR_ATTRS                                                                         \
     COMPLEX_ATTRIBUTES
 
 template <typename T>
@@ -404,7 +458,7 @@ using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
  *
  * The class handles cleanup for:
  * - List memory (automatically freed)
- * - Nested structs (via virtual CleanupStructValue)
+ * - Nested structs (via CleanupStructValue template)
  * - Nullable state transitions
  *
  * @section update_flow Update Flow
@@ -501,7 +555,6 @@ public:
      * @param size Number of elements to allocate (for list types only)
      * @return CHIP_NO_ERROR on success, or:
      *         - CHIP_ERROR_NO_MEMORY if allocation fails
-     *         - CHIP_ERROR_INVALID_LIST_LENGTH if size < 1 for list types
      *         - CHIP_ERROR_INCORRECT_STATE if called during active update
      *
      * @note For list types:
@@ -556,6 +609,18 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Prepares a new value for modification
+     * @param size Number of elements to allocate (for list types only)
+     * @return CHIP_NO_ERROR on success, or:
+     *         - CHIP_ERROR_NO_MEMORY if allocation fails
+     *         - CHIP_ERROR_INCORRECT_STATE if called during active update
+     *         - CHIP_ERROR_INTERNAL if wrong type data
+     *
+     * @note For non-list types:
+     *       - Creates default-initialized value
+     *       - Ignores size parameter
+     */
     CHIP_ERROR CreateNewSingleValue()
     {
         if (mUpdateState != UpdateState::kIdle)
@@ -666,7 +731,7 @@ public:
 
     /**
      * @brief Validates and prepares the new value for commit
-     * @param aUpdCtx Context pointer for callback
+     * @param aUpdCtx Pointer to context data for implementing validation methods that are used when bulk updating attributes (for cross validation f.e)
      * @return CHIP_NO_ERROR if validation succeeds
      * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
      */
@@ -912,7 +977,7 @@ protected:
 
         for (size_t i = 0; i < source.size(); i++)
         {
-            if (CompareStructValue(source[i], destination[i]))
+            if (source[i] != destination[i])
             {
                 return true;
             }
@@ -934,10 +999,6 @@ protected:
             {
                 is_neq = ListsNotEqual(a.Value(), b.Value());
             }
-            else if constexpr (IsValueStruct())
-            {
-                is_neq = CompareStructValue(a.Value(), b.Value());
-            }
             else
             {
                 is_neq = (a.Value() != b.Value());
@@ -946,8 +1007,6 @@ protected:
 
         return is_neq;
     }
-
-    //virtual void CleanupStructValue(PayloadType & aValue) { (void) aValue; }
 };
 
 } // namespace CommodityTariffAttrsDataMgmt

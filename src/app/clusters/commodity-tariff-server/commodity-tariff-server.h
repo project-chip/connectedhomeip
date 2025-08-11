@@ -53,13 +53,11 @@ namespace CommodityTariff {
  * Primary attributes represent the fundamental tariff configuration that can only
  * be changed by authorized tariff updates. These are typically set by utility providers.
  */
-#define COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS                                                                                      \
+#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES                                                                                       \
     X(TariffUnit, DataModel::Nullable<Globals::TariffUnitEnum>)                                                                    \
     X(StartDate, DataModel::Nullable<uint32_t>)                                                                                    \
     X(DefaultRandomizationOffset, DataModel::Nullable<int16_t>)                                                                    \
-    X(DefaultRandomizationType, DataModel::Nullable<DayEntryRandomizationTypeEnum>)
-
-#define COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES                                                                                \
+    X(DefaultRandomizationType, DataModel::Nullable<DayEntryRandomizationTypeEnum>)                                                                         \
     X(TariffInfo, DataModel::Nullable<Structs::TariffInformationStruct::Type>)                                                     \
     X(DayEntries, DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>>)                                             \
     X(DayPatterns, DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>>)                                          \
@@ -67,10 +65,6 @@ namespace CommodityTariff {
     X(TariffPeriods, DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>>)                                      \
     X(IndividualDays, DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>)                                              \
     X(CalendarPeriods, DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
-
-#define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES                                                                                        \
-    COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS                                                                                          \
-    COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
 
 /**
  * @def COMMODITY_TARIFF_CURRENT_ATTRIBUTES
@@ -134,20 +128,7 @@ namespace CommodityTariff {
         attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
         ~attrName##DataClass() override = default;                                                                                 \
     };
-COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
-#undef X
-
-#define X(attrName, attrType)                                                                                                      \
-    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                   \
-    {                                                                                                                              \
-    public:                                                                                                                        \
-        attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
-        ~attrName##DataClass() override = default;                                                                                 \
-                                                                                                                                   \
-    protected:                                                                                                                     \
-        bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const override;                       \
-    };
-COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES
+COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
 /** @} */ // end of attribute_management

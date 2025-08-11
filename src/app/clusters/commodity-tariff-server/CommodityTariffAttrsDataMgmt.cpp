@@ -84,79 +84,6 @@ static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::un
     }
     return false;
 }
-
-/**
- * @brief Custom comparator for Optional-wrapped struct types.
- *
- * @tparam T The struct type being compared
- * @param lhs Left-hand Optional<T> to compare
- * @param rhs Right-hand Optional<T> to compare
- * @return bool True if equal, false otherwise
- *
- * @note This exists because:
- *       1. Optional<T>::operator== requires T to implement operator==
- *       2. Many Matter structs don't implement operator== by design
- *       3. We need to compare structs field-by-field for accurate change detection
- *       4. The default Optional comparison would fail to compile for non-comparable types
- */
-template <typename T>
-static bool OptionalStructsAreEqual(const Optional<T> & lhs, const Optional<T> & rhs)
-{
-    if (lhs.HasValue() != rhs.HasValue())
-        return false;
-    if (!lhs.HasValue())
-        return true;
-    return (lhs.Value() == rhs.Value());
-}
-
-/**
- * @brief Custom comparator for Optional<Nullable<T>> wrapped struct types.
- *
- * @tparam T The struct type being compared
- * @param lhs Left-hand Optional<Nullable<T>> to compare
- * @param rhs Right-hand Optional<Nullable<T>> to compare
- * @return bool True if equal, false otherwise
- *
- * @note This exists because:
- *       1. Combines three levels of wrapping (Optional+Nullable+Struct)
- *       2. Handles all null/missing combinations explicitly
- *       3. Provides consistent behavior when T lacks operator==
- *       4. Needed for attribute change detection in Matter's data model
- *       5. The nested wrappers make default comparisons impractical
- */
-
-template <typename T>
-static bool OptionalNullableStructsAreEqual(const Optional<DataModel::Nullable<T>> & lhs,
-                                            const Optional<DataModel::Nullable<T>> & rhs)
-{
-    // Both missing -> true
-    if (!lhs.HasValue() && !rhs.HasValue())
-    {
-        return true;
-    }
-
-    // One present, one missing -> false
-    if (lhs.HasValue() != rhs.HasValue())
-    {
-        return false;
-    }
-
-    // Both present and both null -> true
-    if (lhs.Value().IsNull() && rhs.Value().IsNull())
-    {
-        return true;
-    }
-
-    // One null, one not null -> false
-    if (lhs.Value().IsNull() != rhs.Value().IsNull())
-    {
-        return false;
-    }
-
-    // Both present and not null -> return true if equal
-    return (lhs.Value().Value() == rhs.Value().Value());
-}
-
 }; // namespace CommonUtilities
 
 /*
@@ -171,19 +98,6 @@ CHIP_ERROR StartDateDataClass::Validate(const ValueType & aValue) const
     return CHIP_NO_ERROR;
 }*/
 
-// TariffInfoDataClass
-bool TariffInfoDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-{
-    if (!CommonUtilities::OptionalNullableStructsAreEqual(source.currency, destination.currency))
-    {
-        return true;
-    }
-
-    return (source.tariffLabel != destination.tariffLabel || source.providerName != destination.providerName ||
-            source.blockMode != destination.blockMode);
-}
-
-// DayEntriesDataClass
 namespace DayEntriesDataClass_Utils {
 
 static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, TariffUpdateCtx * aCtx)
@@ -210,13 +124,6 @@ static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, 
 }
 } // namespace DayEntriesDataClass_Utils
 
-bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-{
-    using chip::app::Clusters::CommodityTariff::Structs::operator!=;
-
-    return source != destination;
-}
-
 // DayPatternsDataClass
 namespace DayPatternsDataClass_Utils {
 static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue, std::unordered_set<uint32_t> & seenDeIDs)
@@ -233,16 +140,6 @@ static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue
     return CHIP_NO_ERROR;
 }
 } // namespace DayPatternsDataClass_Utils
-
-bool DayPatternsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-{
-    if ((source.dayPatternID != destination.dayPatternID) || (source.daysOfWeek.Raw() != destination.daysOfWeek.Raw()))
-    {
-        return true;
-    }
-
-    return (source.dayEntryIDs != destination.dayEntryIDs);
-}
 
 // TariffPeriodsDataClass
 namespace TariffPeriodsDataClass_Utils {
@@ -294,12 +191,6 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
     return CHIP_NO_ERROR;
 }
 } // namespace TariffPeriodsDataClass_Utils
-
-bool TariffPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-{
-    return (source.tariffComponentIDs != destination.tariffComponentIDs || source.dayEntryIDs != destination.dayEntryIDs ||
-            source.label != destination.label);
-}
 
 // TariffComponentsDataClass
 namespace TariffComponentsDataClass_Utils {
@@ -412,63 +303,6 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
     return CHIP_NO_ERROR;
 }
 } // namespace TariffComponentsDataClass_Utils
-
-bool TariffComponentsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-{
-
-    if (source.label != destination.label)
-        return true;
-
-    // If PRICE feature are supported
-    if (!CommonUtilities::OptionalNullableStructsAreEqual(source.price, destination.price))
-    {
-        return true;
-    }
-
-    // If FCRED feature are supported
-    if (source.friendlyCredit != destination.friendlyCredit)
-    {
-        return true;
-    }
-
-    // If AUXLD feature are supported
-    if (!CommonUtilities::OptionalStructsAreEqual(source.auxiliaryLoad, destination.auxiliaryLoad))
-    {
-        return true;
-    }
-
-    // If PEAKP feature are supported
-    if (!CommonUtilities::OptionalStructsAreEqual<>(source.peakPeriod, destination.peakPeriod))
-    {
-        return true;
-    }
-
-    // If PWRTHLD feature are supported
-    if (!CommonUtilities::OptionalStructsAreEqual(source.powerThreshold, destination.powerThreshold))
-    {
-        return true;
-    }
-
-    if (source.predicted != destination.predicted)
-    {
-        return true;
-    }
-
-    return !(source.threshold == destination.threshold);
-}
-
-bool IndividualDaysDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-{
-    using chip::app::Clusters::CommodityTariff::Structs::operator!=;
-    return (source != destination);
-}
-
-// CalendarPeriodsDataClass
-
-bool CalendarPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-{
-    return (source.startDate != destination.startDate || source.dayPatternIDs != destination.dayPatternIDs);
-}
 
 namespace chip {
 namespace app {

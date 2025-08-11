@@ -227,7 +227,6 @@ CHIP_ERROR Instance::SetValue(T & currValue, T & newValue, uint32_t attrId)
     }
     else
     {
-        using chip::app::Clusters::CommodityTariff::Structs::operator!=;
         hasChanged = (currValue.Value() != newValue.Value());
     }
 
