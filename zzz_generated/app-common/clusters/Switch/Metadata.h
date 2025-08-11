@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -31,6 +32,11 @@ namespace MultiPressMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MultiPressMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MultiPressMax
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    NumberOfPositions::kMetadataEntry,
+    CurrentPosition::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
