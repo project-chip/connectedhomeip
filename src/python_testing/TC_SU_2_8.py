@@ -226,7 +226,14 @@ class TC_SU_2_8(MatterBaseTest):
         dut_node_id = self.dut_node_id
         th1 = self.default_controller
         fabric_id_th2 = th1.fabricId + 1
-        vendor_id = 0xFFF1  # from CLI
+        vendor_id = 0xFFF1
+
+        logging.info(f"Endpoint: {endpoint}.")
+        logging.info(f"DUT Node ID: {dut_node_id}.")
+        logging.info(f"Vendor ID: {vendor_id}.")
+
+        logging.info(f"TH1 fabric id: {th1.fabricId}.")
+        logging.info(f"TH2 fabric id: {fabric_id_th2}.")
 
         logging.info("Setting up TH2.")
         th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
