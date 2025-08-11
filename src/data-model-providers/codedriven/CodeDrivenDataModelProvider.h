@@ -197,7 +197,6 @@ private:
 
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * GetServerClusterInterface(const ConcreteClusterPath & path);
-
 };
 
 } // namespace app

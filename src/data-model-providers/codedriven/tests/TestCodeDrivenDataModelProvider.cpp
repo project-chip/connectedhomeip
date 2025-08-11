@@ -525,8 +525,7 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithEmptyStaticData)
                                                        .SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>())
                                                        .Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry4));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry4));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 }
 
