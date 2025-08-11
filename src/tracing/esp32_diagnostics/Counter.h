@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "tracing/esp32_diagnostic_trace/DiagnosticEntry.h"
-#include "tracing/esp32_diagnostic_trace/DiagnosticStorage.h"
+#include "tracing/esp32_diagnostics/DiagnosticEntry.h"
+#include "tracing/esp32_diagnostics/DiagnosticStorage.h"
 #include <map>
 
 namespace chip {
