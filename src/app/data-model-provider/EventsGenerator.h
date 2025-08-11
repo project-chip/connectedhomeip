@@ -85,6 +85,17 @@ class EventsGenerator
 public:
     virtual ~EventsGenerator() = default;
 
+
+    /// Scnedule event delivery to happen immediately (and synchronously).
+    ///
+    /// Use when it is imperative that some events are to be delivered because
+    /// they will not be delivered soon after (e.g. device shutdown events or
+    /// fabric removal events).
+    ///
+    /// This can be done either for a specific fabric, identified by the provided
+    /// FabricIndex, or across all fabrics if no FabricIndex is provided.
+    virtual void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) = 0;
+
     /// Generates the given event.
     ///
     /// Events are generally expected to be sent to subscribed clients and also

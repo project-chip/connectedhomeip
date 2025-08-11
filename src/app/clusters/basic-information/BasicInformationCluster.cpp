@@ -444,7 +444,10 @@ void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
     ChipLogDetail(Zcl, "Emitting StartUp event");
 
     BasicInformation::Events::StartUp::Type event{ softwareVersion };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
+
+    DataModel::EventsGenerator & eventsGenerator = mContext->interactionContext.eventsGenerator;
+    eventsGenerator.GenerateEvent(event, kRootEndpointId);
+    eventsGenerator.ScheduleUrgentEventDeliverySync();
 }
 
 void BasicInformationCluster::OnShutDown()
@@ -456,7 +459,10 @@ void BasicInformationCluster::OnShutDown()
     ChipLogDetail(Zcl, "Emitting ShutDown event");
 
     BasicInformation::Events::ShutDown::Type event;
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
+
+    DataModel::EventsGenerator & eventsGenerator = mContext->interactionContext.eventsGenerator;
+    eventsGenerator.GenerateEvent(event, kRootEndpointId);
+    eventsGenerator.ScheduleUrgentEventDeliverySync();
 }
 
 } // namespace chip::app::Clusters
