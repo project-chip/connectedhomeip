@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandSender.h>
-#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/binding-server/BindingManager.h>
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPError.h>
@@ -35,12 +35,14 @@ using chip::Shell::streamer_get;
 using chip::Shell::streamer_printf;
 #endif // defined(ENABLE_CHIP_SHELL)
 
+using namespace chip::app::Clusters;
+
 static bool sSwitchOnOffState = false;
 #if defined(ENABLE_CHIP_SHELL)
 static void ToggleSwitchOnOff(bool newState)
 {
     sSwitchOnOffState = newState;
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
+    BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
 }
 
 static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
@@ -63,12 +65,10 @@ static void RegisterSwitchCommands()
 {
     static const shell_command_t sSwitchCommand = { SwitchCommandHandler, "switch", "Switch commands. Usage: switch [on|off]" };
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
-    return;
 }
 #endif // defined(ENABLE_CHIP_SHELL)
 
-static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::OperationalDeviceProxy * peer_device,
-                                      void * context)
+static void BoundDeviceChangedFunc(const BindingTableEntry & binding, chip::OperationalDeviceProxy * peer_device, void * context)
 {
     using namespace chip;
     using namespace chip::app;
@@ -105,7 +105,7 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
     }
 }
 
-static void BoundDeviceContextReleaseHandler(void * context)
+static void BoundDeviceContextReleaseFunc(void * context)
 {
     (void) context;
 }
@@ -113,10 +113,10 @@ static void BoundDeviceContextReleaseHandler(void * context)
 static void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
+    BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
-    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler);
+    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedFunc);
+    BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseFunc);
 }
 
 CHIP_ERROR InitBindingHandlers()

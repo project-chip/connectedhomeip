@@ -22,7 +22,7 @@
 #include "app-common/zap-generated/ids/Commands.h"
 #include "lib/core/CHIPError.h"
 #include <app/CommandSender.h>
-#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/binding-server/BindingManager.h>
 #include <controller/InvokeInteraction.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -52,9 +52,11 @@ public:
     }
 
 private:
-    static void OnOffProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
-    static void LevelControlProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
-    static void LightSwitchChangedHandler(const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
+    static void OnOffProcessCommand(chip::CommandId, const chip::app::Clusters::BindingTableEntry &, chip::OperationalDeviceProxy *,
+                                    void *);
+    static void LevelControlProcessCommand(chip::CommandId, const chip::app::Clusters::BindingTableEntry &,
+                                           chip::OperationalDeviceProxy *, void *);
+    static void LightSwitchChangedHandler(const chip::app::Clusters::BindingTableEntry &, chip::OperationalDeviceProxy *, void *);
     static void LightSwitchContextReleaseHandler(void * context);
     static void InitInternal(intptr_t);
 

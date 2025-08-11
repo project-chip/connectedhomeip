@@ -19,15 +19,16 @@
 #include "BindingHandler.h"
 #include "AppConfig.h"
 #include "app/CommandSender.h"
-#include "app/clusters/bindings/BindingManager.h"
+#include "app/clusters/binding-server/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/binding-server/binding-cluster.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 void BindingHandler::Init()
 {
@@ -68,7 +69,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
     }
 }
 
-void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const BindingTableEntry & aBinding,
                                          OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
@@ -144,7 +145,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
     }
 }
 
-void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const BindingTableEntry & aBinding,
                                                 OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
@@ -193,7 +194,7 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aBinding, OperationalDeviceProxy * deviceProxy,
+void BindingHandler::LightSwitchChangedHandler(const BindingTableEntry & aBinding, OperationalDeviceProxy * deviceProxy,
                                                void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
@@ -242,10 +243,10 @@ void BindingHandler::InitInternal(intptr_t arg)
 {
     ASR_LOG("Initialize binding Handler");
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
+    BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
+    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
     BindingHandler::GetInstance().PrintBindingTable();
 }
 

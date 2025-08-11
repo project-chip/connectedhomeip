@@ -22,12 +22,12 @@
 #include "LevelControlCommands.h"
 #include "OnOffCommands.h"
 #include "ThermostatCommands.h"
-#include "app/clusters/bindings/BindingManager.h"
+#include "app/clusters/binding-server/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/binding-server/binding-cluster.h>
 #include <lib/support/CodeUtils.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
@@ -37,6 +37,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 using Shell::Engine;
@@ -50,7 +51,7 @@ Engine sShellSwitchBindingSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
 namespace {
-void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
+void LightSwitchChangedHandler(const BindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
@@ -137,10 +138,10 @@ void LightSwitchContextReleaseHandler(void * context)
 void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
+    BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
+    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
 #if CONFIG_ENABLE_CHIP_SHELL
@@ -189,7 +190,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
+    BindingTableEntry * entry = Platform::New<BindingTableEntry>();
     entry->type                    = MATTER_MULTICAST_BINDING;
     entry->fabricIndex             = atoi(argv[0]);
     entry->groupId                 = atoi(argv[1]);
@@ -204,7 +205,7 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
+    BindingTableEntry * entry = Platform::New<BindingTableEntry>();
     entry->type                    = MATTER_UNICAST_BINDING;
     entry->fabricIndex             = atoi(argv[0]);
     entry->nodeId                  = atoi(argv[1]);
@@ -638,7 +639,7 @@ void BindingWorkerFunction(intptr_t context)
 {
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
 
-    EmberBindingTableEntry * entry = reinterpret_cast<EmberBindingTableEntry *>(context);
+    BindingTableEntry * entry = reinterpret_cast<BindingTableEntry *>(context);
     AddBindingEntry(*entry);
 
     Platform::Delete(entry);

@@ -18,13 +18,15 @@
 #pragma once
 
 #include <app/CASESessionManager.h>
-#include <app/clusters/bindings/PendingNotificationMap.h>
+#include <app/clusters/binding-server/PendingNotificationMap.h>
+#include <app/clusters/binding-server/binding-table.h>
 #include <app/server/Server.h>
-#include <app/util/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
 
 /**
  * Application callback function when a cluster associated with a binding changes.
@@ -39,8 +41,7 @@ namespace chip {
  *
  * The handler is not allowed to hold onto the pointer to the SessionHandler that is passed in.
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device,
-                                           void * context);
+using BoundDeviceChangedHandler = void (*)(const BindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context);
 
 /**
  * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
@@ -179,4 +180,16 @@ private:
     CHIP_ERROR mLastSessionEstablishmentError;
 };
 
+/**
+ * @brief appends a binding to the list of bindings
+ *        This function is to be used when a device wants to add a binding to its own table
+ *        If entry is a unicast binding, BindingManager will be notified and will establish a case session with the peer device
+ *        Entry will be added to the binding table and persisted into storage
+ *        BindingManager will be notified and the binding added callback will be called if it has been set
+ *
+ * @param entry binding to add
+ */
+CHIP_ERROR AddBindingEntry(const BindingTableEntry & entry);
+} // namespace Clusters
+} // namespace app
 } // namespace chip

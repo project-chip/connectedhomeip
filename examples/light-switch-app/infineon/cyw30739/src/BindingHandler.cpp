@@ -19,10 +19,11 @@
 #include "controller/ReadInteraction.h"
 #include <AppShellCommands.h>
 #include <BindingHandler.h>
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/binding-server/binding-cluster.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 void BindingHandler::Init()
 {
@@ -43,7 +44,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
         BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
         *data                              = aBindingData;
         // Establish new CASE session and retrasmit command that was not applied.
-        error = chip::BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
+        error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
                                                                               static_cast<void *>(data));
 
         if (CHIP_NO_ERROR != error)
@@ -58,7 +59,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
     }
 }
 
-void ProcessIdentifyUnicastBindingRead(BindingHandler::BindingData * data, const EmberBindingTableEntry & binding,
+void ProcessIdentifyUnicastBindingRead(BindingHandler::BindingData * data, const BindingTableEntry & binding,
                                        OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -84,7 +85,7 @@ void ProcessIdentifyUnicastBindingRead(BindingHandler::BindingData * data, const
     }
 }
 
-void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const BindingTableEntry & aBinding,
                                          OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
@@ -158,7 +159,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
     }
 }
 
-void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const BindingTableEntry & aBinding,
                                                 OperationalDeviceProxy * aDevice, void * aContext)
 {
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
@@ -207,7 +208,7 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * deviceProxy,
+void BindingHandler::LightSwitchChangedHandler(const BindingTableEntry & binding, OperationalDeviceProxy * deviceProxy,
                                                void * context)
 {
     VerifyOrReturn(context != nullptr, printf("Invalid context for Light switch handler\n"););
@@ -340,7 +341,7 @@ void BindingHandler::SwitchWorkerHandler(intptr_t context)
 void BindingHandler::BindingWorkerHandler(intptr_t context)
 {
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingHandler::Invalid binding work data\n"));
-    EmberBindingTableEntry * entry = reinterpret_cast<EmberBindingTableEntry *>(context);
+    BindingTableEntry * entry = reinterpret_cast<BindingTableEntry *>(context);
     AddBindingEntry(*entry);
 
     Platform::Delete(entry);

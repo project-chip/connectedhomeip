@@ -15,12 +15,13 @@
  *    limitations under the License.
  */
 
-#include <app/util/binding-table.h>
-#include <app/util/config.h>
+#include <app/clusters/binding-server/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
 
 /**
  * Application callback function when a context used in PendingNotificationEntry will not be needed and should be
@@ -68,7 +69,7 @@ public:
 class PendingNotificationMap
 {
 public:
-    static constexpr uint8_t kMaxPendingNotifications = MATTER_BINDING_TABLE_SIZE;
+    static constexpr uint8_t kMaxPendingNotifications = BindingTable::kMaxBindingEntries;
 
     friend class Iterator;
 
@@ -129,4 +130,6 @@ private:
     uint8_t mNumEntries = 0;
 };
 
+} // namespace Clusters
+} // namespace app
 } // namespace chip

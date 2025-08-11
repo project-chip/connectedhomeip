@@ -26,6 +26,7 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 void BindingHandler::Init()
 {
@@ -66,7 +67,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
     }
 }
 
-void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const BindingTableEntry & aBinding,
                                          OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
@@ -142,7 +143,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
     }
 }
 
-void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const BindingTableEntry & aBinding,
                                                 OperationalDeviceProxy * aDevice, void * aContext)
 {
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
@@ -192,7 +193,7 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * deviceProxy,
+void BindingHandler::LightSwitchChangedHandler(const BindingTableEntry & binding, OperationalDeviceProxy * deviceProxy,
                                                void * context)
 {
     VerifyOrReturn(context != nullptr, LOG_ERR("Invalid context for Light switch handler"););

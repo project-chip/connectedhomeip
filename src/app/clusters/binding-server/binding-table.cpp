@@ -19,10 +19,11 @@
  * @file Basic implementation of a binding table.
  */
 
-#include <app/util/binding-table.h>
-#include <app/util/config.h>
+#include <app/clusters/binding-server/binding-table.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
 
 BindingTable BindingTable::sInstance;
 
@@ -31,14 +32,14 @@ BindingTable::BindingTable()
     memset(mNextIndex, kNextNullIndex, sizeof(mNextIndex));
 }
 
-CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
+CHIP_ERROR BindingTable::Add(const BindingTableEntry & entry)
 {
     if (entry.type == MATTER_UNUSED_BINDING)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     uint8_t newIndex = GetNextAvaiableIndex();
-    if (newIndex >= MATTER_BINDING_TABLE_SIZE)
+    if (newIndex >= kMaxBindingEntries)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -82,14 +83,14 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
     return CHIP_NO_ERROR;
 }
 
-const EmberBindingTableEntry & BindingTable::GetAt(uint8_t index)
+const BindingTableEntry & BindingTable::GetAt(uint8_t index)
 {
     return mBindingTable[index];
 }
 
 CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
 {
-    EmberBindingTableEntry & entry    = mBindingTable[index];
+    BindingTableEntry & entry         = mBindingTable[index];
     uint8_t buffer[kEntryStorageSize] = { 0 };
     TLV::TLVWriter writer;
     writer.Init(buffer);
@@ -183,7 +184,7 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
 {
     uint8_t buffer[kEntryStorageSize] = { 0 };
     uint16_t size                     = sizeof(buffer);
-    EmberBindingTableEntry entry;
+    BindingTableEntry entry;
 
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(index).KeyName(), buffer, size));
     TLV::TLVReader reader;
@@ -292,14 +293,14 @@ BindingTable::Iterator BindingTable::end()
 
 uint8_t BindingTable::GetNextAvaiableIndex()
 {
-    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < kMaxBindingEntries; i++)
     {
         if (mBindingTable[i].type == MATTER_UNUSED_BINDING)
         {
             return i;
         }
     }
-    return MATTER_BINDING_TABLE_SIZE;
+    return kMaxBindingEntries;
 }
 
 BindingTable::Iterator BindingTable::Iterator::operator++()
@@ -312,4 +313,6 @@ BindingTable::Iterator BindingTable::Iterator::operator++()
     return *this;
 }
 
+} // namespace Clusters
+} // namespace app
 } // namespace chip

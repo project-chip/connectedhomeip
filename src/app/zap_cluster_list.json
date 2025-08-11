@@ -172,7 +172,7 @@
         "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
         "BALLAST_CONFIGURATION_CLUSTER": [],
         "BASIC_INFORMATION_CLUSTER": ["basic-information"],
-        "BINDING_CLUSTER": ["bindings"],
+        "BINDING_CLUSTER": ["binding-server"],
         "BOOLEAN_STATE_CLUSTER": [],
         "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [
             "boolean-state-configuration-server"

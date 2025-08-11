@@ -11,15 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/BindingManager.cpp"
-    "${CLUSTER_DIR}/BindingManager.h"
-    "${CLUSTER_DIR}/PendingNotificationMap.cpp"
-    "${CLUSTER_DIR}/PendingNotificationMap.h"
-    "${CLUSTER_DIR}/bindings.cpp"
-    "${CLUSTER_DIR}/bindings.h"
-)
+source_set("binding-server") {
+  sources = [
+    "BindingManager.cpp",
+    "BindingManager.h",
+    "PendingNotificationMap.cpp",
+    "PendingNotificationMap.h",
+    "binding-cluster.cpp",
+    "binding-cluster.h",
+    "binding-table.cpp",
+    "binding-table.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/Binding",
+  ]
+}

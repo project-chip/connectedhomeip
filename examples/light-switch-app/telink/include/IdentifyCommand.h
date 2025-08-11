@@ -18,28 +18,31 @@
 
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/binding-server/binding-cluster.h>
 
 #if defined(CONFIG_CHIP_LIB_SHELL)
 #include "lib/shell/Engine.h"
 #include "lib/shell/commands/Help.h"
 #endif // CONFIG_CHIP_LIB_SHELL
 
-using namespace chip;
-using namespace chip::app;
+using chip::OperationalDeviceProxy;
+using chip::app::ConcreteCommandPath;
+using chip::app::ConcreteDataAttributePath;
+using chip::app::StatusIB;
+using chip::app::Clusters::BindingTableEntry;
 
 #if defined(CONFIG_CHIP_LIB_SHELL)
-using Shell::Engine;
-using Shell::shell_command_t;
-using Shell::streamer_get;
-using Shell::streamer_printf;
+using chip::Shell::Engine;
+using chip::Shell::shell_command_t;
+using chip::Shell::streamer_get;
+using chip::Shell::streamer_printf;
 
 Engine sShellSwitchIdentifySubCommands;
 Engine sShellSwitchIdentifyReadSubCommands;
 Engine sShellSwitchGroupsIdentifySubCommands;
 #endif // CONFIG_CHIP_LIB_SHELL
 
-void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const BindingTableEntry & binding,
                                        OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -54,24 +57,24 @@ void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const EmberBin
 
     switch (data->attributeId)
     {
-    case Clusters::Identify::Attributes::AttributeList::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::AttributeList::TypeInfo>(
+    case chip::app::Clusters::Identify::Attributes::AttributeList::Id:
+        chip::Controller::ReadAttribute<chip::app::Clusters::Identify::Attributes::AttributeList::TypeInfo>(
             peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
-    case Clusters::Identify::Attributes::IdentifyTime::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
+    case chip::app::Clusters::Identify::Attributes::IdentifyTime::Id:
+        chip::Controller::ReadAttribute<chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
             peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
-    case Clusters::Identify::Attributes::IdentifyType::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyType::TypeInfo>(
+    case chip::app::Clusters::Identify::Attributes::IdentifyType::Id:
+        chip::Controller::ReadAttribute<chip::app::Clusters::Identify::Attributes::IdentifyType::TypeInfo>(
             peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
     }
 }
 
-void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const BindingTableEntry & binding,
                                           OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -84,44 +87,44 @@ void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Ember
 
     VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
 
-    Clusters::Identify::Commands::Identify::Type identifyCommand;
-    Clusters::Identify::Commands::TriggerEffect::Type triggerEffectCommand;
+    chip::app::Clusters::Identify::Commands::Identify::Type identifyCommand;
+    chip::app::Clusters::Identify::Commands::TriggerEffect::Type triggerEffectCommand;
 
     switch (data->commandId)
     {
-    case Clusters::Identify::Commands::Identify::Id:
+    case chip::app::Clusters::Identify::Commands::Identify::Id:
         identifyCommand.identifyTime = static_cast<uint16_t>(data->args[0]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         identifyCommand, onSuccess, onFailure);
+        chip::Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                               binding.remote, identifyCommand, onSuccess, onFailure);
         break;
 
-    case Clusters::Identify::Commands::TriggerEffect::Id:
-        triggerEffectCommand.effectIdentifier = static_cast<Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
-        triggerEffectCommand.effectVariant    = static_cast<Clusters::Identify::EffectVariantEnum>(data->args[1]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         triggerEffectCommand, onSuccess, onFailure);
+    case chip::app::Clusters::Identify::Commands::TriggerEffect::Id:
+        triggerEffectCommand.effectIdentifier = static_cast<chip::app::Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
+        triggerEffectCommand.effectVariant    = static_cast<chip::app::Clusters::Identify::EffectVariantEnum>(data->args[1]);
+        chip::Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                               binding.remote, triggerEffectCommand, onSuccess, onFailure);
         break;
     }
 }
 
-void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding)
+void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const BindingTableEntry & binding)
 {
-    Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+    chip::Messaging::ExchangeManager & exchangeMgr = chip::Server::GetInstance().GetExchangeManager();
 
-    Clusters::Identify::Commands::Identify::Type identifyCommand;
-    Clusters::Identify::Commands::TriggerEffect::Type triggerEffectCommand;
+    chip::app::Clusters::Identify::Commands::Identify::Type identifyCommand;
+    chip::app::Clusters::Identify::Commands::TriggerEffect::Type triggerEffectCommand;
 
     switch (data->commandId)
     {
-    case Clusters::Identify::Commands::Identify::Id:
+    case chip::app::Clusters::Identify::Commands::Identify::Id:
         identifyCommand.identifyTime = static_cast<uint16_t>(data->args[0]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, identifyCommand);
+        chip::Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, identifyCommand);
         break;
 
-    case Clusters::Identify::Commands::TriggerEffect::Id:
-        triggerEffectCommand.effectIdentifier = static_cast<Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
-        triggerEffectCommand.effectVariant    = static_cast<Clusters::Identify::EffectVariantEnum>(data->args[1]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, triggerEffectCommand);
+    case chip::app::Clusters::Identify::Commands::TriggerEffect::Id:
+        triggerEffectCommand.effectIdentifier = static_cast<chip::app::Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
+        triggerEffectCommand.effectVariant    = static_cast<chip::app::Clusters::Identify::EffectVariantEnum>(data->args[1]);
+        chip::Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, triggerEffectCommand);
         break;
     }
 }
@@ -133,7 +136,7 @@ void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const EmberBi
 
 CHIP_ERROR IdentifyHelpHandler(int argc, char ** argv)
 {
-    sShellSwitchIdentifySubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    sShellSwitchIdentifySubCommands.ForEachCommand(chip::Shell::PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -149,24 +152,24 @@ CHIP_ERROR IdentifySwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR IdentifyCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::Identify::Commands::Identify::Id;
-    data->clusterId           = Clusters::Identify::Id;
+    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    data->commandId           = chip::app::Clusters::Identify::Commands::Identify::Id;
+    data->clusterId           = chip::app::Clusters::Identify::Id;
     data->args[0]             = atoi(argv[0]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TriggerEffectSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::Identify::Commands::TriggerEffect::Id;
-    data->clusterId           = Clusters::Identify::Id;
+    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    data->commandId           = chip::app::Clusters::Identify::Commands::TriggerEffect::Id;
+    data->clusterId           = chip::app::Clusters::Identify::Id;
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
@@ -176,7 +179,7 @@ CHIP_ERROR TriggerEffectSwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR IdentifyReadHelpHandler(int argc, char ** argv)
 {
-    sShellSwitchIdentifyReadSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    sShellSwitchIdentifyReadSubCommands.ForEachCommand(chip::Shell::PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -192,34 +195,34 @@ CHIP_ERROR IdentifyRead(int argc, char ** argv)
 
 CHIP_ERROR IdentifyReadAttributeList(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->attributeId         = Clusters::Identify::Attributes::AttributeList::Id;
-    data->clusterId           = Clusters::Identify::Id;
+    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    data->attributeId         = chip::app::Clusters::Identify::Attributes::AttributeList::Id;
+    data->clusterId           = chip::app::Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR IdentifyReadIdentifyTime(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->attributeId         = Clusters::Identify::Attributes::IdentifyTime::Id;
-    data->clusterId           = Clusters::Identify::Id;
+    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    data->attributeId         = chip::app::Clusters::Identify::Attributes::IdentifyTime::Id;
+    data->clusterId           = chip::app::Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR IdentifyReadIdentifyType(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->attributeId         = Clusters::Identify::Attributes::IdentifyType::Id;
-    data->clusterId           = Clusters::Identify::Id;
+    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    data->attributeId         = chip::app::Clusters::Identify::Attributes::IdentifyType::Id;
+    data->clusterId           = chip::app::Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
@@ -229,7 +232,7 @@ CHIP_ERROR IdentifyReadIdentifyType(int argc, char ** argv)
 
 CHIP_ERROR GroupsIdentifyHelpHandler(int argc, char ** argv)
 {
-    sShellSwitchGroupsIdentifySubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    sShellSwitchGroupsIdentifySubCommands.ForEachCommand(chip::Shell::PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -245,26 +248,26 @@ CHIP_ERROR GroupsIdentifySwitchCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR GroupIdentifyCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::Identify::Commands::Identify::Id;
-    data->clusterId           = Clusters::Identify::Id;
+    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    data->commandId           = chip::app::Clusters::Identify::Commands::Identify::Id;
+    data->clusterId           = chip::app::Clusters::Identify::Id;
     data->args[0]             = atoi(argv[0]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GroupTriggerEffectSwitchCommandHandler(int argc, char ** argv)
 {
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::Identify::Commands::TriggerEffect::Id;
-    data->clusterId           = Clusters::Identify::Id;
+    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    data->commandId           = chip::app::Clusters::Identify::Commands::TriggerEffect::Id;
+    data->clusterId           = chip::app::Clusters::Identify::Id;
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 #endif // CONFIG_CHIP_LIB_SHELL

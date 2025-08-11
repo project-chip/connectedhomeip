@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/bindings/BindingManager.h>
-#include <app/util/binding-table.h>
+#include <app/clusters/binding-server/BindingManager.h>
+#include <app/clusters/binding-server/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -27,8 +27,8 @@ class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 {
     void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
-        chip::BindingTable & bindingTable = chip::BindingTable::GetInstance();
-        auto iter                         = bindingTable.begin();
+        chip::app::Clusters::BindingTable & bindingTable = chip::app::Clusters::BindingTable::GetInstance();
+        auto iter                                        = bindingTable.begin();
         while (iter != bindingTable.end())
         {
             if (iter->fabricIndex == fabricIndex)
@@ -40,7 +40,7 @@ class BindingFabricTableDelegate : public chip::FabricTable::Delegate
                 ++iter;
             }
         }
-        chip::BindingManager::GetInstance().FabricRemoved(fabricIndex);
+        chip::app::Clusters::BindingManager::GetInstance().FabricRemoved(fabricIndex);
     }
 };
 
@@ -48,9 +48,9 @@ BindingFabricTableDelegate gFabricTableDelegate;
 
 } // namespace
 
-namespace {} // namespace
-
 namespace chip {
+namespace app {
+namespace Clusters {
 
 BindingManager BindingManager::sBindingManager;
 
@@ -86,7 +86,7 @@ CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
         // to false.
         if (params.mEstablishConnectionOnInit)
         {
-            for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
+            for (const BindingTableEntry & entry : BindingTable::GetInstance())
             {
                 if (entry.type == MATTER_UNICAST_BINDING)
                 {
@@ -138,7 +138,7 @@ void BindingManager::HandleDeviceConnected(Messaging::ExchangeManager & exchange
     // iterator returns things by value anyway.
     for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
     {
-        EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(pendingNotification.mBindingEntryId);
+        BindingTableEntry entry = BindingTable::GetInstance().GetAt(pendingNotification.mBindingEntryId);
 
         if (sessionHandle->GetPeer() == ScopedNodeId(entry.nodeId, entry.fabricIndex))
         {
@@ -207,4 +207,33 @@ exit:
     return error;
 }
 
+CHIP_ERROR AddBindingEntry(const BindingTableEntry & entry)
+{
+    CHIP_ERROR err = BindingTable::GetInstance().Add(entry);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    if (entry.type == MATTER_UNICAST_BINDING)
+    {
+        err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
+            ChipLogError(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(entry.nodeId), err.Format());
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Clusters
+} // namespace app
 } // namespace chip

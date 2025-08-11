@@ -17,16 +17,17 @@
 
 #include "binding-handler.h"
 #include "app/ConcreteCommandPath.h"
-#include "app/clusters/bindings/BindingManager.h"
+#include "app/clusters/binding-server/BindingManager.h"
 #include "controller/InvokeInteraction.h"
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 static bool sEnabled = false;
 
-static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding,
+static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const BindingTableEntry & binding,
                                                Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle,
                                                BindingCommandData * data)
 {
@@ -95,7 +96,7 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
     }
 }
 
-static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding, BindingCommandData * data)
+static void ProcessSwitchGroupBindingCommand(CommandId commandId, const BindingTableEntry & binding, BindingCommandData * data)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
@@ -156,7 +157,7 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBin
     }
 }
 
-static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
+static void LightSwitchChangedHandler(const BindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "nullptr pointer passed"));
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
