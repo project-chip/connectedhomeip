@@ -23,7 +23,7 @@
 class EventData
 {
 public:
-    chip::app::Clusters::RefrigeratorAlarm::Events::Notify::Fields eventId;
+    chip::app::Clusters::RefrigeratorAlarm::Events::Notify::Fields eventState;
 };
 
 class RefrigeratorAlarmEventData : public EventData

@@ -103,7 +103,7 @@ CHIP_ERROR RefrigeratorAlarmSuppressHandler(int argc, char ** argv)
     }
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
-    data->eventId                     = RefrigeratorAlarm::Events::Notify::Fields::kMask;
+    data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kMask;
     data->doorState                   = static_cast<AlarmBitmap>(0);
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
@@ -135,7 +135,7 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
     int value = std::stoi(argv[0]); // Safe to use now, as we validated the input earlier
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
-    data->eventId                     = RefrigeratorAlarm::Events::Notify::Fields::kState;
+    data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kState;
     data->doorState                   = static_cast<AlarmBitmap>(value);
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
@@ -185,7 +185,7 @@ void EventWorkerFunction(intptr_t context)
     VerifyOrReturn(reinterpret_cast<void *>(context) != nullptr, ChipLogError(Shell, "EventWorkerFunction - Invalid work data"));
     EventData * data = reinterpret_cast<EventData *>(context);
 
-    switch (data->eventId)
+    switch (data->eventState)
     {
     case RefrigeratorAlarm::Events::Notify::Fields::kMask: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
