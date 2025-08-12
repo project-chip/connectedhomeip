@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <platform/LockTracker.h>
 #include "CommodityTariffConsts.h"
 
 #include <cassert>
@@ -393,125 +394,147 @@ struct IsStruct
 
 /// @brief Type extraction utilities
 template <typename U>
-struct ExtractWrappedType
+struct ExtractNonNullableType
 {
     using type = U;
 };
 template <typename U>
-struct ExtractWrappedType<DataModel::Nullable<U>>
+struct ExtractNonNullableType<DataModel::Nullable<U>>
 {
-    using type = typename ExtractWrappedType<U>::type;
+    using type = typename ExtractNonNullableType<U>::type;
 };
 template <typename U>
-using ExtractWrappedType_t = typename ExtractWrappedType<U>::type;
+using ExtractNonNullableType_t = typename ExtractNonNullableType<U>::type;
 template <typename U>
-struct ExtractPayloadType
+struct ExtractRawDataType
 {
     using type = U; // Base case - not a wrapper
 };
 template <typename U>
-struct ExtractPayloadType<DataModel::Nullable<U>>
+struct ExtractRawDataType<DataModel::Nullable<U>>
 {
-    using type = typename ExtractPayloadType<U>::type;
+    using type = typename ExtractRawDataType<U>::type;
 };
 template <typename U>
-struct ExtractPayloadType<DataModel::List<U>>
+struct ExtractRawDataType<DataModel::List<U>>
 {
-    using type = typename ExtractPayloadType<U>::type;
+    using type = typename ExtractRawDataType<U>::type;
 };
 template <typename U>
-using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
+using ExtractRawDataType_t = typename ExtractRawDataType<U>::type;
 
 /**
  * @class CTC_BaseDataClass
- * @tparam T The attribute value type (nullable list , nullable struct or primitive)
- * @brief Base template class for thread-safe attribute data management with atomic update support
+ * @tparam T The attribute value type (non-nullable/nullable list, struct or primitive)
+ * @brief Atomic attribute data management with validation support
  *
- * Provides core functionality for:
+ * @details This template class provides a robust foundation for managing attribute
+ *          values in a thread-safe manner with support for atomic updates, validation,
+ *          and automatic memory management. It handles three categories of attributes:
+ *          1. Nullable types (DataModel::Nullable<U>)
+ *          2. List types (DataModel::List<U>)
+ *          3. Primitive/struct types
+ *
+ * @section features Key Features
  * - Atomic value updates with validation
  * - Change detection and notification
- * - Memory management for complex types
- * - Type-specific behavior through template specialization
- *
- * The class handles three types of attributes differently:
- * 1. Nullable types (DataModel::Nullable<U>)
- * 2. List types (DataModel::List<U>)
- * 3. Primitive/struct types
- *
- * Key Features:
- * - Double-buffered storage for atomic updates
  * - Automatic memory management for complex types
- * - Strict state machine for update flow
- * - Thread-safe value access patterns
+ * - Double-buffered storage for thread-safe access
+ * - Strict state machine for update flow control
  * - Customizable validation hooks
+ * - Support for nullable and list types
  *
- * @section thread_safety Thread Safety
- * @brief Thread-safe usage patterns
- *
- * The class provides the following thread-safety guarantees:
- * - Concurrent read access is always safe via GetValue()
- * - Write operations must be externally synchronized
- * - The update state machine ensures consistent transitions
+ * @section type_handling Type Handling
+ * The class automatically adapts its behavior based on the template type:
+ * - For nullable types (DataModel::Nullable<U>):
+ *   * Manages null state transitions
+ *   * Handles both scalar and complex nullable values
+ * - For list types (DataModel::List<U>):
+ *   * Manages memory allocation/deallocation
+ *   * Provides element-wise copy and cleanup
+ * - For struct types:
+ *   * Uses type-specific CopyData and CleanupStructValue specializations
+ * - For primitive types:
+ *   * Simple value storage with atomic update support
  *
  * @section memory_management Memory Management
- * @brief Automatic cleanup for complex types
- *
- * The class handles cleanup for:
- * - List memory (automatically freed)
+ * The class handles automatic cleanup for:
+ * - List memory (allocated via Platform::MemoryCalloc)
  * - Nested structs (via CleanupStructValue template)
  * - Nullable state transitions
  *
- * @section update_flow Update Flow
- * @brief State machine for managing atomic attribute updates
+ * @section usage_patterns Usage Patterns
  *
- * The complete update process requires explicit UpdateFinish() call:
+ * @subsection basic_usage Basic Value Update
+ * @code{.cpp}
+ * CTC_BaseDataClass<Nullable<uint32_t>> data(attrId);
+ * data.SetNewValue(5->aValue)
+ * - CreateNewSingleValue();         // Initialize new value
+ * - GetNewValueRef().SetNonNull(5); // Modify value
+ * - MarkAsAssigned();               // Mark as ready for validation
+ * data.UpdateBegin(nullptr);        // Validate (no context needed)
+ * data.UpdateFinish(true);          // Commit changes
+ * @endcode
+ *
+ * @subsection list_usage List Value Update
+ * @code{.cpp}
+ * List<DayEntryStruct> mListData = {...}
+ * CTC_BaseDataClass<Nullable<List<DayEntryStruct>>> data(attrId);
+ * data.SetNewValue(mListData->aValue)
+ * - CreateNewListValue(aValue.Size());                 // Allocate 3 elements
+ * - Loop for list items: CopyData<RawDataType>(src_item[i], dst_item[i]);   //copy list elements...
+ * - MarkAsAssigned();
+ * data.UpdateBegin(validationCtx);
+ * data.UpdateFinish(true);
+ * @endcode
+ *
+ * @section update_flow Update State Machine
+ * The class enforces a strict update workflow:
  *
  * @dot
  * digraph update_flow {
+ *   node [shape=box, style=rounded];
  *   kIdle -> kInitialized [label="CreateNewValue()"];
  *   kInitialized -> kAssigned [label="MarkAsAssigned()"];
  *   kAssigned -> kValidated [label="UpdateBegin()"];
- *   kValidated ->  kIdle  [label="UpdateFinish() (mandatory)"];
+ *   kValidated -> kIdle [label="UpdateFinish() (mandatory)"];
  *
- *   // Early termination paths
+ *   // Error/cleanup paths
  *   kInitialized -> kIdle [label="UpdateFinish()" style="dashed"];
  *   kAssigned -> kIdle [label="UpdateFinish()" style="dashed"];
  *   kValidated -> kIdle [label="UpdateFinish()" style="dashed"];
  * }
  * @enddot
  *
- * ### Complete Successful Sequence:
- * 1. CreateNewValue()   // kIdle → kInitialized
- * 2. Modify value       // 
- * 3. MarkAsAssigned()   // kInitialized → kAssigned
- * 4. UpdateBegin()      // kAssigned → kValidated
- * 6. UpdateFinish()     // kValidated →  kIdle (mandatory cleanup)
- *
- * ### Critical Notes:
- * - Omitting UpdateFinish() will leak resources
- * - UpdateFinish() can be called at any state for cleanup
- *
- * @see CreateNewValue()
- * @see MarkAsAssigned()
- * @see UpdateBegin()
- * @see UpdateFinish()
+ * @note UpdateFinish() must always be called to complete the update process,
+ *       even if validation fails or the update is aborted.
  */
 template <typename T>
 class CTC_BaseDataClass
 {
 public:
-    using ValueType   = T;
-    using WrappedType = ExtractWrappedType_t<ValueType>;
-    using PayloadType = ExtractPayloadType_t<WrappedType>;
+    /// The exposed attribute value type
+    using ValueType = T;
+    
+    /// The non-nullable version of the value type
+    using NonNullableType = ExtractNonNullableType_t<ValueType>;
+    
+    /// The raw underlying data type (for lists, this is the element type)
+    using RawDataType = std::conditional_t<
+        IsList<NonNullableType>::value,
+        ExtractRawDataType_t<NonNullableType>,  // List element type
+        ExtractRawDataType_t<ValueType>         // Scalar/struct type
+    >;
 
     /**
      * @brief Construct a new data class instance
-     * @param aAttrId Attribute ID for callback identification
+     * @param[in] aAttrId Attribute ID for identification and callbacks
      *
-     * Initializes the storage based on type:
+     * @post Initializes storage based on type:
      * - Nullable types: set to null
      * - List types: initialized as empty list
-     * - Others: left uninitialized
+     * - Others: default initialized
+     * - Update state set to kIdle
      */
     explicit CTC_BaseDataClass(AttributeId aAttrId) : mAttrId(aAttrId)
     {
@@ -523,47 +546,61 @@ public:
         {
             GetValueRef() = ValueType();
         }
-        mHoldState[mActiveValueIdx]   = StorageState::kEmpty;
+        mHoldState[mActiveValueIdx] = StorageState::kEmpty;
         mUpdateState = UpdateState::kIdle;
     }
 
-    /// @brief Virtual destructor for proper cleanup
+    /// @brief Virtual destructor ensures proper cleanup of resources
     virtual ~CTC_BaseDataClass() { Cleanup(); }
 
     /**
-     * @brief Get mutable reference to stored value
-     * @return ValueType & Reference to the active value storage
+     * @brief Get mutable reference to the active value
+     * @return Reference to the currently active value storage
+     * @warning Modifying the returned reference directly bypasses
+     *          the update state machine and validation. Prefer using
+     *          the proper update workflow.
      */
-    ValueType & GetValue() { return GetValueRef(); }
-    ValueType & GetNewValue() { return GetNewValueRef(); }
+    ValueType& GetValue() { return GetValueRef(); }
+
+    /**
+     * @brief Get mutable reference to the new value (during update)
+     * @return Reference to the new value storage
+     * @pre Must be in kInitialized or kAssigned state
+     */
+    ValueType& GetNewValue() { return GetNewValueRef(); }
 
     /**
      * @brief Check if current update is validated
-     * @return true if in kValidated state
+     * @return true if in kValidated state, false otherwise
      */
     bool IsValid() const { return (mUpdateState == UpdateState::kValidated); }
 
     /**
-     * @brief Check if value storage contains valid data
-     * @return true if storage is in kHold state
+     * @brief Check if active storage contains valid data
+     * @return true if storage is in kHold state, false otherwise
      */
     bool HasValue() const { return (mHoldState[mActiveValueIdx] == StorageState::kHold); }
+
+    /**
+     * @brief Check if new value storage contains valid data
+     * @return true if new storage is in kHold state, false otherwise
+     */
     bool HasNewValue() const { return (mHoldState[!mActiveValueIdx] == StorageState::kHold); }
 
     /**
-     * @brief Prepares a new value for modification
-     * @param size Number of elements to allocate (for list types only)
-     * @return CHIP_NO_ERROR on success, or:
-     *         - CHIP_ERROR_NO_MEMORY if allocation fails
-     *         - CHIP_ERROR_INCORRECT_STATE if called during active update
+     * @brief Prepares a new list value for modification
+     * @param[in] size Number of elements to allocate
+     * @return CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INCORRECT_STATE if called during active update
+     * @retval CHIP_ERROR_NO_MEMORY if allocation fails
+     * @retval CHIP_ERROR_INTERNAL if called on non-list type
      *
-     * @note For list types:
-     *       - Allocates memory for specified number of elements
-     *       - Initializes list storage
-     *       - Transitions state to kInitialized
-     * @note For non-list types:
-     *       - Creates default-initialized value
-     *       - Ignores size parameter
+     * @post On success:
+     * - Allocates memory for list elements
+     * - Initializes new value storage
+     * - Transitions state to kInitialized
+     *
+     * @note For zero size, creates an empty list or null value
      */
     CHIP_ERROR CreateNewListValue(size_t size)
     {
@@ -579,18 +616,18 @@ public:
 
         if (size >= 1)
         {
-            auto * buffer = static_cast<PayloadType *>(Platform::MemoryCalloc(size, sizeof(PayloadType)));
+            auto* buffer = static_cast<RawDataType*>(Platform::MemoryCalloc(size, sizeof(RawDataType)));
             if (!buffer)
             {
                 return CHIP_ERROR_NO_MEMORY;
             }
             if constexpr (IsValueNullable())
             {
-                GetNewValueRef().SetNonNull(DataModel::List<PayloadType>(buffer, size));
+                GetNewValueRef().SetNonNull(DataModel::List<RawDataType>(buffer, size));
             }
             else
             {
-                GetNewValueRef() = DataModel::List<PayloadType>(buffer, size);
+                GetNewValueRef() = DataModel::List<RawDataType>(buffer, size);
             }
         }
         else
@@ -601,7 +638,7 @@ public:
             }
             else
             {
-                GetNewValueRef() = DataModel::List<PayloadType>();
+                GetNewValueRef() = DataModel::List<RawDataType>();
             }
         }
 
@@ -610,16 +647,14 @@ public:
     }
 
     /**
-     * @brief Prepares a new value for modification
-     * @param size Number of elements to allocate (for list types only)
-     * @return CHIP_NO_ERROR on success, or:
-     *         - CHIP_ERROR_NO_MEMORY if allocation fails
-     *         - CHIP_ERROR_INCORRECT_STATE if called during active update
-     *         - CHIP_ERROR_INTERNAL if wrong type data
+     * @brief Prepares a new non-list value for modification
+     * @return CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INCORRECT_STATE if called during active update
+     * @retval CHIP_ERROR_INTERNAL if called on list type
      *
-     * @note For non-list types:
-     *       - Creates default-initialized value
-     *       - Ignores size parameter
+     * @post On success:
+     * - Initializes new value storage
+     * - Transitions state to kInitialized
      */
     CHIP_ERROR CreateNewSingleValue()
     {
@@ -646,7 +681,15 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetNewValue(const ValueType & aValue)
+    /**
+     * @brief Sets a new value from external source
+     * @param[in] aValue The new value to set
+     * @return CHIP_NO_ERROR on success
+     *
+     * @note Handles all type cases (nullable, list, struct, scalar)
+     * @note Performs proper copy and memory management
+     */
+    CHIP_ERROR SetNewValue(const ValueType& aValue)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -658,10 +701,12 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        auto & newValue = aValue.Value();
+        auto& newValue = aValue.Value();
 
         if constexpr (IsValueList())
         {
+            assertChipStackLockedByCurrentThread();
+
             err = CreateNewListValue(newValue.size());
 
             if (CHIP_NO_ERROR == err)
@@ -669,7 +714,7 @@ public:
                 auto buffer = GetNewValueRef().Value().data();
                 for (size_t idx = 0; idx < newValue.size(); idx++)
                 {
-                    if (CHIP_NO_ERROR == (err = CopyData<PayloadType>(newValue[idx], buffer[idx])))
+                    if (CHIP_NO_ERROR == (err = CopyData<RawDataType>(newValue[idx], buffer[idx])))
                     {
                         continue;
                     }
@@ -683,8 +728,8 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                PayloadType tmpValue = newValue;
-                err = CopyData<PayloadType>(newValue, tmpValue); 
+                RawDataType tmpValue = newValue;
+                err = CopyData<RawDataType>(newValue, tmpValue);
                 if (err == CHIP_NO_ERROR)
                 {
                     GetNewValueRef().SetNonNull(tmpValue);
@@ -718,6 +763,8 @@ public:
      * @brief Signals completion of new value modifications
      * @return CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INCORRECT_STATE if not in kInitialized state
+     *
+     * @post Transitions state to kAssigned if successful
      */
     CHIP_ERROR MarkAsAssigned()
     {
@@ -731,11 +778,15 @@ public:
 
     /**
      * @brief Validates and prepares the new value for commit
-     * @param aUpdCtx Pointer to context data for implementing validation methods that are used when bulk updating attributes (for cross validation f.e)
+     * @param[in] aUpdCtx Context data for validation (may be nullptr)
      * @return CHIP_NO_ERROR if validation succeeds
      * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
+     * @retval Other validation errors if validation fails
+     *
+     * @post On success, transitions state to kValidated
+     * @note If aUpdCtx is nullptr, skips context validation
      */
-    CHIP_ERROR UpdateBegin(void * aUpdCtx)
+    CHIP_ERROR UpdateBegin(void* aUpdCtx)
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
@@ -752,7 +803,7 @@ public:
 
         if (aUpdCtx != nullptr)
         {
-            mAuxData = aUpdCtx;            
+            mAuxData = aUpdCtx;
             err = ValidateNewValue();
         }
 
@@ -769,10 +820,12 @@ public:
     }
 
     /**
-     * @brief the function performs a correct completion of the value update process
-     * @param aUpdateAllow allows the upper level of the application to determine the need to update the attribute value.
-     * @return The return value indicates that the stored value has changed.
-     * @note Performs cleanup and resets to idle state
+     * @brief Completes the update process
+     * @param[in] aUpdateAllow Whether to commit the changes
+     * @return true if value changed, false otherwise
+     *
+     * @post Always transitions state to kIdle
+     * @note Performs cleanup of unused storage
      */
     bool UpdateFinish(bool aUpdateAllow)
     {
@@ -805,8 +858,8 @@ public:
     }
 
     /**
-     * @brief Full cleanup of the value storage
-     * @return The return value indicates that the stored value is changed.
+     * @brief Full cleanup of all value storage
+     * @return true if active value was changed, false otherwise
      */
     bool Cleanup()
     {
@@ -822,49 +875,148 @@ public:
         return ret;
     }
 
-    void CleanupExtListEntry(PayloadType & entry)
+    /**
+     * @brief Cleans up an external list entry
+     * @param[in,out] entry The list entry to clean up
+     */
+    void CleanupExtListEntry(RawDataType& entry)
     {
-        CleanupStructValue<PayloadType>(entry);
+        CleanupStructValue<RawDataType>(entry);
     }
 
+    /**
+     * @brief Gets the attribute ID
+     * @return The attribute ID this instance manages
+     */
     AttributeId GetAttrId()
     {
-        return  mAttrId;
+        return mAttrId;
     }
 
 private:
-    uint8_t mActiveValueIdx = 0;
-
-    ValueType & GetValueRef() { return mValueStorage[mActiveValueIdx]; }
-
-    ValueType & GetNewValueRef() { return mValueStorage[!mActiveValueIdx]; }
-
-    void SwapActiveValueStorage() { mActiveValueIdx = !mActiveValueIdx; }
-
-    static constexpr bool IsValueNullable() { return IsNullable<ValueType>::value; }
-
-    static constexpr bool IsValueList() { return IsList<WrappedType>::value; }
-
-    static constexpr bool IsValueStruct() { return IsStruct<WrappedType>::value; }
-
-    static constexpr bool IsValueScalar() { return (IsNumeric<WrappedType>::value || IsEnum<WrappedType>::value) ; }
-
+    /// @brief Internal storage states
     enum class StorageState : uint8_t
     {
         kEmpty, // Value not initialized (default state)
-        kHold,  // GetValueRef() holds valid data
+        kHold,  // Storage holds valid data
     };
 
+    /// @brief Update process states
     enum class UpdateState : uint8_t
     {
         kIdle,        // No active update
-        kInitialized, // New value initialized
-        kAssigned,    // New value populated
-        kValidated,   // New value validated
+        kInitialized, // New value initialized but not populated
+        kAssigned,    // New value populated but not validated
+        kValidated,   // New value validated and ready for commit
     };
 
+    /**
+     * @brief Gets reference to active value storage
+     * @return Reference to active storage
+     */
+    ValueType& GetValueRef() { return mValueStorage[mActiveValueIdx]; }
+
+    /**
+     * @brief Gets reference to new value storage
+     * @return Reference to new storage
+     */
+    ValueType& GetNewValueRef() { return mValueStorage[!mActiveValueIdx]; }
+
+    /**
+     * @brief Swaps active and new value storage indices
+     */
+    void SwapActiveValueStorage() { mActiveValueIdx = !mActiveValueIdx; }
+
+    /**
+     * @brief Checks if value type is nullable
+     * @return true if nullable, false otherwise
+     */
+    static constexpr bool IsValueNullable() { return IsNullable<ValueType>::value; }
+
+    /**
+     * @brief Checks if value type is a list
+     * @return true if list type, false otherwise
+     */
+    static constexpr bool IsValueList() { return IsList<NonNullableType>::value; }
+
+    /**
+     * @brief Checks if value type is a struct
+     * @return true if struct type, false otherwise
+     */
+    static constexpr bool IsValueStruct() { return IsStruct<NonNullableType>::value; }
+
+    /**
+     * @brief Checks if value type is scalar (numeric or enum)
+     * @return true if scalar type, false otherwise
+     */
+    static constexpr bool IsValueScalar() { return (IsNumeric<NonNullableType>::value || IsEnum<NonNullableType>::value); }
+
+    // Internal implementation methods...
+
+    /**
+     * @brief Validates the new value using type-specific validation
+     * @return CHIP_ERROR Validation result
+     */
     CHIP_ERROR ValidateNewValue() { return Validate<ValueType>(GetNewValueRef(), mAuxData); }
 
+    /**
+     * @brief Compares two lists for equality
+     * @param source First list to compare
+     * @param destination Second list to compare
+     * @return true if lists differ, false if identical
+     */
+    bool ListsNotEqual(const DataModel::List<RawDataType>& source, const DataModel::List<RawDataType>& destination)
+    {
+        if (source.size() != destination.size())
+        {
+            return true;
+        }
+
+        assertChipStackLockedByCurrentThread();
+
+        for (size_t i = 0; i < source.size(); i++)
+        {
+            if (source[i] != destination[i])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @brief Compares two nullable values for equality
+     * @param a First value to compare
+     * @param b Second value to compare
+     * @return true if values differ, false if identical
+     */
+    bool NullableNotEqual(const ValueType& a, const ValueType& b)
+    {
+        bool is_neq = false;
+        if (a.IsNull() || b.IsNull())
+        {
+            is_neq = a.IsNull() != b.IsNull();
+        }
+        else
+        {
+            if constexpr (IsList<NonNullableType>::value)
+            {
+                is_neq = ListsNotEqual(a.Value(), b.Value());
+            }
+            else
+            {
+                is_neq = (a.Value() != b.Value());
+            }
+        }
+
+        return is_neq;
+    }
+
+    /**
+     * @brief Checks if new value differs from current value
+     * @return true if values differ, false if identical
+     */
     bool HasChanged()
     {
         if constexpr (IsValueNullable())
@@ -881,6 +1033,10 @@ private:
         }
     }
 
+    /**
+     * @brief Cleans up storage at specified index
+     * @param aIdx Storage index to clean (0 or 1)
+     */
     void CleanupByIdx(uint8_t aIdx)
     {
         if (mActiveValueIdx == aIdx)
@@ -895,13 +1051,17 @@ private:
         }
     }
 
-    void CleanupValueByRef(ValueType & aValue)
+    /**
+     * @brief Cleans up a value reference
+     * @param aValue Reference to value to clean up
+     */
+    void CleanupValueByRef(ValueType& aValue)
     {
         if constexpr (IsValueNullable())
         {
             if (!aValue.IsNull())
             {
-                if constexpr (IsList<WrappedType>::value)
+                if constexpr (IsList<NonNullableType>::value)
                 {
                     CleanupList(aValue.Value());
                 }
@@ -918,95 +1078,39 @@ private:
         }
     }
 
-    void CleanupList(DataModel::List<PayloadType> & list)
+    /**
+     * @brief Cleans up a list and its elements
+     * @param list List to clean up
+     */
+    void CleanupList(DataModel::List<RawDataType>& list)
     {
-        for (auto & item : list)
+        assertChipStackLockedByCurrentThread();
+
+        for (auto& item : list)
         {
             CleanupStruct(item);
         }
         if (list.data())
         {
             Platform::MemoryFree(list.data());
-            list = DataModel::List<PayloadType>();
+            list = DataModel::List<RawDataType>();
         }
     }
-
-    void CleanupStruct(PayloadType & aValue) { CleanupStructValue<PayloadType>(aValue); }
-
-protected:
-    ValueType mValueStorage[2]; // Double-buffered storage
-    StorageState mHoldState[2]  = {StorageState::kEmpty};
-
-    void * mAuxData = nullptr;                  // Validation context
-    const AttributeId mAttrId;                     // Attribute identifier
-
-    UpdateState mUpdateState = UpdateState::kIdle;
 
     /**
-     * @brief Compares two structured values for inequality
-     * @param source The new/input value being compared
-     * @param destination The existing/stored value being compared against
-     * @return bool
-     *   - true if values are different (needs update)
-     *   - false if values are identical (no update needed)
-     * @note This intentionally uses "Compare" in the name but implements "not equal" semantics
-     *       to match the expected behavior in change detection flows.
-     * @warning Must be overridden for any struct payload types. The base implementation
-     *          always returns false (no change) and logs an error.
-     *
-     * Example override:
-     * @code
-     * bool CompareStructValue(const MyStruct& src, const MyStruct& dst) const override {
-     *     return src.field1 != dst.field1 ||
-     *            src.field2 != dst.field2;
-     * }
-     * @endcode
+     * @brief Cleans up a struct value
+     * @param aValue Struct to clean up
      */
-    virtual bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const
-    {
-        ChipLogError(NotSpecified, "CompareStructValue must be overridden for struct types!");
-        return false;
-    }
+    void CleanupStruct(RawDataType& aValue) { CleanupStructValue<RawDataType>(aValue); }
 
-    bool ListsNotEqual(const DataModel::List<PayloadType> & source, const DataModel::List<PayloadType> & destination)
-    {
-        if (source.size() != destination.size())
-        {
-            return true;
-        }
+    // Member variables
+    uint8_t mActiveValueIdx = 0;                  ///< Index of active value storage
+    ValueType mValueStorage[2];                   ///< Double-buffered value storage
+    StorageState mHoldState[2] = {StorageState::kEmpty}; ///< Storage state tracking
 
-        for (size_t i = 0; i < source.size(); i++)
-        {
-            if (source[i] != destination[i])
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    bool NullableNotEqual(const ValueType & a, const ValueType & b)
-    {
-        bool is_neq = false;
-        if (a.IsNull() || b.IsNull())
-        {
-            is_neq = a.IsNull() != b.IsNull();
-        }
-        else
-        {
-            if constexpr (IsList<WrappedType>::value)
-            {
-                is_neq = ListsNotEqual(a.Value(), b.Value());
-            }
-            else
-            {
-                is_neq = (a.Value() != b.Value());
-            }
-        }
-
-        return is_neq;
-    }
+    void* mAuxData = nullptr;                     ///< Validation context data
+    const AttributeId mAttrId;                    ///< Managed attribute ID
+    UpdateState mUpdateState = UpdateState::kIdle; ///< Current update state
 };
 
 } // namespace CommodityTariffAttrsDataMgmt
