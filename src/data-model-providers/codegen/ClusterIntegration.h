@@ -53,7 +53,7 @@ public:
                                                                uint32_t optionalAttributeBits, uint32_t featureMap) = 0;
 
         // Find the previously created cluster on the given path
-        virtual ServerClusterInterface &FindRegistration(unsigned zeroBasedArrayIndex) = 0;
+        virtual ServerClusterInterface & FindRegistration(unsigned zeroBasedArrayIndex) = 0;
 
         // Destroy/free the given registration
         virtual void DestroyRegisration(unsigned zeroBasedArrayIndex) = 0;
@@ -79,7 +79,7 @@ public:
     /// data model provider registry
     ///
     /// Typical implementation is that this gets called in `emberAf....ClusterServerInitCallback`
-    static void RegisterServer(const RegisterServerOptions &options, Delegate & delegate);
+    static void RegisterServer(const RegisterServerOptions & options, Delegate & delegate);
 
     struct UnregisterServerOptions
     {
@@ -90,7 +90,7 @@ public:
     };
 
     /// Typical implementation is that this gets called in `Matter....ClusterServerShutdownCallback`
-    static void UnregisterServer(const UnregisterServerOptions &options, Delegate &delegate);
+    static void UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate);
 };
 
 } // namespace chip::app
