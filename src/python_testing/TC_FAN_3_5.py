@@ -416,14 +416,10 @@ class TC_FAN_3_5(MatterBaseTest):
         await self.send_step_command(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True))
 
         # Get the resulting PercentSetting attribute report value from the queue
-        percent_setting = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
+        self.percent_setting_per_step = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
 
-        # Calculate the percent setting range per step
-        percent_setting_per_step = percent_setting - percent_setting_zero
-
-        self.percent_setting_per_step = percent_setting_per_step
         await percent_setting_sub.cancel()
-        logging.info(f"[FC] PercentSetting range per Step: {percent_setting_per_step}")
+        logging.info(f"[FC] PercentSetting range per Step: {self.percent_setting_per_step}")
 
     def get_expected_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int:
         cluster = Clusters.FanControl
@@ -439,7 +435,7 @@ class TC_FAN_3_5(MatterBaseTest):
         attr = cluster.Attributes
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
         self.percent_setting_from_queue = []
-
+        logging.info(f"\n\n\n\n\n\n\t\t\t\t [FC] lowest_off_field_conditions_test: {step} \n\n\n\n\n\n\n\n")
         # Get the expected final PercentSetting value based on the Step command parameters
         percent_setting_expected = self.get_expected_percent_setting(step)
         if step.direction == cluster.Enums.StepDirectionEnum.kDecrease and not step.wrap and not step.lowestOff:
