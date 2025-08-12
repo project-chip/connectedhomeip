@@ -612,7 +612,7 @@ CHIP_ERROR CertificateTableImpl::GetRootCertificateCount(FabricIndex fabric, uin
 }
 
 CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer,
-                                                          MutableByteSpan & nocsrElementsBuffer, TLSCCDID & id,
+                                                          TLSCCDID & id,
                                                           MutableByteSpan & csr, MutableByteSpan & nonceSignature)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -627,17 +627,8 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
     ReturnErrorOnFailure(keyPair.NewCertificateSigningRequest(csr.data(), csrLen));
     csr.reduce_size(csrLen);
 
-    // Build nocsr_elements_message per spec
-    TLV::TLVWriter writer;
-    writer.Init(nocsrElementsBuffer);
-    TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(NocsrElements::kCsr), csr));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(NocsrElements::kCsrNonce), nonce));
-    ReturnErrorOnFailure(writer.EndContainer(container));
-
     Crypto::P256ECDSASignature signatureBuffer;
-    ReturnErrorOnFailure(keyPair.ECDSA_sign_msg(nocsrElementsBuffer.data(), writer.GetLengthWritten(), signatureBuffer));
+    ReturnErrorOnFailure(keyPair.ECDSA_sign_msg(nonce.data(), nonce.size(), signatureBuffer));
     ReturnErrorOnFailure(CopySpanToMutableSpan(signatureBuffer.Span(), nonceSignature));
 
     // Find a usable ID
