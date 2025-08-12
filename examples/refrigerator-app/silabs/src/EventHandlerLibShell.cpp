@@ -102,8 +102,8 @@ CHIP_ERROR RefrigeratorAlarmSuppressHandler(int argc, char ** argv)
 {
     if (argc != 0)
     {
-        ChipLogError(Shell, "Incorrect arguments");
-        return AlarmHelpHandler(argc, argv);
+        ChipLogError(Shell, "Invalid arguments");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
