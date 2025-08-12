@@ -171,7 +171,7 @@ def main(log_level, gn_extra, extension, known_failure, skip_dir, dirs):
     extensions = set(extension)
     for directory in dirs:
         for path, dirnames, filenames in os.walk(directory):
-            if any([s in path for s in skip_dir]):
+            if any(s in path for s in skip_dir):
                 continue
             for f in filenames:
                 full_path = Path(os.path.join(path, f))

@@ -450,9 +450,9 @@ matter_python_wheel_action("chip-repl") {
     "ipython!=8.1.0",
     "rich",
     "ipykernel",
-    "pyobjc-framework-corebluetooth ; sys_platform=='darwin'",
-    "dbus-python==1.2.18 ; sys_platform=='linux'",
-    "pygobject==3.50.0 ; sys_platform=='linux'",
+    "pyobjc-framework-corebluetooth ; sys_platform==\"darwin\"",
+    "dbus-python==1.2.18 ; sys_platform==\"linux\"",
+    "pygobject==3.50.0 ; sys_platform==\"linux\"",
   ]
 
   py_package_name = "${chip_python_package_prefix}-repl"
