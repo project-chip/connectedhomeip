@@ -22,29 +22,6 @@
 
 namespace chip::app {
 
-// FIXME: implement the following:
-//
-//   - use emberAfGetClusterServerEndpointIndex for multi-cluster support (including logging)
-//   - use emberAfContainsAttribute to determine what attributes are enabled
-//   - use Registry Register/Unregister logic (including logging)
-//   - determine if we can get the raw feature map
-//       - if FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
-//         requires the FeatureMap to NOT be static. How to do this?
-//
-//
-//         using Traits = NumericAttributeTraits<uint32_t>;
-//         Traits::StorageType temp;
-//         uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-//         Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::Identify::Id, Id, readable,
-//         sizeof(temp)); VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status); if
-//         (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-//         {
-//             return Protocols::InteractionModel::Status::ConstraintError;
-//         }
-//         *value = Traits::StorageToWorking(temp);
-//         return status;
-//
-
 /// Handles reusable code for integrating server cluster interfaces with ember:
 ///   - loads ember metadata (optional attributes and feature maps)
 ///   - calls corresponding register/unregister calls on the Codegen Data Model Provider.
@@ -74,6 +51,12 @@ public:
         /// from ember according to supported attributes and that the feature map for the underlying cluster ID has been loaded.
         virtual ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned zeroBasedArrayIndex,
                                                                uint32_t optionalAttributeBits, uint32_t featureMap) = 0;
+
+        // Find the previously created cluster on the given path
+        virtual ServerClusterInterface &FindRegistration(unsigned zeroBasedArrayIndex) = 0;
+
+        // Destroy/free the given registration
+        virtual void DestroyRegisration(unsigned zeroBasedArrayIndex) = 0;
     };
 
     struct RegisterServerOptions
