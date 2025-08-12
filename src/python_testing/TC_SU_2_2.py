@@ -365,8 +365,8 @@ class TC_SU_2_2(MatterBaseTest):
                              "QueryImageResponse status should be UpdateAvailable")
         logger.info(f"Step #1.7 - QueryImage Response Status: {resp.status} is UpdateAvailable.")
 
-        # 1.8 Verify that software image transfer from TH/OTA-P to DUT is successful
-        logger.info("Step #1.8 - Verify that software image transfer from TH/OTA-P to DUT is successful")
+        # 1.8 Send ApplyUpdateRequest
+        logger.info("Step #1.8 - Send ApplyUpdateRequest")
         cmd_apply_update = Clusters.OtaSoftwareUpdateProvider.Commands.ApplyUpdateRequest(
             updateToken=resp.updateToken,  # Use the updateToken from the QueryImageResponse
             newVersion=resp.softwareVersion  # Use the software version from the QueryImageResponse
@@ -379,7 +379,9 @@ class TC_SU_2_2(MatterBaseTest):
             cmd=cmd_apply_update,
             endpoint=0
         )
-        logger.info(f"Step #1.8 - apply_update_resp Response : {apply_update_resp}")
+        logger.info(f"Step #1.8 - Send ApplyUpdateRequest Response : {apply_update_resp}")
+
+        logger.info("Step #1.9 - Verify that software image transfer from TH/OTA-P to DUT is successful")
 
 
 if __name__ == "__main__":
