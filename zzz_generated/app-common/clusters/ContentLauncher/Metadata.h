@@ -20,6 +20,7 @@ namespace ContentLauncher {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace AcceptHeader {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AcceptHeader::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -37,6 +38,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace LaunchContent {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(LaunchContent::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

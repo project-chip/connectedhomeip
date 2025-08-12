@@ -20,6 +20,7 @@ namespace Chime {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace InstalledChimeSounds {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(InstalledChimeSounds::Id,
@@ -44,6 +45,7 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace PlayChimeSound {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PlayChimeSound::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

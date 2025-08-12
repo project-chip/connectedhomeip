@@ -174,7 +174,7 @@ constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
 #ifdef SLI_SI91X_MCU_INTERFACE
                                            .priority = osPriorityRealtime4
 #else
-                                           .priority = osPriorityRealtime7
+                                           .priority = osPriorityRealtime5 // Must be above BLE Link Layer priority
 #endif // SLI_SI91X_MCU_INTERFACE
 };
 osThreadId_t sMainTaskHandle;
