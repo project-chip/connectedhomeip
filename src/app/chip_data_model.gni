@@ -142,6 +142,7 @@ template("chip_data_model") {
     deps = [
       ":${_data_model_name}_codegen_generate",
       "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/app/common:metadata",
       "${chip_root}/src/lib/support:span",
       "${chip_root}/src/protocols/interaction_model",
     ]
@@ -160,6 +161,7 @@ template("chip_data_model") {
         "${chip_root}/src/app/common:cluster-objects",
         "${chip_root}/src/app/common:enums",
         "${chip_root}/src/app/common:ids",
+        "${chip_root}/src/app/common:metadata",
         "${chip_root}/src/lib/core",
         "${chip_root}/src/lib/support",
       ]

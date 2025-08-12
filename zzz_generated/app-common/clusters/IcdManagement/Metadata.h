@@ -20,6 +20,7 @@ namespace IcdManagement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace IdleModeDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(IdleModeDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -75,6 +76,7 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace RegisterClient {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(RegisterClient::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
