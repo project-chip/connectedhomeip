@@ -21,6 +21,7 @@
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/String.h>
+#include <clusters/TimeFormatLocalization/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -201,6 +202,41 @@ TEST(TestAttributePersistence, TestStrings)
         ASSERT_STREQ(readString.c_str(), "");
     }
 }
+
+TEST(TestAttributePersistence, TestEnumHandling)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+
+    Clusters::TimeFormatLocalization::CalendarTypeEnum valueRead = Clusters::TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+
+    // Test storing and loading a valid enum value
+    {
+        const ConcreteAttributePath path(1, 2, 3);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_NO_ERROR);
+        EXPECT_EQ(valueRead, Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese);
+
+        // Test loading the stored enum value
+        valueRead = Clusters::TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian));
+        ASSERT_EQ(valueRead, Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese);
+    }
+
+    // Test attempting to store an unknown enum value
+    {
+        const ConcreteAttributePath path(3, 2, 1);
+        WriteOperation writeOp(path);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(Clusters::TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue);
+        EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
+}
+
 
 TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
 {

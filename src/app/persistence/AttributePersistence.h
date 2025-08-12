@@ -43,7 +43,7 @@ public:
     ///
     /// Error reason for load failure is logged (or nothing logged in case "Value not found" is the
     /// reason for the load failure).
-    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
     bool LoadNativeEndianValue(const ConcreteAttributePath & path, T & value, const T & valueOnLoadFailure)
     {
         return InternalRawLoadNativeEndianValue(path, &value, &valueOnLoadFailure, sizeof(T));
@@ -52,10 +52,18 @@ public:
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - write to storage
-    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
     CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
-        ReturnErrorOnFailure(decoder.Decode(value));
+        T decodedValue;
+
+        ReturnErrorOnFailure(decoder.Decode(decodedValue));
+        if constexpr (std::is_enum_v<T>)
+        {
+            VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        }
+
+        value = decodedValue;
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
 
