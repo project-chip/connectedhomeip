@@ -397,7 +397,7 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
         Reachable::kMetadataEntry,           //
         ProductAppearance::kMetadataEntry,   //
 
-        // Unique because of forced unique functionality for backwards compatibiltiy
+        // Optional because of forced unique functionality for backwards compatibiltiy
         UniqueID::kMetadataEntry, //
     };
 
