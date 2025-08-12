@@ -226,19 +226,19 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
 
 CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessionId)
 {
-    static uint16_t lastSessionId = 0;
+    static uint16_t nextSessionId = 0;
     uint16_t candidateId          = 0;
 
     // Try at most kMaxSessionId+1 attempts to find a free ID
     // This ensures we never loop infinitely even if all IDs are somehow in use
     for (uint16_t attempts = 0; attempts <= kMaxSessionId; attempts++)
     {
-        candidateId = lastSessionId++;
+        candidateId = nextSessionId++;
 
         // Handle wrap-around per spec
-        if (lastSessionId > kMaxSessionId)
+        if (nextSessionId > kMaxSessionId)
         {
-            lastSessionId = 0;
+            nextSessionId = 0;
         }
 
         if (FindSession(candidateId) == nullptr)
@@ -250,7 +250,7 @@ CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessio
 
     // All session IDs are in use
     ChipLogError(Zcl, "All session IDs are in use! Cannot generate new session ID.");
-    return CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED;
+    return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
 }
 
 // Command Handlers
@@ -349,8 +349,8 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     CHIP_ERROR err = GenerateSessionId(sessionId);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "HandleSolicitOffer: Cannot generate session ID");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
         return;
     }
     args.sessionId             = sessionId;
@@ -567,8 +567,8 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         err = GenerateSessionId(sessionId);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: Cannot generate session ID");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
             return;
         }
         args.sessionId = sessionId;
