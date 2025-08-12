@@ -193,13 +193,10 @@ function(chip_zapgen TARGET_NAME)
         # - If ZCL_PATH is passed, use it.
         # - If CHIP_ENABLE_ZCL_ARG is ON, use default path.
         # - Otherwise, skip --zcl to preserve default behavior.
-        if(CHIP_ENABLE_ZCL_ARG AND NOT ARG_ZCL_PATH)
-            set(ARG_ZCL_PATH "${CHIP_ROOT}/src/app/zap-templates/zcl/zcl.json")
-        endif()
-        
-        # Add --zcl only if a valid path is set.
         if(ARG_ZCL_PATH)
             list(APPEND ZAPGEN_ARGS "--zcl" "${ARG_ZCL_PATH}")
+        elseif(CHIP_ENABLE_ZCL_ARG)
+            list(APPEND ZAPGEN_ARGS "--zcl" "${CHIP_ROOT}/src/app/zap-templates/zcl/zcl.json")
         endif()
 
         # Python is expected to be in the path
