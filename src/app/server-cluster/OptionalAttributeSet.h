@@ -68,8 +68,10 @@ public:
     // Checks if an attribute ID is set.
     //
     // NOTE: this does NOT validate that the ID is < 32 because all the Set functions
-    //       generally are asserted on this (forceset as well as subclasses).
-    //       This MUST be called with id < 32.
+    //       generally are asserted on this (forceset as well as subclasses) and the
+    //       initial value contructor uses a uint32_t bitmask as well.
+    //
+    // This MUST be called with id < 32.
     constexpr bool IsSet(AttributeId id) const { return (mSetBits & (1u << id)) != 0; }
 
     /// Exposes a "force attribute bit set" without extra validation,
