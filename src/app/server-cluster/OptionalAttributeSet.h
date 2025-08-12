@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <cstdint>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -56,6 +57,8 @@ struct IsOneOf<T>
 class AttributeSet
 {
 public:
+    explicit AttributeSet(uint32_t initialValue) : mSetBits(initialValue) {}
+
     AttributeSet()                                       = default;
     AttributeSet(const AttributeSet & other)             = default;
     AttributeSet(AttributeSet && other)                  = default;
@@ -79,6 +82,11 @@ public:
         static_assert(id < 32, "Attribute ID must be settable");
         return Set(id, true);
     }
+
+    /// Access the raw value of attribute bits.
+    ///
+    /// Prefer use IsSet or similar for individual bit access.
+    uint32_t Raw() const { return mSetBits; }
 
 protected:
     constexpr AttributeSet & Set(AttributeId id, bool value = true)
@@ -135,6 +143,7 @@ template <AttributeId... OptionalAttributeIds>
 class OptionalAttributeSet : public AttributeSet
 {
 public:
+    explicit OptionalAttributeSet(uint32_t initialValue) : AttributeSet(initialValue) {}
     OptionalAttributeSet(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
     OptionalAttributeSet() = default;
 
