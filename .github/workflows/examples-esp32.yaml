@@ -126,7 +126,7 @@ jobs:
               run: scripts/examples/esp_example.sh energy-gateway-app sdkconfig.defaults
 
             - name: Build example Energy Management App
-              run: scripts/examples/esp_example.sh energy-management-app sdkconfig.defaults              
+              run: scripts/examples/esp_example.sh energy-management-app sdkconfig.defaults
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
