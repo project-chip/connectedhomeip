@@ -328,6 +328,7 @@ private:
     char * mOnboardingPayload           = nullptr;
     uint64_t mDiscoveryFilterCode       = 0;
     char * mDiscoveryFilterInstanceName = nullptr;
+    ::pw::Status mLastRpcStreamError    = ::pw::Status::Unknown();
 
     bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];

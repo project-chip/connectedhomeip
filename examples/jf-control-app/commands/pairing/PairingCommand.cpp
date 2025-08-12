@@ -27,6 +27,7 @@
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/RpcErrorMapping.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/secure_channel/PASESession.h>
 
@@ -688,10 +689,16 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 
             ::pw::rpc::NanopbClientReader<::RequestOptions> localStream =
                 rpcClient.GetStream(request, OnGetStreamOnNext, OnGetStreamOnDone);
+
+            localStream.set_on_error([this](::pw::Status status) {
+                ChipLogError(JointFabric, "RPC stream error: %d", status.code());
+                mLastRpcStreamError = status;
+            });
+
             if (!localStream.active())
             {
                 ChipLogError(JointFabric, "RPC: Opening GetStream Error");
-                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                SetCommandExitStatus(rpc::MapRpcStatusToChipError(mLastRpcStreamError));
                 return;
             }
             else
