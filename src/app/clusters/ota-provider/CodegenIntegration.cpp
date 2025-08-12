@@ -72,7 +72,6 @@ void MatterOtaSoftwareUpdateProviderClusterServerShutdownCallback(EndpointId end
 {
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                      = endpointId,
