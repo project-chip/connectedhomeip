@@ -74,7 +74,7 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpo
             .endpointId                      = endpointId,
             .clusterId                       = AdministratorCommissioning::Id,
             .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = kRootEndpointId,
+            .maxEndpointCount                = 1,
             .fetchFeatureMap                 = true,
             .fetchOptionalAttributes         = false,
         },
@@ -91,7 +91,7 @@ void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId en
             .endpointId                      = endpointId,
             .clusterId                       = AdministratorCommissioning::Id,
             .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = kRootEndpointId,
+            .maxEndpointCount                = 1,
         },
         integrationDelegate);
 }

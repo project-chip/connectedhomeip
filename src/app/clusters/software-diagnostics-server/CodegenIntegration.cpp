@@ -64,7 +64,7 @@ void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
             .endpointId                      = endpointId,
             .clusterId                       = SoftwareDiagnostics::Id,
             .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = kRootEndpointId,
+            .maxEndpointCount                = 1,
             .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = true,
         },
@@ -81,7 +81,7 @@ void MatterSoftwareDiagnosticsClusterServerShutdownCallback(EndpointId endpointI
             .endpointId                      = endpointId,
             .clusterId                       = SoftwareDiagnostics::Id,
             .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = kRootEndpointId,
+            .maxEndpointCount                = 1,
         },
         integrationDelegate);
 }

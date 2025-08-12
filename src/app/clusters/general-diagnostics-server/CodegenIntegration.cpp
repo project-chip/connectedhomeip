@@ -92,7 +92,7 @@ void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
             .endpointId                      = endpointId,
             .clusterId                       = GeneralDiagnostics::Id,
             .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = kRootEndpointId,
+            .maxEndpointCount                = 1,
             .fetchFeatureMap                 = false,
             .fetchOptionalAttributes         = true,
         },
@@ -109,7 +109,7 @@ void MatterGeneralDiagnosticsClusterServerShutdownCallback(EndpointId endpointId
             .endpointId                      = endpointId,
             .clusterId                       = GeneralDiagnostics::Id,
             .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = kRootEndpointId,
+            .maxEndpointCount                = 1,
         },
         integrationDelegate);
 }
