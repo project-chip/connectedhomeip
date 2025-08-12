@@ -39,12 +39,16 @@ struct IsOneOf<T>
     static constexpr bool value = false;
 };
 
-template<AttributeId first, AttributeId... rest>
-constexpr uint32_t AllBits() {
+template <AttributeId first, AttributeId... rest>
+constexpr uint32_t AllBits()
+{
     const uint32_t bit = 1u << first;
-    if constexpr (sizeof...(rest) == 0) {
+    if constexpr (sizeof...(rest) == 0)
+    {
         return bit;
-    } else {
+    }
+    else
+    {
         return bit | AllBits<rest...>();
     }
 }
@@ -163,7 +167,17 @@ public:
         return *this;
     }
 
-    static constexpr uint32_t All() { return Internal::AllBits<OptionalAttributeIds...>(); }
+    static constexpr uint32_t All()
+    {
+        if constexpr (sizeof...(OptionalAttributeIds) == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return Internal::AllBits<OptionalAttributeIds...>();
+        }
+    }
 };
 
 } // namespace app
