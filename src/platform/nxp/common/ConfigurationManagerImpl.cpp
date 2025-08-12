@@ -89,7 +89,7 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
         bootReason = BootReasonType::kSoftwareReset;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         OtaImgState_t img_state = OTA_GetImgState();
-        if(img_state == OtaImgState_RunCandidate)
+        if (img_state == OtaImgState_RunCandidate)
         {
             bootReason = BootReasonType::kSoftwareUpdateCompleted;
         }
