@@ -292,10 +292,10 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         self.validate_energy_transfer_started_event(
             event_data, session_id, expected_state, expected_max_charge)
 
-        self.step("9")
         # This will only work if the optional UserMaximumChargeCurrent attribute is supported
         supported_attributes = await self.get_supported_energy_evse_attributes()
         if Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent.attribute_id in supported_attributes:
+            self.step("9")
             logging.info("UserMaximumChargeCurrent is supported...")
             user_max_charge_current = 6000
             await self.write_user_max_charge(1, user_max_charge_current)
@@ -309,7 +309,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         else:
             logging.info(
                 "UserMaximumChargeCurrent is NOT supported... skipping.")
-            self.mark_step_range_skipped("9a", "9a")
+            self.mark_step_range_skipped("9", "9a")
 
         self.step("10")
         await self.send_test_event_trigger_charge_demand_clear()
