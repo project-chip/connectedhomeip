@@ -69,7 +69,7 @@ class TC_SU_2_2(MatterBaseTest):
         Args:
             controller: The Matter controller (e.g., th1, th4) that will perform the write operation.
             acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
-            node_id: 
+            node_id:
 
         Raises:
             AssertionError: If writing the ACL attribute fails (status is not Status.Success).
@@ -321,21 +321,23 @@ class TC_SU_2_2(MatterBaseTest):
         # Step # 1.5 - Provider sends AnnounceOTAProvider command to TH1 Requestor
         # ------------------------------------------------------------------------------------
 
-        logger.info("Step #1.5 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT)")
-        cmd = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=0x0000000000000001,  # Provider,  # CHECK VALUE FROM PROVIDER -------------------------
+        logger.info("Step #1.5.1 - TH2 (Provider) sends AnnounceOTAProvider command to TH1 (DUT)")
+        cmd_announce = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
+            providerNodeID=0x0000000000000001,  # Provider
             vendorID=0xFFF1,
-            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable,
+            announcementReason=Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kSimpleAnnouncement,
             metadataForNode=None,
             endpoint=0
         )
-        logger.info(f"Step #1.5 - cmd AnnounceOTAProvider: {cmd}")
-        resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
-        logging.info(f"Step #1.5 - AnnounceOTAProvider response: {resp}.")
-        logging.info(f"Step #1.5 - AnnounceOTAProvider sent from node {controller.nodeId} to DUT.")
-        logging.info(f"Step #1.5 - Sent AnnounceOTAProvider to DUT, response: {resp}")
+        logger.info(f"Step #1.5 - cmd AnnounceOTAProvider: {cmd_announce}")
 
-        # await asyncio.sleep(2)
+        resp_announce = await self.send_single_cmd(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT/TH1 NodeID
+            cmd=cmd_announce
+        )
+        logging.info(f"Step #1.5 - AnnounceOTAProvider response: {resp_announce}.")
+        # logging.info(f"Step #1.5 - AnnounceOTAProvider sent from node {controller.nodeId} , {self.dut_node_id} to DUT.")
 
         logger.info("Step #1.6 - Send QueryImage to check if update is available")
         cmd_query_image = Clusters.OtaSoftwareUpdateProvider.Commands.QueryImage(
@@ -348,7 +350,7 @@ class TC_SU_2_2(MatterBaseTest):
             requestorCanConsent=None,
             metadataForProvider=None
         )
-        # logger.info(f"Step #1.6 - cmd cmd_query_image: {cmd_query_image}")
+        logger.info(f"Step #1.6 - cmd cmd_query_image: {cmd_query_image}")
 
         resp = await self.send_single_cmd(
             dev_ctrl=controller,
@@ -366,8 +368,8 @@ class TC_SU_2_2(MatterBaseTest):
         # 1.8 Verify that software image transfer from TH/OTA-P to DUT is successful
         logger.info("Step #1.8 - Verify that software image transfer from TH/OTA-P to DUT is successful")
         cmd_apply_update = Clusters.OtaSoftwareUpdateProvider.Commands.ApplyUpdateRequest(
-            updateToken=resp.updateToken,  # token recibido en QueryImageResponse
-            newVersion=resp.softwareVersion  # if resp.softwareVersion is not None else 0
+            updateToken=resp.updateToken,  # Use the updateToken from the QueryImageResponse
+            newVersion=resp.softwareVersion  # Use the software version from the QueryImageResponse
         )
         logger.info(f"Step #1.8 - cmd_apply_update: {cmd_apply_update}")
 
