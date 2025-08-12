@@ -163,7 +163,7 @@ class TC_SU_2_8(MatterBaseTest):
         Poll UpdateState and checks it remains the same.
         """
 
-        max_wait = 15
+        max_wait = 30
         interval = 3
         elapsed = 0
 
