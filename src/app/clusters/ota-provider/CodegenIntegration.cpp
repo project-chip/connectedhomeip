@@ -37,12 +37,11 @@ LazyRegisteredServerCluster<OtaProviderServer> gServers[kOtaProviderMaxClusterCo
 // Log an error if not found.
 bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 {
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, OtaSoftwareUpdateProvider::Id, kOtaProviderFixedClusterCount);
+    outArrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, OtaSoftwareUpdateProvider::Id, kOtaProviderFixedClusterCount);
 
-    if (arrayIndex >= kOtaProviderMaxClusterCount)
+    if (outArrayIndex >= kOtaProviderMaxClusterCount)
     {
-        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
+        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
         return false;
     }
     return true;
@@ -50,7 +49,7 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 
 } // namespace
 
-void emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
+void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, arrayIndex))
@@ -65,7 +64,7 @@ void emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfOtaSoftwareUpdateProviderClusterShutdownCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateProviderClusterServerShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, arrayIndex))
