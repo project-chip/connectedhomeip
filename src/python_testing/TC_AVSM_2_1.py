@@ -178,12 +178,12 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(4)
         if self.pics_guard(self.check_pics("AVSM.S.A0002")):
-            value = await self.read_single_attribute_check_success(
+            videoSensorParams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
             )
-            logger.info(f"Rx'd VideoSensorParams: {value}")
-            asserts.assert_is_not_none(value, "VideoSensorParams is None")
-            # TODO assert struct fields
+            logger.info(f"Rx'd VideoSensorParams: {videoSensorParams}")
+            asserts.assert_is_not_none(videoSensorParams, "VideoSensorParams is None")
+            self.assert_video_sensor_params_struct(videoSensorParams)
 
         self.step(5)
         if self.pics_guard(self.check_pics("AVSM.S.A0003")):
@@ -195,19 +195,25 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(6)
         if self.pics_guard(self.check_pics("AVSM.S.A0004")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport)
-            logger.info(f"Rx'd MinViewport: {value}")
-            asserts.assert_is_not_none(value, "MinViewport is None")
-            # TODO assert struct fields
+            minViewport = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport
+            )
+            logger.info(f"Rx'd MinViewport: {minViewport}")
+            asserts.assert_is_not_none(minViewport, "MinViewport is None")
+            self.assert_video_resolution_struct(minViewport)
 
         self.step(7)
         if self.pics_guard(self.check_pics("AVSM.S.A0005")):
-            value = await self.read_single_attribute_check_success(
+            rateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
             )
-            logger.info(f"Rx'd RateDistortionTradeOffPoints: {value}")
-            asserts.assert_is_not_none(value, "RateDistortionTradeOffPoints is None")
-            # TODO assert struct fields of list
+            logger.info(f"Rx'd RateDistortionTradeOffPoints: {rateDistortionTradeOffPoints}")
+            asserts.assert_is_not_none(rateDistortionTradeOffPoints, "RateDistortionTradeOffPoints is None")
+            matter_asserts.assert_all(
+                rateDistortionTradeOffPoints,
+                lambda x: self.assert_rate_distortion_trade_off_point_struct(x),
+                "RateDistortionTradeOffPoints has invalid entry",
+            )
 
         self.step(8)
         if self.pics_guard(self.check_pics("AVSM.S.A0006")):
@@ -219,21 +225,21 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(9)
         if self.pics_guard(self.check_pics("AVSM.S.A0007")):
-            value = await self.read_single_attribute_check_success(
+            microphoneCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
             )
-            logger.info(f"Rx'd MicrophoneCapabilities: {value}")
-            asserts.assert_is_not_none(value, "MicrophoneCapabilities is None")
-            # TODO assert struct fields
+            logger.info(f"Rx'd MicrophoneCapabilities: {microphoneCapabilities}")
+            asserts.assert_is_not_none(microphoneCapabilities, "MicrophoneCapabilities is None")
+            self.assert_audio_capabilities_struct(microphoneCapabilities)
 
         self.step(10)
         if self.pics_guard(self.check_pics("AVSM.S.A0008")):
-            value = await self.read_single_attribute_check_success(
+            speakerCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerCapabilities
             )
-            logger.info(f"Rx'd SpeakerCapabilities: {value}")
-            asserts.assert_is_not_none(value, "SpeakerCapabilities is None")
-            # TODO assert struct fields
+            logger.info(f"Rx'd SpeakerCapabilities: {speakerCapabilities}")
+            asserts.assert_is_not_none(speakerCapabilities, "SpeakerCapabilities is None")
+            self.assert_audio_capabilities_struct(speakerCapabilities)
 
         self.step(11)
         if self.pics_guard(self.check_pics("AVSM.S.A0009")):
@@ -250,12 +256,16 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(12)
         if self.pics_guard(self.check_pics("AVSM.S.A000A")):
-            value = await self.read_single_attribute_check_success(
+            snapshotCapabilities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
             )
-            logger.info(f"Rx'd SnapshotCapabilities: {value}")
-            asserts.assert_is_not_none(value, "SnapshotCapabilities is None")
-            # TODO assert struct fields of list
+            logger.info(f"Rx'd SnapshotCapabilities: {snapshotCapabilities}")
+            asserts.assert_is_not_none(snapshotCapabilities, "SnapshotCapabilities is None")
+            matter_asserts.assert_all(
+                snapshotCapabilities,
+                lambda x: self.assert_snapshot_capabilities_struct(x),
+                "SnapshotCapabilities has invalid entry",
+            )
 
         self.step(13)
         if self.pics_guard(self.check_pics("AVSM.S.A000B")):
@@ -288,7 +298,7 @@ class TC_AVSM_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
             )
             logger.info(f"Rx'd SupportedStreamUsages: {value}")
-            # assert enum values of list
+            # TODO assert enum values of list
 
         self.step(17)
         if self.pics_guard(self.check_pics("AVSM.S.A000F")):
@@ -522,6 +532,62 @@ class TC_AVSM_2_1(MatterBaseTest):
                 Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
                 "StatusLightBrightness is not a valid ThreeLevelAutoEnum",
             )
+
+    def assert_video_sensor_params_struct(
+        self, videoSensorParams: Clusters.CameraAvStreamManagement.Structs.VideoSensorParamsStruct
+    ) -> bool:
+        asserts.assert_greater_equal(videoSensorParams.sensorWidth, 64, "SensorWidth is less than 64")
+        asserts.assert_greater_equal(videoSensorParams.sensorHeight, 64, "SensorHeight is less than 64")
+        asserts.assert_greater_equal(videoSensorParams.maxFPS, 1, "MaxFPS is less than 1")
+        if videoSensorParams.maxHDRFPS is not None:
+            matter_asserts.assert_int_in_range(
+                videoSensorParams.maxHDRFPS,
+                1,
+                videoSensorParams.maxFPS,
+                "MaxHDRFPS is not between 1 and MaxFPS",
+            )
+        return True
+
+    def assert_video_resolution_struct(
+        self, videoResolution: Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct
+    ) -> bool:
+        asserts.assert_greater_equal(videoResolution.width, 1, "Width is less than 1")
+        asserts.assert_greater_equal(videoResolution.height, 1, "Height is less than 1")
+        return True
+
+    def assert_rate_distortion_trade_off_point_struct(
+        self, rateDistortionTradeOffPoints: Clusters.CameraAvStreamManagement.Structs.RateDistortionTradeOffPointsStruct
+    ) -> bool:
+        asserts.assert_less(
+            rateDistortionTradeOffPoints.codec,
+            Clusters.CameraAvStreamManagement.Enums.VideoCodecEnum.kUnknownEnumValue,
+            "Codec is not a valid VideoCodecEnum",
+        )
+        self.assert_video_resolution_struct(rateDistortionTradeOffPoints.resolution)
+        asserts.assert_greater_equal(rateDistortionTradeOffPoints.minBitRate, 1, "MinBitRate is less than 1")
+        return True
+
+    def assert_audio_capabilities_struct(
+        self, audioCapabilities: Clusters.CameraAvStreamManagement.Structs.AudioCapabilitiesStruct
+    ) -> bool:
+        asserts.assert_greater_equal(audioCapabilities.maxNumberOfChannels, 1, "MaxNumberOfChannels is less than 1")
+        asserts.assert_greater_equal(len(audioCapabilities.supportedCodecs), 1, "SupportedCodecs list is empty")
+        asserts.assert_greater_equal(len(audioCapabilities.supportedSampleRates), 1, "SupportedSampleRates list is empty")
+        asserts.assert_greater_equal(len(audioCapabilities.supportedBitDepths), 1, "SupportedBitDepths list is empty")
+        # TODO assert supportedCodecs, supportedSampleRates and supportedBitDepths list values
+        return True
+
+    def assert_snapshot_capabilities_struct(
+        self, snapshotCapabilities: Clusters.CameraAvStreamManagement.Structs.SnapshotCapabilitiesStruct
+    ) -> bool:
+        self.assert_video_resolution_struct(snapshotCapabilities.resolution)
+        asserts.assert_greater_equal(snapshotCapabilities.maxFrameRate, 1, "MaxFrameRate is less than 1")
+        asserts.assert_less(
+            snapshotCapabilities.imageCodec,
+            Clusters.CameraAvStreamManagement.Enums.ImageCodecEnum.kUnknownEnumValue,
+            "ImageCodec is not a valid ImageCodecEnum",
+        )
+        return True
 
 
 if __name__ == "__main__":
