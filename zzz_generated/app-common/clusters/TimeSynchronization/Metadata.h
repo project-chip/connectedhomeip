@@ -20,6 +20,7 @@ namespace TimeSynchronization {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace UTCTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UTCTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -83,6 +84,7 @@ constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SetUTCTime {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetUTCTime::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);

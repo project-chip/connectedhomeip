@@ -20,6 +20,7 @@ namespace PowerTopology {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace AvailableEndpoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AvailableEndpoints::Id,
