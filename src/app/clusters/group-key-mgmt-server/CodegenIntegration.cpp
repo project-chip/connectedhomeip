@@ -44,7 +44,7 @@ void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfGroupKeyManagementClusterShutdownCallback(EndpointId endpointId)
+void MatterGroupKeyManagementClusterServerShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
