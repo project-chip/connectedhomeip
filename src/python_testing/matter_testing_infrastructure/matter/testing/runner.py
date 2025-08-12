@@ -564,7 +564,7 @@ class MockTestRunner():
     """
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
-                 pics: Optional[dict[bool, str]] = None, paa_trust_store_path=None):
+                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
@@ -598,7 +598,7 @@ class MockTestRunner():
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: Optional['MatterTestConfig'] = None):
-        from matter.testing.matter_testing import MatterTestConfig
+        from matter.testing.matter_test_config import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
 
@@ -740,8 +740,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if args.PICS is None:
         config.pics = {}
     else:
-        pics_file_dict = read_pics_from_file(args.PICS)
-        config.pics = {v: k for k, v in pics_file_dict.items()}
+        config.pics = read_pics_from_file(args.PICS)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
