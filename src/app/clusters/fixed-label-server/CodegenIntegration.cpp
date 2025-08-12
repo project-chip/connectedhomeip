@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 
-#include "fixed-label-cluster.h"
+#include <app/clusters/fixed-label-server/fixed-label-cluster.h>
+#include <app/static-cluster-config/FixedLabel.h>
+#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -26,27 +28,63 @@ using namespace chip::app::Clusters::FixedLabel;
 using namespace chip::app::Clusters::FixedLabel::Attributes;
 
 namespace {
-LazyRegisteredServerCluster<FixedLabelCluster> gServer;
+
+static constexpr size_t kFixedLabelFixedClusterCount = FixedLabel::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kFixedLabelMaxClusterCount   = kFixedLabelFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+LazyRegisteredServerCluster<FixedLabelCluster> gServers[kFixedLabelMaxClusterCount];
+
+// Find the 0-based array index corresponding to the given endpoint id.
+// Log an error if not found.
+bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+{
+    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, FixedLabel::Id, kFixedLabelFixedClusterCount);
+
+    if (arrayIndex >= kFixedLabelMaxClusterCount)
+    {
+        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
+        return false;
+    }
+    outArrayIndex = arrayIndex;
+
+    return true;
 }
 
-void MatterFixedLabelPluginServerInitCallback()
-{
-    gServer.Create();
+} // namespace
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
+void MatterFixedLabelClusterServerInitCallback(EndpointId endpointId)
+{
+    uint16_t arrayIndex = 0;
+    if (!FindEndpointWithLog(endpointId, arrayIndex))
+    {
+        return;
+    }
+    gServers[arrayIndex].Create(endpointId);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "FixedLabel cluster error registration");
+        ChipLogError(AppServer, "Failed to register FixedLabel cluster on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
     }
 }
 
-void MatterFixedLabelPluginServerShutdownCallback()
+void MatterFixedLabelClusterServerShutdownCallback(EndpointId endpointId)
 {
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
+    uint16_t arrayIndex = 0;
+    if (!FindEndpointWithLog(endpointId, arrayIndex))
     {
-        ChipLogError(AppServer, "FixedLabel unregister error");
+        return;
     }
 
-    gServer.Destroy();
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to unregister FixedLabel cluster on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
+    }
+    gServers[arrayIndex].Destroy();
 }
+
+void MatterFixedLabelPluginServerInitCallback() {}
+
+void MatterFixedLabelPluginServerShutdownCallback() {}

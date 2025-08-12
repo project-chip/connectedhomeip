@@ -24,7 +24,7 @@ namespace chip::app::Clusters {
 class FixedLabelCluster : public DefaultServerCluster
 {
 public:
-    FixedLabelCluster();
+    FixedLabelCluster(EndpointId endpoint);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

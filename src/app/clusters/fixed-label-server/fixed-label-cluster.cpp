@@ -23,7 +23,7 @@ namespace chip::app::Clusters {
 using namespace FixedLabel::Attributes;
 
 // Register for the Fixed Label cluster on all endpoints.
-FixedLabelCluster::FixedLabelCluster() : DefaultServerCluster({ 1, FixedLabel::Id }) {}
+FixedLabelCluster::FixedLabelCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, FixedLabel::Id }) {}
 
 CHIP_ERROR FixedLabelCluster::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
