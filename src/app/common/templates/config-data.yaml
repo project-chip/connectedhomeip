@@ -75,6 +75,7 @@ CommandHandlerInterfaceOnlyClusters:
 # See https://github.com/project-chip/connectedhomeip/issues/4369
 ClustersWithInitFunctions:
     - Color Control
+    - Ethernet Network Diagnostics
     - Groups
     - Identify
     - Level Control

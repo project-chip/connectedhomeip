@@ -73,6 +73,12 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         if (mProvider.GetEthPHYRate(phyRateValue) == CHIP_NO_ERROR)
         {
             pHYRate.SetNonNull(phyRateValue);
+            ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d",
+                            chip::to_underlying(phyRateValue));
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
         }
 
         return encoder.Encode(pHYRate);
@@ -84,6 +90,11 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         if (mProvider.GetEthFullDuplex(duplexValue) == CHIP_NO_ERROR)
         {
             fullDuplex.SetNonNull(duplexValue);
+            ChipLogProgress(Zcl, "The full-duplex operating status of Node: %d", duplexValue);
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
         }
 
         return encoder.Encode(fullDuplex);
@@ -95,6 +106,12 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         if (mProvider.GetEthCarrierDetect(carrierDetectValue) == CHIP_NO_ERROR)
         {
             carrierDetect.SetNonNull(carrierDetectValue);
+            ChipLogProgress(Zcl, "The status of the Carrier Detect control signal present on the ethernet network interface: %d",
+                            carrierDetectValue);
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
         }
 
         return encoder.Encode(carrierDetect);

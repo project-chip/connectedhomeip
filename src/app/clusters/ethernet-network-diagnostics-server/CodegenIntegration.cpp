@@ -44,7 +44,7 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 
     if (arrayIndex >= kEthernetNetworkDiagnosticsMaxClusterCount)
     {
-        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
+        // ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
         return false;
     }
     outArrayIndex = arrayIndex;
@@ -59,7 +59,7 @@ bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
 
 } // namespace
 
-void emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
+void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, arrayIndex))
@@ -89,14 +89,15 @@ void emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     gServers[arrayIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), enabledFeatures, enabledAttributes);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register EthernetNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    // TODO: Reenable log in the following PR
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(AppServer, "Failed to register EthernetNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+    //                  err.Format());
+    // }
 }
 
-void emberAfEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterEthernetNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, arrayIndex))
@@ -105,11 +106,13 @@ void emberAfEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpoin
     }
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister EthernetNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    // TODO: Reenable log in the following PR
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(AppServer, "Failed to unregister EthernetNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT,
+    //     endpointId,
+    //                  err.Format());
+    // }
     gServers[arrayIndex].Destroy();
 }
 

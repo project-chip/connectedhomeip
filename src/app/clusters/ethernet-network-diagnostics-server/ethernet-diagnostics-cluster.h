@@ -36,8 +36,6 @@ struct EthernetDiagnosticsEnabledAttributes
     bool enableTimeSinceReset : 1;
 };
 
-/// Integration of Ethernet network diagnostics within the Matter data model
-/// This cluster is expected to only ever exist on endpoint 0 as it is a singleton cluster.
 class EthernetDiagnosticsServerCluster : public DefaultServerCluster
 {
 public:
