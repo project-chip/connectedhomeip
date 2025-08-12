@@ -20,6 +20,7 @@ namespace OtaSoftwareUpdateRequestor {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace DefaultOTAProviders {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(DefaultOTAProviders::Id,
@@ -49,6 +50,7 @@ constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceOTAProvider::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);
