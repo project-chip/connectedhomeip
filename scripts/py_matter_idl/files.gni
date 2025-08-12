@@ -15,6 +15,8 @@ matter_idl_generator_templates = [
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/sdk/EventIds.h.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/sdk/Ids.h.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/sdk/Metadata.h.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/sdk/MetadataProvider.h.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/sdk/MetadataQuery.h.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/tlvmeta/TLVMetaData_cpp.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/cpp/tlvmeta/TLVMetaData_h.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/idl/MatterIdl.jinja",
