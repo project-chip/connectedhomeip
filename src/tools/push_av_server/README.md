@@ -179,6 +179,7 @@ curl ... -XPOST '...' -d "{\"csr\":\"$(cat client.curl.csr)\"}"
 
 The device sends its `CSR` to the server's /sign endpoint. The server acts as a
 Certificate Authority, verifies the request, and uses its own root key to sign
-the device's public key, creating a valid client certificate. The server then
-sends this new certificate back to the device. The device can now use this
-certificate and its private key to authenticate, just as in Step 2.
+the device's public key, creating a valid client certificate. The server saves this
+certificate and returns its path in the response. The device can then fetch the
+certificate content from that path and use it with its private key to
+authenticate, just as in Step 2.
