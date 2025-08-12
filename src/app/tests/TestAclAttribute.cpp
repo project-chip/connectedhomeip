@@ -61,6 +61,9 @@ const MockNodeConfig & TestMockNodeConfig()
             MockClusterConfig(kTestClusterId, {
                 ClusterRevision::Id, FeatureMap::Id, 1, 2, kTestAttributeId
             }),
+            MockClusterConfig(kTestDeniedClusterId2, {
+                ClusterRevision::Id, FeatureMap::Id, 1, 2, kTestAttributeId
+            }),
         }),
         MockEndpointConfig(kTestDeniedEndpointId, {
             MockClusterConfig(kTestClusterId, {
@@ -226,10 +229,12 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute_Subscribe)
 
         chip::app::AttributePathParams attributePathParams[2];
 
+        attributePathParams[0].mEndpointId  = chip::Test::kTestEndpointId;
         attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId2;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId2;
+        attributePathParams[1].mEndpointId  = chip::Test::kTestDeniedEndpointId;
+        attributePathParams[1].mClusterId   = chip::Test::kTestClusterId;
         attributePathParams[1].mAttributeId = 2;
 
         ReadPrepareParams readPrepareParams(GetSessionBobToAlice());

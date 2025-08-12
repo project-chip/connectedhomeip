@@ -6,7 +6,7 @@
 # --------------------------------------
 # %reset -f
 # import importlib.util
-# spec = importlib.util.find_spec('chip.ChipReplStartup')
+# spec = importlib.util.find_spec('matter.ChipReplStartup')
 # %run {spec.origin}
 # --------------------------------------
 #
