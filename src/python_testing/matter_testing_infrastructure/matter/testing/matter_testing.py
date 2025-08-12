@@ -735,12 +735,15 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.stored_global_wildcard = await global_wildcard
 
     async def cluster_guard(self, endpoint: int, cluster: ClusterObjects.Cluster, skip_step: bool = True):
-        """Similar to attribute_guard. While the `skip_step` argument is set to True (default), and after
-           checking a condition it returns False, it marks the test step as skipped; if it returns True,
-           the test step is executed.
-           If the `skip_step` argument is set to False, no test step is skipped, and the function will
-           return True or False depending on the condition.
-           For example can be used to check if a test step should be run:
+        """Similar to attribute_guard.
+
+           If the `skip_step` argument is set to True (default), and the condition check returns False,
+           it marks the test step as skipped; otherwise the test step is executed.
+
+           If the `skip_step` argument is set to False, and the condition check returns False, the test
+           step isn't skipped, and the function returns True or False.
+
+           For example, it can be used to check if a test step should be run:
 
               self.step("1")
               if await self.cluster_guard(condition1_needs_to_be_true_to_execute):
