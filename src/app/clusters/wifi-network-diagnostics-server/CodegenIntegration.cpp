@@ -89,7 +89,7 @@ void MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpoi
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                      = endpointId,
-            .clusterId                       = GeneralDiagnostics::Id,
+            .clusterId                       = WiFiNetworkDiagnostics::Id,
             .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
             .maxEndpointCount                = kWiFiNetworkDiagnosticsMaxClusterCount,
         },
