@@ -2,31 +2,31 @@
 
 There are following Apps on Android
 
--   CHIPTool - Android CHIPTool is an application for Android for commissioning
-    and controlling Matter accessory devices. It offers the following features:
-    -   Scan a Matter QR code and display payload information to the user
-    -   Read the NFC tag containing Matter onboarding information
-    -   Commission a Matter device
-    -   Send echo requests to the Matter echo server
-    -   Send on/off cluster requests to a Matter device
--   CHIPTest
-    -   Android CHIPTest is an application for Android for running Matter's unit
-        tests
+- CHIPTool - Android CHIPTool is an application for Android for commissioning
+  and controlling Matter accessory devices. It offers the following features:
+    - Scan a Matter QR code and display payload information to the user
+    - Read the NFC tag containing Matter onboarding information
+    - Commission a Matter device
+    - Send echo requests to the Matter echo server
+    - Send on/off cluster requests to a Matter device
+- CHIPTest
+    - Android CHIPTest is an application for Android for running Matter's unit
+      tests
 
 <hr>
 
--   [Building Android](#building-android)
-    -   [Source files](#source-files)
-    -   [Requirements for building](#requirements-for-building)
-        -   [Linux](#linux)
-        -   [MacOS](#macos)
-        -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
-        -   [Gradle \& JDK Version](#gradle--jdk-version)
-        -   [Kotlin Version](#kotlin-version)
-    -   [Preparing for build](#preparing-for-build)
-    -   [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
-    -   [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
-    -   [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
+- [Building Android](#building-android)
+    - [Source files](#source-files)
+    - [Requirements for building](#requirements-for-building)
+        - [Linux](#linux)
+        - [MacOS](#macos)
+        - [ABIs and TARGET_CPU](#abis-and-target_cpu)
+        - [Gradle \& JDK Version](#gradle--jdk-version)
+        - [Kotlin Version](#kotlin-version)
+    - [Preparing for build](#preparing-for-build)
+    - [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
+    - [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
+    - [Building Android CHIPTest from scripts](#building-android-chiptest-from-scripts)
 
 <hr>
 
@@ -43,7 +43,7 @@ directory.
 
 ## Requirements for building
 
-You need Android SDK 30 & NDK 28.2.13676358 downloaded to your machine. Set the
+You need Android SDK 34 & NDK 28.2.13676358 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded.
@@ -58,9 +58,9 @@ downloaded.
     1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
        10.0
     2. Apply
-4. Install SDK 30:
-    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 11.0 (R) SDK Level
-       30
+4. Install SDK 34:
+    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 14.0 (Upside Down
+       Cake) API Level 34
     2. Apply
 5. Install Emulator:
     1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
@@ -98,21 +98,22 @@ architecture:
 
 ### Gradle & JDK Version
 
-All Android projects utilize Gradle version 7.3.3 and JDK version 11.0.
+All Android projects utilize Gradle plugin version 8.5.1, Gradle version 8.7 and
+JDK version 17.0.
 
-For developer using java 11 in MacOS, the JAVA can be configured as follows via
+For developer using java 17 in MacOS, the JAVA can be configured as follows via
 `sdkman`:
 
 ```
-sdk install java 11.0.26-tem
+sdk install java 17.0.14-tem
 ```
 
-For developer using openjdk-11-jdk in Linux, the JAVA_HOME environment variable
+For developer using openjdk-17-jdk in Linux, the JAVA_HOME environment variable
 can be configured as follows:
 
 ```
-sudo apt-get install openjdk-11-jdk
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+sudo apt-get install openjdk-17-jdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ```
 
 <a name="kotlin"></a>
@@ -206,7 +207,6 @@ which allows us to directly edit core Matter code in-IDE.
    Files**.
 
 4) Use one of the following options to build an Android package:
-
     - Click **Make Project** in Android Studio.
     - Run the following command in the command line:
 
