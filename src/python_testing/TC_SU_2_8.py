@@ -271,8 +271,8 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info(f"Commissioning response: {resp}.")
 
-        await self.configure_acl_permissions(th1, endpoint, p1_node)
-        await self.configure_acl_permissions(th2, endpoint, p2_node)
+        # await self.configure_acl_permissions(th1, endpoint, p1_node)
+        # await self.configure_acl_permissions(th2, endpoint, p2_node)
 
         if fabric_id_th2 == th1.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {th1.fabricId} and TH2: {fabric_id_th2}.")
