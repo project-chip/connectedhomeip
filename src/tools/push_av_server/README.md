@@ -88,7 +88,7 @@ necessary to establish a secure HTTPS connection.
 `-XPOST`: Sends a request to create a new resource.
 
 The server generates the key pair and saves it in its working directory (e.g.,
-in `~/.pavstest/certs/device/`). This gives you the credentials the device will
+in `~/.pavstest/certs/device/`). This provides the credentials the device shall
 use in the next step.
 
 ### 2. Authenticating and Creating a Stream
