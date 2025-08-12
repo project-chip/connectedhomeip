@@ -39,20 +39,6 @@ struct IsOneOf<T>
     static constexpr bool value = false;
 };
 
-template <AttributeId first, AttributeId... rest>
-constexpr uint32_t AllBits()
-{
-    const uint32_t bit = 1u << first;
-    if constexpr (sizeof...(rest) == 0)
-    {
-        return bit;
-    }
-    else
-    {
-        return bit | AllBits<rest...>();
-    }
-}
-
 } // namespace Internal
 
 /// It is very common that a class has optional attributes. Such optional attributes
@@ -175,7 +161,7 @@ public:
         }
         else
         {
-            return Internal::AllBits<OptionalAttributeIds...>();
+            return ((1U << OptionalAttributeIds) | ...);
         }
     }
 };
