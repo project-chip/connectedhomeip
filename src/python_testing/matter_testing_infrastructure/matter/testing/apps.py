@@ -157,7 +157,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5540, extra_args: list[str] = []):
+                 port: int = 5541, extra_args: list[str] = []):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -199,8 +199,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
                 subjects=[admin_node_id],  # type: ignore
-                targets=NullValue,
-                fabricIndex=1  # type: ignore
+                targets=NullValue
             ),
             # Operate entry
             Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
@@ -214,7 +213,6 @@ class OTAProviderSubprocess(AppServerSubprocess):
                         deviceType=NullValue
                     )
                 ],
-                fabricIndex=1  # type: ignore
             )
         ]
 
