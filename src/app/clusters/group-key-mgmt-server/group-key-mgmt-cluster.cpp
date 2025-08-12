@@ -697,8 +697,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const Da
     switch (request.path.mAttributeId)
     {
     case GroupKeyMap::Id: {
-        // TODO: wrap this call in NotifyAttributeChangedIfSuccess()
-        return WriteGroupKeyMap(request.path, decoder);
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteGroupKeyMap(request.path, decoder));
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
