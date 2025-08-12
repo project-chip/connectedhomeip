@@ -76,7 +76,7 @@ void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointI
             .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
             .maxEndpointCount                = kWiFiNetworkDiagnosticsMaxClusterCount,
             .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes       = true,
+            .fetchOptionalAttributes         = true,
         },
         integrationDelegate);
 }

@@ -76,7 +76,7 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpo
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = kRootEndpointId,
             .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes       = false,
+            .fetchOptionalAttributes         = false,
         },
         integrationDelegate);
 }
