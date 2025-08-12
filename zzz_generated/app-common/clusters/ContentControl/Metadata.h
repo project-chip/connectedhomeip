@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ContentControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Enabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Enabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -56,10 +58,15 @@ namespace BlockUnrated {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BlockUnrated::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BlockUnrated
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    Enabled::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace UpdatePIN {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(UpdatePIN::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

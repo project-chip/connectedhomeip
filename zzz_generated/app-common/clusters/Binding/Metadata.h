@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,11 +20,16 @@ namespace Binding {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Binding {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Binding::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace Binding
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    Binding::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

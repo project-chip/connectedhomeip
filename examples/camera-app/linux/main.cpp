@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "CameraAppCommandDelegate.h"
 #include "camera-app.h"
 #include "camera-device.h"
 
@@ -25,6 +26,11 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Camera;
+
+namespace {
+NamedPipeCommands sChipNamedPipeCommands;
+CameraAppCommandDelegate sCameraAppCommandDelegate;
+} // namespace
 
 CameraDevice gCameraDevice;
 
@@ -41,13 +47,25 @@ void ApplicationInit()
     {
         ChipLogDetail(Camera, "Using default video device path: %s", Camera::kDefaultVideoDevicePath);
     }
+
+    std::string appPipePath = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    if ((!appPipePath.empty()) && (sChipNamedPipeCommands.Start(appPipePath, &sCameraAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
+
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
+
+    sCameraAppCommandDelegate.SetCameraDevice(&gCameraDevice);
 }
 
 void ApplicationShutdown()
 {
     CameraAppShutdown();
+
+    sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])

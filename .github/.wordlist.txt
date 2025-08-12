@@ -80,6 +80,10 @@ armeabi
 armino
 ARMmbed
 armv
+ARD
+SCL
+SDA
+VCC
 ASAN
 asdk
 ASR
@@ -332,6 +336,7 @@ cstdint
 csu
 csv
 ctl
+CTS
 ctrl
 ctypes
 CurrentHue
@@ -589,6 +594,7 @@ formatters
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FRDM
 FS
 fsl
 fstab
@@ -1271,6 +1277,7 @@ rtd
 RTL
 rtld
 RTOS
+RTS
 RTT
 RTX
 runArgs
@@ -1282,6 +1289,7 @@ RVC
 rw
 RXD
 sandboxed
+sankey
 saveAs
 saveDataVersschemaionAs
 sbin

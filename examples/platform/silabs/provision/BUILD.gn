@@ -50,7 +50,10 @@ source_set("storage") {
 
   deps = [ "${chip_root}/src/lib" ]
 
-  public_deps = [ "${sl_provision_root}:headers" ]
+  public_deps = [
+    "${chip_root}/src/app:test-event-trigger",
+    "${sl_provision_root}:headers",
+  ]
 
   if (sl_enable_test_event_trigger) {
     public_configs = [ "${chip_root}/examples/platform/silabs/test-event-trigger:test-event-trigger-config" ]

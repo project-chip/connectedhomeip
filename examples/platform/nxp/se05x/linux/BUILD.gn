@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
@@ -40,6 +41,7 @@ declare_args() {
 
 config("app-main-config") {
   include_dirs = [
+    "${chip_root}",
     "../",
     "../../../linux",
   ]
@@ -99,6 +101,7 @@ source_set("app-main") {
   defines = [
     "ENABLE_TRACING=${matter_enable_tracing_support}",
     "ENABLE_CAMERA_SERVER=${matter_enable_camera_server}",
+    "CHIP_ATTESTATION_TRUSTY_OS=${chip_with_trusty_os}",
   ]
 
   sources = [

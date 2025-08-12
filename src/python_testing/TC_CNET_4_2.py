@@ -16,11 +16,12 @@
 
 import logging
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 
 class TC_CNET_4_2(MatterBaseTest):
@@ -34,7 +35,7 @@ class TC_CNET_4_2(MatterBaseTest):
         3. DUT is commissioned on the operational network specified
            in the --thread-dataset-hex command-line argument.
         4. TH can communicate with the DUT on the operational network specified
-           in the --thread-dataset-hex command-line argument. 
+           in the --thread-dataset-hex command-line argument.
 
     Example Usage:
         To run the test case, use the following command:
