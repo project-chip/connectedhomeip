@@ -34,8 +34,8 @@ bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fi
     if (zeroBasedArrayIndex >= maxEndpointCount)
     {
         ChipLogError(AppServer,
-                     "Could not find a valid endpoint index for endpoint %u/" ChipLogFormatMEI " (Index %u/0x%u was not valid)",
-                     endpointId, ChipLogValueMEI(clusterId), zeroBasedArrayIndex, zeroBasedArrayIndex);
+                     "Could not find a valid endpoint index for endpoint %u/" ChipLogFormatMEI " (Index %u was not valid)",
+                     endpointId, ChipLogValueMEI(clusterId), zeroBasedArrayIndex);
         return false;
     }
     return true;
