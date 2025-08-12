@@ -278,24 +278,19 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & vi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStream(uint16_t videoStreamId, const VideoStreamStruct & videoStream)
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate,
+                                                                  const VideoStreamStruct & videoStream)
 {
-    mAllocatedVideoStreams.push_back(videoStream);
-
-    auto it = std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
-                           [videoStreamId](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; });
-
-    if (it == mAllocatedVideoStreams.end())
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    it->minFrameRate    = videoStream.minFrameRate;
-    it->maxFrameRate    = videoStream.maxFrameRate;
-    it->minResolution   = videoStream.minResolution;
-    it->maxResolution   = videoStream.maxResolution;
-    it->minBitRate      = videoStream.minBitRate;
-    it->maxBitRate      = videoStream.maxBitRate;
+    // Adjust the range parameters for the allocated video stream to be the
+    // intersection of the existing and the new one.
+    videoStreamToUpdate.minFrameRate         = std::max(videoStreamToUpdate.minFrameRate, videoStream.minFrameRate);
+    videoStreamToUpdate.maxFrameRate         = std::min(videoStreamToUpdate.maxFrameRate, videoStream.maxFrameRate);
+    videoStreamToUpdate.minResolution.width  = std::max(videoStreamToUpdate.minResolution.width, videoStream.minResolution.width);
+    videoStreamToUpdate.minResolution.height = std::max(videoStreamToUpdate.minResolution.height, videoStream.minResolution.height);
+    videoStreamToUpdate.maxResolution.width  = std::min(videoStreamToUpdate.maxResolution.width, videoStream.maxResolution.width);
+    videoStreamToUpdate.maxResolution.height = std::min(videoStreamToUpdate.maxResolution.height, videoStream.maxResolution.height);
+    videoStreamToUpdate.minBitRate           = std::max(videoStreamToUpdate.minBitRate, videoStream.minBitRate);
+    videoStreamToUpdate.maxBitRate           = std::min(videoStreamToUpdate.maxBitRate, videoStream.maxBitRate);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
@@ -343,6 +338,27 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
 CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)
 {
     mAllocatedSnapshotStreams.push_back(snapshotStream);
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
+    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
+                                                                     const SnapshotStreamStruct & snapshotStream)
+{
+    // Adjust the range parameters for the allocated snapshot stream to be the
+    // intersection of the existing and the new one.
+    snapshotStreamToUpdate.minResolution.width =
+        std::max(snapshotStreamToUpdate.minResolution.width, snapshotStream.minResolution.width);
+    snapshotStreamToUpdate.minResolution.height =
+        std::max(snapshotStreamToUpdate.minResolution.height, snapshotStream.minResolution.height);
+    snapshotStreamToUpdate.maxResolution.width =
+        std::min(snapshotStreamToUpdate.maxResolution.width, snapshotStream.maxResolution.width);
+    snapshotStreamToUpdate.maxResolution.height =
+        std::min(snapshotStreamToUpdate.maxResolution.height, snapshotStream.maxResolution.height);
+
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
     MatterReportingAttributeChangeCallback(path);
@@ -1766,15 +1782,21 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
         // Check if the streamID matches an existing one in the
         // mAllocatedVideoStreams.
-        bool streamExists = std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
-                                         [&videoStreamID](const VideoStreamStruct & entry) {
-                                             return entry.videoStreamID == videoStreamID;
-                                         }) != mAllocatedVideoStreams.end();
-        if (!streamExists)
+        auto it =
+            std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
+                         [videoStreamID](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamID; });
+
+        if (it == mAllocatedVideoStreams.end())
         {
             // Add the allocated videostream object in the AllocatedVideoStreams list.
             videoStreamArgs.videoStreamID = videoStreamID;
             AddVideoStream(videoStreamArgs);
+        }
+        else
+        {
+            VideoStreamStruct & vStreamToUpdate = *it;
+            // Reusing the existing stream. Update range parameters
+            UpdateVideoStreamRangeParams(vStreamToUpdate, videoStreamArgs);
         }
 
         response.videoStreamID = videoStreamID;
@@ -1850,6 +1872,11 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
+    VerifyOrReturn(commandData.channelCount >= 1 && commandData.channelCount <= kMaxChannelCount, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid channel count", mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
     VerifyOrReturn(commandData.sampleRate > 0, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid sampleRate", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -1862,11 +1889,6 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
 
     VerifyOrReturn(IsBitDepthValid(commandData.bitDepth), {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitDepth", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
-
-    VerifyOrReturn(commandData.channelCount >= 1 && commandData.channelCount <= kMaxChannelCount, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid channel count", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
@@ -1998,15 +2020,21 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 
     // Check if the streamID matches an existing one in the
     // mAllocatedSnapshotStreams.
-    bool streamExists = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
-                                     [&snapshotStreamID](const SnapshotStreamStruct & entry) {
-                                         return entry.snapshotStreamID == snapshotStreamID;
-                                     }) != mAllocatedSnapshotStreams.end();
-    if (!streamExists)
+    auto it = std::find_if(
+        mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+        [snapshotStreamID](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamID; });
+
+    if (it == mAllocatedSnapshotStreams.end())
     {
         // Add the allocated snapshotstream object in the AllocatedSnapshotStreams list.
         snapshotStreamArgs.snapshotStreamID = snapshotStreamID;
         AddSnapshotStream(snapshotStreamArgs);
+    }
+    else
+    {
+        SnapshotStreamStruct & sStreamToUpdate = *it;
+        // Reusing the existing stream. Update range parameters
+        UpdateSnapshotStreamRangeParams(sStreamToUpdate, snapshotStreamArgs);
     }
 
     response.snapshotStreamID = snapshotStreamID;

@@ -507,19 +507,18 @@ public:
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
-    CHIP_ERROR UpdateVideoStream(uint16_t videoStreamId, const VideoStreamStruct & videoStream);
+    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream);
 
     CHIP_ERROR RemoveVideoStream(uint16_t videoStreamId);
 
     CHIP_ERROR AddAudioStream(const AudioStreamStruct & audioStream);
 
-    CHIP_ERROR UpdateAudioStream(uint16_t audioStreamId, const AudioStreamStruct & audioStream);
-
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
 
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
-    CHIP_ERROR UpdateSnapshotStream(uint16_t snapshotStreamId, const SnapshotStreamStruct & snapshotStream);
+    CHIP_ERROR UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
+                                               const SnapshotStreamStruct & snapshotStream);
 
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
 

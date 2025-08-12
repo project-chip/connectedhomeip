@@ -55,8 +55,8 @@ struct VideoStream
                 videoStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 videoStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
                 videoStreamParams.maxResolution.height >= inputParams.maxResolution.height &&
-                videoStreamParams.minBitRate <= inputParams.minBitRate &&
-                videoStreamParams.maxBitRate >= inputParams.maxBitRate);
+                videoStreamParams.minBitRate <= inputParams.minBitRate && videoStreamParams.maxBitRate >= inputParams.maxBitRate &&
+                videoStreamParams.keyFrameInterval == inputParams.keyFrameInterval);
     }
 };
 
@@ -71,7 +71,7 @@ struct AudioStream
     {
         return (audioStreamParams.audioCodec == inputParams.audioCodec &&
                 audioStreamParams.channelCount == inputParams.channelCount &&
-                audioStreamParams.sampleRate == inputParams.sampleRate);
+                audioStreamParams.sampleRate == inputParams.sampleRate && audioStreamParams.bitDepth == inputParams.bitDepth);
     }
 };
 
@@ -89,8 +89,7 @@ struct SnapshotStream
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 snapshotStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
-                snapshotStreamParams.maxResolution.height >= inputParams.maxResolution.height &&
-                snapshotStreamParams.quality == inputParams.quality);
+                snapshotStreamParams.maxResolution.height >= inputParams.maxResolution.height);
     }
 };
 
