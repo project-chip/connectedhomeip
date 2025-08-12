@@ -61,20 +61,17 @@ private:
 
 } // namespace
 
-void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider * attrProvider)
+void TimeFormatLocalizationLogic::Startup(AttributePersistenceProvider & attrProvider)
 {
-    VerifyOrReturn(attrProvider != nullptr);
-
     InitializeCalendarType(attrProvider);
     InitializeHourFormat(attrProvider);
 }
 
-void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistenceProvider * attrProvider)
+void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistenceProvider & attrProvider)
 {
-    VerifyOrReturn(attrProvider != nullptr);
 
     // Try to read existing calendar type from persistence
-    AttributePersistence attrPersistence{ *attrProvider };
+    AttributePersistence attrPersistence{ attrProvider };
 
     attrPersistence.LoadNativeEndianValue<CalendarTypeEnum>(
         { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType,
@@ -89,10 +86,9 @@ void TimeFormatLocalizationLogic::InitializeCalendarType(AttributePersistencePro
     }
 }
 
-void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvider * attrProvider)
+void TimeFormatLocalizationLogic::InitializeHourFormat(AttributePersistenceProvider & attrProvider)
 {
-    VerifyOrReturn(attrProvider != nullptr);
-    AttributePersistence attrPersistence{ *attrProvider };
+    AttributePersistence attrPersistence{ attrProvider };
 
     attrPersistence.LoadNativeEndianValue<HourFormatEnum>(
         { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
@@ -155,11 +151,10 @@ TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveC
 }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                          AttributePersistenceProvider * attrProvider,
+                                                                          AttributePersistenceProvider & attrProvider,
                                                                           AttributeValueDecoder & decoder)
 {
-    VerifyOrReturnValue(attrProvider != nullptr, Protocols::InteractionModel::Status::Failure);
-    AttributePersistence attrPersistence{ *attrProvider };
+    AttributePersistence attrPersistence{ attrProvider };
 
     switch (request.path.mAttributeId)
     {
@@ -188,8 +183,8 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::WriteAttribute(const 
 
         // Using WriteAttribute directly so we can check that the decoded value is in the supported list
         // before storing it.
-        CHIP_ERROR result = attrProvider->WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id },
-                                                     { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
+        CHIP_ERROR result = attrProvider.WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, ActiveCalendarType::Id },
+                                                    { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
 
         return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
                                        : Protocols::InteractionModel::Status::WriteIgnored;
