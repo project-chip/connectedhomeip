@@ -61,6 +61,8 @@
 #define CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES 1
 
 // Override the CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
+// 256000 bytes was chosen as the large buffer size to accommodate high-resolution image data
+// and large camera frames in camera applications, ensuring sufficient space for typical use cases.
 #define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (256000)
 
 #endif /* CHIPPROJECTCONFIG_H */
