@@ -79,7 +79,7 @@ and uploaded media content.
 $ curl --cacert ~/.pavstest/certs/server/root.pem -XPOST https://localhost:1234/certs/dev/keypair
 ```
 
-This asks the server to create a new identity (a public certificate and a
+This requests the server to create a new identity (a public certificate and a
 private key) for a device.
 
 `--cacert`: This trusts the server's self-signed root certificate, which is
