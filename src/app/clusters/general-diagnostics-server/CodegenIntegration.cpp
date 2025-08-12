@@ -84,15 +84,6 @@ public:
 
 void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet = //
-        GeneralDiagnosticsCluster::OptionalAttributeSet()
-            .Set<TotalOperationalHours::Id>() //
-            .Set<BootReason::Id>()            //
-            .Set<ActiveHardwareFaults::Id>()  //
-            .Set<ActiveRadioFaults::Id>()     //
-            .Set<ActiveNetworkFaults::Id>()   //
-        ;
-
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -103,7 +94,7 @@ void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = kRootEndpointId,
             .fetchFeatureMap                 = false,
-            .optionalAttributesToFetch       = optionalAttributeSet.Raw(),
+            .optionalAttributesToFetch       = GeneralDiagnosticsCluster::OptionalAttributeSet::All(),
         },
         integrationDelegate);
 }

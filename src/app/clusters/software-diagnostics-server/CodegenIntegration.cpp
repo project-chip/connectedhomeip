@@ -56,13 +56,6 @@ public:
 
 void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
-    const SoftwareDiagnosticsLogic::OptionalAttributeSet optionalAttributes =
-        SoftwareDiagnosticsLogic::OptionalAttributeSet()
-                       .Set<ThreadMetrics::Id>()
-                       .Set<CurrentHeapFree::Id>()
-                       .Set<CurrentHeapUsed::Id>()
-                       .Set<CurrentHeapHighWatermark::Id>();
-
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -73,7 +66,7 @@ void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = kRootEndpointId,
             .fetchFeatureMap                 = false,
-            .optionalAttributesToFetch       = optionalAttributes.Raw(),
+            .optionalAttributesToFetch       = SoftwareDiagnosticsLogic::OptionalAttributeSet::All(),
         },
         integrationDelegate);
 }

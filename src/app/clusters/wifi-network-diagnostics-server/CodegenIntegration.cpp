@@ -67,9 +67,6 @@ public:
 // This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
 void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
-    const WiFiDiagnosticsServerLogic::OptionalAttributeSet optionalAttributeSet =
-        WiFiDiagnosticsServerLogic::OptionalAttributeSet().Set<CurrentMaxRate::Id>();
-
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
@@ -79,7 +76,7 @@ void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointI
             .fixedClusterServerEndpointCount = kWiFiNetworkDiagnosticsFixedClusterCount,
             .maxEndpointCount                = kWiFiNetworkDiagnosticsMaxClusterCount,
             .fetchFeatureMap                 = true,
-            .optionalAttributesToFetch       = optionalAttributeSet.Raw(),
+            .optionalAttributesToFetch       = WiFiDiagnosticsServerLogic::OptionalAttributeSet::All(),
         },
         integrationDelegate);
 }

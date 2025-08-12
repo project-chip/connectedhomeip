@@ -39,6 +39,18 @@ struct IsOneOf<T>
     static constexpr bool value = false;
 };
 
+template<AttributeId first, AttributeId... rest>
+constexpr uint32_t AllBits() {
+    const uint32_t bit = 1u << first;
+    if constexpr (sizeof...(rest) == 0) {
+        return bit;
+    } else {
+        return bit | AllBits<rest...>();
+    }
+}
+
+
+
 } // namespace Internal
 
 /// It is very common that a class has optional attributes. Such optional attributes
@@ -84,11 +96,6 @@ public:
         static_assert(id < 32, "Attribute ID must be settable");
         return Set(id, true);
     }
-
-    /// Access the raw value of attribute bits.
-    ///
-    /// Prefer use IsSet or similar for individual bit access.
-    uint32_t Raw() const { return mSetBits; }
 
 protected:
     constexpr AttributeSet & Set(AttributeId id, bool value = true)
@@ -157,6 +164,8 @@ public:
         (void) AttributeSet::Set(ATTRIBUTE_ID, value);
         return *this;
     }
+
+    static constexpr uint32_t All() { return Internal::AllBits<OptionalAttributeIds...>(); }
 };
 
 } // namespace app
