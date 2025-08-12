@@ -2942,13 +2942,24 @@ TEST_F(TestChipCryptoPAL, TestVIDPID_x509Extraction)
         // VID and PID not present cases:
         { sTestCert_PAA_NoVID_Cert, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
         { kOpCertNoVID, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
+        { ByteSpan(), false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_ERROR_INVALID_ARGUMENT },
+
     };
 
     for (const auto & testCase : kTestCases)
     {
         AttestationCertVidPid vidpid;
         CHIP_ERROR result = ExtractVIDPIDFromX509Cert(testCase.cert, vidpid);
-        EXPECT_EQ(result, testCase.expectedResult);
+        if (testCase.cert.empty())
+        {
+            // mbedTLS implementations will return CHIP_ERROR_INTERNAL for empty certs. It's impractical to modify all
+            // implementations to return CHIP_ERROR_INVALID_ARGUMENT, so we allow either to pass for this case.
+            EXPECT_TRUE(result == CHIP_ERROR_INVALID_ARGUMENT || result == CHIP_ERROR_INTERNAL);
+        }
+        else
+        {
+            EXPECT_EQ(result, testCase.expectedResult);
+        }
         ASSERT_EQ(vidpid.mVendorId.HasValue(), testCase.expectedVidPresent);
         ASSERT_EQ(vidpid.mProductId.HasValue(), testCase.expectedPidPresent);
 
