@@ -151,7 +151,7 @@ sudo rm -rf /tmp/chip_*
 ```
 
 ```
-./out/linux-x64-camera/chip-camera-app --camera-deferred-offer
+./out/linux-x64-camera/chip-camera-app
 ```
 
 Terminal 2: Launch and Use the Camera Controller (Client)
