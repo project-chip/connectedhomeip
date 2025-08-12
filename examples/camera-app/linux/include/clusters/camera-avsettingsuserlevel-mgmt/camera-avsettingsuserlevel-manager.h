@@ -45,8 +45,7 @@ public:
     /**
      * delegate command handlers
      */
-    Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                        Optional<uint8_t> aZoom) override;
+    void MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) override;
     Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
                                                          Optional<uint8_t> aZoom) override;
     Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
@@ -61,6 +60,10 @@ public:
 
     void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
 
+    // To be invoked by the Camera App once a physical PTZ action has been completed.  This is expected to be a discrete period of
+    // time after a request s made for PTZ via the HAL.  This results on the request command receiving an appropriate status response.
+    void OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status);
+
     /**
      * DPTZ Stream Indication
      */
@@ -70,6 +73,7 @@ public:
 
 private:
     CameraDeviceInterface * mCameraDeviceHAL = nullptr;
+    PhysicalPTZCallback * mCallback;
 };
 
 } // namespace CameraAvSettingsUserLevelManagement

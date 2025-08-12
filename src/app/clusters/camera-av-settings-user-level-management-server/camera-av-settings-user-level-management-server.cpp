@@ -631,6 +631,17 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
 void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 {
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: InvokeCommand", mEndpointId);
+
+    // Only execute a command if the camera is not engaged in physical movement
+    //
+    if (IsProcessingAsyncCommand())
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Busy);
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: can not execute command as camera is busy with a physical movement", mEndpointId);
+        return;
+
+    }                   
+
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::MPTZSetPosition::Id:
@@ -742,7 +753,7 @@ void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handler
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext & ctx,
                                                                 const Commands::MPTZSetPosition::DecodableType & commandData)
 {
-    Status status           = Status::Success;
+    //Status status           = Status::Success;
     bool hasAtLeastOneValue = false;
 
     Optional<int16_t> pan  = commandData.pan;
@@ -826,10 +837,17 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
         return;
     }
 
-    // Call the delegate to set the new values
+    // We don't send the response until the delegate confirms via callback that the physical device movement is complete
     //
-    status = mDelegate.MPTZSetPosition(pan, tilt, zoom);
+    ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
+    mAsyncCommandHandler = CommandHandler::Handle(&ctx.mCommandHandler);
+    mTargetPan           = pan;
+    mTargetTilt          = tilt;
+    mTargetZoom          = zoom;
 
+    mDelegate.MPTZSetPosition(pan, tilt, zoom, this);
+    return;
+    /**
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -842,6 +860,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
     SetZoom(zoom);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    **/
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext & ctx,
@@ -1291,6 +1310,19 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+// Physical device movement callback
+//
+void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status status)
+{
+    SetPan(mTargetPan);
+    SetTilt(mTargetTilt);
+    SetZoom(mTargetZoom);
+
+   auto commandHandleRef = std::move(mAsyncCommandHandler);
+   auto commandHandle = commandHandleRef.Get();
+   commandHandle->AddStatus(mRequestPath, status);
 }
 
 } // namespace CameraAvSettingsUserLevelManagement

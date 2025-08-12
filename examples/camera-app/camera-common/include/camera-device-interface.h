@@ -333,6 +333,8 @@ public:
         virtual CameraError SetPan(int16_t aPan)   = 0;
         virtual CameraError SetTilt(int16_t aTilt) = 0;
         virtual CameraError SetZoom(uint8_t aZoom) = 0;
+        virtual CameraError SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt, chip::Optional<uint8_t> aZoom) = 0;
+
 
         // Get device defined limits for Pan, Tilt, and Zoom
         virtual int16_t GetPanMin()  = 0;

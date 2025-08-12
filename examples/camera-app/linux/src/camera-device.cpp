@@ -1157,6 +1157,27 @@ CameraError CameraDevice::SetZoom(uint8_t aZoom)
     return CameraError::SUCCESS;
 }
 
+// Set the PTZ values as received
+CameraError CameraDevice::SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt, chip::Optional<uint8_t> aZoom) 
+{
+    if (aPan.HasValue())
+    {
+        SetPan(aPan.Value());
+    }
+
+    if (aTilt.HasValue())
+    {
+        SetTilt(aTilt.Value());
+    }
+
+    if (aZoom.HasValue())
+    {
+        SetZoom(aZoom.Value());
+    }
+
+    return CameraError::SUCCESS;
+}
+
 void CameraDevice::InitializeVideoStreams()
 {
     // Create single video stream with typical supported parameters
