@@ -83,13 +83,14 @@ public:
 
 void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet = //
         GeneralDiagnosticsCluster::OptionalAttributeSet()
-            .Set<TotalOperationalHours::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, TotalOperationalHours::Id))
-            .Set<BootReason::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, BootReason::Id))
-            .Set<ActiveHardwareFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveHardwareFaults::Id))
-            .Set<ActiveRadioFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveRadioFaults::Id))
-            .Set<ActiveNetworkFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveNetworkFaults::Id));
+            .Set<TotalOperationalHours::Id>() //
+            .Set<BootReason::Id>()            //
+            .Set<ActiveHardwareFaults::Id>()  //
+            .Set<ActiveRadioFaults::Id>()     //
+            .Set<ActiveNetworkFaults::Id>()   //
+        ;
 
     IntegrationDelegate integrationDelegate;
 
