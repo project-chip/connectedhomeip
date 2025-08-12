@@ -31,6 +31,7 @@
 import logging
 
 from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.clusters import Attribute
 from matter.interaction_model import Status
