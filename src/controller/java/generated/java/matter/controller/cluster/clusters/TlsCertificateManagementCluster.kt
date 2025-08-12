@@ -52,7 +52,7 @@ class TlsCertificateManagementCluster(
 
   class LookupRootCertificateResponse(val caid: UShort)
 
-  class TLSClientCSRResponse(val ccdid: UShort, val csr: ByteArray, val nonce: ByteArray)
+  class TLSClientCSRResponse(val ccdid: UShort, val csr: ByteArray, val nonceSignature: ByteArray)
 
   class FindClientCertificateResponse(
     val certificateDetails: List<TlsCertificateManagementClusterTLSClientCertificateDetailStruct>
@@ -323,8 +323,8 @@ class TlsCertificateManagementCluster(
     val TAG_CSR: Int = 1
     var csr_decoded: ByteArray? = null
 
-    val TAG_NONCE: Int = 2
-    var nonce_decoded: ByteArray? = null
+    val TAG_NONCE_SIGNATURE: Int = 2
+    var nonceSignature_decoded: ByteArray? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
@@ -337,8 +337,8 @@ class TlsCertificateManagementCluster(
         csr_decoded = tlvReader.getByteArray(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_NONCE)) {
-        nonce_decoded = tlvReader.getByteArray(tag)
+      if (tag == ContextSpecificTag(TAG_NONCE_SIGNATURE)) {
+        nonceSignature_decoded = tlvReader.getByteArray(tag)
       } else {
         tlvReader.skipElement()
       }
@@ -352,18 +352,19 @@ class TlsCertificateManagementCluster(
       throw IllegalStateException("csr not found in TLV")
     }
 
-    if (nonce_decoded == null) {
-      throw IllegalStateException("nonce not found in TLV")
+    if (nonceSignature_decoded == null) {
+      throw IllegalStateException("nonceSignature not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return TLSClientCSRResponse(ccdid_decoded, csr_decoded, nonce_decoded)
+    return TLSClientCSRResponse(ccdid_decoded, csr_decoded, nonceSignature_decoded)
   }
 
   suspend fun provisionClientCertificate(
     ccdid: UShort,
-    clientCertificateDetails: TlsCertificateManagementClusterTLSClientCertificateDetailStruct,
+    clientCertificate: ByteArray,
+    intermediateCertificates: List<ByteArray>,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 9u
@@ -374,11 +375,15 @@ class TlsCertificateManagementCluster(
     val TAG_CCDID_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_CCDID_REQ), ccdid)
 
-    val TAG_CLIENT_CERTIFICATE_DETAILS_REQ: Int = 1
-    clientCertificateDetails.toTlv(
-      ContextSpecificTag(TAG_CLIENT_CERTIFICATE_DETAILS_REQ),
-      tlvWriter,
-    )
+    val TAG_CLIENT_CERTIFICATE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE_REQ), clientCertificate)
+
+    val TAG_INTERMEDIATE_CERTIFICATES_REQ: Int = 2
+    tlvWriter.startArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES_REQ))
+    for (item in intermediateCertificates.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
+    }
+    tlvWriter.endArray()
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

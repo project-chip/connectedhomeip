@@ -17106,10 +17106,11 @@ class TlsCertificateManagementProvisionClientCertificate : public ClusterCommand
 public:
     TlsCertificateManagementProvisionClientCertificate(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("provision-client-certificate", credsIssuerConfig),
-        mComplex_ClientCertificateDetails(&mRequest.clientCertificateDetails)
+        mComplex_IntermediateCertificates(&mRequest.intermediateCertificates)
     {
         AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
-        AddArgument("ClientCertificateDetails", &mComplex_ClientCertificateDetails);
+        AddArgument("ClientCertificate", &mRequest.clientCertificate);
+        AddArgument("IntermediateCertificates", &mComplex_IntermediateCertificates);
         ClusterCommand::AddArguments();
     }
 
@@ -17138,8 +17139,7 @@ public:
 
 private:
     chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type>
-        mComplex_ClientCertificateDetails;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_IntermediateCertificates;
 };
 
 /*

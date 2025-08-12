@@ -20353,15 +20353,15 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer ccdid, byte[] csr, byte[] nonce) {
+    public void onSuccess(Integer ccdid, byte[] csr, byte[] nonceSignature) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo ccdidResponseValue = new CommandResponseInfo("ccdid", "Integer");
       responseValues.put(ccdidResponseValue, ccdid);
       CommandResponseInfo csrResponseValue = new CommandResponseInfo("csr", "byte[]");
       responseValues.put(csrResponseValue, csr);
-      CommandResponseInfo nonceResponseValue = new CommandResponseInfo("nonce", "byte[]");
-      responseValues.put(nonceResponseValue, nonce);
+      CommandResponseInfo nonceSignatureResponseValue = new CommandResponseInfo("nonceSignature", "byte[]");
+      responseValues.put(nonceSignatureResponseValue, nonceSignature);
       callback.onSuccess(responseValues);
     }
 
@@ -31340,14 +31340,21 @@ public class ClusterInfoMapping {
     CommandParameterInfo tlsCertificateManagementprovisionClientCertificateccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
     tlsCertificateManagementprovisionClientCertificateCommandParams.put("ccdid",tlsCertificateManagementprovisionClientCertificateccdidCommandParameterInfo);
 
+    CommandParameterInfo tlsCertificateManagementprovisionClientCertificateclientCertificateCommandParameterInfo = new CommandParameterInfo("clientCertificate", byte[].class, byte[].class);
+    tlsCertificateManagementprovisionClientCertificateCommandParams.put("clientCertificate",tlsCertificateManagementprovisionClientCertificateclientCertificateCommandParameterInfo);
+
+    CommandParameterInfo tlsCertificateManagementprovisionClientCertificateintermediateCertificatesCommandParameterInfo = new CommandParameterInfo("intermediateCertificates", ArrayList.class, ArrayList.class);
+    tlsCertificateManagementprovisionClientCertificateCommandParams.put("intermediateCertificates",tlsCertificateManagementprovisionClientCertificateintermediateCertificatesCommandParameterInfo);
     InteractionInfo tlsCertificateManagementprovisionClientCertificateInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.TlsCertificateManagementCluster) cluster)
         .provisionClientCertificate((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("ccdid")
-        , (ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct)
-        commandArguments.get("clientCertificateDetails")
+        , (byte[])
+        commandArguments.get("clientCertificate")
+        , (ArrayList<byte[]>)
+        commandArguments.get("intermediateCertificates")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

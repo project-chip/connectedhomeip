@@ -19948,7 +19948,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvisionClientCertificateCommandField {Ccdid(0),ClientCertificateDetails(1),;
+                }public enum ProvisionClientCertificateCommandField {Ccdid(0),ClientCertificate(1),IntermediateCertificates(2),;
                     private final int id;
                     ProvisionClientCertificateCommandField(int id) {
                         this.id = id;

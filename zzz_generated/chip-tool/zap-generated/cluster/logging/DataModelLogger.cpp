@@ -12020,7 +12020,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("ccdid", indent + 1, value.ccdid));
     ReturnErrorOnFailure(DataModelLogger::LogValue("csr", indent + 1, value.csr));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("nonce", indent + 1, value.nonce));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("nonceSignature", indent + 1, value.nonceSignature));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }

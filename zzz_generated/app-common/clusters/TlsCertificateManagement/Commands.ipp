@@ -266,7 +266,7 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
     encoder.Encode(to_underlying(Fields::kCsr), csr);
-    encoder.Encode(to_underlying(Fields::kNonce), nonce);
+    encoder.Encode(to_underlying(Fields::kNonceSignature), nonceSignature);
     return encoder.Finalize();
 }
 
@@ -288,9 +288,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, csr);
         }
-        else if (__context_tag == to_underlying(Fields::kNonce))
+        else if (__context_tag == to_underlying(Fields::kNonceSignature))
         {
-            err = DataModel::Decode(reader, nonce);
+            err = DataModel::Decode(reader, nonceSignature);
         }
 
         ReturnErrorOnFailure(err);
@@ -303,7 +303,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
-    encoder.EncodeRequestCommandFabricScopedStructField(to_underlying(Fields::kClientCertificateDetails), clientCertificateDetails);
+    encoder.Encode(to_underlying(Fields::kClientCertificate), clientCertificate);
+    encoder.Encode(to_underlying(Fields::kIntermediateCertificates), intermediateCertificates);
     return encoder.Finalize();
 }
 
@@ -321,13 +322,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, ccdid);
         }
-        else if (__context_tag == to_underlying(Fields::kClientCertificateDetails))
+        else if (__context_tag == to_underlying(Fields::kClientCertificate))
         {
-            err = DataModel::Decode(reader, clientCertificateDetails);
-            if (err == CHIP_NO_ERROR)
-            {
-                clientCertificateDetails.SetFabricIndex(aAccessingFabricIndex);
-            }
+            err = DataModel::Decode(reader, clientCertificate);
+        }
+        else if (__context_tag == to_underlying(Fields::kIntermediateCertificates))
+        {
+            err = DataModel::Decode(reader, intermediateCertificates);
         }
 
         ReturnErrorOnFailure(err);

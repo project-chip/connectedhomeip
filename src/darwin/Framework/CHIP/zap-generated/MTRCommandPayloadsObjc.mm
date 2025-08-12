@@ -41361,7 +41361,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _csr = [NSData data];
 
-        _nonce = [NSData data];
+        _nonceSignature = [NSData data];
     }
     return self;
 }
@@ -41372,14 +41372,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.ccdid = self.ccdid;
     other.csr = self.csr;
-    other.nonce = self.nonce;
+    other.nonceSignature = self.nonceSignature;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; csr:%@; nonce:%@; >", NSStringFromClass([self class]), _ccdid, [_csr base64EncodedStringWithOptions:0], [_nonce base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; csr:%@; nonceSignature:%@; >", NSStringFromClass([self class]), _ccdid, [_csr base64EncodedStringWithOptions:0], [_nonceSignature base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -41436,7 +41436,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.csr = AsData(decodableStruct.csr);
     }
     {
-        self.nonce = AsData(decodableStruct.nonce);
+        self.nonceSignature = AsData(decodableStruct.nonceSignature);
     }
     return CHIP_NO_ERROR;
 }
@@ -41450,7 +41450,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ccdid = @(0);
 
-        _clientCertificateDetails = [MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct new];
+        _clientCertificate = [NSData data];
+
+        _intermediateCertificates = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -41462,7 +41464,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRTLSCertificateManagementClusterProvisionClientCertificateParams alloc] init];
 
     other.ccdid = self.ccdid;
-    other.clientCertificateDetails = self.clientCertificateDetails;
+    other.clientCertificate = self.clientCertificate;
+    other.intermediateCertificates = self.intermediateCertificates;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -41471,7 +41474,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; clientCertificateDetails:%@; >", NSStringFromClass([self class]), _ccdid, _clientCertificateDetails];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; clientCertificate:%@; intermediateCertificates:%@; >", NSStringFromClass([self class]), _ccdid, [_clientCertificate base64EncodedStringWithOptions:0], _intermediateCertificates];
     return descriptionString;
 }
 
@@ -41487,38 +41490,32 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.ccdid = self.ccdid.unsignedShortValue;
     }
     {
-        encodableStruct.clientCertificateDetails.ccdid = self.clientCertificateDetails.ccdid.unsignedShortValue;
-        if (self.clientCertificateDetails.clientCertificate != nil) {
-            auto & definedValue_1 = encodableStruct.clientCertificateDetails.clientCertificate.Emplace();
-            definedValue_1 = AsByteSpan(self.clientCertificateDetails.clientCertificate);
-        }
-        if (self.clientCertificateDetails.intermediateCertificates != nil) {
-            auto & definedValue_1 = encodableStruct.clientCertificateDetails.intermediateCertificates.Emplace();
-            {
-                using ListType_2 = std::remove_reference_t<decltype(definedValue_1)>;
-                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                if (self.clientCertificateDetails.intermediateCertificates.count != 0) {
-                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.clientCertificateDetails.intermediateCertificates.count);
-                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+        encodableStruct.clientCertificate = AsByteSpan(self.clientCertificate);
+    }
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.intermediateCertificates)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.intermediateCertificates.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.intermediateCertificates.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.intermediateCertificates.count; ++i_0) {
+                    auto element_0 = MTR_SAFE_CAST(self.intermediateCertificates[i_0], NSData);
+                    if (!element_0) {
+                        // Wrong kind of value.
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.intermediateCertificates[i_0], NSStringFromClass(NSData.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    listFreer.add(listHolder_2);
-                    for (size_t i_2 = 0; i_2 < self.clientCertificateDetails.intermediateCertificates.count; ++i_2) {
-                        auto element_2 = MTR_SAFE_CAST(self.clientCertificateDetails.intermediateCertificates[i_2], NSData);
-                        if (!element_2) {
-                            // Wrong kind of value.
-                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.clientCertificateDetails.intermediateCertificates[i_2], NSStringFromClass(NSData.class));
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listHolder_2->mList[i_2] = AsByteSpan(element_2);
-                    }
-                    definedValue_1 = ListType_2(listHolder_2->mList, self.clientCertificateDetails.intermediateCertificates.count);
-                } else {
-                    definedValue_1 = ListType_2();
+                    listHolder_0->mList[i_0] = AsByteSpan(element_0);
                 }
+                encodableStruct.intermediateCertificates = ListType_0(listHolder_0->mList, self.intermediateCertificates.count);
+            } else {
+                encodableStruct.intermediateCertificates = ListType_0();
             }
         }
-        encodableStruct.clientCertificateDetails.fabricIndex = self.clientCertificateDetails.fabricIndex.unsignedCharValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
