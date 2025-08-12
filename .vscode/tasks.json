@@ -300,40 +300,6 @@
         },
         {
             "type": "pickString",
-            "id": "openiotsdkNetworkSetupCmd",
-            "description": "Which command do you wish to use?",
-            "options": ["up", "down", "restart"],
-            "default": "up"
-        },
-        {
-            "type": "promptString",
-            "id": "openiotsdkNetworkSetupName",
-            "description": "Type the network namespace name that you want to use.",
-            "default": "ARM"
-        },
-        {
-            "type": "pickString",
-            "id": "openiotsdkDebugMode",
-            "description": "Do you want to use debug mode?",
-            "options": ["false", "true"],
-            "default": "false"
-        },
-        {
-            "type": "pickString",
-            "id": "openiotsdkLwipDebug",
-            "description": "Do you want to use LwIP debug logs?",
-            "options": ["false", "true"],
-            "default": "false"
-        },
-        {
-            "type": "pickString",
-            "id": "openiotsdkCryptoBackend",
-            "description": "Which Crypto algorithm do you wish to use?",
-            "options": ["mbedtls", "psa"],
-            "default": "mbedtls"
-        },
-        {
-            "type": "pickString",
             "id": "imxExampleTarget",
             "description": "What example application type do you want to build?",
             "options": [
@@ -431,8 +397,6 @@
                 "nrf-nrf5340dk-pump",
                 "nrf-nrf5340dk-pump-controller",
                 "nrf-nrf5340dk-shell",
-                "openiotsdk-lock",
-                "openiotsdk-shell",
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-air-quality-sensor",
                 "telink-tlsr9518adk80d-all-clusters",
