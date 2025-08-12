@@ -90,6 +90,10 @@ CHIP_ERROR AlarmHelpHandler(int argc, char ** argv)
 
 CHIP_ERROR EventRefrigeratorAlarmCommandHandler(int argc, char ** argv)
 {
+    if (argc != 0)
+    {
+        return AlarmHelpHandler(argc, argv);
+    }
     sShellRefrigeratorEventAlarmDoorSubCommands.ExecCommand(argc, argv);
     return CHIP_NO_ERROR;
 }
