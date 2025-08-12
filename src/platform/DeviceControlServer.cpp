@@ -47,7 +47,7 @@ CHIP_ERROR DeviceControlServer::PostCommissioningCompleteEvent(NodeId peerNodeId
 
 CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err;
 
     err = ConfigurationMgr().StoreRegulatoryLocation(location);
     SuccessOrExit(err);
@@ -58,7 +58,7 @@ CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const Char
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "SetRegulatoryConfig failed with error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "SetRegulatoryConfig failed with error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;

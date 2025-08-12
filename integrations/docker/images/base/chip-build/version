@@ -1,1 +1,1 @@
-152 : [nrfconnect] Fix nRF Connect and VSCode docker images
+158 : [Android] Fix android NDK path in vscode image

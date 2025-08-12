@@ -51,7 +51,7 @@ overrides:
   ############################################################
   #  Approved by matter-sdk-maintainers
   ############################################################
-  - if: "'sdk-maintainers-approved' in labels and len(groups.approved.include('sdk-maintainers')) >= 1"
+  - if: "'sdk-maintainer-approved' in labels and len(groups.approved.include('sdk-maintainers')) >= 1"
     status: success
     explanation: "Approved by SDK maintainer and label is set."
 
