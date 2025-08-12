@@ -93,11 +93,9 @@ namespace OTAProvider {
 
 void SetDelegate(EndpointId endpointId, OTAProviderDelegate * delegate)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
+    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, OtaSoftwareUpdateProvider::Id,
+                                                               static_cast<uint16_t>(kOtaProviderFixedClusterCount));
+    VerifyOrReturn(arrayIndex < kOtaProviderMaxClusterCount);
     gServers[arrayIndex].Cluster().SetDelegate(delegate);
 }
 
