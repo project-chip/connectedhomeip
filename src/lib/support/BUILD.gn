@@ -183,6 +183,7 @@ static_library("support") {
   output_name = "libSupportLayer"
 
   sources = [
+    "AutoRelease.h",
     "Base64.cpp",
     "Base64.h",
     "BitFlags.h",
@@ -229,6 +230,8 @@ static_library("support") {
     "PoolWrapper.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
+    "ReadOnlyBuffer.cpp",
+    "ReadOnlyBuffer.h",
     "ReferenceCountedHandle.h",
     "SafePointerCast.h",
     "SafeString.h",
@@ -237,6 +240,7 @@ static_library("support") {
     "SetupDiscriminator.h",
     "SortUtils.h",
     "SpanSearchValue.h",
+    "SplitLambda.h",
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",

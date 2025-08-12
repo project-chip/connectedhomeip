@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023, 2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -69,15 +69,21 @@ public:
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastTxCount) override;
-
-    uint32_t mBeaconRxCount          = 0;
-    uint32_t mBeaconLostCount        = 0;
-    uint32_t mPacketMulticastRxCount = 0;
-    uint32_t mPacketMulticastTxCount = 0;
-    uint32_t mPacketUnicastTxCount   = 0;
-    uint32_t mPacketUnicastRxCount   = 0;
-    uint64_t mOverrunCount           = 0;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
+#if CONFIG_CHIP_ETHERNET
+    /**
+     * Ethernet network diagnostics methods
+     */
+    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate) override;
+    CHIP_ERROR GetEthFullDuplex(bool & fullDuplex) override;
+    CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset) override;
+    CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount) override;
+    CHIP_ERROR GetEthPacketTxCount(uint64_t & packetTxCount) override;
+    CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount) override;
+    CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount) override;
+    CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR ResetEthNetworkDiagnosticsCounts() override;
+#endif
 };
 
 /**

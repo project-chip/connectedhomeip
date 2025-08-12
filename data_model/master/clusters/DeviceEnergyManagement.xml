@@ -494,7 +494,9 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="ESAType" type="ESATypeEnum">
-      <enum default="Other"/>
+      <default>
+        <enum default="Other"/>
+      </default>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>

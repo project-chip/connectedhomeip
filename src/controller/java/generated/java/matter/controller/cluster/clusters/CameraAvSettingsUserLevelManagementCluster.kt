@@ -70,14 +70,17 @@ class CameraAvSettingsUserLevelManagementCluster(
     object SubscriptionEstablished : MPTZPresetsAttributeSubscriptionState()
   }
 
-  class DPTZRelativeMoveAttribute(val value: List<UShort>?)
+  class DPTZStreamsAttribute(
+    val value: List<CameraAvSettingsUserLevelManagementClusterDPTZStruct>?
+  )
 
-  sealed class DPTZRelativeMoveAttributeSubscriptionState {
-    data class Success(val value: List<UShort>?) : DPTZRelativeMoveAttributeSubscriptionState()
+  sealed class DPTZStreamsAttributeSubscriptionState {
+    data class Success(val value: List<CameraAvSettingsUserLevelManagementClusterDPTZStruct>?) :
+      DPTZStreamsAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : DPTZRelativeMoveAttributeSubscriptionState()
+    data class Error(val exception: Exception) : DPTZStreamsAttributeSubscriptionState()
 
-    object SubscriptionEstablished : DPTZRelativeMoveAttributeSubscriptionState()
+    object SubscriptionEstablished : DPTZStreamsAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -98,16 +101,6 @@ class CameraAvSettingsUserLevelManagementCluster(
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -609,7 +602,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     }
   }
 
-  suspend fun readDPTZRelativeMoveAttribute(): DPTZRelativeMoveAttribute {
+  suspend fun readDPTZStreamsAttribute(): DPTZStreamsAttribute {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -631,16 +624,18 @@ class CameraAvSettingsUserLevelManagementCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Dptzrelativemove attribute not found in response" }
+    requireNotNull(attributeData) { "Dptzstreams attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UShort>? =
+    val decodedValue: List<CameraAvSettingsUserLevelManagementClusterDPTZStruct>? =
       if (tlvReader.isNextTag(AnonymousTag)) {
-        buildList<UShort> {
+        buildList<CameraAvSettingsUserLevelManagementClusterDPTZStruct> {
           tlvReader.enterArray(AnonymousTag)
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUShort(AnonymousTag))
+            add(
+              CameraAvSettingsUserLevelManagementClusterDPTZStruct.fromTlv(AnonymousTag, tlvReader)
+            )
           }
           tlvReader.exitContainer()
         }
@@ -648,13 +643,13 @@ class CameraAvSettingsUserLevelManagementCluster(
         null
       }
 
-    return DPTZRelativeMoveAttribute(decodedValue)
+    return DPTZStreamsAttribute(decodedValue)
   }
 
-  suspend fun subscribeDPTZRelativeMoveAttribute(
+  suspend fun subscribeDPTZStreamsAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<DPTZRelativeMoveAttributeSubscriptionState> {
+  ): Flow<DPTZStreamsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
       listOf(
@@ -673,7 +668,7 @@ class CameraAvSettingsUserLevelManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            DPTZRelativeMoveAttributeSubscriptionState.Error(
+            DPTZStreamsAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -686,18 +681,21 @@ class CameraAvSettingsUserLevelManagementCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) {
-            "Dptzrelativemove attribute not found in Node State update"
-          }
+          requireNotNull(attributeData) { "Dptzstreams attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UShort>? =
+          val decodedValue: List<CameraAvSettingsUserLevelManagementClusterDPTZStruct>? =
             if (tlvReader.isNextTag(AnonymousTag)) {
-              buildList<UShort> {
+              buildList<CameraAvSettingsUserLevelManagementClusterDPTZStruct> {
                 tlvReader.enterArray(AnonymousTag)
                 while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUShort(AnonymousTag))
+                  add(
+                    CameraAvSettingsUserLevelManagementClusterDPTZStruct.fromTlv(
+                      AnonymousTag,
+                      tlvReader,
+                    )
+                  )
                 }
                 tlvReader.exitContainer()
               }
@@ -705,10 +703,10 @@ class CameraAvSettingsUserLevelManagementCluster(
               null
             }
 
-          decodedValue?.let { emit(DPTZRelativeMoveAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(DPTZStreamsAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(DPTZRelativeMoveAttributeSubscriptionState.SubscriptionEstablished)
+          emit(DPTZStreamsAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -1358,101 +1356,6 @@ class CameraAvSettingsUserLevelManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

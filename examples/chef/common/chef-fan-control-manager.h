@@ -19,4 +19,9 @@
 
 #ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
 void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
+
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+void HandleOnOffAttributeChangeForFan(EndpointId endpointId, bool value);
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+
 #endif

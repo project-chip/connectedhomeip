@@ -805,7 +805,7 @@ constexpr EntryData entryData1[] = {
     },
 };
 
-constexpr size_t entryData1Count = ArraySize(entryData1);
+constexpr size_t entryData1Count = MATTER_ARRAY_SIZE(entryData1);
 static_assert(entryData1Count == (kNumFabric1EntriesInEntryData1 + kNumFabric2EntriesInEntryData1),
               "Must maintain both fabric counts for some tests");
 
@@ -1772,22 +1772,22 @@ TEST_F(TestAccessControl, TestCreateReadEntry)
 TEST_F(TestAccessControl, TestDeleteEntry)
 {
     EntryData data[entryData1Count];
-    for (size_t pos = 0; pos < ArraySize(data); ++pos)
+    for (size_t pos = 0; pos < MATTER_ARRAY_SIZE(data); ++pos)
     {
-        for (size_t count = ArraySize(data) - pos; count > 0; --count)
+        for (size_t count = MATTER_ARRAY_SIZE(data) - pos; count > 0; --count)
         {
             memcpy(data, entryData1, sizeof(data));
             EXPECT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
-            EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
+            EXPECT_EQ(LoadAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data)), CHIP_NO_ERROR);
 
-            memmove(&data[pos], &data[pos + count], (ArraySize(data) - count - pos) * sizeof(data[0]));
+            memmove(&data[pos], &data[pos + count], (MATTER_ARRAY_SIZE(data) - count - pos) * sizeof(data[0]));
 
             for (size_t i = 0; i < count; ++i)
             {
                 EXPECT_EQ(accessControl.DeleteEntry(pos), CHIP_NO_ERROR);
             }
 
-            EXPECT_EQ(CompareAccessControl(accessControl, data, ArraySize(data) - count), CHIP_NO_ERROR);
+            EXPECT_EQ(CompareAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data) - count), CHIP_NO_ERROR);
         }
     }
 
@@ -1795,7 +1795,7 @@ TEST_F(TestAccessControl, TestDeleteEntry)
     {
         memcpy(data, entryData1, sizeof(data));
         EXPECT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
-        EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
+        EXPECT_EQ(LoadAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data)), CHIP_NO_ERROR);
 
         // After deleting Fabric index 1, we should have the number of entries of Fabric index 2
         EXPECT_EQ(accessControl.DeleteAllEntriesForFabric(1), CHIP_NO_ERROR);
@@ -1854,8 +1854,8 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
         constexpr size_t indexes[] = { 0, 1, 2, 3, 4, 5 };
         for (auto & index : indexes)
         {
-            constexpr size_t illegalIndex                          = entryData1Count;
-            constexpr size_t expectedIndexes[][ArraySize(indexes)] = {
+            constexpr size_t illegalIndex                                  = entryData1Count;
+            constexpr size_t expectedIndexes[][MATTER_ARRAY_SIZE(indexes)] = {
                 { 0, 1, 3, 6, illegalIndex, illegalIndex },
                 { 2, 4, 5, 7, 8, illegalIndex },
                 { illegalIndex, illegalIndex, illegalIndex, illegalIndex, illegalIndex, illegalIndex },
@@ -1909,7 +1909,7 @@ TEST_F(TestAccessControl, TestIterator)
         EXPECT_EQ(CompareEntry(entry, entryData1[fabric1[count]]), CHIP_NO_ERROR);
         count++;
     }
-    EXPECT_EQ(count, ArraySize(fabric1));
+    EXPECT_EQ(count, MATTER_ARRAY_SIZE(fabric1));
 
     fabricIndex = 2;
     EXPECT_EQ(accessControl.Entries(iterator, &fabricIndex), CHIP_NO_ERROR);
@@ -1920,7 +1920,7 @@ TEST_F(TestAccessControl, TestIterator)
         EXPECT_EQ(CompareEntry(entry, entryData1[fabric2[count]]), CHIP_NO_ERROR);
         count++;
     }
-    EXPECT_EQ(count, ArraySize(fabric2));
+    EXPECT_EQ(count, MATTER_ARRAY_SIZE(fabric2));
 }
 
 TEST_F(TestAccessControl, TestPrepareEntry)
@@ -1984,17 +1984,17 @@ TEST_F(TestAccessControl, TestPrepareEntry)
                 EXPECT_EQ(entry.GetSubjectCount(subjectCount), CHIP_NO_ERROR);
                 EXPECT_EQ(entry.GetTargetCount(targetCount), CHIP_NO_ERROR);
 
-                EXPECT_EQ(subjectCount, ArraySize(subjects[0]));
-                EXPECT_EQ(targetCount, ArraySize(targets));
+                EXPECT_EQ(subjectCount, MATTER_ARRAY_SIZE(subjects[0]));
+                EXPECT_EQ(targetCount, MATTER_ARRAY_SIZE(targets));
 
-                for (size_t i = 0; i < ArraySize(subjects[subjectIndex]); ++i)
+                for (size_t i = 0; i < MATTER_ARRAY_SIZE(subjects[subjectIndex]); ++i)
                 {
                     NodeId n;
                     EXPECT_EQ(entry.GetSubject(i, n), CHIP_NO_ERROR);
                     EXPECT_EQ(n, subjects[subjectIndex][i]);
                 }
 
-                for (size_t i = 0; i < ArraySize(targets); ++i)
+                for (size_t i = 0; i < MATTER_ARRAY_SIZE(targets); ++i)
                 {
                     Target t;
                     EXPECT_EQ(entry.GetTarget(i, t), CHIP_NO_ERROR);
@@ -2170,17 +2170,17 @@ TEST_F(TestAccessControl, TestUpdateEntry)
 {
     EntryData data[entryData1Count];
     memcpy(data, entryData1, sizeof(data));
-    EXPECT_EQ(LoadAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
+    EXPECT_EQ(LoadAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data)), CHIP_NO_ERROR);
 
-    for (size_t i = 0; i < ArraySize(data); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(data); ++i)
     {
         EntryData updateData;
-        updateData.authMode    = authModes[i % ArraySize(authModes)];
-        updateData.fabricIndex = fabricIndexes[i % ArraySize(fabricIndexes)];
-        updateData.privilege   = privileges[i % (ArraySize(privileges) - 1)];
+        updateData.authMode    = authModes[i % MATTER_ARRAY_SIZE(authModes)];
+        updateData.fabricIndex = fabricIndexes[i % MATTER_ARRAY_SIZE(fabricIndexes)];
+        updateData.privilege   = privileges[i % (MATTER_ARRAY_SIZE(privileges) - 1)];
 
-        updateData.AddSubject(nullptr, subjects[i % ArraySize(authModes)][i % ArraySize(subjects[0])]);
-        updateData.AddTarget(nullptr, targets[i % ArraySize(targets)]);
+        updateData.AddSubject(nullptr, subjects[i % MATTER_ARRAY_SIZE(authModes)][i % MATTER_ARRAY_SIZE(subjects[0])]);
+        updateData.AddTarget(nullptr, targets[i % MATTER_ARRAY_SIZE(targets)]);
 
         data[i] = updateData;
 
@@ -2191,8 +2191,147 @@ TEST_F(TestAccessControl, TestUpdateEntry)
             EXPECT_EQ(accessControl.UpdateEntry(i, entry), CHIP_NO_ERROR);
         }
 
-        EXPECT_EQ(CompareAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
+        EXPECT_EQ(CompareAccessControl(accessControl, data, MATTER_ARRAY_SIZE(data)), CHIP_NO_ERROR);
     }
+}
+
+TEST_F(TestAccessControl, TestCreateUpdateDeleteWithListener)
+{
+    //------------------------------------------------------------------
+    // Fresh state + listener registration
+    //------------------------------------------------------------------
+    ASSERT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR);
+
+    struct CountingListener : public AccessControl::EntryListener
+    {
+        void OnEntryChanged(const SubjectDescriptor *, FabricIndex, size_t, const Entry *, ChangeType type) override
+        {
+            switch (type)
+            {
+            case ChangeType::kAdded:
+                adds++;
+                break;
+            case ChangeType::kUpdated:
+                updates++;
+                break;
+            case ChangeType::kRemoved:
+                removes++;
+                break;
+            }
+        }
+        int adds    = 0;
+        int updates = 0;
+        int removes = 0;
+    } listener;
+
+    accessControl.AddEntryListener(listener);
+
+    //------------------------------------------------------------------
+    // Build a valid entry
+    //------------------------------------------------------------------
+    Entry entry;
+    ASSERT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetPrivilege(Privilege::kOperate), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.AddSubject(nullptr, kOperationalNodeId0), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.AddTarget(nullptr, Target{ Target::kCluster, kOnOffCluster, 0, 0 }), CHIP_NO_ERROR);
+
+    SubjectDescriptor sd{ .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId0 };
+
+    //------------------------------------------------------------------
+    // CreateEntry (subject‑aware overload)
+    //------------------------------------------------------------------
+    size_t idx = ~0u;
+    ASSERT_EQ(accessControl.CreateEntry(&sd, /*fabric=*/1, &idx, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(idx, 0u);
+    EXPECT_EQ(listener.adds, 1);
+    EXPECT_EQ(listener.updates, 0);
+    EXPECT_EQ(listener.removes, 0);
+
+    //------------------------------------------------------------------
+    // UpdateEntry
+    //------------------------------------------------------------------
+    ASSERT_EQ(entry.SetPrivilege(Privilege::kManage), CHIP_NO_ERROR);
+    ASSERT_EQ(accessControl.UpdateEntry(&sd, /*fabric=*/1, idx, entry), CHIP_NO_ERROR);
+    EXPECT_EQ(listener.adds, 1);
+    EXPECT_EQ(listener.updates, 1);
+    EXPECT_EQ(listener.removes, 0);
+
+    //------------------------------------------------------------------
+    // DeleteEntry  (listener still registered)
+    //------------------------------------------------------------------
+    ASSERT_EQ(accessControl.DeleteEntry(&sd, /*fabric=*/1, idx), CHIP_NO_ERROR);
+    EXPECT_EQ(listener.adds, 1);
+    EXPECT_EQ(listener.updates, 1);
+    EXPECT_EQ(listener.removes, 1);
+
+    //------------------------------------------------------------------
+    // Listener removal — no more callbacks expected
+    //------------------------------------------------------------------
+    accessControl.RemoveEntryListener(listener);
+    ASSERT_EQ(accessControl.PrepareEntry(entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetPrivilege(Privilege::kView), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.AddSubject(nullptr, kOperationalNodeId1), CHIP_NO_ERROR);
+    ASSERT_EQ(accessControl.CreateEntry(&sd, 1, nullptr, entry), CHIP_NO_ERROR);
+
+    EXPECT_EQ(listener.adds, 1);
+    EXPECT_EQ(listener.updates, 1);
+    EXPECT_EQ(listener.removes, 1);
+
+    //------------------------------------------------------------------
+    // Sanity‑check helper: IsAccessRestrictionListSupported()
+    //------------------------------------------------------------------
+    EXPECT_FALSE(accessControl.IsAccessRestrictionListSupported());
+}
+
+TEST_F(TestAccessControl, TestBaseDelegateDefaultMethods)
+{
+    AccessControl::Delegate d;
+
+    // Capabilities
+    size_t v = 999;
+    EXPECT_EQ(d.GetMaxEntriesPerFabric(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+    v = 999;
+    EXPECT_EQ(d.GetMaxSubjectsPerEntry(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+    v = 999;
+    EXPECT_EQ(d.GetMaxTargetsPerEntry(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+    v = 999;
+    EXPECT_EQ(d.GetMaxEntryCount(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+
+    // Actualities
+    FabricIndex fabric = 1;
+    EXPECT_EQ(d.GetEntryCount(fabric, v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+    v = 999;
+    EXPECT_EQ(d.GetEntryCount(v), CHIP_NO_ERROR);
+    EXPECT_EQ(v, 0u);
+
+    // Preparation
+    Entry e;
+    EXPECT_EQ(d.PrepareEntry(e), CHIP_NO_ERROR);
+
+    // CRUD (defaults just return CHIP_NO_ERROR)
+    size_t idx = 123;
+    EXPECT_EQ(d.CreateEntry(&idx, e, &fabric), CHIP_NO_ERROR);
+    EXPECT_EQ(d.ReadEntry(0, e, &fabric), CHIP_NO_ERROR);
+    EXPECT_EQ(d.UpdateEntry(0, e, &fabric), CHIP_NO_ERROR);
+    EXPECT_EQ(d.DeleteEntry(0, &fabric), CHIP_NO_ERROR);
+
+    // Iteration
+    EntryIterator it;
+    EXPECT_EQ(d.Entries(it, &fabric), CHIP_NO_ERROR);
+
+    // Check (default returns ACCESS_DENIED)
+    SubjectDescriptor sd{};
+    RequestPath rp{ .cluster = 1, .endpoint = 1 };
+    EXPECT_EQ(d.Check(sd, rp, Privilege::kView), CHIP_ERROR_ACCESS_DENIED);
 }
 
 } // namespace Access

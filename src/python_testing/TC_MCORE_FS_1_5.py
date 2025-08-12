@@ -66,14 +66,15 @@ import struct
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.commissioning import SetupParameters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
@@ -157,6 +158,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_5(self) -> list[TestStep]:
         return [
+            TestStep(0, "Commission DUT if not done", is_commissioning=True),
             TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
             TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
             TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
@@ -177,6 +179,9 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_5(self):
+
+        # Commissioning - done
+        self.step(0)
 
         min_report_interval_sec = 0
         max_report_interval_sec = 30

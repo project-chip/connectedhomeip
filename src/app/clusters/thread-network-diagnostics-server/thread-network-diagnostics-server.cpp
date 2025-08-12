@@ -45,18 +45,18 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-class ThreadDiagosticsAttrAccess : public AttributeAccessInterface
+class ThreadDiagnosticsAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
-    ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
+    ThreadDiagnosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-ThreadDiagosticsAttrAccess gAttrAccess;
+ThreadDiagnosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ThreadDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != ThreadNetworkDiagnostics::Id)
     {
@@ -129,6 +129,8 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::Delay::Id:
     case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
+    case ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
+    case ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
         return WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
     default:
         break;
@@ -206,4 +208,10 @@ void MatterThreadNetworkDiagnosticsPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(&gDiagnosticDelegate);
+}
+
+void MatterThreadNetworkDiagnosticsPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(nullptr);
 }

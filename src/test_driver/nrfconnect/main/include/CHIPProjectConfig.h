@@ -33,7 +33,4 @@
 // Enable unit-test only features
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 
-// Increase max. lambda event size
-#define CHIP_CONFIG_LAMBDA_EVENT_SIZE 32
-
 #endif // CHIP_PROJECT_CONFIG_H

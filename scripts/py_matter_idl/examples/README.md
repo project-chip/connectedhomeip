@@ -16,7 +16,7 @@ scripts/py_matter_idl/examples/matter_idl_plugin:
    `--generator custom:<plugin_path>:<plugin_module_name>` argument and package
    name like `--option package:com.example.matter.proto`
 
-```
+```shell
 # From top-of-tree in this example
 ./scripts/codegen.py \
   --generator custom:./scripts/py_matter_idl/examples:matter_idl_plugin \

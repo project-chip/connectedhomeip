@@ -141,7 +141,6 @@ silabs_executable("dishwasher_app") {
   }
 
   sources = [
-    "${example_enegy_management_dir}/energy-management-common/common/src/EnergyTimeUtils.cpp",
     "${example_enegy_management_dir}/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${example_enegy_management_dir}/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${example_enegy_management_dir}/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",

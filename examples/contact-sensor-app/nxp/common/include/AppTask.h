@@ -34,6 +34,7 @@ public:
 
     // AppTaskFreeRTOS virtual methods
     void PreInitMatterStack() override;
+    void PostInitMatterStack() override;
 
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();

@@ -24,6 +24,7 @@
 #include "AppTask.h"
 #include "hdc2010.h"
 #include "platform/CHIPDeviceLayer.h"
+#include <app-common/zap-generated/cluster-objects.h>
 
 /**********************************************************
  * Defines and Constants

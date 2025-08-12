@@ -61,11 +61,12 @@ import random
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
@@ -126,13 +127,14 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
-                 TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
-                 TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
-                 TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
-                 TestStep("3b", "TH_FSA sends CommissionNode"),
-                 TestStep("3c", "DUT_FSA commissions TH_FSA")]
-        return steps
+        return [
+            TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
+            TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
+            TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
+            TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
+            TestStep("3b", "TH_FSA sends CommissionNode"),
+            TestStep("3c", "DUT_FSA commissions TH_FSA"),
+        ]
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.

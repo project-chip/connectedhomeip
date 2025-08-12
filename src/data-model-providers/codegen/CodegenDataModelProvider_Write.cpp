@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
@@ -35,7 +36,6 @@
 #include <app/util/ember-strings.h>
 #include <app/util/odd-sized-integers.h>
 #include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 
@@ -51,12 +51,11 @@ using Protocols::InteractionModel::Status;
 class ContextAttributesChangeListener : public AttributesChangedListener
 {
 public:
-    ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
-    {}
-    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(path); }
+    ContextAttributesChangeListener(DataModel::ProviderChangeListener & listener) : mListener(listener) {}
+    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
 
 private:
-    DataModel::ProviderChangeListener * mListener;
+    DataModel::ProviderChangeListener & mListener;
 };
 
 /// Attempts to write via an attribute access interface (AAI)
@@ -92,37 +91,21 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
 DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                        AttributeValueDecoder & decoder)
 {
-    auto metadata = Ember::FindAttributeMetadata(request.path);
-
-    // Explicit failure in finding a suitable metadata
-    if (const Status * status = std::get_if<Status>(&metadata))
+    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
-        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
-                    (*status == Status::UnsupportedCluster) ||  //
-                    (*status == Status::UnsupportedAttribute));
-
-        // Check if this is an attribute that ember does not know about but is valid after all and
-        // adjust the return code. All these global attributes are `read only` hence the return
-        // of unsupported write.
-        //
-        // If the cluster or endpoint does not exist, though, keep that return code.
-        if ((*status == Protocols::InteractionModel::Status::UnsupportedAttribute) &&
-            IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId))
-        {
-            return Status::UnsupportedWrite;
-        }
-
-        return *status;
+        return cluster->WriteAttribute(request, decoder);
     }
 
-    const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
-    VerifyOrDie(*attributeMetadata != nullptr);
+    // we must be started up to accept writes (we make use of the context below)
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
 
-    // Extra check: internal requests can bypass the read only check, however global attributes
-    // have no underlying storage, so write still cannot be done
-    //
-    // I.e. if we get a `EmberAfCluster*` value from finding metadata, we fail here.
-    VerifyOrReturnError(attributeMetadata != nullptr, Status::UnsupportedWrite);
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
+
+    // WriteAttribute requirement is that request.path is a VALID path inside the provider
+    // metadata tree. Clients are supposed to validate this (and data version and other flags)
+    // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
 
     if (request.path.mDataVersion.HasValue())
     {
@@ -143,7 +126,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         }
     }
 
-    ContextAttributesChangeListener change_listener(CurrentContext());
+    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
 
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
@@ -161,19 +144,19 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     MutableByteSpan dataBuffer = gEmberAttributeIOBufferSpan;
     {
-        Ember::EmberAttributeDataBuffer emberData(*attributeMetadata, dataBuffer);
+        Ember::EmberAttributeDataBuffer emberData(attributeMetadata, dataBuffer);
         ReturnErrorOnFailure(decoder.Decode(emberData));
     }
 
     Protocols::InteractionModel::Status status;
 
-    if (dataBuffer.size() > (*attributeMetadata)->size)
+    if (dataBuffer.size() > attributeMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
         return Status::InvalidValue;
     }
 
-    EmberAfWriteDataInput dataInput(dataBuffer.data(), (*attributeMetadata)->attributeType);
+    EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
 
     dataInput.SetChangeListener(&change_listener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
@@ -198,9 +181,40 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     return CHIP_NO_ERROR;
 }
 
+void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & aPath,
+                                                              DataModel::ListWriteOperation opType)
+{
+    if (auto * cluster = mRegistry.Get(aPath); cluster != nullptr)
+    {
+        cluster->ListAttributeWriteNotification(aPath, opType);
+        return;
+    }
+
+    AttributeAccessInterface * aai = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
+
+    if (aai != nullptr)
+    {
+        switch (opType)
+        {
+        case DataModel::ListWriteOperation::kListWriteBegin:
+            aai->OnListWriteBegin(aPath);
+            break;
+        case DataModel::ListWriteOperation::kListWriteFailure:
+            aai->OnListWriteEnd(aPath, false);
+            break;
+        case DataModel::ListWriteOperation::kListWriteSuccess:
+            aai->OnListWriteEnd(aPath, true);
+            break;
+        }
+    }
+}
+
 void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
-    ContextAttributesChangeListener change_listener(CurrentContext());
+    // we must be started up to process changes since we use the context
+    VerifyOrReturn(mContext.has_value());
+
+    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
     if (path.mClusterId != kInvalidClusterId)
     {
         emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &change_listener);

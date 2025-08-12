@@ -15,7 +15,7 @@
  */
 #include <app/data-model-provider/MetadataLookup.h>
 
-#include <app/data-model-provider/MetadataList.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace app {

@@ -39,10 +39,11 @@
 import asyncio
 from typing import List
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 kCCAttributeValueIDs = [0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
 
@@ -52,7 +53,7 @@ class TC_CC_10_1(MatterBaseTest):
     #
     # Class Helper functions
     #
-    def _prepare_cc_extension_field_set(self, attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct]) -> Clusters.ScenesManagement.Structs.ExtensionFieldSet:
+    def _prepare_cc_extension_field_set(self, attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct]) -> Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct:
         efs_attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct] = []
         for attribute_id in kCCAttributeValueIDs:
             # Attempt to find the attribute in the input list
@@ -76,7 +77,7 @@ class TC_CC_10_1(MatterBaseTest):
                     )
                 efs_attribute_value_list.append(empty_attribute_value)
 
-        extension_field_set = Clusters.ScenesManagement.Structs.ExtensionFieldSet(
+        extension_field_set = Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
             clusterID=Clusters.Objects.ColorControl.id,
             attributeValueList=efs_attribute_value_list
         )
@@ -114,23 +115,23 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep("3", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
             TestStep("4", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
             TestStep(
-                "5a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the TransitionTime field set to 0 and the ExtensionFieldSets set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x00 }, { AttributeID: 0x0001, ValueUnsigned8: 0xFE }]}]'"),
+                "5a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x00 }, { AttributeID: 0x0001, ValueUnsigned8: 0xFE }]}]'"),
             TestStep("5b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the _TransitionTime_ omitted."),
             TestStep("5c", "TH reads the _CurrentSaturation attribute_ from DUT."),
             TestStep(
-                "6a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03, the TransitionTime field set to 0 and the ExtensionFieldSets set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x01 }, { AttributeID: 0x0003, ValueUnsigned16: 16334 },{ AttributeID: 0x0004, ValueUnsigned16: 13067 }]}]'"),
+                "6a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x01 }, { AttributeID: 0x0003, ValueUnsigned16: 16334 },{ AttributeID: 0x0004, ValueUnsigned16: 13067 }]}]'"),
             TestStep("6b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03 and the _TransitionTime_ omitted."),
             TestStep("6c", "TH reads _CurrentX and CurrentY attributes_ from DUT."),
             TestStep(
-                "7a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x04, the TransitionTime field set to 0 and the ExtensionFieldSets set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x02 }, { AttributeID: 0x0007, ValueUnsigned16: 175 }]}]'"),
+                "7a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x04, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x02 }, { AttributeID: 0x0007, ValueUnsigned16: 175 }]}]'"),
             TestStep("7b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x04 and the _TransitionTime_ omitted."),
             TestStep("7c", "TH reads _ColorTemperatureMireds attribute_ from DUT."),
             TestStep(
-                "8a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05, the TransitionTime field set to 0 and the ExtensionFieldSets set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x03 }, { AttributeID: 0x4000, ValueUnsigned16: 12000 }, { AttributeID: 0x0001, ValueUnsigned16: 70 }]}]'"),
+                "8a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x03 }, { AttributeID: 0x4000, ValueUnsigned16: 12000 }, { AttributeID: 0x0001, ValueUnsigned16: 70 }]}]'"),
             TestStep("8b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05 and the _TransitionTime_ omitted."),
             TestStep("8c", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
             TestStep(
-                "9a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06, the TransitionTime field set to 0 and the ExtensionFieldSets set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4004, ValueUnsigned16: 5 }]}]'"),
+                "9a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4004, ValueUnsigned16: 5 }]}]'"),
             TestStep("9b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05 and the _TransitionTime_ omitted."),
             TestStep("9c", "TH read _ColorLoopActive attribute_ from DUT."),
             TestStep("9d", "TH read _ColorLoopDirection attribute_ from DUT."),
@@ -289,7 +290,7 @@ class TC_CC_10_1(MatterBaseTest):
         asserts.assert_equal(result.sceneID, 0x01, "View Scene failed on sceneID")
         asserts.assert_equal(result.transitionTime, 0, "View Scene failed on transitionTime")
 
-        for EFS in result.extensionFieldSets:
+        for EFS in result.extensionFieldSetStructs:
             if EFS.clusterID != 0x0300:
                 continue
 

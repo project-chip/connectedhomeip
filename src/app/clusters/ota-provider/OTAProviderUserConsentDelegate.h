@@ -28,7 +28,7 @@ public:
 
     virtual UserConsentState GetUserConsentState(const UserConsentSubject & subject) = 0;
 
-    const char * UserConsentStateToString(UserConsentState state)
+    static const char * UserConsentStateToString(UserConsentState state)
     {
         switch (state)
         {

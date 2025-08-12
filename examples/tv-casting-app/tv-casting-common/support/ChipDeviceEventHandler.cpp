@@ -35,7 +35,19 @@ bool ChipDeviceEventHandler::sUdcInProgress = false;
 
 void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() called");
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() called with event type: %u", event->Type);
+
+    // Make sure we have not disconnected from the TargetCastingPlayer when handling incoming messages.
+    // Sometimes the tv-app will still send messages after we clean up the TargetCastingPlayer.
+    // Exmaple: Call stopConnecting() after immediately after calling continueConnectiong()
+    //
+    // A proper fix would be to either not let user navigate back when running post commission or update commissioner, commissionee
+    // communication protocal to better handle asynchronous disconnects
+    if (CastingPlayer::GetTargetCastingPlayer() == nullptr)
+    {
+        ChipLogError(AppServer, "ChipDeviceEventHandler::Handler() TargetCastingPlayer is null for event: %u", event->Type);
+        return;
+    }
 
     bool runPostCommissioning           = false;
     chip::NodeId targetNodeId           = 0;

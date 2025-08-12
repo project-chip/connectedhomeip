@@ -29,7 +29,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-static constexpr size_t kMaxUserLabelListLength = 10;
+static constexpr size_t kMaxUserLabelListLength = 4;
 static constexpr size_t kMaxLabelNameLength     = 16;
 static constexpr size_t kMaxLabelValueLength    = 16;
 static constexpr size_t kMaxActiveLocaleLength  = 35;

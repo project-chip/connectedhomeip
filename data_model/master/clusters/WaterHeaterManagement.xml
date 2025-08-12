@@ -182,7 +182,9 @@ Davis, CA 95616, USA
       </mandatoryConform>
     </attribute>
     <attribute id="0x0005" name="BoostState" type="BoostStateEnum">
-      <enum default="Inactive"/>
+      <default>
+        <enum default="Inactive"/>
+      </default>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

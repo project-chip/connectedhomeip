@@ -38,12 +38,13 @@ import logging
 import random
 import string
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from drlk_2_x_common import DRLK_COMMON
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 
 logger = logging.getLogger(__name__)
 
@@ -591,8 +592,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             numberofcredentialsupportedperuser = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
                                                                                      cluster=drlkcluster,
                                                                                      attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
-        asserts.assert_in(numberofcredentialsupportedperuser, range(
-            0, 255), "NumberOfCredentialsSupportedPerUser value is out of range")
+            asserts.assert_in(numberofcredentialsupportedperuser, range(
+                0, 255), "NumberOfCredentialsSupportedPerUser value is out of range")
         self.step("15b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
             try:

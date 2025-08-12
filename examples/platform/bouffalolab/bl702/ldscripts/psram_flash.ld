@@ -209,8 +209,6 @@ SECTIONS
     KEEP(*(SORT_BY_NAME("._bt_l2cap_fixed_chan.static.*")))
     _bt_l2cap_fixed_chan_list_end = .;
 
-    . = ALIGN(8);
-    KEEP(*libCHIP.a:*(.bss.*PlatformManagerImp*))
   } >tcm_ocram AT >flash
 
   .boot2 (NOLOAD) :
@@ -236,8 +234,8 @@ SECTIONS
     PROVIDE ( __psram_bss_init_start = . );
     /** put the bss data in psram between __psram_bss_init_start and __psram_bss_init_end will bet reset to 0 after psram init*/
     . = ALIGN(16);
-    KEEP(*libCHIP.a:*(.sbss.*))
-    KEEP(*libCHIP.a:*(.bss.*))
+    KEEP(*libCHIP.a:*(EXCLUDE_FILE(*ThreadStackManagerImpl.cpp.o *PlatformManagerImpl.cpp.o) .bss.*))
+    KEEP(*libCHIP.a:*(EXCLUDE_FILE(*ThreadStackManagerImpl.cpp.o *PlatformManagerImpl.cpp.o) .sbss.*))
 
     . = ALIGN(16);
     KEEP(*libCHIPAppServer.a:*(.sbss.*))

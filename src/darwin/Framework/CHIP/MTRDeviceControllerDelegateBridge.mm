@@ -135,7 +135,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     BOOL wantCommissioneeInfo = [strongDelegate respondsToSelector:@selector(controller:readCommissioneeInfo:)];
     BOOL wantProductIdentity = [strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)];
     if (wantCommissioneeInfo || wantProductIdentity) {
-        auto * commissioneeInfo = [[MTRCommissioneeInfo alloc] initWithCommissioningInfo:info];
+        auto * commissioneeInfo = [[MTRCommissioneeInfo alloc] initWithCommissioningInfo:info commissioningParameters:mCommissioningParameters];
         dispatch_async(mQueue, ^{
             if (wantCommissioneeInfo) { // prefer the newer delegate method over the deprecated one
                 [strongDelegate controller:strongController readCommissioneeInfo:commissioneeInfo];
@@ -144,6 +144,9 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
             }
         });
     }
+
+    // Don't hold on to the commissioning parameters now that we don't need them anymore.
+    mCommissioningParameters = nil;
 }
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
@@ -188,7 +191,34 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     }
 }
 
+void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR error)
+{
+    using namespace chip::Controller;
+
+    MTRDeviceController * strongController = mController;
+
+    MTR_LOG("%@ DeviceControllerDelegate stage %s completed for nodeID 0x%016llx with status %s", strongController, StageToString(stageCompleted), peerId.GetNodeId(), error.AsString());
+
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+
+    if (strongDelegate && mQueue && strongController && error == CHIP_NO_ERROR && (stageCompleted == CommissioningStage::kFailsafeBeforeWiFiEnable || stageCompleted == CommissioningStage::kFailsafeBeforeThreadEnable)) {
+        // We're about to send the ConnectNetwork command.  Let our delegate
+        // know that the other side now has network credentials.
+        NSNumber * nodeID = @(peerId.GetNodeId());
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioneeHasReceivedNetworkCredentials:)]) {
+            dispatch_async(mQueue, ^{
+                [strongDelegate controller:strongController commissioneeHasReceivedNetworkCredentials:nodeID];
+            });
+        }
+    }
+}
+
 void MTRDeviceControllerDelegateBridge::SetDeviceNodeID(chip::NodeId deviceNodeId)
 {
     mDeviceNodeId = deviceNodeId;
+}
+
+void MTRDeviceControllerDelegateBridge::SetCommissioningParameters(MTRCommissioningParameters * commissioningParameters)
+{
+    mCommissioningParameters = commissioningParameters;
 }

@@ -40,8 +40,8 @@ CastingStore * CastingStore::GetInstance()
 
 CHIP_ERROR CastingStore::AddOrUpdate(core::CastingPlayer castingPlayer)
 {
-    ChipLogProgress(AppServer, "CastingStore::AddOrUpdate() called with CastingPlayer deviceName: %s",
-                    castingPlayer.GetDeviceName());
+    ChipLogProgress(AppServer, "CastingStore::AddOrUpdate() called with CastingPlayer deviceName: %s, VendorID: %u, ProductID: %u",
+                    castingPlayer.GetDeviceName(), castingPlayer.GetVendorId(), castingPlayer.GetProductId());
 
     // Read cache of CastingPlayers
     std::vector<core::CastingPlayer> castingPlayers = ReadAll();
@@ -479,7 +479,9 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
 
     for (auto & castingPlayer : castingPlayers)
     {
-        ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer:");
+        // ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer:");
+        ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer deviceName: %s, VendorID: %u, ProductID: %u",
+                        castingPlayer.GetDeviceName(), castingPlayer.GetVendorId(), castingPlayer.GetProductId());
         chip::TLV::TLVType castingPlayerContainerType;
         // CastingPlayer container starts
         ReturnErrorOnFailure(
@@ -512,8 +514,10 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
         std::vector<memory::Strong<core::Endpoint>> endpoints = core::CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
         for (auto & endpoint : endpoints)
         {
-            ChipLogProgress(AppServer, "CastingStore::WriteAll() writing CastingPlayer Endpoint with endpointId: %d",
-                            endpoint->GetId());
+            ChipLogProgress(
+                AppServer,
+                "CastingStore::WriteAll() writing CastingPlayer Endpoint with EndpointID: %d, VendorID: %d, ProductID: %d",
+                endpoint->GetId(), endpoint->GetVendorId(), endpoint->GetProductId());
             chip::TLV::TLVType endpointContainerType;
             // Endpoint container starts
             ReturnErrorOnFailure(

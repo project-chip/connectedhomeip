@@ -100,7 +100,7 @@ struct Timestamp
         kSystem = 0,
         kEpoch
     };
-    Timestamp() {}
+    constexpr Timestamp() = default;
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
     Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
     static Timestamp Epoch(System::Clock::Timestamp aValue)
@@ -127,10 +127,9 @@ struct Timestamp
 class EventOptions
 {
 public:
-    EventOptions() : mPriority(PriorityLevel::Invalid) {}
-    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid) {}
+    EventOptions() = default;
+
     ConcreteEventPath mPath;
-    Timestamp mTimestamp;
     PriorityLevel mPriority = PriorityLevel::Invalid;
     // kUndefinedFabricIndex 0 means not fabric associated at all
     FabricIndex mFabricIndex = kUndefinedFabricIndex;

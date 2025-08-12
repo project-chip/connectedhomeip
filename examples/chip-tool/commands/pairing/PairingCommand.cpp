@@ -69,6 +69,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Unpair(remoteId);
         break;
     case PairingMode::Code:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
+            mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
+#endif
         err = PairWithCode(remoteId);
         break;
     case PairingMode::CodePaseOnly:
@@ -76,6 +80,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
+        break;
+    case PairingMode::Nfc:
+        if (mDiscriminator.has_value())
+        {
+            err = Pair(remoteId, PeerAddress::NFC(mDiscriminator.value()));
+        }
+        else
+        {
+            // Discriminator is mandatory
+            err = CHIP_ERROR_MESSAGE_INCOMPLETE;
+        }
         break;
     case PairingMode::OnNetwork:
         err = PairWithMdns(remoteId);
@@ -85,6 +100,8 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case PairingMode::WiFiPAF:
+        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
+            mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
         err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
 #endif

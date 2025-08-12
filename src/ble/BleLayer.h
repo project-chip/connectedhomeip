@@ -57,6 +57,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/SetupDiscriminator.h>
+#include <lib/support/Span.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -69,6 +70,11 @@
 #include "BleUUID.h"
 
 namespace chip {
+
+namespace Test {
+// Forward declaration of BleLayerTestAccess class tests to allow it to be friends with BleLayer
+class BleLayerTestAccess;
+} // namespace Test
 namespace Ble {
 
 /**
@@ -215,6 +221,7 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
+    friend class Test::BleLayerTestAccess;
 
 public:
     // Public data members:
@@ -223,7 +230,7 @@ public:
         kState_NotInitialized = 0,
         kState_Initialized    = 1,
         kState_Disconnecting  = 2
-    } mState; ///< [READ-ONLY] Current state
+    } mState; ///< [READ-ONLY] external access is deprecated, use IsInitialized() / IsBleClosing()
 
     // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
     void * mAppState                 = nullptr;
@@ -236,9 +243,16 @@ public:
                     chip::System::Layer * systemLayer);
     CHIP_ERROR Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
                     BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
+    bool IsInitialized() { return mState != kState_NotInitialized; }
     void IndicateBleClosing();
+    bool IsBleClosing() { return mState == kState_Disconnecting; }
     void Shutdown();
 
+    /**
+     * CancelBleIncompleteConnection will ensure that no more success/error
+     * callbacks will happen until the next call to one of the NewBleConnection*
+     * APIs.
+     */
     CHIP_ERROR CancelBleIncompleteConnection();
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
@@ -247,6 +261,26 @@ public:
                                         BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                         BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
+
+    /**
+     * Attempt to create a connection for any of the discriminators in the provided list of
+     * discriminators.
+     *
+     * The implementation is allowed to call onSuccess multiple times if multiple connections are
+     * created.
+     *
+     * A call to onError indicates that no more calls to onSuccess will happen.
+     *
+     * Callers are expected to call CancelBleIncompleteConnection once they no longer want results
+     * reported.
+     *
+     * The implementation must not assume that the memory backing the "discriminators" argument will
+     * outlive this call returning.
+     */
+    CHIP_ERROR NewBleConnectionByDiscriminators(const Span<const SetupDiscriminator> & discriminators, void * appState,
+                                                BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onSuccess,
+                                                BleConnectionDelegate::OnConnectionErrorFunct onError);
+
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
     void CloseAllBleConnections();
@@ -327,6 +361,5 @@ private:
     static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnConnectionError(void * appState, CHIP_ERROR err);
 };
-
 } /* namespace Ble */
 } /* namespace chip */

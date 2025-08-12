@@ -70,7 +70,15 @@ struct OperationRequest
 
 enum class ReadFlags : uint32_t
 {
-    kFabricFiltered = 0x0001, // reading is performed fabric-filtered
+    kFabricFiltered     = 0x0001, // reading is performed fabric-filtered
+    kAllowsLargePayload = 0x0002, // reading is performed over a transport supporting large payload
+};
+
+enum class ListWriteOperation : uint8_t
+{
+    kListWriteBegin = 0,
+    kListWriteSuccess,
+    kListWriteFailure
 };
 
 struct ReadAttributeRequest : OperationRequest

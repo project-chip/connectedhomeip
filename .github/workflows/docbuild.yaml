@@ -37,11 +37,11 @@ jobs:
         run: |
           python3 -m venv venv
           venv/bin/pip3 install -r docs/requirements.txt
+      # --- Build HTML ---
       - name: Build documentation
         working-directory: matter/docs
         run: |
           source ../venv/bin/activate
-          mkdir -p _build/src
           make html
           touch _build/html/.nojekyll
       - name: Deploy to gh-pages

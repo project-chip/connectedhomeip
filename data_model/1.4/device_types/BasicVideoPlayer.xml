@@ -87,7 +87,7 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0507" name="Media Input" side="server">
       <mandatoryConform>
-        <attribute name="PhysicalInputs"/>
+        <condition name="PhysicalInputs"/>
       </mandatoryConform>
     </cluster>
     <cluster id="0x0508" name="Low Power" side="server">

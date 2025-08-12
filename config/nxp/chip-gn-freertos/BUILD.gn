@@ -21,7 +21,6 @@ assert(current_os == "freertos")
 
 declare_args() {
   chip_build_example_providers = false
-  chip_enable_ethernet = false
   chip_malloc_sys_heap = false
 }
 
@@ -33,7 +32,7 @@ group("nxp_freertos") {
   }
 
   if (chip_build_example_providers) {
-    deps += [ "${chip_root}/examples/providers:device_info_provider" ]
+    deps += [ "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is" ]
   }
 }
 

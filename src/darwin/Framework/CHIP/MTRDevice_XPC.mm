@@ -85,11 +85,12 @@
 @implementation MTRDevice_XPC
 
 @synthesize _internalState;
+@synthesize queue = _queue;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_XPC *)controller
 {
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
-        // Nothing else to do, all set.
+        _queue = dispatch_queue_create("org.csa-iot.matter.framework.devicexpc.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     }
 
     return self;
@@ -129,7 +130,7 @@
                      wifi,
                      thread,
                      _deviceController.uniqueIdentifier,
-                     (unsigned long) self.state];
+                     (unsigned long) [MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber) unsignedLongValue]];
 }
 
 - (nullable NSNumber *)vendorID
@@ -151,16 +152,28 @@
 
 - (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     [super _delegateAdded:delegate];
     MTR_LOG("%@ delegate added: %@", self, delegate);
-    [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+
+    // dispatch to own queue so we're not holding our lock while calling out to the controller code.
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
 }
 
 - (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     [super _delegateRemoved:delegate];
     MTR_LOG("%@ delegate removed: %@", self, delegate);
-    [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+
+    // dispatch to own queue so we're not holding our lock while calling out to the controller code.
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
@@ -255,6 +268,12 @@
     // Not needed since this is a state update now
 }
 
+- (BOOL)diagnosticLogTransferInProgress
+{
+    NSNumber * diagnosticLogTransferInProgressNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress], NSNumber);
+    return diagnosticLogTransferInProgressNumber.boolValue;
+}
+
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
     MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
@@ -269,19 +288,6 @@
         }
     }];
 }
-
-static const auto * requiredInternalStateKeys = @{
-    kMTRDeviceInternalPropertyDeviceState : NSNumber.class,
-    kMTRDeviceInternalPropertyLastSubscriptionAttemptWait : NSNumber.class,
-};
-
-static const auto * optionalInternalStateKeys = @{
-    kMTRDeviceInternalPropertyKeyVendorID : NSNumber.class,
-    kMTRDeviceInternalPropertyKeyProductID : NSNumber.class,
-    kMTRDeviceInternalPropertyNetworkFeatures : NSNumber.class,
-    kMTRDeviceInternalPropertyMostRecentReportTime : NSDate.class,
-    kMTRDeviceInternalPropertyLastSubscriptionFailureTime : NSDate.class,
-};
 
 - (BOOL)_ensureValidValuesForKeys:(const NSDictionary<NSString *, Class> *)keys inInternalState:(NSMutableDictionary *)internalState valueRequired:(BOOL)required
 {
@@ -330,6 +336,20 @@ static const auto * optionalInternalStateKeys = @{
 
 - (void)_updateInternalState:(NSMutableDictionary *)newState
 {
+    static const auto * requiredInternalStateKeys = @{
+        kMTRDeviceInternalPropertyDeviceState : NSNumber.class,
+        kMTRDeviceInternalPropertyLastSubscriptionAttemptWait : NSNumber.class,
+    };
+
+    static const auto * optionalInternalStateKeys = @{
+        kMTRDeviceInternalPropertyKeyVendorID : NSNumber.class,
+        kMTRDeviceInternalPropertyKeyProductID : NSNumber.class,
+        kMTRDeviceInternalPropertyNetworkFeatures : NSNumber.class,
+        kMTRDeviceInternalPropertyMostRecentReportTime : NSDate.class,
+        kMTRDeviceInternalPropertyLastSubscriptionFailureTime : NSDate.class,
+        kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress : NSNumber.class
+    };
+
     VerifyOrReturn([self _ensureValidValuesForKeys:requiredInternalStateKeys inInternalState:newState valueRequired:YES]);
     VerifyOrReturn([self _ensureValidValuesForKeys:optionalInternalStateKeys inInternalState:newState valueRequired:NO]);
 
@@ -359,8 +379,14 @@ static const auto * optionalInternalStateKeys = @{
 
 - (MTRDeviceState)state
 {
+    // TEMPORARY WORKAROUND for UNTIL WE HAVE the addDelegate flow fixed
+    if (![self delegateExists]) {
+        return MTRDeviceStateReachable;
+    }
+
     NSNumber * stateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
     switch (static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue)) {
+    default:
     case MTRDeviceStateUnknown:
         return MTRDeviceStateUnknown;
 
@@ -539,7 +565,11 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                              return;
                          }
 
-                         completion(responses, nil);
+                         if (error != nil) {
+                             MTR_LOG_ERROR("%@ got error trying to invokeCommands: %@", self, error);
+                         }
+
+                         completion(responses, error);
                      });
                  }];
     } @catch (NSException * exception) {

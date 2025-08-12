@@ -126,11 +126,6 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
 
 ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == Test::kRejectedDataVersion)
-    {
-        return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
-    }
-
     TestOnlyAttributeValueDecoderAccessor decodeAccess(decoder);
 
     decodeAccess.SetTriedDecode(true);
@@ -143,8 +138,9 @@ ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeReq
     return CHIP_NO_ERROR;
 }
 
-std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequest & request,
-                                                                chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<ActionReturnStatus> TestImCustomDataModel::InvokeCommand(const InvokeRequest & request,
+                                                                       chip::TLV::TLVReader & input_arguments,
+                                                                       CommandHandler * handler)
 {
     return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
 }

@@ -51,10 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSMapTable<NSNumber *, MTRDevice *> * nodeIDToDeviceMap;
 @property (readonly, assign) os_unfair_lock_t deviceMapLock;
 
-@property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
-// (moved here so subclasses can initialize differently)
-
-- (instancetype)initForSubclasses:(BOOL)startSuspended;
+- (instancetype)initForSubclasses:(BOOL)startSuspended uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -115,6 +112,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
+
+/**
+ * Called by MTRDevice object when their dealloc is called, so the controller can notify interested delegate that active devices have changed
+ */
+- (void)deviceDeallocated;
 
 @end
 

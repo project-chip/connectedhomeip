@@ -190,6 +190,12 @@ void MatterLaundryWasherControlsPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&laundryWasherControlsServer);
 }
 
+void MatterLaundryWasherControlsPluginServerShutdownCallback()
+{
+    LaundryWasherControlsServer & laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&laundryWasherControlsServer);
+}
+
 Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                                            EmberAfAttributeType attributeType, uint16_t size,
                                                                            uint8_t * value)

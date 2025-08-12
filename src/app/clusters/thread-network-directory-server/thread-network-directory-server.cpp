@@ -180,7 +180,7 @@ void ThreadNetworkDirectoryServer::InvokeCommand(HandlerContext & ctx)
 void ThreadNetworkDirectoryServer::HandleAddNetworkRequest(HandlerContext & ctx,
                                                            const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req)
 {
-    OperationalDataset dataset;
+    OperationalDatasetView dataset;
     ByteSpan extendedPanIdSpan;
     uint64_t activeTimestamp;
     union
@@ -200,7 +200,6 @@ void ThreadNetworkDirectoryServer::HandleAddNetworkRequest(HandlerContext & ctx,
     CHIP_ERROR err;
     auto status          = IMStatus::ConstraintError;
     const char * context = nullptr;
-    // TODO: An immutable OperationalDatasetView on top of a ByteSpan (without copying) would be useful here.
     SuccessOrExitAction(err = dataset.Init(req.operationalDataset), context = "OperationalDataset");
     SuccessOrExitAction(err = dataset.GetExtendedPanIdAsByteSpan(extendedPanIdSpan), context = "ExtendedPanID");
     SuccessOrExitAction(err = dataset.GetActiveTimestamp(activeTimestamp), context = "ActiveTimestamp");
@@ -316,3 +315,4 @@ exit:
 } // namespace chip
 
 void MatterThreadNetworkDirectoryPluginServerInitCallback() {}
+void MatterThreadNetworkDirectoryPluginServerShutdownCallback() {}

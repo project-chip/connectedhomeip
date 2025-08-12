@@ -62,97 +62,81 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial version of the WebRTC Transport Requestor Cluster"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0554" name="WebRTC Transport Requestor"/>
+    <clusterId id="0x0554" name="WebRTC Transport Requestor">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WEBRTCR" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="CurrentSessions" type="list" default="0">
       <entry type="WebRTCSessionStruct"/>
-      <access read="true" readPrivilege="view"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x01" name="Offer" direction="commandToServer" response="Y">
+    <command id="0x00" name="Offer" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="SDP" type="string">
+      <field id="1" name="SDP" type="string">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="3" name="ICEServers" type="list">
+      <field id="2" name="ICEServers" type="list">
         <entry type="ICEServerStruct"/>
         <optionalConform/>
         <constraint>
-          <desc/>
+          <maxCount value="10"/>
         </constraint>
       </field>
-      <field id="4" name="ICETransportPolicy" type="string">
+      <field id="3" name="ICETransportPolicy" type="string">
         <optionalConform/>
         <constraint>
-          <desc/>
+          <maxLength value="16"/>
         </constraint>
       </field>
     </command>
-    <command id="0x02" name="Answer" direction="commandToServer" response="Y">
+    <command id="0x01" name="Answer" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="SDP" type="string">
+      <field id="1" name="SDP" type="string">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
-    <command id="0x03" name="ICECandidates" direction="commandToServer" response="Y">
+    <command id="0x02" name="ICECandidates" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="ICECandidates" type="list">
-        <entry type="string"/>
+      <field id="1" name="ICECandidates" type="list">
+        <entry type="ICECandidateStruct"/>
         <mandatoryConform/>
         <constraint>
           <minCount value="1"/>
         </constraint>
       </field>
     </command>
-    <command id="0x04" name="End" direction="commandToServer" response="Y">
+    <command id="0x03" name="End" direction="commandToServer" response="Y">
       <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="1" name="WebRTCSessionID" type="WebRTCSessionID">
+      <field id="0" name="WebRTCSessionID" type="WebRTCSessionID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
-      <field id="2" name="Reason" type="WebRTCEndReasonEnum" default="UNKNOWN_ERROR">
+      <field id="1" name="Reason" type="WebRTCEndReasonEnum">
+        <default>
+          <enum default="UnknownReason"/>
+        </default>
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
   </commands>
