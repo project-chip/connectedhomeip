@@ -15,12 +15,12 @@
 #    limitations under the License.
 
 
+from matter.testing.timeoperations import utc_time_in_matter_epoch
+from matter.interaction_model import InteractionModelError, Status
+import matter.clusters as Clusters
 import logging
 rom mobly import asserts
 
-import matter.clusters as Clusters
-from matter.interaction_model import InteractionModelError, Status
-from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 logger = logging.getLogger(__name__)
 
