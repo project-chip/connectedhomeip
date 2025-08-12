@@ -55,6 +55,10 @@ public:
 
     bool ValidateUrl(std::string url);
 
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage);
+
+    bool ValidateSegmentDuration(uint16_t segmentDuration);
+
     Protocols::InteractionModel::Status ValidateBandwidthLimit(StreamUsageEnum streamUsage,
                                                                const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
