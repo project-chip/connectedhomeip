@@ -22,6 +22,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+
 class TC_APPLAUNCHER_3_5(MatterBaseTest):
     def desc_TC_APPLAUNCHER_3_5(self) -> str:
         # Description of the test case
@@ -69,7 +70,6 @@ class TC_APPLAUNCHER_3_5(MatterBaseTest):
         # Validate each entry is a valid CSA-issued Vendor ID (uint16)
         for vendor_id in catalog_list:
             asserts.assert_greater(len(catalog_list), 0, "CatalogList attribute is empty or not present")
-
 
         # Entry point for the test runner
 if __name__ == "__main__":
