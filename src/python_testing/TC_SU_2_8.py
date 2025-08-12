@@ -15,21 +15,6 @@
 #    limitations under the License.
 #
 
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     factory-reset: true
-#     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-# === END CI TEST ARGUMENTS ===
 
 import logging
 import time
@@ -59,8 +44,8 @@ class TC_SU_2_8(MatterBaseTest):
     def steps_TC_SU_2_8(self) -> list[TestStep]:
         steps = [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
-            TestStep(1, "DUT sends a QueryImage command to TH1/OTA-P."),
-            TestStep(2, "TH1/OTA-P does not respond with QueryImageResponse."),
+            TestStep(1, "DUT tries to send a QueryImage command to TH1/OTA-P."),
+            TestStep(2, "TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P."),
         ]
         return steps
 
@@ -72,6 +57,10 @@ class TC_SU_2_8(MatterBaseTest):
         return ProviderLoc(providerNodeID=provider_node_id, endpoint=endpoint, fabricIndex=fabric_index)
 
     async def _write_default_providers_both_fabrics(self, controller_th1, controller_th2, endpoint, p1_node_id, p2_node_id):
+        """
+        Write default OTA providers.
+        """
+
         prov_th1 = self._make_provider_location(controller_th1, p1_node_id, endpoint)
         prov_th2 = self._make_provider_location(controller_th2, p2_node_id, endpoint)
 
@@ -89,9 +78,13 @@ class TC_SU_2_8(MatterBaseTest):
         asserts.assert_equal(resp[0].Status, Status.Success, "Write DefaultOTAProviders (TH2) failed.")
         logging.info(f"DefaultOTAProviders (TH2) = [{prov_th2}].")
 
-    async def _announce(self, controller, vendor_id: int, p1_node_id: int, endpoint: int):
+    async def _announce(self, controller, vendor_id: int, node_id: int, endpoint: int):
+        """
+        Announce OTA provider.
+        """
+
         cmd = Clusters.Objects.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=p1_node_id,
+            providerNodeID=node_id,
             vendorID=vendor_id,
             announcementReason=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
             metadataForNode=None,
@@ -286,7 +279,7 @@ class TC_SU_2_8(MatterBaseTest):
 
         await self._write_default_providers_both_fabrics(th1, th2, endpoint, p1_node, p2_node)
 
-        # DUT sends a QueryImage command to TH1/OTA-P.
+        # DUT tries to send a QueryImage command to TH1/OTA-P.
         self.step(1)
 
         # Do not announce TH1-OTA Provider 1
@@ -298,7 +291,7 @@ class TC_SU_2_8(MatterBaseTest):
         # Check state remains as kIdle for TH1
         await self.check_state_remains_idle(endpoint, valid_states[0])
 
-        # TH1/OTA-P does not respond with QueryImageResponse.
+        # TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P.
         self.step(2)
 
         await self._announce(th2, vendor_id, p2_node, endpoint)
