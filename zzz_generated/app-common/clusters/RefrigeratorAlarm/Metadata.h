@@ -20,6 +20,7 @@ namespace RefrigeratorAlarm {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Mask {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Mask::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

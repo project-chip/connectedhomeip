@@ -7012,6 +7012,12 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
+ * @brief Ethernet Network Diagnostics Cluster ResetCounts Command callback (from client)
+ */
+bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
+/**
  * @brief Time Synchronization Cluster SetUTCTime Command callback (from client)
  */
 bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
