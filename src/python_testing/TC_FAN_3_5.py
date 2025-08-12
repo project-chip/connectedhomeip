@@ -417,6 +417,9 @@ class TC_FAN_3_5(MatterBaseTest):
         if step.direction == cluster.Enums.StepDirectionEnum.kDecrease and not step.wrap and not step.lowestOff:
             logging.info(f"[FC] Step command: {step}, percent_setting_expected: {percent_setting_expected}")
 
+        # The minimum PercentSetting increment per step is 1. The loop is written to handle that case, but it
+        # won't necessarily run 100 iterations, only as many can fit within the 0–100 PercentSetting range.
+        # Example: if each step increases PercentSetting by 10, the loop will run 10 iterations.
         for i in range(101):
             # Send the Step command
             await self.send_step_command(step)
@@ -424,6 +427,8 @@ class TC_FAN_3_5(MatterBaseTest):
             # Read the resulting PercentSetting attribute report value from the queue
             percent_setting = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
 
+            # Detect if the step increase resulted in a change in PercentSetting, if so,
+            # add it to the `percent_setting_from_queue` list for subsequent comparisons
             if percent_setting is not None:
                 percent_setting_last = percent_setting
                 self.percent_setting_from_queue.append(percent_setting)
@@ -432,8 +437,8 @@ class TC_FAN_3_5(MatterBaseTest):
 
             logging.info(f"[FC] PercentSetting attribute report value: {percent_setting}")
 
-            # Send extra Step command to verify that the PercentSetting
-            # attribute report value stays at the expected value (no wrap)
+            # Once PercentSetting reaches the expected value, send an extra Step command to verify
+            # that the PercentSetting attribute report value stays at the expected value (no wrap)
             if percent_setting == percent_setting_expected:
                 # Send additional Step command
                 await self.send_step_command(step)
