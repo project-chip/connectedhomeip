@@ -15,7 +15,10 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 source_set("metadata") {
-  sources = [ "MetadataTypes.h" ]
+  sources = [
+    "ClusterMetadataProvider.h",
+    "MetadataTypes.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/access:types",
@@ -39,6 +42,7 @@ source_set("data-model-provider") {
     "ActionContext.h",
     "ActionReturnStatus.cpp",
     "ActionReturnStatus.h",
+    "ClusterMetadataProvider.h",
     "Context.h",
     "EventsGenerator.cpp",
     "EventsGenerator.h",
