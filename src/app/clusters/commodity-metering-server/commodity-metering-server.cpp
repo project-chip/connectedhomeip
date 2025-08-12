@@ -103,7 +103,7 @@ struct SpanCopier
         }
 
         std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
-        destination = DataModel::List<const T>(Span<const T>(buffer, elementsToCopy));
+        destination = DataModel::List<const T>(buffer, elementsToCopy);
         return true;
     }
 };
