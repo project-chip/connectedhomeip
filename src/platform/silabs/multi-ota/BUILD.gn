@@ -68,7 +68,7 @@ source_set("multi-ota-efr32") {
     "${silabs_platform_dir}/platformAbstraction:gsdk",
   ]
   if (chip_enable_multi_ota_encryption) {
-    sources += [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKeyPSA.cpp" ]
+    sources += [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp" ]
   }
 }
 
@@ -84,7 +84,7 @@ source_set("multi-ota-efr32-ncp") {
   ]
 
   if (chip_enable_multi_ota_encryption) {
-    sources += [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKeyPSA.cpp" ]
+    sources += [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp" ]
   }
   public_configs = [ ":multi-ota-siwx-config" ]
 }
@@ -98,7 +98,7 @@ source_set("multi-ota-siwx") {
   ]
   if (chip_enable_multi_ota_encryption) {
     sources +=
-        [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKeyMbed.cpp" ]
+        [ "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp" ]
   }
   public_configs = [ ":multi-ota-siwx-config" ]
 }
