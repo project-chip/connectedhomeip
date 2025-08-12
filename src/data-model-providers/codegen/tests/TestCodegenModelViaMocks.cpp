@@ -30,6 +30,7 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceShim.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
@@ -294,6 +295,62 @@ public:
 
     void SetHandleCommands(bool handle) { mHandleCommand = handle; }
 
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
+        return builder.AppendElements(Span<const AcceptedCommandEntry>(mAccepted.data(), mAccepted.size()));
+    }
+
+    CHIP_ERROR RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder) override
+    {
+        VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
+        return builder.AppendElements(Span<const CommandId>(mGenerated.data(), mGenerated.size()));
+    }
+
+    void SetOverrideAccepted(bool overrideAccepted) { mOverrideAccepted = overrideAccepted; }
+    void SetOverrideGenerated(bool overrideGenerated) { mOverrideGenerated = overrideGenerated; }
+
+    std::vector<DataModel::AcceptedCommandEntry> & AcceptedVec() { return mAccepted; }
+    std::vector<CommandId> & GeneratedVec() { return mGenerated; }
+
+private:
+    bool mOverrideAccepted  = false;
+    bool mOverrideGenerated = false;
+    bool mHandleCommand     = false;
+
+    std::vector<DataModel::AcceptedCommandEntry> mAccepted;
+    std::vector<CommandId> mGenerated;
+};
+
+/// Overrides Enumerate*Commands in the CommandHandlerInterface to allow
+/// testing of behaviors when command enumeration is done in the interace.
+class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTesting::Id>
+{
+public:
+    ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceShim(endpointId, clusterId)
+    {
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+    }
+    ~ShimCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+
+    void InvokeCommand(HandlerContext & handlerContext) override
+    {
+        if (mHandleCommand)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::Success);
+            handlerContext.SetCommandHandled();
+        }
+        else
+        {
+            handlerContext.SetCommandNotHandled();
+        }
+    }
+
+    //
+    void SetHandleCommands(bool handle) { mHandleCommand = handle; }
+
+    //
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
     {
         VerifyOrReturnError(mOverrideAccepted, CHIP_ERROR_NOT_IMPLEMENTED);
@@ -308,6 +365,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    //
     CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
     {
         VerifyOrReturnError(mOverrideGenerated, CHIP_ERROR_NOT_IMPLEMENTED);
@@ -322,8 +380,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void SetOverrideAccepted(bool o) { mOverrideAccepted = o; }
-    void SetOverrideGenerated(bool o) { mOverrideGenerated = o; }
+    void SetOverrideAccepted(bool overrideAccepted) { mOverrideAccepted = overrideAccepted; }
+    void SetOverrideGenerated(bool overrideGenerated) { mOverrideGenerated = overrideGenerated; }
 
     std::vector<CommandId> & AcceptedVec() { return mAccepted; }
     std::vector<CommandId> & GeneratedVec() { return mGenerated; }
@@ -1370,6 +1428,38 @@ TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpoints)
               CHIP_ERROR_NOT_FOUND);
 }
 
+TEST_F(TestCodegenModelViaMocks, AcceptedGeneratedCommandsOnInvalidEndpointsUsingShim)
+{
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // register a CHI on ALL endpoints
+    ShimCommandHandler handler(chip::NullOptional, MockClusterId(1));
+    handler.SetHandleCommands(true);
+
+    ReadOnlyBufferBuilder<CommandId> generatedBuilder;
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
+
+    // valid endpoint will result in valid data (even though list is empty)
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(generatedBuilder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), acceptedBuilder), CHIP_NO_ERROR);
+    ASSERT_TRUE(acceptedBuilder.IsEmpty());
+
+    // Invalid endpoint fails - we will get no commands there (even though CHI is registered)
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), generatedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1)), acceptedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+
+    // same for invalid cluster ID
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(0x1123)), generatedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(0x1123)), acceptedBuilder),
+              CHIP_ERROR_NOT_FOUND);
+}
+
 TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
 {
 
@@ -1399,8 +1489,8 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(acceptedBuilder.IsEmpty());
 
     // set some overrides
-    handler.AcceptedVec().push_back(1234);
-    handler.AcceptedVec().push_back(999);
+    handler.AcceptedVec().push_back({ 1234 });
+    handler.AcceptedVec().push_back({ 999 });
 
     handler.GeneratedVec().push_back(33);
 
@@ -1412,8 +1502,80 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_EQ(acceptedCommands[1].commandId, 999u);
 
     ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), generatedBuilder), CHIP_NO_ERROR);
-    auto generatedCommands                      = generatedBuilder.TakeBuffer();
+    auto generatedCommands = generatedBuilder.TakeBuffer();
+    ASSERT_EQ(generatedCommands.size(), std::size_t{ 1 });
     const CommandId expectedGeneratedCommands[] = { 33 };
+    ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
+}
+
+//////
+TEST_F(TestCodegenModelViaMocks, ShimCommandHandlerInterfaceCommandHandling)
+{
+    // This node configuration needs to partially match a cluster tree, using Clusters::Unittesting as a base
+    // clang-format off
+    using namespace Clusters::UnitTesting;
+    static const MockNodeConfig kNodeConfig({
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        })
+    });
+    // clang-format on
+
+    UseMockNodeConfig config(kNodeConfig);
+
+    CodegenDataModelProviderWithContext model;
+
+    // Command handler interface is capable to override accepted and generated commands.
+    // Validate that these work
+    ShimCommandHandler handler(MakeOptional(kMockEndpoint1), Clusters::UnitTesting::Id);
+
+    ReadOnlyBufferBuilder<CommandId> generatedBuilder;
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedBuilder;
+
+    // At this point, without overrides, there should be no accepted/generated commands
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), generatedBuilder),
+              CHIP_NO_ERROR);
+    ASSERT_TRUE(generatedBuilder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), acceptedBuilder),
+              CHIP_NO_ERROR);
+    ASSERT_TRUE(acceptedBuilder.IsEmpty());
+
+    handler.SetOverrideAccepted(true);
+    handler.SetOverrideGenerated(true);
+
+    // with overrides, the list is still empty ...
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), generatedBuilder),
+              CHIP_NO_ERROR);
+    ASSERT_TRUE(generatedBuilder.IsEmpty());
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), acceptedBuilder),
+              CHIP_NO_ERROR);
+    ASSERT_TRUE(acceptedBuilder.IsEmpty());
+
+    // set some overrides
+    handler.AcceptedVec().push_back(Commands::Test::Id);
+    handler.AcceptedVec().push_back(Commands::TestNotHandled::Id);
+
+    handler.GeneratedVec().push_back(Commands::TestSpecific::Id);
+
+    ASSERT_EQ(model.AcceptedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), acceptedBuilder),
+              CHIP_NO_ERROR);
+    auto acceptedCommands = acceptedBuilder.TakeBuffer();
+
+    ASSERT_EQ(acceptedCommands.size(), 2u);
+    ASSERT_EQ(acceptedCommands[0].commandId, Commands::Test::Id);
+    ASSERT_EQ(acceptedCommands[1].commandId, Commands::TestNotHandled::Id);
+
+    ASSERT_EQ(model.GeneratedCommands(ConcreteClusterPath(kMockEndpoint1, Clusters::UnitTesting::Id), generatedBuilder),
+              CHIP_NO_ERROR);
+    auto generatedCommands = generatedBuilder.TakeBuffer();
+    ASSERT_EQ(generatedCommands.size(), 1u);
+
+    const CommandId expectedGeneratedCommands[] = { Commands::TestSpecific::Id };
     ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
 }
 
