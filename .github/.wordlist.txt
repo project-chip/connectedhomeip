@@ -336,6 +336,7 @@ cstdint
 csu
 csv
 ctl
+CTS
 ctrl
 ctypes
 CurrentHue
@@ -1276,6 +1277,7 @@ rtd
 RTL
 rtld
 RTOS
+RTS
 RTT
 RTX
 runArgs
