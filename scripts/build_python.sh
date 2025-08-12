@@ -238,6 +238,21 @@ source "$CHIP_ROOT/scripts/activate.sh"
 #     10.16    // SYSTEM_VERSION_COMPAT is unset or 1
 export SYSTEM_VERSION_COMPAT=0
 
+# Set default crypto to BoringSSL
+chip_crypto="boringssl"
+
+# Disable WebRTC by default only on Darwin due to libdatachannel limitations
+if [[ "$(uname)" == "Darwin" ]]; then
+    echo "Warning: WebRTC is not supported on Darwin. Disabling WebRTC to avoid build errors."
+    enable_webrtc="false"
+fi
+
+# If WebRTC is enabled, switch chip_crypto to OpenSSL,
+# because WebRTC depends on OpenSSL, which must be installed and available.
+if [[ "$enable_webrtc" == "true" ]]; then
+    chip_crypto="openssl"
+fi
+
 # Generates ninja files
 gn_args=(
     # Make all possible human readable tracing available.
@@ -250,7 +265,7 @@ gn_args=(
     "chip_config_network_layer_ble=$enable_ble"
     "chip_enable_ble=$enable_ble"
     "chip_inet_config_enable_ipv4=$enable_ipv4"
-    "chip_crypto=\"openssl\""
+    "chip_crypto=\"$chip_crypto\""
     "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
     "chip_support_webrtc_python_bindings=$enable_webrtc"
     "chip_device_config_enable_joint_fabric=true"
@@ -275,11 +290,11 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[*]}"
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels
 
-# Add wheels from chip_python_wheel_action templates.
-WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
+# Add wheels from matter_python_wheel_action templates.
+WHEEL=("$OUTPUT_ROOT"/controller/python/matter*.whl)
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing*.whl)
+WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)
 
 if [ "$install_pytest_deps" = "yes" ]; then
     # Add wheels with YAML testing support.

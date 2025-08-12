@@ -35,13 +35,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.tlv import TLVReader
-from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
                                verify_commissioning_successful, verify_success)
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.tlv import TLVReader
+from matter.utils import CommissioningBuildingBlocks
 
 
 def verify_fabric(controller: str) -> str:

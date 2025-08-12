@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace EnergyPreference {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace EnergyBalances {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(EnergyBalances::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -45,6 +47,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentLowPowerModeSen
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           Access::Privilege::kOperate);
 } // namespace CurrentLowPowerModeSensitivity
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 

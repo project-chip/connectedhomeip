@@ -108,7 +108,6 @@ jobs:
                     - "-telink-zephyr_3_3"
                     - "-ti"
                     - "-tizen"
-                    - "-openiotsdk"
         steps:
             - name: Checkout
               uses: actions/checkout@v4

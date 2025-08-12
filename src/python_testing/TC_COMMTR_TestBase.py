@@ -18,8 +18,8 @@
 import logging
 import time
 
-import chip.clusters as Clusters
-from chip.testing import matter_asserts
+import matter.clusters as Clusters
+from matter.testing import matter_asserts
 
 logger = logging.getLogger(__name__)
 

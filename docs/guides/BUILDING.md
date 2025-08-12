@@ -333,6 +333,32 @@ ninja -C out/host src/inet/tests:tests_run
 >
 > This means that the tests passed in a previous build.
 
+## Building a single unit test
+
+To run a unit test, pass the target path to ninja in the form:
+"<platform>/phony/<src_path>/<test_file>.run" OR "<platform>/tests/<test_file>"
+
+-   `<platform>` is the build configuration directory, such as `linux_x64_clang`
+    for a Linux build using Clang. You can find this by looking at the
+    subdirectories in your `out/debug` build output.
+-   `<src_path>` is the relative path from the source root to the test file,
+    excluding the platform and file extension. For example, for a test located
+    at `src/transport/tests/TestSessionManagerDispatch.cpp`, the `src_path`
+    would be `src/transport/tests`.
+-   `<test_file>` is the name of the test source file (without extension), such
+    as `TestSessionManagerDispatch`.
+
+For example:
+
+```
+# Assuming `gn gen out/debug` has been run
+ninja -C out/debug mac_arm64_gcc/tests/TestSessionManagerDispatch
+
+# OR enter build directory:
+cd out/debug
+ninja linux_x64_clang/phony/src/transport/tests/TestSessionManagerDispatch.run
+```
+
 ## Using `build_examples.py`
 
 The script `./scripts/build/build_examples.py` provides a uniform build

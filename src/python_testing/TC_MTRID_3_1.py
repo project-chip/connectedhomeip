@@ -45,12 +45,13 @@ import logging
 import queue
 
 import test_plan_support
-from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters import ClusterObjects, MeterIdentification
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
+
+from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.clusters import ClusterObjects, MeterIdentification
+from matter.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 

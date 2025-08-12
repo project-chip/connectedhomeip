@@ -53,10 +53,10 @@ class ContextAttributesChangeListener : public AttributesChangedListener
 public:
     ContextAttributesChangeListener(const DataModel::InteractionModelContext & context) : mListener(context.dataModelChangeListener)
     {}
-    void MarkDirty(const AttributePathParams & path) override { mListener->MarkDirty(path); }
+    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
 
 private:
-    DataModel::ProviderChangeListener * mListener;
+    DataModel::ProviderChangeListener & mListener;
 };
 
 /// Attempts to read via an attribute access interface (AAI)
@@ -290,11 +290,7 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
 ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     // Context not initialized. Need to call Startup(context) before writing.
-    if (mContext == nullptr || mContext->interactionContext == nullptr ||
-        mContext->interactionContext->dataModelChangeListener == nullptr)
-    {
-        return Status::InvalidInState;
-    }
+    VerifyOrReturnError(mContext != nullptr, Status::InvalidInState);
 
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
@@ -334,7 +330,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         }
     }
 
-    ContextAttributesChangeListener changeListener(*mContext->interactionContext);
+    ContextAttributesChangeListener changeListener(mContext->interactionContext);
 
     AttributeAccessInterface * aai =
         AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId);
@@ -432,54 +428,12 @@ CHIP_ERROR ServerClusterShim::AcceptedCommands(const ConcreteClusterPath & path,
 
     CommandHandlerInterface * interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
+
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateAcceptedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            using EnumerationData = struct
-            {
-                ConcreteCommandPath commandPath;
-                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> * acceptedCommandList;
-                CHIP_ERROR processingError;
-            };
-
-            EnumerationData enumerationData;
-            enumerationData.commandPath         = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-            enumerationData.processingError     = CHIP_NO_ERROR;
-            enumerationData.acceptedCommandList = &builder;
-
-            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-            ReturnErrorOnFailure(interface->EnumerateAcceptedCommands(
-                path,
-                [](CommandId commandId, void * context) -> Loop {
-                    auto input                    = reinterpret_cast<EnumerationData *>(context);
-                    input->commandPath.mCommandId = commandId;
-                    CHIP_ERROR appendError        = input->acceptedCommandList->Append(AcceptedCommandEntryFor(input->commandPath));
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
-            return CHIP_NO_ERROR;
-        }
+        CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
@@ -522,49 +476,9 @@ CHIP_ERROR ServerClusterShim::GeneratedCommands(const ConcreteClusterPath & path
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-            using EnumerationData = struct
-            {
-                ReadOnlyBufferBuilder<CommandId> * generatedCommandList;
-                CHIP_ERROR processingError;
-            };
-            EnumerationData enumerationData;
-            enumerationData.processingError      = CHIP_NO_ERROR;
-            enumerationData.generatedCommandList = &builder;
-
-            ReturnErrorOnFailure(interface->EnumerateGeneratedCommands(
-                path,
-                [](CommandId id, void * context) -> Loop {
-                    auto input = reinterpret_cast<EnumerationData *>(context);
-
-                    CHIP_ERROR appendError = input->generatedCommandList->Append(id);
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
-            return CHIP_NO_ERROR;
-        }
+        CHIP_ERROR err = interface->RetrieveGeneratedCommands(path, builder);
+        // If retrieving generated commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 

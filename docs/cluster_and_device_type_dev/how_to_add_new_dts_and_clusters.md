@@ -30,7 +30,7 @@ directory:**
     > </struct>
     > ```
 
-6. [src/controller/python/chip/clusters/\_\_init\_\_.py](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/chip/clusters/__init__.py)
+6. [src/controller/python/matter/clusters/\_\_init\_\_.py](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/matter/clusters/__init__.py)
 
 **Enable your new cluster in the Python and Android clients** in
 [src/controller/data_model/controller-clusters.zap](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/data_model/controller-clusters.zap)

@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h"
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
@@ -101,28 +102,47 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
 {
     AttributeListBuilder attributeListBuilder(builder);
 
-    const DataModel::AttributeEntry mandatoryAttributes[] = {
-        Bssid::kMetadataEntry,         SecurityType::kMetadataEntry, WiFiVersion::kMetadataEntry,
-        ChannelNumber::kMetadataEntry, Rssi::kMetadataEntry,
-    };
-
     const BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags = mLogic.GetFeatureFlags();
 
-    const bool hasErrorCounts  = featureFlags.Has(Feature::kErrorCounts);
-    const bool hasPacketCounts = featureFlags.Has(Feature::kPacketCounts);
-    // Define optional attributes based on features
-    const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-        { hasErrorCounts, BeaconLostCount::kMetadataEntry },
-        { hasErrorCounts, OverrunCount::kMetadataEntry },
-        { hasPacketCounts, BeaconRxCount::kMetadataEntry },
-        { hasPacketCounts, PacketMulticastRxCount::kMetadataEntry },
-        { hasPacketCounts, PacketMulticastTxCount::kMetadataEntry },
-        { hasPacketCounts, PacketUnicastRxCount::kMetadataEntry },
-        { hasPacketCounts, PacketUnicastTxCount::kMetadataEntry },
-        { mLogic.GetEnabledAttributes().enableCurrentMaxRate, CurrentMaxRate::kMetadataEntry },
+    const DataModel::AttributeEntry optionalAttributes[] = {
+        BeaconLostCount::kMetadataEntry,        //
+        OverrunCount::kMetadataEntry,           //
+        BeaconRxCount::kMetadataEntry,          //
+        PacketMulticastRxCount::kMetadataEntry, //
+        PacketMulticastTxCount::kMetadataEntry, //
+        PacketUnicastRxCount::kMetadataEntry,   //
+        PacketUnicastTxCount::kMetadataEntry,   //
+        CurrentMaxRate::kMetadataEntry,         //
     };
 
-    return attributeListBuilder.Append(Span(mandatoryAttributes), Span(optionalEntries));
+    // Full attribute set, to combine real "optional" attributes but also
+    // attributes controlled by feature flags.
+    chip::app::OptionalAttributeSet<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,         //
+                                    WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,        //
+                                    WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,           //
+                                    WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,          //
+                                    WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, //
+                                    WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,   //
+                                    WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, //
+                                    WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id    //
+                                    >
+        optionalAttributeSet(mLogic.GetOptionalAttributeSet());
+
+    if (featureFlags.Has(Feature::kErrorCounts))
+    {
+        optionalAttributeSet.Set<BeaconLostCount::Id>();
+        optionalAttributeSet.Set<OverrunCount::Id>();
+    }
+
+    if (featureFlags.Has(Feature::kPacketCounts))
+    {
+        optionalAttributeSet.Set<BeaconRxCount::Id>();
+        optionalAttributeSet.Set<PacketMulticastRxCount::Id>();
+        optionalAttributeSet.Set<PacketMulticastTxCount::Id>();
+        optionalAttributeSet.Set<PacketUnicastRxCount::Id>();
+        optionalAttributeSet.Set<PacketUnicastTxCount::Id>();
+    }
+    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet);
 }
 
 CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,

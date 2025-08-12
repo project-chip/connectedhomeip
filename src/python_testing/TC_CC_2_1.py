@@ -39,12 +39,14 @@ import logging
 from enum import Enum
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 
 logger = logging.getLogger(__name__)
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace PumpConfigurationAndControl {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace MaxPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPressure::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -111,6 +113,16 @@ namespace ControlMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ControlMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace ControlMode
+constexpr std::array<DataModel::AttributeEntry, 7> kMandatoryMetadata = {
+    MaxPressure::kMetadataEntry,
+    MaxSpeed::kMetadataEntry,
+    MaxFlow::kMetadataEntry,
+    EffectiveOperationMode::kMetadataEntry,
+    EffectiveControlMode::kMetadataEntry,
+    Capacity::kMetadataEntry,
+    OperationMode::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

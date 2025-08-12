@@ -19,10 +19,10 @@
 import sys
 from pathlib import Path
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.testing.pics import parse_pics_xml
-from chip.testing.runner import MockTestRunner
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.testing.pics import parse_pics_xml
+from matter.testing.runner import MockTestRunner
 
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file

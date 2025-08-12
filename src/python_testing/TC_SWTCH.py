@@ -82,15 +82,16 @@ import queue
 import time
 from datetime import datetime, timedelta
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
-                                         run_if_endpoint_matches)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import EventReadResult
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
+                                           run_if_endpoint_matches)
+from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 

@@ -59,10 +59,10 @@
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
 #include <controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h>
 #include <controller/python/ChipDeviceController-StorageDelegate.h>
-#include <controller/python/chip/icd/PyChipCheckInDelegate.h>
-#include <controller/python/chip/interaction_model/Delegate.h>
-#include <controller/python/chip/native/ChipMainLoopWork.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/icd/PyChipCheckInDelegate.h>
+#include <controller/python/matter/interaction_model/Delegate.h>
+#include <controller/python/matter/native/ChipMainLoopWork.h>
+#include <controller/python/matter/native/PyChipError.h>
 
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>

@@ -20,11 +20,12 @@ import logging
 import pprint
 
 import base
-import chip.clusters as Clusters
-import chip.exceptions
-import chip.interaction_model
-from chip.clusters.Attribute import (AttributePath, AttributeStatus, DataVersion, SubscriptionTransaction, TypedAttributePath,
-                                     ValueDecodeFailure)
+
+import matter.clusters as Clusters
+import matter.exceptions
+import matter.interaction_model
+from matter.clusters.Attribute import (AttributePath, AttributeStatus, DataVersion, SubscriptionTransaction, TypedAttributePath,
+                                       ValueDecodeFailure)
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -110,7 +111,7 @@ class ClusterObjectTests:
         try:
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=233, payload=req)
             raise ValueError("Failure expected")
-        except chip.interaction_model.InteractionModelError as ex:
+        except matter.interaction_model.InteractionModelError as ex:
             logger.info(f"Recevied {ex} from server.")
             return
 
@@ -133,7 +134,7 @@ class ClusterObjectTests:
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(Clusters.UnitTesting)])
 
         actual_status = res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.WriteOnlyInt8u].Reason.status
-        expected_status = chip.interaction_model.Status.UnsupportedRead
+        expected_status = matter.interaction_model.Status.UnsupportedRead
 
         if expected_status != actual_status:
             raise AssertionError("Received un-expected WriteOnlyInt8u attribute in TestCluster")
@@ -151,9 +152,9 @@ class ClusterObjectTests:
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
+                                               AttributeId=5), Status=matter.interaction_model.Status.Success),
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                                               AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
+                                               AttributeId=6), Status=matter.interaction_model.Status.ConstraintError)
         ]
 
         logger.info(f"Received WriteResponse: {res}")
@@ -174,7 +175,7 @@ class ClusterObjectTests:
         expectedRes = [
             AttributeStatus(Path=AttributePath.from_attribute(
                 EndpointId=1,
-                Attribute=Clusters.UnitTesting.Attributes.ListLongOctetString), Status=chip.interaction_model.Status.Success),
+                Attribute=Clusters.UnitTesting.Attributes.ListLongOctetString), Status=matter.interaction_model.Status.Success),
         ]
 
         logger.info(f"Received WriteResponse: {res}")
@@ -480,7 +481,7 @@ class ClusterObjectTests:
                                             endpoint=1,
                                             payload=Clusters.UnitTesting.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
             raise ValueError("Unexpected Failure")
-        except chip.interaction_model.InteractionModelError as ex:
+        except matter.interaction_model.InteractionModelError as ex:
             logger.info(f"Recevied {ex} from server.")
         res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=[
             (1, Clusters.UnitTesting.Events.TestFabricScopedEvent, 0),
@@ -558,8 +559,8 @@ class ClusterObjectTests:
             req = Clusters.UnitTesting.Commands.TimedInvokeRequest()
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
             raise AssertionError("The command invoke should be rejected.")
-        except chip.interaction_model.InteractionModelError as ex:
-            if ex.status != chip.interaction_model.Status.NeedsTimedInteraction:
+        except matter.interaction_model.InteractionModelError as ex:
+            if ex.status != matter.interaction_model.Status.NeedsTimedInteraction:
                 raise AssertionError("The command invoke was expected to error with NeedsTimedInteraction.")
 
         logger.info(
@@ -571,8 +572,8 @@ class ClusterObjectTests:
                                                  True)),
                                          ])
             raise AssertionError("The write request should be rejected.")
-        except chip.interaction_model.InteractionModelError as ex:
-            if ex.status != chip.interaction_model.Status.NeedsTimedInteraction:
+        except matter.interaction_model.InteractionModelError as ex:
+            if ex.status != matter.interaction_model.Status.NeedsTimedInteraction:
                 raise AssertionError("The write attribute was expected to error with NeedsTimedInteraction.")
 
     @classmethod
@@ -584,7 +585,7 @@ class ClusterObjectTests:
             # 10ms is a pretty short timeout, RTT is 400ms in simulated network on CI, so this test should fail.
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=1)
             raise AssertionError("Timeout expected!")
-        except chip.exceptions.ChipStackException:
+        except matter.exceptions.ChipStackException:
             pass
 
         logger.info("2: Send Timed Write Request -- Timeout")
@@ -596,7 +597,7 @@ class ClusterObjectTests:
                                          ],
                                          timedRequestTimeoutMs=1)
             raise AssertionError("Timeout expected!")
-        except chip.exceptions.ChipStackException:
+        except matter.exceptions.ChipStackException:
             pass
 
     @classmethod
@@ -620,7 +621,7 @@ class ClusterObjectTests:
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
+                                               AttributeId=5), Status=matter.interaction_model.Status.Success),
         ]
 
         if res != expectedRes:
@@ -652,7 +653,7 @@ class ClusterObjectTests:
 
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
+                                               AttributeId=5), Status=matter.interaction_model.Status.Success),
         ]
 
         if res != expectedRes:
@@ -670,7 +671,7 @@ class ClusterObjectTests:
 
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                                               AttributeId=5), Status=chip.interaction_model.Status.DataVersionMismatch),
+                                               AttributeId=5), Status=matter.interaction_model.Status.DataVersionMismatch),
         ]
 
         if res != expectedRes:

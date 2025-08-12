@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace WaterHeaterManagement {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace HeaterTypes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HeaterTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -43,10 +45,17 @@ namespace BoostState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BoostState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BoostState
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    HeaterTypes::kMetadataEntry,
+    HeatDemand::kMetadataEntry,
+    BoostState::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Boost {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Boost::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

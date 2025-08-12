@@ -32,13 +32,14 @@ import os
 import tempfile
 from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.fault_injection import CHIPFaultId
-from chip.interaction_model import InteractionModelError
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.fault_injection import CHIPFaultId
+from matter.interaction_model import InteractionModelError
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_SC_3_5(MatterBaseTest):

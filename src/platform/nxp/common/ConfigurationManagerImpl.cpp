@@ -51,6 +51,10 @@ extern "C" {
 #include "fsl_silicon_id.h"
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include "OtaSupport.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -82,18 +86,14 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
     }
     else if (rebootCause == kPOWER_ResetCauseSysResetReq)
     {
-        /*
-        kConfigKey_SoftwareUpdateCompleted not supported for now
-        if (NXPConfig::ConfigValueExists(NXPConfig::kConfigKey_SoftwareUpdateCompleted))
+        bootReason = BootReasonType::kSoftwareReset;
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        OtaImgState_t img_state = OTA_GetImgState();
+        if (img_state == OtaImgState_RunCandidate)
         {
             bootReason = BootReasonType::kSoftwareUpdateCompleted;
         }
-        else
-        {
-            bootReason = BootReasonType::kSoftwareReset;
-        }
-        */
-        bootReason = BootReasonType::kSoftwareReset;
+#endif
     }
 
     return StoreBootReason(to_underlying(bootReason));

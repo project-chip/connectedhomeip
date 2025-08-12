@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace LevelControl {
 inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
+
 namespace CurrentLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -75,10 +77,17 @@ namespace StartUpCurrentLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpCurrentLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace StartUpCurrentLevel
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    CurrentLevel::kMetadataEntry,
+    Options::kMetadataEntry,
+    OnLevel::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace MoveToLevel {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MoveToLevel::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
