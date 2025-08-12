@@ -85,6 +85,10 @@ def response_struct(s: Struct) -> bool:
     return s.code is not None
 
 
+def is_optional(attribute: Attribute) -> bool:
+    return attribute.definition.is_optional
+
+
 class SdkGenerator(CodeGenerator):
     """
     Generation of cpp code for application implementation for matter.
@@ -102,6 +106,7 @@ class SdkGenerator(CodeGenerator):
         self.jinja_env.filters['name_for_id_usage'] = name_for_id_usage
         self.jinja_env.tests['global_attribute'] = global_attribute
         self.jinja_env.tests['response_struct'] = response_struct
+        self.jinja_env.tests['is_optional'] = is_optional
 
     def internal_render_all(self):
         """
@@ -117,6 +122,15 @@ class SdkGenerator(CodeGenerator):
             },
         )
 
+        self.internal_render_one_output(
+            template_path="MetadataQuery.h.jinja",
+            output_file_name="MetadataQuery.h",
+            vars={
+                "clusters": self.idl.clusters,
+                "input_name": self.idl.parse_file_name,
+            },
+        )
+
         for cluster in self.idl.clusters:
 
             build_targets = {
@@ -124,6 +138,7 @@ class SdkGenerator(CodeGenerator):
 
                 # contains `*Entry` items for attributes and commands
                 "Metadata.h.jinja": "Metadata.h",
+                "MetadataProvider.h.jinja": "MetadataProvider.h",
 
                 # contains id definitions
                 "AttributeIds.h.jinja": "AttributeIds.h",
