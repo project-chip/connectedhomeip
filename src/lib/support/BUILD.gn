@@ -337,6 +337,11 @@ static_library("support") {
   if (chip_config_memory_debug_dmalloc) {
     libs += [ "dmallocthcxx" ]
   }
+
+  if (chip_device_platform == "esp32" || chip_device_platform == "openiotsdk") {
+    # Has non-posix implementation of getopt_long.
+    defines = [ "CONFIG_NON_POSIX_GETOPT_LONG=1" ]
+  }
 }
 
 source_set("test_utils") {

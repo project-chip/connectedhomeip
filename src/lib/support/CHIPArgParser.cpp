@@ -78,6 +78,32 @@ static inline bool IsShortOptionChar(int ch)
     return isgraph(ch);
 }
 
+#if CONFIG_NON_POSIX_GETOPT_LONG
+static inline bool IsNotAnOption(char * const argv[], int element, int character)
+{
+    char c = argv[element][character];
+    return c == 0 || c == ' ' || c == '\t' || c == '\n' || c == '\r' || optarg == argv[element] + character;
+}
+static inline bool IsShortOption(char * const argv[], int element)
+{
+    return argv[element][1] != '-';
+}
+static inline int NextElementWithOptions(char * const argv[], int element)
+{
+    do
+    {
+        element++;
+    } while (argv[element] && argv[element][0] != '-');
+    return element;
+}
+static inline int FirstCharacter(char * const argv[], int element)
+{
+    if (!argv[element])
+        return 0;
+    return argv[element][1] == '-' ? 2 : 1;
+}
+#endif // CONFIG_NON_POSIX_GETOPT_LONG
+
 /**
  * @brief
  * The list of OptionSets passed to the currently active ParseArgs() call.
@@ -116,6 +142,8 @@ void (*PrintArgError)(const char * msg, ...) = DefaultPrintArgError;
  *                                  be 1 greater than the value specified for argc, and
  *                                  argv[argc] must be set to NULL.  Argument parsing begins with the
  *                                  *second* array element (argv[1]); element 0 is ignored.
+ *                                  `argv` may have its elements permuted as a side effect of this
+ *                                  function.  Non-options will be moved to the end of argv.
  * @param[in]  optSets              A list of pointers to `OptionSet` structures that define the legal
  *                                  options.  The supplied list must be terminated with a NULL.
  * @param[in]  nonOptArgHandler     A pointer to a function that will be called once option parsing
@@ -274,6 +302,17 @@ void (*PrintArgError)(const char * msg, ...) = DefaultPrintArgError;
  * PrintOptionHelp() will print the option help for the different OptionSets together under
  * a common section title.
  *
+ *
+ * ## NON-POSIX IMPLEMENTATIONS OF getopt_long
+ *
+ * Some platforms have a version of getopt_long that behaves differently from the POSIX
+ * version. Define CONFIG_NON_POSIX_GETOPT_LONG if the platform's implementation of getopt_long
+ * differs from POSIX in the following ways (as is the case for ESP32 and OpenIoT):
+ *     (a) Sets optopt to '?' when encountering an unknown short option, instead of setting it
+ *         to the actual value of the character it encountered.
+ *     (b) Treats an unknown long option like a series of short options.
+ *     (c) Does not always permute argv to put the nonoptions at the end.
+ *
  */
 bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
                NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown)
@@ -286,11 +325,34 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
     OptionSet * curOptSet;
     OptionDef * curOpt;
     bool handlerRes;
-#if CHIP_CONFIG_NON_POSIX_LONG_OPT
-    int lastOptIndex    = 0;
-    int subOptIndex     = 0;
-    int currentOptIndex = 0;
-#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
+    int optIndex = -1;
+#if CONFIG_NON_POSIX_GETOPT_LONG
+    // The element and character being looked at during the current iteration's call to getopt_long.
+    int currentElement = 0;
+    int currentCharacter;
+    // The value of optind after the last time getopt_long was called.
+    int prevOptIndex = 1;
+    // All the nonoptions we have found so far will be in range [firstNonoption, lastNonoptionPlus1).
+    int firstNonoption     = 1;
+    int lastNonoptionPlus1 = 1;
+
+    // Temporary variables used When finding a new set of nonoptions.
+    int firstNonoptionNew;
+    int lastNonoptionPlus1New;
+
+    // Temporary variables used when moving already-found nonoptions later in the array so that they
+    // will be contiguous with the new non-options that were just found.
+    // Index the nonoption is being moved to.
+    int moveNonoptionToHere;
+    // Initial index of the nonoption being moved.
+    int nonoptionToMove;
+    // Index of the next pair of elements to swap in argv (indexToSwap and indexToSwap+1).
+    int indexToSwap;
+    // Temporary variable for swapping elements of argv.
+    char * tempSwap;
+    // Permutable version of argv.  Needed to move the nonoptions to the end.
+    char ** permutableArgv = const_cast<char **>(argv);
+#endif // CONFIG_NON_POSIX_GETOPT_LONG
 
     // The getopt() functions do not support recursion, so exit immediately with an
     // error if called recursively.
@@ -332,6 +394,17 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         goto done;
     }
 
+#if CONFIG_NON_POSIX_GETOPT_LONG
+    // This non-POSIX getopt_long will sometimes permute argv, but not in all the cases that the POSIX version would and not always
+    // at the same times.  This makes it hard to predict when it will permute, which can sometimes break the manual permutation that
+    // we're trying to do in here.  To avoid this we do an initial pass through the full argv and let getopt_long get all its
+    // permuting out of the way so that we know argv will remain stable once we begin to parse it for real.
+    optind = 0;
+    while (getopt_long(argc, argv, shortOpts, longOpts, &optIndex) != -1)
+    {
+    }
+#endif // CONFIG_NON_POSIX_GETOPT_LONG
+
     // Force getopt() to reset its internal state.
     optind = 0;
 
@@ -339,41 +412,97 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
     while (true)
     {
         int id;
-        int optIndex = -1;
+        optIndex = -1;
 
         // Attempt to match the current option argument (argv[optind]) against the defined long and short options.
         optarg = nullptr;
         optopt = 0;
-#if CHIP_CONFIG_NON_POSIX_LONG_OPT
-        // to check if index has changed
-        lastOptIndex = currentOptIndex;
-        // optind will not increment on error, this is why we need to keep track of the current option
-        // this is for use when getopt_long fails to find the option and we need to print the error
-        currentOptIndex = optind;
-        // if it's the first run, optind is not set and we need to find the first option ourselves
-        if (!currentOptIndex)
+
+#if CONFIG_NON_POSIX_GETOPT_LONG
+        // Advance to the next element/character that getopt_long will be processing.
+
+        // If currentElement has been initialized and currentElement is currently a short option (or short option group).
+        if (currentElement > 0 && IsShortOption(argv, currentElement))
         {
-            while (currentOptIndex < argc)
+            // If the next character is null or whitespace or the start of the most recent optarg.
+            if (IsNotAnOption(argv, currentElement, currentCharacter + 1))
             {
-                currentOptIndex++;
-                if (*argv[currentOptIndex] == '-')
-                {
-                    break;
-                }
+                // Move currentElement to the next element that starts with '-'
+                currentElement = NextElementWithOptions(argv, currentElement);
+                // Set currentCharacter to the first character after the hyphens.
+                currentCharacter = FirstCharacter(argv, currentElement);
+            }
+            else // The next character is another option.
+                currentCharacter++;
+        }
+        else // currentElement is currently uninitialized or a long option.
+        {
+            // Move currentElement to the next element that starts with '-'
+            currentElement = NextElementWithOptions(argv, currentElement);
+            // Set currentCharacter to the first character after the hyphens.
+            currentCharacter = FirstCharacter(argv, currentElement);
+        }
+#endif // CONFIG_NON_POSIX_GETOPT_LONG
+
+        id = getopt_long(argc, argv, shortOpts, longOpts, &optIndex);
+
+#if CONFIG_NON_POSIX_GETOPT_LONG
+        // The POSIX implementation does the sorting as it goes, gradually permuting argv to put the nonoptions towards the end.
+        // This code attempts to simulate that outcome, the one difference being that the POSIX version will move nonoptions after
+        // the next time getopt_long is called, whereas this code will only move nonoptions when it either encounters additional
+        // nonoptions or it reaches the end.  The final result (at the time the nonoption handler is called) is the same, but the
+        // elements of argv during the execution of this loop may not always match what they would be with the POSIX version.  It is
+        // only guaranteed to match at the end.
+
+        // The elements that just now got processed by getopt_long are [prevOptIndex, optind] if the new option is the non-final
+        // character of an option group (e.g. 'a' or 'b' in "-abc"), or [prevOptIndex, optind) if it's the final character of an
+        // option group or not a group at all.  Walk through those elements knowing that all elements we encounter before reaching
+        // the option must be nonoptions.  Store the range of those nonoptions in firstNonoptionNew and lastNonoptionPlus1New.  If
+        // this is the final iteration (getopt_long returned -1) then prevOptIndex == optind == argc, which means firstNonoptionNe
+        // == lastNonoptionPlus1New == argc, the following for loop will be skipped, and all the nonoptions we had already found
+        // will get moved to the end of argv.
+        firstNonoptionNew     = prevOptIndex;
+        lastNonoptionPlus1New = prevOptIndex;
+        for (nonoptionToMove = prevOptIndex; nonoptionToMove <= optind; nonoptionToMove++)
+        {
+            // Note that this loop INCLUDES nonoptionToMove=optind since the option that just got processed might be part of a group
+            // of short options all sharing a single '-', in which case optind is going to land on that same element several times
+            // in a row before it moves past it.
+            if (argv[nonoptionToMove] && argv[nonoptionToMove][0] == '-')
+            {
+                lastNonoptionPlus1New = nonoptionToMove;
+                break;
             }
         }
-        // similarly we need to keep track of short opts index for groups like "-fba"
-        // if the index has not changed that means we are still analysing the same group
-        if (lastOptIndex != currentOptIndex)
+
+        // Only move the already-found nonoptions if we just now found new nonoptions or we have reached the end.
+        if (firstNonoptionNew < lastNonoptionPlus1New || id == -1)
         {
-            subOptIndex = 0;
+            // Move the old set of nonoptions we had already found so that they abut the new set of nonoptions we just now found,
+            // thus giving us a single contiguous block of nonoptions.
+            moveNonoptionToHere = firstNonoptionNew - 1;
+            for (nonoptionToMove = lastNonoptionPlus1 - 1; nonoptionToMove >= firstNonoption; nonoptionToMove--)
+            {
+                // Move element nonoptionToMove (the last nonoption we haven't moved yet) into the slot moveNonoptionToHere.
+                for (indexToSwap = nonoptionToMove; indexToSwap < moveNonoptionToHere; indexToSwap++)
+                {
+                    // Swap element indexToSwap with element indexToSwap + 1.
+                    tempSwap                        = permutableArgv[indexToSwap];
+                    permutableArgv[indexToSwap]     = permutableArgv[indexToSwap + 1];
+                    permutableArgv[indexToSwap + 1] = tempSwap;
+                }
+                // Decrement moveNonoptionToHere so the next nonoption we move will go into the slot before it.
+                moveNonoptionToHere--;
+            }
+            // Update the range of nonoptions so that it encompasses the merged set.
+            firstNonoption     = firstNonoptionNew - (lastNonoptionPlus1 - firstNonoption);
+            lastNonoptionPlus1 = lastNonoptionPlus1New;
         }
-        else
-        {
-            subOptIndex++;
-        }
-#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
-        id = getopt_long(argc, argv, shortOpts, longOpts, &optIndex);
+
+        // Store the value of optind so we'll know which elements getopt_long processes the next time it is called.
+        prevOptIndex = optind;
+
+#endif // CONFIG_NON_POSIX_GETOPT_LONG
 
         // Stop if there are no more options.
         if (id == -1)
@@ -384,35 +513,32 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         {
             if (ignoreUnknown)
                 continue;
-#if CHIP_CONFIG_NON_POSIX_LONG_OPT
-            // getopt_long doesn't tell us if the option which failed to match is long or short so check
-            bool isLongOption = false;
-            if (strlen(argv[currentOptIndex]) > 2 && argv[currentOptIndex][1] == '-')
-            {
-                isLongOption = true;
-            }
-            if (optopt == 0 || isLongOption)
-            {
-                // getopt_long function incorrectly treats unknown long option as short opt group
-                if (subOptIndex == 0)
-                {
-                    PrintArgError("%s: Unknown option: %s\n", progName, argv[currentOptIndex]);
-                }
-            }
-            else if (optopt == '?')
-            {
-                PrintArgError("%s: Unknown option: -%c\n", progName, argv[currentOptIndex][subOptIndex + 1]);
-            }
-            else
-            {
-                PrintArgError("%s: Unknown option: -%c\n", progName, optopt);
-            }
-#else
             if (optopt != 0)
+            {
+#if CONFIG_NON_POSIX_GETOPT_LONG
+                if (IsShortOption(argv, currentElement))
+                {
+                    // On this platform an unknown short option sets optopt to '?' instead of the actual option character, so fetch
+                    // the character from argv.
+                    if (optopt == '?')
+                        optopt = argv[currentElement][currentCharacter];
+
+                    PrintArgError("%s: Unknown option: -%c\n", progName, optopt);
+                }
+                else // Long option
+                {
+                    // On this platform an unknown long option is treated like a group of short options, so skip past the rest of
+                    // this element.
+                    optind++;
+
+                    PrintArgError("%s: Unknown option: %s\n", progName, argv[currentElement]);
+                }
+#else
                 PrintArgError("%s: Unknown option: -%c\n", progName, optopt);
-            else
+#endif // CONFIG_NON_POSIX_GETOPT_LONG
+            }
+            else // optopt == 0 only happens for long options, so optind has already advanced.
                 PrintArgError("%s: Unknown option: %s\n", progName, argv[optind - 1]);
-#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
             goto done;
         }
 
@@ -422,11 +548,11 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         {
             // NOTE: with the way getopt_long() works, it is impossible to tell whether the option that
             // was missing an argument was a long option or a short option.
-#if CHIP_CONFIG_NON_POSIX_LONG_OPT
-            PrintArgError("%s: Missing argument for %s option\n", progName, argv[currentOptIndex]);
+#if CONFIG_NON_POSIX_GETOPT_LONG
+            PrintArgError("%s: Missing argument for %s option\n", progName, argv[currentElement]);
 #else
             PrintArgError("%s: Missing argument for %s option\n", progName, argv[optind - 1]);
-#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
+#endif // CONFIG_NON_POSIX_GETOPT_LONG
             goto done;
         }
 
@@ -466,6 +592,14 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
     // If supplied, call the non-option argument handler with the remaining arguments (if any).
     if (nonOptArgHandler != nullptr)
     {
+#if CONFIG_NON_POSIX_GETOPT_LONG
+        // On a POSIX implementation, on the final iteration when getopt_long returns -1 indicating it has nothing left to do,
+        // optind would be set to the location of the first nonoption (all of which by now would have been moved to the end of
+        // argv).  On some non-POSIX implementations this is not true -- it simply sets optind to the location of argv's terminal
+        // NULL (i.e. optind == argc).  So we have to alter optind here to simulate the POSIX behavior.
+        optind = firstNonoption;
+#endif // CONFIG_NON_POSIX_GETOPT_LONG
+
         if (!nonOptArgHandler(progName, argc - optind, argv + optind))
             goto done;
     }

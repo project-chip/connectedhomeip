@@ -58,7 +58,7 @@ To build all unit tests:
     $ source scripts/activate.sh
     $ scripts/build/build_examples.py --target esp32-qemu-tests build
 
-This generates a list of QEMU images in `out/esp32-qemu-tests/`
+This generates a set of QEMU images in `out/esp32-qemu-tests/`
 
 There is one image for each test directory (i.e. each chip_test_suite). So for
 example `src/inet/tests` builds to `out/esp32-qemu-tests/testInetLayer.img`
