@@ -54,12 +54,13 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
         ~SaveFlags() { BasicInformationCluster::Instance().OptionalAttributes() = mFlags; }
 
     private:
-        BitFlags<OptionalBasicInformationAttributes> mFlags;
+        BasicInformationCluster::OptionalAttributesSet mFlags;
     } scopedFlagsSave;
 
     // check without optional attributes
     {
-        BasicInformationCluster::Instance().OptionalAttributes().ClearAll();
+        BasicInformationCluster::Instance().OptionalAttributes() =
+            BasicInformationCluster::OptionalAttributesSet().Set<UniqueID::Id>();
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(BasicInformationCluster::Instance().Attributes({ kRootEndpointId, BasicInformation::Id }, builder),
@@ -81,8 +82,8 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
     // Check that disabling unique id works
     {
-        BasicInformationCluster::Instance().OptionalAttributes().ClearAll().Set(
-            OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose); // allowed in early spec version. Force this.
+        // UniqueID is EXPLICITLY NOT SET
+        BasicInformationCluster::Instance().OptionalAttributes() = BasicInformationCluster::OptionalAttributesSet();
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(BasicInformationCluster::Instance().Attributes({ kRootEndpointId, BasicInformation::Id }, builder),
@@ -113,17 +114,17 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
     // All attributes
     {
-        BasicInformationCluster::Instance()
-            .OptionalAttributes()
-            .ClearAll()
-            .Set(OptionalBasicInformationAttributes::kManufacturingDate)
-            .Set(OptionalBasicInformationAttributes::kPartNumber)
-            .Set(OptionalBasicInformationAttributes::kProductURL)
-            .Set(OptionalBasicInformationAttributes::kProductLabel)
-            .Set(OptionalBasicInformationAttributes::kSerialNumber)
-            .Set(OptionalBasicInformationAttributes::kLocalConfigDisabled)
-            .Set(OptionalBasicInformationAttributes::kReachable)
-            .Set(OptionalBasicInformationAttributes::kProductAppearance);
+        BasicInformationCluster::Instance().OptionalAttributes() = //
+            BasicInformationCluster::OptionalAttributesSet()
+                .Set<ManufacturingDate::Id>()
+                .Set<PartNumber::Id>()
+                .Set<ProductURL::Id>()
+                .Set<ProductLabel::Id>()
+                .Set<SerialNumber::Id>()
+                .Set<LocalConfigDisabled::Id>()
+                .Set<Reachable::Id>()
+                .Set<ProductAppearance::Id>()
+                .Set<UniqueID::Id>();
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(BasicInformationCluster::Instance().Attributes({ kRootEndpointId, BasicInformation::Id }, builder),

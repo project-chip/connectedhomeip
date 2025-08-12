@@ -18,6 +18,8 @@
 
 #include <app/persistence/String.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/BasicInformation/AttributeIds.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/PlatformManager.h>
@@ -25,23 +27,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-
-enum class OptionalBasicInformationAttributes : uint16_t
-{
-    kManufacturingDate   = 1 << 0,
-    kPartNumber          = 1 << 1,
-    kProductURL          = 1 << 2,
-    kProductLabel        = 1 << 3,
-    kSerialNumber        = 1 << 4,
-    kLocalConfigDisabled = 1 << 5,
-    kReachable           = 1 << 6,
-    kProductAppearance   = 1 << 7,
-
-    // Old specification versions had UniqueID as optional, so this
-    // appears here even though MANDATORY in the latest spec. We default
-    // it enabled (to decrease chances of error)
-    kDisableMandatoryUniqueIDOnPurpose = 1 << 8,
-};
 
 /// This class provides a code-driven implementation for the Basic Information cluster,
 /// centralizing its logic and state. It is designed as a singleton because the cluster
@@ -58,11 +43,30 @@ enum class OptionalBasicInformationAttributes : uint16_t
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
-    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }) {}
+    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id })
+    {
+        // Unless told otherwise, unique id is mandatory
+        mEnabledOptionalAttributes.Set<BasicInformation::Attributes::UniqueID::Id>();
+    }
+
+    using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
+        BasicInformation::Attributes::ManufacturingDate::Id,       //
+        BasicInformation::Attributes::PartNumber::Id,              //
+        BasicInformation::Attributes::ProductURL::Id,              //
+        BasicInformation::Attributes::ProductLabel::Id,            //
+        BasicInformation::Attributes::SerialNumber::Id,            //
+        BasicInformation::Attributes::LocalConfigDisabled::Id,     //
+        BasicInformation::Attributes::Reachable::Id,               //
+        BasicInformation::Attributes::ProductAppearance::Id,       //
+        // Old specification versions had UniqueID as optional, so this
+        // appears here even though MANDATORY in the latest spec. We
+        // default it enabled (to decrease chances of error)
+        BasicInformation::Attributes::UniqueID::Id //
+        >;
 
     static BasicInformationCluster & Instance();
 
-    BitFlags<OptionalBasicInformationAttributes> & OptionalAttributes() { return mEnabledOptionalAttributes; }
+    OptionalAttributesSet & OptionalAttributes() { return mEnabledOptionalAttributes; }
 
     bool GetLocalConfigDisabled() { return mLocalConfigDisabled; }
 
@@ -75,7 +79,7 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // PlatforMmanagerDelegate
+    // PlatformManagerDelegate
     void OnStartUp(uint32_t softwareVersion) override;
     void OnShutDown() override;
 
@@ -83,7 +87,7 @@ private:
     // write without notification
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 
-    BitFlags<OptionalBasicInformationAttributes> mEnabledOptionalAttributes;
+    OptionalAttributesSet mEnabledOptionalAttributes;
 
     Storage::String<32> mNodeLabel;
     bool mLocalConfigDisabled = false;

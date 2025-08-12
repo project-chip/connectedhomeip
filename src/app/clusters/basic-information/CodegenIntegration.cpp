@@ -48,31 +48,25 @@ ServerClusterRegistration gRegistration(BasicInformationCluster::Instance());
 
 } // namespace
 
-void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
+void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    BasicInformationCluster::Instance().OptionalAttributes() =
-        BitFlags<OptionalBasicInformationAttributes>()
-            .Set(OptionalBasicInformationAttributes::kManufacturingDate,
-                 emberAfContainsAttribute(endpointId, BasicInformation::Id, ManufacturingDate::Id))
-            .Set(OptionalBasicInformationAttributes::kPartNumber,
-                 emberAfContainsAttribute(endpointId, BasicInformation::Id, PartNumber::Id))
-            .Set(OptionalBasicInformationAttributes::kProductURL,
-                 emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductURL::Id))
-            .Set(OptionalBasicInformationAttributes::kProductLabel,
-                 emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductLabel::Id))
-            .Set(OptionalBasicInformationAttributes::kSerialNumber,
-                 emberAfContainsAttribute(endpointId, BasicInformation::Id, SerialNumber::Id))
-            .Set(OptionalBasicInformationAttributes::kLocalConfigDisabled,
-                 emberAfContainsAttribute(endpointId, BasicInformation::Id, LocalConfigDisabled::Id))
-            .Set(OptionalBasicInformationAttributes::kReachable,
-                 emberAfContainsAttribute(endpointId, BasicInformation::Id, Reachable::Id))
-            .Set(OptionalBasicInformationAttributes::kProductAppearance,
-                 emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductAppearance::Id))
-            // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this
-            .Set(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose,
-                 !emberAfContainsAttribute(endpointId, BasicInformation::Id, UniqueID::Id));
+    BasicInformationCluster::OptionalAttributesSet & attrs = BasicInformationCluster::Instance().OptionalAttributes();
+
+    attrs.Set<ManufacturingDate::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, ManufacturingDate::Id))
+        .Set<PartNumber::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, PartNumber::Id))
+        .Set<ProductURL::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductURL::Id))
+        .Set<ProductLabel::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductLabel::Id))
+        .Set<SerialNumber::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, SerialNumber::Id))
+        .Set<LocalConfigDisabled::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, LocalConfigDisabled::Id))
+        .Set<Reachable::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, Reachable::Id))
+        .Set<ProductAppearance::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, ProductAppearance::Id))
+
+        // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this:
+        // Specifically builds need to support the "do not build with unique id (make it optional)"
+        // to emulate the test case where UniqueID is missing as it was optional in previous versions of the spec
+        .Set<UniqueID::Id>(emberAfContainsAttribute(endpointId, BasicInformation::Id, UniqueID::Id));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gRegistration);
     if (err != CHIP_NO_ERROR)
@@ -81,7 +75,7 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfBasicInformationClusterShutdownCallback(EndpointId endpointId)
+void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 

@@ -217,6 +217,20 @@ jobs:
               run: |
                   git grep -I -n "%zu" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            #
+            # Known client-side clusters are allowed to use this only.
+            - name: emberAfClusterInit/Shutdown callbacks are for client side use, not server side. Use ClusterServerInit/Shutdown for server clusters
+              if: always()
+              run: |
+                  git grep -I -n "void emberAf.*Cluster\(Init\|Shutdown\)Callback("  -- \
+                  src/app/clusters \
+                  ':(exclude).github/workflows/lint.yml' \
+                  ':(exclude)src/app/clusters/pump-configuration-and-control-client' \
+                  && exit 1 || exit 0
+
             # Comments like '{{! ... }}' should be used in zap files
             - name: Do not allow TODO in generated files
               if: always()

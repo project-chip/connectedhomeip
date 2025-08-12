@@ -47,6 +47,7 @@
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
@@ -67,6 +68,7 @@
 #include <lib/core/TLVWriter.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
@@ -170,15 +172,6 @@ private:
     std::vector<AttributePathParams> mDirtyList;
 };
 
-class TestEventGenerator : public EventsGenerator
-{
-    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
-                             EventNumber & generatedEventNumber) override
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-};
-
 class TestActionContext : public ActionContext
 {
 public:
@@ -190,23 +183,23 @@ class CodegenDataModelProviderWithContext : public CodegenDataModelProvider
 public:
     CodegenDataModelProviderWithContext()
     {
-        InteractionModelContext context{
-            .eventsGenerator         = &mEventGenerator,
-            .dataModelChangeListener = &mChangeListener,
-            .actionContext           = &mActionContext,
-        };
-
-        Startup(context);
+        SetPersistentStorageDelegate(&mStorageDelegate);
+        Startup({
+            .eventsGenerator         = mEventGenerator,
+            .dataModelChangeListener = mChangeListener,
+            .actionContext           = mActionContext,
+        });
     }
-    ~CodegenDataModelProviderWithContext() { Shutdown(); }
+    ~CodegenDataModelProviderWithContext() override { Shutdown(); }
 
     TestProviderChangeListener & ChangeListener() { return mChangeListener; }
     const TestProviderChangeListener & ChangeListener() const { return mChangeListener; }
 
 private:
-    TestEventGenerator mEventGenerator;
+    LogOnlyEvents mEventGenerator;
     TestProviderChangeListener mChangeListener;
     TestActionContext mActionContext;
+    TestPersistentStorageDelegate mStorageDelegate;
 };
 
 class MockAccessControl : public Access::AccessControl::Delegate, public Access::AccessControl::DeviceTypeResolver
