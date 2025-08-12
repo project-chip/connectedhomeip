@@ -309,6 +309,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         else:
             logging.info(
                 "UserMaximumChargeCurrent is NOT supported... skipping.")
+            self.mark_step_range_skipped("9a", "9a")
 
         self.step("10")
         await self.send_test_event_trigger_charge_demand_clear()
