@@ -19,6 +19,7 @@
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip::app {
@@ -80,7 +81,13 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     uint32_t optionalAttributes = 0;
     if (options.optionalAttributesToFetch)
     {
-        // FIXME: implement
+        for (AttributeId attributeId = 0; attributeId < 32; attributeId++)
+        {
+            if (emberAfContainsAttribute(options.endpointId, options.clusterId, attributeId))
+            {
+                optionalAttributes |= 1u << attributeId;
+            }
+        }
     }
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(
