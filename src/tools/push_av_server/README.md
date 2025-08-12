@@ -72,7 +72,7 @@ $ python server.py --working-directory ~/.pavstest
 ```
 
 This command starts the Push AV (Audio/Video) server. The --working-directory
-flag tells the server where to store all its files, such as certificates, keys,
+option tells the server where to store all its files, such as certificates, keys,
 and uploaded media content.
 
 ```sh
