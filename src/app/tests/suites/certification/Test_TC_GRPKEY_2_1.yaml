@@ -22,9 +22,6 @@ config:
     cluster: "Group Key Management"
     endpoint: 0
 
-    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
-    Groups.Endpoint: 1
-
 tests:
     - label:
           "Step 0: Commission DUT to TH (can be skipped if done in a preceding
