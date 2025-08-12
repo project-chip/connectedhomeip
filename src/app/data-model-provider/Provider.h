@@ -43,19 +43,11 @@ namespace DataModel {
 class Provider : public ProviderMetadataTree
 {
 public:
-    virtual ~Provider() = default;
+    ~Provider() override = default;
 
-    // `context` pointers  will be guaranteed valid until Shutdown is called()
-    virtual CHIP_ERROR Startup(InteractionModelContext context)
-    {
-        mContext = context;
-        return CHIP_NO_ERROR;
-    }
-    virtual CHIP_ERROR Shutdown() = 0;
-
-    // During the transition phase, we expect a large subset of code to require access to
-    // event emitting, path marking and other operations
-    [[nodiscard]] const InteractionModelContext & CurrentContext() const { return mContext; }
+    // `context` references  will be guaranteed valid until Shutdown is called()
+    virtual CHIP_ERROR Startup(InteractionModelContext context) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
 
     /// NOTE: this code is NOT required to handle `List` global attributes:
     ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList
@@ -123,9 +115,6 @@ public:
     ///     convenience to make writing Invoke calls easier.
     virtual std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                             CommandHandler * handler) = 0;
-
-protected:
-    InteractionModelContext mContext = {};
 };
 
 } // namespace DataModel
