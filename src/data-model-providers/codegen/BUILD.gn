@@ -20,6 +20,8 @@ import("//build_overrides/chip.gni")
 # be available at link time for this model to use
 #
 # Use `model.gni` to get access to:
+#   ClusterIntegration.cpp
+#   ClusterIntegration.h
 #   CodegenDataModelProvider.cpp
 #   CodegenDataModelProvider.h
 #   CodegenDataModelProvider_Read.cpp
