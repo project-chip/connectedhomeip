@@ -170,7 +170,7 @@ sed ... | paste ... > client.curl.csr
 ```
 
 This is a text-formatting command. It takes the multi-line `CSR` file and
-converts the newline characters into literal \n characters so the entire `CSR`
+converts the newline characters into literal \n characters so that the entire `CSR`
 can be embedded cleanly into a single-line JSON payload.
 
 ```sh
