@@ -59,7 +59,7 @@ public:
     {
         return gServers[zeroBasedArrayIndex].Cluster();
     }
-    void DestroyRegisration(unsigned zeroBasedArrayIndex) override { gServers[zeroBasedArrayIndex].Destroy(); }
+    void DestroyRegistration(unsigned zeroBasedArrayIndex) override { gServers[zeroBasedArrayIndex].Destroy(); }
 };
 
 } // namespace

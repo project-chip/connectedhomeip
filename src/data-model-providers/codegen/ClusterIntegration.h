@@ -56,7 +56,7 @@ public:
         virtual ServerClusterInterface & FindRegistration(unsigned zeroBasedArrayIndex) = 0;
 
         // Destroy/free the given registration
-        virtual void DestroyRegisration(unsigned zeroBasedArrayIndex) = 0;
+        virtual void DestroyRegistration(unsigned zeroBasedArrayIndex) = 0;
     };
 
     struct RegisterServerOptions

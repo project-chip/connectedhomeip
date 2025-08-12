@@ -122,7 +122,7 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
         // however this should never happen in practice.
     }
 
-    delegate.DestroyRegisration(zeroBasedArrayIndex);
+    delegate.DestroyRegistration(zeroBasedArrayIndex);
 }
 
 } // namespace chip::app

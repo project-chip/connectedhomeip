@@ -49,7 +49,7 @@ public:
     }
 
     ServerClusterInterface & FindRegistration(unsigned zeroBasedArrayIndex) override { return gServer.Cluster(); }
-    void DestroyRegisration(unsigned zeroBasedArrayIndex) override { gServer.Destroy(); }
+    void DestroyRegistration(unsigned zeroBasedArrayIndex) override { gServer.Destroy(); }
 };
 
 } // namespace
