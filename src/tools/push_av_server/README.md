@@ -113,7 +113,7 @@ export PUBLISHING_ENDPOINT=https://localhost:1234/streams/1
 
 This command saves the stream's URL into an environment variable for easy
 access. This URL is the ingest endpoint—the specific address where the `CMAF`
-media segments will be uploaded. The 1 is the stream_id returned by the previous
+media segments will be uploaded. The 1 at the end is the stream_id returned by the previous
 command.
 
 ### 3. Publishing Media Content
