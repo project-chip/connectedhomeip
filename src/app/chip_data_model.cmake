@@ -74,7 +74,7 @@ endfunction()
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
+    cmake_parse_arguments(ARG "" "SCOPE;ZAP_FILE;IDL;ZCL_PATH" "EXTERNAL_CLUSTERS" ${ARGN})
 
     if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
@@ -134,6 +134,7 @@ function(chip_configure_data_model APP_TARGET)
         "zap-generated/IMClusterCommandHandler.cpp"
         OUTPUT_PATH APP_TEMPLATES_GEN_DIR
         OUTPUT_FILES APP_TEMPLATES_GEN_FILES
+        ZCL_PATH ${ARG_ZCL_PATH}
     )
     target_include_directories(${APP_TARGET} ${SCOPE} "${APP_TEMPLATES_GEN_DIR}")
     target_include_directories(${APP_TARGET} ${SCOPE} "${CHIP_APP_BASE_DIR}/zzz_generated")

@@ -139,7 +139,7 @@ endfunction()
 function(chip_zapgen TARGET_NAME)
     cmake_parse_arguments(ARG
          ""
-         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES"
+         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES;ZCL_PATH"
          "OUTPUTS"
          ${ARGN}
     )
@@ -180,6 +180,28 @@ function(chip_zapgen TARGET_NAME)
             message(SEND_ERROR "Unsupported zap generator: ${ARG_GENERATOR}")
         endif()
 
+        set(ZAPGEN_ARGS
+            "--no-prettify-output"
+            "--templates" "${TEMPLATE_PATH}"
+            "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
+            "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
+            "--parallel"
+            "${ARG_INPUT}"
+        )
+
+        # Optional ZCL path for zapgen:
+        # - If ZCL_PATH is passed, use it.
+        # - If CHIP_ENABLE_ZCL_ARG is ON, use default path.
+        # - Otherwise, skip --zcl to preserve default behavior.
+        if(CHIP_ENABLE_ZCL_ARG AND NOT ARG_ZCL_PATH)
+            set(ARG_ZCL_PATH "${CHIP_ROOT}/src/app/zap-templates/zcl/zcl.json")
+        endif()
+        
+        # Add --zcl only if a valid path is set.
+        if(ARG_ZCL_PATH)
+            list(APPEND ZAPGEN_ARGS "--zcl" "${ARG_ZCL_PATH}")
+        endif()
+
         # Python is expected to be in the path
         # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
         find_package(Python3 REQUIRED)
@@ -191,13 +213,7 @@ function(chip_zapgen TARGET_NAME)
         add_custom_command(
             OUTPUT ${OUT_NAMES}
             COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/tools/zap/generate.py"
-            ARGS
-                "--no-prettify-output"
-                "--templates" "${TEMPLATE_PATH}"
-                "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
-                "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
-                "--parallel"
-                "${ARG_INPUT}"
+            ARGS ${ZAPGEN_ARGS}
             DEPENDS
                 "${ARG_INPUT}"
                 ${EXTRA_DEPENDENCIES}
