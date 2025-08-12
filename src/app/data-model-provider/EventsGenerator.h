@@ -39,7 +39,7 @@ template <typename T>
 class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
 public:
-    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData){};
+    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData) {};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
@@ -51,28 +51,6 @@ private:
 
 std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
                                          EventLoggingDelegate & delegate, bool isFabricSensitiveEvent);
-
-template <typename G, typename T>
-std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
-{
-    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-
-    constexpr bool isFabricScoped = DataModel::IsFabricScoped<T>::value;
-
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    if constexpr (isFabricScoped)
-    {
-        fabricIndex = aEventData.GetFabricIndex();
-    }
-
-    EventOptions eventOptions;
-
-    eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    eventOptions.mPriority    = aEventData.GetPriorityLevel();
-    eventOptions.mFabricIndex = fabricIndex;
-
-    return GenerateEvent(eventOptions, generator, eventPayloadWriter, isFabricScoped);
-}
 
 } // namespace internal
 
@@ -109,7 +87,9 @@ public:
     template <typename T>
     std::optional<EventNumber> GenerateEvent(const T & eventData, EndpointId endpointId)
     {
-        return internal::GenerateEvent(*this, eventData, endpointId);
+        internal::SimpleEventPayloadWriter<T> eventPayloadWriter(eventData);
+        constexpr bool isFabricSensitiveEvent = DataModel::IsFabricScoped<T>::value;
+        return internal::GenerateEvent({ endpointId, eventData }, *this, eventPayloadWriter, isFabricSensitiveEvent);
     }
 };
 
