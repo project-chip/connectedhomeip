@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "fixed-label-cluster.h"
+#include <app/clusters/fixed-label-server/fixed-label-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/FixedLabel/Metadata.h>
 
@@ -22,7 +22,6 @@ namespace chip::app::Clusters {
 
 using namespace FixedLabel::Attributes;
 
-// Register for the Fixed Label cluster on all endpoints.
 FixedLabelCluster::FixedLabelCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, FixedLabel::Id }) {}
 
 CHIP_ERROR FixedLabelCluster::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
