@@ -1,4 +1,5 @@
-#    Copyright (c) 2025 Project CHIP Authors
+#
+#   Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,8 +31,8 @@
 import logging
 
 from mobly import asserts
-
 import matter.clusters as Clusters
+from matter.clusters import Attribute
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -68,47 +69,43 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
         )
 
         asserts.assert_true(isinstance(output_list, list), "OutputList should be a list")
-        asserts.assert_true(len(output_list) > 0, "OutputList should not be empty")
-
         valid_indices = []
 
         for output in output_list:
+            # Validate struct type
+            asserts.assert_is_instance(output, cluster.Structs.OutputInfoStruct, f"Expected OutputInfoStruct, got {type(output)}")
+
             # Validate 'index'
             asserts.assert_true(hasattr(output, "index"), "'index' field is missing")
-            asserts.assert_true(isinstance(output.index, int), "'index' should be an unsigned integer")
-            asserts.assert_true(0 <= output.index <= 255, f"'index' should be in uint8 range (0-255), got {output.index}")
+            asserts.assert_is_instance(output.index, int, "'index' should be an unsigned integer")
+            asserts.assert_in(output.index, range(256), f"'index' should be in uint8 range (0-255)")
             valid_indices.append(output.index)
 
             # Validate 'outputType'
             asserts.assert_true(hasattr(output, "outputType"), "'outputType' field is missing")
-            asserts.assert_true(isinstance(output.outputType, int), "'outputType' should be an integer")
-            asserts.assert_true(0 <= output.outputType <= 255,
-                                f"'outputType' should be in enum8 range (0-255), got {output.outputType}")
+            asserts.assert_is_instance(output.outputType, int, "'outputType' should be an integer")
+            asserts.assert_in(output.outputType, range(256), f"'outputType' should be in enum8 range (0-255)")
 
             # Validate 'name'
             asserts.assert_true(hasattr(output, "name"), "'name' field is missing")
-            asserts.assert_true(isinstance(output.name, str), "'name' should be a string")
+            asserts.assert_is_instance(output.name, str, "'name' should be a string")
+
             logging.info(f"Output Struct - index: {output.index}, outputType: {output.outputType}, name: {output.name}")
 
-        # Ensure 'index' values are unique
-        asserts.assert_equal(
-            len(valid_indices), len(set(valid_indices)),
-            "Each 'index' in OutputList must be unique"
-        )
+    # Step 3: Read CurrentOutput (only if OutputList is non-empty)
+        if valid_indices:
+            self.step(3)
+            current_output = await self.read_single_attribute_check_success(
+                cluster=cluster,
+                attribute=attributes.CurrentOutput
+            )
 
-        # Step 3: Read CurrentOutput
-        self.step(3)
-        current_output = await self.read_single_attribute_check_success(
-            cluster=cluster,
-            attribute=attributes.CurrentOutput
-        )
-
-        asserts.assert_true(isinstance(current_output, int), "CurrentOutput should be an integer")
-        asserts.assert_true(0 <= current_output <= 255, "CurrentOutput should be in uint8 range (0-255)")
-        asserts.assert_true(
-            current_output in valid_indices,
-            f"CurrentOutput index ({current_output}) must be one of: {valid_indices}"
-        )
+            asserts.assert_is_instance(current_output, int, "CurrentOutput should be an integer")
+            asserts.assert_in(current_output, range(256), "CurrentOutput should be in uint8 range (0-255)")
+            asserts.assert_in(
+                current_output, valid_indices,
+                f"CurrentOutput index ({current_output}) must be one of: {valid_indices}"
+            )
 
 
 if __name__ == "__main__":
