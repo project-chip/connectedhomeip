@@ -8,14 +8,14 @@ println 'matterBuildSrcDir='+matterBuildSrcDir
 println 'matterUTestLib='+matterUTestLib
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    namespace "com.tcl.chip.chiptest"
+    compileSdkVersion 34
     ndkPath System.getenv("ANDROID_NDK_HOME")
 
     defaultConfig {
         applicationId "com.tcl.chip.chiptest"
         minSdkVersion 26
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -43,11 +43,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     buildFeatures {
