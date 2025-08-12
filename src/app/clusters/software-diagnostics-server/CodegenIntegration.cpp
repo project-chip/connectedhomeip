@@ -66,7 +66,7 @@ void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = kRootEndpointId,
             .fetchFeatureMap                 = false,
-            .optionalAttributesToFetch       = SoftwareDiagnosticsLogic::OptionalAttributeSet::All(),
+            .fetchOptionalAttributes       = true,
         },
         integrationDelegate);
 }

@@ -49,8 +49,6 @@ constexpr uint32_t AllBits() {
     }
 }
 
-
-
 } // namespace Internal
 
 /// It is very common that a class has optional attributes. Such optional attributes
@@ -152,7 +150,7 @@ template <AttributeId... OptionalAttributeIds>
 class OptionalAttributeSet : public AttributeSet
 {
 public:
-    explicit OptionalAttributeSet(uint32_t initialValue) : AttributeSet(initialValue) {}
+    explicit OptionalAttributeSet(uint32_t initialValue) : AttributeSet(initialValue & All()) {}
     OptionalAttributeSet(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
     OptionalAttributeSet() = default;
 

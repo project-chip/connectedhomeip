@@ -66,7 +66,7 @@ public:
         uint16_t fixedClusterServerEndpointCount; // data to aid in ember 0-based indexing
         uint16_t maxEndpointCount;                // this is how many endpoints are supported by the delegates (0-based index)
         bool fetchFeatureMap;                     // read feature map attribute from ember
-        uint32_t optionalAttributesToFetch;       // what optional attributes to read from ember
+        uint32_t fetchOptionalAttributes;         // read the enabling of the first 32 optional attributes from ember
     };
 
     /// Loads required data from ember and calls `CreateRegistration` once all the data

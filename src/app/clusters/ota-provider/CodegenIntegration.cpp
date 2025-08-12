@@ -63,7 +63,7 @@ void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(EndpointId endpoi
             .fixedClusterServerEndpointCount = kOtaProviderFixedClusterCount,
             .maxEndpointCount                = kOtaProviderMaxClusterCount,
             .fetchFeatureMap                 = false,
-            .optionalAttributesToFetch       = 0,
+            .fetchOptionalAttributes       = false,
         },
         integrationDelegate);
 }

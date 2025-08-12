@@ -79,15 +79,13 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     }
 
     uint32_t optionalAttributes = 0;
-    if (options.optionalAttributesToFetch)
+    if (options.fetchOptionalAttributes)
     {
         for (AttributeId attributeId = 0; attributeId < 32; attributeId++)
         {
-            const uint32_t bit = 1u << attributeId;
-            if (((options.optionalAttributesToFetch & bit) != 0) &&
-                emberAfContainsAttribute(options.endpointId, options.clusterId, attributeId))
+            if (emberAfContainsAttribute(options.endpointId, options.clusterId, attributeId))
             {
-                optionalAttributes |= bit;
+                optionalAttributes |= 1u << attributeId;
             }
         }
     }
