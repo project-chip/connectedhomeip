@@ -434,7 +434,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         return percent_setting_expected
 
-    async def perform_lowest_off_step_commands_and_verify(self, step: Clusters.FanControl.Commands.Step) -> None:
+    async def lowest_off_field_conditions_test(self, step: Clusters.FanControl.Commands.Step) -> None:
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
@@ -516,7 +516,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #      an additional Step command to veiryf that the PercentSetting attribute
         #      report value stays at the expected value.
         self.step(self.current_step_index + 1)
-        await self.perform_lowest_off_step_commands_and_verify(step)
+        await self.lowest_off_field_conditions_test(step)
 
         # *** NEXT STEP ***
         #  Read the resulting attribute reports from each subscription after the Step commands
