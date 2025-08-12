@@ -141,8 +141,7 @@ example on your Linux machine. You will need two separate terminal windows.
 
 Terminal 1: Start the Camera App (Device)
 
-1. Launch the chip-camera-app binary. The --camera-deferred-offer flag prepares
-   the camera to stream upon request from the controller.
+1. Launch the chip-camera-app binary.
 
 Clean up any existing configurations (first-time pairing only):
 
