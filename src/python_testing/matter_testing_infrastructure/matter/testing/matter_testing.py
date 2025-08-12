@@ -458,7 +458,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
-        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute,)])
+        # mypy expects tuple-shaped items here. Some tests crash when attribute requests are wrapped in a single-element tuple here.
+        # We pass the plain attribute to avoid the runtime issue; so we ignore that type.
+        read_response = await dev_ctrl.ReadAttribute(node_id, [attribute])  # type: ignore[list-item]
         attrs = {}
         for endpoint in read_response:
             attr_ret = read_response[endpoint][cluster][attribute]
