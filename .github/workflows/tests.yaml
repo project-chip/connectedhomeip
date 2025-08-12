@@ -22,6 +22,18 @@ on:
     pull_request:
     merge_group:
     workflow_dispatch:
+        inputs:
+            disable_ccache:
+                description: 'Disable ccache restore and builds (sets CCACHE_DISABLE=1)'
+                required: false
+                default: 'false'
+                type: choice
+                options: ['false', 'true']
+            cache_suffix:
+                description: 'Optional suffix appended to ccache key to rotate (e.g. short hash)'
+                required: false
+                default: ''
+                type: string
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -43,6 +55,8 @@ jobs:
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             LSAN_OPTIONS: detect_leaks=1
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -79,6 +93,14 @@ jobs:
 
             - name: Set up a IPV6 known environment
               uses: ./.github/actions/add-ipv6
+
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
+              with:
+                build-variant: ${{ matrix.build_variant }}
+                disable: ${{ env.DISABLE_CCACHE }}
+                cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
 
             - name: Validate that xml are parsable
               # The sub-items being run here are the same as the input XMLs listed
@@ -233,11 +255,16 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
                   "
             - name: Build Apps
+              id: build_with_cache
+              continue-on-error: true
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build_python.sh \
                         --install_virtual_env out/venv \
                         --include_pytest_deps yes \
+                        $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                      "
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -254,9 +281,43 @@ jobs:
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-energy-management-${BUILD_VARIANT} \
+                        --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
+            - name: Retry build without cache on master
+              if: ${{ steps.build_with_cache.outcome == 'failure' && github.ref == 'refs/heads/master' }}
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+              run: |
+                  echo "CCACHE_DISABLE=1" >> $GITHUB_ENV
+                  rm -rf "${{ github.workspace }}/.ccache" || true
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build_python.sh \
+                        --install_virtual_env out/venv \
+                        --include_pytest_deps yes \
+                     "
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
+                        --target linux-x64-all-clusters-${BUILD_VARIANT} \
+                        --target linux-x64-lock-${BUILD_VARIANT} \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT} \
+                        --target linux-x64-ota-requestor-${BUILD_VARIANT} \
+                        --target linux-x64-tv-app-${BUILD_VARIANT} \
+                        --target linux-x64-bridge-${BUILD_VARIANT} \
+                        --target linux-x64-lit-icd-${BUILD_VARIANT} \
+                        --target linux-x64-microwave-oven-${BUILD_VARIIANT} \
+                        --target linux-x64-rvc-${BUILD_VARIANT} \
+                        --target linux-x64-network-manager-${BUILD_VARIANT} \
+                        --target linux-x64-energy-gateway-${BUILD_VARIIANT} \
+                        --target linux-x64-energy-management-${BUILD_VARIANT} \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+
+            - name: ccache stats
+              run: ccache -s
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
@@ -362,6 +423,12 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true' && env.DISABLE_CCACHE != 'true' && env.CCACHE_DISABLE != '1'
+              uses: actions/cache/save@v4
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
 
     test_suites_darwin:
         name: Test Suites - Darwin
@@ -521,160 +588,208 @@ jobs:
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
+              with:
+                build-variant: ${{ matrix.build_variant }}
+
             - name: Build python env
-              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
 
             - name: Build linux-x64-all-clusters
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
                   "
             # TODO: determine why some apps are tsan and some are not (and does that add runtime overhead? )
             - name: Build linux-x64-bridge
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-lock
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-lit-icd
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-air-purifier
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-energy-gateway
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-energy-management
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-microwave-oven
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-rvc
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-network-manager
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-fabric-admin-rpc
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-bridge-rpc
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-sync
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
 
             # TODO: camera app needs clang support
             - name: Build linux-x64-camera
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-camera"
 
             - name: Build linux-x64-camera-controller
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera-controller
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-camera-controller"
 
             - name: Build linux-x64-light-data-model-no-unique-id
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
 
-            # TODO: T&C app needs variants (probably)
             - name: Build linux-x64-terms-and-conditions
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-terms-and-conditions
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-terms-and-conditions"
 
             - name: Build linux-x64-python-bindings
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-python-bindings-webrtc
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-python-bindings-webrtc"
 
-            # TODO: JS admin app app needs variants (probably)
             - name: Build linux-x64-jf-control-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-control-app
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-jf-control-app"
 
-            # TODO: JF admin app app needs variants (probably)
             - name: Build linux-x64-jf-admin-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-admin-app
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-jf-admin-app"
 
             - name: Build linux-x64-closure-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test
-                  build --copy-artifacts-to objdir-clone
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: ccache stats
+              run: ccache -s
 
             - name: Install push_av_server dependencies
               run: >-
@@ -770,6 +885,12 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
+              uses: actions/cache/save@v4
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
