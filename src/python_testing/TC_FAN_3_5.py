@@ -357,31 +357,6 @@ class TC_FAN_3_5(MatterBaseTest):
 
         self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
-    async def initialize_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int:
-        """Initialize PercentSetting according to the Step command parameters.
-
-        Args:
-            step (Clusters.FanControl.Commands.Step): Step command parameters.
-
-        Returns:
-            int: The initialized PercentSetting value.
-        """
-        cluster = Clusters.FanControl
-        attr = cluster.Attributes
-        sd_enum = cluster.Enums.StepDirectionEnum
-
-        # Initialize PercentSetting
-        percent_setting_init = 0 if step.direction == sd_enum.kIncrease else self.percent_setting_max
-        if step.wrap:
-            if step.direction == sd_enum.kDecrease:
-                percent_setting_init = self.percent_setting_per_step
-            else:
-                percent_setting_init = self.percent_setting_max
-
-        await self.write_setting(attr.PercentSetting, percent_setting_init)
-
-        return percent_setting_init
-
     async def verify_expected_attribute_value(self, attribute: Callable, expected_value: Any) -> None:
         """Verify that a given attribute has the expected value.
 
@@ -493,12 +468,21 @@ class TC_FAN_3_5(MatterBaseTest):
         Raises:
             AssertionError: If expected conditions are not met during test steps.
         """
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+        sd_enum = cluster.Enums.StepDirectionEnum
 
         # *** NEXT STEP ***
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in accordance with the Step command parameters
         self.step(self.current_step_index + 1)
-        percent_setting_init = await self.initialize_percent_setting(step)
+        percent_setting_init = 0 if step.direction == sd_enum.kIncrease else self.percent_setting_max
+        if step.wrap:
+            if step.direction == sd_enum.kDecrease:
+                percent_setting_init = self.percent_setting_per_step
+            else:
+                percent_setting_init = self.percent_setting_max
+        await self.write_setting(attr.PercentSetting, percent_setting_init)
 
         # *** NEXT STEP ***
         # Subscribe to the requested attributes
@@ -775,11 +759,21 @@ class TC_FAN_3_5(MatterBaseTest):
         Args:
             step (Clusters.FanControl.Commands.Step): Step command parameters.
         """
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+        sd_enum = cluster.Enums.StepDirectionEnum
+
         # *** NEXT STEP ***
         # Initialize the PercentSetting attribute and verify the expected
         # attribute changes in accordance with the Step command parameters
         self.step(self.current_step_index + 1)
-        await self.initialize_percent_setting(step)
+        percent_setting_init = 0 if step.direction == sd_enum.kIncrease else self.percent_setting_max
+        if step.wrap:
+            if step.direction == sd_enum.kDecrease:
+                percent_setting_init = self.percent_setting_per_step
+            else:
+                percent_setting_init = self.percent_setting_max
+        await self.write_setting(attr.PercentSetting, percent_setting_init)
 
         # *** NEXT STEP ***
         # Subscribe to the requested attributes
