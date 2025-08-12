@@ -2923,6 +2923,7 @@
     const EmberAfGenericClusterFunction chipFuncArrayAdministratorCommissioningServer[] = {                                        \
         (EmberAfGenericClusterFunction) emberAfAdministratorCommissioningClusterServerInitCallback,                                \
         (EmberAfGenericClusterFunction) MatterAdministratorCommissioningClusterServerShutdownCallback,                             \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayGroupKeyManagementServer[] = {                                                \
         (EmberAfGenericClusterFunction) emberAfGroupKeyManagementClusterServerInitCallback,                                        \
     };                                                                                                                             \
