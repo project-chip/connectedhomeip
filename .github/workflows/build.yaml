@@ -373,7 +373,7 @@ jobs:
               shell: bash
               run: |
                   source pyenv/bin/activate
-                  cd src/controller/python/test/unit_tests/
+                  cd src/controller/python/tests
                   python3 -m unittest -v
             - name: Clean previous outputs
               run: rm -rf out pyenv
