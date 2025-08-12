@@ -20,6 +20,7 @@ namespace CameraAvSettingsUserLevelManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MPTZPosition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MPTZPosition::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -65,6 +66,7 @@ constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace MPTZSetPosition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MPTZSetPosition::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
