@@ -1,2 +1,3 @@
 OwnershipContext.trustedIcacPublicKeyB max_size:65    // Maximum size of trustedIcacPublicKeyB
-Response.response_bytes max_size:600                  // Maximum size of ICACCSR
+Response.response_bytes max_size:600
+RequestOptions.request_bytes max_size:600

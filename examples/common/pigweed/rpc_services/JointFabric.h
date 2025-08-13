@@ -18,8 +18,11 @@ public:
     void GetStream(const ::pw_protobuf_Empty & request, ServerWriter<::RequestOptions> & writer);
     ::pw::Status ResponseStream(const ::Response & ResponseBytes, ::pw_protobuf_Empty & response);
 
+    CHIP_ERROR GetReplyInternal(MutableByteSpan & icacCSR, RequestOptions & requestOptions);
+
     /* JFARpc overrides */
     CHIP_ERROR GetICACCSRForJF(MutableByteSpan & icacCSR);
+    CHIP_ERROR GetCrossSignedIcacForJF(uint64_t anchorFabricId, ByteSpan & icacCSR, MutableByteSpan & crossSignedICAC);
     void CloseStreams();
 
 private:
