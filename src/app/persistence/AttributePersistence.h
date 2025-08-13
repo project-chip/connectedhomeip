@@ -55,15 +55,18 @@ public:
     template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
     CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
-        T decodedValue;
-
-        ReturnErrorOnFailure(decoder.Decode(decodedValue));
         if constexpr (std::is_enum_v<T>)
         {
+            T decodedValue;
+            ReturnErrorOnFailure(decoder.Decode(decodedValue));
             VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+            value = decodedValue;
+        }
+        else
+        {
+            ReturnErrorOnFailure(decoder.Decode(value));
         }
 
-        value = decodedValue;
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
 
