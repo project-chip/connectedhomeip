@@ -630,17 +630,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
  */
 void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 {
-    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: InvokeCommand", mEndpointId);
-
-    // Only execute a command if the camera is not engaged in physical movement
-    //
-    if (IsProcessingAsyncCommand())
-    {
-        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Busy);
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: can not execute command as camera is busy with a physical movement", mEndpointId);
-        return;
-
-    }                   
+    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: InvokeCommand", mEndpointId);           
 
     switch (handlerContext.mRequestPath.mCommandId)
     {
@@ -828,8 +818,16 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
         return;
     }
 
-    // Check with the delegate that we're in a position to change any of the PTZ values
+    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any of the PTZ values
+    // which may not be possible for other reasons
     //
+    if (IsProcessingAsyncCommand())
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
+        return;
+    }      
+
     if (!mDelegate.CanChangeMPTZ())
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process MPTZ change", mEndpointId);
@@ -841,33 +839,17 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
     //
     ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
     mAsyncCommandHandler = CommandHandler::Handle(&ctx.mCommandHandler);
+    mRequestPath         = ctx.mRequestPath;
     mTargetPan           = pan;
     mTargetTilt          = tilt;
     mTargetZoom          = zoom;
 
     mDelegate.MPTZSetPosition(pan, tilt, zoom, this);
-    return;
-    /**
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    // Set the local values of pan, tilt, and zoom
-    SetPan(pan);
-    SetTilt(tilt);
-    SetZoom(zoom);
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    **/
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext & ctx,
                                                                  const Commands::MPTZRelativeMove::DecodableType & commandData)
 {
-
-    Status status           = Status::Success;
     bool hasAtLeastOneValue = false;
 
     Optional<int16_t> panDelta  = commandData.panDelta;
@@ -1000,8 +982,16 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         return;
     }
 
-    // Check with the delegate that we're in a position to change any of the PTZ values
+    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any of the PTZ values
+    // which may not be possible for other reasons
     //
+    if (IsProcessingAsyncCommand())
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
+        return;
+    }      
+
     if (!mDelegate.CanChangeMPTZ())
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process MPTZ relative value change",
@@ -1010,28 +1000,21 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         return;
     }
 
-    // Call the delegate to simply set the newly calculated MPTZ values based on the deltas received
+    // We don't send the response until the delegate confirms via callback that the physical device movement is complete
     //
-    status = mDelegate.MPTZRelativeMove(newPan, newTilt, newZoom);
+    ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
+    mAsyncCommandHandler = CommandHandler::Handle(&ctx.mCommandHandler);
+    mRequestPath         = ctx.mRequestPath;
+    mTargetPan           = newPan;
+    mTargetTilt          = newTilt;
+    mTargetZoom          = newZoom;
 
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    // Set the local values of pan, tilt, and zoom
-    SetPan(newPan);
-    SetTilt(newTilt);
-    SetZoom(newZoom);
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    mDelegate.MPTZRelativeMove(newPan, newTilt, newZoom, this);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext & ctx,
                                                                  const Commands::MPTZMoveToPreset::DecodableType & commandData)
 {
-    Status status  = Status::Success;
     uint8_t preset = commandData.presetID;
 
     // Verify the provided presetID is within spec limits
@@ -1065,9 +1048,16 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
         return;
     }
 
-    // This is effectively a manipulation of the current PTZ settings, ensure that the device is in a state wherein a PTZ change is
-    // possible
+    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any of the PTZ values
+    // which may not be possible for other reasons
     //
+    if (IsProcessingAsyncCommand())
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
+        return;
+    }      
+
     if (!mDelegate.CanChangeMPTZ())
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Device not able to process move to MPTZ preset", mEndpointId);
@@ -1077,22 +1067,17 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
 
     auto presetValues = it->GetMptzPosition();
 
+    // We don't send the response until the delegate confirms via callback that the physical device movement is complete
+    //
+    ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
+    mAsyncCommandHandler = CommandHandler::Handle(&ctx.mCommandHandler);
+    mRequestPath         = ctx.mRequestPath;
+    mTargetPan           = presetValues.pan;
+    mTargetTilt          = presetValues.tilt;
+    mTargetZoom          = presetValues.zoom;
+
     // Inform the delegate that the device is requested to move to PTZ values given by the selected preset id
-    // Call the delegate to allow the device to handle the physical changes, on success set the MPTZ values based on the preset
-    status = mDelegate.MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom);
-
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    // Set individual Pan, Tilt, and Zoom from the preset
-    SetPan(presetValues.pan);
-    SetTilt(presetValues.tilt);
-    SetZoom(presetValues.zoom);
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+    mDelegate.MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom, this);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & ctx,
@@ -1316,13 +1301,16 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
 //
 void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status status)
 {
-    SetPan(mTargetPan);
-    SetTilt(mTargetTilt);
-    SetZoom(mTargetZoom);
+    if (status == Status::Success)
+    {
+        SetPan(mTargetPan);
+        SetTilt(mTargetTilt);
+        SetZoom(mTargetZoom);
+    }
 
-   auto commandHandleRef = std::move(mAsyncCommandHandler);
-   auto commandHandle = commandHandleRef.Get();
-   commandHandle->AddStatus(mRequestPath, status);
+    auto commandHandleRef = std::move(mAsyncCommandHandler);
+    auto commandHandle = commandHandleRef.Get();
+    commandHandle->AddStatus(mRequestPath, status);
 }
 
 } // namespace CameraAvSettingsUserLevelManagement
