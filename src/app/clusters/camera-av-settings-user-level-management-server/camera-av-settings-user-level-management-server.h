@@ -85,8 +85,8 @@ public:
 class PhysicalPTZCallback
 {
 public:
-    PhysicalPTZCallback()  = default;
-    virtual ~PhysicalPTZCallback() = default;
+    PhysicalPTZCallback()                                                               = default;
+    virtual ~PhysicalPTZCallback()                                                      = default;
     virtual void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) = 0;
 };
 
@@ -120,42 +120,42 @@ public:
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
-     * receoption of an MPTZSetPosition command. Returns a failure status if the physical device cannot realize these values. Within the
-     * provided callback the server will update the server held attribute values for PTZ assuming success.
+     * receoption of an MPTZSetPosition command. Returns a failure status if the physical device cannot realize these values. Within
+     * the provided callback the server will update the server held attribute values for PTZ assuming success.
      * @param aPan  The validated value of the pan that is to be set
      * @param aTilt The validated value of the tilt that is to be set
      * @param aZoom The validated value of the zoom that is to be set
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual void MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                 Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
+    virtual void MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                 PhysicalPTZCallback * callback) = 0;
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
      * receoption of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the
-     * app with the new, requested settings for PTZ. Returns a failure status if the physical device cannot realize these values. Within the
-     * provided callback the server will update the server held attribute values for PTZ assuming success.
+     * app with the new, requested settings for PTZ. Returns a failure status if the physical device cannot realize these values.
+     * Within the provided callback the server will update the server held attribute values for PTZ assuming success.
      * @param aPan  The validated value of the pan that is to be set
      * @param aTilt The validated value of the tilt that is to be set
      * @param aZoom The validated value of the zoom that is to be set
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual void MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                  Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
+    virtual void MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                  PhysicalPTZCallback * callback) = 0;
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
      * receoption of an MPTZMoveToPreset command.  The server has already ensured the requested preset ID exists, and obtained the
-     * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. Within the
-     * provided callback the server will update the server held attribute values for PTZ assuming success.
+     * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. Within
+     * the provided callback the server will update the server held attribute values for PTZ assuming success.
      * @param aPreset The preset ID associated with the provided PTZ values
      * @param aPan    The value for Pan associated with the preset
      * @param aTilt   The value for Tilt associated with the preset
      * @param aZoom   The value for Zoom associated with the preset
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual void MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                  Optional<uint8_t> aZoom, PhysicalPTZCallback * callback) = 0;
+    virtual void MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                  PhysicalPTZCallback * callback) = 0;
 
     /**
      * Informs the delegate that a request has been made to save the current PTZ values in a new (or updated) preset ID.
@@ -342,7 +342,7 @@ public:
     void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) override;
 
     // Is a command already being processed
-    bool IsProcessingAsyncCommand () const { return mAsyncCommandHandler.IsValid(); }
+    bool IsProcessingAsyncCommand() const { return mAsyncCommandHandler.IsValid(); }
 
 private:
     Delegate & mDelegate;
@@ -375,7 +375,7 @@ private:
     // Holding variables for values subject to successful physical movement
     Optional<int16_t> mTargetPan;
     Optional<int16_t> mTargetTilt;
-    Optional<uint8_t>  mTargetZoom;
+    Optional<uint8_t> mTargetZoom;
 
     // Attribute handler interface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -417,7 +417,6 @@ private:
      */
     void MarkDirty(AttributeId aAttributeId);
 };
-
 
 } // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters

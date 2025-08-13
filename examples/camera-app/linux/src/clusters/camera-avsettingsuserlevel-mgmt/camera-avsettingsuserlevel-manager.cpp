@@ -18,9 +18,9 @@
 
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <camera-avsettingsuserlevel-manager.h>
 #include <cmath>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -57,7 +57,8 @@ void CameraAVSettingsUserLevelManager::DefaultViewportUpdated(Globals::Structs::
     this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
 
-void CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+void CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                                       PhysicalPTZCallback * callback)
 {
     mCallback = callback;
 
@@ -70,10 +71,12 @@ void CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, O
     // For the purposes of the Camera App assume that the physical movement has completed.  An actual HAL will need to
     // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([callback] {callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success);});
+    DeviceLayer::SystemLayer().ScheduleLambda(
+        [callback] { callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success); });
 }
 
-void CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+void CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                                        PhysicalPTZCallback * callback)
 {
     mCallback = callback;
 
@@ -86,11 +89,12 @@ void CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, 
     // For the purposes of the Camera App assume that the physical movement has completed.  An actual HAL will need to
     // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([callback] {callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success);});
+    DeviceLayer::SystemLayer().ScheduleLambda(
+        [callback] { callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success); });
 }
 
 void CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                          Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+                                                        Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     mCallback = callback;
 
@@ -103,7 +107,8 @@ void CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optiona
     // For the purposes of the Camera App assume that the physical movement has completed.  An actual HAL will need to
     // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([callback] {callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success);});
+    DeviceLayer::SystemLayer().ScheduleLambda(
+        [callback] { callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success); });
 }
 
 Status CameraAVSettingsUserLevelManager::MPTZSavePreset(uint8_t aPreset)

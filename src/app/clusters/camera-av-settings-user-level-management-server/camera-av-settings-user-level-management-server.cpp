@@ -743,7 +743,7 @@ void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handler
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext & ctx,
                                                                 const Commands::MPTZSetPosition::DecodableType & commandData)
 {
-    //Status status           = Status::Success;
+    // Status status           = Status::Success;
     bool hasAtLeastOneValue = false;
 
     Optional<int16_t> pan  = commandData.pan;
@@ -818,13 +818,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
         return;
     }
 
-    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any of the PTZ values
-    // which may not be possible for other reasons
+    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any
+    // of the PTZ values which may not be possible for other reasons
     //
     if (IsProcessingAsyncCommand())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement",
+                     mEndpointId);
         return;
     }
 
@@ -982,13 +983,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         return;
     }
 
-    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any of the PTZ values
-    // which may not be possible for other reasons
+    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any
+    // of the PTZ values which may not be possible for other reasons
     //
     if (IsProcessingAsyncCommand())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement",
+                     mEndpointId);
         return;
     }
 
@@ -1048,13 +1050,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
         return;
     }
 
-    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any of the PTZ values
-    // which may not be possible for other reasons
+    // If a command is in progress, then return Busy.  Subsequently check with the delegate that we're in a position to change any
+    // of the PTZ values which may not be possible for other reasons
     //
     if (IsProcessingAsyncCommand())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement",
+                     mEndpointId);
         return;
     }
 
@@ -1309,7 +1312,7 @@ void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status stat
     }
 
     auto commandHandleRef = std::move(mAsyncCommandHandler);
-    auto commandHandle = commandHandleRef.Get();
+    auto commandHandle    = commandHandleRef.Get();
     commandHandle->AddStatus(mRequestPath, status);
 }
 
