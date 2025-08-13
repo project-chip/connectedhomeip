@@ -50,11 +50,11 @@ CHIP_ERROR EncodeU64Value(uint64_t value, CHIP_ERROR readError, AttributeValueEn
 
 } // anonymous namespace
 
-EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(
-    DeviceLayer::DiagnosticDataProvider & provider, const BitFlags<EthernetNetworkDiagnostics::Feature> enabledFeatures,
-    const EthernetDiagnosticsEnabledAttributes & enabledAttributes) :
-    DefaultServerCluster({ kRootEndpointId, EthernetNetworkDiagnostics::Id }),
-    mProvider(provider), mEnabledFeatures(enabledFeatures), mEnabledAttributes(enabledAttributes)
+EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
+                                                                   const BitFlags<Feature> enabledFeatures,
+                                                                   OptionalAttributeSet optionalAttributeSet) :
+    DefaultServerCluster({ kRootEndpointId, Id }),
+    mProvider(provider), mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -66,9 +66,9 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
 
     switch (request.path.mAttributeId)
     {
-    case EthernetNetworkDiagnostics::Attributes::PHYRate::Id: {
-        EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo::Type pHYRate;
-        auto phyRateValue = EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
+    case PHYRate::Id: {
+        PHYRate::TypeInfo::Type pHYRate;
+        auto phyRateValue = PHYRateEnum::kRate10M;
 
         if (mProvider.GetEthPHYRate(phyRateValue) == CHIP_NO_ERROR)
         {
@@ -83,8 +83,8 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
 
         return encoder.Encode(pHYRate);
     }
-    case EthernetNetworkDiagnostics::Attributes::FullDuplex::Id: {
-        EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo::Type fullDuplex;
+    case FullDuplex::Id: {
+        FullDuplex::TypeInfo::Type fullDuplex;
         bool duplexValue = false;
 
         if (mProvider.GetEthFullDuplex(duplexValue) == CHIP_NO_ERROR)
@@ -99,8 +99,8 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
 
         return encoder.Encode(fullDuplex);
     }
-    case EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id: {
-        EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
+    case CarrierDetect::Id: {
+        CarrierDetect::TypeInfo::Type carrierDetect;
         bool carrierDetectValue = false;
 
         if (mProvider.GetEthCarrierDetect(carrierDetectValue) == CHIP_NO_ERROR)
@@ -116,28 +116,28 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
 
         return encoder.Encode(carrierDetect);
     }
-    case EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id:
+    case TimeSinceReset::Id:
         err = mProvider.GetEthTimeSinceReset(value);
         break;
-    case EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id:
+    case PacketRxCount::Id:
         err = mProvider.GetEthPacketRxCount(value);
         break;
-    case EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id:
+    case PacketTxCount::Id:
         err = mProvider.GetEthPacketTxCount(value);
         break;
-    case EthernetNetworkDiagnostics::Attributes::TxErrCount::Id:
+    case TxErrCount::Id:
         err = mProvider.GetEthTxErrCount(value);
         break;
-    case EthernetNetworkDiagnostics::Attributes::CollisionCount::Id:
+    case CollisionCount::Id:
         err = mProvider.GetEthCollisionCount(value);
         break;
-    case EthernetNetworkDiagnostics::Attributes::OverrunCount::Id:
+    case OverrunCount::Id:
         err = mProvider.GetEthOverrunCount(value);
         break;
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode(mEnabledFeatures);
     case Globals::Attributes::ClusterRevision::Id:
-        return encoder.Encode(EthernetNetworkDiagnostics::kRevision);
+        return encoder.Encode(kRevision);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -151,7 +151,7 @@ EthernetDiagnosticsServerCluster::InvokeCommand(const DataModel::InvokeRequest &
 {
     switch (request.path.mCommandId)
     {
-    case EthernetNetworkDiagnostics::Commands::ResetCounts::Id:
+    case Commands::ResetCounts::Id:
         // TODO:[#39725] This should properly handle the return value from ResetEthNetworkDiagnosticsCounts().
         // However, for bug-for-bug compatibility with old code, we ignore the return value.
         // The old implementation would drop the error to the floor and always return success,
@@ -166,12 +166,9 @@ EthernetDiagnosticsServerCluster::InvokeCommand(const DataModel::InvokeRequest &
 CHIP_ERROR EthernetDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mEnabledFeatures.Has(EthernetNetworkDiagnostics::Feature::kPacketCounts) ||
-        mEnabledFeatures.Has(EthernetNetworkDiagnostics::Feature::kErrorCounts))
+    if (mEnabledFeatures.Has(Feature::kPacketCounts) || mEnabledFeatures.Has(Feature::kErrorCounts))
     {
-        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-            EthernetNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry
-        };
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetCounts::kMetadataEntry };
         return builder.ReferenceExisting(kAcceptedCommands);
     }
 
@@ -182,25 +179,15 @@ CHIP_ERROR EthernetDiagnosticsServerCluster::AcceptedCommands(const ConcreteClus
 CHIP_ERROR EthernetDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
                                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    bool hasErrorCounts  = mEnabledFeatures.Has(EthernetNetworkDiagnostics::Feature::kErrorCounts);
-    bool hasPacketCounts = mEnabledFeatures.Has(EthernetNetworkDiagnostics::Feature::kPacketCounts);
-
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { mEnabledAttributes.enableCarrierDetect, CarrierDetect::kMetadataEntry },
-        { mEnabledAttributes.enableFullDuplex, FullDuplex::kMetadataEntry },
-        { mEnabledAttributes.enablePHYRate, PHYRate::kMetadataEntry },
-        { mEnabledAttributes.enableTimeSinceReset, TimeSinceReset::kMetadataEntry },
-        { hasErrorCounts, OverrunCount::kMetadataEntry },
-        { hasErrorCounts, CollisionCount::kMetadataEntry },
-        { hasErrorCounts, TxErrCount::kMetadataEntry },
-        { hasPacketCounts, PacketRxCount::kMetadataEntry },
-        { hasPacketCounts, PacketTxCount::kMetadataEntry },
-    };
-
     AttributeListBuilder listBuilder(builder);
 
-    // Ethernet diagnostics cluster has no mandatory attributes beyond global ones
-    return listBuilder.Append(Span<const DataModel::AttributeEntry>(), Span(optionalAttributes));
+    static constexpr DataModel::AttributeEntry optionalAttributeEntries[] = {
+        CarrierDetect::kMetadataEntry,  FullDuplex::kMetadataEntry,    PHYRate::kMetadataEntry,
+        TimeSinceReset::kMetadataEntry, OverrunCount::kMetadataEntry,  CollisionCount::kMetadataEntry,
+        TxErrCount::kMetadataEntry,     PacketRxCount::kMetadataEntry, PacketTxCount::kMetadataEntry,
+    };
+
+    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributeEntries), mOptionalAttributeSet);
 }
 
 } // namespace Clusters

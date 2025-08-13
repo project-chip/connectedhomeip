@@ -25,6 +25,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
+using namespace chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
 
 namespace {
 
@@ -39,8 +40,7 @@ LazyRegisteredServerCluster<EthernetDiagnosticsServerCluster> gServers[kEthernet
 // Log an error if not found.
 bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, EthernetNetworkDiagnostics::Id,
-                                                               kEthernetNetworkDiagnosticsFixedClusterCount);
+    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, Id, kEthernetNetworkDiagnosticsFixedClusterCount);
 
     if (arrayIndex >= kEthernetNetworkDiagnosticsMaxClusterCount)
     {
@@ -54,7 +54,7 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 // Runtime method to check if an attribute is enabled using Ember functions
 bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
 {
-    return emberAfContainsAttribute(endpointId, EthernetNetworkDiagnostics::Id, attributeId);
+    return emberAfContainsAttribute(endpointId, Id, attributeId);
 }
 
 } // namespace
@@ -67,26 +67,29 @@ void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpo
         return;
     }
 
-    const EthernetDiagnosticsEnabledAttributes enabledAttributes{
-        .enableCarrierDetect  = IsAttributeEnabled(endpointId, Attributes::CarrierDetect::Id),
-        .enableFullDuplex     = IsAttributeEnabled(endpointId, Attributes::FullDuplex::Id),
-        .enablePHYRate        = IsAttributeEnabled(endpointId, Attributes::PHYRate::Id),
-        .enableTimeSinceReset = IsAttributeEnabled(endpointId, Attributes::TimeSinceReset::Id),
-    };
+    EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet =
+        EthernetDiagnosticsServerCluster::OptionalAttributeSet()
+            .Set<CarrierDetect::Id>(IsAttributeEnabled(endpointId, CarrierDetect::Id))
+            .Set<FullDuplex::Id>(IsAttributeEnabled(endpointId, FullDuplex::Id))
+            .Set<PHYRate::Id>(IsAttributeEnabled(endpointId, PHYRate::Id))
+            .Set<TimeSinceReset::Id>(IsAttributeEnabled(endpointId, TimeSinceReset::Id))
+            .Set<PacketRxCount::Id>(IsAttributeEnabled(endpointId, PacketRxCount::Id))
+            .Set<PacketTxCount::Id>(IsAttributeEnabled(endpointId, PacketTxCount::Id))
+            .Set<TxErrCount::Id>(IsAttributeEnabled(endpointId, TxErrCount::Id))
+            .Set<CollisionCount::Id>(IsAttributeEnabled(endpointId, CollisionCount::Id))
+            .Set<OverrunCount::Id>(IsAttributeEnabled(endpointId, OverrunCount::Id));
 
-    BitFlags<EthernetNetworkDiagnostics::Feature> enabledFeatures;
-    enabledFeatures.Set(EthernetNetworkDiagnostics::Feature::kPacketCounts,
-                        IsAttributeEnabled(endpointId, Attributes::PacketRxCount::Id) ||
-                            IsAttributeEnabled(endpointId, Attributes::PacketTxCount::Id));
-    enabledFeatures.Set(EthernetNetworkDiagnostics::Feature::kErrorCounts,
-                        IsAttributeEnabled(endpointId, Attributes::TxErrCount::Id) ||
-                            IsAttributeEnabled(endpointId, Attributes::CollisionCount::Id) ||
-                            IsAttributeEnabled(endpointId, Attributes::OverrunCount::Id));
+    BitFlags<Feature> enabledFeatures;
+    enabledFeatures.Set(Feature::kPacketCounts,
+                        IsAttributeEnabled(endpointId, PacketRxCount::Id) || IsAttributeEnabled(endpointId, PacketTxCount::Id));
+    enabledFeatures.Set(Feature::kErrorCounts,
+                        IsAttributeEnabled(endpointId, TxErrCount::Id) || IsAttributeEnabled(endpointId, CollisionCount::Id) ||
+                            IsAttributeEnabled(endpointId, OverrunCount::Id));
 
     // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
     // and do not properly support secondary network interfaces or per-endpoint diagnostics.
     // See issue:#40175
-    gServers[arrayIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), enabledFeatures, enabledAttributes);
+    gServers[arrayIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), enabledFeatures, optionalAttributeSet);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)

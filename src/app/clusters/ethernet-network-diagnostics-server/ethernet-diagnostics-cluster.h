@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/EthernetNetworkDiagnostics/ClusterId.h>
 #include <clusters/EthernetNetworkDiagnostics/Enums.h>
 #include <clusters/EthernetNetworkDiagnostics/Metadata.h>
@@ -39,9 +40,16 @@ struct EthernetDiagnosticsEnabledAttributes
 class EthernetDiagnosticsServerCluster : public DefaultServerCluster
 {
 public:
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
+        EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id, EthernetNetworkDiagnostics::Attributes::FullDuplex::Id,
+        EthernetNetworkDiagnostics::Attributes::PHYRate::Id, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id,
+        EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id, EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id,
+        EthernetNetworkDiagnostics::Attributes::TxErrCount::Id, EthernetNetworkDiagnostics::Attributes::CollisionCount::Id,
+        EthernetNetworkDiagnostics::Attributes::OverrunCount::Id>;
+
     EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
                                      const BitFlags<EthernetNetworkDiagnostics::Feature> mEnabledFeatures,
-                                     const EthernetDiagnosticsEnabledAttributes & enabledAttributes);
+                                     OptionalAttributeSet optionalAttributeSet);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -58,7 +66,7 @@ public:
 private:
     DeviceLayer::DiagnosticDataProvider & mProvider;
     const BitFlags<EthernetNetworkDiagnostics::Feature> mEnabledFeatures;
-    const EthernetDiagnosticsEnabledAttributes mEnabledAttributes;
+    const OptionalAttributeSet mOptionalAttributeSet;
 };
 
 } // namespace Clusters
