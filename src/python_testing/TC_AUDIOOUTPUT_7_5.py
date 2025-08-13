@@ -1,4 +1,3 @@
-#
 # Copyright (c) 2025 Project CHIP Authors
 # Licensed under the Apache License, Version 2.0
 
@@ -20,7 +19,6 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.matter_asserts import assert_valid_uint8, assert_is_string
-
 
 class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
     def desc_TC_AUDIOOUTPUT_7_5(self) -> str:
@@ -88,7 +86,5 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
         else:
             self.skip_test("OutputList is empty, skipping CurrentOutput validation.")
 
-
 if __name__ == "__main__":
     default_matter_test_main()
-    
