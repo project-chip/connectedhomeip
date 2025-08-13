@@ -32,9 +32,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.ChipDeviceCtrl import CommissioningParameters
+from matter.testing.commissioning import CustomCommissioningParameters
 from matter.interaction_model import Status
-from matter.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
 
 
@@ -93,9 +93,9 @@ class CADMINBaseTest(MatterBaseTest):
         node_id: int,
         min_interval_sec: int = 0,
         max_interval_sec: int = 30
-    ) -> ClusterAttributeChangeAccumulator:
+    ) -> AttributeSubscriptionHandler:
         """
-        Create a subscription to WindowStatus attribute using ClusterAttributeChangeAccumulator.
+        Create a subscription to WindowStatus attribute using AttributeSubscriptionHandler.
 
         Args:
             th: Controller to use
@@ -104,9 +104,9 @@ class CADMINBaseTest(MatterBaseTest):
             max_interval_sec: Maximum reporting interval in seconds
 
         Returns:
-            ClusterAttributeChangeAccumulator for WindowStatus
+            AttributeSubscriptionHandler for WindowStatus
         """
-        window_status_accumulator = ClusterAttributeChangeAccumulator(
+        window_status_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.WindowStatus
         )
@@ -122,7 +122,7 @@ class CADMINBaseTest(MatterBaseTest):
 
     async def wait_for_window_status_change(
         self,
-        window_status_accumulator: ClusterAttributeChangeAccumulator,
+        window_status_accumulator: AttributeSubscriptionHandler,
         is_open_expected: bool,
         timeout_sec: float = 10.0
     ) -> bool:
@@ -289,6 +289,42 @@ class CADMINBaseTest(MatterBaseTest):
             # Clean up subscription
             await window_status_accumulator.cancel()
 
+    async def open_commissioning_window_with_full_args(
+        self,
+        dev_ctrl: ChipDeviceCtrl,
+        timeout: int,
+        node_id: int,
+        discriminator: int = None,
+        commissioning_option: CommissioningWindowOption = CommissioningWindowOption.TOKEN_WITH_RANDOM_PIN,
+        iteration: int = 10000
+    ) -> CustomCommissioningParameters:
+        """
+        Open a commissioning window with the specified parameters.
+
+        Args:
+            th: Controller to use
+            timeout: Window timeout in seconds
+            node_id: Target node ID
+            discriminator: Optional discriminator value
+            commissioning_option: Commissioning window option (CommissioningWindowOption, default: TOKEN_WITH_RANDOM_PIN)
+                - ORIGINAL_SETUP_CODE (0): Original commissioning window (PASE)
+                - TOKEN_WITH_RANDOM_PIN (1): Enhanced commissioning window (ECM)
+            iteration: Number of iterations (default: 10000)
+        """
+        try:
+            comm_params = await dev_ctrl.OpenCommissioningWindow(
+                nodeid=node_id,
+                timeout=timeout,
+                iteration=iteration,
+                discriminator=discriminator if discriminator is not None else random.randint(0, 4095),
+                option=commissioning_option.value
+            )
+            params = CustomCommissioningParameters(comm_params, discriminator)
+            return params
+        except Exception as e:
+            logging.exception('Error running OpenCommissioningWindow %s', e)
+            asserts.fail('Failed to open commissioning window')
+
     async def open_commissioning_window_with_subscription_monitoring(
         self,
         th: ChipDeviceCtrl,
@@ -299,7 +335,7 @@ class CADMINBaseTest(MatterBaseTest):
         iteration: int = 10000,
         min_interval_sec: int = 0,
         max_interval_sec: int = 30
-    ) -> tuple[CommissioningParameters, ClusterAttributeChangeAccumulator]:
+    ) -> tuple[CustomCommissioningParameters, AttributeSubscriptionHandler]:
         """
         Open a commissioning window and create subscription for monitoring.
 
@@ -316,7 +352,7 @@ class CADMINBaseTest(MatterBaseTest):
             max_interval_sec: Maximum reporting interval for subscription
 
         Returns:
-            Tuple of (CommissioningParameters, ClusterAttributeChangeAccumulator)
+            Tuple of (CustomCommissioningParameters, AttributeSubscriptionHandler)
         """
         # Create subscription first
         window_status_accumulator = await self.create_window_status_subscription(
@@ -327,8 +363,8 @@ class CADMINBaseTest(MatterBaseTest):
         )
 
         # Open the commissioning window
-        params = await self.open_commissioning_window(
-            th=th,
+        params = await self.open_commissioning_window_with_full_args(
+            dev_ctrl=th,
             timeout=timeout,
             node_id=node_id,
             discriminator=discriminator,
@@ -337,41 +373,6 @@ class CADMINBaseTest(MatterBaseTest):
         )
 
         return params, window_status_accumulator
-
-    async def open_commissioning_window(
-        self,
-        th: ChipDeviceCtrl,
-        timeout: int,
-        node_id: int,
-        discriminator: int = None,
-        commissioning_option: CommissioningWindowOption = CommissioningWindowOption.TOKEN_WITH_RANDOM_PIN,
-        iteration: int = 10000
-    ) -> CommissioningParameters:
-        """
-        Open a commissioning window with the specified parameters.
-
-        Args:
-            th: Controller to use
-            timeout: Window timeout in seconds
-            node_id: Target node ID
-            discriminator: Optional discriminator value
-            commissioning_option: Commissioning window option (CommissioningWindowOption, default: TOKEN_WITH_RANDOM_PIN)
-                - ORIGINAL_SETUP_CODE (0): Original commissioning window (PASE)
-                - TOKEN_WITH_RANDOM_PIN (1): Enhanced commissioning window (ECM)
-            iteration: Number of iterations (default: 10000)
-        """
-        try:
-            params = await th.OpenCommissioningWindow(
-                nodeid=node_id,
-                timeout=timeout,
-                iteration=iteration,
-                discriminator=discriminator if discriminator is not None else random.randint(0, 4095),
-                option=commissioning_option.value
-            )
-            return params
-        except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
-            asserts.fail('Failed to open commissioning window')
 
     async def write_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
         result = await th.WriteAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])

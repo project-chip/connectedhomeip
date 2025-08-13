@@ -182,7 +182,7 @@ class TC_CADMIN(CADMINBaseTest):
             self.step(9)
             # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
             await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=180, iteration=1000, discriminator=0, option=1)
-            results = await self.support.monitor_commissioning_window_closure_with_subscription(
+            results = await self.monitor_commissioning_window_closure_with_subscription(
                 th=self.th2,
                 node_id=self.dut_node_id,
                 expected_duration_seconds=180
