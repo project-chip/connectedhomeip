@@ -294,11 +294,15 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(16)
         if self.pics_guard(self.check_pics("AVSM.S.A000E")):
-            value = await self.read_single_attribute_check_success(
+            supportedStreamUsages = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedStreamUsages
             )
-            logger.info(f"Rx'd SupportedStreamUsages: {value}")
-            # TODO assert enum values of list
+            logger.info(f"Rx'd SupportedStreamUsages: {supportedStreamUsages}")
+            matter_asserts.assert_all(
+                supportedStreamUsages,
+                lambda x: x < Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                "StreamUsage is not a valid StreamUsageEnum",
+            )
 
         self.step(17)
         if self.pics_guard(self.check_pics("AVSM.S.A000F")):
@@ -329,14 +333,14 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(20)
         if self.pics_guard(self.check_pics("AVSM.S.A0012")):
-            value = await self.read_single_attribute_check_success(
+            streamUsagePriorities = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
             )
-            logger.info(f"Rx'd StreamUsagePrioritiesList: {value}")
-            asserts.assert_less(
-                value,
-                Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
-                "StreamUsagePriorities is not a valid StreamUsageEnum",
+            logger.info(f"Rx'd StreamUsagePrioritiesList: {streamUsagePriorities}")
+            matter_asserts.assert_all(
+                streamUsagePriorities,
+                lambda x: x < Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                "StreamUsage is not a valid StreamUsageEnum",
             )
 
         self.step(21)
@@ -385,10 +389,10 @@ class TC_AVSM_2_1(MatterBaseTest):
 
         self.step(26)
         if self.pics_guard(self.check_pics("AVSM.S.A0018")):
-            value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.Viewport)
-            logger.info(f"Rx'd Viewport: {value}")
-            asserts.assert_is_not_none(value, "Viewport is None")
-            # TODO assert struct fields
+            viewport = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.Viewport)
+            logger.info(f"Rx'd Viewport: {viewport}")
+            asserts.assert_is_not_none(viewport, "Viewport is None")
+            self.assert_viewport_struct(viewport)
 
         self.step(27)
         if self.pics_guard(self.check_pics("AVSM.S.A0019")):
@@ -572,9 +576,14 @@ class TC_AVSM_2_1(MatterBaseTest):
     ) -> bool:
         asserts.assert_greater_equal(audioCapabilities.maxNumberOfChannels, 1, "MaxNumberOfChannels is less than 1")
         asserts.assert_greater_equal(len(audioCapabilities.supportedCodecs), 1, "SupportedCodecs list is empty")
+        matter_asserts.assert_all(
+            audioCapabilities.supportedCodecs,
+            lambda x: x < Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum.kUnknownEnumValue,
+            "SupportedCodec contains an entry that is not a valid AudioCodecEnum",
+        )
         asserts.assert_greater_equal(len(audioCapabilities.supportedSampleRates), 1, "SupportedSampleRates list is empty")
         asserts.assert_greater_equal(len(audioCapabilities.supportedBitDepths), 1, "SupportedBitDepths list is empty")
-        # TODO assert supportedCodecs, supportedSampleRates and supportedBitDepths list values
+        # TODO assert supportedSampleRates and supportedBitDepths list values
         return True
 
     def assert_snapshot_capabilities_struct(
@@ -587,6 +596,10 @@ class TC_AVSM_2_1(MatterBaseTest):
             Clusters.CameraAvStreamManagement.Enums.ImageCodecEnum.kUnknownEnumValue,
             "ImageCodec is not a valid ImageCodecEnum",
         )
+        return True
+
+    def assert_viewport_struct(self, viewport: Clusters.Globals.Structs.ViewportStruct) -> bool:
+        # No constraints
         return True
 
 
