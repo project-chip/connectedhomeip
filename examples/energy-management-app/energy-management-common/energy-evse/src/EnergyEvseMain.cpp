@@ -68,8 +68,6 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
 {
     CHIP_ERROR err;
 
-    ChipLogProgress(AppServer, "Some test message to see if PR build is triggered. Will Revert this.");
-
     if (gEvseDelegate || gEvseInstance || gEvseTargetsDelegate)
     {
         ChipLogError(AppServer, "EVSE Instance, Delegate or TargetsDelegate already exist.");

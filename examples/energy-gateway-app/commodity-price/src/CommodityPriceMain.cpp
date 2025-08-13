@@ -44,8 +44,6 @@ CHIP_ERROR CommodityPriceInit(EndpointId endpointId)
 {
     CHIP_ERROR err;
 
-    ChipLogProgress(AppServer, "Some test message to see if PR build is triggered. Will Revert this.");
-
     if (gCommodityPriceDelegate || gCommodityPriceInstance)
     {
         ChipLogError(AppServer, "Commodity Price Instance or Delegate already exist.");
