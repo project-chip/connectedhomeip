@@ -62,6 +62,16 @@ void Instance::Shutdown()
 CHIP_ERROR
 Instance::SetSoilMeasuredValue(const Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
 {
+    if (!soilMoistureMeasuredValue.IsNull())
+    {
+        VerifyOrReturnError(soilMoistureMeasuredValue.Value() <=
+                                mSoilMeasurementData.soilMoistureMeasurementLimits.maxMeasuredValue,
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(soilMoistureMeasuredValue.Value() >=
+                                mSoilMeasurementData.soilMoistureMeasurementLimits.minMeasuredValue,
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+
     if (mSoilMeasurementData.soilMoistureMeasuredValue != soilMoistureMeasuredValue)
     {
         mSoilMeasurementData.soilMoistureMeasuredValue = soilMoistureMeasuredValue;
