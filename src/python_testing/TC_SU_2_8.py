@@ -51,32 +51,23 @@ class TC_SU_2_8(MatterBaseTest):
 
     def _make_provider_location(self, controller, provider_node_id: int, endpoint: int):
         ProviderLoc = Clusters.Objects.OtaSoftwareUpdateRequestor.Structs.ProviderLocation
-        fabric_index = getattr(controller, "fabricIndex", None)
-        if fabric_index is None:
-            return ProviderLoc(providerNodeID=provider_node_id, endpoint=endpoint, fabricIndex=0)
+        fabric_index = controller.fabricId
         return ProviderLoc(providerNodeID=provider_node_id, endpoint=endpoint, fabricIndex=fabric_index)
 
-    async def _write_default_providers_both_fabrics(self, controller_th1, controller_th2, endpoint, p1_node_id, p2_node_id):
+    async def _write_default_providers(self, controller, endpoint, node_id):
         """
         Write default OTA providers.
         """
 
-        prov_th1 = self._make_provider_location(controller_th1, p1_node_id, endpoint)
-        prov_th2 = self._make_provider_location(controller_th2, p2_node_id, endpoint)
+        prov = self._make_provider_location(controller, node_id, endpoint)
 
-        resp = await controller_th1.WriteAttribute(
+        logging.info("Writing DefaultOTAProviders.")
+        resp = await controller.WriteAttribute(
             self.dut_node_id,
-            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([prov_th1]))]
+            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([prov]))]
         )
-        asserts.assert_equal(resp[0].Status, Status.Success, "Write DefaultOTAProviders (TH1) failed.")
-        logging.info(f"DefaultOTAProviders (TH1) = [{prov_th1}].")
-
-        resp = await controller_th2.WriteAttribute(
-            self.dut_node_id,
-            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([prov_th2]))]
-        )
-        asserts.assert_equal(resp[0].Status, Status.Success, "Write DefaultOTAProviders (TH2) failed.")
-        logging.info(f"DefaultOTAProviders (TH2) = [{prov_th2}].")
+        asserts.assert_equal(resp[0].Status, Status.Success, "Write DefaultOTAProviders failed.")
+        logging.info(f"DefaultOTAProviders = [{prov}].")
 
     async def _announce(self, controller, vendor_id: int, node_id: int, endpoint: int):
         """
@@ -271,13 +262,15 @@ class TC_SU_2_8(MatterBaseTest):
 
         logging.info(f"Commissioning response: {resp}.")
 
+        # ACL permissions are not required
         # await self.configure_acl_permissions(th1, endpoint, p1_node)
-        # await self.configure_acl_permissions(th2, endpoint, p2_node)
+        await self.configure_acl_permissions(th2, endpoint, p2_node)
 
         if fabric_id_th2 == th1.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {th1.fabricId} and TH2: {fabric_id_th2}.")
 
-        await self._write_default_providers_both_fabrics(th1, th2, endpoint, p1_node, p2_node)
+        await self._write_default_providers(th1, endpoint, p1_node)
+        await self._write_default_providers(th2, endpoint, p2_node)
 
         # DUT tries to send a QueryImage command to TH1/OTA-P.
         self.step(1)
@@ -299,6 +292,18 @@ class TC_SU_2_8(MatterBaseTest):
         # Check state changes to Querying and Downloading
         await self.wait_for_update_state(endpoint, valid_states[1])
         await self.wait_for_update_state(endpoint, valid_states[2])
+
+        progress = 0
+
+        while progress < 100:
+            progress = await self.read_single_attribute_check_success(
+                node_id=self.dut_node_id,
+                endpoint=endpoint,
+                attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress,
+                cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
+            )
+            logging.info(f"Progress: {progress}.")
+            time.sleep(5)
 
 
 if __name__ == "__main__":
