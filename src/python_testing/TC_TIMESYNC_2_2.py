@@ -70,7 +70,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
 
         self.print_step(2, "Read UTCTime attribute")
         utc_dut_initial = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
-        th_utc = utc_time_in_matter_epoch()
+        th_utc = timeoperations.utc_time_in_matter_epoch()
 
         code = 0
         try:
@@ -93,7 +93,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         asserts.assert_not_equal(granularity_dut, time_cluster.Enums.GranularityEnum.kNoTimeGranularity)
 
         self.print_step(4, "Read UTC time")
-        th_utc = utc_time_in_matter_epoch()
+        th_utc = timeoperations.utc_time_in_matter_epoch()
         utc_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
         asserts.assert_is_not(utc_dut, NullValue, "Received null value for UTCTime after set")
         if granularity_dut == time_cluster.Enums.GranularityEnum.kMinutesGranularity:
