@@ -630,7 +630,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
  */
 void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 {
-    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: InvokeCommand", mEndpointId);           
+    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: InvokeCommand", mEndpointId);
 
     switch (handlerContext.mRequestPath.mCommandId)
     {
@@ -826,7 +826,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
         return;
-    }      
+    }
 
     if (!mDelegate.CanChangeMPTZ())
     {
@@ -990,7 +990,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
         return;
-    }      
+    }
 
     if (!mDelegate.CanChangeMPTZ())
     {
@@ -1056,7 +1056,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: cannot execute command as camera is busy with a physical movement", mEndpointId);
         return;
-    }      
+    }
 
     if (!mDelegate.CanChangeMPTZ())
     {

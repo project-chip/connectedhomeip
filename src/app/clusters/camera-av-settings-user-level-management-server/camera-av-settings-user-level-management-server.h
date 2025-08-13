@@ -239,7 +239,7 @@ enum class OptionalAttributes : uint32_t
     kPanMax       = 0x0100,
 };
 
-class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface, 
+class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface,
                                             public CommandHandlerInterface,
                                             public PhysicalPTZCallback
 {
@@ -343,7 +343,7 @@ public:
 
     // Is a command already being processed
     bool IsProcessingAsyncCommand () const { return mAsyncCommandHandler.IsValid(); }
-    
+
 private:
     Delegate & mDelegate;
     EndpointId mEndpointId;

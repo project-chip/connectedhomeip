@@ -1162,7 +1162,7 @@ CameraError CameraDevice::SetZoom(uint8_t aZoom)
 }
 
 // Set the PTZ values as received
-CameraError CameraDevice::SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt, chip::Optional<uint8_t> aZoom) 
+CameraError CameraDevice::SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt, chip::Optional<uint8_t> aZoom)
 {
     if (aPan.HasValue())
     {
