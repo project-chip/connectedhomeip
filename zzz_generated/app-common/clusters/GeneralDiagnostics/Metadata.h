@@ -20,6 +20,7 @@ namespace GeneralDiagnostics {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace NetworkInterfaces {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(NetworkInterfaces::Id,
@@ -75,6 +76,7 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace TestEventTrigger {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(TestEventTrigger::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
