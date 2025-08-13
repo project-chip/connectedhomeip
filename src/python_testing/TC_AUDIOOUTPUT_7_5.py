@@ -20,6 +20,7 @@ import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.matter_asserts import assert_valid_uint8, assert_is_string
 
+
 class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
     def desc_TC_AUDIOOUTPUT_7_5(self) -> str:
         return "[TC_AUDIOOUTPUT-7.5] AudioOutput CurrentOutput attribute validation"
@@ -55,17 +56,11 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
         valid_indices = []
 
         for output in output_list:
-            # Validate struct type
-            asserts.assert_is_instance(output, cluster.Structs.OutputInfoStruct, "Expected OutputInfoStruct")
 
-            # Validate 'index'
+            asserts.assert_is_instance(output, cluster.Structs.OutputInfoStruct, "Expected OutputInfoStruct")
             assert_valid_uint8(output.index, "'index' should be a valid uint8 value")
             valid_indices.append(output.index)
-
-            # Validate 'outputType'
             assert_valid_uint8(output.outputType, "'outputType' should be a valid enum8 value")
-
-            # Validate 'name'
             assert_is_string(output.name, "'name' should be a string")
 
             logging.info(f"Output Struct - index: {output.index}, outputType: {output.outputType}, name: {output.name}")
@@ -85,6 +80,7 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
             )
         else:
             self.skip_test("OutputList is empty, skipping CurrentOutput validation.")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
