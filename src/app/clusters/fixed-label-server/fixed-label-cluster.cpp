@@ -26,8 +26,6 @@ FixedLabelCluster::FixedLabelCluster(EndpointId endpoint) : DefaultServerCluster
 
 CHIP_ERROR FixedLabelCluster::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
 
     if (provider)
@@ -36,30 +34,23 @@ CHIP_ERROR FixedLabelCluster::ReadLabelList(EndpointId endpoint, AttributeValueE
 
         if (it)
         {
-            err = encoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+            CHIP_ERROR err = encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
                 FixedLabel::Structs::LabelStruct::Type fixedlabel;
 
                 while (it->Next(fixedlabel))
                 {
-                    ReturnErrorOnFailure(encoder.Encode(fixedlabel));
+                    ReturnErrorOnFailure(encod.Encode(fixedlabel));
                 }
 
                 return CHIP_NO_ERROR;
             });
 
             it->Release();
+            return err;
         }
-        else
-        {
-            err = encoder.EncodeEmptyList();
-        }
-    }
-    else
-    {
-        err = encoder.EncodeEmptyList();
     }
 
-    return err;
+    return encoder.EncodeEmptyList();
 }
 
 DataModel::ActionReturnStatus FixedLabelCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
