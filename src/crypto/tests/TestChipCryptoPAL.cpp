@@ -2275,6 +2275,10 @@ TEST_F(TestChipCryptoPAL, TestX509_VerifyAttestationCertificateFormat)
         {  ByteSpan{kPaiPathLen1},                        Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
         {  ByteSpan{kPaaPathLen2},                        Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
         {  ByteSpan{kWrongPathLenFormat},                 Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kDacMalformedSkid},                   Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kDacMalformedAkid},                   Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaiMalformedSkid},                   Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaiMalformedAkid},                   Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
     };
     // clang-format on
 
