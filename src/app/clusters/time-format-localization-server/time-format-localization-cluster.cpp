@@ -149,11 +149,8 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const Dat
 
         // Using WriteAttribute directly so we can check that the decoded value is in the supported list
         // before storing it.
-        CHIP_ERROR result = mContext->attributeStorage.WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
+        return mContext->attributeStorage.WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
                                                     { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
-
-        return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                       : Protocols::InteractionModel::Status::WriteIgnored;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
