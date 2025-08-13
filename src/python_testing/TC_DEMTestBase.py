@@ -21,7 +21,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
-rom mobly import asserts
+from mobly import asserts
 
 
 logger = logging.getLogger(__name__)

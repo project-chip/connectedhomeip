@@ -25,7 +25,7 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
-from matter.testing.timeoperations import utc_time_in_matter_epoch
+from matter import timeoperations
 
 logger = logging.getLogger(__name__)
 
