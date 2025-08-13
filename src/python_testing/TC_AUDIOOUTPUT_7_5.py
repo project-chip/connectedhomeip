@@ -15,11 +15,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-
 from mobly import asserts
-
 import matter.clusters as Clusters
-from matter.testing.matter_asserts import assert_is_string, assert_valid_uint8
+from matter.testing.matter_asserts import assert_valid_uint8, assert_is_string
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
@@ -44,6 +42,7 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         cluster = Clusters.AudioOutput
         attributes = cluster.Attributes
+        enums = cluster.Enums
 
         self.step(1)
 
@@ -57,12 +56,28 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
         asserts.assert_is_instance(output_list, list, "OutputList should be a list")
         valid_indices = []
 
-        for output in output_list:
+        valid_enum_values = [
+            enums.OutputTypeEnum.kHdmi,
+            enums.OutputTypeEnum.kBt,
+            enums.OutputTypeEnum.kOptical,
+            enums.OutputTypeEnum.kHeadphone,
+            enums.OutputTypeEnum.kInternal,
+            enums.OutputTypeEnum.kOther,
+        ]
 
+        for output in output_list:
+            # Validate struct type
             asserts.assert_is_instance(output, cluster.Structs.OutputInfoStruct, "Expected OutputInfoStruct")
+
+            # Validate 'index'
             assert_valid_uint8(output.index, "'index' should be a valid uint8 value")
             valid_indices.append(output.index)
+
+            # Validate 'outputType'
             assert_valid_uint8(output.outputType, "'outputType' should be a valid enum8 value")
+            asserts.assert_in(output.outputType, valid_enum_values, "outputType is not a recognized OutputTypeEnum value")
+
+            # Validate 'name'
             assert_is_string(output.name, "'name' should be a string")
 
             logging.info(f"Output Struct - index: {output.index}, outputType: {output.outputType}, name: {output.name}")
