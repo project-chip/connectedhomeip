@@ -14,7 +14,6 @@ linux/index
 mbedos/index
 nrf/index
 nxp/index
-openiotsdk/index
 openthread/index
 silabs/index
 stm32/index
@@ -30,7 +29,6 @@ ti/index
 -   [MbedOS](./mbedos/)
 -   [NRF](./nrf/)
 -   [NXP](./nxp/)
--   [OpenIoTSDK](./openiotsdk/)
 -   [OpenThread](./openthread/)
 -   [Silabs](./silabs/)
 -   [STM32](./stm32/)
