@@ -350,7 +350,7 @@ private:
     BitFlags<Feature> mFeatures;
     BitFlags<OptionalAttributes> mOptionalAttrs;
 
-    // Cammand handler callback
+    // Command handler callback
     app::CommandHandler::Handle mAsyncCommandHandler;
     ConcreteCommandPath mRequestPath = ConcreteCommandPath(0, 0, 0);
 

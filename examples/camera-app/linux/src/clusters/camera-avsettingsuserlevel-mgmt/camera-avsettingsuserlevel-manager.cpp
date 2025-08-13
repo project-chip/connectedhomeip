@@ -72,7 +72,7 @@ void CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, O
     // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
     //
     DeviceLayer::SystemLayer().ScheduleLambda(
-        [callback] { callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success); });
+        [this] { OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success); });
 }
 
 void CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
@@ -90,7 +90,7 @@ void CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, 
     // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
     //
     DeviceLayer::SystemLayer().ScheduleLambda(
-        [callback] { callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success); });
+        [this] { OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success); });
 }
 
 void CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
@@ -108,7 +108,7 @@ void CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optiona
     // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
     //
     DeviceLayer::SystemLayer().ScheduleLambda(
-        [callback] { callback->OnPhysicalMovementComplete(Protocols::InteractionModel::Status::Success); });
+        [this] { OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success); });
 }
 
 Status CameraAVSettingsUserLevelManager::MPTZSavePreset(uint8_t aPreset)
