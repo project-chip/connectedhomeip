@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""The matter_placeholder_adapter package."""
-
-import setuptools  # type: ignore
-
-setuptools.setup()  # Package definition in setup.cfg
+# This is the equivalent to app_config_dependent_sources.gni
+TARGET_SOURCES(
+        ${APP_TARGET}
+        PRIVATE
+        "${CLUSTER_DIR}/CertificateTableImpl.cpp"
+        "${CLUSTER_DIR}/CertificateTableImpl.h"
+        "${CLUSTER_DIR}/tls-certificate-management-server.cpp"
+        "${CLUSTER_DIR}/tls-certificate-management-server.h"
+)
