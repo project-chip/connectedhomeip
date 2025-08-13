@@ -242,7 +242,7 @@ else
             #    shift
             #    ;;
             --release)
-                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false sl_uart_log_output=false "
                 shift
                 ;;
             --bootloader)
