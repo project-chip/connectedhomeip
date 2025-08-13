@@ -60,14 +60,6 @@ static const TariffDataSet & GetPreset(size_t index)
     X(IndividualDays)                                                                                                              \
     X(CalendarPeriods)
 
-#define ATTR_ITEM(field)                                                                                                           \
-    {                                                                                                                              \
-        tariff_preset.field.IsNull(),                                                                                              \
-        {                                                                                                                          \
-            dg->Get##field##_MgmtObj().SetNewValue(tariff_preset.field), #field                                                    \
-        }                                                                                                                          \
-    }
-
 void SetTestEventTrigger_TariffDataUpdated()
 {
     const TariffDataSet & tariff_preset = GetPreset(presetIndex++);
