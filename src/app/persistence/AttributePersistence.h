@@ -57,7 +57,7 @@ public:
     {
         if constexpr (std::is_enum_v<T>)
         {
-            T decodedValue;
+            T decodedValue = T::kUnknownEnumValue;
             ReturnErrorOnFailure(decoder.Decode(decodedValue));
             VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
             value = decodedValue;
