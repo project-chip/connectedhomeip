@@ -266,10 +266,18 @@ jobs:
                         --include_pytest_deps yes \
                         $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                      "
+                  mkdir -p ccache-debug
+                  CCACHE_DEBUG=1 CCACHE_DEBUGDIR="${{ github.workspace }}/ccache-debug" \
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
+                        --pw-command-launcher=ccache \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
                         --target linux-x64-lock-${BUILD_VARIANT} \
                         --target linux-x64-ota-provider-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
@@ -317,7 +325,12 @@ jobs:
                      "
 
             - name: ccache stats
-              run: ccache -s
+              run: ccache --show-stats --verbose
+            - name: Upload ccache per-object diagnostics (chip-tool, all-clusters)
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ccache-debug-chip-tool-all-clusters
+                  path: ccache-debug/
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
@@ -789,7 +802,7 @@ jobs:
                   && rm -rf out/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: ccache stats
-              run: ccache -s
+              run: ccache --show-stats --verbose
 
             - name: Install push_av_server dependencies
               run: >-
