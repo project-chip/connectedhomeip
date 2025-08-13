@@ -32,6 +32,11 @@ namespace Test {
 class LogOnlyEvents : public app::DataModel::EventsGenerator
 {
 public:
+    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override
+    {
+        mUrgentEventDeliveryCount++;
+    }
+
     CHIP_ERROR GenerateEvent(app::EventLoggingDelegate * eventContentWriter, const app::EventOptions & options,
                              EventNumber & generatedEventNumber) override
     {
@@ -54,6 +59,7 @@ public:
     [[nodiscard]] EventNumber CurrentEventNumber() const { return mCurrentEventNumber; }
     [[nodiscard]] const app::EventOptions & LastOptions() const { return mLastOptions; }
     [[nodiscard]] ByteSpan LastWrittenEvent() const { return mLastEncodedSpan; }
+    [[nodiscard]] uint32_t UrgentEventDeliveryCount() const { return mUrgentEventDeliveryCount; }
 
     // This relies on the default encoding of events which uses
     // DataModel::Encode on a EventDataIB::Tag::kData
@@ -78,7 +84,8 @@ public:
     }
 
 private:
-    EventNumber mCurrentEventNumber = 0;
+    uint32_t mUrgentEventDeliveryCount = 0;
+    EventNumber mCurrentEventNumber    = 0;
     app::EventOptions mLastOptions;
     uint8_t mLastEventEncodeBuffer[128];
     ByteSpan mLastEncodedSpan;
