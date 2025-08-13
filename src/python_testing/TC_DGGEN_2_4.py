@@ -40,10 +40,10 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter import timeoperations
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from matter import timeoperations
 
 logger = logging.getLogger(__name__)
 
