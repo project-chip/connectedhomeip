@@ -97,9 +97,11 @@ class TC_ACL_2_6(MatterBaseTest):
         await self.events_callback.start(self.default_controller, self.dut_node_id, 0)
 
         # Read initial events
+        # Third element in the events tuple is the urgent delivery flag (1 = urgent)
+        urgent = 1
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
-            events=[(0, acec_event, 1)],
+            events=[(0, acec_event, urgent)],
             fabricFiltered=True
         )
         # Getting the initial event from commissioning, validating it is the one
