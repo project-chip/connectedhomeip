@@ -409,7 +409,10 @@ public:
         //   the leave event will be cancelled.
         // - removing the fabric removes all associated access control entries, so generating
         //   subsequent reports containing the leave event will fail the access control check.
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync(MakeOptional(fabricIndex));
+        EventReporter & eventReporter = InteractionModelEngine::GetInstance()->GetReportingEngine();
+
+        // public interface of event delivery is through an event reporter.
+        eventReporter.ScheduleUrgentEventDeliverySync(MakeOptional(fabricIndex));
     }
 
     // Gets called when a fabric is deleted

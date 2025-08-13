@@ -22,6 +22,12 @@ config("config") {
 chip_data_model("camera-common") {
   zap_file = "camera-app.zap"
   is_server = true
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/tls-certificate-management-server",
+    "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
+    "${chip_root}/src/crypto",
+  ]
 }
 
 source_set("camera-lib") {
