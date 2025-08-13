@@ -520,10 +520,10 @@ class CTC_BaseDataClass
         kValidated,   // New value validated and ready for commit
     };
 
-    T mValueStorage[2];                                         ///< Double-buffered value storage
-    StorageState mHoldState[2] = { StorageState::kEmpty };      ///< Storage state tracking
-    std::atomic<UpdateState> mUpdateState{UpdateState::kIdle};  ///< Current update state
-    std::atomic<uint8_t> mActiveValueIdx{0};                    ///< Index of active value storage    
+    T mValueStorage[2];                                          ///< Double-buffered value storage
+    StorageState mHoldState[2] = { StorageState::kEmpty };       ///< Storage state tracking
+    std::atomic<UpdateState> mUpdateState{ UpdateState::kIdle }; ///< Current update state
+    std::atomic<uint8_t> mActiveValueIdx{ 0 };                   ///< Index of active value storage
 public:
     /// The exposed attribute value type
     using ValueType = T;
@@ -591,7 +591,7 @@ public:
      * @brief Check if new value storage contains valid data
      * @return true if new storage is in kHold state, false otherwise
      */
-    bool HasNewValue() const { return (mHoldState[1-mActiveValueIdx.load()] == StorageState::kHold); }
+    bool HasNewValue() const { return (mHoldState[1 - mActiveValueIdx.load()] == StorageState::kHold); }
 
     /**
      * @brief Prepares a new list value for modification
@@ -701,7 +701,7 @@ public:
 
         if (aValue.IsNull())
         {
-            CleanupByIdx(1-mActiveValueIdx.load());
+            CleanupByIdx(1 - mActiveValueIdx.load());
             mUpdateState.store(UpdateState::kInitialized);
             MarkAsAssigned();
             return CHIP_NO_ERROR;
@@ -754,12 +754,12 @@ public:
 
         if (err == CHIP_NO_ERROR)
         {
-            mHoldState[1-mActiveValueIdx.load()] = StorageState::kHold;
+            mHoldState[1 - mActiveValueIdx.load()] = StorageState::kHold;
             MarkAsAssigned();
         }
         else
         {
-            CleanupByIdx(1-mActiveValueIdx.load());
+            CleanupByIdx(1 - mActiveValueIdx.load());
         }
 
         return err;
@@ -855,7 +855,7 @@ public:
         }
         else
         {
-            CleanupByIdx(1-mActiveValueIdx.load());
+            CleanupByIdx(1 - mActiveValueIdx.load());
         }
 
         mUpdateState.store(UpdateState::kIdle);
@@ -875,7 +875,7 @@ public:
             ret = true;
         }
 
-        CleanupByIdx(1-mActiveValueIdx.load());
+        CleanupByIdx(1 - mActiveValueIdx.load());
         CleanupByIdx(mActiveValueIdx.load());
 
         return ret;
@@ -904,12 +904,12 @@ private:
      * @brief Gets reference to new value storage
      * @return Reference to new storage
      */
-    ValueType & GetNewValueRef() { return mValueStorage[1-mActiveValueIdx.load()]; }
+    ValueType & GetNewValueRef() { return mValueStorage[1 - mActiveValueIdx.load()]; }
 
     /**
      * @brief Swaps active and new value storage indices
      */
-    void SwapActiveValueStorage() { mActiveValueIdx.store(1-mActiveValueIdx.load()); }
+    void SwapActiveValueStorage() { mActiveValueIdx.store(1 - mActiveValueIdx.load()); }
 
     /**
      * @brief Checks if value type is nullable
@@ -1030,8 +1030,8 @@ private:
         }
         else
         {
-            CleanupValueByRef(mValueStorage[1-mActiveValueIdx.load()]);
-            mHoldState[1-mActiveValueIdx.load()] = StorageState::kEmpty;
+            CleanupValueByRef(mValueStorage[1 - mActiveValueIdx.load()]);
+            mHoldState[1 - mActiveValueIdx.load()] = StorageState::kEmpty;
         }
     }
 
@@ -1091,8 +1091,8 @@ private:
         CleanupStructValue<StructType>(aValue);
     }
 
-    void * mAuxData = nullptr;                     ///< Validation context data
-    const AttributeId mAttrId;                     ///< Managed attribute ID
+    void * mAuxData = nullptr; ///< Validation context data
+    const AttributeId mAttrId; ///< Managed attribute ID
 };
 
 } // namespace CommodityTariffAttrsDataMgmt
