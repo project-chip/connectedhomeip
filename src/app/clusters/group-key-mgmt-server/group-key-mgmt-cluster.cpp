@@ -103,7 +103,7 @@ struct GroupTableCodec
  * GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Type. This struct however
  * specifies a different Encode() function that loops through all the elements pointed
  * to by the iterator and encodes each of them.
-*/
+ */
 struct KeySetReadAllIndicesResponse
 {
     static constexpr CommandId GetCommandId() { return GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id; }
