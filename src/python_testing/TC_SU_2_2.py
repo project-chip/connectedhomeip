@@ -48,7 +48,9 @@ import asyncio
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, AttributeChangeCallback
+from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, AttributeMatcher
+
 from mobly import asserts
 
 # Create a logger
@@ -337,51 +339,63 @@ class TC_SU_2_2(MatterBaseTest):
             cmd=cmd_announce
         )
         logging.info(f"Step #1.5 - AnnounceOTAProvider response: {resp_announce}.")
-        # logging.info(f"Step #1.5 - AnnounceOTAProvider sent from node {controller.nodeId} , {self.dut_node_id} to DUT.")
 
-        logger.info("Step #1.6 - Send QueryImage to check if update is available")
-        cmd_query_image = Clusters.OtaSoftwareUpdateProvider.Commands.QueryImage(
-            vendorID=0xFFF1,
-            productID=0x8001,
-            softwareVersion=0,
-            protocolsSupported=[Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous],
-            hardwareVersion=None,
-            location=None,
-            requestorCanConsent=None,
-            metadataForProvider=None
+        # ------------------------------------------------------------------------------------
+        # Step # 1.6 - Verify that software image transfer from TH/OTA-P to DUT is successful
+        # Draft implementation
+        # ------------------------------------------------------------------------------------
+
+        logger.info("Step #1.6 - Create an accumulator for the UpdateStateProgress attribute")
+
+        # Create accumulator for UpdateStateProgress attribute
+        accumulator = ClusterAttributeChangeAccumulator(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress
         )
-        logger.info(f"Step #1.6 - cmd cmd_query_image: {cmd_query_image}")
 
-        resp = await self.send_single_cmd(
+        # Start subscription (async)
+        await accumulator.start(
             dev_ctrl=controller,
-            node_id=provider_node_id,
-            cmd=cmd_query_image,
-            endpoint=0
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=5,
+            max_interval_sec=10,
+            keepSubscriptions=True
         )
-        logger.info(f"Step #1.6 - SendQueryImage Response : {resp}")
 
-        logger.info("Step #1.7 - Verify that QueryImageResponse QueryStatus is UpdateAvailable")
-        asserts.assert_equal(resp.status, Clusters.OtaSoftwareUpdateProvider.Enums.StatusEnum.kUpdateAvailable,
-                             "QueryImageResponse status should be UpdateAvailable")
-        logger.info(f"Step #1.7 - QueryImage Response Status: {resp.status} is UpdateAvailable.")
+        # Track last known progress
+        last_progress = {"value": None}
 
-        # 1.8 Send ApplyUpdateRequest
-        logger.info("Step #1.8 - Send ApplyUpdateRequest")
-        cmd_apply_update = Clusters.OtaSoftwareUpdateProvider.Commands.ApplyUpdateRequest(
-            updateToken=resp.updateToken,  # Use the updateToken from the QueryImageResponse
-            newVersion=resp.softwareVersion  # Use the software version from the QueryImageResponse
+        def matcher_final(report):
+            val = report.value
+            if val is not None:
+                last_progress["value"] = val
+                if val == 100:
+                    logger.info("Step #1.6 - Final progress reached 100%, update completed.")
+                    return True
+                return False
+            else:
+                # Null received — can mean finish or failure
+                if last_progress["value"] is not None and last_progress["value"] >= 99:
+                    logger.info("Step #1.6 - Final progress Null after >=99%, update completed.")
+                    return True
+                else:
+                    raise AssertionError("Progress became Null before reaching 99%, update failed.")
+
+        matcher_final_obj = AttributeMatcher.from_callable(
+            description="Final progress: 100 or Null after >=99%",
+            matcher=matcher_final
         )
-        logger.info(f"Step #1.8 - cmd_apply_update: {cmd_apply_update}")
 
-        apply_update_resp = await self.send_single_cmd(
-            dev_ctrl=controller,
-            node_id=provider_node_id,
-            cmd=cmd_apply_update,
-            endpoint=0
-        )
-        logger.info(f"Step #1.8 - Send ApplyUpdateRequest Response : {apply_update_resp}")
+        try:
+            await accumulator.await_all_expected_report_matches([matcher_final_obj], timeout_sec=1200.0)
+            logger.info("Step #1.6 - Update completed successfully.")
+        except Exception as e:
+            raise AssertionError(f"No final progress received in time or failed: {e}")
 
-        logger.info("Step #1.9 - Verify that software image transfer from TH/OTA-P to DUT is successful")
+        # Cancel subscription
+        await accumulator.cancel()
 
 
 if __name__ == "__main__":
