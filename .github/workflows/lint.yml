@@ -63,8 +63,12 @@ jobs:
               # This check enforces that for any newly added file, it must be part of some
               # BUILD.gn file
               run: |
+                  # These ARE actually orphaned but due to dynamic-server we have code paths
+                  # for them. Keeping them as a list as they still need review ...
+                  #   --known-failure app/util/attribute-table.cpp \
+                  #   --known-failure app/util/ember-io-storage.cpp \
+                  #   --known-failure app/util/attribute-storage.cpp \
                   ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
-                     src \
                      --skip-dir app/clusters \
                      --skip-dir darwin \
                      --skip-dir include \
@@ -126,12 +130,39 @@ jobs:
                      --known-failure platform/DeviceSafeQueue.h \
                      --known-failure platform/GLibTypeDeleter.h \
                      --known-failure platform/SingletonConfigurationManager.cpp \
+                     src \
                   "
-                  # These ARE actually orphaned but due to dynamic-server we have code paths
-                  # for them. Keeping them as a list as they still need review ...
-                  #   --known-failure app/util/attribute-table.cpp \
-                  #   --known-failure app/util/ember-io-storage.cpp \
-                  #   --known-failure app/util/attribute-storage.cpp \
+                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
+                     -e py -e matter -e lark -e yaml -e cpp -e java -e kt -e jinja -e proto \
+                     --gn-extra scripts/py_matter_idl/files.gni \
+                     --skip-dir scripts/py_matter_idl/build \
+                     scripts/py_matter_idl \
+                  "
+                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
+                     -e py -e cpp -e cc -e c -e h -e hpp -e mm \
+                     --known-failure build-matter-wheel.py \
+                     --known-failure tests/scripts/base.py \
+                     --known-failure tests/scripts/cirque_restart_remote_device.py \
+                     --known-failure tests/scripts/cluster_objects.py \
+                     --known-failure tests/scripts/commissioning_failure_test.py \
+                     --known-failure tests/scripts/commissioning_test.py \
+                     --known-failure tests/scripts/commissioning_window_test.py \
+                     --known-failure tests/scripts/example_python_commissioning_flow.py \
+                     --known-failure tests/scripts/failsafe_tests.py \
+                     --known-failure tests/scripts/icd_device_test.py \
+                     --known-failure tests/scripts/mobile-device-test.py \
+                     --known-failure tests/scripts/network_commissioning.py \
+                     --known-failure tests/scripts/python_commissioning_flow_test.py \
+                     --known-failure tests/scripts/split_commissioning_test.py \
+                     --known-failure tests/scripts/subscription_resumption_capacity_test_ctrl1.py \
+                     --known-failure tests/scripts/subscription_resumption_capacity_test_ctrl2.py \
+                     --known-failure tests/scripts/subscription_resumption_test.py \
+                     --known-failure tests/scripts/subscription_resumption_timeout_test.py \
+                     --known-failure tests/test_cluster_objects.py \
+                     --known-failure tests/test_generated_cluster_objects.py \
+                     --known-failure tests/test_tlv.py \
+                     src/controller/python \
+                  "
             - name: Check for matter lint errors
               if: always()
               run: |
