@@ -290,7 +290,6 @@ chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId 
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
-
 namespace chip {
 namespace app {
 
