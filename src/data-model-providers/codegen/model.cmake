@@ -24,6 +24,7 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/Instance.cpp"
 
   # These are dependencies from model.gni that are not included directly in cmake
+
   # "${chip_root}/src/app/server-cluster",
   "${BASE_DIR}/../../app/server-cluster/AttributeListBuilder.cpp"
   "${BASE_DIR}/../../app/server-cluster/AttributeListBuilder.h"
@@ -32,6 +33,16 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/../../app/server-cluster/ServerClusterContext.h"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.h"
+
+  # "${chip_root}/src/app/persistence",
+  "${BASE_DIR}/../../app/persistence/AttributePersistence.cpp"
+  "${BASE_DIR}/../../app/persistence/AttributePersistence.h"
+  "${BASE_DIR}/../../app/persistence/AttributePersistenceProvider.h"
+  "${BASE_DIR}/../../app/persistence/PascalString.h"
+  "${BASE_DIR}/../../app/persistence/String.cpp"
+  "${BASE_DIR}/../../app/persistence/String.h"
+
+  # "${chip_root}/src/app/server-cluster:registry",
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterfaceRegistry.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterfaceRegistry.h"
   "${BASE_DIR}/../../app/server-cluster/SingleEndpointServerClusterRegistry.cpp"

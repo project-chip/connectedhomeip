@@ -32965,9 +32965,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maxBitRate = @(0);
 
-        _minKeyFrameInterval = @(0);
-
-        _maxKeyFrameInterval = @(0);
+        _keyFrameInterval = @(0);
 
         _watermarkEnabled = nil;
 
@@ -32990,8 +32988,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.maxResolution = self.maxResolution;
     other.minBitRate = self.minBitRate;
     other.maxBitRate = self.maxBitRate;
-    other.minKeyFrameInterval = self.minKeyFrameInterval;
-    other.maxKeyFrameInterval = self.maxKeyFrameInterval;
+    other.keyFrameInterval = self.keyFrameInterval;
     other.watermarkEnabled = self.watermarkEnabled;
     other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -33002,7 +32999,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minKeyFrameInterval:%@; maxKeyFrameInterval:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minKeyFrameInterval, _maxKeyFrameInterval, _watermarkEnabled, _osdEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; keyFrameInterval:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _keyFrameInterval, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -33041,10 +33038,7 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.maxBitRate = self.maxBitRate.unsignedIntValue;
     }
     {
-        encodableStruct.minKeyFrameInterval = self.minKeyFrameInterval.unsignedShortValue;
-    }
-    {
-        encodableStruct.maxKeyFrameInterval = self.maxKeyFrameInterval.unsignedShortValue;
+        encodableStruct.keyFrameInterval = self.keyFrameInterval.unsignedShortValue;
     }
     {
         if (self.watermarkEnabled != nil) {
