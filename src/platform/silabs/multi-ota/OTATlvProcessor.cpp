@@ -136,13 +136,21 @@ CHIP_ERROR OTATlvProcessor::RemovePadding(MutableByteSpan & block)
     }
 
     // Verify padding bytes
+    uint8_t mismatch = 0;
     for (size_t i = 0; i < padLength; ++i)
     {
         if (block.data()[block.size() - 1 - i] != padLength)
         {
-            ChipLogError(DeviceLayer, "PKCS7 padding verification failed");
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            // not returning early here, we want to check all padding bytes
+            // preventing timing side-channel attacks
+            mismatch = 1;
         }
+    }
+
+    if (mismatch != 0)
+    {
+        ChipLogError(DeviceLayer, "PKCS7 padding verification failed");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     block.reduce_size(block.size() - padLength);
