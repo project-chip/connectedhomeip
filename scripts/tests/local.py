@@ -865,7 +865,7 @@ def python_tests(
         if os.path.basename(file) in excluded_patterns:
             continue
         test_scripts.append(file)
-    test_scripts.append("src/controller/python/test/test_scripts/mobile-device-test.py")
+    test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
 
     execution_times = []
