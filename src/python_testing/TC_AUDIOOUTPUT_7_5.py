@@ -15,9 +15,11 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+
 from mobly import asserts
+
 import matter.clusters as Clusters
-from matter.testing.matter_asserts import assert_valid_uint8, assert_is_string
+from matter.testing.matter_asserts import assert_is_string, assert_valid_uint8
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
