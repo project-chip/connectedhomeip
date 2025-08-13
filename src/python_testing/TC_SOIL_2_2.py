@@ -40,8 +40,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import (AttributeSubscriptionHandler, MatterBaseTest, TestStep, default_matter_test_main,
-                                           has_cluster, run_if_endpoint_matches)
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_SOIL_2_2(MatterBaseTest):
