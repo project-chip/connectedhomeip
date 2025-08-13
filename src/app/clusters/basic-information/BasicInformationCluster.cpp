@@ -1,6 +1,6 @@
-/**
- *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+/*
+ *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,30 +13,26 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- *
  */
+#include <app/clusters/basic-information/BasicInformationCluster.h>
 
-#include "basic-information.h"
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
-#include <app/SpecificationDefinedRevisions.h>
-#include <app/util/attribute-storage.h>
+#include <app/persistence/AttributePersistence.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/PascalString.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BasicInformation/Attributes.h>
+#include <clusters/BasicInformation/Enums.h>
 #include <clusters/BasicInformation/Events.h>
 #include <clusters/BasicInformation/Metadata.h>
 #include <clusters/BasicInformation/Structs.h>
-#include <lib/core/CHIPConfig.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/ConfigurationManager.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 #include <protocols/interaction_model/StatusCode.h>
-
-#include <cstddef>
-#include <cstring>
 #include <tracing/macros.h>
 
 using namespace chip;
@@ -45,9 +41,35 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BasicInformation;
 using namespace chip::app::Clusters::BasicInformation::Attributes;
 using namespace chip::DeviceLayer;
-using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+// Unique ID became mandatory in 4. If we have no unique id, claim revision 3
+inline constexpr uint32_t kRevisionWithoutUniqueId = 3;
+
+// This is NOT the same as the auto-generated attributes:
+// see comment below about UniqueID (which we make behave as optional)
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    DataModelRevision::kMetadataEntry,
+    VendorName::kMetadataEntry,
+    VendorID::kMetadataEntry,
+    ProductName::kMetadataEntry,
+    ProductID::kMetadataEntry,
+    NodeLabel::kMetadataEntry,
+    Location::kMetadataEntry,
+    HardwareVersion::kMetadataEntry,
+    HardwareVersionString::kMetadataEntry,
+    SoftwareVersion::kMetadataEntry,
+    SoftwareVersionString::kMetadataEntry,
+    CapabilityMinima::kMetadataEntry,
+    SpecificationVersion::kMetadataEntry,
+    MaxPathsPerInvoke::kMetadataEntry,
+    ConfigurationVersion::kMetadataEntry,
+    // NOTE: UniqueID used to NOT be mandatory in previous spec version, so we add
+    // this as a separate condition
+    // UniqueID::kMetadataEntry,
+
+};
 
 constexpr size_t kExpectedFixedLocationLength = 2;
 static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
@@ -63,21 +85,6 @@ CHIP_ERROR ClearNullTerminatedStringWhenUnimplemented(CHIP_ERROR status, char * 
 
     return status;
 }
-
-class BasicAttrAccess : public AttributeAccessInterface
-{
-public:
-    // Register for the Basic cluster on all endpoints.
-    BasicAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BasicInformation::Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
-private:
-    CHIP_ERROR WriteLocation(AttributeValueDecoder & aDecoder);
-};
-
-BasicAttrAccess gAttrAccess;
 
 CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
 {
@@ -247,175 +254,216 @@ inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoP
     return aEncoder.Encode(productAppearance);
 }
 
-CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+BasicInformationCluster gInstance;
+
+} // namespace
+
+namespace chip::app::Clusters {
+
+BasicInformationCluster & BasicInformationCluster::Instance()
 {
+    return gInstance;
+}
+
+DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                     AttributeValueEncoder & encoder)
+{
+    using namespace BasicInformation::Attributes;
+
     // NOTE: this is NEVER nullptr, using pointer as we have seen converting to reference
     //       costs some flash (even though code would be more readable that way...)
     auto * deviceInfoProvider = GetDeviceInstanceInfoProvider();
     auto & configManager      = ConfigurationMgr();
 
-    switch (aPath.mAttributeId)
+    switch (request.path.mAttributeId)
     {
+    case FeatureMap::Id:
+        // Explicit specialization: TLVWriter.Put has specialization for various types
+        // but fails for `0u` with `unsigned int &` being ambigous.
+        return encoder.Encode<uint32_t>(0);
     case ClusterRevision::Id:
-        return aEncoder.Encode(kRevision);
+        if (!mEnabledOptionalAttributes.IsSet(UniqueID::Id))
+        {
+            return encoder.Encode(kRevisionWithoutUniqueId);
+        }
+        return encoder.Encode(BasicInformation::kRevision);
+    case NodeLabel::Id:
+        return encoder.Encode(mNodeLabel.Content());
+    case LocalConfigDisabled::Id:
+        return encoder.Encode(mLocalConfigDisabled);
     case DataModelRevision::Id:
-        return aEncoder.Encode(Revision::kDataModelRevision);
+        return encoder.Encode(Revision::kDataModelRevision);
     case Location::Id:
-        return ReadLocation(configManager, aEncoder);
+        return ReadLocation(configManager, encoder);
     case VendorName::Id:
         return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetVendorName,
-                                       false /* unimplementedAllowed */, aEncoder);
+                                       false /* unimplementedAllowed */, encoder);
     case VendorID::Id:
-        return ReadVendorID(deviceInfoProvider, aEncoder);
+        return ReadVendorID(deviceInfoProvider, encoder);
     case ProductName::Id:
         return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductName,
-                                       false /* unimplementedAllowed */, aEncoder);
+                                       false /* unimplementedAllowed */, encoder);
     case ProductID::Id:
-        return ReadProductID(deviceInfoProvider, aEncoder);
+        return ReadProductID(deviceInfoProvider, encoder);
     case HardwareVersion::Id:
-        return ReadHardwareVersion(deviceInfoProvider, aEncoder);
+        return ReadHardwareVersion(deviceInfoProvider, encoder);
     case HardwareVersionString::Id:
         return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetHardwareVersionString,
-                                       false /* unimplementedAllowed */, aEncoder);
+                                       false /* unimplementedAllowed */, encoder);
     case SoftwareVersion::Id:
-        return ReadSoftwareVersion(configManager, aEncoder);
+        return ReadSoftwareVersion(configManager, encoder);
     case SoftwareVersionString::Id:
-        return ReadSoftwareVersionString(configManager, aEncoder);
+        return ReadSoftwareVersionString(configManager, encoder);
     case ManufacturingDate::Id:
-        return ReadManufacturingDate(deviceInfoProvider, aEncoder);
+        return ReadManufacturingDate(deviceInfoProvider, encoder);
     case PartNumber::Id:
         return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetPartNumber,
-                                       true /* unimplementedAllowed */, aEncoder);
+                                       true /* unimplementedAllowed */, encoder);
     case ProductURL::Id:
         return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductURL,
-                                       true /* unimplementedAllowed */, aEncoder);
+                                       true /* unimplementedAllowed */, encoder);
     case ProductLabel::Id:
         return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetProductLabel,
-                                       true /* unimplementedAllowed */, aEncoder);
+                                       true /* unimplementedAllowed */, encoder);
     case SerialNumber::Id:
         return ReadConfigurationString(deviceInfoProvider, &DeviceInstanceInfoProvider::GetSerialNumber,
-                                       true /* unimplementedAllowed */, aEncoder);
+                                       true /* unimplementedAllowed */, encoder);
     case UniqueID::Id:
-        return ReadUniqueID(configManager, aEncoder);
+        return ReadUniqueID(configManager, encoder);
     case CapabilityMinima::Id:
-        return ReadCapabilityMinima(aEncoder);
+        return ReadCapabilityMinima(encoder);
     case ProductAppearance::Id:
-        return ReadProductAppearance(deviceInfoProvider, aEncoder);
+        return ReadProductAppearance(deviceInfoProvider, encoder);
     case SpecificationVersion::Id:
-        return aEncoder.Encode(Revision::kSpecificationVersion);
+        return encoder.Encode(Revision::kSpecificationVersion);
     case MaxPathsPerInvoke::Id:
-        return aEncoder.Encode<uint16_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
+        return encoder.Encode<uint16_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
     case ConfigurationVersion::Id:
-        return ReadConfigurationVersion(configManager, aEncoder);
+        return ReadConfigurationVersion(configManager, encoder);
+    case Reachable::Id:
+        // On some platforms `true` is defined as a unsigned int and that gets
+        // a ambigous TLVWriter::Put error. Hence the specialization.
+        return encoder.Encode<bool>(true);
     default:
-        // We did not find a processing path, the caller will delegate elsewhere.
-        return CHIP_NO_ERROR;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 }
 
-CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                      AttributeValueDecoder & decoder)
 {
-    switch (aPath.mAttributeId)
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+}
+
+DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                                 AttributeValueDecoder & decoder)
+{
+    using namespace BasicInformation::Attributes;
+
+    AttributePersistence persistence(mContext->attributeStorage);
+
+    switch (request.path.mAttributeId)
     {
-    case Attributes::Location::Id: {
-        return WriteLocation(aDecoder);
+    case Location::Id: {
+        CharSpan location;
+        ReturnErrorOnFailure(decoder.Decode(location));
+        VerifyOrReturnError(location.size() == kExpectedFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
+        return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
     }
+    case NodeLabel::Id: {
+        CharSpan label;
+        ReturnErrorOnFailure(decoder.Decode(label));
+        VerifyOrReturnError(mNodeLabel.SetContent(label), Protocols::InteractionModel::Status::ConstraintError);
+        return persistence.StoreString(request.path, mNodeLabel);
+    }
+    case LocalConfigDisabled::Id:
+        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
+}
+
+CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
+                                               ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+
+    DataModel::AttributeEntry optionalAttributes[] = {
+        ManufacturingDate::kMetadataEntry,   //
+        PartNumber::kMetadataEntry,          //
+        ProductURL::kMetadataEntry,          //
+        ProductLabel::kMetadataEntry,        //
+        SerialNumber::kMetadataEntry,        //
+        LocalConfigDisabled::kMetadataEntry, //
+        Reachable::kMetadataEntry,           //
+        ProductAppearance::kMetadataEntry,   //
+
+        // Optional because of forced multi-revision support for backwards compatibility
+        // emulation: we emulate revision 3 when uniqueid is not enabled.
+        UniqueID::kMetadataEntry, //
+    };
+
+    AttributeListBuilder listBuilder(builder);
+
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), mEnabledOptionalAttributes);
+}
+
+CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    if (PlatformMgr().GetDelegate() == nullptr)
+    {
+        PlatformMgr().SetDelegate(this);
+    }
+
+    AttributePersistence persistence(context.attributeStorage);
+
+    (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabel);
+    // Specialization because some platforms `#define` true/false as 1/0 and we get;
+    // error: no matching function for call to
+    //   'chip::app::AttributePersistence::LoadNativeEndianValue(<brace-enclosed initializer list>, bool&, int)'
+    (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+                                                   mLocalConfigDisabled, false);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
+void BasicInformationCluster::Shutdown()
 {
-    chip::CharSpan location;
-
-    ReturnErrorOnFailure(aDecoder.Decode(location));
-
-    bool isValidLength = location.size() == kExpectedFixedLocationLength;
-    if (!isValidLength)
+    if (PlatformMgr().GetDelegate() == this)
     {
-        ChipLogError(Zcl, "Invalid country code: '%s'", NullTerminated(location).c_str());
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        PlatformMgr().SetDelegate(nullptr);
     }
-
-    return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
+    DefaultServerCluster::Shutdown();
 }
 
-class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
+void BasicInformationCluster::OnStartUp(uint32_t softwareVersion)
 {
-    void OnStartUp(uint32_t softwareVersion) override
-    {
-        MATTER_TRACE_INSTANT("OnStartUp", "BasicInfo");
-        // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
-        ChipLogDetail(Zcl, "Emitting StartUp event");
+    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
+    VerifyOrReturn(mContext != nullptr);
 
-        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
-        {
-            // If Basic cluster is implemented on this endpoint
-            Events::StartUp::Type event{ softwareVersion };
-            EventNumber eventNumber;
+    MATTER_TRACE_INSTANT("OnStartUp", "BasicInfo");
+    ChipLogDetail(Zcl, "Emitting StartUp event");
 
-            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
-            if (CHIP_NO_ERROR != err)
-            {
-                ChipLogError(Zcl, "Failed to emit StartUp event: %" CHIP_ERROR_FORMAT, err.Format());
-            }
-        }
-    }
+    BasicInformation::Events::StartUp::Type event{ softwareVersion };
 
-    void OnShutDown() override
-    {
-        MATTER_TRACE_INSTANT("OnShutDown", "BasicInfo");
-        // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
-        ChipLogDetail(Zcl, "Emitting ShutDown event");
-
-        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
-        {
-            // If Basic cluster is implemented on this endpoint
-            Events::ShutDown::Type event;
-            EventNumber eventNumber;
-
-            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
-            if (CHIP_NO_ERROR != err)
-            {
-                ChipLogError(Zcl, "Failed to emit ShutDown event: %" CHIP_ERROR_FORMAT, err.Format());
-            }
-        }
-
-        // Flush the events to increase chances that they get sent before the shutdown
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
-    }
-};
-
-PlatformMgrDelegate gPlatformMgrDelegate;
-
-} // anonymous namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace BasicInformation {
-bool IsLocalConfigDisabled()
-{
-    bool disabled = false;
-    Status status = LocalConfigDisabled::Get(0, &disabled);
-    return status == Status::Success && disabled;
-}
-} // namespace BasicInformation
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-void MatterBasicInformationPluginServerInitCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-    PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
+    DataModel::EventsGenerator & eventsGenerator = mContext->interactionContext.eventsGenerator;
+    eventsGenerator.GenerateEvent(event, kRootEndpointId);
+    eventsGenerator.ScheduleUrgentEventDeliverySync();
 }
 
-void MatterBasicInformationPluginServerShutdownCallback()
+void BasicInformationCluster::OnShutDown()
 {
-    PlatformMgr().SetDelegate(nullptr);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
+    VerifyOrReturn(mContext != nullptr);
+
+    MATTER_TRACE_INSTANT("OnShutDown", "BasicInfo");
+    ChipLogDetail(Zcl, "Emitting ShutDown event");
+
+    BasicInformation::Events::ShutDown::Type event;
+
+    DataModel::EventsGenerator & eventsGenerator = mContext->interactionContext.eventsGenerator;
+    eventsGenerator.GenerateEvent(event, kRootEndpointId);
+    eventsGenerator.ScheduleUrgentEventDeliverySync();
 }
+
+} // namespace chip::app::Clusters
