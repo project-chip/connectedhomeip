@@ -109,11 +109,11 @@ class TestMatterTestingSupport(MatterBaseTest):
     @async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero
-        ret = utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
+        ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
         asserts.assert_equal(ret, 0, "UTC epoch returned non-zero value")
 
         # Jan 2 is exactly 1 day after Jan 1
-        ret = utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
+        ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
         expected_delay = timedelta(days=1)
         actual_delay = timedelta(microseconds=ret)
         asserts.assert_equal(expected_delay, actual_delay, "Calculation for Jan 2 date is incorrect")
