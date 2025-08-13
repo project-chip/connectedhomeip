@@ -59,6 +59,7 @@ tests:
           d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
           d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+      PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -83,6 +84,7 @@ tests:
           a0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
           b1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
           c2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+      PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -108,6 +110,7 @@ tests:
           GroupId: 0x0101, GroupKeySetId: 0x01a1, List item 2: GroupId: 0x0102,
           GroupKeySetId: 0x01a1, List item 3: GroupId: 0x0103, GroupKeySetId:
           0x01a3"
+      PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -123,6 +126,7 @@ tests:
           "Step 3: TH sends a AddGroup Command to the Groups cluster on Endpoint
           PIXIT.G.ENDPOINT over CASE with the GroupID field set to 0x0103 and
           the GroupName set to an empty string"
+      PICS: G.S.C00.Rsp
       cluster: "Groups"
       endpoint: Groups.Endpoint
       command: "AddGroup"
@@ -181,6 +185,7 @@ tests:
           "Step 5: TH sends a AddGroup Command to the Groups cluster on Endpoint
           PIXIT.G.ENDPOINT over CASE with the GroupID field set to 0x0104 and
           the GroupName set to an empty string"
+      PICS: G.S.C00.Rsp
       cluster: "Groups"
       endpoint: Groups.Endpoint
       command: "AddGroup"
@@ -197,6 +202,7 @@ tests:
           "Step 6: TH sends a AddGroup Command to the Groups cluster with the
           GroupID field set to 0x0101 and the GroupName set to an empty string.
           The command is sent as a group command using GroupID 0x0103"
+      PICS: G.S.C00.Rsp
       cluster: "Groups"
       groupId: 0x0103
       command: "AddGroup"
@@ -220,6 +226,7 @@ tests:
           "Step 7: TH sends a AddGroup Command to the Groups cluster with the
           GroupID field set to 0x0102 and the GroupName set to an empty string.
           The command is sent as a group command using GroupID 0x0101"
+      PICS: G.S.C00.Rsp
       cluster: "Groups"
       groupId: 0x0101
       command: "AddGroup"
@@ -262,6 +269,7 @@ tests:
           "Step 9: TH sends a ViewGroup Command to the Groups cluster on
           Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0101 to
           confirm that the AddGroup command from step 6 was successful"
+      PICS: G.S.C01.Rsp
       cluster: "Groups"
       endpoint: Groups.Endpoint
       command: "ViewGroup"
@@ -282,6 +290,7 @@ tests:
           "Step 10: TH sends a ViewGroup Command to the Groups cluster on
           Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0102 to
           confirm that the AddGroup command from step 7 was not successful"
+      PICS: G.S.C01.Rsp
       cluster: "Groups"
       endpoint: Groups.Endpoint
       command: "ViewGroup"
@@ -302,6 +311,7 @@ tests:
           "Step 11: TH sends a AddGroup Command to the Groups cluster with the
           GroupID field set to 0x0105 and the GroupName set to an empty string.
           The command is sent as a group command using GroupID 0x0103"
+      PICS: G.S.C00.Rsp
       cluster: "Groups"
       groupId: 0x0103
       command: "AddGroup"
@@ -316,6 +326,7 @@ tests:
           "Step 12: TH sends a ViewGroup Command to the Groups cluster on
           Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0105 to
           confirm that the AddGroup command from step 11 was not successful"
+      PICS: G.S.C01.Rsp
       cluster: "Groups"
       endpoint: Groups.Endpoint
       command: "ViewGroup"
@@ -335,6 +346,7 @@ tests:
     - label:
           "Step 13: TH sends the RemoveAllGroups Command to the Groups cluster
           on Endpoint PIXIT.G.ENDPOINT over CASE"
+      PICS: G.S.C04.Rsp
       cluster: "Groups"
       endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
@@ -343,6 +355,7 @@ tests:
           "Step 14: TH resets the GroupKeyMap attribute list on
           GroupKeyManagement cluster by writing the GroupKeyMap attribute with
           an empty list"
+      PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -353,6 +366,7 @@ tests:
           "Step 15: TH resets the key set by sending the KeySetRemove command to
           the GroupKeyManagement cluster over CASE with the following fields:
           GroupKeySetID: 0x01a3"
+      PICS: GRPKEY.S.C03.Rsp
       cluster: "Group Key Management"
       command: "KeySetRemove"
       arguments:
@@ -364,6 +378,7 @@ tests:
           "Step 16: TH resets the key set by sending the KeySetRemove command to
           the GroupKeyManagement cluster over CASE with the following fields:
           GroupKeySetID: 0x01a1"
+      PICS: GRPKEY.S.C03.Rsp
       cluster: "Group Key Management"
       command: "KeySetRemove"
       arguments:
