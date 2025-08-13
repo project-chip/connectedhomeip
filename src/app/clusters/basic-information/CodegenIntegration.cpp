@@ -59,7 +59,9 @@ public:
     }
 
     ServerClusterInterface & FindRegistration(unsigned zeroBasedArrayIndex) override { return BasicInformationCluster::Instance(); }
-    void DestroyRegistration(unsigned zeroBasedArrayIndex) override { /* nothing: singleton will not get deleted */ }
+
+    // Nothing to destroy: separate singleton class without constructor/destructor is used
+    void DestroyRegistration(unsigned zeroBasedArrayIndex) override {}
 };
 
 } // namespace
