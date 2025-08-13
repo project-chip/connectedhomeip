@@ -34,7 +34,7 @@ def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label:
     return None
 
 
-def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int, is_tlv_endpoint: bool, additional_features: list[uint] = [], additional_attributes: list[uint] = [], additional_commands: list[uint] = []) -> dict[int, Any]:
+def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int, is_tlv_endpoint: bool = True, additional_features: list[uint] = [], additional_attributes: list[uint] = [], additional_commands: list[uint] = []) -> dict[int, Any]:
     attrs = {}
     mandatory_features = [mask for mask, f in xml_clusters[cluster_id].features.items() if _is_mandatory(f.conformance)]
     mandatory_features.extend(additional_features)
@@ -42,15 +42,17 @@ def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int
     for mask in mandatory_features:
         feature_map |= mask
 
-    mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items() if _is_mandatory(a.conformance)]
+    mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items(
+    ) if a.conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY]
     mandatory_attributes.extend(additional_attributes)
 
-    mandatory_accepted_commands = [id for id, a in xml_clusters[cluster_id].accepted_commands.items()
-                                   if _is_mandatory(a.conformance)]
+    mandatory_accepted_commands = [id for id, c in xml_clusters[cluster_id].accepted_commands.items(
+    ) if c.conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY]
     mandatory_accepted_commands.extend(additional_commands)
 
-    mandatory_generated_commands = [id for id, a in xml_clusters[cluster_id].generated_commands.items()
-                                    if _is_mandatory(a.conformance)]
+    mandatory_generated_commands = [id for id, c in xml_clusters[cluster_id].generated_commands.items(
+    ) if c.conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+
     revision = xml_clusters[cluster_id].revision
     if is_tlv_endpoint:
         for m in mandatory_attributes:
