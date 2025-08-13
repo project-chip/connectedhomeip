@@ -29,7 +29,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h"
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -136,12 +135,4 @@ void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
 {
     // Apply the relock state in the application control
     BoltLockMgr().InitiateAction(AppEvent::kEventType_Timer, BoltLockManager::LOCK_ACTION);
-}
-
-void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
-{
-    ChipLogProgress(NotSpecified, "Setting log provider.");
-
-    auto & logProvider = LogProvider::GetInstance();
-    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }

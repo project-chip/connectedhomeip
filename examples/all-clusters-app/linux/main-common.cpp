@@ -43,7 +43,7 @@
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
@@ -204,6 +204,13 @@ void ApplicationInit()
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
     SetTagList(/* endpoint= */ 4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
+
+    auto & logProvider = chip::app::Clusters::DiagnosticLogs::LogProvider::GetInstance();
+    logProvider.SetEndUserSupportLogFilePath(AppOptions::GetEndUserSupportLogFilePath());
+    logProvider.SetNetworkDiagnosticsLogFilePath(AppOptions::GetNetworkDiagnosticsLogFilePath());
+    logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
+
+    chip::app::Clusters::DiagnosticLogs::SetDelegate(kRootEndpointId, &logProvider);
 }
 
 void ApplicationShutdown()
@@ -253,17 +260,6 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
     sWindowCoveringManager.Init(endpoint);
     Clusters::WindowCovering::SetDefaultDelegate(endpoint, &sWindowCoveringManager);
     Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
-}
-
-using namespace chip::app::Clusters::DiagnosticLogs;
-void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
-{
-    auto & logProvider = LogProvider::GetInstance();
-    logProvider.SetEndUserSupportLogFilePath(AppOptions::GetEndUserSupportLogFilePath());
-    logProvider.SetNetworkDiagnosticsLogFilePath(AppOptions::GetNetworkDiagnosticsLogFilePath());
-    logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
-
-    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
 
 using namespace chip::app::Clusters::Thermostat;

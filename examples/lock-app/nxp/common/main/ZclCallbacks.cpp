@@ -35,11 +35,6 @@
 #include "UserInterfaceFeedback.h"
 #endif
 
-#if CONFIG_DIAG_LOGS_DEMO
-#include <DiagnosticLogsProviderDelegateImpl.h>
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
-#endif
-
 using namespace ::chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DoorLock;
@@ -167,11 +162,3 @@ void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
     DoorLockServer::Instance().SetLockState(1, DlLockState::kLocked, OperationSourceEnum::kAuto, NullNullable, NullNullable,
                                             NullNullable, NullNullable);
 }
-
-#if CONFIG_DIAG_LOGS_DEMO
-void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
-{
-    auto & logProvider = LogProvider::GetInstance();
-    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
-}
-#endif

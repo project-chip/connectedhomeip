@@ -36,6 +36,7 @@
 #endif // GP_UPGRADE_DIVERSITY_DUAL_BOOT
 
 #include "DiagnosticLogsProviderDelegateImpl.h"
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 
 using namespace ::chip;
@@ -93,6 +94,9 @@ void AppTask::InitServer(intptr_t arg)
     {
         PlatformMgr().ScheduleWork(OpenCommissioning, 0);
     }
+
+    auto & logProvider = LogProvider::GetInstance();
+    chip::app::Clusters::DiagnosticLogs::SetDelegate(kRootEndpointId, &logProvider);
 }
 
 bool AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)

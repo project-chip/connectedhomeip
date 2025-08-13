@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "CodeIntegration.h"
+#include "CodegenIntegration.h"
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsCluster.h>
 #include <app/static-cluster-config/DiagnosticLogs.h>
@@ -63,6 +63,7 @@ void emberAfDiagnosticLogsClusterInitCallback(EndpointId endpointId)
         return;
     }
     gServers[arrayIndex].Create();
+    gServers[arrayIndex].Cluster().Init(kDiagnosticLogsMaxClusterCount);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {

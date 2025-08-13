@@ -26,11 +26,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
 
-#if CONFIG_DIAG_LOGS_DEMO
-#include <DiagnosticLogsProviderDelegateImpl.h>
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
-#endif
-
 using namespace ::chip;
 
 #if CONFIG_DIAG_LOGS_DEMO
@@ -47,11 +42,3 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         cb->PostAttributeChangeCallback(path.mEndpointId, path.mClusterId, path.mAttributeId, type, size, value);
     }
 }
-
-#if CONFIG_DIAG_LOGS_DEMO
-void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
-{
-    auto & logProvider = LogProvider::GetInstance();
-    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
-}
-#endif

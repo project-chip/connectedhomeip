@@ -24,7 +24,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
-#include <app/clusters/diagnostic-logs-server/CodeIntegration.h>
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>

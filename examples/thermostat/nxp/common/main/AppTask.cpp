@@ -28,6 +28,11 @@
 #include "BLEApplicationManager.h"
 #endif
 
+#if CONFIG_DIAG_LOGS_DEMO
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
+using namespace chip::app::Clusters::DiagnosticLogs;
+#endif
+
 using namespace chip;
 
 void ThermostatApp::AppTask::PreInitMatterStack()
@@ -45,6 +50,11 @@ void ThermostatApp::AppTask::PostInitMatterStack()
     chip::NXP::App::BleAppMgr().Init();
 #endif
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
+
+#if CONFIG_DIAG_LOGS_DEMO
+    auto & logProvider = LogProvider::GetInstance();
+    SetDelegate(kRootEndpointId, &logProvider);
+#endif
 }
 
 // This returns an instance of this class.

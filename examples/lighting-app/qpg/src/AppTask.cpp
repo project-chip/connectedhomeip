@@ -38,12 +38,15 @@
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/DeferredAttributePersistenceProvider.h>
 #include <app/server/Server.h>
+#include "diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h"
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app::Clusters::DiagnosticLogs;
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -164,6 +167,10 @@ void AppTask::InitServer(intptr_t arg)
         ChipLogProgress(NotSpecified, "No fabrics, starting commissioning.");
         PlatformMgr().ScheduleWork(OpenCommissioning, 0);
     }
+
+    ChipLogProgress(NotSpecified, "Setting log provider.");
+    auto & logProvider = LogProvider::GetInstance();
+    SetDelegate(kRootEndpointId, &logProvider);
 }
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
