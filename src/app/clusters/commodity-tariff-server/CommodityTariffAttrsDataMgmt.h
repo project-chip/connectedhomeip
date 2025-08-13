@@ -18,10 +18,10 @@
 
 #pragma once
 
+#include "CommodityTariffConsts.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/LockTracker.h>
-#include "CommodityTariffConsts.h"
 
 #include <cassert>
 #include <cstdint>
@@ -89,7 +89,7 @@ inline bool operator==(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs, cons
 {
     return (lhs.number == rhs.number) && (lhs.requiredState == rhs.requiredState);
 }
-} // namespace namespace AuxiliaryLoadSwitchSettingsStruct
+} // namespace AuxiliaryLoadSwitchSettingsStruct
 
 // PeakPeriodStruct
 namespace PeakPeriodStruct {
@@ -102,10 +102,8 @@ inline bool operator==(const Type & lhs, const Type & rhs)
 namespace TariffInformationStruct {
 inline bool operator==(const Type & lhs, const Type & rhs)
 {
-    return (lhs.currency == rhs.currency) &&
-           (lhs.tariffLabel == rhs.tariffLabel) &&
-           (lhs.providerName == rhs.providerName) &&
-           (lhs.blockMode == rhs.blockMode);
+    return (lhs.currency == rhs.currency) && (lhs.tariffLabel == rhs.tariffLabel) && (lhs.providerName == rhs.providerName) &&
+        (lhs.blockMode == rhs.blockMode);
 }
 
 inline bool operator!=(const Type & lhs, const Type & rhs)
@@ -142,9 +140,8 @@ inline bool operator!=(const Type & lhs, const Type & rhs)
 namespace DayPatternStruct {
 inline bool operator==(const Type & lhs, const Type & rhs)
 {
-    return (lhs.dayPatternID == rhs.dayPatternID) &&
-           (lhs.daysOfWeek.Raw() == rhs.daysOfWeek.Raw()) &&
-           (lhs.dayEntryIDs == rhs.dayEntryIDs);
+    return (lhs.dayPatternID == rhs.dayPatternID) && (lhs.daysOfWeek.Raw() == rhs.daysOfWeek.Raw()) &&
+        (lhs.dayEntryIDs == rhs.dayEntryIDs);
 }
 
 inline bool operator!=(const Type & lhs, const Type & rhs)
@@ -156,14 +153,9 @@ inline bool operator!=(const Type & lhs, const Type & rhs)
 namespace TariffComponentStruct {
 inline bool operator==(const Type & lhs, const Type & rhs)
 {
-    return (lhs.label == rhs.label) &&
-           (lhs.price == rhs.price) &&
-           (lhs.friendlyCredit == rhs.friendlyCredit) &&
-           (lhs.auxiliaryLoad == rhs.auxiliaryLoad) &&
-           (lhs.peakPeriod == rhs.peakPeriod) &&
-           (lhs.powerThreshold == rhs.powerThreshold) &&
-           (lhs.predicted == rhs.predicted) &&
-           (lhs.threshold == rhs.threshold);
+    return (lhs.label == rhs.label) && (lhs.price == rhs.price) && (lhs.friendlyCredit == rhs.friendlyCredit) &&
+        (lhs.auxiliaryLoad == rhs.auxiliaryLoad) && (lhs.peakPeriod == rhs.peakPeriod) &&
+        (lhs.powerThreshold == rhs.powerThreshold) && (lhs.predicted == rhs.predicted) && (lhs.threshold == rhs.threshold);
 }
 
 inline bool operator!=(const Type & lhs, const Type & rhs)
@@ -175,9 +167,7 @@ inline bool operator!=(const Type & lhs, const Type & rhs)
 namespace TariffPeriodStruct {
 inline bool operator==(const Type & lhs, const Type & rhs)
 {
-    return (lhs.tariffComponentIDs == rhs.tariffComponentIDs) &&
-           (lhs.dayEntryIDs == rhs.dayEntryIDs) &&
-           (lhs.label == rhs.label);
+    return (lhs.tariffComponentIDs == rhs.tariffComponentIDs) && (lhs.dayEntryIDs == rhs.dayEntryIDs) && (lhs.label == rhs.label);
 }
 
 inline bool operator!=(const Type & lhs, const Type & rhs)
@@ -189,8 +179,7 @@ inline bool operator!=(const Type & lhs, const Type & rhs)
 namespace CalendarPeriodStruct {
 inline bool operator==(const Type & lhs, const Type & rhs)
 {
-    return (lhs.startDate == rhs.startDate) &&
-           (lhs.dayPatternIDs == rhs.dayPatternIDs);
+    return (lhs.startDate == rhs.startDate) && (lhs.dayPatternIDs == rhs.dayPatternIDs);
 }
 
 inline bool operator!=(const Type & lhs, const Type & rhs)
@@ -296,7 +285,7 @@ struct StrToSpan
             return CHIP_ERROR_NO_MEMORY;
 
         memcpy(buffer, source.data(), source.size());
-        destination           = CharSpan(buffer, source.size());
+        destination = CharSpan(buffer, source.size());
         return CHIP_NO_ERROR;
     }
 
@@ -311,49 +300,52 @@ struct StrToSpan
     }
 };
 
-#define SCALAR_ATTRS                    \
-    X(Clusters::Globals::TariffUnitEnum)                  \
-    X(uint32_t)                         \
-    X(int16_t)                          \
+#define SCALAR_ATTRS                                                                                                               \
+    X(Clusters::Globals::TariffUnitEnum)                                                                                           \
+    X(uint32_t)                                                                                                                    \
+    X(int16_t)                                                                                                                     \
     X(Clusters::CommodityTariff::DayEntryRandomizationTypeEnum)
 
-#define COMPLEX_ATTRIBUTES                          \
-    X(Clusters::CommodityTariff::Structs::TariffInformationStruct::Type)                \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::DayEntryStruct::Type>)        \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::DayPatternStruct::Type>)      \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>) \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type>)    \
-    X(DataModel::List<Clusters::CommodityTariff::Structs::DayStruct::Type>)             \
+#define COMPLEX_ATTRIBUTES                                                                                                         \
+    X(Clusters::CommodityTariff::Structs::TariffInformationStruct::Type)                                                           \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::DayEntryStruct::Type>)                                                   \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::DayPatternStruct::Type>)                                                 \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>)                                            \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type>)                                               \
+    X(DataModel::List<Clusters::CommodityTariff::Structs::DayStruct::Type>)                                                        \
     X(DataModel::List<Clusters::CommodityTariff::Structs::CalendarPeriodStruct::Type>)
 
-#define ALL_ATTRIBUTES                                                                   \
-    SCALAR_ATTRS                                                                         \
+#define ALL_ATTRIBUTES                                                                                                             \
+    SCALAR_ATTRS                                                                                                                   \
     COMPLEX_ATTRIBUTES
 
 template <typename T>
-CHIP_ERROR CopyData(const T& input, T& output);
+CHIP_ERROR CopyData(const T & input, T & output);
 
 // Declare the specializations (no definitions here)
-#define X(attrType) template <> \
-CHIP_ERROR CopyData<attrType>(const attrType & input, attrType & output);
+#define X(attrType)                                                                                                                \
+    template <>                                                                                                                    \
+    CHIP_ERROR CopyData<attrType>(const attrType & input, attrType & output);
 COMPLEX_ATTRIBUTES
 #undef X
 
 // Primary template declaration
 template <typename T>
-void CleanupStructValue(T& aValue);
+void CleanupStructValue(T & aValue);
 
 // Specialization declarations
-#define X(attrType) template <> \
-void CleanupStructValue<attrType>(attrType & aValue);
+#define X(attrType)                                                                                                                \
+    template <>                                                                                                                    \
+    void CleanupStructValue<attrType>(attrType & aValue);
 COMPLEX_ATTRIBUTES
 #undef X
 
 template <typename T>
-CHIP_ERROR Validate(const T& aValue, void * aCtx);
+CHIP_ERROR Validate(const T & aValue, void * aCtx);
 
-#define X(attrType) template <> \
-CHIP_ERROR Validate<DataModel::Nullable<attrType>>(const DataModel::Nullable<attrType>& aValue, void * aCtx);
+#define X(attrType)                                                                                                                \
+    template <>                                                                                                                    \
+    CHIP_ERROR Validate<DataModel::Nullable<attrType>>(const DataModel::Nullable<attrType> & aValue, void * aCtx);
 ALL_ATTRIBUTES
 #undef X
 
@@ -515,14 +507,12 @@ class CTC_BaseDataClass
 public:
     /// The exposed attribute value type
     using ValueType = T;
-    
+
     /// The non-nullable version of the value type
     using NonNullableType = ExtractNonNullableType_t<ValueType>;
-    using ListEntryType = std::conditional_t<
-        IsList<NonNullableType>::value,
-        ExtractNestedType_t<NonNullableType>,  // Extract the list element type
-        void *
-    >;
+    using ListEntryType   = std::conditional_t<IsList<NonNullableType>::value,
+                                             ExtractNestedType_t<NonNullableType>, // Extract the list element type
+                                             void *>;
 
     /**
      * @brief Construct a new data class instance
@@ -545,7 +535,7 @@ public:
             GetValueRef() = ValueType();
         }
         mHoldState[mActiveValueIdx] = StorageState::kEmpty;
-        mUpdateState = UpdateState::kIdle;
+        mUpdateState                = UpdateState::kIdle;
     }
 
     /// @brief Virtual destructor ensures proper cleanup of resources
@@ -558,14 +548,14 @@ public:
      *          the update state machine and validation. Prefer using
      *          the proper update workflow.
      */
-    ValueType& GetValue() { return GetValueRef(); }
+    ValueType & GetValue() { return GetValueRef(); }
 
     /**
      * @brief Get mutable reference to the new value (during update)
      * @return Reference to the new value storage
      * @pre Must be in kInitialized or kAssigned state
      */
-    ValueType& GetNewValue() { return GetNewValueRef(); }
+    ValueType & GetNewValue() { return GetNewValueRef(); }
 
     /**
      * @brief Check if current update is validated
@@ -614,7 +604,7 @@ public:
 
         if (size >= 1)
         {
-            auto* buffer = static_cast<ListEntryType*>(Platform::MemoryCalloc(size, sizeof(ListEntryType)));
+            auto * buffer = static_cast<ListEntryType *>(Platform::MemoryCalloc(size, sizeof(ListEntryType)));
             if (!buffer)
             {
                 return CHIP_ERROR_NO_MEMORY;
@@ -687,7 +677,7 @@ public:
      * @note Handles all type cases (nullable, list, struct, scalar)
      * @note Performs proper copy and memory management
      */
-    CHIP_ERROR SetNewValue(const ValueType& aValue)
+    CHIP_ERROR SetNewValue(const ValueType & aValue)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -699,7 +689,7 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        auto& newValue = aValue.Value();
+        auto & newValue = aValue.Value();
 
         if constexpr (IsValueList())
         {
@@ -727,7 +717,7 @@ public:
             if (CHIP_NO_ERROR == err)
             {
                 NonNullableType tmpValue = newValue;
-                err = CopyData<NonNullableType>(newValue, tmpValue);
+                err                      = CopyData<NonNullableType>(newValue, tmpValue);
                 if (err == CHIP_NO_ERROR)
                 {
                     GetNewValueRef().SetNonNull(tmpValue);
@@ -784,7 +774,7 @@ public:
      * @post On success, transitions state to kValidated
      * @note If aUpdCtx is nullptr, skips context validation
      */
-    CHIP_ERROR UpdateBegin(void* aUpdCtx)
+    CHIP_ERROR UpdateBegin(void * aUpdCtx)
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
@@ -802,7 +792,7 @@ public:
         if (aUpdCtx != nullptr)
         {
             mAuxData = aUpdCtx;
-            err = ValidateNewValue();
+            err      = ValidateNewValue();
         }
 
         if (err == CHIP_NO_ERROR)
@@ -877,19 +867,13 @@ public:
      * @brief Cleans up an external list entry
      * @param[in,out] entry The list entry to clean up
      */
-    void CleanupExtListEntry(ListEntryType& entry)
-    {
-        CleanupStructValue<ListEntryType>(entry);
-    }
+    void CleanupExtListEntry(ListEntryType & entry) { CleanupStructValue<ListEntryType>(entry); }
 
     /**
      * @brief Gets the attribute ID
      * @return The attribute ID this instance manages
      */
-    AttributeId GetAttrId()
-    {
-        return mAttrId;
-    }
+    AttributeId GetAttrId() { return mAttrId; }
 
 private:
     /// @brief Internal storage states
@@ -912,13 +896,13 @@ private:
      * @brief Gets reference to active value storage
      * @return Reference to active storage
      */
-    ValueType& GetValueRef() { return mValueStorage[mActiveValueIdx]; }
+    ValueType & GetValueRef() { return mValueStorage[mActiveValueIdx]; }
 
     /**
      * @brief Gets reference to new value storage
      * @return Reference to new storage
      */
-    ValueType& GetNewValueRef() { return mValueStorage[!mActiveValueIdx]; }
+    ValueType & GetNewValueRef() { return mValueStorage[!mActiveValueIdx]; }
 
     /**
      * @brief Swaps active and new value storage indices
@@ -963,7 +947,7 @@ private:
      * @param destination Second list to compare
      * @return true if lists differ, false if identical
      */
-    bool ListsNotEqual(const DataModel::List<ListEntryType>& source, const DataModel::List<ListEntryType>& destination)
+    bool ListsNotEqual(const DataModel::List<ListEntryType> & source, const DataModel::List<ListEntryType> & destination)
     {
         if (source.size() != destination.size())
         {
@@ -989,7 +973,7 @@ private:
      * @param b Second value to compare
      * @return true if values differ, false if identical
      */
-    bool NullableNotEqual(const ValueType& a, const ValueType& b)
+    bool NullableNotEqual(const ValueType & a, const ValueType & b)
     {
         bool is_neq = false;
         if (a.IsNull() || b.IsNull())
@@ -1053,7 +1037,7 @@ private:
      * @brief Cleans up a value reference
      * @param aValue Reference to value to clean up
      */
-    void CleanupValueByRef(ValueType& aValue)
+    void CleanupValueByRef(ValueType & aValue)
     {
         if constexpr (IsValueNullable())
         {
@@ -1080,11 +1064,11 @@ private:
      * @brief Cleans up a list and its elements
      * @param list List to clean up
      */
-    void CleanupList(DataModel::List<ListEntryType>& list)
+    void CleanupList(DataModel::List<ListEntryType> & list)
     {
         assertChipStackLockedByCurrentThread();
 
-        for (auto& item : list)
+        for (auto & item : list)
         {
             CleanupStruct<ListEntryType>(item);
         }
@@ -1099,16 +1083,19 @@ private:
      * @brief Cleans up a struct value
      * @param aValue Struct to clean up
      */
-    template<typename StructType>
-    void CleanupStruct(StructType& aValue) { CleanupStructValue<StructType>(aValue); }
+    template <typename StructType>
+    void CleanupStruct(StructType & aValue)
+    {
+        CleanupStructValue<StructType>(aValue);
+    }
 
     // Member variables
-    uint8_t mActiveValueIdx = 0;                  ///< Index of active value storage
-    ValueType mValueStorage[2];                   ///< Double-buffered value storage
-    StorageState mHoldState[2] = {StorageState::kEmpty}; ///< Storage state tracking
+    uint8_t mActiveValueIdx = 0;                           ///< Index of active value storage
+    ValueType mValueStorage[2];                            ///< Double-buffered value storage
+    StorageState mHoldState[2] = { StorageState::kEmpty }; ///< Storage state tracking
 
-    void* mAuxData = nullptr;                     ///< Validation context data
-    const AttributeId mAttrId;                    ///< Managed attribute ID
+    void * mAuxData = nullptr;                     ///< Validation context data
+    const AttributeId mAttrId;                     ///< Managed attribute ID
     UpdateState mUpdateState = UpdateState::kIdle; ///< Current update state
 };
 

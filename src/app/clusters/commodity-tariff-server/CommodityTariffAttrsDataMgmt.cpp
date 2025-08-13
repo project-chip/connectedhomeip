@@ -312,25 +312,35 @@ using namespace CommodityTariffConsts;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<TariffUnitEnum>>(const DataModel::Nullable<TariffUnitEnum>& aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<TariffUnitEnum>>(const DataModel::Nullable<TariffUnitEnum> & aValue, void * aCtx)
 {
     return CHIP_NO_ERROR;
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<uint32_t>>(const DataModel::Nullable<uint32_t>& aValue, void * aCtx)
-{ return CHIP_NO_ERROR; }
+CHIP_ERROR Validate<DataModel::Nullable<uint32_t>>(const DataModel::Nullable<uint32_t> & aValue, void * aCtx)
+{
+    return CHIP_NO_ERROR;
+}
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<int16_t>>(const DataModel::Nullable<int16_t>& aValue, void * aCtx)
-{ return CHIP_NO_ERROR; }
+CHIP_ERROR Validate<DataModel::Nullable<int16_t>>(const DataModel::Nullable<int16_t> & aValue, void * aCtx)
+{
+    return CHIP_NO_ERROR;
+}
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<DayEntryRandomizationTypeEnum>>(const DataModel::Nullable<DayEntryRandomizationTypeEnum>& aValue, void * aCtx)
-{ return CHIP_NO_ERROR; }
+CHIP_ERROR
+Validate<DataModel::Nullable<DayEntryRandomizationTypeEnum>>(const DataModel::Nullable<DayEntryRandomizationTypeEnum> & aValue,
+                                                             void * aCtx)
+{
+    return CHIP_NO_ERROR;
+}
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<TariffInformationStruct::Type>>(const DataModel::Nullable<TariffInformationStruct::Type>& aValue, void * aCtx)
+CHIP_ERROR
+Validate<DataModel::Nullable<TariffInformationStruct::Type>>(const DataModel::Nullable<TariffInformationStruct::Type> & aValue,
+                                                             void * aCtx)
 {
     // The tariff info is always required (cannot be null)
     if (aValue.IsNull())
@@ -339,7 +349,7 @@ CHIP_ERROR Validate<DataModel::Nullable<TariffInformationStruct::Type>>(const Da
     }
 
     const TariffInformationStruct::Type & newValue = aValue.Value();
-    auto * ctx                   = static_cast<TariffUpdateCtx *>(aCtx);
+    auto * ctx                                     = static_cast<TariffUpdateCtx *>(aCtx);
 
     // Validate string lengths (if fields are provided)
     VerifyOrReturnError(newValue.tariffLabel.IsNull() || newValue.tariffLabel.Value().size() <= kTariffInfoMaxLabelLength,
@@ -381,7 +391,8 @@ CHIP_ERROR Validate<DataModel::Nullable<TariffInformationStruct::Type>>(const Da
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>(const DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>& aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>(
+    const DataModel::Nullable<DataModel::List<DayEntryStruct::Type>> & aValue, void * aCtx)
 {
     // Required field check
     if (aValue.IsNull())
@@ -421,7 +432,8 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>(
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>(const DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>& aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>(
+    const DataModel::Nullable<DataModel::List<DayPatternStruct::Type>> & aValue, void * aCtx)
 {
     if (aValue.IsNull())
     {
@@ -471,7 +483,8 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>(const DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>& aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>(
+    const DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>> & aValue, void * aCtx)
 {
     // Required field check
     if (aValue.IsNull())
@@ -508,7 +521,8 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffComponentStruct::T
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>(const DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>& aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>(
+    const DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>> & aValue, void * aCtx)
 {
     // Required field check
     if (aValue.IsNull())
@@ -543,7 +557,8 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayStruct::Type>>>(const DataModel::Nullable<DataModel::List<DayStruct::Type>>& aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayStruct::Type>>>(
+    const DataModel::Nullable<DataModel::List<DayStruct::Type>> & aValue, void * aCtx)
 {
     // Early return for null case (valid)
     if (aValue.IsNull())
@@ -598,7 +613,8 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<DayStruct::Type>>>(const
 }
 
 template <>
-CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>(const DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>& aValue, void * aCtx)
+CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>(
+    const DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>> & aValue, void * aCtx)
 {
     // If calendar is null, it's always valid
     if (aValue.IsNull())
@@ -612,8 +628,7 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Ty
 
     TariffUpdateCtx * ctx = static_cast<TariffUpdateCtx *>(aCtx);
 
-    std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs =
-        ctx->CalendarPeriodsDayPatternIDs;
+    std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs = ctx->CalendarPeriodsDayPatternIDs;
 
     auto & tariffStartDate = ctx->TariffStartTimestamp;
 
@@ -644,12 +659,14 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Ty
         {
             if (tariffStartDate.Value() == 0 && (!item.startDate.IsNull() && item.startDate.Value() > 0))
             {
-                ChipLogError(NotSpecified, "The first StartDate in CalendarPeriods can't have a value if the StartDate of tariff is 0");
+                ChipLogError(NotSpecified,
+                             "The first StartDate in CalendarPeriods can't have a value if the StartDate of tariff is 0");
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            else if (tariffStartDate.Value() > 0 && (item.startDate.IsNull() || item.startDate.Value() == 0) )
+            else if (tariffStartDate.Value() > 0 && (item.startDate.IsNull() || item.startDate.Value() == 0))
             {
-                ChipLogError(NotSpecified, "The first StartDate in CalendarPeriods can't be not set if the StartDate of tariff is specified");
+                ChipLogError(NotSpecified,
+                             "The first StartDate in CalendarPeriods can't be not set if the StartDate of tariff is specified");
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
@@ -683,7 +700,8 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Ty
 }
 
 template <>
-CHIP_ERROR CopyData<TariffInformationStruct::Type>(const TariffInformationStruct::Type & input, TariffInformationStruct::Type & output)
+CHIP_ERROR CopyData<TariffInformationStruct::Type>(const TariffInformationStruct::Type & input,
+                                                   TariffInformationStruct::Type & output)
 {
     output.tariffLabel.SetNull();
     output.providerName.SetNull();
@@ -731,26 +749,26 @@ template <>
 CHIP_ERROR CopyData<DayEntryStruct::Type>(const DayEntryStruct::Type & input, DayEntryStruct::Type & output)
 {
     output.dayEntryID = input.dayEntryID;
-    output.startTime = input.startTime;
-    
+    output.startTime  = input.startTime;
+
     output.duration.ClearValue();
     if (input.duration.HasValue())
     {
         output.duration.SetValue(input.duration.Value());
     }
-    
+
     output.randomizationOffset.ClearValue();
     if (input.randomizationOffset.HasValue())
     {
         output.randomizationOffset.SetValue(input.randomizationOffset.Value());
     }
-    
+
     output.randomizationType.ClearValue();
     if (input.randomizationType.HasValue())
     {
         output.randomizationType.SetValue(input.randomizationType.Value());
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -758,7 +776,7 @@ template <>
 CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Type & input, TariffComponentStruct::Type & output)
 {
     output.tariffComponentID = input.tariffComponentID;
-    
+
     output.price.ClearValue();
     if (input.price.HasValue())
     {
@@ -766,16 +784,16 @@ CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Ty
         output.price.Value().SetNull();
         if (!input.price.Value().IsNull())
         {
-            auto & priceInput = input.price.Value().Value();            
+            auto & priceInput = input.price.Value().Value();
             TariffPriceStruct::Type tmp_price;
 
             tmp_price.priceType = priceInput.priceType;
-            
+
             if (priceInput.price.HasValue())
             {
                 tmp_price.price.SetValue(priceInput.price.Value());
             }
-            
+
             if (priceInput.priceLevel.HasValue())
             {
                 tmp_price.priceLevel.SetValue(priceInput.priceLevel.Value());
@@ -784,42 +802,42 @@ CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Ty
             output.price.Value().SetNonNull(tmp_price);
         }
     }
-    
+
     output.friendlyCredit.ClearValue();
     if (input.friendlyCredit.HasValue())
     {
         output.friendlyCredit.SetValue(input.friendlyCredit.Value());
     }
-    
+
     output.auxiliaryLoad.ClearValue();
     if (input.auxiliaryLoad.HasValue())
     {
         output.auxiliaryLoad.Emplace();
-        output.auxiliaryLoad.Value().number = input.auxiliaryLoad.Value().number;
+        output.auxiliaryLoad.Value().number        = input.auxiliaryLoad.Value().number;
         output.auxiliaryLoad.Value().requiredState = input.auxiliaryLoad.Value().requiredState;
     }
-    
+
     output.peakPeriod.ClearValue();
     if (input.peakPeriod.HasValue())
     {
         output.peakPeriod.Emplace();
-        output.peakPeriod.Value().severity = input.peakPeriod.Value().severity;
+        output.peakPeriod.Value().severity   = input.peakPeriod.Value().severity;
         output.peakPeriod.Value().peakPeriod = input.peakPeriod.Value().peakPeriod;
     }
-    
+
     output.powerThreshold.ClearValue();
     if (input.powerThreshold.HasValue())
     {
         output.powerThreshold.Emplace();
         output.powerThreshold.Value() = input.powerThreshold.Value();
     }
-    
+
     output.threshold.SetNull();
     if (!input.threshold.IsNull())
     {
         output.threshold.SetNonNull(input.threshold.Value());
     }
-    
+
     output.label.ClearValue();
     if (input.label.HasValue())
     {
@@ -827,20 +845,19 @@ CHIP_ERROR CopyData<TariffComponentStruct::Type>(const TariffComponentStruct::Ty
         output.label.Value().SetNull();
         if (!input.label.Value().IsNull())
         {
-            if (!SpanCopier<char>::Copy(
-                input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()))
+            if (!SpanCopier<char>::Copy(input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()))
             {
                 return CHIP_ERROR_NO_MEMORY;
             }
         }
     }
-    
+
     output.predicted.ClearValue();
     if (input.predicted.HasValue())
     {
         output.predicted.SetValue(input.predicted.Value());
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -850,23 +867,24 @@ CHIP_ERROR CopyData<TariffPeriodStruct::Type>(const TariffPeriodStruct::Type & i
     output.label.SetNull();
     if (!input.label.IsNull())
     {
-        if (!SpanCopier<char>::Copy(
-            input.label.Value(), output.label, input.label.Value().size()))
+        if (!SpanCopier<char>::Copy(input.label.Value(), output.label, input.label.Value().size()))
         {
             return CHIP_ERROR_NO_MEMORY;
         }
     }
-    
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kTariffPeriodItemMaxIDs))
+
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
+                                    output.dayEntryIDs, kTariffPeriodItemMaxIDs))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()), output.tariffComponentIDs, kTariffPeriodItemMaxIDs))
+
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()),
+                                    output.tariffComponentIDs, kTariffPeriodItemMaxIDs))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -874,27 +892,29 @@ template <>
 CHIP_ERROR CopyData<DayPatternStruct::Type>(const DayPatternStruct::Type & input, DayPatternStruct::Type & output)
 {
     output.dayPatternID = input.dayPatternID;
-    output.daysOfWeek = input.daysOfWeek;
-    
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kDayPatternItemMaxDayEntryIDs))
+    output.daysOfWeek   = input.daysOfWeek;
+
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
+                                    output.dayEntryIDs, kDayPatternItemMaxDayEntryIDs))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
 template <>
 CHIP_ERROR CopyData<DayStruct::Type>(const DayStruct::Type & input, DayStruct::Type & output)
 {
-    output.date = input.date;
+    output.date    = input.date;
     output.dayType = input.dayType;
-    
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()), output.dayEntryIDs, kDayStructItemMaxDayEntryIDs))
+
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
+                                    output.dayEntryIDs, kDayStructItemMaxDayEntryIDs))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -906,27 +926,28 @@ CHIP_ERROR CopyData<CalendarPeriodStruct::Type>(const CalendarPeriodStruct::Type
     {
         output.startDate.SetNonNull(input.startDate.Value());
     }
-    
-    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayPatternIDs.data(), input.dayPatternIDs.size()), output.dayPatternIDs, kCalendarPeriodItemMaxDayPatternIDs))
+
+    if (!SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayPatternIDs.data(), input.dayPatternIDs.size()),
+                                    output.dayPatternIDs, kCalendarPeriodItemMaxDayPatternIDs))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
 template <>
-void CleanupStructValue<TariffInformationStruct::Type>(TariffInformationStruct::Type& aValue)
+void CleanupStructValue<TariffInformationStruct::Type>(TariffInformationStruct::Type & aValue)
 {
     if (!aValue.tariffLabel.IsNull() && aValue.tariffLabel.Value().data())
     {
-        Platform::MemoryFree(const_cast<char*>(aValue.tariffLabel.Value().data()));
+        Platform::MemoryFree(const_cast<char *>(aValue.tariffLabel.Value().data()));
         aValue.tariffLabel.SetNull();
     }
 
     if (!aValue.providerName.IsNull() && aValue.providerName.Value().data())
     {
-        Platform::MemoryFree(const_cast<char*>(aValue.providerName.Value().data()));
+        Platform::MemoryFree(const_cast<char *>(aValue.providerName.Value().data()));
         aValue.providerName.SetNull();
     }
 
@@ -934,7 +955,7 @@ void CleanupStructValue<TariffInformationStruct::Type>(TariffInformationStruct::
 }
 
 template <>
-void CleanupStructValue<DayEntryStruct::Type>(DayEntryStruct::Type& aValue)
+void CleanupStructValue<DayEntryStruct::Type>(DayEntryStruct::Type & aValue)
 {
     aValue.duration.ClearValue();
     aValue.randomizationOffset.ClearValue();
@@ -942,11 +963,11 @@ void CleanupStructValue<DayEntryStruct::Type>(DayEntryStruct::Type& aValue)
 }
 
 template <>
-void CleanupStructValue<TariffPeriodStruct::Type>(TariffPeriodStruct::Type& aValue)
+void CleanupStructValue<TariffPeriodStruct::Type>(TariffPeriodStruct::Type & aValue)
 {
     if (!aValue.label.IsNull() && aValue.label.Value().data())
     {
-        Platform::MemoryFree(const_cast<char*>(aValue.label.Value().data()));
+        Platform::MemoryFree(const_cast<char *>(aValue.label.Value().data()));
         aValue.label.SetNull();
     }
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
@@ -954,7 +975,7 @@ void CleanupStructValue<TariffPeriodStruct::Type>(TariffPeriodStruct::Type& aVal
 }
 
 template <>
-void CleanupStructValue<TariffComponentStruct::Type>(TariffComponentStruct::Type& aValue)
+void CleanupStructValue<TariffComponentStruct::Type>(TariffComponentStruct::Type & aValue)
 {
 
     if (aValue.label.HasValue() && !aValue.label.Value().IsNull())
@@ -970,21 +991,20 @@ void CleanupStructValue<TariffComponentStruct::Type>(TariffComponentStruct::Type
     aValue.powerThreshold.ClearValue();
 }
 
-
 template <>
-void CleanupStructValue<DayPatternStruct::Type>(DayPatternStruct::Type& aValue)
+void CleanupStructValue<DayPatternStruct::Type>(DayPatternStruct::Type & aValue)
 {
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
 }
 
 template <>
-void CleanupStructValue<DayStruct::Type>(DayStruct::Type& aValue)
+void CleanupStructValue<DayStruct::Type>(DayStruct::Type & aValue)
 {
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
 }
 
 template <>
-void CleanupStructValue<CalendarPeriodStruct::Type>(CalendarPeriodStruct::Type& aValue)
+void CleanupStructValue<CalendarPeriodStruct::Type>(CalendarPeriodStruct::Type & aValue)
 {
     CommonUtilities::CleanUpIDs(aValue.dayPatternIDs);
 }

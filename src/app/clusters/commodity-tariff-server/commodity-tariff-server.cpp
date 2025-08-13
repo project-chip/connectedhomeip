@@ -277,12 +277,8 @@ void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aU
 
     DeinitCurrentAttrs();
 
-    if ( mDelegate.GetTariffUnit().IsNull() ||
-         mDelegate.GetStartDate().IsNull() ||
-         mDelegate.GetTariffInfo().IsNull() ||
-         mDelegate.GetDayEntries().IsNull() ||
-         mDelegate.GetTariffPeriods().IsNull() ||
-         mDelegate.GetTariffComponents().IsNull() )
+    if (mDelegate.GetTariffUnit().IsNull() || mDelegate.GetStartDate().IsNull() || mDelegate.GetTariffInfo().IsNull() ||
+        mDelegate.GetDayEntries().IsNull() || mDelegate.GetTariffPeriods().IsNull() || mDelegate.GetTariffComponents().IsNull())
     {
         ChipLogError(NotSpecified, "Seems the new tariff is unavailable - skip the current/next attrs init");
         return;
@@ -290,7 +286,8 @@ void Instance::TariffDataUpdatedCb(bool is_erased, std::vector<AttributeId> & aU
 
     if (!is_erased)
     {
-        InitCurrentAttrs();;
+        InitCurrentAttrs();
+        ;
     }
 }
 
@@ -347,21 +344,24 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
     if (!aCtx.mTariffProvider->GetCalendarPeriods().IsNull())
     {
         const Structs::CalendarPeriodStruct::Type * period = nullptr;
-        bool first_item = true;
+        bool first_item                                    = true;
 
-        for (const auto& entry : aCtx.mTariffProvider->GetCalendarPeriods().Value()) {
-            if ( first_item && aCtx.mTariffProvider->GetStartDate().Value() == 0 &&
-                 (entry.startDate.IsNull() || entry.startDate.Value() == 0) ) {
-                period = &entry;  // Use this entry as fallback
+        for (const auto & entry : aCtx.mTariffProvider->GetCalendarPeriods().Value())
+        {
+            if (first_item && aCtx.mTariffProvider->GetStartDate().Value() == 0 &&
+                (entry.startDate.IsNull() || entry.startDate.Value() == 0))
+            {
+                period     = &entry; // Use this entry as fallback
                 first_item = false;
-                continue;         // Keep looking for a better match
+                continue; // Keep looking for a better match
             }
 
             // Check if entry matches our target day
             const auto entryStart = entry.startDate.Value();
-            if (entryStart >= DayStartTS && entryStart < (DayStartTS + kSecondsPerDay)) {
-                period = &entry;  // Found perfect match
-                break;            // No need to continue searching
+            if (entryStart >= DayStartTS && entryStart < (DayStartTS + kSecondsPerDay))
+            {
+                period = &entry; // Found perfect match
+                break;           // No need to continue searching
             }
         }
 
@@ -399,7 +399,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 {
     const Structs::DayEntryStruct::Type * currentPtr = nullptr;
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
-    *CurrentEntryMinutesRemain                                 = 0;
+    *CurrentEntryMinutesRemain                       = 0;
 
     for (const auto & entryID : dayEntryIDs)
     {
@@ -433,8 +433,8 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         // Check if current entry matches the current time
         if (current->startTime <= minutesSinceMidnight && (current->startTime + duration) > minutesSinceMidnight)
         {
-            currentPtr       = current;
-            nextPtr          = next;
+            currentPtr                 = current;
+            nextPtr                    = next;
             *CurrentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - current->startTime));
             break;
         }
@@ -487,10 +487,10 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
         return CHIP_ERROR_NOT_FOUND;
     }
     const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
-    const size_t componentCount = period->tariffComponentIDs.size();
+    const size_t componentCount                          = period->tariffComponentIDs.size();
 
     tempVector.reserve(componentCount);
-    
+
     for (const auto & entryID : componentIDs)
     {
         Structs::TariffComponentStruct::Type entry;
@@ -521,7 +521,8 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
 
     if (err == CHIP_NO_ERROR)
     {
-        err = mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempVector.data(), tempVector.size())));
+        err = mgmtObj.SetNewValue(
+            MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempVector.data(), tempVector.size())));
 
         if (err == CHIP_NO_ERROR)
         {
@@ -586,7 +587,7 @@ void Instance::UpdateCurrentAttrs()
 
     // Update day information
     UpdateDayInformation(now);
-    
+
     // Update day entry information
     UpdateDayEntryInformation(now);
 }
@@ -609,7 +610,7 @@ void Instance::UpdateDayInformation(uint32_t now)
     SetCurrentDay(currentDay);
 
     nextDay.SetNonNull(Utils::FindDay(mServerTariffAttrsCtx, now + kSecondsPerDay));
-    
+
     if (Utils::DayIsValid(&nextDay.Value()))
     {
         ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day date: %u", nextDay.Value().date);
@@ -625,11 +626,11 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
     }
 
     const uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);
-    uint16_t currentEntryMinutesRemain = 0;
-    auto& currentDayEntryIDs = mCurrentDay.Value().dayEntryIDs;
+    uint16_t currentEntryMinutesRemain  = 0;
+    auto & currentDayEntryIDs           = mCurrentDay.Value().dayEntryIDs;
 
-    auto [currentEntry, nextEntry] = Utils::FindDayEntry(
-        mServerTariffAttrsCtx, currentDayEntryIDs, minutesSinceMidnight, &currentEntryMinutesRemain);
+    auto [currentEntry, nextEntry] =
+        Utils::FindDayEntry(mServerTariffAttrsCtx, currentDayEntryIDs, minutesSinceMidnight, &currentEntryMinutesRemain);
 
     // Handle current day entry
     DataModel::Nullable<Structs::DayEntryStruct::Type> tmpDayEntry;
@@ -639,9 +640,10 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
     {
         tmpDayEntry.SetNonNull(*currentEntry);
         tmpDate.SetNonNull(mCurrentDay.Value().date);
-        
-        if (CHIP_NO_ERROR != Utils::UpdateTariffComponentAttrsDayEntryById(
-                this, mServerTariffAttrsCtx, currentEntry->dayEntryID, mCurrentTariffComponents_MgmtObj))
+
+        if (CHIP_NO_ERROR !=
+            Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, currentEntry->dayEntryID,
+                                                          mCurrentTariffComponents_MgmtObj))
         {
             ChipLogError(NotSpecified, "Unable to update the CurrentTariffComponents attribute!");
         }
@@ -658,8 +660,9 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
     if (nextEntry != nullptr)
     {
         tmpDayEntry.SetNonNull(*nextEntry);
-        if (CHIP_NO_ERROR != Utils::UpdateTariffComponentAttrsDayEntryById(
-                this, mServerTariffAttrsCtx, nextEntry->dayEntryID, mNextTariffComponents_MgmtObj))
+        if (CHIP_NO_ERROR !=
+            Utils::UpdateTariffComponentAttrsDayEntryById(this, mServerTariffAttrsCtx, nextEntry->dayEntryID,
+                                                          mNextTariffComponents_MgmtObj))
         {
             ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
         }
@@ -672,8 +675,8 @@ void Instance::UpdateDayEntryInformation(uint32_t now)
     if (currentEntryMinutesRemain > 0)
     {
         tmpDate.SetNonNull((currentEntryMinutesRemain >= (kDayEntryDurationLimit - minutesSinceMidnight)) && !mNextDay.IsNull()
-            ? mNextDay.Value().date
-            : mCurrentDay.Value().date);
+                               ? mNextDay.Value().date
+                               : mCurrentDay.Value().date);
         SetNextDayEntryDate(tmpDate);
     }
 }
