@@ -243,7 +243,7 @@ static inline Structs::TariffInformationStruct::Type TariffInfo() {
             .currency = 200,
             .decimalPoints = 1
         })),
-        .blockMode = DataModel::MakeNullable(static_cast<BlockModeEnum>(0))
+        .blockMode = DataModel::MakeNullable(static_cast<BlockModeEnum>(1))
     };
 }
 
