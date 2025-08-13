@@ -343,7 +343,7 @@ fabric_scoped struct WebRTCSessionStruct {
   StreamUsageEnum streamUsage = 3;
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
-  optional boolean metadataEnabled = 6;
+  boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
 }
 
@@ -6339,11 +6339,10 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 6;
     int32u minBitRate = 7;
     int32u maxBitRate = 8;
-    int16u minKeyFrameInterval = 9;
-    int16u maxKeyFrameInterval = 10;
-    optional boolean watermarkEnabled = 11;
-    optional boolean OSDEnabled = 12;
-    int8u referenceCount = 13;
+    int16u keyFrameInterval = 9;
+    optional boolean watermarkEnabled = 10;
+    optional boolean OSDEnabled = 11;
+    int8u referenceCount = 12;
   }
 
   struct SnapshotStreamStruct {
@@ -6472,10 +6471,9 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 5;
     int32u minBitRate = 6;
     int32u maxBitRate = 7;
-    int16u minKeyFrameInterval = 8;
-    int16u maxKeyFrameInterval = 9;
-    optional boolean watermarkEnabled = 10;
-    optional boolean OSDEnabled = 11;
+    int16u keyFrameInterval = 8;
+    optional boolean watermarkEnabled = 9;
+    optional boolean OSDEnabled = 10;
   }
 
   response struct VideoStreamAllocateResponse = 4 {
