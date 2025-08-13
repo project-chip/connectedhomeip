@@ -30,7 +30,7 @@ from matter.testing.pics import parse_pics, parse_pics_xml
 from matter.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from matter.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from matter import timeoperations
 from matter.tlv import uint
 
 
@@ -109,11 +109,11 @@ class TestMatterTestingSupport(MatterBaseTest):
     @async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero
-        ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
+        ret = utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
         asserts.assert_equal(ret, 0, "UTC epoch returned non-zero value")
 
         # Jan 2 is exactly 1 day after Jan 1
-        ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
+        ret = utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
         expected_delay = timedelta(days=1)
         actual_delay = timedelta(microseconds=ret)
         asserts.assert_equal(expected_delay, actual_delay, "Calculation for Jan 2 date is incorrect")

@@ -46,7 +46,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from matter import timeoperations
 from matter.tlv import uint
 
 
