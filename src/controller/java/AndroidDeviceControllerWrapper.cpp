@@ -858,7 +858,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     err = JniReferences::GetInstance().FindMethod(
         env, mJavaObjectRef.ObjectRef(), "onScanNetworksSuccess",
         "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking Java callback: %s", ErrorStr(err)));
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format()));
 
     jobject NetworkingStatus;
     std::string NetworkingStatusClassName     = "java/lang/Integer";

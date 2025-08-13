@@ -291,6 +291,7 @@ source_set("events") {
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model:data-model",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -314,6 +315,7 @@ static_library("attribute-access") {
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider:core",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -401,6 +403,7 @@ source_set("command-handler-interface") {
     "CommandHandlerInterface.h",
     "CommandHandlerInterfaceRegistry.cpp",
     "CommandHandlerInterfaceRegistry.h",
+    "CommandHandlerInterfaceShim.h",
   ]
 
   public_deps = [
@@ -489,6 +492,7 @@ source_set("generic-test-event-trigger-handler") {
 
   public_deps = [
     ":test-event-trigger",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-diagnostics-server",
     "${chip_root}/src/platform",
   ]
 }
