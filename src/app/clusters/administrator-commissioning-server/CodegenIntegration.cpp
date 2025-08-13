@@ -18,6 +18,8 @@
 #include <app/static-cluster-config/AdministratorCommissioning.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
+#include <app/util/config.h> // REQUIRED for ifdefs for commands
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
