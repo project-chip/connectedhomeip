@@ -101,6 +101,8 @@ jobs:
                 build-variant: ${{ matrix.build_variant }}
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+            - name: ccache zero stats
+              run: ccache -z
 
             - name: Validate that xml are parsable
               # The sub-items being run here are the same as the input XMLs listed
@@ -325,6 +327,16 @@ jobs:
                      "
 
             - name: ccache stats
+              run: ccache --show-stats --verbose
+            - name: Rebuild chip-tool and all-clusters for cache-hit validation
+              run: |
+                  CCACHE_DEBUG=1 CCACHE_DEBUGDIR="$GITHUB_WORKSPACE/ccache-debug" \
+                  ./scripts/run_in_build_env.sh \
+                    "ninja -C out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} -t clean && ninja -C out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}"
+                  CCACHE_DEBUG=1 CCACHE_DEBUGDIR="$GITHUB_WORKSPACE/ccache-debug" \
+                  ./scripts/run_in_build_env.sh \
+                    "ninja -C out/linux-x64-all-clusters-${BUILD_VARIANT} -t clean && ninja -C out/linux-x64-all-clusters-${BUILD_VARIANT}"
+            - name: ccache stats (post-rebuild)
               run: ccache --show-stats --verbose
             - name: Upload ccache per-object diagnostics (chip-tool, all-clusters)
               uses: actions/upload-artifact@v4
