@@ -17,10 +17,8 @@
  */
 
 #include <CommodityTariffInstance.h>
-#include <csetjmp>
 
 #include <app/clusters/commodity-tariff-server/CommodityTariffConsts.h>
-#include <locale>
 
 using namespace chip;
 using namespace chip::app;

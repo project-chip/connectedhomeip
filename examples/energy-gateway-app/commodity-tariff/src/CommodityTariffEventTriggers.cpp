@@ -68,47 +68,32 @@ void SetTestEventTrigger_TariffDataUpdated()
     const TariffDataSet & tariff_preset = GetPreset(presetIndex++);
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
     CommodityTariffInstance * instance = GetCommodityTariffInstance();
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    const std::vector<std::pair<bool, std::pair<CHIP_ERROR, const char*>>> required_tariff_items = {
-#define X(attrName) ATTR_ITEM(attrName),
+    auto process_attribute = [&](auto& mgmt_obj, const auto& preset_value, const char* name, bool is_required) {
+        if (!preset_value.IsNull()) {
+            err = mgmt_obj.SetNewValue(preset_value);
+            if (err != CHIP_NO_ERROR) {
+                ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", name);
+                return false;
+            }
+        } else if (is_required) {
+            ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\" is not present", name);
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+            return false;
+        }
+        return true;
+    };
+
+    #define X(attrName) \
+        if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, true)) { return; }
     COMMODITY_TARIFF_ATTRIBUTES_REQ
-#undef X
-    };
+    #undef X
 
-    const std::vector<std::pair<bool, std::pair<CHIP_ERROR, const char*>>> optional_tariff_items = {
-#define X(attrName) ATTR_ITEM(attrName),
+    #define X(attrName) \
+        if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, false)) { return; }
     COMMODITY_TARIFF_ATTRIBUTES_OPT
-#undef X
-    };
-
-    for (const auto & item : required_tariff_items)
-    {
-        if (item.first)
-        {
-             ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\"is not present", item.second.second);
-             return;
-        }
-        else
-        {
-            if (item.second.first != CHIP_NO_ERROR)
-            {
-                ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", item.second.second);
-                return;
-            }
-        }
-    }
-
-    for (const auto & item : optional_tariff_items)
-    {
-        if (!item.first)
-        {
-            if (item.second.first != CHIP_NO_ERROR)
-            {
-                ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", item.second.second);
-                return;
-            }
-        }
-    }
+    #undef X
 
     instance->ActivateTariffTimeTracking(tariff_preset.TariffTestTimestamp);
 
@@ -117,7 +102,6 @@ void SetTestEventTrigger_TariffDataUpdated()
 
 #undef COMMODITY_TARIFF_ATTRIBUTES_REQ
 #undef COMMODITY_TARIFF_ATTRIBUTES_OPT
-#undef TARIFF_ITEM
 
 void SetTestEventTrigger_TariffDataClear()
 {
