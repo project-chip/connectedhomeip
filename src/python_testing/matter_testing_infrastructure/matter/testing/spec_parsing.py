@@ -18,6 +18,7 @@
 import importlib
 import importlib.resources as pkg_resources
 import logging
+import re
 import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
@@ -198,6 +199,7 @@ DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-
 
 # fuzzy match to name because some of the old specs weren't careful here
 def _fuzzy_name(to_fuzz: str):
+    to_fuzz = re.sub("\(.*?\)|\[.*?\]", "", to_fuzz)
     return to_fuzz.lower().strip().replace(' ', '').replace('/', '')
 
 
