@@ -27,8 +27,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Protocols::InteractionModel;
 
-using namespace chip::app::Clusters::TimeFormatLocalization::Attributes;
-
 namespace {
 
 LazyRegisteredServerCluster<TimeFormatLocalizationCluster> gServer;
@@ -42,7 +40,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 
     // Get feature Map
     uint32_t rawFeatureMap;
-    if (FeatureMap::Get(endpoint, &rawFeatureMap) != Status::Success)
+    if (TimeFormatLocalization::Attributes::FeatureMap::Get(endpoint, &rawFeatureMap) != Status::Success)
     {
         ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpoint);
         rawFeatureMap = 0;

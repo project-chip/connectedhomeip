@@ -54,6 +54,37 @@ private:
     Iterator * mIterator;
 };
 
+bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr)
+{
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, false);
+
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), false);
+
+    TimeFormatLocalization::CalendarTypeEnum type;
+    bool found = false;
+
+    while (it.Next(type))
+    {
+        // Update the optional validCalendar to a value from the SupportedList.
+        // This will return either the last element of the list or the requested
+        // value if exists.
+        if (validCalendar != nullptr)
+        {
+            *validCalendar = type;
+        }
+
+        if (type == reqCalendar)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    return found;
+}
+
 } // namespace
 
 TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId,
@@ -167,36 +198,6 @@ CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath &
     return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
 }
 
-bool TimeFormatLocalizationCluster::IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, TimeFormatLocalization::CalendarTypeEnum * validCalendar)
-{
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-    VerifyOrReturnValue(provider != nullptr, false);
-
-    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
-    VerifyOrReturnValue(it.IsValid(), false);
-
-    TimeFormatLocalization::CalendarTypeEnum type;
-    bool found = false;
-
-    while (it.Next(type))
-    {
-        // Update the optional validCalendar to a value from the SupportedList.
-        // This will return either the last element of the list or the requested
-        // value if exists.
-        if (validCalendar != nullptr)
-        {
-            *validCalendar = type;
-        }
-
-        if (type == reqCalendar)
-        {
-            found = true;
-            break;
-        }
-    }
-
-    return found;
-}
 
 CHIP_ERROR TimeFormatLocalizationCluster::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const
 {

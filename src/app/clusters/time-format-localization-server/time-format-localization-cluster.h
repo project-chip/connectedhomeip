@@ -29,7 +29,6 @@ public:
     static constexpr TimeFormatLocalization::CalendarTypeEnum kDefaultCalendarType =
         TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
     static constexpr TimeFormatLocalization::HourFormatEnum kDefaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
-    static constexpr size_t kMaxExpectedAttributeCount                         = 3;
 
     TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features);
 
@@ -44,10 +43,8 @@ public:
 
 private:
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
-    bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
-                                 TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
     CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
-    BitFlags<TimeFormatLocalization::Feature> mFeatures;
+    const BitFlags<TimeFormatLocalization::Feature> mFeatures;
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
 };
