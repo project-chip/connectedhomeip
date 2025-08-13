@@ -637,7 +637,6 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
             logging.info("Ignoring non-XML file %s", f.name)
             continue
 
-        logging.info('Parsing file %s', f.name)
         found_xmls += 1
         with f.open("r", encoding="utf8") as file:
             root = ElementTree.parse(file).getroot()
@@ -973,7 +972,6 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     for file in top.iterdir():
         if not file.name.endswith('.xml'):
             continue
-        logging.info('Parsing file %r / %s', top, file.name)
         found_xmls += 1
         with file.open('r', encoding="utf8") as xml:
             root = ElementTree.parse(xml).getroot()

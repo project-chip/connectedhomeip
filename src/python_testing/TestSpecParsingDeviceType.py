@@ -469,6 +469,11 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         one_four, one_four_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
         one_four_one, one_four_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_1)
         one_four_two, one_four_two_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_2)
+        self.problems.extend(one_two_problems)
+        self.problems.extend(one_three_problems)
+        self.problems.extend(one_four_problems)
+        self.problems.extend(one_four_one_problems)
+        self.problems.extend(one_four_two_problems)
 
         asserts.assert_equal(len(one_two_problems), 0, "Problems found when parsing 1.2 spec")
         asserts.assert_equal(len(one_three_problems), 0, "Problems found when parsing 1.3 spec")
