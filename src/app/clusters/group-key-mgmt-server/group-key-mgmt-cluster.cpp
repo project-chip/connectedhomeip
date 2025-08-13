@@ -96,6 +96,14 @@ struct GroupTableCodec
     }
 };
 
+/*
+ * This struct is used to build the response when the KeySetReadAllIndicies command
+ * is invoked. It follows the format expected by AddResponse() by using a struct that
+ * can be encoded with DataModel::Encode like the one in 
+ * GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Type. This struct however
+ * specifies a different Encode() function that loops through all the elements pointed 
+ * to by the iterator and encodes each of them.
+*/
 struct KeySetReadAllIndicesResponse
 {
     static constexpr CommandId GetCommandId() { return GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id; }
@@ -132,7 +140,7 @@ CHIP_ERROR ReadGroupKeyMap(AttributeValueEncoder & aEncoder)
     auto provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
-    CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
         for (auto & fabric : Server::GetInstance().GetFabricTable())
@@ -163,7 +171,6 @@ CHIP_ERROR ReadGroupKeyMap(AttributeValueEncoder & aEncoder)
         }
         return encodeStatus;
     });
-    return err;
 }
 
 CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
@@ -584,7 +591,7 @@ std::optional<DataModel::ActionReturnStatus> HandleKeySetRemove(CommandHandler *
 
     if (CHIP_NO_ERROR == err)
     {
-        return Status::Success;
+        return err;
     }
 
     Status status = (CHIP_ERROR_NOT_FOUND == err || CHIP_ERROR_KEY_NOT_FOUND == err) ? Status::NotFound : Status::Failure;
@@ -670,11 +677,10 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
     case GroupKeyManagement::Attributes::ClusterRevision::Id:
         return encoder.Encode(GroupKeyManagement::kRevision);
     case Attributes::FeatureMap::Id: {
-        uint32_t features = 0;
+        BitFlags<GroupKeyManagement::Feature> features;
         if (IsMCSPSupported())
         {
-            // TODO: Once there is MCSP support, this will need to add the
-            // right feature bit.
+            features.Set(Clusters::GroupKeyManagement::Feature::kCacheAndSync);
         }
         return encoder.Encode(features);
     }
