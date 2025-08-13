@@ -84,6 +84,11 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_4_1(MatterBaseTest):
+    @property
+    def default_timeout(self) -> int:
+        # This test has potentially 45s waits, so set the timeout to 100
+        return 100
+
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
