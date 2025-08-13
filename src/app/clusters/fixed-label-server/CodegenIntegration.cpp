@@ -52,7 +52,7 @@ bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 
 } // namespace
 
-void MatterFixedLabelClusterServerInitCallback(EndpointId endpointId)
+void emberAfFixedLabelClusterServerInitCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!FindEndpointWithLog(endpointId, arrayIndex))
@@ -68,7 +68,7 @@ void MatterFixedLabelClusterServerInitCallback(EndpointId endpointId)
     }
 }
 
-void MatterFixedLabelClusterServerShutdownCallback(EndpointId endpointId)
+void emberAfFixedLabelClusterServerShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!FindEndpointWithLog(endpointId, arrayIndex))
@@ -84,6 +84,10 @@ void MatterFixedLabelClusterServerShutdownCallback(EndpointId endpointId)
     }
     gServers[arrayIndex].Destroy();
 }
+
+void MatterFixedLabelClusterServerInitCallback(EndpointId endpointId) {}
+
+void MatterFixedLabelClusterServerShutdownCallback(EndpointId endpointId) {}
 
 void MatterFixedLabelPluginServerInitCallback() {}
 

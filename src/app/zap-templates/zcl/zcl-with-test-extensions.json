@@ -793,6 +793,11 @@
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Fixed Label": [
+            "LabelList",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",
