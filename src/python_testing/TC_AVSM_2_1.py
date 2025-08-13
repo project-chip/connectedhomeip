@@ -311,7 +311,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd AllocatedVideoStreams: {value}")
             asserts.assert_is_not_none(value, "AllocatedVideoStreams is None")
-            # TODO assert struct fields of list
+            # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(18)
         if self.pics_guard(self.check_pics("AVSM.S.A0010")):
@@ -320,7 +320,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd AllocatedAudioStreams: {value}")
             asserts.assert_is_not_none(value, "AllocatedAudioStreams is None")
-            # TODO assert struct fields of list
+            # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(19)
         if self.pics_guard(self.check_pics("AVSM.S.A0011")):
@@ -329,7 +329,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd AllocatedSnapshotStreams: {value}")
             asserts.assert_is_not_none(value, "AllocatedSnapshotStreams is None")
-            # TODO assert struct fields of list
+            # TODO assert struct fields of list - currently list is empty as nothing allocated
 
         self.step(20)
         if self.pics_guard(self.check_pics("AVSM.S.A0012")):
@@ -583,7 +583,7 @@ class TC_AVSM_2_1(MatterBaseTest):
         )
         asserts.assert_greater_equal(len(audioCapabilities.supportedSampleRates), 1, "SupportedSampleRates list is empty")
         asserts.assert_greater_equal(len(audioCapabilities.supportedBitDepths), 1, "SupportedBitDepths list is empty")
-        # TODO assert supportedSampleRates and supportedBitDepths list values
+        # TODO assert supportedSampleRates and supportedBitDepths list values - is this needed?
         return True
 
     def assert_snapshot_capabilities_struct(
