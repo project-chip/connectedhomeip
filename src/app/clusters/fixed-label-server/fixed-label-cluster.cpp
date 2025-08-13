@@ -72,7 +72,7 @@ DataModel::ActionReturnStatus FixedLabelCluster::ReadAttribute(const DataModel::
     case ClusterRevision::Id:
         return encoder.Encode(FixedLabel::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode(static_cast<uint32_t>(0));
+        return encoder.Encode<uint32_t>(0);
     default:
         return Protocols::InteractionModel::Status::UnreportableAttribute;
     }
