@@ -348,7 +348,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                 known_ids = list(self.test.xml_device_types.keys())
                 device_type_id = [a for a in range(min(known_ids), max(known_ids)) if a not in known_ids][0]
                 device_type_list = [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type_id, revision=2)]
-                attrs[Clusters.Descriptor][Clusters.Descriptor.deviceTypeList] = device_type_list
+                attrs[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList] = device_type_list
                 # note - not populating the TLV for this since it's not used.
             self.test.endpoints = {1: attrs}
             self.test.endpoints_tlv = {1: attrs_tlv}
