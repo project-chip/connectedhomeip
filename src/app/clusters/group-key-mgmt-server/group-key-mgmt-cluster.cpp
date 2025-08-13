@@ -99,9 +99,9 @@ struct GroupTableCodec
 /*
  * This struct is used to build the response when the KeySetReadAllIndicies command
  * is invoked. It follows the format expected by AddResponse() by using a struct that
- * can be encoded with DataModel::Encode like the one in 
+ * can be encoded with DataModel::Encode like the one in
  * GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Type. This struct however
- * specifies a different Encode() function that loops through all the elements pointed 
+ * specifies a different Encode() function that loops through all the elements pointed
  * to by the iterator and encodes each of them.
 */
 struct KeySetReadAllIndicesResponse
