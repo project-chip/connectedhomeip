@@ -534,10 +534,10 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
             }
         }
     }
-    else
+
+    for (auto & entry : tempVector)
     {
-        for (auto & entry : tempVector)
-            mgmtObj.CleanupExtListEntry(entry);
+        mgmtObj.CleanupExtListEntry(entry);
     }
 
     return err;
