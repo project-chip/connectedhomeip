@@ -76,7 +76,7 @@ void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
     CodegenClusterIntegration::RegisterServer(
         {
             .endpointId                      = endpointId,
-            .clusterId                       = GeneralDiagnostics::Id,
+            .clusterId                       = BasicInformation::Id,
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = 1,
             .fetchFeatureMap                 = false,
@@ -94,7 +94,7 @@ void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                      = endpointId,
-            .clusterId                       = GeneralDiagnostics::Id,
+            .clusterId                       = BasicInformation::Id,
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = 1,
         },
