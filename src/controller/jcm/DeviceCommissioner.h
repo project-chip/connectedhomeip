@@ -88,6 +88,8 @@ public:
      */
     TrustVerificationInfo & GetTrustVerificationInfo() { return mInfo; }
 
+    bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData) override;
+
 protected:
     // Override ParseExtraCommissioningInfo to parse JCM administrator info
     CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) override;
