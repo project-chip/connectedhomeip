@@ -1,18 +1,6 @@
 #
-#   Copyright (c) 2025 Project CHIP Authors
-#    All rights reserved.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
+# Copyright (c) 2025 Project CHIP Authors
+# Licensed under the Apache License, Version 2.0
 
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
@@ -27,15 +15,11 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
-
 import logging
-
 from mobly import asserts
-
 import matter.clusters as Clusters
-from matter.clusters import Attribute
-from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_asserts import assert_valid_uint8, assert_is_string
 
 
 class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
@@ -69,31 +53,26 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
             attribute=attributes.OutputList
         )
 
-        asserts.assert_true(isinstance(output_list, list), "OutputList should be a list")
+        asserts.assert_is_instance(output_list, list, "OutputList should be a list")
         valid_indices = []
 
         for output in output_list:
             # Validate struct type
-            asserts.assert_is_instance(output, cluster.Structs.OutputInfoStruct, f"Expected OutputInfoStruct, got {type(output)}")
+            asserts.assert_is_instance(output, cluster.Structs.OutputInfoStruct, "Expected OutputInfoStruct")
 
             # Validate 'index'
-            asserts.assert_true(hasattr(output, "index"), "'index' field is missing")
-            asserts.assert_is_instance(output.index, int, "'index' should be an unsigned integer")
-            asserts.assert_in(output.index, range(256), f"'index' should be in uint8 range (0-255)")
+            assert_valid_uint8(output.index, "'index' should be a valid uint8 value")
             valid_indices.append(output.index)
 
             # Validate 'outputType'
-            asserts.assert_true(hasattr(output, "outputType"), "'outputType' field is missing")
-            asserts.assert_is_instance(output.outputType, int, "'outputType' should be an integer")
-            asserts.assert_in(output.outputType, range(256), f"'outputType' should be in enum8 range (0-255)")
+            assert_valid_uint8(output.outputType, "'outputType' should be a valid enum8 value")
 
             # Validate 'name'
-            asserts.assert_true(hasattr(output, "name"), "'name' field is missing")
-            asserts.assert_is_instance(output.name, str, "'name' should be a string")
+            assert_is_string(output.name, "'name' should be a string")
 
             logging.info(f"Output Struct - index: {output.index}, outputType: {output.outputType}, name: {output.name}")
 
-    # Step 3: Read CurrentOutput (only if OutputList is non-empty)
+        # Step 3: Read CurrentOutput (only if OutputList is non-empty)
         if valid_indices:
             self.step(3)
             current_output = await self.read_single_attribute_check_success(
@@ -101,13 +80,15 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
                 attribute=attributes.CurrentOutput
             )
 
-            asserts.assert_is_instance(current_output, int, "CurrentOutput should be an integer")
-            asserts.assert_in(current_output, range(256), "CurrentOutput should be in uint8 range (0-255)")
+            assert_valid_uint8(current_output, "CurrentOutput should be a valid uint8 value")
             asserts.assert_in(
                 current_output, valid_indices,
-                f"CurrentOutput index ({current_output}) must be one of: {valid_indices}"
+                "CurrentOutput index must be one of the indices in OutputList"
             )
+        else:
+            self.skip_test("OutputList is empty, skipping CurrentOutput validation.")
 
 
 if __name__ == "__main__":
     default_matter_test_main()
+    
