@@ -18,6 +18,7 @@
 import importlib
 import importlib.resources as pkg_resources
 import logging
+import os
 import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
@@ -617,13 +618,14 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     # If it's a prebuilt directory, build the path based on the version and data model level
     zip_file_traversable = pkg_resources.files(importlib.import_module('matter.testing')).joinpath(
         'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
-    # Convert Traversable to a real ZipFile for typing compatibility
-    with zip_file_traversable.open('rb') as f:  # type: ignore[attr-defined]
-        zf = zipfile.ZipFile(f)
-        zip_root = zipfile.Path(zf)
-    path_inside_zip = zip_root / data_model_level.dirname
 
-    return path_inside_zip
+    # Avoid returning a zipfile.Path backed by a closed file handle. Build Path from the filesystem path
+    # so the ZipFile lifecycle is managed by zipfile.Path itself.
+    # mypy: Traversable does not declare __fspath__, but runtime object from importlib.resources
+    # is a FileSystem resource that implements it. Safe to coerce for zipfile.Path usage.
+    zip_path = os.fspath(zip_file_traversable)  # type: ignore[call-overload]
+    zip_root = zipfile.Path(zip_path)
+    return zip_root / data_model_level.dirname
 
 
 def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> typing.Tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
