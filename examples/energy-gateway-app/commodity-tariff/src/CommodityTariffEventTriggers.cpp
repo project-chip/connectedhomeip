@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
 #include <CommodityTariffMain.h>
 #include <CommodityTariffSamples.h>
+#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -45,39 +45,48 @@ static const TariffDataSet & GetPreset(size_t index)
     return kTariffPresets[index];
 }
 
-#define COMMODITY_TARIFF_ATTRIBUTES_REQ \
-    X(TariffUnit)                   \
-    X(StartDate)                    \
-    X(TariffInfo)                   \
-    X(DayEntries)                   \
-    X(TariffComponents)             \
+#define COMMODITY_TARIFF_ATTRIBUTES_REQ                                                                                            \
+    X(TariffUnit)                                                                                                                  \
+    X(StartDate)                                                                                                                   \
+    X(TariffInfo)                                                                                                                  \
+    X(DayEntries)                                                                                                                  \
+    X(TariffComponents)                                                                                                            \
     X(TariffPeriods)
 
-#define COMMODITY_TARIFF_ATTRIBUTES_OPT \
-    X(DefaultRandomizationOffset)   \
-    X(DefaultRandomizationType)     \
-    X(DayPatterns)                  \
-    X(IndividualDays)               \
+#define COMMODITY_TARIFF_ATTRIBUTES_OPT                                                                                            \
+    X(DefaultRandomizationOffset)                                                                                                  \
+    X(DefaultRandomizationType)                                                                                                    \
+    X(DayPatterns)                                                                                                                 \
+    X(IndividualDays)                                                                                                              \
     X(CalendarPeriods)
 
-#define ATTR_ITEM(field) \
-    {tariff_preset.field.IsNull(), { dg->Get##field##_MgmtObj().SetNewValue(tariff_preset.field), #field}}
+#define ATTR_ITEM(field)                                                                                                           \
+    {                                                                                                                              \
+        tariff_preset.field.IsNull(),                                                                                              \
+        {                                                                                                                          \
+            dg->Get##field##_MgmtObj().SetNewValue(tariff_preset.field), #field                                                    \
+        }                                                                                                                          \
+    }
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
     const TariffDataSet & tariff_preset = GetPreset(presetIndex++);
-    CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
-    CommodityTariffInstance * instance = GetCommodityTariffInstance();
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CommodityTariffDelegate * dg        = GetCommodityTariffDelegate();
+    CommodityTariffInstance * instance  = GetCommodityTariffInstance();
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
 
-    auto process_attribute = [&](auto& mgmt_obj, const auto& preset_value, const char* name, bool is_required) {
-        if (!preset_value.IsNull()) {
+    auto process_attribute = [&](auto & mgmt_obj, const auto & preset_value, const char * name, bool is_required) {
+        if (!preset_value.IsNull())
+        {
             err = mgmt_obj.SetNewValue(preset_value);
-            if (err != CHIP_NO_ERROR) {
+            if (err != CHIP_NO_ERROR)
+            {
                 ChipLogError(NotSpecified, "Unable to load tariff data for the \"%s\" field", name);
                 return false;
             }
-        } else if (is_required) {
+        }
+        else if (is_required)
+        {
             ChipLogError(NotSpecified, "Invalid tariff data: the mandatory field \"%s\" is not present", name);
             err = CHIP_ERROR_INVALID_ARGUMENT;
             return false;
@@ -85,15 +94,21 @@ void SetTestEventTrigger_TariffDataUpdated()
         return true;
     };
 
-    #define X(attrName) \
-        if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, true)) { return; }
+#define X(attrName)                                                                                                                \
+    if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, true))                                \
+    {                                                                                                                              \
+        return;                                                                                                                    \
+    }
     COMMODITY_TARIFF_ATTRIBUTES_REQ
-    #undef X
+#undef X
 
-    #define X(attrName) \
-        if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, false)) { return; }
+#define X(attrName)                                                                                                                \
+    if (!process_attribute(dg->Get##attrName##_MgmtObj(), tariff_preset.attrName, #attrName, false))                               \
+    {                                                                                                                              \
+        return;                                                                                                                    \
+    }
     COMMODITY_TARIFF_ATTRIBUTES_OPT
-    #undef X
+#undef X
 
     instance->ActivateTariffTimeTracking(tariff_preset.TariffTestTimestamp);
 
@@ -134,7 +149,7 @@ void SetTestEventTrigger_TimeShift4h()
     CommodityTariffInstance * instance = GetCommodityTariffInstance();
 
     if (instance)
-    {    
+    {
         instance->TariffTimeTrackingSetOffset(kSecondsPer4hr);
         instance->TariffTimeAttrsSync();
     }
@@ -145,7 +160,7 @@ void SetTestEventTrigger_TimeShiftDisable()
     CommodityTariffInstance * instance = GetCommodityTariffInstance();
 
     if (instance)
-    {    
+    {
         instance->TariffTimeTrackingSetOffset(0);
     }
 }

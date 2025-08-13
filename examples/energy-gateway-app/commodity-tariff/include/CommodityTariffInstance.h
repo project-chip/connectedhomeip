@@ -59,6 +59,7 @@ public:
 
     void ActivateTariffTimeTracking(uint32_t timestamp);
     void TariffTimeTrackingSetOffset(uint32_t offset);
+
 private:
     CommodityTariffDelegate * mDelegate;
 

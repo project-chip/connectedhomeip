@@ -42,8 +42,8 @@ using DayPatternStructType        = DayPatternStruct::Type;
 using CalendarPeriodStructType    = CalendarPeriodStruct::Type;
 
 static constexpr uint32_t kTimerPollIntervalInSec = 30;
-static uint32_t TimestampNow = 0;
-static uint32_t TestTimeOverlay = 0;
+static uint32_t TimestampNow                      = 0;
+static uint32_t TestTimeOverlay                   = 0;
 
 CHIP_ERROR CommodityTariffInstance::Init()
 {
@@ -59,10 +59,7 @@ void CommodityTariffInstance::ScheduleTariffTimeUpdate()
 {
     DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Milliseconds32(kTimerPollIntervalInSec * 1000),
-        [](System::Layer *, void * context) {
-            static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb();
-        },
-        this);
+        [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); }, this);
 }
 
 void CommodityTariffInstance::TariffTimeUpdCb()
