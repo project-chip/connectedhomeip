@@ -224,25 +224,33 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
     return session;
 }
 
-uint16_t WebRTCTransportProviderServer::GenerateSessionId()
+CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessionId)
 {
-    static uint16_t lastSessionId = 1;
+    static uint16_t nextSessionId = 0;
+    uint16_t candidateId          = 0;
 
-    do
+    // Try at most kMaxSessionId+1 attempts to find a free ID
+    // This ensures we never loop infinitely even if all IDs are somehow in use
+    for (uint16_t attempts = 0; attempts <= kMaxSessionId; attempts++)
     {
-        uint16_t candidateId = lastSessionId++;
+        candidateId = nextSessionId++;
 
         // Handle wrap-around per spec
-        if (lastSessionId > kMaxSessionId)
+        if (nextSessionId > kMaxSessionId)
         {
-            lastSessionId = 1;
+            nextSessionId = 0;
         }
 
         if (FindSession(candidateId) == nullptr)
         {
-            return candidateId;
+            outSessionId = candidateId;
+            return CHIP_NO_ERROR;
         }
-    } while (true);
+    }
+
+    // All session IDs are in use
+    ChipLogError(Zcl, "All session IDs are in use! Cannot generate new session ID.");
+    return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
 }
 
 // Command Handlers
@@ -271,35 +279,81 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // Validate VideoStreamID against AllocatedVideoStreams if present and not null
-    if (req.videoStreamID.HasValue() && !req.videoStreamID.Value().IsNull())
+    // At least one of Video Stream ID and Audio Stream ID has to be present
+    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
     {
-        // Delegate should validate against AllocatedVideoStreams
-        if (mDelegate.ValidateVideoStreamID(req.videoStreamID.Value().Value()) != CHIP_NO_ERROR)
+        ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
+    // Validate VideoStreamID against AllocatedVideoStreams.
+    // If present and null then a stream has to have been allocated.
+    // If present and not null, then the stream ID has to exist
+    if (req.videoStreamID.HasValue())
+    {
+        if (req.videoStreamID.Value().IsNull())
         {
-            ChipLogError(Zcl, "HandleSolicitOffer: VideoStreamID %u does not match AllocatedVideoStreams",
-                         req.videoStreamID.Value().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-            return;
+            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer method
+            if (!mDelegate.HasAllocatedVideoStreams())
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: video requested when there are no AllocatedVideoStreams");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+                return;
+            }
+        }
+        else
+        {
+            // Delegate should validate against AllocatedVideoStreams
+            if (mDelegate.ValidateVideoStreamID(req.videoStreamID.Value().Value()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: VideoStreamID %u does not match AllocatedVideoStreams",
+                             req.videoStreamID.Value().Value());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+                return;
+            }
         }
     }
 
-    // Validate AudioStreamID against AllocatedAudioStreams if present and not null
-    if (req.audioStreamID.HasValue() && !req.audioStreamID.Value().IsNull())
+    // Validate AudioStreamID against AllocatedAudioStreams if present
+    // If present and null then a stream has to have been allocated.
+    // If present and not null, then the stream ID has to exist
+    if (req.audioStreamID.HasValue())
     {
-        // Delegate should validate against AllocatedAudioStreams
-        if (mDelegate.ValidateAudioStreamID(req.audioStreamID.Value().Value()) != CHIP_NO_ERROR)
+        if (req.audioStreamID.Value().IsNull())
         {
-            ChipLogError(Zcl, "HandleSolicitOffer: AudioStreamID %u does not match AllocatedAudioStreams",
-                         req.audioStreamID.Value().Value());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-            return;
+            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer method
+            if (!mDelegate.HasAllocatedAudioStreams())
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedAudioStreams");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+                return;
+            }
+        }
+        else
+        {
+            // Delegate should validate against AllocatedAudioStreams
+            if (mDelegate.ValidateAudioStreamID(req.audioStreamID.Value().Value()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: AudioStreamID %u does not match AllocatedAudioStreams",
+                             req.audioStreamID.Value().Value());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+                return;
+            }
         }
     }
 
     // Prepare the arguments for the delegate.
     Delegate::OfferRequestArgs args;
-    args.sessionId             = GenerateSessionId();
+    uint16_t sessionId;
+    CHIP_ERROR err = GenerateSessionId(sessionId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        return;
+    }
+    args.sessionId             = sessionId;
     args.streamUsage           = req.streamUsage;
     args.videoStreamId         = req.videoStreamID;
     args.audioStreamId         = req.audioStreamID;
@@ -441,7 +495,17 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // Validate VideoStreamID if present and not null
+        // At least one of Video Stream ID and Audio Stream ID has to be present
+        if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
+        }
+
+        // Validate VideoStreamID against AllocatedVideoStreams.
+        // If present and null then a stream has to have been allocated.
+        // If present and not null, then the stream ID has to exist
         if (videoStreamID.HasValue() && !videoStreamID.Value().IsNull())
         {
             if (mDelegate.ValidateVideoStreamID(videoStreamID.Value().Value()) != CHIP_NO_ERROR)
@@ -498,8 +562,16 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // Generate new sessiond id
-        args.sessionId = GenerateSessionId();
+        // Generate new session id
+        uint16_t sessionId;
+        err = GenerateSessionId(sessionId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
+            return;
+        }
+        args.sessionId = sessionId;
     }
 
     args.streamUsage           = req.streamUsage;

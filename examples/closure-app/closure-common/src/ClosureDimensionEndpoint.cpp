@@ -55,10 +55,13 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
         .Set(Feature::kMotionLatching)
         .Set(Feature::kUnit)
         .Set(Feature::kLimitation)
-        .Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
+        .Set(Feature::kSpeed)
+        .Set(Feature::kRotation);
 
     ClusterInitParameters clusterInitParameters;
+    clusterInitParameters.translationDirection = TranslationDirectionEnum::kDownward;
+    clusterInitParameters.rotationAxis         = RotationAxisEnum::kCenteredVertical;
+    clusterInitParameters.modulationType       = ModulationTypeEnum::kVentilation;
 
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());

@@ -94,7 +94,7 @@ environment to ensure all dependencies are correct.
 1. Pull the Cross-Compilation Docker Image
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:140
+docker pull ghcr.io/project-chip/chip-build-crosscompile:162
 ```
 
 2. Run the Docker Container This command starts an interactive shell inside the
@@ -102,7 +102,7 @@ docker pull ghcr.io/project-chip/chip-build-crosscompile:140
    container's /var/connectedhomeip directory.
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:140 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:162 /bin/bash
 ```
 
 3. Build Inside the Container From within the Docker container's shell, execute
@@ -141,8 +141,7 @@ example on your Linux machine. You will need two separate terminal windows.
 
 Terminal 1: Start the Camera App (Device)
 
-1. Launch the chip-camera-app binary. The --camera-deferred-offer flag prepares
-   the camera to stream upon request from the controller.
+1. Launch the chip-camera-app binary.
 
 Clean up any existing configurations (first-time pairing only):
 
@@ -151,7 +150,7 @@ sudo rm -rf /tmp/chip_*
 ```
 
 ```
-./out/linux-x64-camera/chip-camera-app --camera-deferred-offer
+./out/linux-x64-camera/chip-camera-app
 ```
 
 Terminal 2: Launch and Use the Camera Controller (Client)

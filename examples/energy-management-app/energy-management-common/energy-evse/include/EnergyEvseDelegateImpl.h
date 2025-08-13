@@ -122,7 +122,7 @@ class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
     EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
-    ~EnergyEvseDelegate();
+    ~EnergyEvseDelegate() { CancelActiveTimers(); }
 
     EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
 
@@ -207,6 +207,13 @@ public:
      * on ChargingEnabledUntil / DischargingEnabledUntil expiring.
      */
     Status ScheduleCheckOnEnabledTimeout();
+    void CancelActiveTimers();
+
+    /**
+     * @brief   Helper function to handle timer expiration when in enabled state
+     * @param matterEpoch Current time in Matter epoch seconds
+     */
+    void HandleEnabledStateExpiration(uint32_t matterEpochSeconds);
 
     /**
      * @brief   Helper function to get know if the EV is plugged in based on state
@@ -216,8 +223,10 @@ public:
 
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
-    Status HwSetMaxHardwareCurrentLimit(int64_t currentmA);
-    int64_t HwGetMaxHardwareCurrentLimit() { return mMaxHardwareCurrentLimit; }
+    Status HwSetMaxHardwareChargeCurrentLimit(int64_t currentmA);
+    int64_t HwGetMaxHardwareChargeCurrentLimit() { return mMaxHardwareChargeCurrentLimit; }
+    Status HwSetMaxHardwareDischargeCurrentLimit(int64_t currentmA);
+    int64_t HwGetMaxHardwareDischargeCurrentLimit() { return mMaxHardwareDischargeCurrentLimit; }
     Status HwSetNominalMainsVoltage(int64_t voltage_mV);
     int64_t HwGetNominalMainsVoltage() { return mNominalMainsVoltage; }
     Status HwSetCircuitCapacity(int64_t currentmA);
@@ -228,6 +237,7 @@ public:
     Status HwSetFault(FaultStateEnum fault);
     Status HwSetRFID(ByteSpan uid);
     Status HwSetVehicleID(const CharSpan & vehID);
+    CHIP_ERROR HwGetVehicleID(DataModel::Nullable<MutableCharSpan> & outValue);
     Status HwDiagnosticsComplete();
     Status SendEVConnectedEvent();
     Status SendEVNotDetectedEvent();
@@ -309,11 +319,14 @@ private:
     static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced_sec = 30;
 
     /* private variables for controlling the hardware - these are not attributes */
-    int64_t mMaxHardwareCurrentLimit                = 0; /* Hardware current limit in mA */
-    int64_t mCableAssemblyCurrentLimit              = 0; /* Cable limit detected when cable is plugged in, in mA */
-    int64_t mMaximumChargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when charging enabled */
-    int64_t mActualChargingCurrentLimit             = 0;
-    int64_t mNominalMainsVoltage                    = 230000; /* Assume a sensible default mains voltage */
+    int64_t mMaxHardwareChargeCurrentLimit             = 0; /* Hardware current limit in mA for charging */
+    int64_t mMaxHardwareDischargeCurrentLimit          = 0; /* Hardware current limit in mA for discharging */
+    int64_t mCableAssemblyCurrentLimit                 = 0; /* Cable limit detected when cable is plugged in, in mA */
+    int64_t mMaximumChargingCurrentLimitFromCommand    = 0; /* Value of current maximum limit when charging enabled */
+    int64_t mActualChargingCurrentLimit                = 0;
+    int64_t mMaximumDischargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when discharging enabled */
+    int64_t mActualDischargingCurrentLimit             = 0;
+    int64_t mNominalMainsVoltage                       = 230000; /* Assume a sensible default mains voltage (mV) */
 
     StateEnum mHwState = StateEnum::kNotPluggedIn; /* Hardware state */
 
@@ -323,7 +336,8 @@ private:
 
     /* Callback related */
     EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
-    Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
+    Status NotifyApplicationChargeCurrentLimitChange(int64_t maximumChargeCurrent);
+    Status NotifyApplicationDischargeCurrentLimitChange(int64_t maximumDischargeCurrent);
     Status NotifyApplicationStateChange();
     Status NotifyApplicationChargingPreferencesChange();
     Status GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue);
@@ -342,9 +356,10 @@ private:
     Status HandleFaultCleared();
 
     /**
-     * @brief Helper function to work out the charge limit based on conditions and settings
+     * @brief Helper functions to work out the charge & discharge limits based on conditions and settings
      */
     Status ComputeMaxChargeCurrentLimit();
+    Status ComputeMaxDischargeCurrentLimit();
 
     /**
      * @brief This checks if the charging or discharging needs to be disabled
@@ -379,12 +394,14 @@ private:
 
     /* PNC attributes*/
     DataModel::Nullable<CharSpan> mVehicleID;
+    char mVehicleIDBuf[kMaxVehicleIDBufSize];
 
     /* Session Object */
     EvseSession mSession = EvseSession();
 
-    /* Helper variable to hold meter val since last EnergyTransferStarted event */
-    int64_t mMeterValueAtEnergyTransferStart;
+    /* Helper variables to hold meter val since last EnergyTransferStarted event */
+    int64_t mImportedMeterValueAtEnergyTransferStart; // Charging
+    int64_t mExportedMeterValueAtEnergyTransferStart; // Discharging
 
     /* Targets Delegate */
     EvseTargetsDelegate * mEvseTargetsDelegate = nullptr;

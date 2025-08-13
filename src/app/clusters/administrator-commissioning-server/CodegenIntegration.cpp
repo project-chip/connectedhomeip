@@ -29,7 +29,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-// AdministraotrCommissioningCluster implementation is specifically implemented
+// AdministratorCommissioningCluster implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
 // So either:
 //   - we have a fixed config and it is endpoint 0 OR
@@ -53,7 +53,7 @@ LazyRegisteredServerCluster<ClusterImpl> gServer;
 
 } // namespace
 
-void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
+void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpointId)
 {
     if (endpointId != kRootEndpointId)
     {
@@ -75,7 +75,7 @@ void emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId endpointId)
 {
     if (endpointId != kRootEndpointId)
     {

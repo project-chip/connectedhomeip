@@ -16,14 +16,17 @@
  */
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/util.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
+using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 
 // for fixed endpoint, this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
 // the static assert is skipped in case of dynamic endpoints.
@@ -33,41 +36,20 @@ static_assert((SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig
 
 namespace {
 
-LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic>> gServer;
-
-// compile-time evaluated method if "is <EP>::SoftwareDiagnostics::<ATTR>" enabled
-constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
-{
-    for (auto & config : SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig)
-    {
-        if (config.endpointNumber != endpointId)
-        {
-            continue;
-        }
-        for (auto & attr : config.enabledAttributes)
-        {
-            if (attr == attributeId)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
+LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 
 } // namespace
 
-void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
+void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
-    const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapHighWatermark::Id),
-    };
 
-    gServer.Create(enabledAttributes);
+    gServer.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet()
+                       .Set<ThreadMetrics::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, ThreadMetrics::Id))
+                       .Set<CurrentHeapFree::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapFree::Id))
+                       .Set<CurrentHeapUsed::Id>(emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapUsed::Id))
+                       .Set<CurrentHeapHighWatermark::Id>(
+                           emberAfContainsAttribute(endpointId, SoftwareDiagnostics::Id, CurrentHeapHighWatermark::Id)));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
     if (err != CHIP_NO_ERROR)
@@ -77,7 +59,7 @@ void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterSoftwareDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());

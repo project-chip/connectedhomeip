@@ -1707,8 +1707,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn(commandData.minBitRate >= 1 && commandData.minBitRate <= commandData.maxBitRate && commandData.maxBitRate >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(commandData.minKeyFrameInterval <= commandData.maxKeyFrameInterval &&
-                       commandData.maxKeyFrameInterval <= kMaxKeyFrameIntervalMaxValue,
+    VerifyOrReturn(commandData.keyFrameInterval <= kMaxKeyFrameIntervalMaxValue,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
@@ -1719,20 +1718,19 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     VideoStreamStruct videoStreamArgs;
-    videoStreamArgs.videoStreamID       = 0;
-    videoStreamArgs.streamUsage         = commandData.streamUsage;
-    videoStreamArgs.videoCodec          = commandData.videoCodec;
-    videoStreamArgs.minFrameRate        = commandData.minFrameRate;
-    videoStreamArgs.maxFrameRate        = commandData.maxFrameRate;
-    videoStreamArgs.minResolution       = commandData.minResolution;
-    videoStreamArgs.maxResolution       = commandData.maxResolution;
-    videoStreamArgs.minBitRate          = commandData.minBitRate;
-    videoStreamArgs.maxBitRate          = commandData.maxBitRate;
-    videoStreamArgs.minKeyFrameInterval = commandData.minKeyFrameInterval;
-    videoStreamArgs.maxKeyFrameInterval = commandData.maxKeyFrameInterval;
-    videoStreamArgs.watermarkEnabled    = commandData.watermarkEnabled;
-    videoStreamArgs.OSDEnabled          = commandData.OSDEnabled;
-    videoStreamArgs.referenceCount      = 0;
+    videoStreamArgs.videoStreamID    = 0;
+    videoStreamArgs.streamUsage      = commandData.streamUsage;
+    videoStreamArgs.videoCodec       = commandData.videoCodec;
+    videoStreamArgs.minFrameRate     = commandData.minFrameRate;
+    videoStreamArgs.maxFrameRate     = commandData.maxFrameRate;
+    videoStreamArgs.minResolution    = commandData.minResolution;
+    videoStreamArgs.maxResolution    = commandData.maxResolution;
+    videoStreamArgs.minBitRate       = commandData.minBitRate;
+    videoStreamArgs.maxBitRate       = commandData.maxBitRate;
+    videoStreamArgs.keyFrameInterval = commandData.keyFrameInterval;
+    videoStreamArgs.watermarkEnabled = commandData.watermarkEnabled;
+    videoStreamArgs.OSDEnabled       = commandData.OSDEnabled;
+    videoStreamArgs.referenceCount   = 0;
 
     // Call the delegate
     status = mDelegate.VideoStreamAllocate(videoStreamArgs, videoStreamID);
@@ -1934,6 +1932,24 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
+    // If WatermarkEnabled is provided then the Watermark feature has to be supported
+    if (commandData.watermarkEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kWatermark), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
+
+    // If OSDEnabled is provided then the OSD feature has to be supported
+    if (commandData.OSDEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
+
     SnapshotStreamStruct snapshotStreamArgs;
     snapshotStreamArgs.snapshotStreamID = 0;
     snapshotStreamArgs.imageCodec       = commandData.imageCodec;
@@ -1979,19 +1995,32 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
     auto & isOSDEnabled       = commandData.OSDEnabled;
     auto & snapshotStreamID   = commandData.snapshotStreamID;
 
-    // If Watermark feature is supported, then command should have the
-    // isWaterMarkEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If WatermarkEnabled is provided then the Watermark feature has to be supported
+    if (commandData.watermarkEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kWatermark), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
-    // If OSD feature is supported, then command should have the
-    // isOSDEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If OSDEnabled is provided then the OSD feature has to be supported
+    if (commandData.OSDEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
-    // Call the delegate
+    // One of WatermarkEnabled or OSDEnabled has to be present
+    VerifyOrReturn(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), {
+        ChipLogError(Zcl,
+                     "CameraAVStreamMgmt[ep=%d]: One of WatermarkEnabled or OSDEnabled must be provided in SnapshotStreamModify",
+                     mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+    });
+
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)

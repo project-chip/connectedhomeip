@@ -38,6 +38,7 @@ using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
+using namespace chip::app::Clusters::ZoneManagement;
 
 using namespace Camera;
 
@@ -324,6 +325,9 @@ CameraDevice::CameraDevice()
 
     // Set the CameraDevice interface in WebRTCManager
     mWebRTCProviderManager.SetCameraDevice(this);
+
+    // Set the CameraDevice interface in ZoneManager
+    mZoneManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -1157,6 +1161,40 @@ CameraError CameraDevice::SetZoom(uint8_t aZoom)
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)
+{
+    mDetectionSensitivity = aSensitivity;
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::CreateZoneTrigger(const ZoneTriggerControlStruct & zoneTrigger)
+{
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::UpdateZoneTrigger(const ZoneTriggerControlStruct & zoneTrigger)
+{
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
+{
+
+    return CameraError::SUCCESS;
+}
+
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
+{
+    mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+}
+
+void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
+{
+    mZoneManager.OnZoneStoppedEvent(zoneID, ZoneEventStoppedReasonEnum::kActionStopped);
+}
+
 void CameraDevice::InitializeVideoStreams()
 {
     // Create single video stream with typical supported parameters
@@ -1169,8 +1207,7 @@ void CameraDevice::InitializeVideoStreams()
                                   { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
                                   kMinBitRateBps /* MinBitRate */,
                                   kMaxBitRateBps /* MaxBitRate */,
-                                  kMinKeyFrameIntervalMsec /* MinKeyFrameInterval */,
-                                  kMaxKeyFrameIntervalMsec /* MaxKeyFrameInterval */,
+                                  kKeyFrameIntervalMsec /* KeyFrameInterval */,
                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
                                   0 /* RefCount */ },
@@ -1196,13 +1233,17 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
-    SnapshotStream snapshotStream = { { 1 /* Id */,
-                                        ImageCodecEnum::kJpeg,
-                                        kSnapshotStreamFrameRate /* FrameRate */,
-                                        { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
-                                        { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                                        90 /* Quality */,
-                                        0 /* RefCount */ },
+    SnapshotStream snapshotStream = { {
+                                          1 /* Id */,
+                                          ImageCodecEnum::kJpeg,
+                                          kSnapshotStreamFrameRate /* FrameRate */,
+                                          { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
+                                          { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+                                          90 /* Quality */,
+                                          0 /* RefCount */,
+                                          false /* EncodedPixels */,
+                                          false /* HardwareEncoder */
+                                      },
                                       false,
                                       nullptr };
 
@@ -1232,6 +1273,11 @@ CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
 CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
+}
+
+ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
+{
+    return mZoneManager;
 }
 
 MediaController & CameraDevice::GetMediaController()
