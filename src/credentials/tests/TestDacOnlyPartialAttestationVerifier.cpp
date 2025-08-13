@@ -30,7 +30,6 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
-#include <openssl/rand.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -53,19 +52,21 @@ struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    void SetUp() override { attestationResult = AttestationVerificationResult::kSuccess; }
+
+    // Create attestation verification result variable
+    // This will be used to capture the result of the verification callback
+    PartialDACVerifier verifier;
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback{
+        OnAttestationInformationVerificationCallback, &attestationResult
+    };
 };
 
 // Test verifier behavior with empty parameters
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidParameters)
 {
-    // Create attestation verification result variable
-    // This will be used to capture the result of the verification callback
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
     // Create AttestationInfo with empty buffers
     DeviceAttestationVerifier::AttestationInfo invalidInfo(ByteSpan(),                    // empty attestationElements
                                                            ByteSpan(),                    // empty attestationChallenge
@@ -98,15 +99,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithLargeAttestationElementsBu
     // Create ByteSpan from the large buffer
     ByteSpan largeAttestationElements(largeBuffer, kLargeBufferSize);
 
-    // Create attestation verification result variable
-    // This will be used to capture the result of the verification callback
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
-    // Create some minimal valid test data for other required fields
+    // The following test data uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t challengeData[32] = { 0x01, 0x02, 0x03 }; // Example challenge
     uint8_t signatureData[64] = { 0x04, 0x05, 0x06 }; // Example signature
     uint8_t paiData[256]      = { 0x07, 0x08, 0x09 }; // Example PAI certificate
@@ -129,18 +123,12 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithLargeAttestationElementsBu
 // Test verifier behavior with valid attestation elements
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidAttestationElements)
 {
-    // Create attestation verification result variable
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
     // Use real test vectors from CHIPCert_unit_test_vectors.h for PAI and DAC certificates
     auto paiAsset = GetIAA1CertAsset();
     auto dacAsset = GetNodeA1CertAsset();
 
-    // Create minimal valid test data
+    // The following test data uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t attestationElements[32] = { 0x01, 0x02, 0x03 };
     uint8_t challengeData[32]       = { 0x04, 0x05, 0x06 };
     uint8_t signatureData[64]       = { 0x07, 0x08, 0x09 };
@@ -159,18 +147,12 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidAttestationElements)
 // Test verifier behavior with VID/PID mismatch
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithVIDPIDMismatch)
 {
-    // Create attestation verification result variable
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
     // Use real test vectors from CHIPCert_unit_test_vectors.h for PAI and DAC certificates
     auto paiAsset = GetIAA1CertAsset();
     auto dacAsset = GetNodeA1CertAsset();
 
-    // Create minimal valid test data
+    // The following test data uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t attestationElements[32] = { 0x01, 0x02, 0x03 };
     uint8_t challengeData[32]       = { 0x04, 0x05, 0x06 };
     uint8_t signatureData[64]       = { 0x07, 0x08, 0x09 };
@@ -191,14 +173,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithVIDPIDMismatch)
 // Test with valid DAC but invalid PAI
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidDACButInvalidPAI)
 {
-    // Create attestation verification result variable
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
-    // Create minimal valid test data, but with an invalid PAI certificate
+    // The following test data uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data (PAI intentionally invalid).
     uint8_t attestationElements[32] = { 0x01, 0x02, 0x03 };
     uint8_t challengeData[32]       = { 0x04, 0x05, 0x06 };
     uint8_t signatureData[64]       = { 0x07, 0x08, 0x09 };
@@ -219,14 +195,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidDACButInvalidPAI)
 // Test with mismatched Vendor IDs
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedVendorIDs)
 {
-    // Create attestation verification result variable
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
-    // Create minimal valid attestation information
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t attestationElements[32] = { 0x01, 0x02, 0x03 };
     uint8_t challengeData[32]       = { 0x04, 0x05, 0x06 };
     uint8_t signatureData[64]       = { 0x07, 0x08, 0x09 };
@@ -247,14 +217,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedVendorIDs)
 // Test with valid PAI and DAC
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestPassingVIDPIDChecks)
 {
-    // Create attestation verification result variable
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
-    // Create minimal valid attestation information
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t attestationElements[32] = { 0x01, 0x02, 0x03 };
     uint8_t challengeData[32]       = { 0x04, 0x05, 0x06 };
     uint8_t signatureData[64]       = { 0x07, 0x08, 0x09 };
@@ -275,14 +239,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestPassingVIDPIDChecks)
 // Test with matching PAI and DAC Product IDs
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMatchingPAIAndDACProductIDs)
 {
-    // Create attestation verification result variable
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
-    // Create minimal valid attestation information
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t attestationElements[32] = { 0x01, 0x02, 0x03 };
     uint8_t challengeData[32]       = { 0x04, 0x05, 0x06 };
     uint8_t signatureData[64]       = { 0x07, 0x08, 0x09 };
@@ -303,14 +261,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMatchingPAIAndDACProductID
 // Test with mismatched PAI and DAC Product IDs
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedPAIAndDACProductIDs)
 {
-    // Create attestation verification result variable
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
-    // Create minimal valid attestation information
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t attestationElements[32] = { 0x01, 0x02, 0x03 };
     uint8_t challengeData[32]       = { 0x04, 0x05, 0x06 };
     uint8_t signatureData[64]       = { 0x07, 0x08, 0x09 };
@@ -331,14 +283,8 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMismatchedPAIAndDACProduct
 // Test with invalid attestation signature format
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidAttestationSignatureFormat)
 {
-    // Create attestation verification result variable
-    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
-    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationCallback(
-        OnAttestationInformationVerificationCallback, &attestationResult);
-
-    PartialDACVerifier verifier;
-
-    // Use valid certificates but provide an oversized signature that will fail SetLength
+    // The following attestation information uses arbitrary values solely for test structure;
+    // the actual contents do not represent real or meaningful data.
     uint8_t attestationElements[32] = { 0x01, 0x02, 0x03 };
     uint8_t challengeData[32]       = { 0x04, 0x05, 0x06 };
     uint8_t nonceData[32]           = { 0x0A, 0x0B, 0x0C };
