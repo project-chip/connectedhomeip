@@ -213,7 +213,7 @@ def create_graph(wildcardResponse, xml_device_types):
     vid = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID]
     pid = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductID]
     software_version = wildcardResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
-    deviceGraph.save(f'matter_device_graph_0x{vid:4X}_0x{pid:4X}_{software_version}.dot')
+    deviceGraph.save(f'matter_device_graph_0x{vid:04X}_0x{pid:04X}_{software_version}.dot')
 
 
 class TC_MatterDeviceGraph(MatterBaseTest):
