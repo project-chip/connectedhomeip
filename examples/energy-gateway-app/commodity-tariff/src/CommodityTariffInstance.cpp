@@ -41,10 +41,6 @@ using DayStructType               = DayStruct::Type;
 using DayPatternStructType        = DayPatternStruct::Type;
 using CalendarPeriodStructType    = CalendarPeriodStruct::Type;
 
-static constexpr uint32_t kTimerPollIntervalInSec = 30;
-static uint32_t TimestampNow                      = 0;
-static uint32_t TestTimeOverlay                   = 0;
-
 CHIP_ERROR CommodityTariffInstance::Init()
 {
     return Instance::Init();

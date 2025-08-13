@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
-
+static constexpr uint32_t kTimerPollIntervalInSec = 30;
 using chip::Protocols::InteractionModel::Status;
 
 class CommodityTariffDelegate : public CommodityTariff::Delegate
@@ -62,6 +62,8 @@ public:
 
 private:
     CommodityTariffDelegate * mDelegate;
+    uint32_t TimestampNow = 0;
+    uint32_t TestTimeOverlay = 0;
 
     void ScheduleTariffTimeUpdate();
     void TariffTimeUpdCb();
