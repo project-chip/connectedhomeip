@@ -406,22 +406,22 @@ struct ExtractNonNullableType<DataModel::Nullable<U>>
 template <typename U>
 using ExtractNonNullableType_t = typename ExtractNonNullableType<U>::type;
 template <typename U>
-struct ExtractRawDataType
+struct ExtractNestedType
 {
     using type = U; // Base case - not a wrapper
 };
 template <typename U>
-struct ExtractRawDataType<DataModel::Nullable<U>>
+struct ExtractNestedType<DataModel::Nullable<U>>
 {
-    using type = typename ExtractRawDataType<U>::type;
+    using type = typename ExtractNestedType<U>::type;
 };
 template <typename U>
-struct ExtractRawDataType<DataModel::List<U>>
+struct ExtractNestedType<DataModel::List<U>>
 {
-    using type = typename ExtractRawDataType<U>::type;
+    using type = typename ExtractNestedType<U>::type;
 };
 template <typename U>
-using ExtractRawDataType_t = typename ExtractRawDataType<U>::type;
+using ExtractNestedType_t = typename ExtractNestedType<U>::type;
 
 /**
  * @class CTC_BaseDataClass
@@ -482,7 +482,7 @@ using ExtractRawDataType_t = typename ExtractRawDataType<U>::type;
  * CTC_BaseDataClass<Nullable<List<DayEntryStruct>>> data(attrId);
  * data.SetNewValue(mListData->aValue)
  * - CreateNewListValue(aValue.Size());                 // Allocate 3 elements
- * - Loop for list items: CopyData<RawDataType>(src_item[i], dst_item[i]);   //copy list elements...
+ * - Loop for list items: CopyData<ListEntryType>(src_item[i], dst_item[i]);   //copy list elements...
  * - MarkAsAssigned();
  * data.UpdateBegin(validationCtx);
  * data.UpdateFinish(true);
@@ -518,12 +518,10 @@ public:
     
     /// The non-nullable version of the value type
     using NonNullableType = ExtractNonNullableType_t<ValueType>;
-    
-    /// The raw underlying data type (for lists, this is the element type)
-    using RawDataType = std::conditional_t<
+    using ListEntryType = std::conditional_t<
         IsList<NonNullableType>::value,
-        ExtractRawDataType_t<NonNullableType>,  // List element type
-        ExtractRawDataType_t<ValueType>         // Scalar/struct type
+        ExtractNestedType_t<NonNullableType>,  // Extract the list element type
+        void *
     >;
 
     /**
@@ -616,18 +614,18 @@ public:
 
         if (size >= 1)
         {
-            auto* buffer = static_cast<RawDataType*>(Platform::MemoryCalloc(size, sizeof(RawDataType)));
+            auto* buffer = static_cast<ListEntryType*>(Platform::MemoryCalloc(size, sizeof(ListEntryType)));
             if (!buffer)
             {
                 return CHIP_ERROR_NO_MEMORY;
             }
             if constexpr (IsValueNullable())
             {
-                GetNewValueRef().SetNonNull(DataModel::List<RawDataType>(buffer, size));
+                GetNewValueRef().SetNonNull(DataModel::List<ListEntryType>(buffer, size));
             }
             else
             {
-                GetNewValueRef() = DataModel::List<RawDataType>(buffer, size);
+                GetNewValueRef() = DataModel::List<ListEntryType>(buffer, size);
             }
         }
         else
@@ -638,7 +636,7 @@ public:
             }
             else
             {
-                GetNewValueRef() = DataModel::List<RawDataType>();
+                GetNewValueRef() = DataModel::List<ListEntryType>();
             }
         }
 
@@ -714,7 +712,7 @@ public:
                 auto buffer = GetNewValueRef().Value().data();
                 for (size_t idx = 0; idx < newValue.size(); idx++)
                 {
-                    if (CHIP_NO_ERROR == (err = CopyData<RawDataType>(newValue[idx], buffer[idx])))
+                    if (CHIP_NO_ERROR == (err = CopyData<ListEntryType>(newValue[idx], buffer[idx])))
                     {
                         continue;
                     }
@@ -728,8 +726,8 @@ public:
 
             if (CHIP_NO_ERROR == err)
             {
-                RawDataType tmpValue = newValue;
-                err = CopyData<RawDataType>(newValue, tmpValue);
+                NonNullableType tmpValue = newValue;
+                err = CopyData<NonNullableType>(newValue, tmpValue);
                 if (err == CHIP_NO_ERROR)
                 {
                     GetNewValueRef().SetNonNull(tmpValue);
@@ -879,9 +877,9 @@ public:
      * @brief Cleans up an external list entry
      * @param[in,out] entry The list entry to clean up
      */
-    void CleanupExtListEntry(RawDataType& entry)
+    void CleanupExtListEntry(ListEntryType& entry)
     {
-        CleanupStructValue<RawDataType>(entry);
+        CleanupStructValue<ListEntryType>(entry);
     }
 
     /**
@@ -965,7 +963,7 @@ private:
      * @param destination Second list to compare
      * @return true if lists differ, false if identical
      */
-    bool ListsNotEqual(const DataModel::List<RawDataType>& source, const DataModel::List<RawDataType>& destination)
+    bool ListsNotEqual(const DataModel::List<ListEntryType>& source, const DataModel::List<ListEntryType>& destination)
     {
         if (source.size() != destination.size())
         {
@@ -1067,7 +1065,7 @@ private:
                 }
                 else if constexpr (IsValueStruct())
                 {
-                    CleanupStruct(aValue.Value());
+                    CleanupStruct<NonNullableType>(aValue.Value());
                 }
             }
             aValue.SetNull();
@@ -1082,18 +1080,18 @@ private:
      * @brief Cleans up a list and its elements
      * @param list List to clean up
      */
-    void CleanupList(DataModel::List<RawDataType>& list)
+    void CleanupList(DataModel::List<ListEntryType>& list)
     {
         assertChipStackLockedByCurrentThread();
 
         for (auto& item : list)
         {
-            CleanupStruct(item);
+            CleanupStruct<ListEntryType>(item);
         }
         if (list.data())
         {
             Platform::MemoryFree(list.data());
-            list = DataModel::List<RawDataType>();
+            list = DataModel::List<ListEntryType>();
         }
     }
 
@@ -1101,7 +1099,8 @@ private:
      * @brief Cleans up a struct value
      * @param aValue Struct to clean up
      */
-    void CleanupStruct(RawDataType& aValue) { CleanupStructValue<RawDataType>(aValue); }
+    template<typename StructType>
+    void CleanupStruct(StructType& aValue) { CleanupStructValue<StructType>(aValue); }
 
     // Member variables
     uint8_t mActiveValueIdx = 0;                  ///< Index of active value storage
