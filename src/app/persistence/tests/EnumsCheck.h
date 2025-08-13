@@ -22,27 +22,29 @@
  */
 namespace chip {
 namespace app {
-    namespace Clusters {
+namespace Clusters {
 
-        enum class TestEnum : uint8_t {
-            kValue1 = 0,
-            kValue2 = 1,
-            kValue3 = 2,
-            kUnknownEnumValue = 3
-        };
+enum class TestEnum : uint8_t
+{
+    kValue1           = 0,
+    kValue2           = 1,
+    kValue3           = 2,
+    kUnknownEnumValue = 3
+};
 
-        static auto __attribute__((unused)) EnsureKnownEnumValue(TestEnum val)
-        {
-            using EnumType = TestEnum;
-            switch (val) {
-            case EnumType::kValue1:
-            case EnumType::kValue2:
-            case EnumType::kValue3:
-                return val;
-            default:
-                return EnumType::kUnknownEnumValue;
-            }
-        }
-    } // namespace Clusters
+static auto __attribute__((unused)) EnsureKnownEnumValue(TestEnum val)
+{
+    using EnumType = TestEnum;
+    switch (val)
+    {
+    case EnumType::kValue1:
+    case EnumType::kValue2:
+    case EnumType::kValue3:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+} // namespace Clusters
 } // namespace app
 } // namespace chip
