@@ -291,6 +291,7 @@ source_set("events") {
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model:data-model",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -402,6 +403,7 @@ source_set("command-handler-interface") {
     "CommandHandlerInterface.h",
     "CommandHandlerInterfaceRegistry.cpp",
     "CommandHandlerInterfaceRegistry.h",
+    "CommandHandlerInterfaceShim.h",
   ]
 
   public_deps = [
