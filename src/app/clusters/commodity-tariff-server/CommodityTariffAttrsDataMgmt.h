@@ -423,7 +423,7 @@ using ExtractNestedType_t = typename ExtractNestedType<U>::type;
  * @details This template class provides a robust foundation for managing attribute
  *          values in a thread-safe manner with support for atomic updates, validation,
  *          and automatic memory management. It handles three categories of attributes:
- *          1. Nullable types (DataModel::Nullable<U>)
+ *          1. Nullable types (DataModel::Nullable<U>, DataModel::Nullable<DataModel::List<U>>)
  *          2. List types (DataModel::List<U>)
  *          3. Primitive/struct types
  *
@@ -504,6 +504,26 @@ using ExtractNestedType_t = typename ExtractNestedType<U>::type;
 template <typename T>
 class CTC_BaseDataClass
 {
+    /// @brief Internal storage states
+    enum class StorageState : uint8_t
+    {
+        kEmpty, // Value not initialized (default state)
+        kHold,  // Storage holds valid data
+    };
+
+    /// @brief Update process states
+    enum class UpdateState : uint8_t
+    {
+        kIdle,        // No active update
+        kInitialized, // New value initialized but not populated
+        kAssigned,    // New value populated but not validated
+        kValidated,   // New value validated and ready for commit
+    };
+
+    T mValueStorage[2];                                         ///< Double-buffered value storage
+    StorageState mHoldState[2] = { StorageState::kEmpty };      ///< Storage state tracking
+    std::atomic<UpdateState> mUpdateState{UpdateState::kIdle};  ///< Current update state
+    std::atomic<uint8_t> mActiveValueIdx{0};                    ///< Index of active value storage    
 public:
     /// The exposed attribute value type
     using ValueType = T;
@@ -534,8 +554,6 @@ public:
         {
             GetValueRef() = ValueType();
         }
-        mHoldState[mActiveValueIdx] = StorageState::kEmpty;
-        mUpdateState                = UpdateState::kIdle;
     }
 
     /// @brief Virtual destructor ensures proper cleanup of resources
@@ -561,19 +579,19 @@ public:
      * @brief Check if current update is validated
      * @return true if in kValidated state, false otherwise
      */
-    bool IsValid() const { return (mUpdateState == UpdateState::kValidated); }
+    bool IsValid() const { return (mUpdateState.load() == UpdateState::kValidated); }
 
     /**
      * @brief Check if active storage contains valid data
      * @return true if storage is in kHold state, false otherwise
      */
-    bool HasValue() const { return (mHoldState[mActiveValueIdx] == StorageState::kHold); }
+    bool HasValue() const { return (mHoldState[mActiveValueIdx.load()] == StorageState::kHold); }
 
     /**
      * @brief Check if new value storage contains valid data
      * @return true if new storage is in kHold state, false otherwise
      */
-    bool HasNewValue() const { return (mHoldState[!mActiveValueIdx] == StorageState::kHold); }
+    bool HasNewValue() const { return (mHoldState[1-mActiveValueIdx.load()] == StorageState::kHold); }
 
     /**
      * @brief Prepares a new list value for modification
@@ -592,7 +610,7 @@ public:
      */
     CHIP_ERROR CreateNewListValue(size_t size)
     {
-        if (mUpdateState != UpdateState::kIdle)
+        if (mUpdateState.load() != UpdateState::kIdle)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
@@ -630,7 +648,7 @@ public:
             }
         }
 
-        mUpdateState = UpdateState::kInitialized;
+        mUpdateState.store(UpdateState::kInitialized);
         return CHIP_NO_ERROR;
     }
 
@@ -646,7 +664,7 @@ public:
      */
     CHIP_ERROR CreateNewSingleValue()
     {
-        if (mUpdateState != UpdateState::kIdle)
+        if (mUpdateState.load() != UpdateState::kIdle)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
@@ -665,7 +683,7 @@ public:
             GetNewValueRef() = ValueType();
         }
 
-        mUpdateState = UpdateState::kInitialized;
+        mUpdateState.store(UpdateState::kInitialized);
         return CHIP_NO_ERROR;
     }
 
@@ -683,8 +701,8 @@ public:
 
         if (aValue.IsNull())
         {
-            CleanupByIdx(!mActiveValueIdx);
-            mUpdateState = UpdateState::kInitialized;
+            CleanupByIdx(1-mActiveValueIdx.load());
+            mUpdateState.store(UpdateState::kInitialized);
             MarkAsAssigned();
             return CHIP_NO_ERROR;
         }
@@ -736,12 +754,12 @@ public:
 
         if (err == CHIP_NO_ERROR)
         {
-            mHoldState[!mActiveValueIdx] = StorageState::kHold;
+            mHoldState[1-mActiveValueIdx.load()] = StorageState::kHold;
             MarkAsAssigned();
         }
         else
         {
-            CleanupByIdx(!mActiveValueIdx);
+            CleanupByIdx(1-mActiveValueIdx.load());
         }
 
         return err;
@@ -756,11 +774,11 @@ public:
      */
     CHIP_ERROR MarkAsAssigned()
     {
-        if (mUpdateState != UpdateState::kInitialized)
+        if (mUpdateState.load() != UpdateState::kInitialized)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
-        mUpdateState = UpdateState::kAssigned;
+        mUpdateState.store(UpdateState::kAssigned);
         return CHIP_NO_ERROR;
     }
 
@@ -777,12 +795,12 @@ public:
     CHIP_ERROR UpdateBegin(void * aUpdCtx)
     {
         /* Skip if the attribute object has no new attached data */
-        if (mUpdateState == UpdateState::kIdle)
+        if (mUpdateState.load() == UpdateState::kIdle)
         {
             return CHIP_NO_ERROR;
         }
 
-        if (mUpdateState != UpdateState::kAssigned)
+        if (mUpdateState.load() != UpdateState::kAssigned)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
@@ -797,7 +815,7 @@ public:
 
         if (err == CHIP_NO_ERROR)
         {
-            mUpdateState = UpdateState::kValidated;
+            mUpdateState.store(UpdateState::kValidated);
         }
         else
         {
@@ -819,16 +837,16 @@ public:
     {
         bool ret = false;
         /* Skip if the attribute object has no new attached data */
-        if (mUpdateState == UpdateState::kIdle)
+        if (mUpdateState.load() == UpdateState::kIdle)
         {
             return false;
         }
 
-        if (aUpdateAllow && (mUpdateState == UpdateState::kValidated) && (HasChanged()))
+        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated) && (HasChanged()))
         {
             if (HasValue())
             {
-                CleanupByIdx(mActiveValueIdx); // Cleanup current value
+                CleanupByIdx(mActiveValueIdx.load()); // Cleanup current value
             }
 
             SwapActiveValueStorage();
@@ -837,10 +855,10 @@ public:
         }
         else
         {
-            CleanupByIdx(!mActiveValueIdx);
+            CleanupByIdx(1-mActiveValueIdx.load());
         }
 
-        mUpdateState = UpdateState::kIdle;
+        mUpdateState.store(UpdateState::kIdle);
 
         return ret;
     }
@@ -857,8 +875,8 @@ public:
             ret = true;
         }
 
-        CleanupByIdx(!mActiveValueIdx);
-        CleanupByIdx(mActiveValueIdx);
+        CleanupByIdx(1-mActiveValueIdx.load());
+        CleanupByIdx(mActiveValueIdx.load());
 
         return ret;
     }
@@ -876,38 +894,22 @@ public:
     AttributeId GetAttrId() { return mAttrId; }
 
 private:
-    /// @brief Internal storage states
-    enum class StorageState : uint8_t
-    {
-        kEmpty, // Value not initialized (default state)
-        kHold,  // Storage holds valid data
-    };
-
-    /// @brief Update process states
-    enum class UpdateState : uint8_t
-    {
-        kIdle,        // No active update
-        kInitialized, // New value initialized but not populated
-        kAssigned,    // New value populated but not validated
-        kValidated,   // New value validated and ready for commit
-    };
-
     /**
      * @brief Gets reference to active value storage
      * @return Reference to active storage
      */
-    ValueType & GetValueRef() { return mValueStorage[mActiveValueIdx]; }
+    ValueType & GetValueRef() { return mValueStorage[mActiveValueIdx.load()]; }
 
     /**
      * @brief Gets reference to new value storage
      * @return Reference to new storage
      */
-    ValueType & GetNewValueRef() { return mValueStorage[!mActiveValueIdx]; }
+    ValueType & GetNewValueRef() { return mValueStorage[1-mActiveValueIdx.load()]; }
 
     /**
      * @brief Swaps active and new value storage indices
      */
-    void SwapActiveValueStorage() { mActiveValueIdx = !mActiveValueIdx; }
+    void SwapActiveValueStorage() { mActiveValueIdx.store(1-mActiveValueIdx.load()); }
 
     /**
      * @brief Checks if value type is nullable
@@ -1023,13 +1025,13 @@ private:
     {
         if (mActiveValueIdx == aIdx)
         {
-            CleanupValueByRef(mValueStorage[mActiveValueIdx]);
-            mHoldState[mActiveValueIdx] = StorageState::kEmpty;
+            CleanupValueByRef(mValueStorage[mActiveValueIdx.load()]);
+            mHoldState[mActiveValueIdx.load()] = StorageState::kEmpty;
         }
         else
         {
-            CleanupValueByRef(mValueStorage[!mActiveValueIdx]);
-            mHoldState[!mActiveValueIdx] = StorageState::kEmpty;
+            CleanupValueByRef(mValueStorage[1-mActiveValueIdx.load()]);
+            mHoldState[1-mActiveValueIdx.load()] = StorageState::kEmpty;
         }
     }
 
@@ -1089,14 +1091,8 @@ private:
         CleanupStructValue<StructType>(aValue);
     }
 
-    // Member variables
-    uint8_t mActiveValueIdx = 0;                           ///< Index of active value storage
-    ValueType mValueStorage[2];                            ///< Double-buffered value storage
-    StorageState mHoldState[2] = { StorageState::kEmpty }; ///< Storage state tracking
-
     void * mAuxData = nullptr;                     ///< Validation context data
     const AttributeId mAttrId;                     ///< Managed attribute ID
-    UpdateState mUpdateState = UpdateState::kIdle; ///< Current update state
 };
 
 } // namespace CommodityTariffAttrsDataMgmt
