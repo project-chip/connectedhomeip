@@ -180,11 +180,14 @@
             "AdminVendorId"
         ],
         "Basic Information": [
+            "FeatureMap",
+            "ClusterRevision",
             "DataModelRevision",
             "VendorName",
             "VendorID",
             "ProductName",
             "ProductID",
+            "NodeLabel",
             "Location",
             "HardwareVersion",
             "HardwareVersionString",
@@ -195,11 +198,14 @@
             "ProductURL",
             "ProductLabel",
             "SerialNumber",
+            "LocalConfigDisabled",
+            "Reachable",
             "UniqueID",
             "CapabilityMinima",
             "ProductAppearance",
             "SpecificationVersion",
-            "MaxPathsPerInvoke"
+            "MaxPathsPerInvoke",
+            "ConfigurationVersion"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
@@ -800,6 +806,11 @@
             "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
+        "TLS Certificate Management": [
+            "ClusterRevision",
+            "MaxRootCertificates",
+            "MaxClientCertificates"
+        ],
         "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
         "Thermostat": [
             "MaxThermostatSuggestions",

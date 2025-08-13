@@ -20,6 +20,7 @@ namespace EnergyPreference {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace EnergyBalances {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(EnergyBalances::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
