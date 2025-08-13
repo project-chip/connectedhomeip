@@ -267,7 +267,7 @@ jobs:
                         $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                      "
                   mkdir -p ccache-debug
-                  CCACHE_DEBUG=1 CCACHE_DEBUGDIR="${{ github.workspace }}/ccache-debug" \
+                  CCACHE_DEBUG=1 CCACHE_DEBUGDIR="$GITHUB_WORKSPACE/ccache-debug" \
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
