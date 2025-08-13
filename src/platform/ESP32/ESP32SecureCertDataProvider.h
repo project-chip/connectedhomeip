@@ -47,6 +47,12 @@ public:
     // GetRotatingDeviceIdUniqueId from GenericDeviceInstanceInfoProvider
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+
+    // esp-secure-cert partition contains two 32-byte random numbers that can be used for any generic purpose.
+    // eg: If someone wants to use one of the random value as serial number, they can use this function to get the random value.
+    static constexpr uint32_t kRandomLength = 32;
+    static CHIP_ERROR GetRandom1(MutableByteSpan & randomBuf);
+    static CHIP_ERROR GetRandom2(MutableByteSpan & randomBuf);
 };
 
 } // namespace DeviceLayer
