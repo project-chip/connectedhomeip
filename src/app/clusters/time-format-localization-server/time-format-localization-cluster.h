@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include <app/clusters/time-format-localization-server/time-format-localization-logic.h>
-
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TimeFormatLocalization/ClusterId.h>
 
@@ -28,6 +26,11 @@ namespace Clusters {
 class TimeFormatLocalizationCluster : public DefaultServerCluster
 {
 public:
+    static constexpr TimeFormatLocalization::CalendarTypeEnum kDefaultCalendarType =
+        TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+    static constexpr TimeFormatLocalization::HourFormatEnum kDefaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
+    static constexpr size_t kMaxExpectedAttributeCount                         = 3;
+
     TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -39,8 +42,14 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-protected:
-    TimeFormatLocalizationLogic mLogic;
+private:
+    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
+    bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
+                                 TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
+    CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
+    BitFlags<TimeFormatLocalization::Feature> mFeatures;
+    TimeFormatLocalization::HourFormatEnum mHourFormat;
+    TimeFormatLocalization::CalendarTypeEnum mCalendarType;
 };
 
 } // namespace Clusters

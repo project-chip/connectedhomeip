@@ -15,24 +15,77 @@
  */
 
 #include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
+#include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
+#include <platform/DeviceInfoProvider.h>
 #include <tracing/macros.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace {
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry,
+};
+class AutoReleaseIterator
+{
+public:
+    using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
+
+    explicit AutoReleaseIterator(Iterator * value) : mIterator(value) {}
+    ~AutoReleaseIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
+
+    // Delete copy constuctor and assignement
+    AutoReleaseIterator(const AutoReleaseIterator &)             = delete;
+    AutoReleaseIterator & operator=(const AutoReleaseIterator &) = delete;
+
+    bool IsValid() const { return mIterator != nullptr; }
+    bool Next(TimeFormatLocalization::CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
+
+private:
+    Iterator * mIterator;
+};
+
+} // namespace
+
 TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId,
                                                              BitFlags<TimeFormatLocalization::Feature> features) :
     DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
-    mLogic(features)
+    mFeatures(features)
 {}
 
 CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    mLogic.Startup(context.attributeStorage);
+    AttributePersistence attrPersistence{ context.attributeStorage };
+
+    // Initialize the CalendarType if available
+    attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::CalendarTypeEnum>(
+        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType,
+        kDefaultCalendarType);
+
+    // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
+    // If initial value is not one of the allowed values, pick one valid value and write it.
+    TimeFormatLocalization::CalendarTypeEnum validCalendar = kDefaultCalendarType;
+    if (!IsSupportedCalendarType(mCalendarType, &validCalendar))
+    {
+        mCalendarType = validCalendar;
+    }
+
+    // Initialize HourFormat
+    attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::HourFormatEnum>(
+        { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
+        kDefaultHourFormat);
+
 
     return CHIP_NO_ERROR;
 }
@@ -40,12 +93,40 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                             AttributeValueDecoder & decoder)
 {
-    auto result = mLogic.WriteAttribute(request, mContext->attributeStorage, decoder);
-    if (result == Protocols::InteractionModel::Status::Success)
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+}
+
+DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+{
+    AttributePersistence persistence { mContext->attributeStorage };
+
+    switch (request.path.mAttributeId)
     {
-        NotifyAttributeChanged(request.path.mAttributeId);
+    case TimeFormatLocalization::Attributes::HourFormat::Id: {
+        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mHourFormat);
     }
-    return result;
+    case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
+        TimeFormatLocalization::CalendarTypeEnum newCalendar;
+        ReturnErrorOnFailure(decoder.Decode(newCalendar));
+
+        if (!IsSupportedCalendarType(newCalendar))
+        {
+            return Protocols::InteractionModel::Status::ConstraintError;
+        }
+
+         mCalendarType = newCalendar;
+
+        // Using WriteAttribute directly so we can check that the decoded value is in the supported list
+        // before storing it.
+        CHIP_ERROR result = mContext->attributeStorage.WriteValue({ kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id },
+                                                    { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
+
+        return result == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
+                                       : Protocols::InteractionModel::Status::WriteIgnored;
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
+    }
 }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -54,16 +135,16 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
     switch (request.path.mAttributeId)
     {
     case TimeFormatLocalization::Attributes::HourFormat::Id:
-        return encoder.Encode(mLogic.GetHourFormat());
+        return encoder.Encode(mHourFormat);
 
     case TimeFormatLocalization::Attributes::ActiveCalendarType::Id:
-        return encoder.Encode(mLogic.GetActiveCalendarType());
+        return encoder.Encode(mCalendarType);
 
     case TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id:
-        return mLogic.GetSupportedCalendarTypes(encoder);
+        return GetSupportedCalendarTypes(encoder);
 
     case TimeFormatLocalization::Attributes::FeatureMap::Id:
-        return encoder.Encode(mLogic.GetFeatureMap());
+        return encoder.Encode(mFeatures);
 
     case TimeFormatLocalization::Attributes::ClusterRevision::Id:
         return encoder.Encode(TimeFormatLocalization::kRevision);
@@ -76,7 +157,64 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
 CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath & path,
                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    return mLogic.Attributes(builder);
+    AttributeListBuilder listBuilder(builder);
+
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+        { mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat), TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry },
+        { mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat), TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry }
+    };
+
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
+}
+
+bool TimeFormatLocalizationCluster::IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, TimeFormatLocalization::CalendarTypeEnum * validCalendar)
+{
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, false);
+
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), false);
+
+    TimeFormatLocalization::CalendarTypeEnum type;
+    bool found = false;
+
+    while (it.Next(type))
+    {
+        // Update the optional validCalendar to a value from the SupportedList.
+        // This will return either the last element of the list or the requested
+        // value if exists.
+        if (validCalendar != nullptr)
+        {
+            *validCalendar = type;
+        }
+
+        if (type == reqCalendar)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    return found;
+}
+
+CHIP_ERROR TimeFormatLocalizationCluster::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const
+{
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, aEncoder.EncodeEmptyList());
+
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
+
+    return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+        TimeFormatLocalization::CalendarTypeEnum type;
+
+        while (it.Next(type))
+        {
+            ReturnErrorOnFailure(encoder.Encode(type));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 } // namespace Clusters
