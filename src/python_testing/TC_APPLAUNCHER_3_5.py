@@ -15,52 +15,49 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-
 from mobly import asserts
-
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_asserts import assert_valid_uint16
 
 
 class TC_APPLAUNCHER_3_5(MatterBaseTest):
     def desc_TC_APPLAUNCHER_3_5(self) -> str:
-        # Description of the test case
         return "[TC_APPLAUNCHER-3.5] AppLauncher CatalogList attribute validation"
 
     def pics_TC_APPLAUNCHER_3_5(self):
-        # PICS requirement: AppLauncher cluster must be supported
         return [
             "APPLAUNCHER.S",
         ]
 
     def steps_TC_APPLAUNCHER_3_5(self):
-        # Define the test steps
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH reads CatalogList attribute from the DUT for the list of supported application catalogs")
+            TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep(1, "TH reads CatalogList attribute from the DUT for the list of supported application catalogs")
         ]
 
     @async_test_body
     async def test_TC_APPLAUNCHER_3_5(self):
-        # Get the endpoint where AppLauncher cluster is implemented
         self.endpoint = self.get_endpoint()
         cluster = Clusters.ApplicationLauncher
         attributes = cluster.Attributes
 
-        # Step 1: Commissioning (already completed)
-        self.step(1)
+        # Precondition: Commissioning
+        self.step("precondition")
 
-        # Step 2: Read CatalogList attribute
-        self.step(2)
+        # Step 1: Read CatalogList attribute
+        self.step(1)
         catalog_list = await self.read_single_attribute_check_success(
             cluster=cluster,
             attribute=attributes.CatalogList
         )
+
         # Confirm it's a list
-        asserts.assert_true(
-            isinstance(catalog_list, list),
+        asserts.assert_is_instance(
+            catalog_list, list,
             f"CatalogList is not a list. Received type: {type(catalog_list)}"
         )
+
         # Validate that CatalogList is present and not empty
         asserts.assert_greater(len(catalog_list), 0, "CatalogList attribute is empty or not present")
 
@@ -68,9 +65,8 @@ class TC_APPLAUNCHER_3_5(MatterBaseTest):
 
         # Validate each entry is a valid CSA-issued Vendor ID (uint16)
         for vendor_id in catalog_list:
-            asserts.assert_greater(len(catalog_list), 0, "CatalogList attribute is empty or not present")
+            assert_valid_uint16(vendor_id, f"Invalid Vendor ID in CatalogList: {vendor_id}")
 
 
-        # Entry point for the test runner
 if __name__ == "__main__":
     default_matter_test_main()
