@@ -13,8 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <pw_unit_test/framework.h>
-
+#include "EnumsCheck.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
@@ -27,6 +26,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <pw_unit_test/framework.h>
 #include <unistd.h>
 
 namespace {
@@ -205,38 +205,39 @@ TEST(TestAttributePersistence, TestStrings)
 
 TEST(TestAttributePersistence, TestEnumHandling)
 {
+    using namespace chip::app::Clusters;
+
     TestPersistentStorageDelegate storageDelegate;
     DefaultAttributePersistenceProvider ramProvider;
     ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
 
     AttributePersistence persistence(ramProvider);
 
-    Clusters::TimeFormatLocalization::CalendarTypeEnum valueRead = Clusters::TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+    TestEnum valueRead = TestEnum::kUnknownEnumValue;
 
     // Test storing and loading a valid enum value
     {
         const ConcreteAttributePath path(1, 2, 3);
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(TestEnum::kValue1);
         EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_NO_ERROR);
-        EXPECT_EQ(valueRead, Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese);
+        EXPECT_EQ(valueRead, TestEnum::kValue1);
 
         // Test loading the stored enum value
-        valueRead = Clusters::TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
-        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian));
-        ASSERT_EQ(valueRead, Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese);
+        valueRead = TestEnum::kUnknownEnumValue;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, TestEnum::kValue2));
+        ASSERT_TRUE(valueRead == TestEnum::kValue1);
     }
 
     // Test attempting to store an unknown enum value
     {
         const ConcreteAttributePath path(3, 2, 1);
+        const uint8_t testUnknownValue = 0x12;
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(Clusters::TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(testUnknownValue);
         EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
-
 }
-
 
 TEST(TestAttributePersistence, TestInvalidPascalLengthStored)
 {
