@@ -23,8 +23,8 @@ from datetime import datetime, timedelta, timezone
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
-from matter.testing import timeoperations
 from matter.clusters.Types import Nullable, NullValue
+from matter.testing import timeoperations
 from matter.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, matchers,
                                            parse_matter_test_args)
 from matter.testing.pics import parse_pics, parse_pics_xml
