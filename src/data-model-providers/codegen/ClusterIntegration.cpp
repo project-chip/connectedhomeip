@@ -82,7 +82,7 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     uint32_t optionalAttributes = 0;
     if (options.fetchOptionalAttributes)
     {
-        for (AttributeId attributeId = 0; attributeId < std::numeric_limits<typeof(optionalAttributes)>::digits; attributeId++)
+        for (AttributeId attributeId = 0; attributeId < std::numeric_limits<uint32_t>::digits; attributeId++)
         {
             if (emberAfContainsAttribute(options.endpointId, options.clusterId, attributeId))
             {
