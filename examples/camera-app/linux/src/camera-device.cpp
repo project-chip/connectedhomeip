@@ -461,12 +461,12 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 
     // Camera caps request: RAW @ WxH @ fps
     GstCaps * caps1 = gst_caps_new_simple("video/x-raw", "width", G_TYPE_INT, width, "height", G_TYPE_INT, height, "framerate",
-                                         GST_TYPE_FRACTION, framerate, 1, nullptr);
+                                          GST_TYPE_FRACTION, framerate, 1, nullptr);
     g_object_set(capsfilter1, "caps", caps1, nullptr);
     gst_caps_unref(caps1);
 
     // Camera caps request: I420
-    GstCaps * caps2 = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING,"I420", nullptr);
+    GstCaps * caps2 = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", nullptr);
     g_object_set(capsfilter2, "caps", caps2, nullptr);
     gst_caps_unref(caps2);
 
