@@ -112,7 +112,7 @@ class TestSubscriptionResumption(CHIPVirtualHome):
         command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
                    "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --remote-server-app {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/subscription_resumption_test.py"), ethernet_ip,
+                CHIP_REPO, "src/controller/python/tests/scripts/subscription_resumption_test.py"), ethernet_ip,
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS), TEST_END_DEVICE_APP)
         ret = self.execute_device_cmd(req_device_id, command)
 

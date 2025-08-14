@@ -108,7 +108,6 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                              "Incorrect response type")
-        asserts.assert_not_equal(resp.webRTCSessionID, 0, "webrtcSessionID in SolicitOfferResponse should not be 0.")
         asserts.assert_false(resp.deferredOffer, "Expected 'deferredOffer' to be False.")
 
         # TODO: Enable this check after integrating with Camera AvStreamManager

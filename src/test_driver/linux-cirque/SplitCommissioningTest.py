@@ -108,7 +108,7 @@ class TestSplitCommissioning(CHIPVirtualHome):
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
                    "{} -t 150 --address1 {} --address2 {} --paa-trust-store-path {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/split_commissioning_test.py"),
+                CHIP_REPO, "src/controller/python/tests/scripts/split_commissioning_test.py"),
             ethernet_ips[0], ethernet_ips[1], os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
         ret = self.execute_device_cmd(req_device_id, command)
 
