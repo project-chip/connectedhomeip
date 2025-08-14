@@ -60,13 +60,8 @@ jobs:
                       realtek:
                         - '**/realtek/**'
 
-            - name: Set up environment for size reports
-              uses: ./.github/actions/setup-size-reports
-              if: ${{ !env.ACT }}
-              with:
-                  gh-context: ${{ toJson(github) }}
-
-            - name: Build rtl8777g examples
+            - name: Build all rtl8777g examples (Full)
+              if: steps.changed_paths.outputs.realtek == 'true' 
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -79,4 +74,13 @@ jobs:
                       --target realtek-rtl8777g-window \
                       build \
                   "
-           
+
+            - name: Build subset rtl8777g examples (Subset)
+              if: steps.changed_paths.outputs.realtek != 'true'
+              run: |
+                 scripts/run_in_build_env.sh "\
+                    ./scripts/build/build_examples.py \
+                    --target realtek-rtl8777g-lighting \
+                    --target realtek-rtl8777g-light-switch \
+                    build \
+                  "
