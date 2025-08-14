@@ -23,7 +23,7 @@ config:
     endpoint: 3
     TempAccountIdentifier:
         type: char_string
-        defaultValue: "1111"
+        defaultValue: "1234efgh5678abcd"
     catalogVendorId:
         type: int16u
         defaultValue: 123
