@@ -89,7 +89,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         {
             // Load qvOta_ header structure and call application callback to validate image header
             qvOta_ImageHeader_t qvOta_ImgHeader;
-            this->mSwVer                             = header.mSoftwareVersion; // Store software version in imageProcessor as well
+            this->mSwVer                         = header.mSoftwareVersion; // Store software version in imageProcessor as well
             qvOta_ImgHeader.vendorId             = header.mVendorId;
             qvOta_ImgHeader.productId            = header.mProductId;
             qvOta_ImgHeader.softwareVersion      = header.mSoftwareVersion;
@@ -98,8 +98,10 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
             // Call Matter OTA processor to handle the header
             uint16_t headerSize = 0;
-            VerifyOrReturnError(qvOta_StatusSuccess == this->mProcessor->ProcessHeader(&qvOta_ImgHeader, &headerSize, block_size, block.data(), block.size()),
-                   CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED);
+            VerifyOrReturnError(
+                qvOta_StatusSuccess ==
+                    this->mProcessor->ProcessHeader(&qvOta_ImgHeader, &headerSize, block_size, block.data(), block.size()),
+                CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED);
 
             // Get and store provider location
             OTARequestorInterface * requestor = GetRequestorInstance();
@@ -107,7 +109,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
             Optional<ProviderLocation> lastUsedProvider;
             requestor->GetProviderLocation(lastUsedProvider);
             qvOta_SetLastProvider(lastUsedProvider.Value().providerNodeID, lastUsedProvider.Value().endpoint,
-                                      lastUsedProvider.Value().fabricIndex);
+                                  lastUsedProvider.Value().fabricIndex);
             ChipLogProgress(SoftwareUpdate, "Provider location - node id: 0x" ChipLogFormatX64 ", endpoint: %u, fabric index: %u",
                             ChipLogValueX64(lastUsedProvider.Value().providerNodeID), lastUsedProvider.Value().endpoint,
                             lastUsedProvider.Value().fabricIndex);
@@ -274,9 +276,9 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     // Call Matter OTA processor method to process the block
-    uint32_t skip_bytes = 0;
-    qvOta_Status_t result = imageProcessor->mProcessor->ProcessBlock(&imageProcessor->mParams.downloadedBytes,
-                        &skip_bytes, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
+    uint32_t skip_bytes   = 0;
+    qvOta_Status_t result = imageProcessor->mProcessor->ProcessBlock(&imageProcessor->mParams.downloadedBytes, &skip_bytes,
+                                                                     imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
     if (result != qvOta_StatusSuccess)
     {
         ChipLogError(SoftwareUpdate, "Failed to process block");
