@@ -37,7 +37,6 @@
 
 from datetime import timedelta
 
-
 from mobly import asserts
 
 import matter.clusters as Clusters

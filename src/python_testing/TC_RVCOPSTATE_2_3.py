@@ -39,6 +39,7 @@
 
 import logging
 from time import sleep
+
 from mobly import asserts
 
 import matter.clusters as Clusters
