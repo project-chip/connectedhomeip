@@ -34,7 +34,6 @@ tests:
                 value: nodeId
 
     - label: "Step 2: TH reads from the DUT the MinTemperature attribute"
-      PICS: TCTL.S.A0001
       command: "readAttribute"
       attribute: "MinTemperature"
       response:
@@ -43,7 +42,6 @@ tests:
               type: temperature
 
     - label: "Step 3: TH reads from the DUT the MaxTemperature attribute"
-      PICS: TCTL.S.A0002
       command: "readAttribute"
       attribute: "MaxTemperature"
       response:
@@ -54,7 +52,6 @@ tests:
     - label:
           "Step 4: TH reads from the DUT the Step attribute and validates
           constraints"
-      PICS: TCTL.S.A0003
       command: "readAttribute"
       attribute: "Step"
       response:
@@ -67,7 +64,6 @@ tests:
     - label:
           "Verify that the DUT response (maxTemperature - minTemperature) % the
           received value of the Step attribute == 0."
-      PICS: TCTL.S.A0003 && TCTL.S.A0002 && TCTL.S.A0001
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
       arguments:
@@ -82,7 +78,6 @@ tests:
                   value: true
 
     - label: "Step 5: TH reads from the DUT the TemperatureSetpoint attribute"
-      PICS: TCTL.S.A0000
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:
@@ -94,7 +89,6 @@ tests:
     - label:
           "Verify that the DUT response (temperature value - minTemperature) %
           the received value of the Step attribute from step 4 == 0."
-      PICS: TCTL.S.A0000 && TCTL.S.A0001
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
       arguments:
