@@ -30,9 +30,6 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-
-protected:
-    CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder);
 };
 
 } // namespace chip::app::Clusters

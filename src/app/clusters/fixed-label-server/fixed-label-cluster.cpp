@@ -22,9 +22,9 @@ namespace chip::app::Clusters {
 
 using namespace FixedLabel::Attributes;
 
-FixedLabelCluster::FixedLabelCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, FixedLabel::Id }) {}
+namespace {
 
-CHIP_ERROR FixedLabelCluster::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
 
@@ -52,6 +52,10 @@ CHIP_ERROR FixedLabelCluster::ReadLabelList(EndpointId endpoint, AttributeValueE
 
     return encoder.EncodeEmptyList();
 }
+
+} // namespace
+
+FixedLabelCluster::FixedLabelCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, FixedLabel::Id }) {}
 
 DataModel::ActionReturnStatus FixedLabelCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
