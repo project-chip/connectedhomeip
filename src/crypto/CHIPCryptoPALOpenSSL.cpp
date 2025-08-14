@@ -1745,16 +1745,20 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 }
             }
             break;
-        case NID_subject_key_identifier:
+        case NID_subject_key_identifier: {
             VerifyOrExit(!isCritical && !extSKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_subject_key_id(x509Cert)->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            const ASN1_OCTET_STRING * pSKID = X509_get0_subject_key_id(x509Cert);
+            VerifyOrExit(pSKID != nullptr && pSKID->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extSKIDPresent = true;
             break;
-        case NID_authority_key_identifier:
+        }
+        case NID_authority_key_identifier: {
             VerifyOrExit(!isCritical && !extAKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_authority_key_id(x509Cert)->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            const ASN1_OCTET_STRING * pAKID = X509_get0_authority_key_id(x509Cert);
+            VerifyOrExit(pAKID != nullptr && pAKID->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extAKIDPresent = true;
             break;
+        }
         default:
             break;
         }
