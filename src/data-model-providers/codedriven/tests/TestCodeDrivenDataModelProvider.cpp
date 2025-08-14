@@ -54,6 +54,7 @@ class TestEventGenerator : public DataModel::EventsGenerator
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override {}
 };
 
 class TestActionContext : public DataModel::ActionContext
