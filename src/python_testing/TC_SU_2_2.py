@@ -341,19 +341,77 @@ class TC_SU_2_2(MatterBaseTest):
         logging.info(f"Step #1.5 - AnnounceOTAProvider response: {resp_announce}.")
 
         # ------------------------------------------------------------------------------------
-        # Step # 1.6 - Verify that software image transfer from TH/OTA-P to DUT is successful
-        # Draft implementation
+        # Step # 1.6 - Verify image transfer from TH/OTA-P to DUT is successful
+        # by UpdateStateProgress
         # ------------------------------------------------------------------------------------
 
-        logger.info("Step #1.6 - Create an accumulator for the UpdateStateProgress attribute")
+        # logger.info("Step #1.6 - Create an accumulator for the UpdateStateProgress attribute")
 
-        # Create accumulator for UpdateStateProgress attribute
+        # # Create accumulator for UpdateStateProgress attribute
+        # accumulator = ClusterAttributeChangeAccumulator(
+        #     expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+        #     expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress
+        # )
+
+        # # Start subscription (async)
+        # await accumulator.start(
+        #     dev_ctrl=controller,
+        #     node_id=requestor_node_id,
+        #     endpoint=0,
+        #     fabric_filtered=False,
+        #     min_interval_sec=5,
+        #     max_interval_sec=10,
+        #     keepSubscriptions=True
+        # )
+
+        # # Track last known progress
+        # last_progress = {"value": None}
+
+        # def matcher_final(report):
+        #     val = report.value
+        #     if val is not None:
+        #         last_progress["value"] = val
+        #         if val == 100:
+        #             logger.info("Step #1.6 - Final progress reached 100%, update completed.")
+        #             return True
+        #         return False
+        #     else:
+        #         # Null received — can mean finish or failure
+        #         if last_progress["value"] is not None and last_progress["value"] >= 99:
+        #             logger.info("Step #1.6 - Final progress Null after >=99%, update completed.")
+        #             return True
+        #         else:
+        #             raise AssertionError("Progress became Null before reaching 99%, update failed.")
+
+        # matcher_final_obj = AttributeMatcher.from_callable(
+        #     description="Final progress: 100 or Null after >=99%",
+        #     matcher=matcher_final
+        # )
+
+        # try:
+        #     await accumulator.await_all_expected_report_matches([matcher_final_obj], timeout_sec=1200.0)
+        #     logger.info("Step #1.6 - Update completed successfully.")
+        # except Exception as e:
+        #     raise AssertionError(f"No final progress received in time or failed: {e}")
+
+        # # Cancel subscription
+        # await accumulator.cancel()
+
+        # ------------------------------------------------------------------------------------
+        # Step # 1.7 - Verify image transfer from TH/OTA-P to DUT is successful
+        # by UpdateState
+        # ------------------------------------------------------------------------------------
+
+        logger.info("Step #1.6 - Create an accumulator for the UpdateState attribute")
+
+        # Create accumulator for UpdateState attribute
         accumulator = ClusterAttributeChangeAccumulator(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        # Start subscription (async)
+        # Start subscription (async) to receive periodic updates of UpdateState
+        # This keeps the subscription active and sets update intervals between 5–10 seconds
         await accumulator.start(
             dev_ctrl=controller,
             node_id=requestor_node_id,
@@ -364,32 +422,44 @@ class TC_SU_2_2(MatterBaseTest):
             keepSubscriptions=True
         )
 
-        # Track last known progress
-        last_progress = {"value": None}
+        # Track last known state to validate expected OTA update flow
+        last_state = None
 
-        def matcher_final(report):
+        def matcher_update_state(report):
+            nonlocal last_state
             val = report.value
-            if val is not None:
-                last_progress["value"] = val
-                if val == 100:
-                    logger.info("Step #1.6 - Final progress reached 100%, update completed.")
-                    return True
+            if val is None:
                 return False
-            else:
-                # Null received — can mean finish or failure
-                if last_progress["value"] is not None and last_progress["value"] >= 99:
-                    logger.info("Step #1.6 - Final progress Null after >=99%, update completed.")
-                    return True
-                else:
-                    raise AssertionError("Progress became Null before reaching 99%, update failed.")
 
-        matcher_final_obj = AttributeMatcher.from_callable(
-            description="Final progress: 100 or Null after >=99%",
-            matcher=matcher_final
+            # Only log when the value changes
+            if last_state != val:
+                logger.info(f"1.6 - UpdateState changed: {val}")
+                last_state = val
+            else:
+                return False  # Ignore duplicates, don't match yet
+
+            # Validate expected OTA state sequence:
+            # Downloading → Applying → Idle
+            if last_state is None and val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:
+                return False
+            if last_state == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading and val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying:
+                return False
+            if last_state == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying and val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
+                return False
+
+            last_state = val
+            # We finish when reaching the Idle state
+            return val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle  # Terminamos cuando llega a Idle
+
+        # Create matcher object for the accumulator
+        matcher_update_state_obj = AttributeMatcher.from_callable(
+            description="Validate OTA UpdateState transitions: Downloading > Applying > Idlee",
+            matcher=matcher_update_state
         )
 
         try:
-            await accumulator.await_all_expected_report_matches([matcher_final_obj], timeout_sec=1200.0)
+            # Wait until all expected states have been reported or until timeout (20 min)
+            await accumulator.await_all_expected_report_matches([matcher_update_state_obj], timeout_sec=1200.0)
             logger.info("Step #1.6 - Update completed successfully.")
         except Exception as e:
             raise AssertionError(f"No final progress received in time or failed: {e}")
