@@ -58,6 +58,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/soil-measurement-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
