@@ -20,6 +20,7 @@ namespace HepaFilterMonitoring {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Condition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Condition::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -54,6 +55,7 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ResetCondition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ResetCondition::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

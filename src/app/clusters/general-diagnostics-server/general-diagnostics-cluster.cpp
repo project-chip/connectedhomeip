@@ -319,22 +319,17 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
 {
     AttributeListBuilder listBuilder(builder);
 
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-        { mEnabledAttributes.enableTotalOperationalHours, GeneralDiagnostics::Attributes::TotalOperationalHours::kMetadataEntry },
-        { mEnabledAttributes.enableBootReason, GeneralDiagnostics::Attributes::BootReason::kMetadataEntry },
-        { mEnabledAttributes.enableActiveHardwareFaults, GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry },
-        { mEnabledAttributes.enableActiveRadioFaults, GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry },
-        { mEnabledAttributes.enableActiveNetworkFaults, GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry },
-        /*
-         * Enforcing UpTime to always be added here because it is a mandatory attribute for
-         * revision 2 and beyond, but is left as optional in the XML for now for backwards
-         * compatibility. This allows us to still use the code generated mandatory attributes
-         * and have support for UpTime.
-         */
-        { true, GeneralDiagnostics::Attributes::UpTime::kMetadataEntry },
+    static constexpr DataModel::AttributeEntry optionalAttributeEntries[] = {
+        GeneralDiagnostics::Attributes::TotalOperationalHours::kMetadataEntry,
+        GeneralDiagnostics::Attributes::BootReason::kMetadataEntry,
+        GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry,
+        GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry,
+        GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry,
+        GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
     };
 
-    return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
+    return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries),
+                              mOptionalAttributeSet);
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -369,7 +364,7 @@ void GeneralDiagnosticsCluster::OnDeviceReboot(BootReasonEnum bootReason)
 
     GeneralDiagnostics::Events::BootReason::Type event{ bootReason };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
@@ -385,7 +380,7 @@ void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxH
         reinterpret_cast<const GeneralDiagnostics::HardwareFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::HardwareFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
@@ -401,7 +396,7 @@ void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadi
         reinterpret_cast<const GeneralDiagnostics::RadioFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::RadioFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
@@ -417,7 +412,7 @@ void GeneralDiagnosticsCluster::OnNetworkFaultsDetect(const GeneralFaults<kMaxNe
         reinterpret_cast<const GeneralDiagnostics::NetworkFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::NetworkFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
