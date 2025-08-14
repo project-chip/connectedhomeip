@@ -245,8 +245,7 @@ class AVSUMTestBase:
                                                                                               height=aVideoSensorParams.sensorHeight),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minKeyFrameInterval=2000,
-                maxKeyFrameInterval=8000,
+                keyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             ),

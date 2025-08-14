@@ -3805,5 +3805,15 @@ CHIP_ERROR DeviceController::GetRootPublicKey(Crypto::P256PublicKey & outRootPub
     return fabricTable->FetchRootPubkey(mFabricIndex, outRootPublicKey);
 }
 
+bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData)
+{
+    if (nodeData.commissioningMode == to_underlying(Dnssd::CommissioningMode::kDisabled))
+    {
+        ChipLogProgress(Controller, "Discovered device does not have an open commissioning window.");
+        return false;
+    }
+    return true;
+}
+
 } // namespace Controller
 } // namespace chip
