@@ -50,9 +50,10 @@ import ipaddress
 import logging
 import re
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 
 '''

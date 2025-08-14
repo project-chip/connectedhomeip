@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace PushAvStreamTransport {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace SupportedFormats {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedFormats::Id,
@@ -31,10 +33,16 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace CurrentConnections
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    SupportedFormats::kMetadataEntry,
+    CurrentConnections::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AllocatePushTransport {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(AllocatePushTransport::Id,
