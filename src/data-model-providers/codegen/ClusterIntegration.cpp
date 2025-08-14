@@ -54,7 +54,7 @@ void LoadFeatureMap(EndpointId endpointId, ClusterId clusterId, uint32_t & featu
         emberAfReadAttribute(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, readable, sizeof(temp));
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(AppServer, "Failed to load featuremap for %u/" ChipLogFormatMEI " (Status %d)", endpointId,
+        ChipLogError(AppServer, "Failed to load feature map for %u/" ChipLogFormatMEI " (Status %d)", endpointId,
                      ChipLogValueMEI(clusterId), static_cast<int>(status));
         return;
     }
