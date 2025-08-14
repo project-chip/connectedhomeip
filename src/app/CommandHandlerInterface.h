@@ -237,8 +237,9 @@ protected:
             //
             handlerContext.SetCommandHandled();
 
-            if (requestPayload.Decode(handlerContext.mPayload, handlerContext.mCommandHandler.GetAccessingFabricIndex()) !=
-                CHIP_NO_ERROR)
+            DataModel::FabricAwareTLVReader reader(handlerContext.mPayload,
+                                                   handlerContext.mCommandHandler.GetAccessingFabricIndex());
+            if (DataModel::Decode(reader, requestPayload) != CHIP_NO_ERROR)
             {
                 handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
                                                          Protocols::InteractionModel::Status::InvalidCommand);

@@ -101,15 +101,18 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
  * depends on the presence of a Decode method on X. The signature of that method
  * is as follows:
  *
- * CHIP_ERROR <Object>::Decode(TLVReader &reader);
+ * CHIP_ERROR <Object>::Decode(SomeReaderType & reader);
  *
+ * Where ReaderType needs to be convertible to SomeReaderType.  For example, the
+ * two types could be the same, or ReaderType could be FabricAwareTLVReader
+ * while SomeReaderType is TLV::TLVReader.
  */
-template <typename X,
-          typename std::enable_if_t<
-              std::is_class<X>::value &&
-                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>())), CHIP_ERROR>::value,
-              X> * = nullptr>
-CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
+template <
+    typename ReaderType, typename X,
+    typename std::enable_if_t<std::is_class<X>::value &&
+                                  std::is_same<decltype(std::declval<X>().Decode(std::declval<ReaderType &>())), CHIP_ERROR>::value,
+                              X> * = nullptr>
+CHIP_ERROR Decode(ReaderType & reader, X & x)
 {
     return x.Decode(reader);
 }
@@ -146,8 +149,8 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path, X
  *
  * Decodes an optional value (struct field, command field, event field).
  */
-template <typename X>
-CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x)
+template <typename ReaderType, typename X>
+CHIP_ERROR Decode(ReaderType & reader, Optional<X> & x)
 {
     // If we are calling this, it means we found the right tag, so just decode
     // the item.
@@ -159,8 +162,8 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x)
  *
  * Decodes a nullable value.
  */
-template <typename X>
-CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
+template <typename ReaderType, typename X>
+CHIP_ERROR Decode(ReaderType & reader, Nullable<X> & x)
 {
     if (reader.GetType() == TLV::kTLVType_Null)
     {
@@ -176,6 +179,21 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
     }
     return CHIP_NO_ERROR;
 }
+
+// Should this be declared in a separate header?
+struct FabricAwareTLVReader
+{
+    FabricAwareTLVReader(TLV::TLVReader & reader, FabricIndex accessingFabricIndex) :
+        mTLVReader(reader), mAccessingFabricIndex(accessingFabricIndex)
+    {}
+
+    operator TLV::TLVReader &() { return mTLVReader; }
+
+    TLV::TLVType GetType() const { return mTLVReader.GetType(); }
+
+    TLV::TLVReader & mTLVReader;
+    const FabricIndex mAccessingFabricIndex;
+};
 
 } // namespace DataModel
 } // namespace app

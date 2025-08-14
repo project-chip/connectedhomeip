@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -101,7 +102,7 @@ public:
 
     chip::CharSpan tempAccountIdentifier;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace GetSetupPIN
 namespace GetSetupPINResponse {
@@ -174,7 +175,7 @@ public:
     chip::CharSpan setupPIN;
     Optional<chip::NodeId> node;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace Login
 namespace Logout {
@@ -208,7 +209,7 @@ public:
 
     Optional<chip::NodeId> node;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace Logout
 } // namespace Commands

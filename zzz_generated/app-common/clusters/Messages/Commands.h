@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -109,7 +110,7 @@ public:
     chip::CharSpan messageText;
     Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace PresentMessagesRequest
 namespace CancelMessagesRequest {
@@ -143,7 +144,7 @@ public:
 
     DataModel::DecodableList<chip::ByteSpan> messageIDs;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace CancelMessagesRequest
 } // namespace Commands

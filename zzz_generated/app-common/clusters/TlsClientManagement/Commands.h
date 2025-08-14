@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -118,7 +119,7 @@ public:
     DataModel::Nullable<uint16_t> ccdid;
     DataModel::Nullable<uint16_t> endpointID;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ProvisionEndpoint
 namespace ProvisionEndpointResponse {
@@ -185,7 +186,7 @@ public:
 
     uint16_t endpointID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace FindEndpoint
 namespace FindEndpointResponse {
@@ -252,7 +253,7 @@ public:
 
     uint16_t endpointID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RemoveEndpoint
 } // namespace Commands

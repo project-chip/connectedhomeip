@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -111,7 +112,7 @@ public:
 
     Structs::GroupKeySetStruct::DecodableType groupKeySet;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace KeySetWrite
 namespace KeySetRead {
@@ -145,7 +146,7 @@ public:
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace KeySetRead
 namespace KeySetReadResponse {
@@ -212,7 +213,7 @@ public:
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace KeySetRemove
 namespace KeySetReadAllIndices {
@@ -241,7 +242,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace KeySetReadAllIndices
 namespace KeySetReadAllIndicesResponse {

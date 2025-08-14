@@ -4,6 +4,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
@@ -96,7 +97,7 @@ public:
 
     {{#if (isClient source)}}
     {{#if isFabricScoped~}}
-    CHIP_ERROR Decode(TLV::TLVReader &reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
     {{else}}
     CHIP_ERROR Decode(TLV::TLVReader &reader);
     {{/if}}

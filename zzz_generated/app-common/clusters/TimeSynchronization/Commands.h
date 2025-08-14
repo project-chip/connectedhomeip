@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -151,7 +152,7 @@ public:
 
     DataModel::Nullable<Structs::FabricScopedTrustedTimeSourceStruct::DecodableType> trustedTimeSource;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace SetTrustedTimeSource
 namespace SetTimeZone {

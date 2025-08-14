@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -118,7 +119,7 @@ public:
     Optional<chip::ByteSpan> verificationKey;
     ClientTypeEnum clientType = static_cast<ClientTypeEnum>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace RegisterClient
 namespace RegisterClientResponse {
@@ -188,7 +189,7 @@ public:
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     Optional<chip::ByteSpan> verificationKey;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace UnregisterClient
 namespace StayActiveRequest {
