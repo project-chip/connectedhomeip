@@ -17,6 +17,7 @@
 #include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
 #include <platform/DeviceInfoProvider.h>
 #include <tracing/macros.h>
@@ -186,13 +187,23 @@ CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath &
                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
+    
 
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-        { mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat), TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry },
-        { mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat), TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry }
+    const DataModel::AttributeEntry optionalAttributes[] = {
+        TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry,
+        TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry
     };
 
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
+    chip::app::OptionalAttributeSet<TimeFormatLocalization::Attributes::ActiveCalendarType::Id,
+                                    TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id> optionalAttributeSet;
+
+    if(mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat)) 
+    {
+        optionalAttributeSet.Set<TimeFormatLocalization::Attributes::ActiveCalendarType::Id>();
+        optionalAttributeSet.Set<TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id>();
+    }
+
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), optionalAttributeSet);
 }
 
 
