@@ -232,7 +232,9 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kGroupMessage, &payloadHeader, &packetHeader,
                                 chip::ByteSpan(message->Start(), message->TotalLength()),
-                                /* messageTotalSize = */(packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() + cryptoContext.EncryptionOverhead()));
+                                /* messageTotalSize = */
+                                (packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() +
+                                 cryptoContext.EncryptionOverhead()));
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
@@ -262,13 +264,15 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             .SetSessionId(session->GetPeerSessionId()) //
             .SetSessionType(Header::SessionType::kUnicastSession);
 
-        destination_address = session->GetPeerAddress();
+        destination_address           = session->GetPeerAddress();
         CryptoContext & cryptoContext = session->GetCryptoContext();
 
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kSecureSession, &payloadHeader, &packetHeader,
                                 chip::ByteSpan(message->Start(), message->TotalLength()),
-                                /* totalMessageSize = */(packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() + cryptoContext.EncryptionOverhead()));
+                                /* totalMessageSize = */
+                                (packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() +
+                                 cryptoContext.EncryptionOverhead()));
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
@@ -305,7 +309,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Trace after all headers are settled.
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
                                 chip::ByteSpan(message->Start(), message->TotalLength()),
-                                /* messageTotalSize = */ packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength());
+                                /* messageTotalSize = */ packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() +
+                                    message->TotalLength());
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
@@ -878,7 +883,8 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     if (mCB != nullptr)
     {
         MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
-                                    unsecuredSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()), messageTotalSize);
+                                    unsecuredSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()),
+                                    messageTotalSize);
 
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, unsecuredSession, peerAddress, msg->Start(), msg->TotalLength());
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msg));
@@ -1022,7 +1028,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     if (mCB != nullptr)
     {
         MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kSecureUnicast, &payloadHeader, &packetHeader,
-                                    secureSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()), messageTotalSize);
+                                    secureSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()),
+                                    messageTotalSize);
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, secureSession, peerAddress, msg->Start(), msg->TotalLength());
 
         // Always recompute whether a message is for a commissioning session based on the latest knowledge of
@@ -1251,7 +1258,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
                                                      packetHeaderCopy.GetSourceNodeId().Value());
 
         MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kGroupMessage, &payloadHeader, &packetHeaderCopy,
-                                    &groupSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()), messageTotalSize);
+                                    &groupSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()),
+                                    messageTotalSize);
 
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeaderCopy, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
         mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, SessionHandle(groupSession),
