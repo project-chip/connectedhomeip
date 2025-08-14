@@ -117,7 +117,12 @@ PushAvStreamManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
 
 bool PushAvStreamManager::ValidateUrl(std::string url)
 {
-    return true;
+    // Basic URL validation: checks for scheme and host
+    // Accepts http, https, rtsp, rtmp, etc.
+    static const std::regex url_regex(
+        R"(^(https?|rtsp|rtmp)://([a-zA-Z0-9\-\.]+)(:[0-9]+)?(/.*)?$)",
+        std::regex::icase);
+    return std::regex_match(url, url_regex);
 }
 
 Protocols::InteractionModel::Status PushAvStreamManager::SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId)
