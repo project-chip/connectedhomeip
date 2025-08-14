@@ -121,7 +121,7 @@ public:
         // RTCP helpers (recommended)
         mSr   = std::make_shared<rtc::RtcpSrReporter>(mRtpCfg);
         mNack = std::make_shared<rtc::RtcpNackResponder>();
-        mPaketizer->addToChain(mSr);
+        mPacketizer->addToChain(mSr);
         mPacketizer->addToChain(mNack);
 
         // Attach handler chain to the sending track
@@ -135,7 +135,6 @@ public:
             // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
             rtc::binary frame(size);
             std::memcpy(frame.data(), data, size);
-            // ChipLogProgress(Camera, "Send frame: %zuB to packetizer", size);
             mTrack->send(std::move(frame));
         }
         else
