@@ -593,15 +593,19 @@ class TC_TSTAT_2_2(MatterBaseTest):
         # Test Harness Reads MinSetpointDeadBand attribute from Server DUT and verifies that the value is within range
         if self.pics_guard(hasAutoModeFeature):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
-            asserts.assert_less_equal(val, 25)
+            asserts.assert_less_equal(val, 127)
+            asserts.assert_greater_equal(val, 0)
 
             if self.pics_guard(self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
-                # Test Harness Writes a value back that is different but valid for MinSetpointDeadBand attribute
-                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(5), endpoint_id=endpoint)
+                validval = val - 1 if val > 0 else 5    # only non-negative integer smaller than val is guaranteed valid
+                # otherwise if val = 0 then randomly pick 5 for testing as the write will always be discarded
 
-                # Test Harness Reads it back again to confirm the successful write of MinSetpointDeadBand attribute
-                val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
-                asserts.assert_equal(val, 5)
+                # Test Harness Writes a value back that is different but valid for MinSetpointDeadBand attribute
+                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(validval), endpoint_id=endpoint)
+
+                # Test Harness Reads it back again to confirm the write of MinSetpointDeadBand attribute is discarded
+                newval = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                asserts.assert_equal(val, newval)
 
         self.step("11b")
 
@@ -611,17 +615,27 @@ class TC_TSTAT_2_2(MatterBaseTest):
             asserts.assert_equal(status, Status.ConstraintError)
 
             # Test Harness Writes the value above MinSetpointDeadBand
-            status = await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(30), endpoint_id=endpoint, expect_success=False)
+            status = await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(128), endpoint_id=endpoint, expect_success=False)
             asserts.assert_equal(status, Status.ConstraintError)
 
         self.step("11c")
 
         if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+
             # Test Harness Writes the min limit of MinSetpointDeadBand
             await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(0), endpoint_id=endpoint)
 
+            # Test Harness Reads it back again to confirm the write of MinSetpointDeadBand attribute is discarded
+            newval = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+            asserts.assert_equal(val, newval)
+
             # Test Harness Writes the max limit of MinSetpointDeadBand
-            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(25), endpoint_id=endpoint)
+            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(127), endpoint_id=endpoint)
+
+            # Test Harness Reads it back again to confirm the write of MinSetpointDeadBand attribute is discarded
+            newval = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+            asserts.assert_equal(val, newval)
 
         self.step("12")
 
