@@ -809,7 +809,7 @@ class AsyncReadTransaction:
                 self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
-        if (self._subscription_handler is not None):
+        if self._subscription_handler is not None:
             self._subscription_handler.OnReportBeginCb(self._subscription_handler)
 
     def _handleReportEnd(self):
