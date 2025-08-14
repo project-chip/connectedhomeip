@@ -317,10 +317,10 @@ fi
 ninja -C "$output_root" python_wheels
 
 # Add wheels from matter_python_wheel_action templates.
-WHEEL=("$OUTPUT_ROOT"/controller/python/matter*.whl)
+WHEEL=("$output_root"/controller/python/matter*.whl)
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)
+WHEEL+=("$output_root"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)
 
 if [ "$install_pytest_deps" = "yes" ]; then
     # Add wheels with YAML testing support.
