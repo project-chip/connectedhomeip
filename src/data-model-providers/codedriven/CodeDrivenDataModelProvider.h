@@ -21,6 +21,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
@@ -60,7 +61,9 @@ namespace app {
 class CodeDrivenDataModelProvider : public DataModel::Provider
 {
 public:
-    CodeDrivenDataModelProvider(PersistentStorageDelegate & delegate) : mPersistentStorageDelegate(delegate) {}
+    CodeDrivenDataModelProvider(PersistentStorageDelegate & storage, AttributePersistenceProvider & attributeStorage) :
+        mPersistentStorageDelegate(storage), mAttributePersistenceProvider(attributeStorage)
+    {}
 
     /* DataModel::Provider implementation */
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
@@ -190,7 +193,9 @@ private:
     EndpointInterfaceRegistry mEndpointInterfaceRegistry;
     ServerClusterInterfaceRegistry mServerClusterRegistry;
     std::optional<ServerClusterContext> mServerClusterContext;
+    std::optional<DataModel::InteractionModelContext> mInteractionModelContext;
     PersistentStorageDelegate & mPersistentStorageDelegate;
+    AttributePersistenceProvider & mAttributePersistenceProvider;
 
     /// Return the interface registered for the given endpoint ID or nullptr if one does not exist
     EndpointInterface * GetEndpointInterface(EndpointId endpointId);

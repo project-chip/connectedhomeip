@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "CodeDrivenDataModelProvider.h"
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
@@ -32,11 +33,14 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
 {
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
 
-    mServerClusterContext.emplace(ServerClusterContext({
-        .provider           = this,
-        .storage            = &mPersistentStorageDelegate,
-        .interactionContext = &this->mContext,
-    }));
+    mInteractionModelContext.emplace(context);
+
+    mServerClusterContext.emplace(ServerClusterContext{
+        .provider           = *this,
+        .storage            = mPersistentStorageDelegate,
+        .attributeStorage   = mAttributePersistenceProvider,
+        .interactionContext = *mInteractionModelContext,
+    });
 
     // Start up all registered server clusters
     bool had_failure = false;
@@ -80,6 +84,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
     }
 
     mServerClusterContext.reset();
+    mInteractionModelContext.reset();
 
     if (had_failure)
     {
@@ -227,12 +232,12 @@ CHIP_ERROR CodeDrivenDataModelProvider::EventInfo(const ConcreteEventPath & path
 
 void CodeDrivenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
-    if (mContext.dataModelChangeListener == nullptr)
+    if (!mInteractionModelContext)
     {
         ChipLogError(DataManagement, "Temporary_ReportAttributeChanged called before provider has been started.");
         return;
     }
-    mContext.dataModelChangeListener->MarkDirty(path);
+    mInteractionModelContext->dataModelChangeListener.MarkDirty(path);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistration & registration)

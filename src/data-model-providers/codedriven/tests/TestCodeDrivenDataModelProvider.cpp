@@ -230,16 +230,17 @@ protected:
     TestEventGenerator mEventGenerator;
     TestActionContext mActionContext;
     DataModel::InteractionModelContext mContext{
-        .eventsGenerator         = &mEventGenerator,
-        .dataModelChangeListener = &mChangeListener,
-        .actionContext           = &mActionContext,
+        .eventsGenerator         = mEventGenerator,
+        .dataModelChangeListener = mChangeListener,
+        .actionContext           = mActionContext,
     };
     chip::Test::TestServerClusterContext mServerClusterTestContext;
     CodeDrivenDataModelProvider mProvider;
     std::vector<std::unique_ptr<SpanEndpoint>> mEndpointStorage;                     // To keep providers alive
     std::vector<std::unique_ptr<EndpointInterfaceRegistration>> mOwnedRegistrations; // To keep registration objects alive
 
-    TestCodeDrivenDataModelProvider() : mProvider(mServerClusterTestContext.StorageDelegate())
+    TestCodeDrivenDataModelProvider() :
+        mProvider(mServerClusterTestContext.StorageDelegate(), mServerClusterTestContext.AttributePersistenceProvider())
     {
         EXPECT_EQ(mProvider.Startup(mContext), CHIP_NO_ERROR);
     }
@@ -490,7 +491,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddAndRemoveEndpoints)
 
 TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     static const ClusterId clientClustersArray[]               = { 0xD001, 0xD002 };
@@ -531,7 +533,8 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithEmptyStaticData)
 
 TEST_F(TestCodeDrivenDataModelProvider, AddClusterFailsIfEndpointExists)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
@@ -551,7 +554,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddClusterFailsIfEndpointExists)
 
 TEST_F(TestCodeDrivenDataModelProvider, AddClusterDoesntStartCluster)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 100), 1, {});
@@ -566,7 +570,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddClusterDoesntStartCluster)
 
 TEST_F(TestCodeDrivenDataModelProvider, AddClusterWithEmptyPathFails)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     MockServerCluster testCluster({}, 1, {});
@@ -576,7 +581,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddClusterWithEmptyPathFails)
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupNotCalledWhenAddingToNonStartedProviderThenCalledOnProviderStartup)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 101), 1, {});
     ASSERT_EQ(testCluster.startupCallCount, 0);
@@ -599,7 +605,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupNotCalledWhenAddingToNonSt
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterFailsIfEndpointExists)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 102), 1, {});
@@ -619,7 +626,8 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterFailsIfEndpointExists)
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterSucceedsIfEndpointRemoved)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 102), 1, {});
@@ -640,7 +648,8 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterSucceedsIfEndpointRemoved)
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownNotCalledWhenRemovingFromNonStartedProvider)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 103), 1, {});
     static ServerClusterRegistration registration(testCluster);
@@ -1010,7 +1019,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddDuplicateEndpointId)
 
 TEST_F(TestCodeDrivenDataModelProvider, AddEndpointStartsClusterWithMultipleEndpoints)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     MockServerCluster testCluster({ { 1, 100 }, { 2, 100 } }, 1, {});
@@ -1035,7 +1045,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddEndpointStartsClusterWithMultipleEndp
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointShutsDownClusterWithMultipleEndpoints)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     MockServerCluster testCluster({ { 1, 100 }, { 2, 100 } }, 1, {});
@@ -1064,7 +1075,8 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointShutsDownClusterWithMultip
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointThenRemoveClusterCallsShutdownOnce)
 {
-    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 102), 1, {});
