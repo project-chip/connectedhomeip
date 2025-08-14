@@ -30,6 +30,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DiagnosticLogs;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
@@ -48,7 +49,7 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 
     if (arrayIndex >= kDiagnosticLogsMaxClusterCount)
     {
-        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
+        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
         return false;
     }
     return true;
@@ -109,7 +110,7 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandH
         return true;
     }
 
-    auto instance = gServers[arrayIndex].Cluster().Instance();
+    auto instance = gServers[arrayIndex].Cluster();
     if (protocol == TransferProtocolEnum::kResponsePayload)
     {
         instance.HandleLogRequestForResponsePayload(commandObj, commandPath, intent);

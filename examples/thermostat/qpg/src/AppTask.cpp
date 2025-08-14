@@ -35,8 +35,8 @@
 #include "qPinCfg.h"
 
 #include "diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h"
-#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 
 using namespace ::chip;
