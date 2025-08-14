@@ -46,6 +46,11 @@ set(SRC_DIRS_LIST
   "${CHIP_ROOT}/examples/platform/esp32/shell_extension"
 )
 
+if (CONFIG_ESP_INSIGHTS_ENABLED AND CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics/insights/")
+    list(APPEND SRC_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics/insights/")
+endif() # CONFIG_ESP_INSIGHTS_ENABLED AND CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
 if(CONFIG_ENABLE_PW_RPC)
   # Append additional directories for RPC build
   set(PRIV_INCLUDE_DIRS_LIST "${PRIV_INCLUDE_DIRS_LIST}"
@@ -77,9 +82,9 @@ chip_configure_data_model(${COMPONENT_LIB}
     ZAP_FILE ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-management-app.zap
 )
 
-if(CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+if (CONFIG_ESP_INSIGHTS_ENABLED AND CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
   target_add_binary_data(${COMPONENT_TARGET} "insights_auth_key.txt" TEXT)
-endif()
+endif() # CONFIG_ESP_INSIGHTS_ENABLED AND CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")

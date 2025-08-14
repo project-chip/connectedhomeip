@@ -58,16 +58,6 @@
 #include <DeviceInfoProviderImpl.h>
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
-#if CONFIG_SEC_CERT_DAC_PROVIDER
-#include <platform/ESP32/ESP32SecureCertDACProvider.h>
-#endif
-
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
-#include <esp_insights.h>
-#include <tracing/esp32_trace/esp32_tracing.h>
-#include <tracing/registry.h>
-#endif
-
 using namespace ::chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -77,10 +67,13 @@ using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
+#include <insights-delegate.h>
+#define START_TIMEOUT_MS 10000
+static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
 extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
-#endif
+
+using namespace chip::Insights;
 
 static const char * TAG = "energy-management-app";
 
@@ -195,6 +188,20 @@ void ApplicationShutdown()
 #endif // CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
 }
 
+static void InitInsights()
+{
+#if CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    chip::Insights::InsightsInitParams initParams = { .diagnosticBuffer     = endUserBuffer,
+                                                      .diagnosticBufferSize = CONFIG_END_USER_BUFFER_SIZE,
+                                                      .authKey              = insights_auth_key_start };
+    InsightsDelegate & insightsDelegate           = InsightsDelegate::GetInstance();
+    CHIP_ERROR error                              = insightsDelegate.Init(initParams);
+    VerifyOrReturn(error == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to initialize ESP Insights"));
+    error = insightsDelegate.StartPeriodicInsights(chip::System::Clock::Timeout(START_TIMEOUT_MS));
+    VerifyOrReturn(error == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to start periodic insights"));
+#endif // CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+}
+
 static void InitServer(intptr_t context)
 {
     // Print QR Code URL
@@ -203,23 +210,7 @@ static void InitServer(intptr_t context)
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND
                             // Initialize device attestation config
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
-    esp_insights_config_t config = {
-        .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
-        .auth_key = insights_auth_key_start,
-    };
-
-    esp_err_t ret = esp_insights_init(&config);
-
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to initialize ESP Insights, err:0x%x", ret);
-    }
-
-    static Tracing::Insights::ESP32Backend backend;
-    Tracing::Register(backend);
-#endif
-
+    InitInsights();
     // Application code should always be initialised after the initialisation of
     // server.
     ApplicationInit();
