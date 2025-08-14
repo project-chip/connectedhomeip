@@ -586,11 +586,11 @@ class SubscriptionTransaction:
 
     @property
     def OnReportBeginCb(self) -> Callable[[SubscriptionTransaction], None]:
-            return self._onReportBeginCb
+        return self._onReportBeginCb
 
     @property
     def OnReportEndCb(self) -> Callable[[SubscriptionTransaction], None]:
-            return self._onReportEndCb
+        return self._onReportEndCb
 
     @property
     def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
