@@ -27,6 +27,7 @@
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/secure_channel/PASESession.h>
 
@@ -836,7 +837,13 @@ void PairingCommand::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t pro
 void PairingCommand::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
 {
     // Ignore nodes with closed commissioning window
-    VerifyOrReturn(nodeData.commissioningMode != 0);
+    VerifyOrReturn(nodeData.commissioningMode != to_underlying(Dnssd::CommissioningMode::kDisabled));
+
+    if (mJCM.ValueOr(false) && nodeData.commissioningMode != to_underlying(Dnssd::CommissioningMode::kEnabledJointFabric))
+    {
+        ChipLogProgress(chipTool, "Skipping device with commissioning mode %u", nodeData.commissioningMode);
+        return; // Skip nodes that do not match the JCM commissioning mode.
+    }
 
     auto & resolutionData = nodeData;
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ClosureControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace CountdownTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CountdownTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -45,10 +47,18 @@ namespace LatchControlModes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LatchControlModes
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    MainState::kMetadataEntry,
+    CurrentErrorList::kMetadataEntry,
+    OverallCurrentState::kMetadataEntry,
+    OverallTargetState::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Stop {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Stop::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

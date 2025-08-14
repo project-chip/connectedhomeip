@@ -758,5 +758,3 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterCommodityTariffPluginServerInitCallback() {}

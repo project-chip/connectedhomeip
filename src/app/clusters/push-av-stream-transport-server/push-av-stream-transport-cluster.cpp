@@ -51,11 +51,6 @@ constexpr CommandId kGeneratedCommands[] = {
     FindTransportResponse::Id,
 };
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    PushAvStreamTransport::Attributes::SupportedFormats::kMetadataEntry,
-    PushAvStreamTransport::Attributes::CurrentConnections::kMetadataEntry,
-};
-
 } // namespace
 
 using Protocols::InteractionModel::Status;
@@ -65,7 +60,7 @@ CHIP_ERROR PushAvStreamTransportServer::Attributes(const ConcreteClusterPath & p
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryAttributes), {});
+    return listBuilder.Append(Span(PushAvStreamTransport::Attributes::kMandatoryMetadata), {}, {});
 }
 
 CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder)
@@ -186,8 +181,3 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Invoke
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterPushAvStreamTransportClusterServerShutdownCallback(chip::EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "Shuting Push AV Stream Transport server cluster on endpoint %d", endpoint);
-}

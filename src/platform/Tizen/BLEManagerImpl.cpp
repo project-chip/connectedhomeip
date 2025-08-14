@@ -834,10 +834,10 @@ void BLEManagerImpl::RemoveConnection(const char * remoteAddr)
     BLEConnection * conn = GetConnection(remoteAddr);
     VerifyOrReturn(conn != nullptr,
                    ChipLogError(DeviceLayer, "Connection does not exist for [%s]", StringOrNullMarker(remoteAddr)));
-
-    NotifyBLEDisconnection(conn);
-
+    // Drop the closed connection from the map.
     mConnectionMap.erase(remoteAddr);
+    // Notify the BLE layer that the connection was closed.
+    NotifyBLEDisconnection(conn);
     // The BLE layer notification above is done asynchronously (it will be processed
     // in the next event loop iteration). So, we can not delete the connection object
     // immediately, because the BLE layer might still use it. Instead, we will also
