@@ -190,12 +190,6 @@ class PersistentStorage:
             self._handle.pychip_Storage_ShutdownAdapter(self._closure)
             self._isActive = False
 
-    @property
-    def jsonData(self) -> Dict:
-        ''' Returns a copy of the internal cached JSON data.
-        '''
-        return copy.deepcopy(self._data)
-
     def __del__(self):
         self.Shutdown()
 
@@ -224,6 +218,12 @@ class PersistentStorageJSON(PersistentStorage):
                 json.dump(self._data, f, ensure_ascii=True, indent=4)
         except Exception as ex:
             LOGGER.critical("Could not save configuration to JSON file: %s", ex)
+
+    @property
+    def jsonData(self) -> Dict:
+        ''' Returns a copy of the internal cached JSON data.
+        '''
+        return copy.deepcopy(self._data)
 
 
 class PersistentStorageINI(PersistentStorage):
