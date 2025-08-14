@@ -94,14 +94,17 @@ Protocols::InteractionModel::Status PushAvStreamManager::ManuallyTriggerTranspor
     const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
 {
     // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
-    for (PushAvStream & stream : pushavStreams)
+    auto it = std::find_if(pushavStreams.begin(), pushavStreams.end(),
+                           [connectionID](const PushAvStream & stream) { return stream.id == connectionID; });
+
+    if (it == pushavStreams.end())
     {
-        if (stream.id == connectionID)
-        {
-            stream.connectionStatus = PushAvStreamTransportStatusEnum::kBusy;
-            ChipLogProgress(Zcl, "Transport triggered for Push AV Stream with ID: %d", connectionID);
-        }
+        ChipLogError(Zcl, "Push AV Stream with ID: %d not found for triggering", connectionID);
+        return Status::NotFound;
     }
+
+    it->connectionStatus = PushAvStreamTransportStatusEnum::kBusy;
+    ChipLogProgress(Zcl, "Transport triggered for Push AV Stream with ID: %d", connectionID);
     return Status::Success;
 }
 
