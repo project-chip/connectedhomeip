@@ -25,6 +25,7 @@
 
 #include <cassert>
 #include <atomic>
+
 namespace chip {
 
 // Span comparison operators
