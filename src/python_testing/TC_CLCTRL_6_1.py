@@ -160,11 +160,11 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         while True:
             remaining = timeout - (time.time() - start_time)
             if remaining <= 0:
-                asserts.fail(f"Timeout waiting for event {event_type}.")
+                asserts.fail(f"Timeout waiting for event {event_type.__name__}.")
             try:
                 event = event_queue.get(block=True, timeout=remaining)
             except queue.Empty:
-                asserts.fail(f"Timeout waiting for event {event_type}.")
+                asserts.fail(f"Timeout waiting for event {event_type.__name__}.")
             if event.Header.EventId == event_type.event_id:
                 logging.info(f"Event {event_type.__name__} received: {event}")
                 return event.Data
