@@ -573,7 +573,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # Wait for the SecureStateChanged event to be emitted
             data = self.wait_for_event_type_and_return_data(
                 event_sub_handler, Clusters.ClosureControl.Events.SecureStateChanged, timeout=timeout)
-            asserts.assert_true(not data.secureValue, f"Unexpected event data: {data.secureValue}")
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
             # STEP 7e: TH sends command MoveTo with Position = MoveToFullyClosed.
             self.step("7e")
@@ -704,7 +704,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # Wait for the SecureStateChanged event to be emitted
             data = self.wait_for_event_type_and_return_data(
                 event_sub_handler, Clusters.ClosureControl.Events.SecureStateChanged, timeout=timeout)
-            asserts.assert_true(not data.secureValue, f"Unexpected event data: {data.secureValue}")
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
         # STEP 9a: If LT feature is not supported on the cluster or PS feature is not supported on the cluster, skip steps 9b to 9l
         self.step("9a")
@@ -818,7 +818,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # Wait for the SecureStateChanged event to be emitted
             data = self.wait_for_event_type_and_return_data(
                 event_sub_handler, Clusters.ClosureControl.Events.SecureStateChanged, timeout=timeout)
-            asserts.assert_true(not data.secureValue, f"Unexpected event data: {data.secureValue}")
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
 
 if __name__ == "__main__":
