@@ -69,6 +69,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Commodity Tariff
     - Joint Fabric Administrator
     - Zone Management
+    - Soil Measurement
     - Basic Information
 
 # We need a more configurable way of deciding which clusters have which init functions....
