@@ -210,6 +210,9 @@ class PersistentStorageJSON(PersistentStorage):
             with open(self._path) as f:
                 LOGGER.info("Loading configuration from JSON file")
                 data = json.loads(f.read() or '{}')
+        except FileNotFoundError:
+            LOGGER.info("Configuration file not found, using empty configuration")
+            data = {}
         except Exception as ex:
             LOGGER.critical("Could not load configuration from JSON file: %s", ex)
             data = {}

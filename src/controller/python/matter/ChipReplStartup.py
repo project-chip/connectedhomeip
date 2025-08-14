@@ -121,9 +121,16 @@ def main():
         "-b", "--ble-controller", metavar="INDEX", type=int, default=0,
         help="BLE controller selector (see example or platform docs for details)")
     parser.add_argument(
-        "-i", "--server-interactions", action="store_false",
+        "-i", "--server-interactions", action="store_true",
         help="enable server interactions")
     args = parser.parse_args()
+
+    if args.chip_tool_common_storage_path or args.chip_tool_fabric_storage_path:
+        if not (args.chip_tool_common_storage_path and args.chip_tool_fabric_storage_path):
+            console.print('''
+[bold red]Error: [/][bold]One must specify both chip-tool common and chip-tool fabric storage paths[/]
+            ''')
+            return
 
     if not os.path.exists(args.trust_store):
         # there is a chance that the script is being run from a sub-path of a checkout.

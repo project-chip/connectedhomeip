@@ -199,7 +199,7 @@ class ChipStack(object):
         # We only shutdown the persistent storage layer AFTER we've shut down the stack,
         # since there is a possibility of interactions with the storage layer during shutdown.
         # TODO: The storage object was passed to the stack during initialization,
-        #       hence, is should not be shut down here.
+        #       maybe it should not be shut down here?
         self._persistentStorage.Shutdown()
 
         # Stack init happens in native, but shutdown happens here unfortunately.
