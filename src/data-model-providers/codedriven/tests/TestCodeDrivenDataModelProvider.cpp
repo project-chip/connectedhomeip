@@ -832,9 +832,15 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
     ConcreteAttributePath path(1, 10, 1);
     mProvider.ListAttributeWriteNotification(path, DataModel::ListWriteOperation::kListWriteSuccess);
     ASSERT_TRUE(testCluster.mLastListWriteOpPath.has_value());
-    EXPECT_EQ(testCluster.mLastListWriteOpPath.value(), path);
+    if (testCluster.mLastListWriteOpPath)
+    {
+        EXPECT_EQ(testCluster.mLastListWriteOpPath.value(), path);
+    }
     ASSERT_TRUE(testCluster.mLastListWriteOpType.has_value());
-    EXPECT_EQ(testCluster.mLastListWriteOpType.value(), DataModel::ListWriteOperation::kListWriteSuccess);
+    if (testCluster.mLastListWriteOpType)
+    {
+        EXPECT_EQ(testCluster.mLastListWriteOpType.value(), DataModel::ListWriteOperation::kListWriteSuccess);
+    }
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
@@ -921,7 +927,10 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
     DataModel::InvokeRequest requestUnsupportedEndpoint = { .path = ConcreteCommandPath(5, 10, 1) };
     auto result                                         = mProvider.InvokeCommand(requestUnsupportedEndpoint, reader, nullptr);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
+    if (result)
+    {
+        EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
+    }
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
@@ -939,7 +948,10 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
     DataModel::InvokeRequest requestUnsupportedCluster = { .path = ConcreteCommandPath(1, 99, 1) };
     auto result                                        = mProvider.InvokeCommand(requestUnsupportedCluster, reader, nullptr);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
+    if (result)
+    {
+        EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
+    }
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, SingleServerClusterInterfaceWithMultipleClustersAndMultipleEndpoints)
