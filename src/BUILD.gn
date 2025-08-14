@@ -88,6 +88,7 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/tests",
       "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
       "${chip_root}/src/srp/tests",
+      "${chip_root}/src/app/clusters/diagnostic-logs-server/tests/",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
