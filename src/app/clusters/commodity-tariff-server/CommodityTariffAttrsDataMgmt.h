@@ -24,10 +24,7 @@
 #include <platform/LockTracker.h>
 
 #include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <type_traits>
-
+#include <atomic>
 namespace chip {
 
 // Span comparison operators
