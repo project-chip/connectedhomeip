@@ -291,6 +291,7 @@ source_set("events") {
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model:data-model",
     "${chip_root}/src/lib/core",
   ]
 }
