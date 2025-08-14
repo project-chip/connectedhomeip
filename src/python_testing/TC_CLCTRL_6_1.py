@@ -35,6 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import queue
 import time
 
 from mobly import asserts
@@ -162,7 +163,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 asserts.fail(f"Timeout waiting for event {event_type}.")
             try:
                 event = event_queue.get(block=True, timeout=remaining)
-            except event_queue.Empty:
+            except queue.Empty:
                 asserts.fail(f"Timeout waiting for event {event_type}.")
             if event.Header.EventId == event_type.event_id:
                 logging.info(f"Event {event_type.__name__} received: {event}")
