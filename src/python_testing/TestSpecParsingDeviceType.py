@@ -23,7 +23,6 @@ from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests, get_supersets
 
 import matter.clusters as Clusters
-from matter.clusters import Attribute
 from matter.testing.conformance import conformance_allowed
 from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
