@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -47,6 +48,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private final long timeout;
 
   private ExecutorService mResolveExecutorService;
+  private ScheduledExecutorService mBackgroundExecutorService;
 
   /**
    * @param context application context
@@ -73,7 +75,10 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
     this.timeout = timeout;
 
-    mResolveExecutorService = Executors.newSingleThreadExecutor();
+    mResolveExecutorService =
+        Executors.newSingleThreadExecutor(new NamedThreadFactory("NsdResolver"));
+    mBackgroundExecutorService =
+        Executors.newScheduledThreadPool(2, new NamedThreadFactory("NsdResolverBackground"));
   }
 
   public NsdManagerServiceResolver(Context context) {
@@ -128,8 +133,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
 
           ScheduledFuture<?> resolveTimeoutExecutor =
-              Executors.newSingleThreadScheduledExecutor()
-                  .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
+              mBackgroundExecutorService.schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
 
           NsdServiceFinderAndResolver serviceFinderResolver =
               new NsdServiceFinderAndResolver(
@@ -140,6 +144,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                   chipMdnsCallback,
                   multicastLock,
                   resolveTimeoutExecutor,
+                  mBackgroundExecutorService,
                   nsdManagerResolverAvailState);
           serviceFinderResolver.start();
         });
