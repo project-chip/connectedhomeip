@@ -20,6 +20,7 @@ namespace ContentControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace Enabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Enabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -65,6 +66,7 @@ constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
 } // namespace Attributes
 
 namespace Commands {
+
 namespace UpdatePIN {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(UpdatePIN::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
