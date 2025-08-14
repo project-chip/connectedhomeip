@@ -43,7 +43,7 @@ from datetime import datetime, timedelta, timezone
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import timeoperations
+from matter.testing import timeoperations
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
