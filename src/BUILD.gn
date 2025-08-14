@@ -96,6 +96,7 @@ if (chip_build_tests) {
       # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
       # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/srp/tests",
+      "${chip_root}/src/app/clusters/diagnostic-logs-server/tests/",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
