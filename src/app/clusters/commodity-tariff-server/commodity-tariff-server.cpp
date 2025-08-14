@@ -831,5 +831,3 @@ void Instance::SetupTimeShiftOffset(uint32_t offset)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterCommodityTariffPluginServerInitCallback() {}
