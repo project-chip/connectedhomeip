@@ -107,9 +107,12 @@ TEST(TestOptionalAttributeSet, TestBitInitAndRestrictions)
 
     {
         using Supported = OptionalAttributeSet<1, 3, 5>;
-        Supported supported(0x8);
+        Supported supported(0x9);
 
-        // Only bits 1,3 and 5 can be set
+        // Only bits 1,3 and 5 can be set, however constructor
+        // explicitly setx 0xD == 0b1101, so bit 3 is set (and bit 2
+        // and bit 0 are not allowed to be set)
+        EXPECT_FALSE(supported.IsSet(0));
         EXPECT_FALSE(supported.IsSet(1));
         EXPECT_FALSE(supported.IsSet(2));
         EXPECT_TRUE(supported.IsSet(3));
