@@ -20,9 +20,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.testing import timeoperations
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing import timeoperations
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
