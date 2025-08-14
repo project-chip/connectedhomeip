@@ -37,9 +37,9 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing import timeoperations
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing import timeoperations
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 

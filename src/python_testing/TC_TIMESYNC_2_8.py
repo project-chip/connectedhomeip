@@ -42,9 +42,9 @@ from datetime import datetime, timedelta, timezone
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing import timeoperations
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
+from matter.testing import timeoperations
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 from matter.tlv import uint
 

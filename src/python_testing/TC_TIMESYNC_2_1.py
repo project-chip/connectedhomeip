@@ -42,8 +42,8 @@ from datetime import timedelta
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing import timeoperations
 from matter.clusters.Types import NullValue
+from matter.testing import timeoperations
 from matter.testing.matter_testing import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster,
                                            run_if_endpoint_matches)
 
