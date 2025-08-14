@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace PressureMeasurement {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 14;
+
 namespace MeasuredValue {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MeasuredValue

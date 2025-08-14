@@ -474,7 +474,11 @@ DeviceCommissioner::DeviceCommissioner() :
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
-{}
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    (void) mPeerAdminJFAdminClusterEndpointId;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+}
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
@@ -1386,7 +1390,7 @@ void DeviceCommissioner::HandleDeviceAttestationCompleted()
     }
     else
     {
-        ChipLogProgress(Controller, "Device attestation failed and no delegate set, failing commissioning");
+        ChipLogError(Controller, "Need to wait for device attestation delegate, but no delegate available. Failing commissioning");
         CommissioningDelegate::CommissioningReport report;
         report.Set<AttestationErrorInfo>(mAttestationResult);
         CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
@@ -3799,6 +3803,16 @@ CHIP_ERROR DeviceController::GetRootPublicKey(Crypto::P256PublicKey & outRootPub
     const auto * fabricTable = GetFabricTable();
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return fabricTable->FetchRootPubkey(mFabricIndex, outRootPublicKey);
+}
+
+bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData)
+{
+    if (nodeData.commissioningMode == to_underlying(Dnssd::CommissioningMode::kDisabled))
+    {
+        ChipLogProgress(Controller, "Discovered device does not have an open commissioning window.");
+        return false;
+    }
+    return true;
 }
 
 } // namespace Controller
