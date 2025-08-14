@@ -1843,12 +1843,15 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     {
         X509_VERIFY_PARAM * param = X509_STORE_CTX_get0_param(verifyCtx);
         chip::ASN1::ASN1UniversalTime asn1Time;
-        char * asn1TimeStr = reinterpret_cast<char *>(X509_getm_notBefore(x509LeafCertificate)->data);
         uint32_t unixEpoch;
 
         VerifyOrExit(param != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
-        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(CharSpan(asn1TimeStr, strlen(asn1TimeStr))),
+        ASN1_TIME * pNotBefore = X509_getm_notBefore(x509LeafCertificate);
+        VerifyOrExit(pNotBefore != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        CharSpan asn1TimeSpan(reinterpret_cast<char *>(pNotBefore->data), pNotBefore->length);
+
+        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(asn1TimeSpan),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
         VerifyOrExit(asn1Time.ExportTo_UnixTime(unixEpoch),
