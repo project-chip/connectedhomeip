@@ -87,6 +87,7 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/pushav-clip-recorder.cpp",
     "${chip_root}/examples/camera-app/linux/src/uploader/pushav-uploader.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-libdatachannel.cpp",
+    "${chip_root}/examples/camera-app/linux/src/pushav-prerollbuffer.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-transport.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
