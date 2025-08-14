@@ -34,8 +34,8 @@ namespace {
 
 struct TestFixedLabelCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
 constexpr size_t kFixedLabelFixedClusterCount = 2;
@@ -50,20 +50,17 @@ public:
 
     DataModel::ActionReturnStatus GetStatus() const { return mStatus; }
 
-    void operator()(chip::app::DataModel::ReadAttributeRequest & request)
+    void operator()(DataModel::ReadAttributeRequest & request)
     {
-        // Create a buffer for encoding
-        chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
+        Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
         ASSERT_NE(buffer.Alloc(1024).Get(), nullptr);
 
-        // Create AttributeReportIBs::Builder for the encoder
-        chip::app::AttributeReportIBs::Builder attributeReportIBsBuilder;
-        chip::TLV::TLVWriter reportWriter;
+        AttributeReportIBs::Builder attributeReportIBsBuilder;
+        TLV::TLVWriter reportWriter;
         reportWriter.Init(buffer.Get(), buffer.AllocatedSize());
         ASSERT_EQ(attributeReportIBsBuilder.Init(&reportWriter), CHIP_NO_ERROR);
 
-        chip::app::AttributeValueEncoder encoder(attributeReportIBsBuilder, chip::Access::SubjectDescriptor{}, request.path,
-                                                 0 /* dataVersion */);
+        AttributeValueEncoder encoder(attributeReportIBsBuilder, Access::SubjectDescriptor{}, request.path, 0 /* dataVersion */);
 
         mStatus = mCluster.ReadAttribute(request, encoder);
     }
@@ -93,7 +90,7 @@ TEST_F(TestFixedLabelCluster, ReadAttributeTest)
     {
         FixedLabelCluster fixedLabel(endpoint);
 
-        chip::app::DataModel::ReadAttributeRequest request;
+        DataModel::ReadAttributeRequest request;
         request.path.mEndpointId  = endpoint;
         request.path.mClusterId   = FixedLabel::Id;
         request.path.mAttributeId = Globals::Attributes::ClusterRevision::Id;
