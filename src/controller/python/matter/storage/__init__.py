@@ -236,6 +236,8 @@ class PersistentStorageINI(PersistentStorage):
             # Set the default section to 'NO-DEFAULT' to treat the default section
             # as a regular section, so other sections will not inherit from it.
             super().__init__(defaults=defaults, default_section='NO-DEFAULT', interpolation=None)
+            # SDK configuration is stored in the 'Default' (mind the case) section.
+            self.add_section('Default')
 
         def optionxform(self, option: str) -> str:
             """Preserves case of keys."""
@@ -253,8 +255,8 @@ class PersistentStorageINI(PersistentStorage):
             config = PersistentStorageINI.ConfigParser()
             LOGGER.info("Loading configuration from INI file: %s", path)
             config.read(path)
-            if config.has_section('DEFAULT'):
-                data['sdk-config'] = dict(config.items('DEFAULT'))
+            if config.has_section('Default'):
+                data['sdk-config'] = dict(config.items('Default'))
             if config.has_section('REPL'):
                 data['repl-config'] = {
                     k: json.loads(v) if v else None
@@ -264,13 +266,13 @@ class PersistentStorageINI(PersistentStorage):
                 # Compatibility layer with chip-tool persistent storage.
                 LOGGER.info("Loading fabric configuration from INI file: %s", chipToolFabricStoragePath)
                 config.read(chipToolFabricStoragePath)
-                if value := config.get('DEFAULT', 'ExampleOpCredsCAKey0', fallback=None):
+                if value := config.get('Default', 'ExampleOpCredsCAKey0', fallback=None):
                     data['sdk-config']['ExampleOpCredsCAKey1'] = value
-                if value := config.get('DEFAULT', 'ExampleOpCredsICAKey0', fallback=None):
+                if value := config.get('Default', 'ExampleOpCredsICAKey0', fallback=None):
                     data['sdk-config']['ExampleOpCredsICAKey1'] = value
-                if value := config.get('DEFAULT', 'ExampleCARootCert0', fallback=None):
+                if value := config.get('Default', 'ExampleCARootCert0', fallback=None):
                     data['sdk-config']['ExampleCARootCert1'] = value
-                if value := config.get('DEFAULT', 'ExampleCAIntermediateCert0', fallback=None):
+                if value := config.get('Default', 'ExampleCAIntermediateCert0', fallback=None):
                     data['sdk-config']['ExampleCAIntermediateCert1'] = value
         except Exception as ex:
             LOGGER.critical("Could not load configuration from INI file: %s", ex)
@@ -283,20 +285,20 @@ class PersistentStorageINI(PersistentStorage):
             # Compatibility layer with chip-tool persistent storage.
             config = PersistentStorageINI.ConfigParser()
             if value := self._data['sdk-config'].pop('ExampleOpCredsCAKey1', None):
-                config['DEFAULT']['ExampleOpCredsCAKey0'] = value
+                config['Default']['ExampleOpCredsCAKey0'] = value
             if value := self._data['sdk-config'].pop('ExampleOpCredsICAKey1', None):
-                config['DEFAULT']['ExampleOpCredsICAKey0'] = value
+                config['Default']['ExampleOpCredsICAKey0'] = value
             if value := self._data['sdk-config'].pop('ExampleCARootCert1', None):
-                config['DEFAULT']['ExampleCARootCert0'] = value
+                config['Default']['ExampleCARootCert0'] = value
             if value := self._data['sdk-config'].pop('ExampleCAIntermediateCert1', None):
-                config['DEFAULT']['ExampleCAIntermediateCert0'] = value
+                config['Default']['ExampleCAIntermediateCert0'] = value
             try:
                 with open(self._chipToolFabricStoragePath, 'w') as f:
                     config.write(f)
             except Exception as ex:
                 LOGGER.critical("Could not save fabric configuration to INI file: %s", ex)
         config = PersistentStorageINI.ConfigParser()
-        config['DEFAULT'] = self._data['sdk-config']
+        config['Default'] = self._data['sdk-config']
         config['REPL'] = {
             k: json.dumps(v, separators=(',', ':'))
             for k, v in self._data['repl-config'].items()

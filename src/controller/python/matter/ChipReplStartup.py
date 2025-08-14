@@ -106,19 +106,19 @@ def main():
     parser.add_argument(
         "-d", "--debug", help="set default logging level to debug", action="store_true")
     parser.add_argument(
-        "-s", "--storage-path", action="store", default="/tmp/repl-storage.json",
+        "-s", "--storage-path", metavar="PATH", action="store", default="/tmp/repl-storage.json",
         help="path to persistent storage configuration file")
     parser.add_argument(
-        "--chip-tool-common-storage-path", action="store", default=None,
+        "--chip-tool-common-storage-path", metavar="PATH", action="store", default=None,
         help="path to chip-tool common persistent storage configuration file (INI format)")
     parser.add_argument(
-        "--chip-tool-fabric-storage-path", action="store", default=None,
+        "--chip-tool-fabric-storage-path", metavar="PATH", action="store", default=None,
         help="path to chip-tool fabric persistent storage configuration file (INI format)")
     parser.add_argument(
-        "-t", "--trust-store", action="store", default="credentials/development/paa-root-certs",
+        "-t", "--trust-store", metavar="PATH", action="store", default="credentials/development/paa-root-certs",
         help="path to the PAA trust store")
     parser.add_argument(
-        "-b", "--ble-controller", type=int, default=0,
+        "-b", "--ble-controller", metavar="INDEX", type=int, default=0,
         help="BLE controller selector (see example or platform docs for details)")
     parser.add_argument(
         "-i", "--server-interactions", action="store_false",
