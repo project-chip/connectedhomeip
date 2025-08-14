@@ -91,7 +91,7 @@ TEST(TestOptionalAttributeSet, TestBitInitAndRestrictions)
         using Supported = OptionalAttributeSet<>;
         Supported supported(0xFF);
 
-        // No bits can be set becasue no bits are supported
+        // No bits can be set because no bits are supported
         EXPECT_FALSE(supported.IsSet(1));
         EXPECT_FALSE(supported.IsSet(2));
     }
