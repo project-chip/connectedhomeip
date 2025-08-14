@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include <CommodityMeteringInstance.h>
+#include <CommodityMeteringMain.h>
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+
 #include <array>
 #include <cstdint>
 #include <vector>
@@ -162,7 +163,7 @@ private:
 
     void SaveAttributes()
     {
-        mInstance = GetInstance();
+        mInstance = GetCommodityMeteringInstance();
         VerifyOrDieWithMsg(mInstance, AppServer, "CommodityMetering instance is null");
         mMaximumMeteredQuantities = mInstance->GetMaximumMeteredQuantities();
         SaveMeteredQuantity(mInstance->GetMeteredQuantity());
