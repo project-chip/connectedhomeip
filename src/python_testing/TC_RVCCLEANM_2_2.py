@@ -38,6 +38,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import enum
+
 from mobly import asserts
 
 import matter.clusters as Clusters

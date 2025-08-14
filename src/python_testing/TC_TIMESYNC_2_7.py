@@ -38,6 +38,7 @@
 import time
 import typing
 from datetime import timedelta
+
 from mobly import asserts
 
 import matter.clusters as Clusters

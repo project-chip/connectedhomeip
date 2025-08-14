@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import typing
+
 from mobly import asserts
 
 import matter.clusters as Clusters
