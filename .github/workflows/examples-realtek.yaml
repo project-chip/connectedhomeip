@@ -60,6 +60,12 @@ jobs:
                       realtek:
                         - '**/realtek/**'
 
+            - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                  gh-context: ${{ toJson(github) }}
+
             - name: Build all rtl8777g examples (Full)
               if: steps.changed_paths.outputs.realtek == 'true' 
               run: |
@@ -73,7 +79,23 @@ jobs:
                       --target realtek-rtl8777g-thermostat \
                       --target realtek-rtl8777g-window \
                       build \
+                      --copy-artifacts-to out/artifacts \
                   "
+                  
+            - name: Get rtl8777g lighting app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    realtek rtl8777g lighting-app \
+                    out/artifacts/realtek-rtl8777g-lighting/chip-rtl8777g-lighting-app \
+                    /tmp/bloat_reports/
+
+            - name: Get rtl8777g light-switch app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    realtek rtl8777g light-switch-app \
+                    out/artifacts/realtek-rtl8777g-lighting/chip-rtl8777g-light-switch-app \
+                    /tmp/bloat_reports/
+
 
             - name: Build subset rtl8777g examples (Subset)
               if: steps.changed_paths.outputs.realtek != 'true'
