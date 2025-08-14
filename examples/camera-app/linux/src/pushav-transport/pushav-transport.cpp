@@ -20,7 +20,8 @@
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct aAudioStreamParams, VideoStreamStruct aVideoStreamParams) :
-    audioStreamParams(aAudioStreamParams), videoStreamParams(aVideoStreamParams)
+    audioStreamParams(aAudioStreamParams),
+    videoStreamParams(aVideoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
@@ -349,7 +350,7 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
     {
         ChipLogProgress(Camera, "PushAVTransport transport status changed to active");
 
-        uploader            = std::make_unique<PushAVUploader>(mCertPath);
+        uploader = std::make_unique<PushAVUploader>(mCertPath);
         uploader->Start();
         InitializeRecorder();
 

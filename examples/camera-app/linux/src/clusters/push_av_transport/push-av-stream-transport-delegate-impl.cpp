@@ -101,7 +101,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     // Get root certificate
     TLSCertificateManagement::Commands::FindRootCertificateResponse::Type rootCertResponse;
     rootCertResponse.CertificateDetails = DataModel::List<TLSCertificateManagement::Structs::TLSCertStruct::Type>();
-    err = tlsCertManager->FindRootCertificate(endpoint.CAID, rootCertResponse);
+    err                                 = tlsCertManager->FindRootCertificate(endpoint.CAID, rootCertResponse);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to find root certificate for CAID %u: %" CHIP_ERROR_FORMAT, endpoint.CAID, err.Format());
@@ -129,7 +129,6 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
             ChipLogError(Camera, "Failed to get private key for CCDID %u", endpoint.CCDID.Value());
             return;
         }
-
     }
     mTransportMap[connectionID].get()->SetTLSCertPath(rootCert, clientCert, mDevKey);
 #else

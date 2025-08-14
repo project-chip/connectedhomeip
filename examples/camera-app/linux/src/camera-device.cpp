@@ -1272,7 +1272,7 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
     return mWebRTCProviderManager;
 }
 
-PushAvStreamTransportDelegate& CameraDevice::GetPushAVDelegate()
+PushAvStreamTransportDelegate & CameraDevice::GetPushAVDelegate()
 {
     return mPushAVTransportManager;
 }
