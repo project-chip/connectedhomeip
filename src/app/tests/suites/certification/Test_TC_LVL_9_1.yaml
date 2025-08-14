@@ -265,7 +265,7 @@ tests:
                 value: G1
 
     - label: "Cleanup: TH sends a RemoveAllGroups command to DUT."
-      PICS: G.S.C03.Rsp
+      PICS: G.S.C04.Rsp
       cluster: "Groups"
       endpoint: endpoint
       command: "RemoveAllGroups"
