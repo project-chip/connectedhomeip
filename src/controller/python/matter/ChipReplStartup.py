@@ -32,6 +32,7 @@ import matter.FabricAdmin
 import matter.logging
 import matter.native
 from matter.ChipStack import ChipStack
+from matter.storage import PersistentStorageJSON
 
 
 def ReplInit(debug):
@@ -158,7 +159,9 @@ or run `os.chdir` to the root of your CHIP repository checkout.
 
     ReplInit(args.debug)
 
-    chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=args.server_interactions)
+    chipStack = ChipStack(
+        PersistentStorageJSON(args.storagepath),
+        enableServerInteractions=args.server_interactions)
     certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()
