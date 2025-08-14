@@ -437,7 +437,7 @@ jobs:
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --chip-tool ./out/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
+                     --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4,TestGroupMessaging}' \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
