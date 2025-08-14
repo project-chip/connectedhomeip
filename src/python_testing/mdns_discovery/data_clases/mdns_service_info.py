@@ -55,7 +55,22 @@ class MdnsServiceInfo(JsonSerializable):
         self.host_ttl = si.host_ttl
         self.other_ttl = si.other_ttl
 
-        if self.service_name and self.service_type and self.service_name.endswith(f".{self.service_type}"):
-            self.instance_name = self.service_name[: -len(self.service_type) - 1]
+        def _strip_dot(s: str | None) -> str:
+            if not s:
+                return ""
+            return s[:-1] if s.endswith(".") else s
+
+        # Normalize names (remove trailing dot for comparisons)
+        name = _strip_dot(self.service_name)
+        stype = _strip_dot(self.service_type)
+
+        # If subtype, use the base service type after "._sub."
+        if "._sub." in stype:
+            stype = stype.split("._sub.", 1)[1]
+
+        # Remove ".<base_service_type>" suffix from the full service name
+        suffix = "." + stype if stype else ""
+        if suffix and name.endswith(suffix):
+            self.instance_name = name[: -len(suffix)]
         else:
-            self.instance_name = self.service_name
+            self.instance_name = name

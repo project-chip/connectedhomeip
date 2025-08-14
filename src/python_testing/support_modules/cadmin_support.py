@@ -25,7 +25,6 @@ from time import sleep
 from typing import Optional
 
 from mdns_discovery import mdns_discovery
-from mdns_discovery.enums.mdns_service_type import MdnsServiceType
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -58,14 +57,6 @@ class CADMINBaseTest(MatterBaseTest):
             attribute=attribute
         )
         return current_fabric_index
-
-    async def get_txt_record(self):
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        comm_service = await discovery.get_commissionable_service(
-            discovery_timeout_sec=240,
-            log_output=False,
-        )
-        return comm_service
 
     async def write_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
         result = await th.WriteAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
@@ -143,22 +134,12 @@ class CADMINBaseTest(MatterBaseTest):
             d_match = self.d == expected_d
             return cm_match and d_match
 
-    async def get_all_txt_records(self):
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        await discovery._discover(
-            discovery_timeout_sec=240,
-            log_output=False,
-            service_types=[MdnsServiceType.COMMISSIONABLE.value]
-        )
-
-        if MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
-            return discovery._discovered_services[MdnsServiceType.COMMISSIONABLE.value]
-        return []
-
     async def wait_for_correct_cm_value(self, expected_cm_value: int, expected_discriminator: int, max_attempts: int = 5, delay_sec: int = 5):
         """Wait for the correct CM value and discriminator in DNS-SD with retries."""
         for attempt in range(max_attempts):
-            raw_services = await self.get_all_txt_records()
+            discovery = mdns_discovery.MdnsDiscovery()
+            raw_services = await discovery.get_commissionable_services(discovery_timeout_sec=240, log_output=True)
+
             services = [self.ParsedService(service) for service in raw_services]
 
             # Look through all services for a match

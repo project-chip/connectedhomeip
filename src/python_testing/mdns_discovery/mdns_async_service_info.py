@@ -20,10 +20,7 @@ from typing import TYPE_CHECKING
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
-from zeroconf._services.info import float_
 from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_AAAA
-
-_AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
 
 
 class MdnsAsyncServiceInfo(ServiceInfo):
@@ -66,61 +63,96 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         addr: str | None = None,
         port: int = _MDNS_PORT,
     ) -> bool:
-        """Returns true if the service could be discovered on the
-        network, and updates this object with details discovered.
+        """Returns true if the service could be discovered on the network, and updates this
+        object with details discovered.
 
-        This override of **zeroconf.ServiceInfo.async_request** disables
-        known-answer caching and clears the cache to ensure a fresh
-        response each time.
+        Custom override of `zeroconf.ServiceInfo.async_request` that prioritizes fresh data.
+
+        Key differences from the base implementation:
+        - Bypasses known-answer caching to force a network query on every call.
+        - Clears the internal cache before querying to prevent stale results.
+        - Allows filtering by specific DNS record types (SRV, TXT, A, AAAA, etc.).
         """
         if not zc.started:
             await zc.async_wait_for_start()
-
-        now = current_time_millis()
-
         if TYPE_CHECKING:
             assert zc.loop is not None
 
-        first_request = True
-        delay = self._get_initial_delay()
-        next_ = now
-        last = now + timeout
+        # Force fresh queries by clearing cache and question history
+        zc.cache.cache.clear()
+        zc.question_history.clear()
+        self.async_clear_cache()
+
+        now = current_time_millis()
+
+        # Absolute cutoff time after which the request stops if incomplete
+        deadline_ms = now + timeout
+
+        # Delay before sending the first retry query if the initial query did not complete
+        initial_delay_ms = _LISTENER_TIME + randint(0, 50)
+
+        # Minimum delay between subsequent QM retries after the first retry,
+        # to prevent duplicate-question suppression by responding devices
+        duplicate_interval_ms = _DUPLICATE_QUESTION_INTERVAL
+
+        # Linger after completion to catch late SRV/TXT/AAAA/A responses
+        # Most devices send these within <200 ms, but we allow extra headroom
+        linger_after_complete_ms = randint(300, 500)
+
+        first_send = True
+        next_send = now
+
+        # Build an outgoing DNS query for the requested record types
+        def build_outgoing(as_qu: bool) -> DNSOutgoing:
+            out = DNSOutgoing(_FLAGS_QR_QUERY)
+            for rtype in self._query_record_types:
+                q = DNSQuestion(self._name, rtype, _CLASS_IN)
+                q.unicast = as_qu
+                out.add_question(q)
+            return out
+
         try:
-            self.async_clear_cache()
             zc.async_add_listener(self, None)
+            use_qu_first = (question_type in (None, DNSQuestionType.QU))
+
             while not self._is_complete:
-                if last <= now:
-                    return False
-                if next_ <= now:
-                    this_question_type = question_type or DNSQuestionType.QU if first_request else DNSQuestionType.QM
-                    first_request = False
-
-                    # Prepare outgoing mDNS query message with
-                    # single or multiple record types
-                    out = DNSOutgoing(_FLAGS_QR_QUERY)
-                    for record_type in self._query_record_types:
-                        question = DNSQuestion(self._name, record_type, _CLASS_IN)
-                        question.unicast = question_type is DNSQuestionType.QU
-                        out.add_question(question)
-
-                    # Send the query to the specified address and port.
-                    zc.async_send(out, addr, port)
-
-                    next_ = now + delay
-                    next_ += randint(*_AVOID_SYNC_DELAY_RANDOM_INTERVAL)
-
-                    if this_question_type is DNSQuestionType.QM and delay < _DUPLICATE_QUESTION_INTERVAL:
-                        delay = _DUPLICATE_QUESTION_INTERVAL
-
-                await self.async_wait(min(next_, last) - now, zc.loop)
                 now = current_time_millis()
+
+                # Deadline reached before record was found
+                if now >= deadline_ms:
+                    return False
+
+                if now >= next_send:
+                    # If this is the first cycle and QU is allowed, send a unicast-preferred query first.
+                    if use_qu_first:
+                        zc.async_send(build_outgoing(as_qu=True), addr, port)
+                        use_qu_first = False
+                    # Always send the multicast (QM) query to reach all possible responders.
+                    zc.async_send(build_outgoing(as_qu=False), addr, port)
+
+                if first_send:
+                    # First retry: wait the shorter initial delay before sending again.
+                    next_send = now + initial_delay_ms
+                    first_send = False
+                else:
+                    # Subsequent retries: wait at least the duplicate-question interval
+                    # to avoid suppression by responders, plus a small random offset.
+                    next_send = now + max(duplicate_interval_ms, initial_delay_ms + randint(0, 100))
+
+                # Sleep until the next scheduled send time or the overall deadline,
+                # whichever occurs first. Clamp to 0 to avoid negative waits.
+                await self.async_wait(max(0, min(next_send, deadline_ms) - now), zc.loop)
+
+            # After exiting the query loop, wait briefly to passively
+            # catch any late TXT/SRV/AAAA/A responses.
+            remaining = max(0, min(linger_after_complete_ms, (deadline_ms - current_time_millis())))
+            if remaining:
+                await self.async_wait(remaining, zc.loop)
+
+            return True
+
         finally:
             zc.async_remove_listener(self)
-
-        return True
-
-    def _get_initial_delay(self) -> float_:
-        return _LISTENER_TIME
 
 
 class AddressResolverIPv6(MdnsAsyncServiceInfo):
