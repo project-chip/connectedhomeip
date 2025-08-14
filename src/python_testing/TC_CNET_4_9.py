@@ -27,7 +27,6 @@ from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_mat
                                            matchers)
 
 
-
 class TC_CNET_4_9(MatterBaseTest):
     """
     [TC-CNET-4.9] [Wi-Fi] Verification for RemoveNetwork Command [DUT-Server].
