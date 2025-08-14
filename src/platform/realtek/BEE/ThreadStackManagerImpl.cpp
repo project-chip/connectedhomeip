@@ -40,14 +40,16 @@
 #include <platform/ThreadStackManager.h>
 #include <platforms/openthread-system.h>
 
+#if DLPS_EN
 #ifdef __cplusplus
 extern "C" {
 #endif
- 
+
 void BEE_RadioExternalWakeup(void);
- 
+
 #ifdef __cplusplus
 }
+#endif
 #endif
 
 extern void otSysInit(int argc, char * argv[]);
@@ -67,8 +69,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 void ThreadStackManagerImpl::_LockThreadStack(void)
 {
     xSemaphoreTake(sInstance.mThreadStackLock, portMAX_DELAY);
-#if DLPS_EN   
-     ChipLogProgress(DeviceLayer, "_LockThreadStack tyrone");
+#if DLPS_EN
     BEE_RadioExternalWakeup();
 #endif
 }
