@@ -102,20 +102,21 @@ def mattersetdebug(enableDebugMode: bool = True):
 def main():
     console = Console()
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        "-p", "--storagepath",
-        help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)",
-        action="store",
-        default="/tmp/repl-storage.json")
+        "-d", "--debug", help="set default logging level to debug", action="store_true")
     parser.add_argument(
-        "-d", "--debug", help="Set default logging level to debug.", action="store_true")
+        "-s", "--storage-path", action="store", default="/tmp/repl-storage.json",
+        help="path to persistent storage configuration file")
     parser.add_argument(
-        "-t", "--trust-store", help="Path to the PAA trust store.", action="store", default="./credentials/development/paa-root-certs")
+        "-t", "--trust-store", action="store", default="credentials/development/paa-root-certs",
+        help="path to the PAA trust store")
     parser.add_argument(
-        "-b", "--ble-controller", help="BLE controller selector, see example or platform docs for details", type=int, default=None)
+        "-b", "--ble-controller", type=int, default=0,
+        help="BLE controller selector (see example or platform docs for details)")
     parser.add_argument(
-        "-s", "--server-interactions", help="Enable server interactions.", action="store_true")
+        "-i", "--server-interactions", action="store_false",
+        help="enable server interactions")
     args = parser.parse_args()
 
     if not os.path.exists(args.trust_store):
@@ -160,7 +161,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
     ReplInit(args.debug)
 
     chipStack = ChipStack(
-        PersistentStorageJSON(args.storagepath),
+        PersistentStorageJSON(args.storage_path),
         enableServerInteractions=args.server_interactions)
     certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
