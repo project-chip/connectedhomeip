@@ -342,6 +342,9 @@ CHIP_ERROR GenericThreadDriver::DisconnectFromNetwork()
 {
     if (ThreadStackMgrImpl().IsThreadProvisioned())
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+        ThreadStackMgrImpl().ClearAllSrpHostAndServices();
+#endif
         Thread::OperationalDataset emptyNetwork = {};
         // Attach to an empty network will disconnect the driver.
         ReturnErrorOnFailure(ThreadStackMgrImpl().AttachToThreadNetwork(emptyNetwork, nullptr));
