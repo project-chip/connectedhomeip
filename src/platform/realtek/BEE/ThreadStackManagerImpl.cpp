@@ -40,6 +40,16 @@
 #include <platform/ThreadStackManager.h>
 #include <platforms/openthread-system.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+ 
+void BEE_RadioExternalWakeup(void);
+ 
+#ifdef __cplusplus
+}
+#endif
+
 extern void otSysInit(int argc, char * argv[]);
 
 namespace chip {
@@ -52,6 +62,22 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
     return InitThreadStack(NULL);
+}
+
+void ThreadStackManagerImpl::_LockThreadStack(void)
+{
+    xSemaphoreTake(sInstance.mThreadStackLock, portMAX_DELAY);
+    BEE_RadioExternalWakeup();
+}
+
+bool ThreadStackManagerImpl::_TryLockThreadStack(void)
+{
+    return xSemaphoreTake(sInstance.mThreadStackLock, 0) == pdTRUE;
+}
+
+void ThreadStackManagerImpl::_UnlockThreadStack(void)
+{
+    xSemaphoreGive(sInstance.mThreadStackLock);
 }
 
 CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
