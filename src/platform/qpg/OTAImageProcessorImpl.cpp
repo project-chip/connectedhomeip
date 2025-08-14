@@ -234,6 +234,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     if (result != qvOta_StatusSuccess)
     {
         ChipLogError(SoftwareUpdate, "Failed to finalize download");
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INTERNAL);
         return;
     }
 }
@@ -296,6 +297,11 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         {
             ChipLogError(SoftwareUpdate, "Invalid argument during block processing");
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "Unknown error during block processing: %d", result);
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INTERNAL);
         }
         return;
     }
