@@ -47,15 +47,10 @@ TEST_F(TestEthernetDiagnosticsCluster, CompileTest)
     {
     };
 
-    const EthernetDiagnosticsEnabledAttributes enabledAttributes{
-        .enableCarrierDetect  = false,
-        .enableFullDuplex     = false,
-        .enablePHYRate        = false,
-        .enableTimeSinceReset = false,
-    };
+    const EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet;
 
     NullProvider nullProvider;
-    EthernetDiagnosticsServerCluster cluster(nullProvider, {}, enabledAttributes);
+    EthernetDiagnosticsServerCluster cluster(nullProvider, {}, optionalAttributeSet);
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, EthernetNetworkDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -68,15 +63,11 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         class NullProvider : public DeviceLayer::DiagnosticDataProvider
         {
         };
-        const EthernetDiagnosticsEnabledAttributes enabledAttributes{
-            .enableCarrierDetect  = false,
-            .enableFullDuplex     = false,
-            .enablePHYRate        = false,
-            .enableTimeSinceReset = false,
-        };
+
+        const EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet;
 
         NullProvider nullProvider;
-        EthernetDiagnosticsServerCluster cluster(nullProvider, {}, enabledAttributes);
+        EthernetDiagnosticsServerCluster cluster(nullProvider, {}, optionalAttributeSet);
 
         // without any enabled attributes, no commands are accepted
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
@@ -104,17 +95,16 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
             }
         };
 
-        const EthernetDiagnosticsEnabledAttributes enabledAttributes{
-            .enableCarrierDetect  = false,
-            .enableFullDuplex     = false,
-            .enablePHYRate        = false,
-            .enableTimeSinceReset = false,
-        };
+        const EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet =
+            EthernetDiagnosticsServerCluster::OptionalAttributeSet()
+                .Set<EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id>();
 
         ResetCountsProvider resetCountsProvider;
         EthernetDiagnosticsServerCluster cluster(
             resetCountsProvider,
-            BitFlags<EthernetNetworkDiagnostics::Feature>{ EthernetNetworkDiagnostics::Feature::kPacketCounts }, enabledAttributes);
+            BitFlags<EthernetNetworkDiagnostics::Feature>{ EthernetNetworkDiagnostics::Feature::kPacketCounts },
+            optionalAttributeSet);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
@@ -191,17 +181,22 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
             }
         };
 
-        const EthernetDiagnosticsEnabledAttributes enabledAttributes{
-            .enableCarrierDetect  = true,
-            .enableFullDuplex     = true,
-            .enablePHYRate        = true,
-            .enableTimeSinceReset = true,
-        };
+        const EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet =
+            EthernetDiagnosticsServerCluster::OptionalAttributeSet()
+                .Set<EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::FullDuplex::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::PHYRate::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::TxErrCount::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::CollisionCount::Id>()
+                .Set<EthernetNetworkDiagnostics::Attributes::OverrunCount::Id>();
 
         AllProvider allProvider;
         EthernetDiagnosticsServerCluster cluster(
             allProvider, { EthernetNetworkDiagnostics::Feature::kPacketCounts, EthernetNetworkDiagnostics::Feature::kErrorCounts },
-            enabledAttributes);
+            optionalAttributeSet);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
