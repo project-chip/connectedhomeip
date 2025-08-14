@@ -28,11 +28,9 @@ from ..native import GetLibraryHandle
 
 LOGGER = logging.getLogger(__name__)
 
-_SyncSetKeyValueCbFunct = CFUNCTYPE(
-    None, py_object, c_char_p, POINTER(c_char),  c_uint16)
-_SyncGetKeyValueCbFunct = CFUNCTYPE(
-    None, py_object, c_char_p, POINTER(c_char), POINTER(c_uint16), POINTER(c_bool))
-_SyncDeleteKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p)
+_SetKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char),  c_uint16)
+_GetKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char), POINTER(c_uint16), POINTER(c_bool))
+_DeleteKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p)
 
 
 class PersistentStorage:
@@ -53,12 +51,12 @@ class PersistentStorage:
         Object must be resident before the Matter stack starts up and last past its shutdown.
     '''
 
-    @_SyncSetKeyValueCbFunct
-    def _OnSyncSetKeyValueCb(self, key: bytes, value, size):
+    @_SetKeyValueCbFunc
+    def _OnSetKeyValueCb(self, key: bytes, value, size):
         self.SetSdkKey(key.decode("utf-8"), ctypes.string_at(value, size))
 
-    @_SyncGetKeyValueCbFunct
-    def _OnSyncGetKeyValueCb(self, key: bytes, value, size, is_found):
+    @_GetKeyValueCbFunc
+    def _OnGetKeyValueCb(self, key: bytes, value, size, is_found):
         ''' This does not adhere to the API requirements of
         PersistentStorageDelegate::SyncGetKeyValue, but that is okay since
         the C++ storage binding layer is capable of adapting results from
@@ -88,8 +86,8 @@ class PersistentStorage:
             is_found[0] = False
             size[0] = 0
 
-    @_SyncDeleteKeyValueCbFunct
-    def _OnSyncDeleteKeyValueCb(self, key):
+    @_DeleteKeyValueCbFunc
+    def _OnDeleteKeyValueCb(self, key):
         self.DeleteSdkKey(key.decode("utf-8"))
 
     def __init__(self, data: Dict = {}):
@@ -109,11 +107,11 @@ class PersistentStorage:
 
         self._handle.pychip_Storage_InitializeStorageAdapter.restype = c_void_p
         self._handle.pychip_Storage_InitializeStorageAdapter.argtypes = [ctypes.py_object,
-                                                                         _SyncSetKeyValueCbFunct,
-                                                                         _SyncGetKeyValueCbFunct,
-                                                                         _SyncDeleteKeyValueCbFunct]
+                                                                         _SetKeyValueCbFunc,
+                                                                         _GetKeyValueCbFunc,
+                                                                         _DeleteKeyValueCbFunc]
         self._closure = self._handle.pychip_Storage_InitializeStorageAdapter(
-            ctypes.py_object(self), self._OnSyncSetKeyValueCb, self._OnSyncGetKeyValueCb, self._OnSyncDeleteKeyValueCb)
+            ctypes.py_object(self), self._OnSetKeyValueCb, self._OnGetKeyValueCb, self._OnDeleteKeyValueCb)
 
     def GetSdkStorageObject(self):
         ''' Returns a ctypes c_void_p reference to the SDK-side adapter instance.
