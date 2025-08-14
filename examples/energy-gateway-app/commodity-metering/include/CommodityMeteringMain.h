@@ -20,12 +20,28 @@
 
 #include <app/clusters/commodity-metering-server/commodity-metering-server.h>
 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
+#include <lib/support/CodeUtils.h>
+
+CHIP_ERROR CommodityMeteringInit(chip::EndpointId endpointId);
+CHIP_ERROR CommodityMeteringShutdown();
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityMetering {
 
-Instance * GetInstance();
+/** @brief Helper function to return the singleton CommodityMeteringInstance instance
+ *
+ * This is needed to support TestEventTriggers which are called outside of any
+ * class context. This allows the Delegate instance in which to invoke the test
+ * events on.
+ *
+ * This function is typically found in main.cpp or wherever the singleton is created.
+ */
+Instance * GetCommodityMeteringInstance();
 
 } // namespace CommodityMetering
 } // namespace Clusters
