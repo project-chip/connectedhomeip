@@ -644,7 +644,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
             root = ElementTree.parse(file).getroot()
             add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
 
-    # For now we assume even a single XML means the directory was probaly OK
+    # For now we assume even a single XML means the directory was probably OK
     # we may increase this later as most our data model directories are larger
     #
     # Intent here is to make user aware of typos in paths instead of silently having
@@ -870,6 +870,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     location = DeviceTypePathLocation(device_type_id=id)
                     problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                     severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
+                    continue
                 # Workaround for 1.3 device types with zigbee clusters and old scenes
                 # This is OK because there are other tests that ensure that unknown clusters do not appear on the device
                 if cid not in cluster_definition_xml:
@@ -967,7 +968,11 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
     if not cluster_definition_xml:
-        cluster_definition_xml, _ = build_xml_clusters(data_model_directory)
+        cluster_dir = data_model_directory
+        if not isinstance(data_model_directory, PrebuiltDataModelDirectory):
+            # Transform this into the cluster directory
+            cluster_dir = data_model_directory.joinpath('..', 'clusters')
+        cluster_definition_xml, _ = build_xml_clusters(cluster_dir)
 
     found_xmls = 0
 

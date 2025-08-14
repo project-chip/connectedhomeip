@@ -44,10 +44,11 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         print(f"-------------- Testing against spec revision {revision.dirname}")
         self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(revision)
         self.xml_device_types, self.xml_device_types_problems = build_xml_device_types(revision)
-        # Let's just build a dictionary of device types to IDs becasue I need them and we don't have codegen
+        # Let's just build a dictionary of device types to IDs because I need them and we don't have codegen
         self.dt_ids = {re.sub('[ -/]*', '', dt.name.lower()): id for id, dt in self.xml_device_types.items()}
 
     # This just tests that the prebuilt specs can be parsed without failures
+
     @run_against_all_spec_revisions
     def test_spec_device_parsing(self):
         for id, d in self.xml_device_types.items():
