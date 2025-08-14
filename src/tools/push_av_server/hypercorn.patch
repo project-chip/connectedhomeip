@@ -1,6 +1,6 @@
-diff --color -bur lib/python3.9/site-packages/hypercorn/asyncio/tcp_server.py lib/python3.9/site-packages/hypercorn.patched/asyncio/tcp_server.py
---- lib/python3.9/site-packages/hypercorn/asyncio/tcp_server.py     2025-06-02 09:30:41
-+++ lib/python3.9/site-packages/hypercorn.patched/asyncio/tcp_server.py     2025-05-29 16:50:34
+diff --color -bur hypercorn/asyncio/tcp_server.py hypercorn.patched/asyncio/tcp_server.py
+--- hypercorn/asyncio/tcp_server.py     2025-06-02 09:30:41
++++ hypercorn.patched/asyncio/tcp_server.py     2025-05-29 16:50:34
 @@ -47,11 +47,16 @@
              server = parse_socket_addr(socket.family, socket.getsockname())
              ssl_object = self.writer.get_extra_info("ssl_object")
@@ -20,9 +20,9 @@ diff --color -bur lib/python3.9/site-packages/hypercorn/asyncio/tcp_server.py li
  
              async with TaskGroup(self.loop) as task_group:
                  self._task_group = task_group
-diff --color -bur lib/python3.9/site-packages/hypercorn/protocol/__init__.py lib/python3.9/site-packages/hypercorn.patched/protocol/__init__.py
---- lib/python3.9/site-packages/hypercorn/protocol/__init__.py      2025-06-02 09:30:41
-+++ lib/python3.9/site-packages/hypercorn.patched/protocol/__init__.py      2025-05-29 16:50:42
+diff --color -bur hypercorn/protocol/__init__.py hypercorn.patched/protocol/__init__.py
+--- hypercorn/protocol/__init__.py      2025-06-02 09:30:41
++++ hypercorn.patched/protocol/__init__.py      2025-05-29 16:50:42
 @@ -17,7 +17,7 @@
          context: WorkerContext,
          task_group: TaskGroup,
@@ -32,9 +32,9 @@ diff --color -bur lib/python3.9/site-packages/hypercorn/protocol/__init__.py lib
          client: Optional[Tuple[str, int]],
          server: Optional[Tuple[str, int]],
          send: Callable[[Event], Awaitable[None]],
-diff --color -bur lib/python3.9/site-packages/hypercorn/protocol/h2.py lib/python3.9/site-packages/hypercorn.patched/protocol/h2.py
---- lib/python3.9/site-packages/hypercorn/protocol/h2.py    2025-06-02 09:30:41
-+++ lib/python3.9/site-packages/hypercorn.patched/protocol/h2.py    2025-05-29 16:50:57
+diff --color -bur hypercorn/protocol/h2.py hypercorn.patched/protocol/h2.py
+--- hypercorn/protocol/h2.py    2025-06-02 09:30:41
++++ hypercorn.patched/protocol/h2.py    2025-05-29 16:50:57
 @@ -86,7 +86,7 @@
          context: WorkerContext,
          task_group: TaskGroup,
@@ -44,9 +44,9 @@ diff --color -bur lib/python3.9/site-packages/hypercorn/protocol/h2.py lib/pytho
          client: Optional[Tuple[str, int]],
          server: Optional[Tuple[str, int]],
          send: Callable[[Event], Awaitable[None]],
-diff --color -bur lib/python3.9/site-packages/hypercorn/protocol/http_stream.py lib/python3.9/site-packages/hypercorn.patched/protocol/http_stream.py
---- lib/python3.9/site-packages/hypercorn/protocol/http_stream.py   2025-06-02 09:30:41
-+++ lib/python3.9/site-packages/hypercorn.patched/protocol/http_stream.py   2025-05-29 16:51:17
+diff --color -bur hypercorn/protocol/http_stream.py hypercorn.patched/protocol/http_stream.py
+--- hypercorn/protocol/http_stream.py   2025-06-02 09:30:41
++++ hypercorn.patched/protocol/http_stream.py   2025-05-29 16:51:17
 @@ -53,7 +53,7 @@
          config: Config,
          context: WorkerContext,

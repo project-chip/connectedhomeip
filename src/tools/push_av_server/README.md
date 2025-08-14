@@ -22,7 +22,7 @@ running the server. This is done with the following command (assuming it is run
 from a shell with virtual env enabled):
 
 ```sh
-$ patch -d $VIRTUAL_ENV < src/tools/push_av_server/hypercorn.patch
+$ patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") < src/tools/push_av_server/hypercorn.patch
 ```
 
 ## Example
