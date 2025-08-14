@@ -49,6 +49,15 @@ public:
         ///
         /// When this is called, the caller has ensured that the endpointID was valid, that optionalAttributeBits are loaded
         /// from ember according to supported attributes and that the feature map for the underlying cluster ID has been loaded.
+        ///
+        /// NOTE: optionalAttributeBits is intended for low id attributes since it supports attribute bits up to 31 only. It is
+        ///       intended for use with `OptionalAttributeSet` and NOT all clusters support this. Specific examples:
+        ///        - LevelControl::StartupCurrentLevel has ID 0x4000
+        ///        - OnOff attributes GlobalSceneControl, OnTime, OffWaitTime, StartupOnOff have ID >= 0x4000
+        ///        - ColorControl, Thermostat and DoorLock have many attributes with high ID as well
+        ///
+        /// Use optionalAttributes only if its usage makes sense for the cluster. In many instances it does,
+        /// however it is not a generic rule. Usage of it must be double-checked as sufficient.
         virtual ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned zeroBasedArrayIndex,
                                                                uint32_t optionalAttributeBits, uint32_t featureMap) = 0;
 

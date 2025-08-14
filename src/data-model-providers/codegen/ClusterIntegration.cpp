@@ -79,6 +79,18 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
         LoadFeatureMap(options.endpointId, options.clusterId, featureMap);
     }
 
+
+    // NOTE: we fetch low ID attributes only here as a convenience/speedup for the very frequent cluster case
+    //       where attributes are few and with low IDS.
+    //
+    // This is NOT a general rule. Specific examples are:
+    //   - LevelControl::StartupCurrentLevel has ID 0x4000
+    //   - OnOff has several: GlobalSceneControl, OnTime, OffWaitTime, StartupOnOff with id >= 0x4000
+    //   - Thermostat and DoorLock have more than 32 attributes in general
+    //   - ColorControl has a lot of high-ID attributes
+    //
+    // The above examples however are few compared to the large number of clusters tha matter supports,
+    // so this optimization is considered worth it at this time.
     uint32_t optionalAttributes = 0;
     if (options.fetchOptionalAttributes)
     {
