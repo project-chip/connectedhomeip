@@ -32,7 +32,7 @@ import matter.FabricAdmin
 import matter.logging
 import matter.native
 from matter.ChipStack import ChipStack
-from matter.storage import PersistentStorageJSON
+from matter.storage import PersistentStorageINI, PersistentStorageJSON
 
 
 def ReplInit(debug):
@@ -109,6 +109,12 @@ def main():
         "-s", "--storage-path", action="store", default="/tmp/repl-storage.json",
         help="path to persistent storage configuration file")
     parser.add_argument(
+        "--chip-tool-common-storage-path", action="store", default=None,
+        help="path to chip-tool common persistent storage configuration file (INI format)")
+    parser.add_argument(
+        "--chip-tool-fabric-storage-path", action="store", default=None,
+        help="path to chip-tool fabric persistent storage configuration file (INI format)")
+    parser.add_argument(
         "-t", "--trust-store", action="store", default="credentials/development/paa-root-certs",
         help="path to the PAA trust store")
     parser.add_argument(
@@ -160,9 +166,12 @@ or run `os.chdir` to the root of your CHIP repository checkout.
 
     ReplInit(args.debug)
 
-    chipStack = ChipStack(
-        PersistentStorageJSON(args.storage_path),
-        enableServerInteractions=args.server_interactions)
+    if args.chip_tool_common_storage_path and args.chip_tool_fabric_storage_path:
+        storage = PersistentStorageINI(args.chip_tool_common_storage_path, args.chip_tool_fabric_storage_path)
+    else:
+        storage = PersistentStorageJSON(args.storage_path)
+
+    chipStack = ChipStack(storage, enableServerInteractions=args.server_interactions)
     certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()
