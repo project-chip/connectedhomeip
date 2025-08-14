@@ -266,14 +266,14 @@ class PersistentStorageINI(PersistentStorage):
                 # Compatibility layer with chip-tool persistent storage.
                 LOGGER.info("Loading fabric configuration from INI file: %s", chipToolFabricStoragePath)
                 config.read(chipToolFabricStoragePath)
+                if value := config.get('Default', 'ExampleCAIntermediateCert0', fallback=None):
+                    data['sdk-config']['ExampleCAIntermediateCert1'] = value
+                if value := config.get('Default', 'ExampleCARootCert0', fallback=None):
+                    data['sdk-config']['ExampleCARootCert1'] = value
                 if value := config.get('Default', 'ExampleOpCredsCAKey0', fallback=None):
                     data['sdk-config']['ExampleOpCredsCAKey1'] = value
                 if value := config.get('Default', 'ExampleOpCredsICAKey0', fallback=None):
                     data['sdk-config']['ExampleOpCredsICAKey1'] = value
-                if value := config.get('Default', 'ExampleCARootCert0', fallback=None):
-                    data['sdk-config']['ExampleCARootCert1'] = value
-                if value := config.get('Default', 'ExampleCAIntermediateCert0', fallback=None):
-                    data['sdk-config']['ExampleCAIntermediateCert1'] = value
         except Exception as ex:
             LOGGER.critical("Could not load configuration from INI file: %s", ex)
         self._path = path
@@ -281,24 +281,26 @@ class PersistentStorageINI(PersistentStorage):
         super().__init__(data)
 
     def Commit(self):
+        # Get a copy of the SDK configuration so that we can modify it.
+        sdkConfig = self._data['sdk-config'].copy()
         if self._chipToolFabricStoragePath:
             # Compatibility layer with chip-tool persistent storage.
-            config = PersistentStorageINI.ConfigParser()
-            if value := self._data['sdk-config'].pop('ExampleOpCredsCAKey1', None):
-                config['Default']['ExampleOpCredsCAKey0'] = value
-            if value := self._data['sdk-config'].pop('ExampleOpCredsICAKey1', None):
-                config['Default']['ExampleOpCredsICAKey0'] = value
-            if value := self._data['sdk-config'].pop('ExampleCARootCert1', None):
-                config['Default']['ExampleCARootCert0'] = value
-            if value := self._data['sdk-config'].pop('ExampleCAIntermediateCert1', None):
-                config['Default']['ExampleCAIntermediateCert0'] = value
+            configFabric = PersistentStorageINI.ConfigParser()
+            if value := sdkConfig.pop('ExampleCAIntermediateCert1', None):
+                configFabric['Default']['ExampleCAIntermediateCert0'] = value
+            if value := sdkConfig.pop('ExampleCARootCert1', None):
+                configFabric['Default']['ExampleCARootCert0'] = value
+            if value := sdkConfig.pop('ExampleOpCredsCAKey1', None):
+                configFabric['Default']['ExampleOpCredsCAKey0'] = value
+            if value := sdkConfig.pop('ExampleOpCredsICAKey1', None):
+                configFabric['Default']['ExampleOpCredsICAKey0'] = value
             try:
                 with open(self._chipToolFabricStoragePath, 'w') as f:
-                    config.write(f)
+                    configFabric.write(f)
             except Exception as ex:
                 LOGGER.critical("Could not save fabric configuration to INI file: %s", ex)
         config = PersistentStorageINI.ConfigParser()
-        config['Default'] = self._data['sdk-config']
+        config['Default'] = sdkConfig
         config['REPL'] = {
             k: json.dumps(v, separators=(',', ':'))
             for k, v in self._data['repl-config'].items()
