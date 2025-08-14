@@ -67,7 +67,10 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 void ThreadStackManagerImpl::_LockThreadStack(void)
 {
     xSemaphoreTake(sInstance.mThreadStackLock, portMAX_DELAY);
+#if DLPS_EN   
+     ChipLogProgress(DeviceLayer, "_LockThreadStack tyrone");
     BEE_RadioExternalWakeup();
+#endif
 }
 
 bool ThreadStackManagerImpl::_TryLockThreadStack(void)
