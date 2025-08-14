@@ -1173,7 +1173,6 @@ CameraError CameraDevice::SetZoom(uint8_t aZoom)
     return CameraError::SUCCESS;
 }
 
-<<<<<<< HEAD
 CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)
 {
     mDetectionSensitivity = aSensitivity;
@@ -1208,10 +1207,7 @@ void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
     mZoneManager.OnZoneStoppedEvent(zoneID, ZoneEventStoppedReasonEnum::kActionStopped);
 }
 
-VideoStreamStruct CameraDevice::InitializeVideoStreams()
-=======
 void CameraDevice::InitializeVideoStreams()
->>>>>>> 41c4d9b54a (Implemented delegate API)
 {
     // Create single video stream with typical supported parameters
     VideoStream videoStream = { { 1 /* Id */,
