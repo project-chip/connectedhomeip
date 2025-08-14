@@ -65,6 +65,7 @@ import secrets
 import struct
 import tempfile
 import time
+
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator

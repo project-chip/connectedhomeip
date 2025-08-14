@@ -34,14 +34,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 from typing import Union
+
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches,
-                                           matchers)
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, matchers,
+                                           run_if_endpoint_matches)
 from matter.tlv import uint
 
 
