@@ -29,8 +29,8 @@ using namespace chip::app::Clusters::FixedLabel::Attributes;
 
 namespace {
 
-static constexpr size_t kFixedLabelFixedClusterCount = FixedLabel::StaticApplicationConfig::kFixedClusterConfig.size();
-static constexpr size_t kFixedLabelMaxClusterCount   = kFixedLabelFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kFixedLabelFixedClusterCount = FixedLabel::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kFixedLabelMaxClusterCount   = kFixedLabelFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<FixedLabelCluster> gServers[kFixedLabelMaxClusterCount];
 
