@@ -38,7 +38,7 @@ static uint8_t presetIndex = 0;
 static const TariffDataSet & GetNextPreset()
 {
     const TariffDataSet & preset = kTariffPresets[presetIndex];
-    presetIndex = (presetIndex + 1) % kCount;
+    presetIndex                  = (presetIndex + 1) % kCount;
     return preset;
 }
 

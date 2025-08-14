@@ -62,7 +62,7 @@ public:
 
 private:
     CommodityTariffDelegate * mDelegate;
-    uint32_t TimestampNow = 0;
+    uint32_t TimestampNow    = 0;
     uint32_t TestTimeOverlay = 0;
 
     void ScheduleTariffTimeUpdate();
