@@ -20,7 +20,7 @@
 /*
  *  @brief  Creates an Instance for the Commodity Metering cluster
  *
- * The Instance is created and its Init() method is called to register 
+ * The Instance is created and its Init() method is called to register
  * the attribute and command handlers.
  */
 
