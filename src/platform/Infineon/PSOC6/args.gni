@@ -27,3 +27,7 @@ chip_device_platform = "psoc6"
 lwip_platform = "psoc6"
 
 chip_build_tests = false
+
+# Optimize for size by default
+optimize_debug_level = "s"
+lwip_debug = false
