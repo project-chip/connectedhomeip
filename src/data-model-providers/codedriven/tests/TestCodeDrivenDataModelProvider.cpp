@@ -23,6 +23,7 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
@@ -47,16 +48,6 @@ public:
     std::vector<AttributePathParams> mDirtyList;
 };
 
-class TestEventGenerator : public DataModel::EventsGenerator
-{
-    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
-                             EventNumber & generatedEventNumber) override
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override {}
-};
-
 class TestActionContext : public DataModel::ActionContext
 {
 public:
@@ -68,8 +59,7 @@ class MockServerCluster : public DefaultServerCluster
 public:
     MockServerCluster(std::initializer_list<ConcreteClusterPath> paths, DataVersion dataVersion,
                       BitFlags<DataModel::ClusterQualityFlags> flags) :
-        DefaultServerCluster({ 0, 0 }),
-        mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
+        DefaultServerCluster({ 0, 0 }), mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
         mAttributeEntry(1, BitMask<DataModel::AttributeQualityFlags>(), std::nullopt, std::nullopt)
     {}
 
@@ -228,7 +218,7 @@ public:
 
 protected:
     TestProviderChangeListener mChangeListener;
-    TestEventGenerator mEventGenerator;
+    chip::Test::LogOnlyEvents mEventGenerator;
     TestActionContext mActionContext;
     DataModel::InteractionModelContext mContext{
         .eventsGenerator         = mEventGenerator,
