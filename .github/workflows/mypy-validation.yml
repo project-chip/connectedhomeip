@@ -85,10 +85,11 @@ jobs:
             src/python_testing/matter_testing_infrastructure/matter/testing/tasks.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/taglist_and_topology_test.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/pics.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/runner.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/choice_conformance.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/commissioning.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/decorators.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/basic_composition.py"
-
+          
           # Print a reminder about expanding coverage
           echo "⚠️ NOTE: Currently only checking a subset of files. Remember to expand coverage!"
