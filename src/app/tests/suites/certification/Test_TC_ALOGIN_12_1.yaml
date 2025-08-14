@@ -59,11 +59,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label:
-          "Step 1: TH sends a GetSetupPIN command to the DUT with a TempAccountIdentifier field. 
-          This field SHALL specify the client’s Temporary Account Identifier. The length of this 
-          field SHALL be between 16 and 100 characters (e.g., "1234efgh5678abcd") to protect the account
-          holder against password guessing attacks."
+    - label: "Step 1: TH sends a GetSetupPIN command to the DUT with a TempAccountIdentifier field. This field SHALL specify the client’s Temporary Account Identifier. The length of this field SHALL be between 16 and 100 characters (e.g., \"1234efgh5678abcd\") to protect the account holder against password guessing attacks."
       PICS: ALOGIN.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
       command: "GetSetupPIN"
       timedInteractionTimeoutMs: 10000
@@ -78,8 +74,7 @@ tests:
                 constraints:
                     minLength: 8
 
-    - label:
-          "Step 2: TH sends a Login command to the DUT using the same TempAccountIdentifier from Step 1 and the SetupPIN received in Step 1"
+    - label: "Step 2: TH sends a Login command to the DUT using the same TempAccountIdentifier from Step 1 and the SetupPIN received in Step 1"
       PICS: ALOGIN.S.C02.Rsp && PICS_SKIP_SAMPLE_APP
       command: "Login"
       timedInteractionTimeoutMs: 10000
@@ -92,8 +87,7 @@ tests:
               - name: "Node"
                 value: nodeId
 
-    - label:
-          "Step 3: TH sends a Logout command to the DUT."
+    - label: "Step 3: TH sends a Logout command to the DUT."
       PICS: ALOGIN.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
       command: "Logout"
       timedInteractionTimeoutMs: 10000
