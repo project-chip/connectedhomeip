@@ -86,6 +86,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/srp/tests",
+      "${chip_root}/src/app/clusters/diagnostic-logs-server/tests/",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
