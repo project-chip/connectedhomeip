@@ -37,8 +37,9 @@ enum class MatterTLVSubType : uint8_t
     kSpake2pSalt              = 2,
     kSpake2pIterationCount    = 3,
     kRotatingDeviceIdUniqueId = 4,
-    kRandom1                  = 128,
-    kRandom2                  = 129,
+    // Subtype identifier for fixed random values set during manufacturing
+    kFixedRandom1 = 128,
+    kFixedRandom2 = 129,
 };
 
 // Scoped wrapper class for handling TLV data retrieval from secure cert partition
@@ -145,15 +146,15 @@ CHIP_ERROR ESP32SecureCertDataProvider::GetRotatingDeviceIdUniqueId(MutableByteS
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 
-CHIP_ERROR ESP32SecureCertDataProvider::GetRandom1(MutableByteSpan & randomBuf)
+CHIP_ERROR ESP32SecureCertDataProvider::GetFixedRandom1(MutableByteSpan & randomBuf)
 {
-    ScopedTLVInfo tlvInfo(MatterTLVSubType::kRandom1);
+    ScopedTLVInfo tlvInfo(MatterTLVSubType::kFixedRandom1);
     return tlvInfo.GetValue(randomBuf);
 }
 
-CHIP_ERROR ESP32SecureCertDataProvider::GetRandom2(MutableByteSpan & randomBuf)
+CHIP_ERROR ESP32SecureCertDataProvider::GetFixedRandom2(MutableByteSpan & randomBuf)
 {
-    ScopedTLVInfo tlvInfo(MatterTLVSubType::kRandom2);
+    ScopedTLVInfo tlvInfo(MatterTLVSubType::kFixedRandom2);
     return tlvInfo.GetValue(randomBuf);
 }
 
