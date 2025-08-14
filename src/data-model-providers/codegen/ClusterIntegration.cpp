@@ -79,7 +79,6 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
         LoadFeatureMap(options.endpointId, options.clusterId, featureMap);
     }
 
-
     // NOTE: we fetch low ID attributes only here as a convenience/speedup for the very frequent cluster case
     //       where attributes are few and with low IDS.
     //
