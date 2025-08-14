@@ -1850,7 +1850,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
         ASN1_TIME * pNotBefore = X509_getm_notBefore(x509LeafCertificate);
         VerifyOrExit(pNotBefore != nullptr,
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
-        CharSpan asn1TimeSpan(reinterpret_cast<char *>(pNotBefore->data), pNotBefore->length);
+        CharSpan asn1TimeSpan(reinterpret_cast<char *>(pNotBefore->data), static_cast<size_t>(pNotBefore->length));
 
         VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(asn1TimeSpan),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
