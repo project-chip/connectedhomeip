@@ -20,6 +20,7 @@ namespace BallastConfiguration {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace PhysicalMinLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalMinLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
