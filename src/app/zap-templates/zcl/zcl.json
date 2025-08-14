@@ -801,7 +801,8 @@
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",
-            "ClusterRevision"
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
         "TLS Certificate Management": [
