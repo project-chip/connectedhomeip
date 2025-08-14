@@ -38,7 +38,7 @@ from .clusters import Command as ClusterCommand
 from .exceptions import ChipStackError, ChipStackException, DeviceError
 from .interaction_model import delegate as im
 from .native import FindNativeLibraryPath, GetLibraryHandle, Library, PyChipError
-from .storage import PersistentStorageJSON
+from .storage import PersistentStorageINI
 
 __all__ = [
     "DeviceStatusStruct",
@@ -160,7 +160,7 @@ class ChipStack(object):
 
         # Storage has to be initialized BEFORE initializing the stack, since the latter
         # requires a PersistentStorageDelegate to be provided to DeviceControllerFactory.
-        self._persistentStorage = PersistentStorageJSON(persistentStoragePath)
+        self._persistentStorage = PersistentStorageINI(persistentStoragePath)
 
         # Initialize the chip stack.
         res = self._ChipStackLib.pychip_DeviceController_StackInit(

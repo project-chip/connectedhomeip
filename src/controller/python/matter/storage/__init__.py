@@ -20,8 +20,9 @@ import copy
 import ctypes
 import json
 import logging
+from configparser import ConfigParser
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
-from typing import Dict
+from typing import Dict, Optional
 
 from ..native import GetLibraryHandle
 
@@ -205,7 +206,7 @@ class PersistentStorageJSON(PersistentStorage):
     """Persistent storage back-end which stores data in a JSON file."""
 
     def __init__(self, path: str):
-        LOGGER.info("Initializing persistent storage from JSON file: %s", path)
+        LOGGER.info("Loading configuration from JSON file: %s", path)
         self._path = path
         try:
             with open(self._path) as f:
@@ -222,3 +223,88 @@ class PersistentStorageJSON(PersistentStorage):
                 json.dump(self._data, f, ensure_ascii=True, indent=4)
         except Exception as ex:
             LOGGER.critical("Could not save configuration to JSON file: %s", ex)
+
+
+class PersistentStorageINI(PersistentStorage):
+    """Persistent storage back-end which stores data in an INI file.
+
+    This persistent storage is compatible with the chip-tool implementation.
+    """
+
+    class ConfigParser(ConfigParser):
+        """Parser that preserves key case and does not use interpolation."""
+
+        def __init__(self, defaults=None):
+            # Set the default section to 'NO-DEFAULT' to treat the default section
+            # as a regular section, so other sections will not inherit from it.
+            super().__init__(defaults=defaults, default_section='NO-DEFAULT', interpolation=None)
+
+        def optionxform(self, option: str) -> str:
+            """Preserves case of keys."""
+            return option
+
+    def __init__(self, path: str, chipToolFabricStoragePath: Optional[str] = None):
+        """Initializes the persistent storage from an INI file.
+
+        Optionally, a chipToolFabricStoragePath can be provided to load fabric CA
+        from a separate file. This allows to load chip-tool persistent storage which
+        stores fabric CA in a separate file.
+        """
+        try:
+            data = {}
+            config = PersistentStorageINI.ConfigParser()
+            LOGGER.info("Loading configuration from INI file: %s", path)
+            config.read(path)
+            if config.has_section('DEFAULT'):
+                data['sdk-config'] = dict(config.items('DEFAULT'))
+            if config.has_section('REPL'):
+                data['repl-config'] = {
+                    k: json.loads(v) if v else None
+                    for k, v in config.items('REPL')
+                }
+            if chipToolFabricStoragePath:
+                # Compatibility layer with chip-tool persistent storage.
+                LOGGER.info("Loading fabric configuration from INI file: %s", chipToolFabricStoragePath)
+                config.read(chipToolFabricStoragePath)
+                if value := config.get('DEFAULT', 'ExampleOpCredsCAKey0', fallback=None):
+                    data['sdk-config']['ExampleOpCredsCAKey1'] = value
+                if value := config.get('DEFAULT', 'ExampleOpCredsICAKey0', fallback=None):
+                    data['sdk-config']['ExampleOpCredsICAKey1'] = value
+                if value := config.get('DEFAULT', 'ExampleCARootCert0', fallback=None):
+                    data['sdk-config']['ExampleCARootCert1'] = value
+                if value := config.get('DEFAULT', 'ExampleCAIntermediateCert0', fallback=None):
+                    data['sdk-config']['ExampleCAIntermediateCert1'] = value
+        except Exception as ex:
+            LOGGER.critical("Could not load configuration from INI file: %s", ex)
+        self._path = path
+        self._chipToolFabricStoragePath = chipToolFabricStoragePath
+        super().__init__(data)
+
+    def Commit(self):
+        if self._chipToolFabricStoragePath:
+            # Compatibility layer with chip-tool persistent storage.
+            config = PersistentStorageINI.ConfigParser()
+            if value := self._data['sdk-config'].pop('ExampleOpCredsCAKey1', None):
+                config['DEFAULT']['ExampleOpCredsCAKey0'] = value
+            if value := self._data['sdk-config'].pop('ExampleOpCredsICAKey1', None):
+                config['DEFAULT']['ExampleOpCredsICAKey0'] = value
+            if value := self._data['sdk-config'].pop('ExampleCARootCert1', None):
+                config['DEFAULT']['ExampleCARootCert0'] = value
+            if value := self._data['sdk-config'].pop('ExampleCAIntermediateCert1', None):
+                config['DEFAULT']['ExampleCAIntermediateCert0'] = value
+            try:
+                with open(self._chipToolFabricStoragePath, 'w') as f:
+                    config.write(f)
+            except Exception as ex:
+                LOGGER.critical("Could not save fabric configuration to INI file: %s", ex)
+        config = PersistentStorageINI.ConfigParser()
+        config['DEFAULT'] = self._data['sdk-config']
+        config['REPL'] = {
+            k: json.dumps(v, separators=(',', ':'))
+            for k, v in self._data['repl-config'].items()
+        }
+        try:
+            with open(self._path, 'w') as f:
+                config.write(f)
+        except Exception as ex:
+            LOGGER.critical("Could not save configuration to INI file: %s", ex)
