@@ -43,7 +43,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned zeroBasedArrayIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[zeroBasedArrayIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(rawFeatureMap));
+        gServers[zeroBasedArrayIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
         return gServers[zeroBasedArrayIndex].Registration();
     }
 
