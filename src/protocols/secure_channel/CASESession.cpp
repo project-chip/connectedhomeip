@@ -1596,6 +1596,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     MATTER_TRACE_COUNTER("Sigma3");
 
     auto helper = WorkHelper<HandleSigma3Data>::Create(*this, &HandleSigma3b, &CASESession::HandleSigma3c);
+
     VerifyOrExit(helper, err = CHIP_ERROR_NO_MEMORY);
     {
         auto & data = helper->mData;
@@ -1915,10 +1916,16 @@ CHIP_ERROR CASESession::SetEffectiveTime()
         // If the system has given us a wall clock time, we must use it or
         // fail.  Conversion failures here are therefore always an error.
         System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
-        ReturnErrorOnFailure(mValidContext.SetEffectiveTimeFromUnixTime<CurrentChipEpochTime>(currentUnixTime));
+        //ReturnErrorOnFailure(mValidContext.SetEffectiveTimeFromUnixTime<CurrentChipEpochTime>(currentUnixTime));
+        err = mValidContext.SetEffectiveTimeFromUnixTime<CurrentChipEpochTime>(currentUnixTime);
+        if (err == CHIP_ERROR_INVALID_TIME)
+            goto try_again;
+        else
+            return err;
     }
     else
     {
+try_again:
         // If we don't have wall clock time, the spec dictates that we should
         // fall back to Last Known Good Time.  Ultimately, the calling application's
         // validity policy will determine whether this is permissible.

@@ -1,0 +1,145 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/scm1612s.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${scm1612s_sdk_build_root}/scm1612s_executable.gni")
+import("${scm1612s_sdk_build_root}/scm1612s_sdk.gni")
+
+assert(current_os == "freertos")
+
+scm1612s_project_dir = "${chip_root}/examples/lighting-app/senscomm/scm1612s"
+examples_plat_dir = "${chip_root}/examples/platform/senscomm/scm1612s"
+elf_name = "chip-scm1612s-lighting-app-example.out"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = true
+
+  # PIN code for PASE session establishment.
+  setup_pin_code = 20202021
+
+  # Monitor & log memory usage at runtime.
+  enable_heap_monitoring = false
+
+  # Build update app
+  build_update_image = false
+}
+
+scm1612s_sdk_sources("lighting_app_sdk_sources") {
+  sources = [ "${scm1612s_project_dir}/include/CHIPProjectConfig.h" ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/senscomm/scm1612s",
+    "${scm1612s_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+
+  defines = [
+#    "BOARD_ID=${scm1612s_board}",
+#    "P6_LOG_ENABLED=1",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setup_pin_code}",
+  ]
+
+  public_configs =
+      [ "${chip_root}/third_party/senscomm/scm1612s:scm1612s_sdk_config" ]
+
+#  if (chip_enable_ota_requestor) {
+#    public_configs += [ ":psoc6_ota_config" ]
+#  }
+}
+
+scm1612s_postbuild("lighting_postbuild") {
+  input_name = "${elf_name}"
+  map_name = "System.map"
+  deps = [
+    "//:lighting_app.executable",
+    "//:lighting_app.image"
+  ]
+}
+
+scm1612s_executable("lighting_app") {
+  output_name = "${elf_name}"
+  include_dirs = []
+  defines = [
+    #"__PWM_DIMMABLE_LED__"
+  ]
+
+  sources = [
+    "src/AppTask.cpp",
+    "src/ColorFormat.cpp",
+    "src/DimmableLEDWidget.cpp",
+    "src/LEDWidget.cpp",
+    "src/LightingManager.cpp",
+    "src/ZclCallbacks.cpp",
+    "src/main.cpp",
+    "src/AtomicHack.cpp",
+  ]
+
+  deps = [
+    ":lighting_app_sdk_sources",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  include_dirs += [
+    "include",
+    "${examples_plat_dir}",
+    "${scm1612s_project_dir}/include",
+  ]
+
+  defines = []
+
+#  if (chip_enable_ota_requestor) {
+#    defines += [ "MT793X_OTA_ENABLED" ]
+#    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+#  }
+
+  if (enable_heap_monitoring) {
+    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    defines += [ "HEAP_MONITORING" ]
+  }
+
+  if (chip_print_memory_usage) {
+    ldflags = [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+#group("scm1612s") {
+#  deps = [ ":lighting_app" ]
+#}
+
+#group("default") {
+#  deps = [ ":scm1612s" ]
+#}
+
+group("default") {
+  deps = [
+           ":lighting_postbuild_map",
+           ":lighting_postbuild_sign",
+           ":lighting_postbuild_dis",
+         ]
+}
