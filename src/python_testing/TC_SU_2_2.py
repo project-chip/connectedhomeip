@@ -417,16 +417,22 @@ class TC_SU_2_2(MatterBaseTest):
             node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
-            min_interval_sec=5,
-            max_interval_sec=10,
+            min_interval_sec=0,
+            max_interval_sec=1,
             keepSubscriptions=True
         )
 
-        # Track last known state to validate expected OTA update flow
+        # Track last known state to print changes and save full sequence
         last_state = None
+        state_sequence = []  # List to store the full OTA state flow
 
         def matcher_update_state(report):
-            nonlocal last_state
+            """
+            Matcher function to track OTA UpdateState.
+            Prints only when state changes and saves the full sequence.
+            Handles normal OTA flow: Downloading -> Applying -> Idle
+            """
+            nonlocal last_state, state_sequence
             val = report.value
             if val is None:
                 return False
@@ -435,37 +441,45 @@ class TC_SU_2_2(MatterBaseTest):
             if last_state != val:
                 logger.info(f"1.6 - UpdateState changed: {val}")
                 last_state = val
+                state_sequence.append(val)
             else:
-                return False  # Ignore duplicates, don't match yet
+                return False  # Ignore duplicates, sequence not advanced
 
-            # Validate expected OTA state sequence:
-            # Downloading → Applying → Idle
-            if last_state is None and val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:
-                return False
-            if last_state == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading and val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying:
-                return False
-            if last_state == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying and val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
-                return False
-
-            last_state = val
-            # We finish when reaching the Idle state
-            return val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle  # Terminamos cuando llega a Idle
+            # Return True when Idle is reached (end of expected OTA sequence)
+            return val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
 
         # Create matcher object for the accumulator
         matcher_update_state_obj = AttributeMatcher.from_callable(
-            description="Validate OTA UpdateState transitions: Downloading > Applying > Idlee",
+            description="Validate OTA UpdateState transitions: Downloading > Applying > Idle",
             matcher=matcher_update_state
         )
 
         try:
-            # Wait until all expected states have been reported or until timeout (20 min)
+            # Wait until the final state (Idle) is reached or timeout (20 min)
             await accumulator.await_all_expected_report_matches([matcher_update_state_obj], timeout_sec=1200.0)
             logger.info("Step #1.6 - Update completed successfully.")
         except Exception as e:
-            raise AssertionError(f"No final progress received in time or failed: {e}")
+            # Handle OTA errors and timeout (logs like Transfer timed out or retransmission errors)
+            logger.warning(f"OTA update encountered an error or timeout: {e}")
+        finally:
+            # Cancel subscription to stop receiving updates
+            await accumulator.cancel()
 
-        # Cancel subscription
-        await accumulator.cancel()
+        # After subscription ends, validate the full OTA state sequence
+        logger.info(f"Step #1.6 - Full OTA state sequence observed: {state_sequence}")
+
+        # Assert that the expected flow happened at least once
+        expected_flow = [
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        ]
+        # Assert that the observed OTA state sequence matches exactly the expected flow
+        asserts.assert_equal(
+            state_sequence,
+            expected_flow,
+            msg=f"OTA flow did not match expected sequence. Observed: {state_sequence}, Expected: {expected_flow}"
+        )
 
 
 if __name__ == "__main__":
