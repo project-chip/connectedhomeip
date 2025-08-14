@@ -43,6 +43,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned zeroBasedArrayIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
+        ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, zeroBasedArrayIndex);
         gServers[zeroBasedArrayIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
         return gServers[zeroBasedArrayIndex].Registration();
     }
@@ -58,7 +59,6 @@ public:
 void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId)
 {
 
-    ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, arrayIndex);
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
