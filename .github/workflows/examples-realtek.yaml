@@ -93,7 +93,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     realtek rtl8777g light-switch-app \
-                    out/artifacts/realtek-rtl8777g-lighting/chip-rtl8777g-light-switch-app \
+                    out/artifacts/realtek-rtl8777g-light-switch/chip-rtl8777g-light-switch-app \
                     /tmp/bloat_reports/
 
 
