@@ -17,6 +17,8 @@ name: 4.2.4. [TC-LVL-9.1] Scenes Management Cluster Interaction (DUT as Server)
 PICS:
     - LVL.S
     - S.S
+    - G.S
+    - GRPKEY.S
 
 config:
     nodeId: 0x12344321
@@ -39,6 +41,7 @@ tests:
           "Step 0a :TH sends KeySetWrite command in the GroupKeyManagement
           cluster to DUT using a key that is pre-installed on the TH.
           GroupKeySet fields are as follows:"
+      PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
@@ -61,6 +64,7 @@ tests:
           "Step 0b: TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the
           GroupKeyMap attribute list on GroupKeyManagement cluster by writing
           the GroupKeyMap attribute with two entries as follows:"
+      PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -69,6 +73,7 @@ tests:
           value: [{ FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 }]
 
     - label: "Step 0c: TH sends a RemoveAllGroups command to DUT."
+      PICS: G.S.C04.Rsp
       cluster: "Groups"
       endpoint: endpoint
       command: "RemoveAllGroups"
@@ -76,6 +81,7 @@ tests:
     - label:
           "Step 1a: TH sends a AddGroup command to DUT with the GroupID field
           set to G1."
+      PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -259,6 +265,7 @@ tests:
                 value: G1
 
     - label: "Cleanup: TH sends a RemoveAllGroups command to DUT."
+      PICS: G.S.C03.Rsp
       cluster: "Groups"
       endpoint: endpoint
       command: "RemoveAllGroups"
