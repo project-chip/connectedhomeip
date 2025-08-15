@@ -95,7 +95,7 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     //   - Thermostat and DoorLock have more than 32 attributes in general
     //   - ColorControl has a lot of high-ID attributes
     //
-    // The above examples however are few compared to the large number of clusters tha matter supports,
+    // The above examples however are few compared to the large number of clusters that matter supports,
     // so this optimization is considered worth it at this time.
     uint32_t optionalAttributes = 0;
     if (options.fetchOptionalAttributes)
