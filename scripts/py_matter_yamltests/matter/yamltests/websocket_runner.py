@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 import logging
-import platform
 import re
 import select
 import subprocess
