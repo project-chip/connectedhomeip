@@ -77,7 +77,7 @@ public:
     }
 
     ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
-    void DestroyRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
 };
 
 } // namespace

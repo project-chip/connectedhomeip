@@ -61,7 +61,7 @@ public:
     ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return BasicInformationCluster::Instance(); }
 
     // Nothing to destroy: separate singleton class without constructor/destructor is used
-    void DestroyRegistration(unsigned emberEndpointIndex) override {}
+    void ReleaseRegistration(unsigned emberEndpointIndex) override {}
 };
 
 } // namespace

@@ -47,7 +47,7 @@ public:
     {
         return gServers[emberEndpointIndex].Cluster();
     }
-    void DestroyRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
 
 } // namespace

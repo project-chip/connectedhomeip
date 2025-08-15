@@ -73,7 +73,7 @@ public:
         /// as applicable.
         ///
         /// It is assumed that this is called as the couterpart of `CreateRegistration`.
-        virtual void DestroyRegistration(unsigned emberEndpointIndex) = 0;
+        virtual void ReleaseRegistration(unsigned emberEndpointIndex) = 0;
     };
 
     struct RegisterServerOptions

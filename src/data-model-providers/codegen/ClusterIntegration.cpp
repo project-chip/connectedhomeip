@@ -134,7 +134,7 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
         // However, this should never happen in practice.
     }
 
-    delegate.DestroyRegistration(emberEndpointIndex);
+    delegate.ReleaseRegistration(emberEndpointIndex);
 }
 
 } // namespace chip::app
