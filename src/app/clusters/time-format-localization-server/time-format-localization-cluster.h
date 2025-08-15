@@ -26,11 +26,8 @@ namespace Clusters {
 class TimeFormatLocalizationCluster : public DefaultServerCluster
 {
 public:
-    static constexpr TimeFormatLocalization::CalendarTypeEnum kDefaultCalendarType =
-        TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
-    static constexpr TimeFormatLocalization::HourFormatEnum kDefaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
-
-    TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features);
+    TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features, 
+        TimeFormatLocalization::HourFormatEnum defaultHourFormat, TimeFormatLocalization::CalendarTypeEnum defaultCalendarType);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 

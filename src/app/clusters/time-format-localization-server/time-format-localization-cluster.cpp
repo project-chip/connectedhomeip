@@ -89,9 +89,11 @@ bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalenda
 } // namespace
 
 TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId,
-                                                             BitFlags<TimeFormatLocalization::Feature> features) :
+                                                             BitFlags<TimeFormatLocalization::Feature> features,
+                                                             TimeFormatLocalization::HourFormatEnum defaultHourFormat, 
+                                                             TimeFormatLocalization::CalendarTypeEnum defaultCalendarType) :
     DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
-    mFeatures(features)
+    mFeatures(features), mHourFormat(defaultHourFormat), mCalendarType(defaultCalendarType)
 {}
 
 CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context)
@@ -100,14 +102,18 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 
+    // Store default values before attempting to load from persistence
+    TimeFormatLocalization::CalendarTypeEnum defaultCalendarType = mCalendarType;
+    TimeFormatLocalization::HourFormatEnum defaultHourFormat = mHourFormat;
+
     // Initialize the CalendarType if available
     attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::CalendarTypeEnum>(
         { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id }, mCalendarType,
-        kDefaultCalendarType);
+        defaultCalendarType);
 
     // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
     // If initial value is not one of the allowed values, pick one valid value and write it.
-    TimeFormatLocalization::CalendarTypeEnum validCalendar = kDefaultCalendarType;
+    TimeFormatLocalization::CalendarTypeEnum validCalendar = defaultCalendarType;
     if (!IsSupportedCalendarType(mCalendarType, &validCalendar))
     {
         mCalendarType = validCalendar;
@@ -116,7 +122,7 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
     // Initialize HourFormat
     attrPersistence.LoadNativeEndianValue<TimeFormatLocalization::HourFormatEnum>(
         { kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id }, mHourFormat,
-        kDefaultHourFormat);
+        defaultHourFormat);
 
 
     return CHIP_NO_ERROR;
