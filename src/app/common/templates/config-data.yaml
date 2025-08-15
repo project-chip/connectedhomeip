@@ -60,6 +60,7 @@ CommandHandlerInterfaceOnlyClusters:
     - General Diagnostics
     - Software Diagnostics
     - Ethernet Network Diagnostics
+    - Group Key Management
     - Wi-Fi Network Diagnostics
     - Camera AV Settings User Level Management
     - Administrator Commissioning
@@ -82,6 +83,7 @@ ClustersWithInitFunctions:
     - Ethernet Network Diagnostics
     - General Diagnostics
     - Groups
+    - Group Key Management
     - Identify
     - Level Control
     - Localization Configuration

@@ -282,7 +282,7 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
 
 } // namespace DiagnosticLogs
 
-namespace GroupKeyManagement {
+namespace EthernetNetworkDiagnostics {
 
 Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
                                                           TLV::TLVReader & aDataTlv)
@@ -292,39 +292,12 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::KeySetWrite::Id: {
-            Commands::KeySetWrite::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
+        case Commands::ResetCounts::Id: {
+            Commands::ResetCounts::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfGroupKeyManagementClusterKeySetWriteCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::KeySetRead::Id: {
-            Commands::KeySetRead::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGroupKeyManagementClusterKeySetReadCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::KeySetRemove::Id: {
-            Commands::KeySetRemove::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGroupKeyManagementClusterKeySetRemoveCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::KeySetReadAllIndices::Id: {
-            Commands::KeySetReadAllIndices::DecodableType commandData;
-            TLVError = commandData.Decode(aDataTlv, apCommandObj->GetAccessingFabricIndex());
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -348,7 +321,7 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
     return Protocols::InteractionModel::Status::Success;
 }
 
-} // namespace GroupKeyManagement
+} // namespace EthernetNetworkDiagnostics
 
 namespace Groups {
 
@@ -880,8 +853,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::DiagnosticLogs::Id:
         errorStatus = Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-    case Clusters::GroupKeyManagement::Id:
-        errorStatus = Clusters::GroupKeyManagement::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+    case Clusters::EthernetNetworkDiagnostics::Id:
+        errorStatus = Clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Groups::Id:
         errorStatus = Clusters::Groups::DispatchServerCommand(apCommandObj, aCommandPath, aReader);

@@ -194,8 +194,8 @@ public:
     CameraError SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode) override;
     bool GetSoftLivestreamPrivacyModeEnabled() override { return mSoftLivestreamPrivacyModeEnabled; }
 
-    // Currently, defaulting to not supporting hard privacy switch.
-    bool HasHardPrivacySwitch() override { return false; }
+    // Currently, defaulting to supporting hard privacy switch.
+    bool HasHardPrivacySwitch() override { return true; }
 
     // Currently, defaulting to supporting speaker.
     bool HasSpeaker() override { return true; }

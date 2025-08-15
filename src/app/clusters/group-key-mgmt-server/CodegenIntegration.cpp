@@ -1,6 +1,6 @@
-/*
+/**
+ *
  *    Copyright (c) 2025 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,29 +14,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
-#include <app/static-cluster-config/SoftwareDiagnostics.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
+
+#include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
+#include <app/static-cluster-config/GroupKeyManagement.h>
+#include <app/util/config.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
+namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::SoftwareDiagnostics;
-using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
+using namespace chip::app::Clusters::GroupKeyManagement;
 
-// for fixed endpoint, this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
-// the static assert is skipped in case of dynamic endpoints.
-static_assert((SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
-               SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
-              SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
+static_assert((GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+               GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
+              GroupKeyManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
-namespace {
-
-LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
+LazyRegisteredServerCluster<GroupKeyManagementCluster> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -44,48 +38,48 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet(optionalAttributeBits));
+        gServer.Create();
         return gServer.Registration();
     }
 
     ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+
+    // Nothing to destroy: separate singleton class without constructor/destructor is used
     void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
 };
 
 } // namespace
 
-void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpointId)
+void emberAfGroupKeyManagementClusterServerInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
             .endpointId                      = endpointId,
-            .clusterId                       = SoftwareDiagnostics::Id,
+            .clusterId                       = GroupKeyManagement::Id,
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = 1,
             .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = true,
+            .fetchOptionalAttributes         = false,
         },
         integrationDelegate);
 }
 
-void MatterSoftwareDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterGroupKeyManagementClusterServerShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                      = endpointId,
-            .clusterId                       = SoftwareDiagnostics::Id,
+            .clusterId                       = GroupKeyManagement::Id,
             .fixedClusterServerEndpointCount = 1,
             .maxEndpointCount                = 1,
         },
         integrationDelegate);
 }
 
-void MatterSoftwareDiagnosticsPluginServerInitCallback() {}
+void MatterGroupKeyManagementPluginServerInitCallback() {}
 
-void MatterSoftwareDiagnosticsPluginServerShutdownCallback() {}
+void MatterGroupKeyManagementPluginServerShutdownCallback() {}
