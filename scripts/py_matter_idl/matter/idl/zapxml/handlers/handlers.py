@@ -364,7 +364,8 @@ class FeaturesHandler(BaseHandler):
 
     def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context)
-        self._features = Bitmap(name='Feature', base_type="bitmap32", entries=[])
+        self._features = Bitmap(
+            name='Feature', base_type="bitmap32", entries=[])
         self._cluster = cluster
 
     def GetNextProcessor(self, name, attrs):
