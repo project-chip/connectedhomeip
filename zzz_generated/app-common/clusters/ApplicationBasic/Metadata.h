@@ -20,6 +20,7 @@ namespace ApplicationBasic {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace VendorName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(VendorName::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
