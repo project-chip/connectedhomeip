@@ -27,6 +27,10 @@ public:
     {
         AddArgument("node-id", 0, UINT64_MAX, &mPeerNodeId);
         AddArgument("stream-usage", 0, UINT8_MAX, &mStreamUsage);
+        AddArgument("min-width", 0, UINT16_MAX, &mMinWidth);
+        AddArgument("min-height", 0, UINT16_MAX, &mMinHeight);
+        AddArgument("min-framerate", 0, UINT16_MAX, &mMinFrameRate);
+        AddArgument("min-bitrate", 0, UINT32_MAX, &mMinBitRate);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -37,6 +41,10 @@ public:
 private:
     chip::NodeId mPeerNodeId = chip::kUndefinedNodeId;
     chip::Optional<uint8_t> mStreamUsage;
+    chip::Optional<uint16_t> mMinWidth;
+    chip::Optional<uint16_t> mMinHeight;
+    chip::Optional<uint16_t> mMinFrameRate;
+    chip::Optional<uint32_t> mMinBitRate;
 };
 
 class LiveViewStopCommand : public CHIPCommand

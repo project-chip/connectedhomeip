@@ -85,11 +85,14 @@ void DeviceManager::Shutdown()
     WebRTCManager::Instance().Disconnect();
 }
 
-CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage, WebRTCOfferType offerType)
+CHIP_ERROR DeviceManager::AllocateVideoStream(NodeId nodeId, uint8_t streamUsage, WebRTCOfferType offerType,
+                                              Optional<uint16_t> minWidth, Optional<uint16_t> minHeight,
+                                              Optional<uint16_t> minFrameRate, Optional<uint32_t> minBitRate)
 {
     ChipLogProgress(Camera, "Allocate a video stream on the camera device.");
 
-    CHIP_ERROR error = mAVStreamManagment.AllocateVideoStream(nodeId, kCameraEndpointId, streamUsage);
+    CHIP_ERROR error = mAVStreamManagment.AllocateVideoStream(nodeId, kCameraEndpointId, streamUsage, minWidth, minHeight,
+                                                              minFrameRate, minBitRate);
 
     if (error != CHIP_NO_ERROR)
     {

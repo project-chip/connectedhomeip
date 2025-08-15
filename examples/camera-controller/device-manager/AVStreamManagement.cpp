@@ -45,7 +45,9 @@ void AVStreamManagement::Init(Controller::DeviceCommissioner * commissioner)
     mCommissioner = commissioner;
 }
 
-CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId endpointId, uint8_t streamUsage)
+CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId endpointId, uint8_t streamUsage,
+                                                   Optional<uint16_t> minWidth, Optional<uint16_t> minHeight,
+                                                   Optional<uint16_t> minFrameRate, Optional<uint32_t> minBitRate)
 {
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -59,13 +61,13 @@ CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId end
     mVideoStreamAllocate.videoCodec =
         app::Clusters::CameraAvStreamManagement::VideoCodecEnum::kH264; // Default to H.264; adjust as needed.
 
-    mVideoStreamAllocate.minFrameRate = kMinFrameRate;
+    mVideoStreamAllocate.minFrameRate = minFrameRate.ValueOr(kMinFrameRate);
     mVideoStreamAllocate.maxFrameRate = kMaxFrameRate;
 
-    mVideoStreamAllocate.minResolution = { .width = kMinWidth, .height = kMinHeight };
+    mVideoStreamAllocate.minResolution = { .width = minWidth.ValueOr(kMinWidth), .height = minHeight.ValueOr(kMinHeight) };
     mVideoStreamAllocate.maxResolution = { .width = kMaxWidth, .height = kMaxHeight };
 
-    mVideoStreamAllocate.minBitRate = kDefaultBitRate;
+    mVideoStreamAllocate.minBitRate = minBitRate.ValueOr(kDefaultBitRate);
     mVideoStreamAllocate.maxBitRate = kDefaultBitRate;
 
     mVideoStreamAllocate.keyFrameInterval = kKeyFrameInterval;

@@ -53,10 +53,18 @@ public:
      * @param nodeId      The node ID of the remote camera device.
      * @param streamUsage The usage of the stream(Recording, LiveView, etc) that this allocation is for.
      * @param offerType   The type of WebRTC offer to use (ProvideOffer or SolicitOffer).
+     * @param minWidth    Optional minimum width for the video stream. If not specified, uses default value.
+     * @param minHeight   Optional minimum height for the video stream. If not specified, uses default value.
+     * @param minFrameRate Optional minimum frame rate for the video stream. If not specified, uses default value.
+     * @param minBitRate  Optional minimum bit rate for the video stream. If not specified, uses default value.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or an appropriate error code on failure.
      */
     CHIP_ERROR AllocateVideoStream(chip::NodeId nodeId, uint8_t streamUsage,
-                                   WebRTCOfferType offerType = WebRTCOfferType::kProvideOffer);
+                                   WebRTCOfferType offerType             = WebRTCOfferType::kProvideOffer,
+                                   chip::Optional<uint16_t> minWidth     = chip::NullOptional,
+                                   chip::Optional<uint16_t> minHeight    = chip::NullOptional,
+                                   chip::Optional<uint16_t> minFrameRate = chip::NullOptional,
+                                   chip::Optional<uint32_t> minBitRate   = chip::NullOptional);
 
     /**
      * @brief Sends a VideoStreamDeallocate command to the device.
