@@ -267,7 +267,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             daemon=True)
         restart_monitor_thread.start()
 
-    script_args += f" --restart-flag-file {restart_flag_file}"
+    if "mobile-device-test.py" not in script:
+        script_args += f" --restart-flag-file {restart_flag_file}"
 
     script_command = [
         script,
