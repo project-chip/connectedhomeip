@@ -16,8 +16,8 @@
 import logging
 import re
 import select
-import subprocess
 import shutil
+import subprocess
 import time
 from dataclasses import dataclass
 
