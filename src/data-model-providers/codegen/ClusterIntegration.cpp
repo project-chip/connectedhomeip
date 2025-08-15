@@ -49,8 +49,8 @@ bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fi
 
 /// Fetch the featuremap from ember for the given endpoint/cluster
 ///
-/// Input feature map is unchanged if load fails.
-void LoadFeatureMap(EndpointId endpointId, ClusterId clusterId, uint32_t & featureMap)
+/// on error 0 is returned
+uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -63,10 +63,10 @@ void LoadFeatureMap(EndpointId endpointId, ClusterId clusterId, uint32_t & featu
         ChipLogError(AppServer, "Failed to load feature map for %u/" ChipLogFormatMEI " (Status %d)", endpointId,
                      ChipLogValueMEI(clusterId), static_cast<int>(status));
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        return;
+        return 0;
     }
     // note: we do not try to check if value is representable: all the uint32_t values are representable
-    featureMap = Traits::StorageToWorking(temp);
+    return Traits::StorageToWorking(temp);
 }
 
 } // namespace
@@ -83,7 +83,7 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     uint32_t featureMap = 0;
     if (options.fetchFeatureMap)
     {
-        LoadFeatureMap(options.endpointId, options.clusterId, featureMap);
+        featureMap = LoadFeatureMap(options.endpointId, options.clusterId);
     }
 
     // NOTE: we fetch low ID attributes only here as a convenience/speedup for the very frequent cluster case
