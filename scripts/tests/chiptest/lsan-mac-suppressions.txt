@@ -83,3 +83,8 @@ leak:nw_parameters_create_secure_udp
 leak:nw_path_create_evaluator_for_listener
 leak:nw_listener_handle_new_path_on_queue
 leak:nw_endpoint_create_host
+
+# String leaks in error logging paths when Python ZAP XML 
+# parsing errors occur during attribute loading (e.g. 'quality' is unhandled)
+# Remove once Python ZAP XML parser is updated for these.
+leak:*emAfLoadAttributeDefaults*ChipError::AsString*
