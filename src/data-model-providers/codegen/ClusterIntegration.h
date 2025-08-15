@@ -98,7 +98,7 @@ public:
         uint16_t maxEndpointCount;                // this is how many endpoints are supported by the delegates (0-based index)
     };
 
-    /// Typical implementation is that this gets called in `Matter....ClusterServerShutdownCallback`
+    /// A typical implementation is that this gets called in `Matter....ClusterServerShutdownCallback`.
     static void UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate);
 };
 
