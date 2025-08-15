@@ -30,18 +30,17 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <memory>
 #include <protocols/interaction_model/StatusCode.h>
 #include <thread>
 #include <vector>
 
-using namespace chip::app::Clusters::PushAvStreamTransport;
-
 class PushAVTransport : public Transport
 {
 public:
-    PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
-                    AudioStreamStruct mAudioStreamParams, VideoStreamStruct mVideoStreamParams);
+    PushAVTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
+                    const uint16_t connectionID, AudioStreamStruct mAudioStreamParams, VideoStreamStruct mVideoStreamParams);
     ~PushAVTransport() override;
     // Send video data for a given stream ID
     void SendVideo(const char * data, size_t size, uint16_t videoStreamID) override;
@@ -66,17 +65,20 @@ public:
     uint16_t GetPreRollLength();
 
     // Set Transport status
-    void SetTransportStatus(TransportStatusEnum status);
+    void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
-    void TriggerTransport(TriggerActivationReasonEnum activationReason);
+    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason);
 
     // Get Transport status
-    bool GetTransportStatus() { return (mTransportStatus == TransportStatusEnum::kInactive); } // 0:Active 1:Inactive
+    bool GetTransportStatus()
+    {
+        return (mTransportStatus == chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum::kInactive);
+    } // 0:Active 1:Inactive
 
-    void ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions, AudioStreamStruct mAudioStreamParams,
-                                   VideoStreamStruct mVideoStreamParams);
+    void ConfigureRecorderSettings(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
+                                   AudioStreamStruct mAudioStreamParams, VideoStreamStruct mVideoStreamParams);
 
-    void ModifyPushTransport(const TransportOptionsStorage transportOptions);
+    void ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage transportOptions);
 
     bool HandleTriggerDetected();
 
@@ -86,8 +88,8 @@ public:
     void SetTLSCertPath(std::string rootCert, std::string devCert, std::string devKey);
 
 private:
-    bool isRecorderInitialized                   = false;
-    bool isUploaderInitialized                   = false;
+    // bool isRecorderInitialized                   = false;
+    // bool isUploaderInitialized                   = false;
     bool hasAugmented                            = false;
     bool mStreaming                              = false;
     std::unique_ptr<PushAVClipRecorder> recorder = nullptr;
@@ -106,10 +108,10 @@ private:
     // Dummy implementation to indicate if audio can be sent
     bool mCanSendAudio = false;
 
-    unsigned int mClipId = 0;
+    // unsigned int mClipId = 0;
 
     // Enum indicating the type of trigger used to start the transport
-    TransportStatusEnum mTransportStatus;
-    TransportTriggerTypeEnum mTransportTriggerType;
+    chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
+    chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
 };

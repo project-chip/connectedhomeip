@@ -64,7 +64,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
     mTransportMap[connectionID] =
-        std::move(std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams));
+        std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
 
     if (mMediaController == nullptr)
     {

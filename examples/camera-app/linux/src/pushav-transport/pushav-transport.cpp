@@ -18,6 +18,8 @@
 
 #include <pushav-transport.h>
 
+using namespace chip::app::Clusters::PushAvStreamTransport;
+
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct aAudioStreamParams, VideoStreamStruct aVideoStreamParams) :
     audioStreamParams(aAudioStreamParams),
@@ -88,8 +90,9 @@ void PrintTransportSettings(PushAVClipRecorder::ClipInfoStruct clipInfo, PushAVC
 void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,
                                                 AudioStreamStruct mAudioStreamParams, VideoStreamStruct mVideoStreamParams)
 {
+    bool debug = true; // Set this to false for debug purpose
 
-    if (true) // Set this to false for debug purpose
+    if (debug)
     {
         clipInfo.mHasAudio    = true;
         clipInfo.mHasVideo    = true;
@@ -126,6 +129,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         clipInfo.mPreRollLength        = 0;
         clipInfo.mUrl                  = "https://localhost:1234/streams/1/";
     }
+
     mTransportTriggerType   = transportOptions.triggerOptions.triggerType;
     clipInfo.mClipId        = 0;
     clipInfo.mOutputPath    = "./clips/";
@@ -238,7 +242,7 @@ bool InBlindPeriod(std::chrono::steady_clock::time_point blindStartTime, uint16_
     {
         auto now     = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - blindStartTime).count();
-        ChipLogProgress(Camera, "PushAVTransport blind period elapsed: %ld", elapsed);
+        ChipLogProgress(Camera, "PushAVTransport blind period elapsed: %lld", elapsed);
         return ((elapsed >= 0) && (elapsed < blindDuration));
     }
 }

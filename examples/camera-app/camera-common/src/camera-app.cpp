@@ -44,7 +44,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     mWebRTCTransportProviderPtr =
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
-    BitFlags<PushAvStreamTransport::Feature> pavFeatures;
     Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVDelegate()));
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
