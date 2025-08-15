@@ -74,7 +74,7 @@ class TC_ACL_2_9(MatterBaseTest):
                 "DUT is commissioned on TH2 fabric"),
             TestStep(
                 3,
-                "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
+                "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element giving TH2 Manage access to the node",
                 "Result is SUCCESS"),
             TestStep(
                 4,
