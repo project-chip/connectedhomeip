@@ -137,12 +137,12 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, options.endpointId,
                      ChipLogValueMEI(options.clusterId), err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        // NOTE: There is no sane way to handle this failure:
-        //   - Returning here means we never free resources and a future registration will fail.
-        //   - Not returning (as we do now) will free resources, but it is unclear why unregistration failed (is it still in use?).
-        //
-        // For now, assume that unregistration failed due to "already missing", so it is safe to delete.
-        // However, this should never happen in practice.
+       // NOTE: There is no sane way to handle this failure:
+       //   - Returning here means we never free resources and a future registration will fail.
+       //   - Not returning (as we do now) will free resources, but it is unclear why unregistration failed (is it still in use?).
+       //
+       // For now, assume that unregistration failed due to "already missing", so it is safe to delete.
+       // However, this should never happen in practice.
     }
 
     delegate.ReleaseRegistration(emberEndpointIndex);
