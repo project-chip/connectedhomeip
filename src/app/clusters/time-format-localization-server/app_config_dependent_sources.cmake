@@ -25,6 +25,4 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/time-format-localization-cluster.cpp"
     "${CLUSTER_DIR}/time-format-localization-cluster.h"
-    "${CLUSTER_DIR}/time-format-localization-logic.cpp"
-    "${CLUSTER_DIR}/time-format-localization-logic.h"
 )

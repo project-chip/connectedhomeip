@@ -44,7 +44,7 @@ public:
         }
     }
 
-    // Delete copy constuctor and assignement
+    // Delete copy constructor and assignment
     AutoReleaseIterator(const AutoReleaseIterator &)             = delete;
     AutoReleaseIterator & operator=(const AutoReleaseIterator &) = delete;
 
@@ -70,8 +70,8 @@ bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalenda
     while (it.Next(type))
     {
         // Update the optional validCalendar to a value from the SupportedList.
-        // This will return either the last element of the list or the requested
-        // value if exists.
+        // If reqCalendar is supported, validCalendar is set to it. Otherwise,
+        // it is set to the last supported value from the provider.
         if (validCalendar != nullptr)
         {
             *validCalendar = type;
