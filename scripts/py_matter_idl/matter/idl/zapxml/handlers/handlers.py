@@ -172,7 +172,7 @@ class AttributeHandler(BaseHandler):
         self._cluster.attributes.append(self._attribute)
 
 
-class SkipProvisioalHandler(BaseHandler):
+class SkipProvisionalHandler(BaseHandler):
     def __init__(self, context: Context, attrs):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
 
@@ -235,7 +235,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                 field.qualities |= FieldQuality.FABRIC_SENSITIVE
 
             self._struct.fields.append(field)
-            return SkipProvisioalHandler(self.context, attrs)
+            return SkipProvisionalHandler(self.context, attrs)
         elif name.lower() == 'cluster':
             self._cluster_codes.add(ParseInt(attrs['code']))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
