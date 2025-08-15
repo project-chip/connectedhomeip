@@ -21,6 +21,9 @@
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+#include <codegen/CodegenProcessingConfig.h>
+
 #include <limits>
 
 namespace chip::app {
@@ -34,9 +37,11 @@ bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fi
 
     if (emberEndpointIndex >= maxEndpointCount)
     {
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         ChipLogError(AppServer,
                      "Could not find a valid endpoint index for endpoint %u/" ChipLogFormatMEI " (Index %u was not valid)",
                      endpointId, ChipLogValueMEI(clusterId), emberEndpointIndex);
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         return false;
     }
     return true;
@@ -54,8 +59,10 @@ void LoadFeatureMap(EndpointId endpointId, ClusterId clusterId, uint32_t & featu
         emberAfReadAttribute(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, readable, sizeof(temp));
     if (status != Protocols::InteractionModel::Status::Success)
     {
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         ChipLogError(AppServer, "Failed to load feature map for %u/" ChipLogFormatMEI " (Status %d)", endpointId,
                      ChipLogValueMEI(clusterId), static_cast<int>(status));
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         return;
     }
     // note: we do not try to check if value is representable: all the uint32_t values are representable
@@ -107,8 +114,10 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
 
     if (err != CHIP_NO_ERROR)
     {
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, options.endpointId,
                      ChipLogValueMEI(options.clusterId), err.Format());
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
 }
 
@@ -124,8 +133,10 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&delegate.FindRegistration(emberEndpointIndex));
     if (err != CHIP_NO_ERROR)
     {
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, options.endpointId,
                      ChipLogValueMEI(options.clusterId), err.Format());
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         // NOTE: There is no sane way to handle this failure:
         //   - Returning here means we never free resources and a future registration will fail.
         //   - Not returning (as we do now) will free resources, but it is unclear why unregistration failed (is it still in use?).

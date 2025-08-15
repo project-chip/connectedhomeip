@@ -41,6 +41,7 @@ codegen_data_model_PUBLIC_DEPS = [
   "${chip_root}/src/app/data-model-provider",
   "${chip_root}/src/app:required-privileges",
   "${chip_root}/src/data-model-providers/codegen:instance-header",
+  "${chip_root}/src/data-model-providers/codegen:processing-config",
   "${chip_root}/src/app/server-cluster",
   "${chip_root}/src/app/server-cluster:registry",
   "${chip_root}/src/app/persistence",
