@@ -18,7 +18,7 @@
 #include <app/static-cluster-config/EthernetNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
@@ -36,88 +36,62 @@ static constexpr size_t kEthernetNetworkDiagnosticsMaxClusterCount =
 
 LazyRegisteredServerCluster<EthernetDiagnosticsServerCluster> gServers[kEthernetNetworkDiagnosticsMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
-// Log an error if not found.
-bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, Id, kEthernetNetworkDiagnosticsFixedClusterCount);
-
-    if (arrayIndex >= kEthernetNetworkDiagnosticsMaxClusterCount)
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        // ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
-        return false;
-    }
-    outArrayIndex = arrayIndex;
-    return true;
-}
+        ChipLogProgress(AppServer, "Registering Ethernet Network Diagnostics Cluster on endpoint %u, %d", endpointId,
+                        emberEndpointIndex);
 
-// Runtime method to check if an attribute is enabled using Ember functions
-bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
-{
-    return emberAfContainsAttribute(endpointId, Id, attributeId);
-}
+        // Create OptionalAttributeSet from optionalAttributeBits
+        EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+
+        // Create the cluster with all required parameters
+        gServers[emberEndpointIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), BitFlags<Feature>(featureMap),
+                                            optionalAttributeSet);
+
+        return gServers[emberEndpointIndex].Registration();
+    }
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    {
+        return gServers[emberEndpointIndex].Cluster();
+    }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+};
 
 } // namespace
 
 void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet =
-        EthernetDiagnosticsServerCluster::OptionalAttributeSet()
-            .Set<CarrierDetect::Id>(IsAttributeEnabled(endpointId, CarrierDetect::Id))
-            .Set<FullDuplex::Id>(IsAttributeEnabled(endpointId, FullDuplex::Id))
-            .Set<PHYRate::Id>(IsAttributeEnabled(endpointId, PHYRate::Id))
-            .Set<TimeSinceReset::Id>(IsAttributeEnabled(endpointId, TimeSinceReset::Id))
-            .Set<PacketRxCount::Id>(IsAttributeEnabled(endpointId, PacketRxCount::Id))
-            .Set<PacketTxCount::Id>(IsAttributeEnabled(endpointId, PacketTxCount::Id))
-            .Set<TxErrCount::Id>(IsAttributeEnabled(endpointId, TxErrCount::Id))
-            .Set<CollisionCount::Id>(IsAttributeEnabled(endpointId, CollisionCount::Id))
-            .Set<OverrunCount::Id>(IsAttributeEnabled(endpointId, OverrunCount::Id));
-
-    BitFlags<Feature> enabledFeatures;
-    enabledFeatures.Set(Feature::kPacketCounts,
-                        IsAttributeEnabled(endpointId, PacketRxCount::Id) || IsAttributeEnabled(endpointId, PacketTxCount::Id));
-    enabledFeatures.Set(Feature::kErrorCounts,
-                        IsAttributeEnabled(endpointId, TxErrCount::Id) || IsAttributeEnabled(endpointId, CollisionCount::Id) ||
-                            IsAttributeEnabled(endpointId, OverrunCount::Id));
-
-    // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
-    // and do not properly support secondary network interfaces or per-endpoint diagnostics.
-    // See issue:#40175
-    gServers[arrayIndex].Create(DeviceLayer::GetDiagnosticDataProvider(), enabledFeatures, optionalAttributeSet);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        // TODO: Reenable log in the following PR
-        //     ChipLogError(AppServer, "Failed to register EthernetNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT,
-        //     endpointId,
-        //                  err.Format());
-    }
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = EthernetNetworkDiagnostics::Id,
+            .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
+            .maxEndpointCount                = kEthernetNetworkDiagnosticsMaxClusterCount,
+            .fetchFeatureMap                 = true,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
 }
 
 void MatterEthernetNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        // TODO: Reenable log in the following PR
-        //     ChipLogError(AppServer, "Failed to unregister EthernetNetworkDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT,
-        //     endpointId,
-        //                  err.Format());
-    }
-    gServers[arrayIndex].Destroy();
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = EthernetNetworkDiagnostics::Id,
+            .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
+            .maxEndpointCount                = kEthernetNetworkDiagnosticsMaxClusterCount,
+        },
+        integrationDelegate);
 }
 
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback() {}
