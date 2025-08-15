@@ -66,18 +66,12 @@ jobs:
               with:
                   gh-context: ${{ toJson(github) }}
 
-            - name: Build all rtl8777g examples (Full)
-              if: steps.changed_paths.outputs.realtek == 'true' 
+            - name: Build rtl8777g lighting and light-switch examples
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target realtek-rtl8777g-lighting \
                       --target realtek-rtl8777g-light-switch \
-                      --target realtek-rtl8777g-lock \
-                      --target realtek-rtl8777g-all-clusters \
-                      --target realtek-rtl8777g-ota-requestor \
-                      --target realtek-rtl8777g-thermostat \
-                      --target realtek-rtl8777g-window \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -96,13 +90,21 @@ jobs:
                     out/artifacts/realtek-rtl8777g-light-switch/chip-rtl8777g-light-switch-app \
                     /tmp/bloat_reports/
 
+            - name: Uploading Size Reports
+              uses: ./.github/actions/upload-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                  platform-name: REALTEK-FREERTOS
 
-            - name: Build subset rtl8777g examples (Subset)
-              if: steps.changed_paths.outputs.realtek != 'true'
+            - name: Build other rtl8777g examples
+              if: steps.changed_paths.outputs.realtek == 'true'
               run: |
                  scripts/run_in_build_env.sh "\
                     ./scripts/build/build_examples.py \
-                    --target realtek-rtl8777g-lighting \
-                    --target realtek-rtl8777g-light-switch \
+                      --target realtek-rtl8777g-lock \
+                      --target realtek-rtl8777g-all-clusters \
+                      --target realtek-rtl8777g-ota-requestor \
+                      --target realtek-rtl8777g-thermostat \
+                      --target realtek-rtl8777g-window \
                     build \
                   "
