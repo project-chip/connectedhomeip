@@ -225,8 +225,8 @@ TEST(TestAttributePersistence, TestEnumHandling)
 
         // Test loading the stored enum value
         valueRead = CalendarTypeEnum::kUnknownEnumValue;
-        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, CalendarTypeEnum::kPersian));
-        ASSERT_TRUE(valueRead == CalendarTypeEnum::kGregorian);
+        EXPECT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, CalendarTypeEnum::kPersian));
+        EXPECT_EQ(valueRead, CalendarTypeEnum::kGregorian);
     }
 
     // Test attempting to store an unknown enum value
