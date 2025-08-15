@@ -16,6 +16,7 @@ name: Data model directory checks
 
 on:
   pull_request:
+    paths-ignore: ["**/*.md", "*.md"]
 
 jobs:
   check-data-model-updates:
