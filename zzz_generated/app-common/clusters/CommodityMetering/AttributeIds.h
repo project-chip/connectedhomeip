@@ -24,9 +24,9 @@ namespace MeteredQuantityTimestamp {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace MeteredQuantityTimestamp
 
-namespace MeasurementType {
+namespace TariffUnit {
 inline constexpr AttributeId Id = 0x00000002;
-} // namespace MeasurementType
+} // namespace TariffUnit
 
 namespace MaximumMeteredQuantities {
 inline constexpr AttributeId Id = 0x00000003;

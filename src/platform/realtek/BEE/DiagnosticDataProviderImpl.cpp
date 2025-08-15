@@ -234,7 +234,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMax
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
     NetworkInterface * ifp = new NetworkInterface();
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
     ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
@@ -242,11 +241,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
-    ;
 
     otExtAddress extAddr;
     ThreadStackMgrImpl().GetExtAddress(extAddr);
-    ifp->hardwareAddress = ByteSpan(extAddr.m8, OT_EXT_ADDRESS_SIZE);
+    memcpy(ifp->MacAddress, extAddr.m8, OT_EXT_ADDRESS_SIZE);
+    ifp->hardwareAddress = ByteSpan(ifp->MacAddress, OT_EXT_ADDRESS_SIZE);
 
     /* Thread only support IPv6 */
     uint8_t ipv6AddressesCount = 0;
