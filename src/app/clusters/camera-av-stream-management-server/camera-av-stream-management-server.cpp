@@ -1794,9 +1794,9 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
         }
         else
         {
-            VideoStreamStruct & vStreamToUpdate = *it;
+            VideoStreamStruct & videoStreamToUpdate = *it;
             // Reusing the existing stream. Update range parameters
-            UpdateVideoStreamRangeParams(vStreamToUpdate, videoStreamArgs);
+            UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs);
         }
 
         response.videoStreamID = videoStreamID;
@@ -2032,9 +2032,9 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
     }
     else
     {
-        SnapshotStreamStruct & sStreamToUpdate = *it;
+        SnapshotStreamStruct & snapshotStreamToUpdate = *it;
         // Reusing the existing stream. Update range parameters
-        UpdateSnapshotStreamRangeParams(sStreamToUpdate, snapshotStreamArgs);
+        UpdateSnapshotStreamRangeParams(snapshotStreamToUpdate, snapshotStreamArgs);
     }
 
     response.snapshotStreamID = snapshotStreamID;
