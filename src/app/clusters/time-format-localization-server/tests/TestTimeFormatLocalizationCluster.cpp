@@ -18,12 +18,12 @@
 
 #include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 
+#include <app/ConcreteClusterPath.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <app/ConcreteClusterPath.h>
 
 #include <clusters/TimeFormatLocalization/Attributes.h>
 #include <lib/core/TLV.h>
@@ -49,12 +49,8 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
     {
         BitFlags<TimeFormatLocalization::Feature> features{ 0 };
 
-        TimeFormatLocalizationCluster onlyMandatory(
-            kRootEndpointId,
-            features,
-            TimeFormatLocalization::HourFormatEnum::k12hr,
-            TimeFormatLocalization::CalendarTypeEnum::kBuddhist
-        );
+        TimeFormatLocalizationCluster onlyMandatory(kRootEndpointId, features, TimeFormatLocalization::HourFormatEnum::k12hr,
+                                                    TimeFormatLocalization::CalendarTypeEnum::kBuddhist);
 
         // Test attributes listing with no features enabled
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
@@ -72,12 +68,8 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
     {
         BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
 
-        TimeFormatLocalizationCluster withCalendarFeature(
-            kRootEndpointId,
-            features,
-            TimeFormatLocalization::HourFormatEnum::k12hr,
-            TimeFormatLocalization::CalendarTypeEnum::kBuddhist
-        );
+        TimeFormatLocalizationCluster withCalendarFeature(kRootEndpointId, features, TimeFormatLocalization::HourFormatEnum::k12hr,
+                                                          TimeFormatLocalization::CalendarTypeEnum::kBuddhist);
 
         // Test attributes listing with CalendarFormat feature enabled
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;

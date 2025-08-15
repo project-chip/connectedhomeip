@@ -27,7 +27,8 @@ class TimeFormatLocalizationCluster : public DefaultServerCluster
 {
 public:
     TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features,
-        TimeFormatLocalization::HourFormatEnum defaultHourFormat, TimeFormatLocalization::CalendarTypeEnum defaultCalendarType);
+                                  TimeFormatLocalization::HourFormatEnum defaultHourFormat,
+                                  TimeFormatLocalization::CalendarTypeEnum defaultCalendarType);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 

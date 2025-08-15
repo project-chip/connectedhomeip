@@ -46,21 +46,22 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
         rawFeatureMap = 0;
     }
 
-    // Get the default values from ZAP, just in case of read failure we set the values to the initial of the enum (k12hr and kBuddhist).
-    TimeFormatLocalization::HourFormatEnum defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
+    // Get the default values from ZAP, just in case of read failure we set the values to the initial of the enum (k12hr and
+    // kBuddhist).
+    TimeFormatLocalization::HourFormatEnum defaultHourFormat     = TimeFormatLocalization::HourFormatEnum::k12hr;
     TimeFormatLocalization::CalendarTypeEnum defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
 
     // First the HourFormat
-    if(TimeFormatLocalization::Attributes::HourFormat::Get(endpoint, &defaultHourFormat) != Status::Success)
+    if (TimeFormatLocalization::Attributes::HourFormat::Get(endpoint, &defaultHourFormat) != Status::Success)
     {
         ChipLogError(AppServer, "Failed to get HourFormat for endpoint %u", endpoint);
         defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
     }
 
     // Get the ActiveCalendarType default value if the feature is enabled.
-    if(BitFlags<TimeFormatLocalization::Feature>(rawFeatureMap).Has(TimeFormatLocalization::Feature::kCalendarFormat))
+    if (BitFlags<TimeFormatLocalization::Feature>(rawFeatureMap).Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
-        if(TimeFormatLocalization::Attributes::ActiveCalendarType::Get(endpoint, &defaultCalendarType) != Status::Success)
+        if (TimeFormatLocalization::Attributes::ActiveCalendarType::Get(endpoint, &defaultCalendarType) != Status::Success)
         {
             ChipLogError(AppServer, "Failed to get ActiveCalendarType for endpoint %u", endpoint);
             defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
