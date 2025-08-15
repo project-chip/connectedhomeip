@@ -48,6 +48,15 @@ static void OnAttestationInformationVerificationCallback(void * context, const D
 
 } // namespace
 
+CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
+{
+    Crypto::P256SerializedKeypair serialized_keypair;
+    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
+    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
+    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
+    return keypair.Deserialize(serialized_keypair);
+}
+
 struct TestDacOnlyPartialAttestationVerifier : public ::testing::Test
 {
     static constexpr VendorId kTestVendorId  = static_cast<VendorId>(0xFFF1);
@@ -271,4 +280,61 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMatchingPAIAndDACProductID
     // Call the verifier with the matching PAI and DAC information
     verifier.VerifyAttestationInformation(matchingPidInfo, &attestationCallback);
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kAttestationSignatureInvalid);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidSignature)
+{
+    // Prepare TLV attestationElements
+    uint8_t cdData[32]    = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t nonceData[32] = { 0x55, 0x66, 0x77, 0x88 };
+    uint8_t tlvBuf[128];
+
+    chip::TLV::TLVWriter writer;
+    writer.Init(tlvBuf, sizeof(tlvBuf));
+    chip::TLV::TLVType outerType;
+
+    CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
+    writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData));
+    writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0));
+    writer.Put(chip::TLV::ContextTag(4), ByteSpan());
+    writer.Put(chip::TLV::ContextTag(5), ByteSpan());
+
+    err = writer.EndContainer(outerType);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    size_t tlvLen = writer.GetLengthWritten();
+
+    // Prepare attestationChallenge
+    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
+
+    // Concatenate attestationElements + attestationChallenge
+    uint8_t toSign[128 + 32];
+    memcpy(toSign, tlvBuf, tlvLen);
+    memcpy(toSign + tlvLen, challengeData, sizeof(challengeData));
+
+    // Load DAC private key and public key from test vectors
+    chip::Crypto::P256Keypair keypair;
+    err = LoadKeypairFromRaw(
+        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey),
+        ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey),
+        keypair);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    // Sign the attestationElements + attestationChallenge
+    chip::Crypto::P256ECDSASignature signature;
+    err = keypair.ECDSA_sign_msg(toSign, tlvLen + sizeof(challengeData), signature);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    // Prepare AttestationInfo
+    DeviceAttestationVerifier::AttestationInfo validInfo(
+        ByteSpan(tlvBuf, tlvLen), ByteSpan(challengeData), ByteSpan(signature.ConstBytes(), signature.Length()),
+        TestCerts::sTestCert_PAI_FFF1_8000_Cert,
+        TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert,
+        ByteSpan(nonceData), kTestVendorId, kTestProductId);
+
+    verifier.VerifyAttestationInformation(validInfo, &attestationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaaFormatInvalid);
 }
