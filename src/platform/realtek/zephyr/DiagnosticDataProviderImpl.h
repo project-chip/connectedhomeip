@@ -15,11 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the DiagnosticDataProvider object.
- */
-
 #pragma once
 
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>

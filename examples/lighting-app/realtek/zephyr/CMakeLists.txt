@@ -19,12 +19,6 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(REALTEK_COMMON ${CHIP_ROOT}/examples/platform/realtek REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
-# if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
-#   set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
-# else()
-#   unset(LOCAL_DTC_OVERLAY_FILE)
-# endif()
-
 if(EXISTS "${CHIP_ROOT}/src/platform/realtek/zephyr/${BOARD}.overlay")
   set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/realtek/zephyr/${BOARD}.overlay")
 else()
@@ -59,7 +53,8 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}/lighting-app
                            ${REALTEK_COMMON}/bee/ota
                            ${REALTEK_COMMON}/zephyr
-                           ${ZEPHYR_BASE}/../modules/hal/realtek/bee/drivers/wdt/inc)
+                           ${ZEPHYR_BASE}/../modules/hal/realtek/bee/drivers/wdt/inc
+                           ${ZEPHYR_BASE}/../realtek-zephyr-project/applications/matter_common)
 
 target_sources(app PRIVATE
                main/main.cpp
@@ -82,7 +77,9 @@ chip_configure_data_model(app
 )
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
-  target_sources(app PRIVATE ${REALTEK_COMMON}/bee/ota/OTAInitializer.cpp)
+  target_sources(app PRIVATE
+                 ${REALTEK_COMMON}/bee/ota/OTAInitializer.cpp
+                 ${ZEPHYR_BASE}/../realtek-zephyr-project/applications/matter_common/matter_ota.c)
 endif()
 
 # Fix for unused swap parameter in: zephyr/include/zephyr/arch/riscv/irq.h:70

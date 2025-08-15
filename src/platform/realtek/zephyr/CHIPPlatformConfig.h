@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for CHIP on
- *          Realtek platforms.
- */
-
 #pragma once
 
 // ==================== General Platform Adaptations ====================

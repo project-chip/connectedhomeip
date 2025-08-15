@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the KeyValueStoreManager object
- *          for Realtek platforms, by including Zephyr platform
- *          implementation.
- */
-
 #pragma once
 
 #include <platform/Zephyr/KeyValueStoreManagerImpl.h>

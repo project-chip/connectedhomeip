@@ -15,13 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Defines platform-specific event types and data for the chip
- *          Device Layer on Realtek platforms, by including Zephyr
- *          platform definitions.
- */
-
 #pragma once
 
 #include <platform/Zephyr/CHIPDevicePlatformEvent.h>

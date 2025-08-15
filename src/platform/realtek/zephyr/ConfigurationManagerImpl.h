@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the ConfigurationManager object
- *          for the Realtek platform, by including Zephyr platform
- *          implementation.
- */
-
 #pragma once
 
 #include <platform/Zephyr/ConfigurationManagerImpl.h>

@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the chip Device Layer
- *          on Realtek platforms.
- */
-
 #pragma once
 
 // ==================== Platform Adaptations ====================

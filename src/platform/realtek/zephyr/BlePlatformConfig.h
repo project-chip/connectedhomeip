@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Realtek platform.
- *
- */
-
 #pragma once
 
 #include <zephyr/bluetooth/bluetooth.h>

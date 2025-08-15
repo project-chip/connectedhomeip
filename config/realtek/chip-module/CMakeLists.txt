@@ -28,7 +28,6 @@ if (CONFIG_CHIP)
 include(ExternalProject)
 include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
-#include(generate_factory_data.cmake)
 
 # ==============================================================================
 # Prepare CHIP configuration based on the project Kconfig configuration
@@ -136,10 +135,10 @@ elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
 endif()
 
-# if (CONFIG_CHIP_ROTATING_DEVICE_ID)
-#     matter_add_gn_arg_bool("chip_enable_rotating_device_id"          "true")
-#     matter_add_gn_arg_bool("chip_enable_additional_data_advertising" "true")
-# endif()
+if (CONFIG_CHIP_ROTATING_DEVICE_ID)
+    matter_add_gn_arg_bool("chip_enable_rotating_device_id"          "true")
+    matter_add_gn_arg_bool("chip_enable_additional_data_advertising" "true")
+endif()
 
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     matter_add_gn_arg_string("chip_mdns" "platform")
@@ -189,11 +188,6 @@ set(BLOCK_SIZE "1024")
 dt_nodelabel(dts_partition_path NODELABEL "boot_patch_0")
 dt_reg_size(mcuboot_size PATH ${dts_partition_path})
 math(EXPR boot_blocks "${mcuboot_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
-
-# get code-partition factory_partition address
-# dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
-# dt_reg_addr(factory_size PATH ${dts_partition_path})
-# math(EXPR factory_blocks "${factory_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
 
 # ==============================================================================
 # Define 'factory_data' target for generating a factory data partition

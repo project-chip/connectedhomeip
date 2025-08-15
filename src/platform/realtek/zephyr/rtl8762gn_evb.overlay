@@ -17,7 +17,7 @@
 		};
 	};
 
-    buttons {
+	buttons {
 		compatible = "gpio-keys";
 		button0: button_0 {
 			gpios = <&gpiob 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
@@ -35,21 +35,21 @@
 			gpios = <&gpioa 24 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 			label = "Push button switch 3";
 		};
-        button4: button_4 {
+		button4: button_4 {
 			gpios = <&gpiob 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 			label = "Push button switch 4";
 		};
-    };
+	};
 
 	/* These aliases are provided for compatibility with samples */
 	aliases {
 		led0 = &led0;
 		led1 = &led1;
-        sw0 = &button0;
+		sw0 = &button0;
 		sw1 = &button1;
 		sw2 = &button2;
 		sw3 = &button3;
-        sw4 = &button4;
+		sw4 = &button4;
 	};
 
 	tcm {
@@ -83,7 +83,7 @@
 };
 
 &flash {
-    reg = <0x4000000 DT_SIZE_M(4)>;
+	reg = <0x4000000 DT_SIZE_M(4)>;
 	partitions {
 		/delete-node/ partition@2d000;
 		/delete-node/ partition@94000;
@@ -94,7 +94,7 @@
 			reg = <0x2D000 DT_SIZE_K(1024)>;
 		};
 		/* Bank 1 */
-        ota_header_1: partition@12d000 {
+		ota_header_1: partition@12d000 {
 			label = "ota-header-1-image";
 			reg = <0x12D000 DT_SIZE_K(4)>;
 		};

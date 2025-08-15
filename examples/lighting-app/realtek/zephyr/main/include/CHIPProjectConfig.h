@@ -130,7 +130,7 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
  *
- * A monothonic number identifying the software version running on the device.
+ * A monotonic number identifying the software version running on the device.
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1

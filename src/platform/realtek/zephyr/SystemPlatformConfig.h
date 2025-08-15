@@ -15,13 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP System
- *          Layer on Zephyr platform.
- *
- */
-
 #pragma once
 
 #include <stdint.h>

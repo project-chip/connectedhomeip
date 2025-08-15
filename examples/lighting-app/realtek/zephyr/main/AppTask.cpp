@@ -94,14 +94,14 @@ namespace StatusLed {
 namespace Unprovisioned {
 constexpr uint32_t kOn_ms{ 100 };
 constexpr uint32_t kOff_ms{ kOn_ms };
-} /* namespace Unprovisioned */
+} // namespace Unprovisioned
 namespace Provisioned {
 constexpr uint32_t kOn_ms{ 50 };
 constexpr uint32_t kOff_ms{ 950 };
-} /* namespace Provisioned */
+} // namespace Provisioned
 
-} /* namespace StatusLed */
-} /* namespace LedConsts */
+} // namespace StatusLed
+} // namespace LedConsts
 
 CHIP_ERROR AppTask::Init()
 {

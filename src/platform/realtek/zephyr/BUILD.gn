@@ -103,10 +103,8 @@ static_library("realtek_zephyr") {
 
   if (chip_enable_ota_requestor) {
     sources += [
-      "ota/OTAImageProcessorImpl.cpp",
-      "ota/OTAImageProcessorImpl.h",
-      "ota/matter_ota.c",
-      "ota/matter_ota.h",
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
     ]
   }
 }

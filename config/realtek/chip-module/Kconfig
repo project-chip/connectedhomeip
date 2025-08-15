@@ -142,8 +142,6 @@ config CHIP_FACTORY_RESET_ERASE_NVS
 	bool
 	default y
 
-endif
-
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
 	help
@@ -198,3 +196,5 @@ config REALTEK_OTA_BANK1
 	bool "OTA BANK1 APP"
 	default n
 	depends on CHIP_OTA_REQUESTOR
+
+endif() # CONFIG_CHIP

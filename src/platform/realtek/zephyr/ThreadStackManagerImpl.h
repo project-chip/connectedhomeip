@@ -15,13 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the ThreadStackManager object
- *          for Realtek platforms, by including Zephyr platform
- *          implementation.
- */
-
 #pragma once
 
 #include <platform/Zephyr/ThreadStackManagerImpl.h>

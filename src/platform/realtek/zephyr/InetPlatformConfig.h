@@ -15,13 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the Openchip Inet
- *          Layer on Realtek platforms.
- *
- */
-
 #pragma once
 
 // ==================== Platform Adaptations ====================

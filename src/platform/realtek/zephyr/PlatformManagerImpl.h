@@ -15,13 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the PlatformManager object
- *          for the Realtek platforms, by including Zephyr platform
- *          implementation.
- */
-
 #pragma once
 
 #include <platform/Zephyr/PlatformManagerImpl.h>
