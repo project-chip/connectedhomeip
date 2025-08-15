@@ -237,13 +237,19 @@ class AndroidBuilder(Builder):
         # Check multiple possible SDK manager locations for Android SDK compatibility
         sdk_manager, checked_details = self._find_sdk_manager("validation")
 
-        if not sdk_manager:
-            logging.error("SDK manager not found in any expected location")
-            for detail in checked_details:
-                logging.error(f"  {detail}")
+        # New SDK manager at cmdline-tools/10.0/bin/
+        new_sdk_manager = os.path.join(
+            os.environ["ANDROID_HOME"], "cmdline-tools", "10.0", "bin", "sdkmanager"
+        )
+        if not (
+            os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)
+        ) and not (
+            os.path.isfile(new_sdk_manager) and os.access(
+                new_sdk_manager, os.X_OK)
+        ):
             raise Exception(
-                "SDK manager not found in any expected location. Checked: %s"
-                % "; ".join(checked_details)
+                "'%s' and '%s' is not executable by the current user"
+                % (sdk_manager, new_sdk_manager)
             )
 
         # In order to accept a license, the licenses folder is updated with the hash of the
