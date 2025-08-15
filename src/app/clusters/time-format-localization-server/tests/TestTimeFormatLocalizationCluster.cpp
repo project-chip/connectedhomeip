@@ -50,7 +50,7 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
         BitFlags<TimeFormatLocalization::Feature> features{ 0 };
 
         TimeFormatLocalizationCluster onlyMandatory(
-            kRootEndpointId, 
+            kRootEndpointId,
             features,
             TimeFormatLocalization::HourFormatEnum::k12hr,
             TimeFormatLocalization::CalendarTypeEnum::kBuddhist
@@ -73,7 +73,7 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
         BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
 
         TimeFormatLocalizationCluster withCalendarFeature(
-            kRootEndpointId, 
+            kRootEndpointId,
             features,
             TimeFormatLocalization::HourFormatEnum::k12hr,
             TimeFormatLocalization::CalendarTypeEnum::kBuddhist

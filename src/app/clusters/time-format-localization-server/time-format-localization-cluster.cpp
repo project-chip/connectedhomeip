@@ -90,7 +90,7 @@ bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalenda
 
 TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId,
                                                              BitFlags<TimeFormatLocalization::Feature> features,
-                                                             TimeFormatLocalization::HourFormatEnum defaultHourFormat, 
+                                                             TimeFormatLocalization::HourFormatEnum defaultHourFormat,
                                                              TimeFormatLocalization::CalendarTypeEnum defaultCalendarType) :
     DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
     mFeatures(features), mHourFormat(defaultHourFormat), mCalendarType(defaultCalendarType)
@@ -193,7 +193,7 @@ CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath &
                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    
+
 
     const DataModel::AttributeEntry optionalAttributes[] = {
         TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry,
@@ -203,7 +203,7 @@ CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath &
     chip::app::OptionalAttributeSet<TimeFormatLocalization::Attributes::ActiveCalendarType::Id,
                                     TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id> optionalAttributeSet;
 
-    if(mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat)) 
+    if(mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
         optionalAttributeSet.Set<TimeFormatLocalization::Attributes::ActiveCalendarType::Id>();
         optionalAttributeSet.Set<TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id>();

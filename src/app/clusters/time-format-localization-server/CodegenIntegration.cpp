@@ -51,7 +51,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     TimeFormatLocalization::CalendarTypeEnum defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
 
     // First the HourFormat
-    if(TimeFormatLocalization::Attributes::HourFormat::Get(endpoint, &defaultHourFormat) != Status::Success) 
+    if(TimeFormatLocalization::Attributes::HourFormat::Get(endpoint, &defaultHourFormat) != Status::Success)
     {
         ChipLogError(AppServer, "Failed to get HourFormat for endpoint %u", endpoint);
         defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
@@ -60,7 +60,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     // Get the ActiveCalendarType default value if the feature is enabled.
     if(BitFlags<TimeFormatLocalization::Feature>(rawFeatureMap).Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
-        if(TimeFormatLocalization::Attributes::ActiveCalendarType::Get(endpoint, &defaultCalendarType) != Status::Success) 
+        if(TimeFormatLocalization::Attributes::ActiveCalendarType::Get(endpoint, &defaultCalendarType) != Status::Success)
         {
             ChipLogError(AppServer, "Failed to get ActiveCalendarType for endpoint %u", endpoint);
             defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
