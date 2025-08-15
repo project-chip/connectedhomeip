@@ -76,12 +76,16 @@ public:
         virtual void ReleaseRegistration(unsigned emberEndpointIndex) = 0;
     };
 
+    // Note on indexing:
+    //   - The methods here use emberAfGetClusterServerEndpointIndex to convert
+    //     an endpointId to a linear index [0; maxEndpointCount) from ember.
+    //     For this ember requires the fixedClusterServerEndpointCount.
     struct RegisterServerOptions
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterServerEndpointCount; // Data to aid in ember 0-based indexing.
-        uint16_t maxEndpointCount;                // This is how many endpoints are supported by the delegates (0-based index).
+        uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints in ember configuration.
+        uint16_t maxEndpointCount;                // This is how many endpoints are supported by the delegate (0-based index).
         bool fetchFeatureMap;                     // Read feature map attribute from ember.
         bool fetchOptionalAttributes;             // Read the enabling of the first 32 optional attributes from ember.
     };
@@ -95,6 +99,9 @@ public:
     /// The returned `CreateRegistration` value will be used to register to the codegen
     /// data model provider registry
     ///
+    /// In case of errors, this method will log the error and return (error state is not
+    /// returned to the caller as it is generally not actionable/fixable)
+    ///
     /// Typical implementation is that this gets called in `emberAf....ClusterServerInitCallback`
     static void RegisterServer(const RegisterServerOptions & options, Delegate & delegate);
 
@@ -102,11 +109,14 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterServerEndpointCount; // Data to aid in ember 0-based indexing.
-        uint16_t maxEndpointCount;                // This is how many endpoints are supported by the delegates (0-based index).
+        uint16_t fixedClusterServerEndpointCount; // Number of fixed endpoints in ember configuration.
+        uint16_t maxEndpointCount;                // This is how many endpoints are supported by the delegate (0-based index).
     };
 
     /// A typical implementation is that this gets called in `Matter....ClusterServerShutdownCallback`.
+    ///
+    /// In case of errors, this method will log the error and return (error state is not
+    /// returned to the caller as it is generally not actionable/fixable)
     static void UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate);
 };
 
