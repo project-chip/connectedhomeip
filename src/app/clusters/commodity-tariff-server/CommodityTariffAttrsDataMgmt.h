@@ -23,8 +23,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/LockTracker.h>
 
-#include <cassert>
 #include <atomic>
+#include <cassert>
 
 namespace chip {
 
