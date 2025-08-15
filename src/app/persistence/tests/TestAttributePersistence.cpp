@@ -13,7 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "EnumsCheck.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
@@ -205,7 +204,8 @@ TEST(TestAttributePersistence, TestStrings)
 
 TEST(TestAttributePersistence, TestEnumHandling)
 {
-    using namespace chip::app::Clusters;
+    // Using TimeFormatLocalization enums for these tests.
+    using namespace chip::app::Clusters::TimeFormatLocalization;
 
     TestPersistentStorageDelegate storageDelegate;
     DefaultAttributePersistenceProvider ramProvider;
@@ -213,26 +213,26 @@ TEST(TestAttributePersistence, TestEnumHandling)
 
     AttributePersistence persistence(ramProvider);
 
-    TestEnum valueRead = TestEnum::kUnknownEnumValue;
+    CalendarTypeEnum valueRead = CalendarTypeEnum::kUnknownEnumValue;
 
     // Test storing and loading a valid enum value
     {
         const ConcreteAttributePath path(1, 2, 3);
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(TestEnum::kValue1);
+        AttributeValueDecoder decoder = writeOp.DecoderFor(CalendarTypeEnum::kGregorian);
         EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_NO_ERROR);
-        EXPECT_EQ(valueRead, TestEnum::kValue1);
+        EXPECT_EQ(valueRead, CalendarTypeEnum::kGregorian);
 
         // Test loading the stored enum value
-        valueRead = TestEnum::kUnknownEnumValue;
-        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, TestEnum::kValue2));
-        ASSERT_TRUE(valueRead == TestEnum::kValue1);
+        valueRead = CalendarTypeEnum::kUnknownEnumValue;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, valueRead, CalendarTypeEnum::kPersian));
+        ASSERT_TRUE(valueRead == CalendarTypeEnum::kGregorian);
     }
 
     // Test attempting to store an unknown enum value
     {
         const ConcreteAttributePath path(3, 2, 1);
-        const uint8_t testUnknownValue = 0x12;
+        const uint8_t testUnknownValue = static_cast<uint8_t>(CalendarTypeEnum::kUnknownEnumValue) + 1;
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(testUnknownValue);
         EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_IM_GLOBAL_STATUS(ConstraintError));
