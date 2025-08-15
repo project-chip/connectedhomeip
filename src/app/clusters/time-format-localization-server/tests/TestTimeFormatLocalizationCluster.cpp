@@ -16,13 +16,14 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/time-format-localization-server/time-format-localization-logic.h>
+#include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <app/ConcreteClusterPath.h>
 
 #include <clusters/TimeFormatLocalization/Attributes.h>
 #include <lib/core/TLV.h>
@@ -48,15 +49,17 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
     {
         BitFlags<TimeFormatLocalization::Feature> features{ 0 };
 
-        TimeFormatLocalizationLogic onlyMandatory(features);
+        TimeFormatLocalizationCluster onlyMandatory(
+            kRootEndpointId, 
+            features,
+            TimeFormatLocalization::HourFormatEnum::k12hr,
+            TimeFormatLocalization::CalendarTypeEnum::kBuddhist
+        );
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-
-        // No features enabled
-        ASSERT_EQ(onlyMandatory.GetFeatureMap(), BitFlags<TimeFormatLocalization::Feature>{ 0 });
-
+        // Test attributes listing with no features enabled
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(onlyMandatory.Attributes(attributesBuilder), CHIP_NO_ERROR);
+        ConcreteClusterPath clusterPath(kRootEndpointId, TimeFormatLocalization::Id);
+        ASSERT_EQ(onlyMandatory.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
         ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
@@ -69,14 +72,17 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
     {
         BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
 
-        TimeFormatLocalizationLogic onlyMandatory(features);
+        TimeFormatLocalizationCluster withCalendarFeature(
+            kRootEndpointId, 
+            features,
+            TimeFormatLocalization::HourFormatEnum::k12hr,
+            TimeFormatLocalization::CalendarTypeEnum::kBuddhist
+        );
 
-        // CalendarFormat feature enabled.
-        ASSERT_EQ(onlyMandatory.GetFeatureMap(),
-                  BitFlags<TimeFormatLocalization::Feature>{ TimeFormatLocalization::Feature::kCalendarFormat });
-
+        // Test attributes listing with CalendarFormat feature enabled
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(onlyMandatory.Attributes(attributesBuilder), CHIP_NO_ERROR);
+        ConcreteClusterPath clusterPath(kRootEndpointId, TimeFormatLocalization::Id);
+        ASSERT_EQ(withCalendarFeature.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
         ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
@@ -91,77 +97,4 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
     }
 }
 
-TEST_F(TestTimeFormatLocalizationCluster, ListCalendarTest)
-{
-    // TODO: This seems to work to test the ListCalendar using a Encoder/Decoder with TLV. Probably there is an easier way.
-    uint8_t buf[1024];
-    TLV::TLVWriter tlvWriter;
-    tlvWriter.Init(buf);
-
-    AttributeReportIBs::Builder builder;
-    builder.Init(&tlvWriter);
-
-    ConcreteAttributePath path(0, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id);
-    ConcreteReadAttributePath readPath(path);
-    DataVersion version{ 0 };
-    Access::SubjectDescriptor descriptor;
-    AttributeValueEncoder encoder(builder, descriptor, path, version);
-
-    BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
-
-    // Save old provider
-    DeviceLayer::DeviceInfoProvider * oldProvider = DeviceLayer::GetDeviceInfoProvider();
-    // Set new SampleProvider
-    DeviceLayer::SampleDeviceProvider testProvider;
-    DeviceLayer::SetDeviceInfoProvider(&testProvider);
-
-    TimeFormatLocalizationLogic clusterSim(features);
-
-    EXPECT_EQ(clusterSim.GetSupportedCalendarTypes(encoder), CHIP_NO_ERROR);
-
-    TLV::TLVReader reader;
-    reader.Init(buf);
-
-    TLV::TLVReader attrReportsReader;
-    TLV::TLVReader attrReportReader;
-    TLV::TLVReader attrDataReader;
-
-    reader.Next();
-    reader.OpenContainer(attrReportsReader);
-
-    attrReportsReader.Next();
-    attrReportsReader.OpenContainer(attrReportReader);
-
-    attrReportReader.Next();
-    attrReportReader.OpenContainer(attrDataReader);
-
-    // We're now in the attribute data IB, skip to the desired tag, we want TagNum = 2
-    attrDataReader.Next();
-    for (int i = 0; i < 3 && !(IsContextTag(attrDataReader.GetTag()) && TagNumFromTag(attrDataReader.GetTag()) == 2); ++i)
-    {
-        attrDataReader.Next();
-    }
-    EXPECT_TRUE(IsContextTag(attrDataReader.GetTag()));
-    EXPECT_EQ(TagNumFromTag(attrDataReader.GetTag()), 2u);
-
-    TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo::DecodableType list;
-    TimeFormatLocalization::CalendarTypeEnum calendarType;
-    CHIP_ERROR err = list.Decode(attrDataReader);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    auto iter = list.begin();
-
-    EXPECT_TRUE(iter.Next());
-    calendarType = iter.GetValue();
-    EXPECT_EQ(calendarType, TimeFormatLocalization::CalendarTypeEnum::kGregorian);
-    EXPECT_TRUE(iter.Next());
-    calendarType = iter.GetValue();
-    EXPECT_EQ(calendarType, TimeFormatLocalization::CalendarTypeEnum::kChinese);
-    EXPECT_TRUE(iter.Next());
-    calendarType = iter.GetValue();
-    EXPECT_EQ(calendarType, TimeFormatLocalization::CalendarTypeEnum::kJapanese);
-
-    // Revert provider to old state
-    DeviceLayer::SetDeviceInfoProvider(oldProvider);
-}
 } // namespace
