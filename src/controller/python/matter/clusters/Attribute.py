@@ -554,7 +554,7 @@ class SubscriptionTransaction:
 
     def SetReportBeginCallback(self, callback: Callable[[SubscriptionTransaction], None]):
         '''
-        Sets the callback function for when a subscription report starts,
+        Sets the callback function for when a subscription report with at least one path starts,
         accepts a Callable that accepts the transaction.
         '''
         if callback is not None:
@@ -562,7 +562,7 @@ class SubscriptionTransaction:
 
     def SetReportEndCallback(self, callback: Callable[[SubscriptionTransaction], None]):
         '''
-        Sets the callback function for when a subscription report ends,
+        Sets the callback function for when a subscription report with at least one path ends,
         accepts a Callable that accepts the transaction.
         '''
         if callback is not None:
