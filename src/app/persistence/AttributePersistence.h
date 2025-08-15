@@ -52,21 +52,24 @@ public:
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - write to storage
-    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
     CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
     {
-        if constexpr (std::is_enum_v<T>)
-        {
-            T decodedValue = T::kUnknownEnumValue;
-            ReturnErrorOnFailure(decoder.Decode(decodedValue));
-            VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-            value = decodedValue;
-        }
-        else
-        {
-            ReturnErrorOnFailure(decoder.Decode(value));
-        }
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
+    }
 
+    // Specialization for enums
+    // - decode the given data
+    // - verifies that it is a valid enum value
+    // - writes to storage
+    template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
+    CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
+    {
+        T decodedValue = T::kUnknownEnumValue;
+        ReturnErrorOnFailure(decoder.Decode(decodedValue));
+        VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        value = decodedValue;
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
 
