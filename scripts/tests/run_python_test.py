@@ -242,6 +242,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
+    restart_monitor_thread = None
     app_exit_code = 0
     stream_output = sys.stdout.buffer
     if quiet:
@@ -293,7 +294,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
                                      output_cb=process_test_script_output,
                                      f_stdout=stream_output,
-                                     f_stderr=sys.stderr.buffer)
+                                     f_stderr=stream_output)
     test_script_process.start()
     test_script_process.p.stdin.close()
 
