@@ -43,23 +43,23 @@ LazyRegisteredServerCluster<WiFiDiagnosticsServerCluster> gServers[kWiFiNetworkD
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned zeroBasedArrayIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         // NOTE: Currently, diagnostics only support a single provider (DeviceLayer::GetDiagnosticDataProvider())
         // and do not properly support secondary network interfaces or per-endpoint diagnostics.
         // See issue:#40317
-        gServers[zeroBasedArrayIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
-                                             WiFiDiagnosticsServerLogic::OptionalAttributeSet(optionalAttributeBits),
-                                             BitFlags<WiFiNetworkDiagnostics::Feature>(featureMap));
-        return gServers[zeroBasedArrayIndex].Registration();
+        gServers[emberEndpointIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
+                                            WiFiDiagnosticsServerLogic::OptionalAttributeSet(optionalAttributeBits),
+                                            BitFlags<WiFiNetworkDiagnostics::Feature>(featureMap));
+        return gServers[emberEndpointIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned zeroBasedArrayIndex) override
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
     {
-        return gServers[zeroBasedArrayIndex].Cluster();
+        return gServers[emberEndpointIndex].Cluster();
     }
-    void DestroyRegistration(unsigned zeroBasedArrayIndex) override { gServers[zeroBasedArrayIndex].Destroy(); }
+    void DestroyRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
 
 } // namespace

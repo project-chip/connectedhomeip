@@ -41,15 +41,15 @@ LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned zeroBasedArrayIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         gServer.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet(optionalAttributeBits));
         return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned zeroBasedArrayIndex) override { return gServer.Cluster(); }
-    void DestroyRegistration(unsigned zeroBasedArrayIndex) override { gServer.Destroy(); }
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
+    void DestroyRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
 };
 
 } // namespace

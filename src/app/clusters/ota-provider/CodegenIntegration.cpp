@@ -36,18 +36,18 @@ LazyRegisteredServerCluster<OtaProviderServer> gServers[kOtaProviderMaxClusterCo
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned zeroBasedArrayIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[zeroBasedArrayIndex].Create(endpointId);
-        return gServers[zeroBasedArrayIndex].Registration();
+        gServers[emberEndpointIndex].Create(endpointId);
+        return gServers[emberEndpointIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned zeroBasedArrayIndex) override
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
     {
-        return gServers[zeroBasedArrayIndex].Cluster();
+        return gServers[emberEndpointIndex].Cluster();
     }
-    void DestroyRegistration(unsigned zeroBasedArrayIndex) override { gServers[zeroBasedArrayIndex].Destroy(); }
+    void DestroyRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
 };
 
 } // namespace

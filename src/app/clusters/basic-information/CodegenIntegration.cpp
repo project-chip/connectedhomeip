@@ -48,7 +48,7 @@ ServerClusterRegistration gRegistration(BasicInformationCluster::Instance());
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned zeroBasedArrayIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
 
@@ -58,10 +58,10 @@ public:
         return gRegistration;
     }
 
-    ServerClusterInterface & FindRegistration(unsigned zeroBasedArrayIndex) override { return BasicInformationCluster::Instance(); }
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return BasicInformationCluster::Instance(); }
 
     // Nothing to destroy: separate singleton class without constructor/destructor is used
-    void DestroyRegistration(unsigned zeroBasedArrayIndex) override {}
+    void DestroyRegistration(unsigned emberEndpointIndex) override {}
 };
 
 } // namespace

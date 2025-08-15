@@ -28,15 +28,15 @@ namespace chip::app {
 namespace {
 
 bool findEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fixedClusterServerEndpointCount,
-                         uint16_t maxEndpointCount, uint16_t & zeroBasedArrayIndex)
+                         uint16_t maxEndpointCount, uint16_t & emberEndpointIndex)
 {
-    zeroBasedArrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, clusterId, fixedClusterServerEndpointCount);
+    emberEndpointIndex = emberAfGetClusterServerEndpointIndex(endpointId, clusterId, fixedClusterServerEndpointCount);
 
-    if (zeroBasedArrayIndex >= maxEndpointCount)
+    if (emberEndpointIndex >= maxEndpointCount)
     {
         ChipLogError(AppServer,
                      "Could not find a valid endpoint index for endpoint %u/" ChipLogFormatMEI " (Index %u was not valid)",
-                     endpointId, ChipLogValueMEI(clusterId), zeroBasedArrayIndex);
+                     endpointId, ChipLogValueMEI(clusterId), emberEndpointIndex);
         return false;
     }
     return true;
@@ -66,9 +66,9 @@ void LoadFeatureMap(EndpointId endpointId, ClusterId clusterId, uint32_t & featu
 
 void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & options, Delegate & delegate)
 {
-    uint16_t zeroBasedArrayIndex;
+    uint16_t emberEndpointIndex;
     if (!findEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
-                             options.maxEndpointCount, zeroBasedArrayIndex))
+                             options.maxEndpointCount, emberEndpointIndex))
     {
         return;
     }
@@ -103,7 +103,7 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     }
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(
-        delegate.CreateRegistration(options.endpointId, zeroBasedArrayIndex, optionalAttributes, featureMap));
+        delegate.CreateRegistration(options.endpointId, emberEndpointIndex, optionalAttributes, featureMap));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -114,14 +114,14 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
 
 void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate)
 {
-    uint16_t zeroBasedArrayIndex;
+    uint16_t emberEndpointIndex;
     if (!findEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterServerEndpointCount,
-                             options.maxEndpointCount, zeroBasedArrayIndex))
+                             options.maxEndpointCount, emberEndpointIndex))
     {
         return;
     }
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&delegate.FindRegistration(zeroBasedArrayIndex));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&delegate.FindRegistration(emberEndpointIndex));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, options.endpointId,
@@ -134,7 +134,7 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
         // However, this should never happen in practice.
     }
 
-    delegate.DestroyRegistration(zeroBasedArrayIndex);
+    delegate.DestroyRegistration(emberEndpointIndex);
 }
 
 } // namespace chip::app
