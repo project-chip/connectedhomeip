@@ -72,10 +72,10 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterServerEndpointCount; // data to aid in ember 0-based indexing
-        uint16_t maxEndpointCount;                // this is how many endpoints are supported by the delegates (0-based index)
-        bool fetchFeatureMap;                     // read feature map attribute from ember
-        bool fetchOptionalAttributes;             // read the enabling of the first 32 optional attributes from ember
+        uint16_t fixedClusterServerEndpointCount; // Data to aid in ember 0-based indexing.
+        uint16_t maxEndpointCount;                // This is how many endpoints are supported by the delegates (0-based index).
+        bool fetchFeatureMap;                     // Read feature map attribute from ember.
+        bool fetchOptionalAttributes;             // Read the enabling of the first 32 optional attributes from ember.
     };
 
     /// Loads required data from ember and calls `CreateRegistration` once all the data
@@ -94,8 +94,8 @@ public:
     {
         EndpointId endpointId;
         ClusterId clusterId;
-        uint16_t fixedClusterServerEndpointCount; // data to aid in ember 0-based indexing
-        uint16_t maxEndpointCount;                // this is how many endpoints are supported by the delegates (0-based index)
+        uint16_t fixedClusterServerEndpointCount; // Data to aid in ember 0-based indexing.
+        uint16_t maxEndpointCount;                // This is how many endpoints are supported by the delegates (0-based index).
     };
 
     /// A typical implementation is that this gets called in `Matter....ClusterServerShutdownCallback`.
