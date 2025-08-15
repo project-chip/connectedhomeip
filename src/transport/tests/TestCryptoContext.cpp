@@ -74,7 +74,8 @@ TEST_F(TestGroupCryptoContext, TestBuildPrivacyNonce)
 
 TEST_F(TestGroupCryptoContext, TestEncryptionOverhead)
 {
-    // Matter has a single set of crypto primitives and thus a fixed amount of overhead.
+    // This may seem trivial, but adding new crypto suite should lead to
+    // an update of this test to properly vet the overhead for all suites.
     CryptoContext context;
     EXPECT_EQ(context.EncryptionOverhead(), chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 }
