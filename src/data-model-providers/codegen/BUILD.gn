@@ -13,7 +13,6 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
-
 declare_args() {
   # enable extra error logging if emberAf lokups or data loading fails
   # during cluster register/unregister
@@ -29,9 +28,7 @@ buildconfig_header("processing-config") {
   header = "CodegenProcessingConfig.h"
   header_dir = "codegen"
 
-  defines = [
-    "CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS=${chip_enable_codegen_integration_lookup_errors}",
-  ]
+  defines = [ "CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS=${chip_enable_codegen_integration_lookup_errors}" ]
 }
 
 # This source set is TIGHLY coupled with code-generated data models

@@ -54,7 +54,8 @@ source_set("without-logging") {
   # This exists mainly for compatibility with CMAKE systems: need to ensure
   # that the corresponding buildconfig header is generated (regardless if used or not)
   if (chip_build_enable_codegen_configuration) {
-    public_deps += [ "${chip_root}/src/data-model-providers/codegen:processing-config" ]
+    public_deps +=
+        [ "${chip_root}/src/data-model-providers/codegen:processing-config" ]
   }
 
   # Only include the DefaultAttestationVerifier if needed in the build.
