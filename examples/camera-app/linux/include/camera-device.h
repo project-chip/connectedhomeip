@@ -21,6 +21,7 @@
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
+#include "push-av-stream-transport-delegate-impl.h"
 #include "webrtc-provider-manager.h"
 #include "zone-manager.h"
 
@@ -86,6 +87,7 @@ public:
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
@@ -194,8 +196,8 @@ public:
     CameraError SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode) override;
     bool GetSoftLivestreamPrivacyModeEnabled() override { return mSoftLivestreamPrivacyModeEnabled; }
 
-    // Currently, defaulting to not supporting hard privacy switch.
-    bool HasHardPrivacySwitch() override { return false; }
+    // Currently, defaulting to supporting hard privacy switch.
+    bool HasHardPrivacySwitch() override { return true; }
 
     // Currently, defaulting to supporting speaker.
     bool HasSpeaker() override { return true; }
@@ -318,6 +320,7 @@ private:
     chip::app::Clusters::ChimeManager mChimeManager;
     chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderManager mWebRTCProviderManager;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager mPushAVTransportManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
     chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
 
