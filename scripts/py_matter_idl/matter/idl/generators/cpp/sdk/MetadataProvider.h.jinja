@@ -1,0 +1,48 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Cluster metadata information for cluster {{cluster.name}} (cluster code: {{"%d/0x%X" | format(cluster.code, cluster.code)}})
+// based on {{input_name}}
+#pragma once
+
+#include <optional>
+
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/ClusterMetadataProvider.h>
+#include <clusters/{{cluster.name | upfirst}}/Ids.h>
+#include <clusters/{{cluster.name | upfirst}}/Metadata.h>
+
+namespace chip {
+namespace app {
+namespace DataModel {
+
+template<>
+struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::{{cluster.name | upfirst}}::Id>
+{
+  static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId) {
+    using namespace Clusters::{{cluster.name | upfirst}}::Attributes;
+    switch(attributeId) {
+    {% for attribute in cluster.attributes | reject("global_attribute") -%}
+      case {{attribute.definition.name | upfirst}}::Id: return {{attribute.definition.name | upfirst}}::kMetadataEntry;
+    {% endfor -%}
+      default: return std::nullopt;
+    }
+  }
+};
+
+template<>
+struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::{{cluster.name | upfirst}}::Id>
+{
+  static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId) {
+    using namespace Clusters::{{cluster.name | upfirst}}::Commands;
+    switch(commandId){
+    {% for command in cluster.commands -%}
+      case {{command.name | upfirst}}::Id: return {{command.name | upfirst}}::kMetadataEntry;
+    {% endfor %}
+      default: return std::nullopt;
+    }
+  }
+};
+
+} // namespace DataModel
+} // namespace app
+} // namespace chip

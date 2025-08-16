@@ -38,6 +38,7 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -61,6 +62,8 @@ constexpr uint32_t kTestListLength        = 5;
 
 // We don't really care about the content, we just need a buffer.
 uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
+
+TestPersistentStorageDelegate gStorageDelegate;
 
 class TestWriteChunking : public Test::AppContext
 {
@@ -339,7 +342,7 @@ TEST_F(TestWriteChunking, TestListChunking)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -430,7 +433,7 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -534,7 +537,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -617,7 +620,7 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -702,7 +705,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -777,7 +780,7 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -861,7 +864,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -925,7 +928,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -1110,7 +1113,7 @@ void TestWriteChunking::RunTest(Instructions instructions, EncodingMethod encodi
 TEST_F(TestWriteChunking, TestTransactionalList)
 {
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

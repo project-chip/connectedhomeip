@@ -114,7 +114,7 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <attributes>
-    <attribute id="0x0000" name="NumberOfPositions" type="uint8" default="2">
+    <attribute id="0x0000" name="NumberOfPositions" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -122,7 +122,7 @@ Davis, CA 95616, USA
         <min value="2"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="CurrentPosition" type="uint8" default="0">
+    <attribute id="0x0001" name="CurrentPosition" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -130,7 +130,7 @@ Davis, CA 95616, USA
         <max value="NumberOfPositions - 1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="MultiPressMax" type="uint8" default="2">
+    <attribute id="0x0002" name="MultiPressMax" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>

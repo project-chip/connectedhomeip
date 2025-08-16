@@ -28,13 +28,13 @@ choice CHIP_NXP_PLATFORM_SELECTION
 		depends on MCUX_HW_DEVICE_RW612 || MCUX_HW_DEVICE_RW610
 		help
 			NXP RW61x platform.
-		    
+
 	config CHIP_NXP_PLATFORM_RT1170
 		bool "RT1170 platform"
 		depends on MCUX_HW_DEVICE_MIMXRT1171 || MCUX_HW_DEVICE_MIMXRT1172 || MCUX_HW_DEVICE_MIMXRT1173 || MCUX_HW_DEVICE_MIMXRT1175 || MCUX_HW_DEVICE_MIMXRT1176
 		help
 			NXP RT1170 platform.
-		
+
 	config CHIP_NXP_PLATFORM_RT1060
 		bool "RT1060 platform"
 		depends on MCUX_HW_DEVICE_MIMXRT1061 || MCUX_HW_DEVICE_MIMXRT1062
@@ -77,10 +77,17 @@ config CHIP_NXP_PLATFORM_FAMILY
 	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	default "rt" if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
 
+config CHIP_NXP_CRYPTO_IMPL
+	string "NXP Crypto Implementation chosen"
+	default "se05x" if CHIP_SE05X
+	default ""
+	help
+		Defines crypto implementation to be used
+
 choice CHIP_NVM_COMPONENT
 	prompt "NVM component selection"
 	default CHIP_NVM_COMPONENT_NVS
-	
+
 	config CHIP_NVM_COMPONENT_NVS
 		bool "NVS"
 		help
@@ -90,7 +97,7 @@ choice CHIP_NVM_COMPONENT
 		bool "LittleFS"
 		help
 			Use LittleFS component to store CHIP data.
-		
+
 	config CHIP_NVM_COMPONENT_KEYSTORAGE
 		bool "Key Storage"
 		help
@@ -100,19 +107,19 @@ choice CHIP_NVM_COMPONENT
 		bool "NVM Framework"
 		help
 			Use the NVM Framework component to store CHIP data.
-endchoice	
+endchoice
 
 choice CHIP_CRYPTO
 	prompt "CHIP Crypto selection"
+	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_SE05X
 	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
-	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-	
+
 	config CHIP_CRYPTO_MBEDTLS
 		bool "CHIP MbedTLS crypto"
 		help
 			Enables the implementation of the Matter cryptographic operations that is
 			based on the mbedTLS crypto API.
-	
+
 	config CHIP_CRYPTO_PLATFORM
 		bool "CHIP platform crypto"
 		help
@@ -128,6 +135,7 @@ endchoice
 
 config CHIP_TASK_STACK_SIZE
 	int "CHIP task stack size"
+	default 13000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
 	default 10240
 	help
 		Set the stack size for the CHIP task.
@@ -200,6 +208,13 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 		within range [-JITTER; +JITTER].
 
+# Secure Element
+config CHIP_SE05X
+	bool "Enable Secure Element support"
+	select SE05X_LIB
+	help
+		Enable SE05x Secure element for offloading crypto operations.
+
 # Thread network features
 
 if NET_L2_OPENTHREAD
@@ -226,6 +241,7 @@ config NETWORK_LAYER_BLE
 config OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
 	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default y if CHIP_SE05X
 	help
 		"Use custom implementation of operational keystore"
 
@@ -280,7 +296,7 @@ if CHIP_OTA_REQUESTOR
 config CHIP_OTA_ENCRYPTION
 	bool "OTA with encryption"
 	help
-		When enabled, the OTA image processor expects the image to be encrypted with AES, 
+		When enabled, the OTA image processor expects the image to be encrypted with AES,
 		so it will attempt to decrypt each block before storing it in flash.
 
 config CHIP_OTA_ENCRYPTION_KEY
@@ -288,7 +304,7 @@ config CHIP_OTA_ENCRYPTION_KEY
 	depends on CHIP_OTA_ENCRYPTION
 	default "1234567890ABCDEFA1B2C3D4E5F6F1B4"
 	help
-		Defines the key used for encrypting the OTA image. 
+		Defines the key used for encrypting the OTA image.
 		This key is reused to perform an AES decryption of the OTA image.
 
 endif # CHIP_OTA_REQUESTOR

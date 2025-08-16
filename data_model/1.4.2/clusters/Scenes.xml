@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Based on the ZCL Scenes Cluster, Updated the Cluster ID to 0x0062, the name to Scenes Management, removed the provisional status; Removed attributes SceneCount, CurrentScene, CurrentGroup, SceneValid, and NameSupport; Removed Explicit, TableSize and FabricScenes features; Removed EnhancedAddScene, EnhancedAddSceneResponse, EnhancedViewScene, EnhancedViewSceneResponse; TransitionTime field changed milliseconds in AddScene, ViewSceneResponse and RecallScene"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0062" name="Scenes Management">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0062" name="Scenes Management"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
   <features>
@@ -120,25 +118,25 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="SceneInfoStruct">
-      <field id="0" name="SceneCount" type="uint8" default="0">
+      <field id="0" name="SceneCount" type="uint8">
         <mandatoryConform/>
       </field>
-      <field id="1" name="CurrentScene" type="uint8" default="0xFF">
+      <field id="1" name="CurrentScene" type="uint8">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="2" name="CurrentGroup" type="group-id" default="0">
+      <field id="2" name="CurrentGroup" type="group-id">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="SceneValid" type="bool" default="false">
+      <field id="3" name="SceneValid" type="bool">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="RemainingCapacity" type="uint8" default="MS">
+      <field id="4" name="RemainingCapacity" type="uint8">
         <mandatoryConform/>
         <constraint>
           <max value="253"/>
@@ -149,9 +147,10 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="DoNotUse">
+      <access read="true" readPrivilege="view"/>
       <disallowConform/>
     </attribute>
-    <attribute id="0x0001" name="SceneTableSize" type="uint16" default="16">
+    <attribute id="0x0001" name="SceneTableSize" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>

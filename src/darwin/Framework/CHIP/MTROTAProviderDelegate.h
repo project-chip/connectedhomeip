@@ -21,6 +21,7 @@
 #import <Matter/MTRDefines.h>
 
 @class MTRDeviceController;
+@class MTRMetrics;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -140,7 +141,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)handleBDXTransferSessionEndForNodeID:(NSNumber *)nodeID
                                   controller:(MTRDeviceController *)controller
-                                       error:(NSError * _Nullable)error;
+                                     metrics:(MTRMetrics *)metrics
+                                       error:(NSError * _Nullable)error
+    MTR_AVAILABLE(ios(26.1), macos(26.1), watchos(26.1), tvos(26.1));
+
+- (void)handleBDXTransferSessionEndForNodeID:(NSNumber *)nodeID
+                                  controller:(MTRDeviceController *)controller
+                                       error:(NSError * _Nullable)error
+    MTR_DEPRECATED_WITH_REPLACEMENT("handleBDXTransferSessionEndForNodeID:controller:metrics:error:", ios(16.1, 26.1),
+        macos(13.0, 26.1), watchos(9.1, 26.1), tvos(16.1, 26.1));
 
 /**
  * Notify the delegate when a BDX Query message has been received for some node.

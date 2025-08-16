@@ -17,10 +17,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from matter_testing_infrastructure.chip.testing.matter_asserts import assert_valid_uint8
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_asserts import assert_valid_uint8
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -54,6 +55,10 @@ class TC_CNET_4_16(MatterBaseTest):
         # Precondition 1: DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
         # Precondition 2: TH can communicate with the DUT on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
         networkID = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.LastNetworkID)
+
+        asserts.assert_is_not_none(
+            networkID, "Failed to read LastNetworkID attribute. Returned None. Ensure DUT is commissioned to Thread network.")
+
         logger.info(f" --- NetworkID: {networkID.hex()}")
         asserts.assert_in(networkID.hex(), thread_1st.hex(),
                           f"NetworkID: {networkID.hex()} not in {thread_1st.hex()}")

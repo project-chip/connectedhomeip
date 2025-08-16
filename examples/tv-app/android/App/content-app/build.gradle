@@ -3,12 +3,13 @@ plugins {
 }
 
 android {
-    compileSdk 30
+    namespace 'com.example.contentapp'
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.contentapp"
-        minSdk 24
-        targetSdk 30
+        minSdk 26
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -22,8 +23,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -36,7 +37,9 @@ android {
             aidl.srcDirs = ['../common-api/src/main/aidl']
         }
     }
-
+    buildFeatures {
+        aidl = true
+    }
 }
 
 dependencies {

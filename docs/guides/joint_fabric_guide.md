@@ -2,8 +2,11 @@
 
 -   [Joint Fabric Guide](#joint-fabric-guide)
     -   [Joint Fabric Example Applications](#joint-fabric-example-applications)
-        -   [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
-        -   [Run Joint Fabric Demo](#run-joint-fabric-demo)
+        -   [Building the Example Application](#building-the-example-application)
+    -   [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
+        -   [Initialize Ecosystem A (Vendor ID = 0xFFF1)](#initialize-ecosystem-a-vendor-id--0xfff1)
+        -   [Initialize Ecosystem B (Vendor ID = 0xFFF2)](#initialize-ecosystem-b-vendor-id--0xfff2)
+    -   [Manually Testing JCM (Joint Commissioning Method)](#manually-testing-jcm-joint-commissioning-method)
 
 ## Joint Fabric Example Applications
 
@@ -60,7 +63,7 @@ $ rm -rf /tmp/chip_*
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
 $ rm -rf jfa_a_kvs && touch jfa_a_kvs
-$ ./jfa-app --capabilities 0x4 --passcode 110220033 --secured-device-port 5533 --rpc-server-port 33033 --KVS jfa_a_kvs
+$ ./jfa-app --capabilities 0x4 --passcode 110220033 --discriminator 3840  --secured-device-port 5533 --rpc-server-port 33033 --KVS jfa_a_kvs
 ```
 
 -   Start jf-control-app
@@ -74,7 +77,7 @@ $ ./jfc-app --rpc-server-port 33033 --storage-directory jfc_a_storage_directory 
 -   Commission jf-admin-app
 
 ```
->>> pairing onnetwork 1 110220033 --anchor true
+>>> pairing onnetwork-long 1 110220033 3840 --anchor true
 ```
 
 Check for the following logs on the jf-control-app side:
@@ -158,7 +161,7 @@ should be found.
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
 $ rm -rf jfa_b_kvs && touch jfa_b_kvs
-$ ./jfa-app --capabilities 0x4 --passcode 110220055 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
+$ ./jfa-app --capabilities 0x4 --passcode 110220055 --discriminator 3841 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
 ```
 
 -   Start jf-control-app
@@ -172,13 +175,13 @@ $ ./jfc-app --rpc-server-port 33055 --storage-directory jfc_b_storage_directory 
 -   Commission jf-admin-app
 
 ```
->>> pairing onnetwork 11 110220055 --anchor true
+>>> pairing onnetwork-long 11 110220055 3841 --anchor true
 ```
 
 Check for the following logs on the jf-control-app side:
 
 ```
->>> [JF] Anchor Administrator commissioned with sucess
+>>> [JF] Anchor Administrator commissioned with success
 ```
 
 Make sure that the NOC issued to jf-admin-app contains an Anchor CAT and an
@@ -250,4 +253,28 @@ jf-admin-app has been installed:
 A `Subjects` field equal to `18446744065119551489` (`FFFFFFFDFFFF0001` in hex)
 should be found.
 
-## Run Joint Fabric Demo
+## Manually Testing JCM (Joint Commissioning Method)
+
+Execute all the initialization steps for Ecosystem A and Ecosystem B above.
+
+On the Ecosystem B Joint Fabric Controller application
+
+-   Open Joint Commissioning Window on JF Admin App of Ecosystem B
+
+```
+>>> pairing open-joint-commissioning-window 11 1 400 1000 1261
+```
+
+Check for the following logs on the jf-admin-app side:
+
+```
+>>> [DIS] Advertise commission parameter vendorID=65522 productID=32769 discriminator=1261/04 cm=3 cp=0 jf=14
+```
+
+Note: Capture the [manual pairing code]
+
+On the Ecosystem A Joint Fabric Controller application
+
+```
+pairing code 10 [manual pairing code] --jcm true
+```

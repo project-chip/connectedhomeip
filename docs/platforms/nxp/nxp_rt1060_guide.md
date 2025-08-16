@@ -9,7 +9,7 @@
             -   [Hardware requirements RT1060+IW416](#hardware-requirements-rt1060iw416)
             -   [Hardware requirements RT1060+88W8801](#hardware-requirements-rt106088w8801)
             -   [Hardware requirements RT1060 + K32W0](#hardware-requirements-rt1060--k32w0)
-            -   [Hardware requirements RT1060-EVK-C+IW612](#hardware-requirements-rt1060-evk-ciw612)
+            -   [Hardware requirements RT1060-EVK-C + IW612 / IW610](#hardware-requirements-rt1060-evk-c--iw612--iw610)
             -   [Hardware requirements RT1060 + 88W8801 + K32W0x1DK6](#hardware-requirements-rt1060--88w8801--k32w0x1dk6)
     -   [Building](#building)
         -   [CMake Build System](#cmake-build-system)
@@ -51,16 +51,19 @@ Matter over Wi-Fi :
 -   RT1060 + IW416 (Wi-Fi + BLE)
 -   RT1060 + 88W8801 (Wi-Fi)
 -   RT1060-EVK-C + IW612 (Wi-Fi + 15.4 + BLE)
+-   RT1060-EVK-C + IW610 (Wi-Fi + 15.4 + BLE)
 
 Matter over Thread :
 
 -   RT1060 + K32W0 (15.4 + BLE)
 -   RT1060-EVK-C + IW612 (Wi-Fi + 15.4 + BLE)
+-   RT1060-EVK-C + IW610 (Wi-Fi + 15.4 + BLE)
 
 Matter over Wi-Fi with Openthread Border Router support :
 
 -   RT1060 + 88W8801 + K32W0x1DK6
 -   RT1060-EVK-C + IW612 (Wi-Fi + 15.4 + BLE)
+-   RT1060-EVK-C + IW610 (Wi-Fi + 15.4 + BLE)
 
 ### Hardware requirements RT1060 + transceiver
 
@@ -181,7 +184,7 @@ The below picture shows pins connections for the MIMXRT1060-EVK.
 
 ![rt1060_k32w061_pin_settings](../../../examples/platform/nxp/rt/rt1060/doc/images/rt1060_k32w061_pin_settings.jpg)
 
-#### Hardware requirements RT1060-EVK-C+IW612
+#### Hardware requirements RT1060-EVK-C + IW612 / IW610
 
 Host part:
 
@@ -206,6 +209,13 @@ Transceiver part :
     [2EL M2 A1 IW612 Secure Module](https://www.nxp.com/products/wireless/wi-fi-plus-bluetooth-plus-802-15-4/2-4-5-ghz-dual-band-1x1-wi-fi-6-802-11ax-plus-bluetooth-5-2-plus-802-15-4-tri-radio-solution:IW612)
 
 ![](../../../examples/platform/nxp/rt/rt1170/doc/images/iwx612_2EL.jpg)
+
+-   2
+    [2LL M2 IW610 Secure Module](https://www.nxp.com/products/wireless-connectivity/wi-fi-plus-bluetooth-plus-802-15-4/2-4-5ghz-dual-band-1x1-wi-fi-6-plus-bluetooth-low-energy-5-4-plus-802-15-4-tri-radio-solution:IW610)
+    Need to populate R9 with a 10kOhm resistor:
+
+![](../../../examples/platform/nxp/rt/rt1060/doc/images/iw610_2LL.jpg)
+![](../../../examples/platform/nxp/rt/rt1060/doc/images/iw610_hw_rework.jpg)
 
 #### Hardware requirements RT1060 + 88W8801 + K32W0x1DK6
 
@@ -246,10 +256,13 @@ in the build command.
 | Matter-over-WiFi with BLE              | MIMXRT1060-EVK-B + IW416        | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW416`                                                                            |
 | Matter-over-WiFi without BLE           | MIMXRT1060-EVK-B + 8801         | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.88W8801`                                                                          |
 | Matter-over-WiFi with BLE              | MIMXRT1060-EVK-C + IW612        | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X`                                                                            |
+| Matter-over-WiFi with BLE              | MIMXRT1060-EVK-C + IW610        | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X` and `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.board_murata_2ll_m2`   |
 | Matter-over-Thread                     | MIMXRT1060-EVK-B + K32W0        | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver`                                                              |
 | Matter-over-Thread                     | MIMXRT1060-EVK-C + IW612        | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X`                                                                            |
+| Matter-over-Thread                     | MIMXRT1060-EVK-C + IW610        | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X` and `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.board_murata_2ll_m2`   |
 | Matter-over-WiFi with OT Border Router | MIMXRT1060-EVK-B + 8801 + K32W0 | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.88W8801` and `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver` |
 | Matter-over-WiFi with OT Border Router | MIMXRT1060-EVK-C + IW612        | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X`                                                                            |
+| Matter-over-WiFi with OT Border Router | MIMXRT1060-EVK-C + IW610        | `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X` and `CONFIG_MCUX_COMPONENT_component.wifi_bt_module.board_murata_2ll_m2`   |
 
 Example of build command to build the All-Clusters app with Matter-over-WiFi
 configuration on RT1060-EVK-C + IW612 platform :

@@ -1686,8 +1686,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
     VerifyOrExit(X509_get_serialNumber(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_signature_nid(x509Cert) == NID_ecdsa_with_SHA256, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_issuer_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_getm_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_getm_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_subject_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
 
     // Verify public key presence and format.
@@ -1745,16 +1745,20 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 }
             }
             break;
-        case NID_subject_key_identifier:
+        case NID_subject_key_identifier: {
             VerifyOrExit(!isCritical && !extSKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_subject_key_id(x509Cert)->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            const ASN1_OCTET_STRING * pSKID = X509_get0_subject_key_id(x509Cert);
+            VerifyOrExit(pSKID != nullptr && pSKID->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extSKIDPresent = true;
             break;
-        case NID_authority_key_identifier:
+        }
+        case NID_authority_key_identifier: {
             VerifyOrExit(!isCritical && !extAKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_authority_key_id(x509Cert)->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            const ASN1_OCTET_STRING * pAKID = X509_get0_authority_key_id(x509Cert);
+            VerifyOrExit(pAKID != nullptr && pAKID->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extAKIDPresent = true;
             break;
+        }
         default:
             break;
         }
@@ -1839,12 +1843,16 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     {
         X509_VERIFY_PARAM * param = X509_STORE_CTX_get0_param(verifyCtx);
         chip::ASN1::ASN1UniversalTime asn1Time;
-        char * asn1TimeStr = reinterpret_cast<char *>(X509_get_notBefore(x509LeafCertificate)->data);
         uint32_t unixEpoch;
 
         VerifyOrExit(param != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
-        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(CharSpan(asn1TimeStr, strlen(asn1TimeStr))),
+        ASN1_TIME * pNotBefore = X509_getm_notBefore(x509LeafCertificate);
+        VerifyOrExit(pNotBefore != nullptr,
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+        CharSpan asn1TimeSpan(reinterpret_cast<char *>(pNotBefore->data), static_cast<size_t>(pNotBefore->length));
+
+        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(asn1TimeSpan),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
         VerifyOrExit(asn1Time.ExportTo_UnixTime(unixEpoch),
@@ -1897,9 +1905,9 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, c
     x509issuerCertificate = d2i_X509(nullptr, &pIssuerCertificate, static_cast<long>(issuerCertificate.size()));
     VerifyOrExit(x509issuerCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    candidateNotBeforeTime = X509_get_notBefore(x509CandidateCertificate);
-    issuerNotBeforeTime    = X509_get_notBefore(x509issuerCertificate);
-    issuerNotAfterTime     = X509_get_notAfter(x509issuerCertificate);
+    candidateNotBeforeTime = X509_getm_notBefore(x509CandidateCertificate);
+    issuerNotBeforeTime    = X509_getm_notBefore(x509issuerCertificate);
+    issuerNotAfterTime     = X509_getm_notAfter(x509issuerCertificate);
     VerifyOrExit(candidateNotBeforeTime && issuerNotBeforeTime && issuerNotAfterTime, error = CHIP_ERROR_INTERNAL);
 
     result = ASN1_TIME_diff(&days, &seconds, issuerNotBeforeTime, candidateNotBeforeTime);
@@ -1936,14 +1944,14 @@ CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
     x509Certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509Certificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    time = X509_get_notBefore(x509Certificate);
+    time = X509_getm_notBefore(x509Certificate);
     VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
 
     result = X509_cmp_current_time(time);
     // check if certificate's notBefore timestamp is earlier than or equal to current time.
     VerifyOrExit(result == -1, error = CHIP_ERROR_CERT_EXPIRED);
 
-    time = X509_get_notAfter(x509Certificate);
+    time = X509_getm_notAfter(x509Certificate);
     VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
 
     result = X509_cmp_current_time(time);
@@ -2271,11 +2279,32 @@ CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSp
     return ExtractRawDNFromX509Cert(false, certificate, issuer);
 }
 
+class ScopedASN1Object
+{
+public:
+    ScopedASN1Object(const char * string, int no_name) : obj(OBJ_txt2obj(string, no_name)) {}
+    ~ScopedASN1Object() { ASN1_OBJECT_free(obj); }
+
+    explicit operator bool() const { return obj != nullptr; }
+    ASN1_OBJECT * Get() const { return obj; }
+
+    ScopedASN1Object(const ScopedASN1Object &)             = delete;
+    ScopedASN1Object & operator=(const ScopedASN1Object &) = delete;
+
+private:
+    ASN1_OBJECT * obj = nullptr;
+};
+
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
-    ASN1_OBJECT * commonNameObj = OBJ_txt2obj("2.5.4.3", 1);
-    ASN1_OBJECT * matterVidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
-    ASN1_OBJECT * matterPidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
+    ScopedASN1Object commonNameObj("2.5.4.3", 1);
+    VerifyOrReturnError(commonNameObj, CHIP_ERROR_NO_MEMORY);
+
+    ScopedASN1Object matterVidObj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
+    VerifyOrReturnError(matterVidObj, CHIP_ERROR_NO_MEMORY);
+
+    ScopedASN1Object matterPidObj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
+    VerifyOrReturnError(matterPidObj, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     X509 * x509certificate             = nullptr;
@@ -2284,7 +2313,7 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     int x509EntryCountIdx              = 0;
     AttestationCertVidPid vidpidFromCN;
 
-    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!certificate.empty() && CanCastTo<long>(certificate.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     x509certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -2300,15 +2329,15 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
 
         DNAttrType attrType = DNAttrType::kUnspecified;
-        if (OBJ_cmp(object, commonNameObj) == 0)
+        if (OBJ_cmp(object, commonNameObj.Get()) == 0)
         {
             attrType = DNAttrType::kCommonName;
         }
-        else if (OBJ_cmp(object, matterVidObj) == 0)
+        else if (OBJ_cmp(object, matterVidObj.Get()) == 0)
         {
             attrType = DNAttrType::kMatterVID;
         }
-        else if (OBJ_cmp(object, matterPidObj) == 0)
+        else if (OBJ_cmp(object, matterPidObj.Get()) == 0)
         {
             attrType = DNAttrType::kMatterPID;
         }
@@ -2335,9 +2364,6 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     }
 
 exit:
-    ASN1_OBJECT_free(commonNameObj);
-    ASN1_OBJECT_free(matterVidObj);
-    ASN1_OBJECT_free(matterPidObj);
     X509_free(x509certificate);
 
     return err;

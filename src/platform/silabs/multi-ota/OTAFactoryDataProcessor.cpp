@@ -79,7 +79,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
 exit:
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Failed to update factory data. Error: %s", ErrorStr(error));
+        ChipLogError(SoftwareUpdate, "Failed to update factory data. Error: %" CHIP_ERROR_FORMAT, error.Format());
     }
     else
     {

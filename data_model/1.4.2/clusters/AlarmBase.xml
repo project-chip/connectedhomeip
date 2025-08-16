@@ -75,22 +75,22 @@ Davis, CA 95616, USA
     <bitmap name="AlarmBitmap"/>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Mask" type="AlarmBitmap" default="0">
+    <attribute id="0x0000" name="Mask" type="AlarmBitmap">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="Latch" type="AlarmBitmap" default="0">
+    <attribute id="0x0001" name="Latch" type="AlarmBitmap">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="RESET"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="State" type="AlarmBitmap" default="0">
+    <attribute id="0x0002" name="State" type="AlarmBitmap">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0003" name="Supported" type="AlarmBitmap" default="0">
+    <attribute id="0x0003" name="Supported" type="AlarmBitmap">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -102,14 +102,14 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="RESET"/>
       </mandatoryConform>
-      <field id="0" name="Alarms" type="AlarmBitmap" default="0">
+      <field id="0" name="Alarms" type="AlarmBitmap">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x01" name="ModifyEnabledAlarms" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <optionalConform/>
-      <field id="0" name="Mask" type="AlarmBitmap" default="0">
+      <field id="0" name="Mask" type="AlarmBitmap">
         <mandatoryConform/>
       </field>
     </command>
@@ -118,16 +118,16 @@ Davis, CA 95616, USA
     <event id="0x00" name="Notify" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform/>
-      <field id="0" name="Active" type="AlarmBitmap" default="0">
+      <field id="0" name="Active" type="AlarmBitmap">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Inactive" type="AlarmBitmap" default="0">
+      <field id="1" name="Inactive" type="AlarmBitmap">
         <mandatoryConform/>
       </field>
-      <field id="2" name="State" type="AlarmBitmap" default="0">
+      <field id="2" name="State" type="AlarmBitmap">
         <mandatoryConform/>
       </field>
-      <field id="3" name="Mask" type="AlarmBitmap" default="0">
+      <field id="3" name="Mask" type="AlarmBitmap">
         <mandatoryConform/>
       </field>
     </event>

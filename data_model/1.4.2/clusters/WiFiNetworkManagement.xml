@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WIFINM" scope="Endpoint"/>
   <attributes>
-    <attribute id="0x0000" name="SSID" type="octstr" default="null">
+    <attribute id="0x0000" name="SSID" type="octstr">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -77,7 +77,7 @@ Davis, CA 95616, USA
         </lengthBetween>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="PassphraseSurrogate" type="uint64" default="null">
+    <attribute id="0x0001" name="PassphraseSurrogate" type="uint64">
       <access read="true" readPrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>

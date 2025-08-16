@@ -140,6 +140,9 @@ qemu_args += [
 ]
 
 kernel_args = "console=ttyAMA0 earlyprintk earlycon root=/dev/vda"
+# For some reason memory cgroup is not enabled by default in Tizen kernel,
+# but it is required by resourced system service on Tizen >= 9.0.
+kernel_args += " cgroup_enable=memory"
 if args.interactive:
     # Run root shell instead of the runner script.
     kernel_args += " rootshell"

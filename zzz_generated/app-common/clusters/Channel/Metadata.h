@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace Channel {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace ChannelList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ChannelList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -32,10 +34,14 @@ namespace CurrentChannel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentChannel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentChannel
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ChangeChannel {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeChannel::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

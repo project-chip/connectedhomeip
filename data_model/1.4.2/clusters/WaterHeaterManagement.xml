@@ -151,22 +151,22 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="HeaterTypes" type="WaterHeaterHeatSourceBitmap" default="0">
+    <attribute id="0x0000" name="HeaterTypes" type="WaterHeaterHeatSourceBitmap">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="HeatDemand" type="WaterHeaterHeatSourceBitmap" default="0">
+    <attribute id="0x0001" name="HeatDemand" type="WaterHeaterHeatSourceBitmap">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="TankVolume" type="uint16" default="0">
+    <attribute id="0x0002" name="TankVolume" type="uint16">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="EM"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0003" name="EstimatedHeatRequired" type="energy-mWh" default="0">
+    <attribute id="0x0003" name="EstimatedHeatRequired" type="energy-mWh">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="EM"/>
@@ -175,16 +175,13 @@ Davis, CA 95616, USA
         <min value="0"/>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="TankPercentage" type="percent" default="0">
+    <attribute id="0x0004" name="TankPercentage" type="percent">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="TP"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0005" name="BoostState" type="BoostStateEnum">
-      <default>
-        <enum default="Inactive"/>
-      </default>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

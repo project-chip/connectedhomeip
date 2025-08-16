@@ -39,12 +39,13 @@ import random
 import tempfile
 from configparser import ConfigParser
 
-import chip.clusters as Clusters
-from chip import CertificateAuthority
-from chip.storage import PersistentStorage
-from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import CertificateAuthority
+from matter.storage import PersistentStorage
+from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_JFADMIN_2_1(MatterBaseTest):
@@ -108,7 +109,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with success",
+            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
             timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later

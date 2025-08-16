@@ -2762,7 +2762,7 @@ static NSString * const sClusterKey = @"clusterKey";
 @end
 
 @implementation MTRAttributePath
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path
+- (instancetype)initWithPath:(const ConcreteAttributePath &)path
 {
     if (self = [super initWithPath:path]) {
         _attribute = @(path.mAttributeId);

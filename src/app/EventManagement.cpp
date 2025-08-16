@@ -861,6 +861,11 @@ CHIP_ERROR EventManagement::GenerateEvent(EventLoggingDelegate * eventPayloadWri
     return LogEvent(eventPayloadWriter, options, generatedEventNumber);
 }
 
+void EventManagement::ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex)
+{
+    mpEventReporter->ScheduleUrgentEventDeliverySync(FromStdOptional(fabricIndex));
+}
+
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {

@@ -135,4 +135,16 @@ public final class AndroidChipPlatform {
       int spake2pIterationCount,
       long setupPasscode,
       int discriminator);
+
+  public interface ServiceResolveListener {
+    void onServiceResolve(String instanceName, String serviceType);
+  }
+
+  /**
+   * Set a listener which will be notified a service is resolved. The notification will indicate the
+   * instance name and the service type.
+   *
+   * @param ServiceResolveListener listener to notify (or null to disable the Listener)
+   */
+  public native void setServiceResolveListener(ServiceResolveListener listener);
 }

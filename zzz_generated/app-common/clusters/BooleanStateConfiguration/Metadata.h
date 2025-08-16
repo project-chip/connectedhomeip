@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace BooleanStateConfiguration {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace CurrentSensitivityLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentSensitivityLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -52,10 +54,14 @@ namespace SensorFault {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SensorFault::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SensorFault
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SuppressAlarm {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SuppressAlarm::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

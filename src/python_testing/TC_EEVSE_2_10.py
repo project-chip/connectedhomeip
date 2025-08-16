@@ -44,12 +44,13 @@ import logging
 import time
 from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
@@ -85,7 +86,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00) and event EVConnected sent"),
             TestStep("4a", "TH reads from the DUT the State",
                      "Value has to be 0x01 (PluggedInNoDemand)"),
-            TestStep("5", "TH sends command EnableCharging with ChargingEnabledUntil=10 seconds in the future, MinimumChargeCurrent=6000, MaximumChargeCurrent=60000. Store the ChargingEnabledUntil into Matter EPOCH in UTC as ChargingEnabledUntilEpochTime, MinimumChargeCurrent as MinimumChargeCurrent and MaximumChargeCurrent as MaximumChargeCurrent",
+            TestStep("5", "TH sends command EnableCharging with ChargingEnabledUntil=15 seconds in the future, MinimumChargeCurrent=6000, MaximumChargeCurrent=60000. Store the ChargingEnabledUntil into Matter EPOCH in UTC as ChargingEnabledUntilEpochTime, MinimumChargeCurrent as MinimumChargeCurrent and MaximumChargeCurrent as MaximumChargeCurrent",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("6a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x01 (ChargingEnabled)"),
@@ -120,7 +121,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
                      "Value has to be 0"),
             TestStep("9f", "TH reads from the DUT the MaximumDischargeCurrent",
                      "Value has to be 0"),
-            TestStep("10", "Wait 5 seconds"),
+            TestStep("10", "Wait 10 seconds"),
             TestStep("10a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x00 (Disabled)"),
             TestStep("10b", "TH reads from the DUT the ChargingEnabledUntil",
@@ -222,12 +223,12 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("5")
 
-        # TH sends command EnableCharging with ChargingEnabledUntil=10 seconds in the future,
+        # TH sends command EnableCharging with ChargingEnabledUntil=15 seconds in the future,
         # MinimumChargeCurrent=6000, MaximumChargeCurrent=60000.
         # Store the ChargingEnabledUntil into Matter EPOCH in UTC as ChargingEnabledUntilEpochTime,
         # MinimumChargeCurrent as MinimumChargeCurrent and MaximumChargeCurrent as MaximumChargeCurrent
         # Verify DUT responds w/ status SUCCESS(0x00)
-        charging_duration = 10  # seconds
+        charging_duration = 15  # seconds
         min_charge_current = 6000
         max_charge_current = 60000
         utc_time_charging_end = datetime.now(
@@ -358,9 +359,9 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("MaximumDischargeCurrent", 0)
 
         self.step("10")
-        # Wait 5 seconds
-        logger.info("Waiting for 5 seconds for charging timer to expire")
-        time.sleep(5)
+        # Wait 10 seconds
+        logger.info("Waiting for 10 seconds for charging timer to expire")
+        time.sleep(10)
 
         self.step("10a")
         # TH reads from the DUT the SupplyState

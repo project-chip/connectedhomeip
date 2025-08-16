@@ -3220,38 +3220,6 @@
               "isEnabled": 1
             },
             {
-              "name": "EnhancedMoveHue",
-              "code": 65,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedStepHue",
-              "code": 66,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedMoveToHueAndSaturation",
-              "code": 67,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "ColorLoopSet",
-              "code": 68,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
               "name": "StopMoveStep",
               "code": 71,
               "mfgCode": null,

@@ -221,30 +221,30 @@ class YamlTestParserGroup(click.Group):
 CONTEXT_SETTINGS = dict(
     default_map={
         'chiptool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'chipyaml.adapters.chiptool.adapter',
             'server_name': 'chip-tool',
             'server_arguments': 'interactive server',
         },
         'darwinframeworktool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'chipyaml.adapters.chiptool.adapter',
             'server_name': 'darwin-framework-tool',
             'server_arguments': 'interactive server',
         },
         'app1': {
             'configuration_directory': 'examples/placeholder/linux/apps/app1',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'chipyaml.adapters.placeholder.adapter',
             'server_name': 'chip-app1',
             'server_arguments': '--interactive',
         },
         'app2': {
             'configuration_directory': 'examples/placeholder/linux/apps/app2',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'chipyaml.adapters.placeholder.adapter',
             'server_name': 'chip-app2',
             'server_arguments': '--interactive',
         },
         'chip-repl': {
-            'adapter': 'matter_yamltest_repl_adapter.adapter',
-            'runner': 'matter_yamltest_repl_adapter.runner',
+            'adapter': 'chipyaml.adapters.repl.adapter',
+            'runner': 'chipyaml.adapters.repl.runner',
         },
     },
     max_content_width=120,

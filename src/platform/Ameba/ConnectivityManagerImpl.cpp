@@ -542,7 +542,7 @@ void ConnectivityManagerImpl::DriveStationState()
                 err = Internal::AmebaUtils::WiFiConnectProvisionedNetwork();
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(DeviceLayer, "WiFiConnectProvisionedNetwork() failed: %s", chip::ErrorStr(err));
+                    ChipLogError(DeviceLayer, "WiFiConnectProvisionedNetwork() failed: %" CHIP_ERROR_FORMAT, err.Format());
                 }
                 SuccessOrExit(err);
             }

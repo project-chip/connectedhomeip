@@ -40,7 +40,8 @@ RUN git clone --depth=1 --single-branch --branch=v3.5.0 https://github.com/Silic
 
 # SLC-cli install
 # TODO: figure out a way to make this a fixed version. Currently a moving target.
-RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
+
+RUN wget https://www.silabs.com/documents/public/software/slc_cli_linux.zip && \
     unzip ./slc_cli_linux.zip -d /tmp && \
     rm ./slc_cli_linux.zip \
     && : # last line

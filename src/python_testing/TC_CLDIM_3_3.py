@@ -37,13 +37,14 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
@@ -80,8 +81,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "If Limitation feature is supportes, read LimitRange attribute"),
-            TestStep("2c", "If Positioning feature is supportes, read Resolution attribute"),
+            TestStep("2b", "If Limitation feature is supported, read LimitRange attribute"),
+            TestStep("2c", "If Positioning feature is supported, read Resolution attribute"),
             TestStep("2d", "Establish wilcard subscription to all attributes"),
             TestStep("2e", "Read CurrentState attribute"),
             TestStep("2f", "If Latching feature is not supported or state is unlatched, skip steps 2g to 2l"),

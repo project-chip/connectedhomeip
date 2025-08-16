@@ -62,12 +62,12 @@ static_library("ESP32") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "SystemTimeSupport.h",
   ]
 
   deps = [
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",

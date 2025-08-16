@@ -507,6 +507,8 @@ public:
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
+    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream);
+
     CHIP_ERROR RemoveVideoStream(uint16_t videoStreamId);
 
     CHIP_ERROR AddAudioStream(const AudioStreamStruct & audioStream);
@@ -514,6 +516,9 @@ public:
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
 
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
+
+    CHIP_ERROR UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
+                                               const SnapshotStreamStruct & snapshotStream);
 
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
 

@@ -11,6 +11,13 @@ namespace app {
 namespace Clusters {
 namespace OnOff {
 namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 6;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace Off {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Off

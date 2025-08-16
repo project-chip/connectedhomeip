@@ -611,7 +611,7 @@ public:
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
-    Optional<bool> metadataEnabled;
+    bool metadataEnabled          = static_cast<bool>(0);
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

@@ -301,9 +301,10 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 & aDevice)
     if (conn != nullptr && !bluez_device1_get_connected(&aDevice))
     {
         ChipLogDetail(DeviceLayer, "BLE connection closed: conn=%p", conn);
+        // Drop the closed connection from the map.
+        mConnMap.erase(objectPath);
         // Notify the BLE layer that the connection was closed.
         BLEManagerImpl::HandleConnectionClosed(conn);
-        mConnMap.erase(objectPath);
         // The BLE layer notification above is done asynchronously (it will be processed
         // in the next event loop iteration). So, we can not delete the connection object
         // immediately, because the BLE layer might still use it. Instead, we will also

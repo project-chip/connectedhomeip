@@ -337,8 +337,7 @@ class CameraAvStreamManagementCluster(
     maxResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
     minBitRate: UInt,
     maxBitRate: UInt,
-    minKeyFrameInterval: UShort,
-    maxKeyFrameInterval: UShort,
+    keyFrameInterval: UShort,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
     timedInvokeTimeout: Duration? = null,
@@ -372,18 +371,15 @@ class CameraAvStreamManagementCluster(
     val TAG_MAX_BIT_RATE_REQ: Int = 7
     tlvWriter.put(ContextSpecificTag(TAG_MAX_BIT_RATE_REQ), maxBitRate)
 
-    val TAG_MIN_KEY_FRAME_INTERVAL_REQ: Int = 8
-    tlvWriter.put(ContextSpecificTag(TAG_MIN_KEY_FRAME_INTERVAL_REQ), minKeyFrameInterval)
+    val TAG_KEY_FRAME_INTERVAL_REQ: Int = 8
+    tlvWriter.put(ContextSpecificTag(TAG_KEY_FRAME_INTERVAL_REQ), keyFrameInterval)
 
-    val TAG_MAX_KEY_FRAME_INTERVAL_REQ: Int = 9
-    tlvWriter.put(ContextSpecificTag(TAG_MAX_KEY_FRAME_INTERVAL_REQ), maxKeyFrameInterval)
-
-    val TAG_WATERMARK_ENABLED_REQ: Int = 10
+    val TAG_WATERMARK_ENABLED_REQ: Int = 9
     watermarkEnabled?.let {
       tlvWriter.put(ContextSpecificTag(TAG_WATERMARK_ENABLED_REQ), watermarkEnabled)
     }
 
-    val TAG_OSD_ENABLED_REQ: Int = 11
+    val TAG_OSD_ENABLED_REQ: Int = 10
     OSDEnabled?.let { tlvWriter.put(ContextSpecificTag(TAG_OSD_ENABLED_REQ), OSDEnabled) }
     tlvWriter.endStructure()
 

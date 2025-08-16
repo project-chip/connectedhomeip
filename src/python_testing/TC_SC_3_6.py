@@ -42,12 +42,13 @@ import time
 from threading import Event
 from typing import List
 
-import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClustersObjects
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClustersObjects
+from matter.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.utils import CommissioningBuildingBlocks
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic
 #       to some internal behavior assumptions of the SDK we are making relative to the write to

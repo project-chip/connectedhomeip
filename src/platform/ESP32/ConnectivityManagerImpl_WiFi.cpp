@@ -77,8 +77,9 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {
-        bool autoConnect = (val == kWiFiStationMode_Enabled);
-        err              = Internal::ESP32Utils::SetAPMode(autoConnect);
+        /* Remain consistent with the previous logic to enable STA mode here.
+           TODO: Set STA mode according to `val`. */
+        err = Internal::ESP32Utils::EnableStationMode();
         SuccessOrExit(err);
 
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
@@ -108,71 +109,12 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
             return;
         }
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     }
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != kWiFiAPMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (mWiFiAPMode != val)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
-    }
-
-    mWiFiAPMode = val;
-
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
-
-exit:
-    return err;
-}
-
-void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
-{
-    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
-    {
-        mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
-    }
-}
-
-void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
-{
-    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
-    {
-        mLastAPDemandTime = System::Clock::kZero;
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
-    }
-}
-
-void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
-{
-    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
-    {
-        if (mWiFiAPState == kWiFiAPState_Activating || mWiFiAPState == kWiFiAPState_Active)
-        {
-            mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
-        }
-    }
-}
-
-void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
-{
-    mWiFiAPIdleTimeout = val;
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
 #define WIFI_BAND_2_4GHZ 2400
 #define WIFI_BAND_5_0GHZ 5000
@@ -392,13 +334,6 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
     mWiFiStationState             = kWiFiStationState_NotConnected;
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    mLastAPDemandTime  = System::Clock::kZero;
-    mWiFiAPMode        = kWiFiAPMode_Disabled;
-    mWiFiAPState       = kWiFiAPState_NotActive;
-    mWiFiAPIdleTimeout = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-
     mFlags.SetRaw(0);
 
     // TODO Initialize the Chip Addressing and Routing Module.
@@ -440,15 +375,8 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
         }
     }
 
-    // Force AP mode off for now.
-    ReturnErrorOnFailure(Internal::ESP32Utils::SetAPMode(false));
-
     // Queue work items to bootstrap the AP and station state machines once the Chip event loop is running.
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     return CHIP_NO_ERROR;
 }
@@ -491,22 +419,6 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_STOP");
                 DriveStationState();
                 break;
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-            case WIFI_EVENT_AP_START:
-                ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_START");
-                ChangeWiFiAPState(kWiFiAPState_Active);
-                DriveAPState();
-                break;
-            case WIFI_EVENT_AP_STOP:
-                ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_STOP");
-                ChangeWiFiAPState(kWiFiAPState_NotActive);
-                DriveAPState();
-                break;
-            case WIFI_EVENT_AP_STACONNECTED:
-                ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_STACONNECTED");
-                MaintainOnDemandWiFiAP();
-                break;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
             default:
                 break;
             }
@@ -788,192 +700,6 @@ void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, 
 {
     sInstance.DriveStationState();
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-void ConnectivityManagerImpl::DriveAPState()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    WiFiAPState targetState;
-    bool espAPModeEnabled;
-
-    // Determine if AP mode is currently enabled in the ESP WiFi layer.
-    err = Internal::ESP32Utils::IsAPEnabled(espAPModeEnabled);
-    SuccessOrExit(err);
-
-    // Adjust the Connectivity Manager's AP state to match the state in the WiFi layer.
-    if (espAPModeEnabled && (mWiFiAPState == kWiFiAPState_NotActive || mWiFiAPState == kWiFiAPState_Deactivating))
-    {
-        ChangeWiFiAPState(kWiFiAPState_Activating);
-    }
-    if (!espAPModeEnabled && (mWiFiAPState == kWiFiAPState_Active || mWiFiAPState == kWiFiAPState_Activating))
-    {
-        ChangeWiFiAPState(kWiFiAPState_Deactivating);
-    }
-
-    // If the AP interface is not under application control...
-    if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
-    {
-        // Ensure the ESP WiFi layer is started.
-        err = Internal::ESP32Utils::StartWiFiLayer();
-        SuccessOrExit(err);
-
-        // Determine the target (desired) state for AP interface...
-
-        // The target state is 'NotActive' if the application has expressly disabled the AP interface.
-        if (mWiFiAPMode == kWiFiAPMode_Disabled)
-        {
-            targetState = kWiFiAPState_NotActive;
-        }
-
-        // The target state is 'Active' if the application has expressly enabled the AP interface.
-        else if (mWiFiAPMode == kWiFiAPMode_Enabled)
-        {
-            targetState = kWiFiAPState_Active;
-        }
-
-        // The target state is 'Active' if the AP mode is 'On demand, when no station is available'
-        // and the station interface is not provisioned or the application has disabled the station
-        // interface.
-        else if (mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision &&
-                 (!IsWiFiStationProvisioned() || GetWiFiStationMode() == kWiFiStationMode_Disabled))
-        {
-            targetState = kWiFiAPState_Active;
-        }
-
-        // The target state is 'Active' if the AP mode is one of the 'On demand' modes and there
-        // has been demand for the AP within the idle timeout period.
-        else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
-        {
-            System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
-
-            if (mLastAPDemandTime != System::Clock::kZero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
-            {
-                targetState = kWiFiAPState_Active;
-
-                // Compute the amount of idle time before the AP should be deactivated and
-                // arm a timer to fire at that time.
-                System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
-                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
-                SuccessOrExit(err);
-                ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms",
-                                System::Clock::Milliseconds32(apTimeout).count());
-            }
-            else
-            {
-                targetState = kWiFiAPState_NotActive;
-            }
-        }
-
-        // Otherwise the target state is 'NotActive'.
-        else
-        {
-            targetState = kWiFiAPState_NotActive;
-        }
-
-        // If the current AP state does not match the target state...
-        if (mWiFiAPState != targetState)
-        {
-            // If the target state is 'Active' and the current state is NOT 'Activating', enable
-            // and configure the AP interface, and then enter the 'Activating' state.  Eventually
-            // a SYSTEM_EVENT_AP_START event will be received from the ESP WiFi layer which will
-            // cause the state to transition to 'Active'.
-            if (targetState == kWiFiAPState_Active)
-            {
-                if (mWiFiAPState != kWiFiAPState_Activating)
-                {
-                    err = Internal::ESP32Utils::SetAPMode(true);
-                    SuccessOrExit(err);
-
-                    err = ConfigureWiFiAP();
-                    SuccessOrExit(err);
-
-                    ChangeWiFiAPState(kWiFiAPState_Activating);
-                }
-            }
-
-            // Otherwise, if the target state is 'NotActive' and the current state is not 'Deactivating',
-            // disable the AP interface and enter the 'Deactivating' state.  Later a SYSTEM_EVENT_AP_STOP
-            // event will move the AP state to 'NotActive'.
-            else
-            {
-                if (mWiFiAPState != kWiFiAPState_Deactivating)
-                {
-                    err = Internal::ESP32Utils::SetAPMode(false);
-                    SuccessOrExit(err);
-
-                    ChangeWiFiAPState(kWiFiAPState_Deactivating);
-                }
-            }
-        }
-    }
-
-    // If AP is active, but the interface doesn't have an IPv6 link-local
-    // address, assign one now.
-    if (mWiFiAPState == kWiFiAPState_Active && ESP32Utils::IsInterfaceUp(ESP32Utils::kDefaultWiFiAPNetifKey) &&
-        !ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultWiFiAPNetifKey))
-    {
-        esp_err_t error = esp_netif_create_ip6_linklocal(esp_netif_get_handle_from_ifkey(ESP32Utils::kDefaultWiFiAPNetifKey));
-        if (error != ESP_OK)
-        {
-            ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for %s interface, err:%s",
-                         ESP32Utils::kDefaultWiFiAPNetifKey, esp_err_to_name(error));
-            goto exit;
-        }
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR && mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
-    {
-        SetWiFiAPMode(kWiFiAPMode_Disabled);
-        Internal::ESP32Utils::SetAPMode(false);
-    }
-}
-
-CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
-{
-    wifi_config_t wifiConfig;
-
-    memset(&wifiConfig, 0, sizeof(wifiConfig));
-
-    uint16_t discriminator;
-    ReturnErrorOnFailure(GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
-
-    uint16_t vendorId;
-    uint16_t productId;
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetProductId(productId));
-
-    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
-             discriminator, vendorId, productId);
-    wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
-    wifiConfig.ap.authmode        = WIFI_AUTH_OPEN;
-    wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
-    wifiConfig.ap.beacon_interval = CHIP_DEVICE_CONFIG_WIFI_AP_BEACON_INTERVAL;
-    ChipLogProgress(DeviceLayer, "Configuring WiFi AP: SSID %s, channel %u", wifiConfig.ap.ssid, wifiConfig.ap.channel);
-    esp_err_t err = esp_wifi_set_config(WIFI_IF_AP, &wifiConfig);
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "esp_wifi_set_config(WIFI_IF_AP) failed: %s", esp_err_to_name(err));
-        return ESP32Utils::MapError(err);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
-{
-    if (mWiFiAPState != newState)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi AP state change: %s -> %s", WiFiAPStateToStr(mWiFiAPState), WiFiAPStateToStr(newState));
-        mWiFiAPState = newState;
-    }
-}
-
-void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState)
-{
-    sInstance.DriveAPState();
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
 void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 {

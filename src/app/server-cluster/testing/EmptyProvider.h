@@ -33,7 +33,6 @@ class EmptyProvider : public app::DataModel::Provider
 public:
     using ActionReturnStatus = app::DataModel::ActionReturnStatus;
 
-    CHIP_ERROR Shutdown() override;
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder) override;
 
     CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;

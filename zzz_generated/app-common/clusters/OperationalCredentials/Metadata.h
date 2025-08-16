@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace OperationalCredentials {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace NOCs {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(NOCs::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -47,10 +49,20 @@ namespace CurrentFabricIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentFabricIndex::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentFabricIndex
+constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
+    NOCs::kMetadataEntry,
+    Fabrics::kMetadataEntry,
+    SupportedFabrics::kMetadataEntry,
+    CommissionedFabrics::kMetadataEntry,
+    TrustedRootCertificates::kMetadataEntry,
+    CurrentFabricIndex::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AttestationRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AttestationRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);
