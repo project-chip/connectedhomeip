@@ -15,12 +15,13 @@
 #    limitations under the License.
 #
 
-import re
 import functools
 import inspect
+import re
 
 from mdns_discovery.mdns_discovery import MdnsServiceType
 from mobly import asserts
+
 
 def not_none_args(func):
     """
@@ -40,6 +41,7 @@ def not_none_args(func):
 
 # Discovery
 
+
 @not_none_args
 def assert_valid_operational_instance_name(instance_name: str) -> None:
     """
@@ -56,7 +58,7 @@ def assert_valid_operational_instance_name(instance_name: str) -> None:
 
     Returns:
         None
-    
+
     Raises:
         TestFailure: If `instance_name` does not conform to the constraints.
 
@@ -164,7 +166,7 @@ def assert_valid_long_discriminator_subtype(ld_subtype: str) -> None:
     value_in_range = not is_match or int(m.group('val')) <= 4095
     valid = is_match and value_in_range
 
-    asserts.assert_true(valid,f"Invalid long discriminator subtype: '{ld_subtype}'")
+    asserts.assert_true(valid, f"Invalid long discriminator subtype: '{ld_subtype}'")
 
 
 @not_none_args
@@ -199,7 +201,7 @@ def assert_valid_short_discriminator_subtype(sd_subtype: str) -> None:
     value_in_range = not is_match or int(m.group('val')) <= 15
     valid = is_match and value_in_range
 
-    asserts.assert_true(valid,f"Invalid long discriminator subtype: '{sd_subtype}'")
+    asserts.assert_true(valid, f"Invalid long discriminator subtype: '{sd_subtype}'")
 
 
 @not_none_args
@@ -297,7 +299,7 @@ def assert_valid_d_key(d_key: str) -> None:
 
     Spec:
         https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#15-txt-key-for-discriminator-d
-    """   
+    """
     m = re.fullmatch(r'(?:D=)?(?P<val>0|[1-9]\d{0,3})', d_key)
     is_match = bool(m)
     value_in_range = not is_match or int(m.group('val')) <= 4095
