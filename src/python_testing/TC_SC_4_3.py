@@ -50,9 +50,8 @@ import ipaddress
 import logging
 import re
 
-from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
-from zeroconf.const import _TYPE_AAAA, _TYPES
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -67,6 +66,9 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 '''
 
 TCP_PICS_STR = "MCORE.SC.TCP"
+ONE_HOUR_IN_MS = 3600000
+MAX_SAT_VALUE = 65535
+MAX_T_VALUE = 6
 
 
 class TC_SC_4_3(MatterBaseTest):
@@ -86,16 +88,12 @@ class TC_SC_4_3(MatterBaseTest):
                 TestStep(8, "TH performs a query for the AAAA record against the target listed in the SRV record",
                          "Verify AAAA record is returned"),
                 TestStep(9, "TH verifies the following from the returned records:",
-                         "TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character) hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)"),
+                         "The hostname must be a fixed-length twelve-character (or sixteen-character) hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)"),
                 TestStep(10, "TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.",
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
                 TestStep(11, "TH performs a DNS-SD browse for _matter._tcp.local",
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
                 ]
-
-    ONE_HOUR_IN_MS = 3600000
-    MAX_SAT_VALUE = 65535
-    MAX_T_VALUE = 6
 
     async def get_descriptor_server_list(self):
         return await self.read_single_attribute_check_success(
@@ -121,16 +119,20 @@ class TC_SC_4_3(MatterBaseTest):
             attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
 
-    def get_dut_instance_name(self) -> str:
+    def get_dut_instance_name(self, log_result: bool = False) -> str:
         node_id = self.dut_node_id
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        if log_result:
+            logging.info(f"\n\n\tDUT Instance Name: {instance_name}\n")
         return instance_name
 
-    def get_operational_subtype(self) -> str:
+    def get_operational_subtype(self, log_result: bool = False) -> str:
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        service_name = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
-        return service_name
+        operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
+        if log_result:
+            logging.info(f"\n\n\tOperational Subtype: {operational_subtype}\n")
+        return operational_subtype
 
     @staticmethod
     def verify_decimal_value(input_value, max_value: int):
@@ -163,7 +165,7 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify t_value is a decimal number without leading zeros and less than or equal to 6
         try:
             T_int = int(t_value)
-            if T_int < 0 or T_int > self.MAX_T_VALUE:
+            if T_int < 0 or T_int > MAX_T_VALUE:
                 return False, f"T value ({t_value}) is not in the range 0 to 6. ({t_value})"
             if str(t_value).startswith("0") and T_int != 0:
                 return False, f"T value ({t_value}) has leading zeros."
@@ -192,24 +194,14 @@ class TC_SC_4_3(MatterBaseTest):
             return False, f"T value ({t_value}) is not a valid integer"
 
     @staticmethod
-    def is_ipv6_address(addresses):
-        if isinstance(addresses, str):
-            addresses = [addresses]
-
-        for address in addresses:
-            try:
-                # Attempt to create an IPv6 address object. If successful, this is an IPv6 address.
-                ipaddress.IPv6Address(address)
-                return True, "At least one IPv6 address is present."
-            except ipaddress.AddressValueError:
-                # If an AddressValueError is raised, the current address is not a valid IPv6 address.
-                return False, f"Invalid IPv6 address encountered: {address}, provided addresses: {addresses}"
-        return False, "No IPv6 addresses found."
-
-    @staticmethod
-    def extract_ipv6_address(text):
-        items = text.split(',')
-        return items[-1]
+    def is_valid_ipv6_address(address) -> bool:
+        try:
+            # Attempt to create an IPv6 address object. If successful, this is an IPv6 address.
+            ipaddress.IPv6Address(address)
+            return True
+        except ipaddress.AddressValueError:
+            # If an AddressValueError is raised, the current address is not a valid IPv6 address.
+            return False
 
     @staticmethod
     def verify_hostname(hostname: str) -> bool:
@@ -230,7 +222,6 @@ class TC_SC_4_3(MatterBaseTest):
         supports_icd = None
         supports_lit = None
         active_mode_threshold_ms = None
-        instance_name = None
 
         # *** STEP 1 ***
         # DUT is commissioned on the same fabric as TH.
@@ -269,18 +260,16 @@ class TC_SC_4_3(MatterBaseTest):
         # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
         # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
         self.step(5)
-        instance_name = self.get_dut_instance_name()
+        instance_name = self.get_dut_instance_name(log_result=True)
         instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
 
         # *** STEP 6 ***
         # TH performs a query for the SRV record against the qname instance_qname.
-        # Verify SRV record is returned
         self.step(6)
         mdns = MdnsDiscovery()
-        operational_record = await mdns.get_service_by_record_type(
+        operational_record = await mdns.get_srv_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            record_type=DNSRecordType.SRV,
             log_output=True
         )
 
@@ -288,18 +277,16 @@ class TC_SC_4_3(MatterBaseTest):
         srv_record_returned = operational_record is not None and operational_record.service_name == instance_qname
         asserts.assert_true(srv_record_returned, "SRV record was not returned")
 
-        # Will be used in Step 8 and 11
-        # This is the hostname
+        # Will be used in Step 8
         hostname = operational_record.server
 
         # *** STEP 7 ***
         # TH performs a query for the TXT record against the qname instance_qname.
         # Verify TXT record is returned
         self.step(7)
-        operational_record = await mdns.get_service_by_record_type(
+        operational_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            record_type=DNSRecordType.TXT,
             log_output=True
         )
 
@@ -313,25 +300,14 @@ class TC_SC_4_3(MatterBaseTest):
 
         # *** STEP 8 ***
         # TH performs a query for the AAAA record against the target listed in the SRV record.
-        # Verify AAAA record is returned
         self.step(8)
-
-        quada_record = await mdns.get_service_by_record_type(
-            service_name=hostname,
-            service_type=MdnsServiceType.OPERATIONAL.value,
-            record_type=DNSRecordType.AAAA,
+        quada_records = await mdns.get_quada_records(
+            hostname=hostname,
             log_output=True
         )
 
-        asserts.assert_true(quada_record is not None, "Device did not return AAAA records when individual record request was sent")
-
-        answer_record_type = quada_record.get_type(quada_record.type)
-        quada_record_type = _TYPES[_TYPE_AAAA]
-
         # Verify AAAA record is returned
-        asserts.assert_equal(hostname, quada_record.name, f"Server name mismatch: {hostname} vs {quada_record.name}")
-        asserts.assert_equal(quada_record_type, answer_record_type,
-                             f"Record type should be {quada_record_type} but got {answer_record_type}")
+        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
@@ -386,7 +362,7 @@ class TC_SC_4_3(MatterBaseTest):
 
             logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             sii_value = operational_record.txt_record['SII']
-            result, message = self.verify_decimal_value(sii_value, self.ONE_HOUR_IN_MS)
+            result, message = self.verify_decimal_value(sii_value, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # SAI TXT KEY
@@ -396,7 +372,7 @@ class TC_SC_4_3(MatterBaseTest):
 
             logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             sai_value = operational_record.txt_record['SAI']
-            result, message = self.verify_decimal_value(sai_value, self.ONE_HOUR_IN_MS)
+            result, message = self.verify_decimal_value(sai_value, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # SAT TXT KEY
@@ -404,7 +380,7 @@ class TC_SC_4_3(MatterBaseTest):
             logging.info(
                 "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
             sat_value = operational_record.txt_record['SAT']
-            result, message = self.verify_decimal_value(sat_value, self.MAX_SAT_VALUE)
+            result, message = self.verify_decimal_value(sat_value, MAX_SAT_VALUE)
             asserts.assert_true(result, message)
 
             if supports_icd:
@@ -415,36 +391,44 @@ class TC_SC_4_3(MatterBaseTest):
         result, message = self.verify_t_value(operational_record)
         asserts.assert_true(result, message)
 
-        # AAAA
-        logging.info("Verify the AAAA record contains at least one IPv6 address")
-        ipv6_address = self.extract_ipv6_address(str(quada_record))
-        result, message = self.is_ipv6_address(ipv6_address)
-        asserts.assert_true(result, message)
+        # Verify the AAAA records contain a valid IPv6 address
+        logging.info("Verify the AAAA record contains a valid IPv6 address")
+        for r in quada_records:
+            asserts.assert_true(
+                self.is_valid_ipv6_address(r.address),
+                f"Invalid IPv6 address: '{r.address}'"
+            )
 
         # # *** STEP 10 ***
         # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed
         # Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8)
-        # text using capital letters. Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        # text using capital letters.
         self.step(10)
-        service_types = await mdns.get_service_types(log_output=True)
-        op_sub_type = self.get_operational_subtype()
-        logging.info(f"Received the following responses for {op_sub_type}")
-        asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}' was found.")
+        op_sub_type = self.get_operational_subtype(log_result=True)
+        ptr_records = await mdns.get_ptr_records(
+            service_types=[op_sub_type],
+            log_output=True,
+        )
+
+        # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        asserts.assert_true(
+            any(r.instance_name == instance_name for r in ptr_records),
+            f"No PTR record with DNS-SD instance name '{instance_name}' was found."
+        )
 
         # # *** STEP 11 ***
         # TH performs a DNS-SD browse for _matter._tcp.local
-        # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
         self.step(11)
-        op_service_info = await mdns._get_service(
-            service_type=MdnsServiceType.OPERATIONAL,
+        ptr_records = await mdns.get_ptr_records(
+            service_types=[MdnsServiceType.OPERATIONAL.value],
             log_output=True,
-            discovery_timeout_sec=15
         )
 
-        # Verify DUT returns a PTR record with DNS-SD instance name set instance_name
-        asserts.assert_equal(op_service_info.server, hostname,
-                             f"No PTR record with DNS-SD instance name '{MdnsServiceType.OPERATIONAL.value}'")
-        asserts.assert_equal(instance_name, op_service_info.instance_name, "Instance name mismatch")
+        # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        asserts.assert_true(
+            any(r.instance_name == instance_name for r in ptr_records),
+            f"No PTR record with DNS-SD instance name '{instance_name}' was found."
+        )
 
 
 if __name__ == "__main__":
