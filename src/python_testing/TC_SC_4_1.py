@@ -181,13 +181,13 @@ class TC_SC_4_1(MatterBaseTest):
         # Validate that the commissionable long discriminator subtype is a 12-bit long discriminator,
         # encoded as a variable-length decimal number in ASCII text, omitting any leading zeros
         long_discriminator_subtype = next((s for s in subtypes if s.startswith('_L')), None)
-        asserts.assert_is_not_none(long_discriminator_subtype, f"Long discriminator must be present.")
+        asserts.assert_is_not_none(long_discriminator_subtype, "Long discriminator must be present.")
         assert_valid_long_discriminator_subtype(long_discriminator_subtype)
 
         # Validate that the short commissionable discriminator subtype is a 4-bit long discriminator,
         # encoded as a variable-length decimal number in ASCII text, omitting any leading zeros
         short_discriminator_subtype = next((s for s in subtypes if s.startswith('_S')), None)
-        asserts.assert_is_not_none(short_discriminator_subtype, f"Short discriminator must be present.")
+        asserts.assert_is_not_none(short_discriminator_subtype, "Short discriminator must be present.")
         assert_valid_short_discriminator_subtype(short_discriminator_subtype)
 
         # If the commissionable vendor subtype is present, validate it's a
