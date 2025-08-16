@@ -6857,11 +6857,6 @@ provisional cluster Chime = 1366 {
 provisional cluster TlsCertificateManagement = 2049 {
   revision 1;
 
-  enum StatusCodeEnum : enum8 {
-    kCertificateAlreadyInstalled = 2;
-    kDuplicateKey = 3;
-  }
-
   fabric_scoped struct TLSCertStruct {
     int16u caid = 0;
     optional long_octet_string<3000> certificate = 1;
@@ -6915,18 +6910,19 @@ provisional cluster TlsCertificateManagement = 2049 {
   }
 
   request struct TLSClientCSRRequest {
-    octet_string<128> nonce = 0;
+    octet_string<32> nonce = 0;
   }
 
   response struct TLSClientCSRResponse = 8 {
     int16u ccdid = 0;
     long_octet_string<3000> csr = 1;
-    octet_string<128> nonce = 2;
+    octet_string<128> nonceSignature = 2;
   }
 
   request struct ProvisionClientCertificateRequest {
     int16u ccdid = 0;
-    TLSClientCertificateDetailStruct clientCertificateDetails = 1;
+    long_octet_string<3000> clientCertificate = 1;
+    octet_string intermediateCertificates[] = 2;
   }
 
   request struct FindClientCertificateRequest {
@@ -6951,7 +6947,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 
   /** This command SHALL provision a newly provided certificate, or rotate an existing one, based on the contents of the CAID field. */
   fabric command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
-  /** This command SHALL return the specified TLS root certificate, or all TLS provisioned root certificates, based on the contents of the CAID field. */
+  /** This command SHALL return the specified TLS root certificate, or all provisioned TLS root certificates, based on the contents of the CAID field. */
   fabric command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
   /** This command SHALL return the CAID for the passed in fingerprint. */
   fabric command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;

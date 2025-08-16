@@ -51982,16 +51982,6 @@ class TlsCertificateManagement(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
-    class Enums:
-        class StatusCodeEnum(MatterIntEnum):
-            kCertificateAlreadyInstalled = 0x02
-            kDuplicateKey = 0x03
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 0
-
     class Structs:
         @dataclass
         class TLSCertStruct(ClusterObject):
@@ -52169,12 +52159,12 @@ class TlsCertificateManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="csr", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="nonce", Tag=2, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="nonceSignature", Tag=2, Type=bytes),
                     ])
 
             ccdid: uint = 0
             csr: bytes = b""
-            nonce: bytes = b""
+            nonceSignature: bytes = b""
 
         @dataclass
         class ProvisionClientCertificate(ClusterCommand):
@@ -52188,11 +52178,13 @@ class TlsCertificateManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="clientCertificateDetails", Tag=1, Type=TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct),
+                        ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="intermediateCertificates", Tag=2, Type=typing.List[bytes]),
                     ])
 
             ccdid: uint = 0
-            clientCertificateDetails: TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct = field(default_factory=lambda: TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct())
+            clientCertificate: bytes = b""
+            intermediateCertificates: typing.List[bytes] = field(default_factory=lambda: [])
 
         @dataclass
         class FindClientCertificate(ClusterCommand):

@@ -14301,7 +14301,8 @@ class ChipClusters:
                 "commandName": "ProvisionClientCertificate",
                 "args": {
                     "ccdid": "int",
-                    "clientCertificateDetails": "TLSClientCertificateDetailStruct",
+                    "clientCertificate": "bytes",
+                    "intermediateCertificates": "bytes",
                 },
             },
             0x0000000A: {

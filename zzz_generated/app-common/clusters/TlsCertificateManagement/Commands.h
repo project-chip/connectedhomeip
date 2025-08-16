@@ -400,9 +400,9 @@ public:
 namespace TLSClientCSRResponse {
 enum class Fields : uint8_t
 {
-    kCcdid = 0,
-    kCsr   = 1,
-    kNonce = 2,
+    kCcdid          = 0,
+    kCsr            = 1,
+    kNonceSignature = 2,
 };
 
 struct Type
@@ -414,7 +414,7 @@ public:
 
     uint16_t ccdid = static_cast<uint16_t>(0);
     chip::ByteSpan csr;
-    chip::ByteSpan nonce;
+    chip::ByteSpan nonceSignature;
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -431,7 +431,7 @@ public:
 
     uint16_t ccdid = static_cast<uint16_t>(0);
     chip::ByteSpan csr;
-    chip::ByteSpan nonce;
+    chip::ByteSpan nonceSignature;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -440,7 +440,8 @@ namespace ProvisionClientCertificate {
 enum class Fields : uint8_t
 {
     kCcdid                    = 0,
-    kClientCertificateDetails = 1,
+    kClientCertificate        = 1,
+    kIntermediateCertificates = 2,
 };
 
 struct Type
@@ -451,7 +452,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
 
     uint16_t ccdid = static_cast<uint16_t>(0);
-    Structs::TLSClientCertificateDetailStruct::Type clientCertificateDetails;
+    chip::ByteSpan clientCertificate;
+    DataModel::List<const chip::ByteSpan> intermediateCertificates;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -468,7 +470,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     uint16_t ccdid = static_cast<uint16_t>(0);
-    Structs::TLSClientCertificateDetailStruct::DecodableType clientCertificateDetails;
+    chip::ByteSpan clientCertificate;
+    DataModel::DecodableList<chip::ByteSpan> intermediateCertificates;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
