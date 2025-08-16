@@ -46,6 +46,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR GetOtaTlvEncryptionKeyId(uint32_t & value) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    CHIP_ERROR DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & mIVOffset) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
     void SetEnableKey(const uint8_t * key, size_t length)
     {
         if (length == sizeof(mEnableKey))
