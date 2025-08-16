@@ -28,6 +28,12 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-storage.h>
 
+#if CONFIG_DIAG_LOGS_DEMO
+#include "DiagnosticLogsProviderDelegateImpl.h"
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
+using namespace chip::app::Clusters::DiagnosticLogs;
+#endif
+
 #if !CHIP_CONFIG_ENABLE_ICD_SERVER
 #include "ICDUtil.h"
 #endif
@@ -125,6 +131,11 @@ void LockApp::AppTask::PostInitMatterStack()
 {
 #if !CHIP_CONFIG_ENABLE_ICD_SERVER
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
+#endif
+
+#if CONFIG_DIAG_LOGS_DEMO
+    auto & logProvider = LogProvider::GetInstance();
+    SetDelegate(kRootEndpointId, &logProvider);
 #endif
 }
 

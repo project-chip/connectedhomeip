@@ -31,7 +31,9 @@
 #include "StatusLed.h"
 #include "qPinCfg.h"
 
+#include "DiagnosticLogsProviderDelegateImpl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 
@@ -40,6 +42,7 @@ using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app::Clusters::DiagnosticLogs;
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -78,6 +81,10 @@ CHIP_ERROR AppTask::Init()
     }
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
     StatusLed_SetLed(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
+
+    ChipLogProgress(NotSpecified, "Setting log provider.");
+    auto & logProvider = LogProvider::GetInstance();
+    chip::app::Clusters::DiagnosticLogs::SetDelegate(kRootEndpointId, &logProvider);
 
     return err;
 }

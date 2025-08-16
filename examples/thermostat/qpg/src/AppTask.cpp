@@ -34,7 +34,9 @@
 #include "ThermostaticRadiatorValveManager.h"
 #include "qPinCfg.h"
 
+#include "diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 
 using namespace ::chip;
@@ -42,6 +44,7 @@ using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app::Clusters::DiagnosticLogs;
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -75,6 +78,10 @@ CHIP_ERROR AppTask::Init()
         ChipLogError(NotSpecified, "ThermostaticRadiatorValveMgr().Init() failed");
         return err;
     }
+
+    ChipLogProgress(NotSpecified, "Setting log provider.");
+    auto & logProvider = LogProvider::GetInstance();
+    SetDelegate(kRootEndpointId, &logProvider);
 
     gpSched_ScheduleEvent(1 * ONE_SECOND_US, Application_StartPeriodicBatteryUpdate);
 

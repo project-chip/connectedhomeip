@@ -73,6 +73,9 @@
 
 #if CONFIG_DIAG_LOGS_DEMO
 #include "DiagnosticLogsDemo.h"
+#include "DiagnosticLogsProviderDelegateImpl.h"
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>
+using namespace chip::app::Clusters::DiagnosticLogs;
 #endif
 
 #if CONFIG_LOW_POWER
@@ -236,6 +239,11 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
     VerifyOrDie(WifiConnectAtboot(chip::NXP::App::GetAppTask().GetWifiDriverInstance()) == CHIP_NO_ERROR);
+#endif
+
+#if CONFIG_DIAG_LOGS_DEMO
+    auto & logProvider = LogProvider::GetInstance();
+    SetDelegate(kRootEndpointId, &logProvider);
 #endif
 }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,18 +15,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-#include "CHIPDeviceManager.h"
+#include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 
-#include <app/ConcreteAttributePath.h>
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DiagnosticLogs {
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
-{
-    chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
-        chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
-    if (cb != nullptr)
-    {
-        // propagate event to device manager
-        cb->PostAttributeChangeCallback(path.mEndpointId, path.mClusterId, path.mAttributeId, type, size, value);
-    }
-}
+void SetDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
+
+} // namespace DiagnosticLogs
+} // namespace Clusters
+} // namespace app
+} // namespace chip
