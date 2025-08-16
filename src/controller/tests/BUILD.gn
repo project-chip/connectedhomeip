@@ -23,7 +23,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libControllerTests"
 
-  test_sources = []
+  test_sources = [ "TestDeviceController.cpp" ]
 
   # Not supported on efr32.
   if (chip_device_platform != "efr32") {
@@ -66,7 +66,10 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  sources = [ "AutoCommissionerTestAccess.h" ]
+  sources = [
+    "AutoCommissionerTestAccess.h",
+    "DispatchDataModel.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
