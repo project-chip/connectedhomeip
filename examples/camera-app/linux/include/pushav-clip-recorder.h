@@ -72,13 +72,13 @@ public:
         uint16_t mAugmentationDuration;                       ///< Duration increment on motion detect
         uint16_t mChunkDuration;                              ///< Segment duration in seconds
         uint16_t mBlindDuration;                              ///< Duration without recording after motion stop
+        uint16_t mPreRollLength;                              ///< Pre-roll length in seconds
         std::string mRecorderId;                              ///< Unique recorder identifier
         std::string mOutputPath;                              ///< Base output directory path
         AVRational mInputTimeBase;                            ///< Input time base
         std::string mUrl;                                     ///< URL for uploading clips;
         int mTriggerType;                                     ///< Recording trigger type
         std::chrono::steady_clock::time_point activationTime; ///< Time when the recording started
-        int mPreRollLength;                                   ///< Pre-roll length in seconds
     };
 
     /**
