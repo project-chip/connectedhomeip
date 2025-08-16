@@ -30,7 +30,7 @@ class MdnsServiceInfo(JsonSerializable):
     service_name: Optional[str] = field(init=False)
     service_type: Optional[str] = field(init=False)
     instance_name: Optional[str] = field(init=False)
-    server: Optional[str] = field(init=False)
+    hostname: Optional[str] = field(init=False)
     port: Optional[int] = field(init=False)
     addresses: Optional[List[str]] = field(init=False)
     txt_record: Optional[Dict[str, str]] = field(init=False)
@@ -45,7 +45,7 @@ class MdnsServiceInfo(JsonSerializable):
 
         self.service_name = si.name
         self.service_type = si.type
-        self.server = si.server
+        self.hostname = si.server
         self.port = si.port
         self.addresses = si.parsed_addresses()
         self.txt_record = si.decoded_properties
