@@ -98,7 +98,7 @@ async def main():
     )
 
     # Print Hostname
-    print(f"Hostname: {srv_record.server}")
+    print(f"Hostname: {srv_record.hostname}")
 
 asyncio.run(main())
 ```
@@ -228,7 +228,7 @@ full information.
 | --------------------------------------------- | :----------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **AsyncZeroconfServiceTypes**                 |                      Returns all the advertised service-<br>types on the network.                      | \_matterd.\_udp.local.<br>\_matter.<br>\_tcp.local.<br>\_V65521.\_sub.\_matterd.\_udp.local.<br> \_IB7322C948581262F.\_sub.\_matter.\_tcp.local.                                                                                                                                                                                                                                                                                      |
 | **AsyncServiceBrowser**                       | Browse for services of specific service-<br>types, returns PTR info, service-name<br>and service-type. | "`service_type`": "\_matterd.\_udp.local."<br>"`service_name`": "A6666A3E45CF5655.\_matterd.\_udp.local."<br>"`instance_name`": "A6666A3E45CF5655"                                                                                                                                                                                                                                                                                    |
-| **async_request**<br>(from ServiceInfo class) |           Returns full-service info by service-<br>name (server, txt, addresses, ttl, etc.).           | "`service_name`": "354D34458F15657D.\_matterd.\_udp.local."<br>"`service_type`": "\_V65521.\_sub.\_matterd.\_udp.local."<br>"`instance_name`": "354D34458F15657D"<br>"`server`": "00155DD54A04.local."<br>"`port`": 5550<br>"`addresses`": ["172.30.139.182", "fe80::215:5dff:fed5:4a04"]<br>"`txt`": {"VP": "65521+32769}"<br>"`priority`": 0<br>"`interface_index`": 2<br>"`weight`": 0<br>"`host_ttl`": 120<br>"`other_ttl`": 4500 |
+| **async_request**<br>(from ServiceInfo class) |           Returns full-service info by service-<br>name (hostname, txt, addresses, ttl, etc.).           | "`service_name`": "354D34458F15657D.\_matterd.\_udp.local."<br>"`service_type`": "\_V65521.\_sub.\_matterd.\_udp.local."<br>"`instance_name`": "354D34458F15657D"<br>"`hostname`": "00155DD54A04.local."<br>"`port`": 5550<br>"`addresses`": ["172.30.139.182", "fe80::215:5dff:fed5:4a04"]<br>"`txt`": {"VP": "65521+32769}"<br>"`priority`": 0<br>"`interface_index`": 2<br>"`weight`": 0<br>"`host_ttl`": 120<br>"`other_ttl`": 4500 |
 
 ## 📌 General Information
 
