@@ -223,7 +223,12 @@ class device_feature(Conformance):
         self.feature = feature
 
     def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecisionWithChoice:
-        return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
+        if (self.feature.lower() == "matter"):
+            return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
+        elif (self.feature.lower() == 'zigbee'):
+            return ConformanceDecisionWithChoice(ConformanceDecision.DISALLOWED)
+        else:
+            return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
 
     def __str__(self):
         return self.feature
@@ -465,25 +470,6 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Call
         raise ConformanceException(f'Unexpected conformance tag with children {element}')
 
 
-def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callable:
-    ''' Only allows basic, or wrappers over things that degrade to basic.'''
-    if not list(element):
-        try:
-            return parse_basic_callable_from_xml(element)
-        # For device types ONLY, there are conformances called "attributes" that are essentially just placeholders for conditions in the device library.
-        # For example, temperature controlled cabinet has conditions called "heating" and "cooling". The cluster conditions are dependent on them, but they're not
-        # actually exposed anywhere ON the device other than through the presence of the cluster. So for now, treat any attribute conditions that are cluster conditions
-        # as just optional, because it's optional to implement any device type feature.
-        # Device types also have some marked as "condition" that are similarly optional
-        except BasicConformanceException:
-            if element.tag == ATTRIBUTE_TAG or element.tag == CONDITION_TAG or element.tag == FEATURE_TAG:
-                return device_feature(element.attrib['name'])
-            raise
-
-    ops = [parse_device_type_callable_from_xml(sub) for sub in element]
-    return parse_wrapper_callable_from_xml(element, ops)
-
-
 def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Callable:
     if not list(element):
         try:
@@ -508,6 +494,8 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
                 raise ConformanceException(f'Conformance specifies attribute or command not in table: {name}')
         elif element.tag == COMMAND_TAG:
             return command(params.command_map[element.get('name')], element.get('name'))
+        elif element.tag == CONDITION_TAG:
+            return device_feature(element.attrib['name'])
         else:
             raise ConformanceException(
                 f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')
