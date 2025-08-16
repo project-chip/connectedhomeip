@@ -116,9 +116,9 @@ class TC_ICDM_5_1(MatterBaseTest):
                                    f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
 
         # Get TXT record
-        icdTxtRecord = OperatingModeEnum(int(service.txt_record['ICD']))
-        if icdTxtRecord.value != int(service.txt_record['ICD']):
-            raise AttributeError(f'Not a known ICD type: {service.txt_record["ICD"]}')
+        icdTxtRecord = OperatingModeEnum(int(service.txt['ICD']))
+        if icdTxtRecord.value != int(service.txt['ICD']):
+            raise AttributeError(f'Not a known ICD type: {service.txt["ICD"]}')
 
         return icdTxtRecord
 

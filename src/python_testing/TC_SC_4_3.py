@@ -154,13 +154,13 @@ class TC_SC_4_3(MatterBaseTest):
             return (False, f"Input ({input_value}) is not a valid decimal number.")
 
     def verify_t_value(self, operational_record):
-        has_t = operational_record and operational_record.txt_record and 'T' in operational_record.txt_record
+        has_t = operational_record and operational_record.txt and 'T' in operational_record.txt
         if not has_t:
             asserts.assert_false(self.check_pics(TCP_PICS_STR),
                                  f"T key must be included if TCP is supported - returned TXT record: {operational_record}")
             return True, 'T is not provided or required'
 
-        t_value = operational_record.txt_record['T']
+        t_value = operational_record.txt['T']
         logging.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
         # Verify t_value is a decimal number without leading zeros and less than or equal to 6
         try:
@@ -288,8 +288,8 @@ class TC_SC_4_3(MatterBaseTest):
         )
 
         # Request the TXT record. The device may opt not to return a TXT record if there are no mandatory TXT keys
-        txt_record_returned = txt_record is not None and txt_record.txt_record is not None and bool(
-            txt_record.txt_record)
+        txt_record_returned = txt_record is not None and txt_record.txt is not None and bool(
+            txt_record.txt)
         txt_record_required = supports_icd or self.check_pics(TCP_PICS_STR)
 
         if txt_record_required:
@@ -319,7 +319,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(9)
 
         def txt_has_key(key: str):
-            return txt_record_returned and key in txt_record.txt_record.keys()
+            return txt_record_returned and key in txt_record.txt.keys()
 
         # Verify hostname character length (12 or 16)
         asserts.assert_true(self.verify_hostname(hostname=srv_record.hostname),
@@ -333,12 +333,12 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('ICD'), "ICD key is NOT present in the TXT record.")
 
             # Verify it has the value of 0 or 1 (ASCII)
-            icd_value = int(txt_record.txt_record['ICD'])
+            icd_value = int(txt_record.txt['ICD'])
             asserts.assert_true(icd_value == 0 or icd_value == 1, "ICD value is different than 0 or 1 (ASCII).")
         else:
             logging.info("supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
             if txt_record_returned:
-                asserts.assert_not_in('ICD', txt_record.txt_record, "ICD key is present in the TXT record.")
+                asserts.assert_not_in('ICD', txt_record.txt, "ICD key is present in the TXT record.")
 
         # SII TXT KEY
         if supports_icd and not supports_lit:
@@ -358,7 +358,7 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('SII'), "SII key is NOT present in the TXT record.")
 
             logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
-            sii_value = txt_record.txt_record['SII']
+            sii_value = txt_record.txt['SII']
             result, message = self.verify_decimal_value(sii_value, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
@@ -368,7 +368,7 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('SAI'), "SAI key is NOT present in the TXT record.")
 
             logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
-            sai_value = txt_record.txt_record['SAI']
+            sai_value = txt_record.txt['SAI']
             result, message = self.verify_decimal_value(sai_value, ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
@@ -376,7 +376,7 @@ class TC_SC_4_3(MatterBaseTest):
         if txt_has_key('SAT'):
             logging.info(
                 "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
-            sat_value = txt_record.txt_record['SAT']
+            sat_value = txt_record.txt['SAT']
             result, message = self.verify_decimal_value(sat_value, MAX_SAT_VALUE)
             asserts.assert_true(result, message)
 

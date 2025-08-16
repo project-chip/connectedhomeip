@@ -33,7 +33,7 @@ class MdnsServiceInfo(JsonSerializable):
     hostname: Optional[str] = field(init=False)
     port: Optional[int] = field(init=False)
     addresses: Optional[List[str]] = field(init=False)
-    txt_record: Optional[Dict[str, str]] = field(init=False)
+    txt: Optional[Dict[str, str]] = field(init=False)
     priority: Optional[int] = field(init=False)
     interface_index: Optional[int] = field(init=False)
     weight: Optional[int] = field(init=False)
@@ -48,7 +48,7 @@ class MdnsServiceInfo(JsonSerializable):
         self.hostname = si.server
         self.port = si.port
         self.addresses = si.parsed_addresses()
-        self.txt_record = si.decoded_properties
+        self.txt = si.decoded_properties
         self.priority = si.priority
         self.interface_index = si.interface_index
         self.weight = si.weight

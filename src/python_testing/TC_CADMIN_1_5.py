@@ -124,7 +124,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
             expected_cm_value=2,
             expected_discriminator=params.randomDiscriminator
         )
-        logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
+        logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
         sleep(190)
 
         self.step(4)
