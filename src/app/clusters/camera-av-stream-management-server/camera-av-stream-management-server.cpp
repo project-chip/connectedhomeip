@@ -1685,11 +1685,12 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
     VerifyOrReturn(commandData.streamUsage == Globals::StreamUsageEnum::kRecording ||
-                   commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis  ||
-                   commandData.streamUsage == Globals::StreamUsageEnum::kLiveView, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
+                       commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis ||
+                       commandData.streamUsage == Globals::StreamUsageEnum::kLiveView,
+                   {
+                       ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                   });
 
     VerifyOrReturn(commandData.videoCodec != VideoCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid video codec", mEndpointId);
@@ -1817,11 +1818,12 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     uint16_t audioStreamID = 0;
 
     VerifyOrReturn(commandData.streamUsage == Globals::StreamUsageEnum::kRecording ||
-                   commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis  ||
-                   commandData.streamUsage == Globals::StreamUsageEnum::kLiveView, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
+                       commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis ||
+                       commandData.streamUsage == Globals::StreamUsageEnum::kLiveView,
+                   {
+                       ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                   });
 
     VerifyOrReturn(commandData.audioCodec != AudioCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid audio codec", mEndpointId);
