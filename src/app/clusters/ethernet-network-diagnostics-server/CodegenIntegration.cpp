@@ -42,9 +42,6 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogProgress(AppServer, "Registering Ethernet Network Diagnostics Cluster on endpoint %u, %d", endpointId,
-                        emberEndpointIndex);
-
         // Create OptionalAttributeSet from optionalAttributeBits
         EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
 
@@ -75,7 +72,7 @@ void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpo
             .fixedClusterServerEndpointCount = kEthernetNetworkDiagnosticsFixedClusterCount,
             .maxEndpointCount                = kEthernetNetworkDiagnosticsMaxClusterCount,
             .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = false,
+            .fetchOptionalAttributes         = true,
         },
         integrationDelegate);
 }

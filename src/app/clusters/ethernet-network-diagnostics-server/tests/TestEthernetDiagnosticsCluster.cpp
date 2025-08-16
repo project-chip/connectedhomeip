@@ -93,6 +93,12 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
                 v = 234;
                 return CHIP_NO_ERROR;
             }
+
+            CHIP_ERROR GetEthPacketTxCount(uint64_t & v) override
+            {
+                v = 345;
+                return CHIP_NO_ERROR;
+            }
         };
 
         const EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet =

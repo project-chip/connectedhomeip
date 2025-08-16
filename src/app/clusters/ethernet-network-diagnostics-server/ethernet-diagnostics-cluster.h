@@ -42,10 +42,7 @@ class EthernetDiagnosticsServerCluster : public DefaultServerCluster
 public:
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
         EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id, EthernetNetworkDiagnostics::Attributes::FullDuplex::Id,
-        EthernetNetworkDiagnostics::Attributes::PHYRate::Id, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id,
-        EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id, EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id,
-        EthernetNetworkDiagnostics::Attributes::TxErrCount::Id, EthernetNetworkDiagnostics::Attributes::CollisionCount::Id,
-        EthernetNetworkDiagnostics::Attributes::OverrunCount::Id>;
+        EthernetNetworkDiagnostics::Attributes::PHYRate::Id, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id>;
 
     EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
                                      const BitFlags<EthernetNetworkDiagnostics::Feature> mEnabledFeatures,

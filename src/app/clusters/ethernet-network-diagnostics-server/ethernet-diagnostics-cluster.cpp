@@ -60,7 +60,6 @@ EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                               AttributeValueEncoder & encoder)
 {
-    // Handle numeric attributes inline
     uint64_t value;
     CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 
@@ -120,18 +119,28 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         err = mProvider.GetEthTimeSinceReset(value);
         break;
     case PacketRxCount::Id:
+        if (!mEnabledFeatures.Has(Feature::kPacketCounts))
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthPacketRxCount(value);
         break;
     case PacketTxCount::Id:
+        if (!mEnabledFeatures.Has(Feature::kPacketCounts))
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthPacketTxCount(value);
         break;
     case TxErrCount::Id:
+        if (!mEnabledFeatures.Has(Feature::kErrorCounts))
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthTxErrCount(value);
         break;
     case CollisionCount::Id:
+        if (!mEnabledFeatures.Has(Feature::kErrorCounts))
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthCollisionCount(value);
         break;
     case OverrunCount::Id:
+        if (!mEnabledFeatures.Has(Feature::kErrorCounts))
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthOverrunCount(value);
         break;
     case Globals::Attributes::FeatureMap::Id:
@@ -181,13 +190,23 @@ CHIP_ERROR EthernetDiagnosticsServerCluster::Attributes(const ConcreteClusterPat
 {
     AttributeListBuilder listBuilder(builder);
 
-    static constexpr DataModel::AttributeEntry optionalAttributeEntries[] = {
-        CarrierDetect::kMetadataEntry,  FullDuplex::kMetadataEntry,    PHYRate::kMetadataEntry,
-        TimeSinceReset::kMetadataEntry, OverrunCount::kMetadataEntry,  CollisionCount::kMetadataEntry,
-        TxErrCount::kMetadataEntry,     PacketRxCount::kMetadataEntry, PacketTxCount::kMetadataEntry,
+    const bool havePacketCounts = mEnabledFeatures.Has(Feature::kPacketCounts);
+    const bool haveErrorCounts  = mEnabledFeatures.Has(Feature::kErrorCounts);
+
+    // Counts only via feature bits; other optionals via optional attribute set.
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+        { havePacketCounts, PacketRxCount::kMetadataEntry },
+        { havePacketCounts, PacketTxCount::kMetadataEntry },
+        { haveErrorCounts, TxErrCount::kMetadataEntry },
+        { haveErrorCounts, CollisionCount::kMetadataEntry },
+        { haveErrorCounts, OverrunCount::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(CarrierDetect::Id), CarrierDetect::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(FullDuplex::Id), FullDuplex::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(PHYRate::Id), PHYRate::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(TimeSinceReset::Id), TimeSinceReset::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributeEntries), mOptionalAttributeSet);
+    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
 }
 
 } // namespace Clusters

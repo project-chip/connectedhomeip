@@ -2697,7 +2697,7 @@ endpoint 0 {
     callback attribute overrunCount;
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 3;
     callback attribute clusterRevision;
   }
 
