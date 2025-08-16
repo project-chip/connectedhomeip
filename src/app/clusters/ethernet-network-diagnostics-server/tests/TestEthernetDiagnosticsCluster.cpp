@@ -102,9 +102,7 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         };
 
         const EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet =
-            EthernetDiagnosticsServerCluster::OptionalAttributeSet()
-                .Set<EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id>()
-                .Set<EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id>();
+            EthernetDiagnosticsServerCluster::OptionalAttributeSet();
 
         ResetCountsProvider resetCountsProvider;
         EthernetDiagnosticsServerCluster cluster(
@@ -192,12 +190,7 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
                 .Set<EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id>()
                 .Set<EthernetNetworkDiagnostics::Attributes::FullDuplex::Id>()
                 .Set<EthernetNetworkDiagnostics::Attributes::PHYRate::Id>()
-                .Set<EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id>()
-                .Set<EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id>()
-                .Set<EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id>()
-                .Set<EthernetNetworkDiagnostics::Attributes::TxErrCount::Id>()
-                .Set<EthernetNetworkDiagnostics::Attributes::CollisionCount::Id>()
-                .Set<EthernetNetworkDiagnostics::Attributes::OverrunCount::Id>();
+                .Set<EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id>();
 
         AllProvider allProvider;
         EthernetDiagnosticsServerCluster cluster(
