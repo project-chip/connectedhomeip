@@ -46,7 +46,7 @@ void AVStreamManagement::Init(Controller::DeviceCommissioner * commissioner)
 }
 
 CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId endpointId, uint8_t streamUsage,
-                                                   Optional<uint16_t> minWidth, Optional<uint16_t> minHeight,
+                                                   Optional<uint16_t> minResWidth, Optional<uint16_t> minResHeight,
                                                    Optional<uint16_t> minFrameRate, Optional<uint32_t> minBitRate)
 {
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -74,8 +74,8 @@ CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId end
     mVideoStreamAllocate.maxFrameRate = kMaxFrameRate;
 
     // Handle resolution configuration with validation
-    uint16_t requestedMinWidth  = minWidth.ValueOr(kMinWidth);
-    uint16_t requestedMinHeight = minHeight.ValueOr(kMinHeight);
+    uint16_t requestedMinWidth  = minResWidth.ValueOr(kMinWidth);
+    uint16_t requestedMinHeight = minResHeight.ValueOr(kMinHeight);
 
     // Ensure min values don't exceed max values
     if (requestedMinWidth > kMaxWidth)
