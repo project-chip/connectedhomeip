@@ -16,6 +16,7 @@
 import logging
 import re
 import select
+import shutil
 import subprocess
 import time
 from dataclasses import dataclass
@@ -105,7 +106,13 @@ class WebSocketRunner(TestRunner):
         if command:
             start_time = time.time()
 
-            command = ['stdbuf', '-o0', '-e0'] + command  # disable buffering
+            # Disable buffering for live test output, if 'stdbuf' is available.
+            # This improves real-time logs in WebSocketRunner.
+            if shutil.which("stdbuf"):
+                command = ['stdbuf', '-o0', '-e0'] + command
+            else:
+                logging.debug("'stdbuf' not found - output may be buffered.")
+
             instance = subprocess.Popen(
                 command, text=False, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
