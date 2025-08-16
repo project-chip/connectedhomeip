@@ -119,28 +119,18 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         err = mProvider.GetEthTimeSinceReset(value);
         break;
     case PacketRxCount::Id:
-        if (!mEnabledFeatures.Has(Feature::kPacketCounts))
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthPacketRxCount(value);
         break;
     case PacketTxCount::Id:
-        if (!mEnabledFeatures.Has(Feature::kPacketCounts))
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthPacketTxCount(value);
         break;
     case TxErrCount::Id:
-        if (!mEnabledFeatures.Has(Feature::kErrorCounts))
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthTxErrCount(value);
         break;
     case CollisionCount::Id:
-        if (!mEnabledFeatures.Has(Feature::kErrorCounts))
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthCollisionCount(value);
         break;
     case OverrunCount::Id:
-        if (!mEnabledFeatures.Has(Feature::kErrorCounts))
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
         err = mProvider.GetEthOverrunCount(value);
         break;
     case Globals::Attributes::FeatureMap::Id:
