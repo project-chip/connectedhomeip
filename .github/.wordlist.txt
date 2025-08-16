@@ -145,6 +145,7 @@ betaprogram
 BinaryInputBasic
 Binfmt
 bitbake
+bitrate
 bld
 BLE
 BleApplicationDelegate
@@ -272,6 +273,7 @@ cn
 COAP
 codeaurora
 codebase
+codec
 codegen
 CodeGenerator
 CodeLab
@@ -337,6 +339,7 @@ cstdint
 csu
 csv
 ctl
+CTS
 ctrl
 ctypes
 CurrentHue
@@ -1040,7 +1043,6 @@ OnOffSwitchConfiguration
 OnPlatformEvent
 onwards
 OO
-openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -1280,6 +1282,7 @@ rtd
 RTL
 rtld
 RTOS
+RTS
 RTT
 RTX
 runArgs
@@ -1506,6 +1509,7 @@ TotalTrihalomethanesConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+transcoder
 TransferSession
 transitionTime
 TransportMgrBase

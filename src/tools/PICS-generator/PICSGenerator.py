@@ -430,8 +430,8 @@ class DeviceMappingTest(MatterBaseTest):
                 xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
             elif specVersion == 0x1040100:
                 xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
-            elif specVersion == 0x1050000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+            elif specVersion == 0x1040200:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
             else:
                 console.print("FAILURE: Specification version reported by device not supported")
                 return

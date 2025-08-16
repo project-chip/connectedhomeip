@@ -20,6 +20,7 @@ namespace UnitLocalization {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace TemperatureUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);

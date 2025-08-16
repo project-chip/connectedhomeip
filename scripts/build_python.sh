@@ -51,6 +51,7 @@ declare -a extra_packages
 declare -a extra_gn_args
 declare chip_build_controller_dynamic_server=true
 declare enable_pw_rpc=false
+declare enable_ccache=no
 declare enable_webrtc=true
 
 help() {
@@ -86,6 +87,7 @@ Input Options:
   -ds, --chip_build_controller_dynamic_server <true/false>  Enable dynamic server in controller.
                                                             Defaults to $chip_build_controller_dynamic_server.
   -pw  --enable_pw_rpc <true/false>                         Build Pw Python wheels. Defaults to $enable_pw_rpc.
+  --enable-ccache                                           Use ccache for building python wheels. Defaults to $enable_ccache.
 "
 }
 
@@ -193,6 +195,9 @@ while (($#)); do
             fi
             shift
             ;;
+        --enable-ccache)
+            enable_ccache=yes
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -216,6 +221,7 @@ echo "  enable_ipv4=\"$enable_ipv4\""
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
 echo "  chip_support_webrtc_python_bindings=\"$enable_webrtc\""
 echo "  enable_pw_rpc=\"$enable_pw_rpc\""
+echo "  enable_ccache=\"$enable_ccache\""
 
 if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
     echo "In addition, the following extra args will added to gn command line: ${extra_gn_args[*]}"
@@ -238,6 +244,21 @@ source "$CHIP_ROOT/scripts/activate.sh"
 #     10.16    // SYSTEM_VERSION_COMPAT is unset or 1
 export SYSTEM_VERSION_COMPAT=0
 
+# Set default crypto to BoringSSL
+chip_crypto="boringssl"
+
+# Disable WebRTC by default only on Darwin due to libdatachannel limitations
+if [[ "$(uname)" == "Darwin" ]]; then
+    echo "Warning: WebRTC is not supported on Darwin. Disabling WebRTC to avoid build errors."
+    enable_webrtc="false"
+fi
+
+# If WebRTC is enabled, switch chip_crypto to OpenSSL,
+# because WebRTC depends on OpenSSL, which must be installed and available.
+if [[ "$enable_webrtc" == "true" ]]; then
+    chip_crypto="openssl"
+fi
+
 # Generates ninja files
 gn_args=(
     # Make all possible human readable tracing available.
@@ -250,11 +271,15 @@ gn_args=(
     "chip_config_network_layer_ble=$enable_ble"
     "chip_enable_ble=$enable_ble"
     "chip_inet_config_enable_ipv4=$enable_ipv4"
-    "chip_crypto=\"openssl\""
+    "chip_crypto=\"$chip_crypto\""
     "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
     "chip_support_webrtc_python_bindings=$enable_webrtc"
     "chip_device_config_enable_joint_fabric=true"
 )
+# Add ccache support through pw_command_launcher when enabled
+if [[ "$enable_ccache" == "yes" ]]; then
+    gn_args+=("pw_command_launcher=\"ccache\"")
+fi
 if [[ -n "$chip_mdns" ]]; then
     gn_args+=("chip_mdns=\"$chip_mdns\"")
 fi
@@ -265,12 +290,23 @@ if [[ -n "$pregen_dir" ]]; then
     gn_args+=("chip_code_pre_generated_directory=\"$pregen_dir\"")
 fi
 if [[ -n $wifi_paf_config ]]; then
-    args+=("$wifi_paf_config")
+    gn_args+=("$wifi_paf_config")
 fi
 # Append extra arguments provided by the user.
 gn_args+=("${extra_gn_args[@]}")
 
 gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[*]}"
+
+# Set up ccache environment for compilation
+if [[ "$enable_ccache" == "yes" ]]; then
+    # Only wrap if not already wrapped with ccache
+    if [[ -n "$CC" ]] && [[ "$CC" != ccache* ]]; then
+        export CC="ccache $CC"
+    fi
+    if [[ -n "$CXX" ]] && [[ "$CXX" != ccache* ]]; then
+        export CXX="ccache $CXX"
+    fi
+fi
 
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels
