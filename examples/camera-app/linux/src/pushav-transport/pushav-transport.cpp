@@ -242,7 +242,7 @@ bool InBlindPeriod(std::chrono::steady_clock::time_point blindStartTime, uint16_
     {
         auto now     = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - blindStartTime).count();
-        ChipLogProgress(Camera, "PushAVTransport blind period elapsed: %lld", elapsed);
+        ChipLogProgress(Camera, "PushAVTransport blind period elapsed: %lld", static_cast<long long int>(elapsed));
         return ((elapsed >= 0) && (elapsed < blindDuration));
     }
 }
