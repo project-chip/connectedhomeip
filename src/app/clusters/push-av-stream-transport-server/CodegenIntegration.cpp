@@ -116,6 +116,17 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
     gServers[arrayIndex].Cluster().Init();
 }
 
+void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDelegate * delegate)
+{
+    ChipLogProgress(AppServer, "Setting TLS Client Management delegate on endpoint %u", endpointId);
+    uint16_t arrayIndex = 0;
+    if (!FindEndpointWithLog(endpointId, arrayIndex))
+    {
+        return;
+    }
+    gServers[arrayIndex].Cluster().SetTLSClientManagementDelegate(endpointId, delegate);
+}
+
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app
