@@ -162,7 +162,7 @@ class TC_JFDS_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_JFDS_2_1(self):
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
+        _fabric_a_persistent_storage = PersistentStorage(self.ecoACtrlStorage)
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)

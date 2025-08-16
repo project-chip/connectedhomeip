@@ -231,7 +231,7 @@ class TC_JCM_1_2(MatterBaseTest):
     async def test_TC_JCM_1_2(self):
 
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
+        _fabric_a_persistent_storage = PersistentStorage(self.ecoACtrlStorage)
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
@@ -242,7 +242,7 @@ class TC_JCM_1_2(MatterBaseTest):
             catTags=[int(self.ecoACATs, 16), int('fffe0001', 16)])
 
         # Creating a Controller for Ecosystem B
-        _fabric_b_persistent_storage = PersistentStorage(jsonData=self.ecoBCtrlStorage)
+        _fabric_b_persistent_storage = PersistentStorage(self.ecoBCtrlStorage)
         _certAuthorityManagerB = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_b_persistent_storage)

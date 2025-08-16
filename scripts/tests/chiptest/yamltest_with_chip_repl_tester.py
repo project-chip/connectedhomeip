@@ -36,6 +36,7 @@ import click
 import matter.CertificateAuthority
 import matter.native
 from matter.ChipStack import ChipStack
+from matter.storage import PersistentStorageJSON
 from matter.yaml.runner import ReplTestRunner
 from matter.yamltests.definitions import SpecDefinitionsFromPaths
 from matter.yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig
@@ -100,7 +101,7 @@ async def main(setup_code, yaml_path, node_id, pics_file):
     # Setting up python environment for running YAML CI tests using python parser.
     with tempfile.NamedTemporaryFile() as chip_stack_storage:
         matter.native.Init()
-        chip_stack = ChipStack(chip_stack_storage.name)
+        chip_stack = ChipStack(PersistentStorageJSON(chip_stack_storage.name))
         certificate_authority_manager = matter.CertificateAuthority.CertificateAuthorityManager(
             chip_stack, chip_stack.GetStorageManager())
         certificate_authority_manager.LoadAuthoritiesFromStorage()

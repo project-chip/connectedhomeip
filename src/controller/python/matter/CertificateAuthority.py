@@ -58,7 +58,7 @@ class CertificateAuthority:
     def logger(cls):
         return logging.getLogger('CertificateAuthority')
 
-    def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: PersistentStorage = None):
+    def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: Optional[PersistentStorage] = None):
         '''  Initializes the CertificateAuthority. This will set-up the associated C++ OperationalCredentialsAdapter
              as well.
 
@@ -86,7 +86,7 @@ class CertificateAuthority:
         self._Handle().pychip_OpCreds_SetCertificateValidityPeriod.restype = PyChipError
         self._Handle().pychip_OpCreds_SetCertificateValidityPeriod.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
 
-        if (persistentStorage is None):
+        if persistentStorage is None:
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
@@ -99,7 +99,7 @@ class CertificateAuthority:
                 ctypes.py_object(self), ctypes.c_uint32(self._caIndex), self._persistentStorage.GetSdkStorageObject())
         )
 
-        if (self._closure is None):
+        if self._closure is None:
             raise ValueError("Encountered error initializing OpCreds adapter")
 
         self._isActive = True
@@ -250,7 +250,7 @@ class CertificateAuthorityManager:
     def logger(cls):
         return logging.getLogger('CertificateAuthorityManager')
 
-    def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: PersistentStorage = None):
+    def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: Optional[PersistentStorage] = None):
         ''' Initializes the manager.
 
             chipStack:          Reference to a matter.ChipStack object that is used to initialize
@@ -261,7 +261,7 @@ class CertificateAuthorityManager:
         '''
         self._chipStack = chipStack
 
-        if (persistentStorage is None):
+        if persistentStorage is None:
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
