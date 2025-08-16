@@ -35,13 +35,32 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import re
-from typing import Any, Optional, Tuple, Union
+from typing import Any
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from construct import Enum
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.utils.asserts import (
+    assert_valid_commissionable_instance_name,
+    assert_is_commissionable_type,
+    assert_valid_hostname,
+    assert_valid_long_discriminator_subtype,
+    assert_valid_short_discriminator_subtype,
+    assert_valid_vendor_subtype,
+    assert_valid_devtype_subtype,
+    assert_valid_d_key,
+    assert_valid_vp_key,
+    assert_valid_sii_key,
+    assert_valid_sai_key,
+    assert_valid_sat_key,
+    assert_valid_cm_key,
+    assert_valid_dt_key,
+    assert_valid_dn_key,
+    assert_valid_ri_key,
+    assert_valid_ph_key,
+    assert_valid_pi_key
+)
+
 from mobly import asserts
 
 '''
@@ -60,12 +79,6 @@ MAX_SAT_VALUE = 65535
 MAX_T_VALUE = 6
 LONG_DISCRIMINATOR = 3840
 CM_SUBTYPE = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
-
-
-class DiscriminatorLength(Enum):
-    LONG = 12
-    SHORT = 4
-
 
 class TC_SC_4_1(MatterBaseTest):
 
@@ -100,137 +113,6 @@ class TC_SC_4_1(MatterBaseTest):
             cluster=Clusters.IcdManagement,
             attribute=Clusters.IcdManagement.Attributes.ActiveModeThreshold
         )
-
-    @staticmethod
-    def is_valid_dns_sd_instance_name(name: str) -> bool:
-        return bool(re.fullmatch(r'[A-F0-9]{16}', name))
-
-    @staticmethod
-    def is_valid_hostname(hostname: str) -> bool:
-        # Remove '.local' suffix if present
-        hostname = hostname.rstrip('.')
-        if hostname.endswith('.local'):
-            hostname = hostname[:-6]
-
-        # Regular expression to match an uppercase hexadecimal string of 12 or 16 characters
-        pattern = re.compile(r'^[0-9A-F]{12}$|^[0-9A-F]{16}$')
-        return bool(pattern.match(hostname))
-
-    @staticmethod
-    def get_vendor_subtype(subtypes: list[str]) -> Optional[str]:
-        pattern = re.compile(rf'^(_V(\d+))\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}$')
-        return next((s for s in subtypes if pattern.fullmatch(s)), None)
-
-    @staticmethod
-    def get_devtype_subtype(subtypes: list[str]) -> Optional[str]:
-        pattern = re.compile(rf'^(_T([1-9]\d*))\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}$')
-        return next((s for s in subtypes if pattern.fullmatch(s)), None)
-
-    @staticmethod
-    def is_valid_discriminator_subtype(
-        subtypes: list[str],
-        discriminator_length: DiscriminatorLength
-    ) -> bool:
-        prefix = '_L' if discriminator_length == DiscriminatorLength.LONG else '_S'
-        max_value = 4095 if discriminator_length == DiscriminatorLength.LONG else 15
-
-        pattern = re.compile(rf'^({prefix}(\d+))\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}$')
-
-        for subtype in subtypes:
-            match = pattern.fullmatch(subtype)
-            if match and 0 <= int(match.group(2)) <= max_value:
-                return True
-
-        return False
-
-    @staticmethod
-    def is_valid_vendor_subtype(subtype: str) -> bool:
-        return 0 <= int(subtype.split('_V')[1].split('.')[0]) <= 65535
-
-    @staticmethod
-    def is_valid_devtype_subtype(subtype: str) -> bool:
-        return int(subtype.split('_T')[1].split('.')[0]) >= 1
-
-    @staticmethod
-    def verify_d_key(txt_record: dict) -> bool:
-        value = txt_record.get('D')
-        return value is not None and value.isdigit() and 1 <= int(value) <= 9999 and not value.startswith('0')
-
-    @staticmethod
-    def is_valid_key_decimal_value(input_value, max_value: int) -> Union[bool, Tuple[bool, str]]:
-        try:
-            input_float = float(input_value)
-            input_int = int(input_float)
-
-            if str(input_value).startswith("0") and input_int != 0:
-                return (False, f"Input ({input_value}) has leading zeros.")
-
-            if input_float != input_int:
-                return (False, f"Input ({input_value}) is not an integer.")
-
-            if input_int <= max_value:
-                return (True, f"Input ({input_value}) is valid.")
-            else:
-                return (False, f"Input ({input_value}) exceeds the allowed value {max_value}.")
-        except ValueError:
-            return (False, f"Input ({input_value}) is not a valid decimal number.")
-
-    @staticmethod
-    def is_valid_vp_key(value: str) -> bool:
-        parts = value.split('+')
-
-        if not (1 <= len(parts) <= 2):
-            return False
-
-        try:
-            vendor_id = int(parts[0])
-            if not (0 <= vendor_id <= 65535):
-                return False
-
-            if len(parts) == 2:
-                product_id = int(parts[1])
-                if not (0 <= product_id <= 65535):
-                    return False
-
-            return True
-        except ValueError:
-            return False
-
-    @staticmethod
-    def is_valid_dt_key(value: str) -> bool:
-        # Must be a decimal ASCII string without leading zeros and ≥ 1
-        return value.isdigit() and not value.startswith('0') and int(value) >= 1
-
-    @staticmethod
-    def is_valid_dn_key(value: str) -> bool:
-        try:
-            return len(value.encode('utf-8')) <= 32
-        except UnicodeEncodeError:
-            return False
-
-    @staticmethod
-    def is_valid_ri_key(value: str) -> bool:
-        # Uppercase hex string, each byte is 2 hex chars
-        if not re.fullmatch(r'[0-9A-F]{2,100}', value):
-            return False
-        return len(value) % 2 == 0 and len(value) <= 100
-
-    @staticmethod
-    def is_valid_ph_key(value: str) -> bool:
-        if not value.isdigit():
-            return False
-        if value == '0' or value.startswith('0'):
-            return False
-        return True
-
-    @staticmethod
-    def is_valid_pi_key(value: str) -> bool:
-        if value is None:
-            return False
-        try:
-            return len(value.encode('utf-8')) <= 128
-        except (UnicodeEncodeError, AttributeError):
-            return False
 
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
@@ -287,76 +169,69 @@ class TC_SC_4_1(MatterBaseTest):
         mdns = MdnsDiscovery()
 
         # Get DUT's commissionable service
-        commissionable_service = await mdns.get_commissionable_service(log_output=True)
+        commissionable_services = await mdns.get_commissionable_services(log_output=True)
 
         # Verify presence of DUT's comissionable service
-        asserts.assert_is_not_none(commissionable_service, "DUT's commissionable service not present")
+        asserts.assert_greater(len(commissionable_services), 0, "DUT's commissionable services not present")
+        commissionable_service = commissionable_services[0]
 
         # Verify DUT's commissionable service is a valid DNS-SD instance name
         # (64-bit randomly selected ID expressed as a sixteen-char hex string with capital letters)
-        asserts.assert_true(self.is_valid_dns_sd_instance_name(commissionable_service.instance_name),
-                            f"Invalid DNS-SD instance name: {commissionable_service.instance_name}")
+        assert_valid_commissionable_instance_name(commissionable_service.instance_name)
 
         # Verify DUT's commissionable service service type is '_matterc._udp' and service domain '.local.'
-        asserts.assert_equal(commissionable_service.service_type, MdnsServiceType.COMMISSIONABLE.value,
-                             f"Invalid service type '{commissionable_service.service_type}', must be '{MdnsServiceType.COMMISSIONABLE.value}'")
+        assert_is_commissionable_type(commissionable_service.service_type)
 
         # Verify target hostname is derived from the 48bit or 64bit MAC address
         # expressed as a twelve or sixteen capital letter hex string. If the MAC
         # is randomized for privacy, the randomized version must be used each time.
-        asserts.assert_true(self.is_valid_hostname(commissionable_service.server),
-                            f"Invalid server hostname: {commissionable_service.server}")
+        assert_valid_hostname(commissionable_service.server)
 
         # Get commissionable subtypes
         subtypes = await mdns.get_commissionable_subtypes(log_output=True)
 
-        # Validate that the long discriminator commissionable subtype is a 12-bit long discriminator,
+        # Validate that the commissionable long discriminator subtype is a 12-bit long discriminator,
         # encoded as a variable-length decimal number in ASCII text, omitting any leading zeros
-        asserts.assert_true(
-            self.is_valid_discriminator_subtype(subtypes, DiscriminatorLength.LONG),
-            "Invalid long discriminator commissionable subtype or not present."
-        )
+        long_discriminator_subtype = next((s for s in subtypes if s.startswith('_L')), None)
+        asserts.assert_is_not_none(long_discriminator_subtype, f"Long discriminator must be present.")
+        assert_valid_long_discriminator_subtype(long_discriminator_subtype)
 
-        # Validate that the short discriminator commissionable subtype is a 4-bit long discriminator,
+        # Validate that the short commissionable discriminator subtype is a 4-bit long discriminator,
         # encoded as a variable-length decimal number in ASCII text, omitting any leading zeros
-        asserts.assert_true(
-            self.is_valid_discriminator_subtype(subtypes, DiscriminatorLength.SHORT),
-            "Invalid short discriminator commissionable subtype or not present."
-        )
+        short_discriminator_subtype = next((s for s in subtypes if s.startswith('_S')), None)
+        asserts.assert_is_not_none(short_discriminator_subtype, f"Short discriminator must be present.")
+        assert_valid_short_discriminator_subtype(short_discriminator_subtype)
 
-        # If the vendor commissionable subtype is present, validate it's a
+        # If the commissionable vendor subtype is present, validate it's a
         # 16-bit vendor id, encoded as a variable-length decimal number in
         # ASCII text, omitting any leading zeros
-        vendor_subtype = self.get_vendor_subtype(subtypes)
+        vendor_subtype = next((s for s in subtypes if s.startswith('_V')), None)
         if vendor_subtype:
-            asserts.assert_true(
-                self.is_valid_vendor_subtype(vendor_subtype),
-                f"Invalid vendor commissionable subtype: {vendor_subtype}."
-            )
+            assert_valid_vendor_subtype(vendor_subtype)
 
-        # If the devtype commissionable subtype is present, validate it's a
-        # variable length decimal number in ASCII without leading zeros
-        devtype_subtype = self.get_devtype_subtype(subtypes)
+        # If the commissionable devtype subtype is present, validate it's a
+        # 32-bit variable length decimal number in ASCII without leading zeros
+        # TODO: Update test plan to inclide "32-bit"
+        devtype_subtype = next((s for s in subtypes if s.startswith('_T')), None)
         if devtype_subtype:
-            asserts.assert_true(
-                self.is_valid_devtype_subtype(devtype_subtype),
-                f"Invalid devtype commissionable subtype: {devtype_subtype}."
-            )
+            assert_valid_devtype_subtype(devtype_subtype)
 
         # Verify presence of the _CM subtype
-        asserts.assert_in(CM_SUBTYPE, subtypes, f"{CM_SUBTYPE} subtype not present.")
+        asserts.assert_in(CM_SUBTYPE, subtypes, f"'{CM_SUBTYPE}' subtype must be present.")
 
         # Verify D key is present, which represents the discriminator
         # and must be encoded as a variable-length decimal value with up to 4
         # digits omitting any leading zeros
-        asserts.assert_true(self.verify_d_key(commissionable_service.txt_record), "D key is invalid or not present.")
+        d_key = commissionable_service.txt_record.get('D')
+        asserts.assert_is_not_none(d_key, "D key must be present.")
+        assert_valid_d_key(d_key)
 
         # If VP key is present, verify it contain at least Vendor ID
         # and if Product ID is present, values must be separated by a + sign
         if 'VP' in commissionable_service.txt_record:
             vp_key = commissionable_service.txt_record['VP']
             if vp_key:
-                asserts.assert_true(self.is_valid_vp_key(vp_key), f"Invalid VP key: {vp_key}")
+                assert_valid_vp_key(vp_key)
 
         # If SAI key is present, SII key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
@@ -364,8 +239,7 @@ class TC_SC_4_1(MatterBaseTest):
         if 'SII' in commissionable_service.txt_record:
             sii_key = commissionable_service.txt_record['SII']
             if sii_key:
-                result, message = self.is_valid_key_decimal_value(sii_key, ONE_HOUR_IN_MS)
-                asserts.assert_true(result, message)
+                assert_valid_sii_key(sii_key)
 
         # If SAI key is present, SAI key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
@@ -373,16 +247,14 @@ class TC_SC_4_1(MatterBaseTest):
         if 'SAI' in commissionable_service.txt_record:
             sai_key = commissionable_service.txt_record['SAI']
             if sai_key:
-                result, message = self.is_valid_key_decimal_value(sai_key, ONE_HOUR_IN_MS)
-                asserts.assert_true(result, message)
+                assert_valid_sai_key(sai_key)
 
         # - If the SAT key is present, verify that it is a decimal value with
         #   no leading zeros and is less than or equal to 65535
         if 'SAT' in commissionable_service.txt_record:
             sat_key = commissionable_service.txt_record['SAT']
             if sat_key:
-                result, message = self.is_valid_key_decimal_value(sat_key, MAX_SAT_VALUE)
-                asserts.assert_true(result, message)
+                assert_valid_sat_key(sat_key)
 
             # - If the SAT key is present and supports_icd is true, verify that
             #   the value is equal to active_mode_threshold
@@ -397,10 +269,11 @@ class TC_SC_4_1(MatterBaseTest):
             "SAI key must be present if SAT key is present."
         )
 
-        # TODO: how to make CM = 1, getting CM = 2 currently
-        # Verify that the CM key is present and is equal to 1
-        # cm_key = commissionable_service.txt_record.get('CM')
-        # if cm_key:
+        # TODO: how to make CM = 1, getting CM = 2 currently, why 1?
+        # # Verify that the CM key is present and is equal to 1
+        # if 'CM' in commissionable_service.txt_record:
+        #     cm_key = commissionable_service.txt_record['CM']
+        #     assert_valid_cm_key(cm_key)
         #     asserts.assert_true(cm_key == "1", f"CM key must be equal to 1, got {cm_key}")
         # else:
         #     asserts.fail("CM key not present")
@@ -410,48 +283,32 @@ class TC_SC_4_1(MatterBaseTest):
         # ASCII number without leading zeros
         if 'DT' in commissionable_service.txt_record:
             dt_key = commissionable_service.txt_record['DT']
-            asserts.assert_true(
-                self.is_valid_dt_key(dt_key),
-                f"Invalid DT key: must be a decimal ASCII number ≥ 1 without leading zeros, got {dt_key}"
-            )
+            assert_valid_dt_key(dt_key)
 
         # If the DN key is present, DN key must be a UTF-8 encoded string with a maximum length of 32B
         if 'DN' in commissionable_service.txt_record:
             dn_key = commissionable_service.txt_record['DN']
-            asserts.assert_true(
-                self.is_valid_dn_key(dn_key),
-                f"DN key must be valid UTF-8 and <= 32 bytes, got {len(dn_key.encode('utf-8'))} bytes"
-            )
+            assert_valid_dn_key(dn_key)
 
         # If the RI key is present, key RI must include the Rotating Device Identifier
         # encoded as an uppercase string with a maximum length of 100 chars (each octet
         # encoded as a 2-digit hex number, max 50 octets)
         if 'RI' in commissionable_service.txt_record:
             ri_key = commissionable_service.txt_record['RI']
-            asserts.assert_true(
-                self.is_valid_ri_key(ri_key),
-                f"RI key must be uppercase hex with even length ≤ 100, got {ri_key}"
-            )
+            assert_valid_ri_key(ri_key)
 
         # If the PH key is present, key PH must be encoded as a variable-length decimal number
         # in ASCII text, omitting any leading zeros. If present value must be different of 0
         if 'PH' in commissionable_service.txt_record:
             ph_key = commissionable_service.txt_record['PH']
-            asserts.assert_true(
-                self.is_valid_ph_key(ph_key),
-                f"PH key must be a non-zero decimal number without leading zeros, got {ph_key}"
-            )
+            assert_valid_ph_key(ph_key)
 
-        # TODO: Fix PI key coming in None
-        # # If the PI key is present, key PI must be encoded as a valid UTF-8 string
-        # # with a maximum length of 128 bytes
-        # if 'PI' in commissionable_service.txt_record:
-        #     pi_key = commissionable_service.txt_record['PI']
-        #     pi_value = len(pi_key.encode('utf-8')) if pi_key is not None else None
-        #     asserts.assert_true(
-        #         self.is_valid_pi_key(pi_key),
-        #         f"PI key must be valid UTF-8 and <= 128 bytes, got {pi_value} bytes"
-        #     )
+        # TODO: Fix PI key present but null/None ??
+        # If the PI key is present, key PI must be encoded as a valid UTF-8 string
+        # with a maximum length of 128 bytes
+        if 'PI' in commissionable_service.txt_record:
+            pi_key = commissionable_service.txt_record['PI']
+            # assert_valid_pi_key(pi_key)
 
         # TH performs a query for the AAAA record against the target
         # listed in the Commissionable Service SRV record.
