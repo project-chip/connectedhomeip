@@ -26,6 +26,10 @@ if(NOT DEFINED EXAMPLE_NXP_PLATFORM_DIR)
     get_filename_component(EXAMPLE_NXP_PLATFORM_DIR ${CHIP_ROOT}/examples/platform/nxp/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME} REALPATH)
 endif()
 
+# Enable default ZCL path to be passed to the zapgen command for all examples.
+# This is only used if the ZCL_PATH argument is not provided in the chip_configure_data_model().
+set(CHIP_ENABLE_ZCL_ARG ON)
+
 if (CONFIG_CHIP_APP_COMMON)
     target_sources(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/source/AppTaskBase.cpp
