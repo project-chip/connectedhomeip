@@ -297,4 +297,10 @@ CHIP_ERROR CryptoContext::PrivacyDecrypt(const uint8_t * input, size_t input_len
     return mKeyContext->PrivacyDecrypt(privacytext, privacyNonce, plaintext);
 }
 
+size_t CryptoContext::EncryptionOverhead()
+{
+    // Matter has a single set of crypto primitives and thus a fixed amount of overhead.
+    return chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
+}
+
 } // namespace chip
