@@ -416,24 +416,19 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
     return nullptr; // Here to avoid compiler warnings, should never reach this point.
 }
 
-// Helper function to create a GStreamer pipeline
+// Helper function to create a GStreamer pipeline that ingests MJPEG frames coming
+// from the camera, converted to H.264, and sent to media controller via app sink.
 GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int width, int height, int framerate,
                                                CameraError & error)
 {
-    width                    = 640;
-    height                   = 480;
-    framerate                = 30;
-    GstElement * pipeline    = gst_pipeline_new("video-pipeline");
-    GstElement * capsfilter1 = gst_element_factory_make("capsfilter", "filter1");
-    ;
+    GstElement * pipeline     = gst_pipeline_new("video-pipeline");
+    GstElement * capsfilter   = gst_element_factory_make("capsfilter", "mjpeg_caps");
+    GstElement * jpegdec      = gst_element_factory_make("jpegdec", "jpegdec");
     GstElement * videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
-    GstElement * capsfilter2  = gst_element_factory_make("capsfilter", "filter2");
     GstElement * x264enc      = gst_element_factory_make("x264enc", "encoder");
     GstElement * rtph264pay   = gst_element_factory_make("rtph264pay", "rtph264");
     GstElement * appsink      = gst_element_factory_make("appsink", "appsink");
     GstElement * source       = nullptr;
-    GstCaps * caps1           = nullptr;
-    GstCaps * caps2           = nullptr;
 
 #ifdef AV_STREAM_GST_USE_TEST_SRC
     source = gst_element_factory_make("videotestsrc", "source");
@@ -447,9 +442,9 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     const std::vector<std::pair<GstElement *, const char *>> elements = {
         { pipeline, "pipeline" },         //
         { source, "source" },             //
-        { capsfilter1, "filter1" },       //
+        { capsfilter, "mjpeg_caps" },     //
+        { jpegdec, "jpegdec" },           //
         { videoconvert, "videoconvert" }, //
-        { capsfilter2, "filter2" },       //
         { x264enc, "encoder" },           //
         { rtph264pay, "rtph264" },        //
         { appsink, "appsink" }            //
@@ -461,16 +456,29 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     {
         ChipLogError(Camera, "Not all elements could be created.");
         // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter1, videoconvert, capsfilter2, x264enc, rtph264pay,
-                                             appsink);
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, appsink);
+
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
 
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter1, videoconvert, capsfilter2, x264enc, appsink, nullptr);
+    // Camera caps request: MJPEG @ WxH @ fps
+    GstCaps * caps = gst_caps_new_simple("image/jpeg", "width", G_TYPE_INT, width, "height", G_TYPE_INT, height, "framerate",
+                                         GST_TYPE_FRACTION, framerate, 1, nullptr);
+    g_object_set(capsfilter, "caps", caps, nullptr);
+    gst_caps_unref(caps);
 
-    // Link elements: source -> capsfilter1 -> videoconvert -> capsfilter2 -> x264enc -> udpsink
-    if (!gst_element_link_many(source, capsfilter1, videoconvert, capsfilter2, x264enc, appsink, nullptr))
+    // Configure encoder for low‑latency
+    gst_util_set_object_arg(G_OBJECT(x264enc), "tune", "zerolatency");
+
+    // Configure appsink for receiving H.264 RTP data
+    g_object_set(appsink, "emit-signals", TRUE, "sync", FALSE, "async", FALSE, nullptr);
+
+    // Build pipeline: v4l2src → capsfilter → jpegdec → videoconvert → x264enc → rtph264pay → appsink
+    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, appsink, nullptr);
+
+    // Link the elements
+    if (!gst_element_link_many(source, capsfilter, jpegdec, videoconvert, x264enc, rtph264pay, appsink, nullptr))
     {
         ChipLogError(Camera, "CreateVideoPipeline: link failed");
 
@@ -479,21 +487,6 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
-
-    caps1 = gst_caps_new_simple("video/x-raw", "width", G_TYPE_INT, width, "height", G_TYPE_INT, height, "framerate",
-                                GST_TYPE_FRACTION, framerate, 1, nullptr);
-    g_object_set(capsfilter1, "caps", caps1, nullptr);
-    gst_caps_unref(caps1);
-
-    // Enforce I420 output
-    caps2 = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", nullptr);
-    g_object_set(capsfilter2, "caps", caps2, NULL);
-    gst_caps_unref(caps2);
-
-    // Add elements in new order
-    g_object_set(x264enc, "tune", "zerolatency", "key-int-max", framerate * 1, "profile", "high", NULL);
-
-    g_object_set(appsink, "emit-signals", TRUE, NULL);
 
     return pipeline;
 }
