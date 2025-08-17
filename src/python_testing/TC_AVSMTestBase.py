@@ -120,7 +120,7 @@ class AVSMTestBase:
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=1024,
+                bitRate=30000,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)

@@ -59,6 +59,7 @@ CommandHandlerInterfaceOnlyClusters:
     - General Commissioning
     - General Diagnostics
     - Software Diagnostics
+    - Group Key Management
     - Wi-Fi Network Diagnostics
     - Camera AV Settings User Level Management
     - Administrator Commissioning
@@ -69,6 +70,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Commodity Tariff
     - Joint Fabric Administrator
     - Zone Management
+    - Soil Measurement
     - Basic Information
 
 # We need a more configurable way of deciding which clusters have which init functions....
@@ -79,6 +81,7 @@ ClustersWithInitFunctions:
     - Color Control
     - General Diagnostics
     - Groups
+    - Group Key Management
     - Identify
     - Level Control
     - Localization Configuration
