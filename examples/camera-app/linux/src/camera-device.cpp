@@ -468,7 +468,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     g_object_set(capsfilter, "caps", caps, nullptr);
     gst_caps_unref(caps);
 
-    // Configure encoder for low‑latency
+    // Configure encoder for low-latency
     gst_util_set_object_arg(G_OBJECT(x264enc), "tune", "zerolatency");
 
     // Configure appsink for receiving H.264 RTP data
