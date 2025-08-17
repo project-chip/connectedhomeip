@@ -1,13 +1,13 @@
 |                                |   Pass Rate |
 |:-------------------------------|------------:|
-| darwin                         |          57 |
-| delete-old-artifacts           |          96 |
-| build-example-ti-cc32xx        |         100 |
+| darwin                         |          67 |
 | build-example-asr              |         100 |
+| build-example-ti-cc32xx        |         100 |
+| cirque                         |         100 |
 | issue-labeler                  |         100 |
 | builds                         |         100 |
 | build-example-esp32            |         100 |
-| cirque                         |         100 |
+| build-example-nuttx            |         100 |
 | chef-ci                        |         100 |
 | tv-casting-example-darwin      |         100 |
 | build-example-linux-arm        |         100 |
@@ -15,7 +15,7 @@
 | test-tv-casting-example        |         100 |
 | build-example-nrf-connect-sdk  |         100 |
 | build-example-nxp              |         100 |
-| build-example-nuttx            |         100 |
+| lint-code-base                 |         100 |
 | minimal-build-linux-configure  |         100 |
 | build-example-qpg              |         100 |
 | build-example-linux-standalone |         100 |
@@ -31,13 +31,13 @@
 | full-builds-android            |         100 |
 | build-example-tizen            |         100 |
 | build-example-efr32            |         100 |
-| lint-code-base                 |         100 |
 | unit-integration-tests         |         100 |
 | build-example-telink           |         100 |
-| build-example-stm32            |         100 |
 | codeql                         |         100 |
+| build-example-stm32            |         100 |
 | bloat-check                    |         100 |
 | darwin-tests                   |         100 |
 | build-example-ameba            |         100 |
+| delete-old-artifacts           |         100 |
 | zap                            |         100 |
 | build-example-infineon         |         100 |
