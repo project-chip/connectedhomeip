@@ -470,6 +470,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 
     // Configure encoder for low-latency
     gst_util_set_object_arg(G_OBJECT(x264enc), "tune", "zerolatency");
+    g_object_set(G_OBJECT(x264enc), "key-int-max", static_cast<guint>(framerate), nullptr);
 
     // Configure appsink for receiving H.264 RTP data
     g_object_set(appsink, "emit-signals", TRUE, "sync", FALSE, "async", FALSE, nullptr);
