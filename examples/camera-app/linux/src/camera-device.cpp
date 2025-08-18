@@ -427,8 +427,6 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     GstElement * x264enc      = gst_element_factory_make("x264enc", "encoder");
     GstElement * appsink      = gst_element_factory_make("appsink", "appsink");
     GstElement * source       = nullptr;
-    GstCaps * caps1           = nullptr;
-    GstCaps * caps2           = nullptr;
 
 #ifdef AV_STREAM_GST_USE_TEST_SRC
     source = gst_element_factory_make("videotestsrc", "source");
@@ -689,7 +687,7 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(videoPipeline, &state, nullptr, 5 * GST_SECOND);
+    gst_element_get_state(videoPipeline, &state, nullptr, 6 * GST_SECOND);
     if (state != GST_STATE_PLAYING)
     {
         ChipLogError(Camera, "Video pipeline did not reach PLAYING state.");
