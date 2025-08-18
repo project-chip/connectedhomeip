@@ -69,34 +69,37 @@ void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Globals::Stru
     this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
 
-void AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                            Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                              Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
     // the callback. The server itself will persist the new values.
     //
     DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+    return Status::Success;
 }
 
-void AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                             Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                               Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
     // the callback. The server itself will persist the new values.
     //
     DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+    return Status::Success;
 }
 
-void AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                             Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                               Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated the preset is valid, and provided the MPTZ values associated with that preset.
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed
     // movements, invoke the callback. The server itself will persist the new values.
     //
     DeviceLayer::SystemLayer().ScheduleLambda([callback] { callback->OnPhysicalMovementComplete(Status::Success); });
+    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSavePreset(uint8_t aPreset)

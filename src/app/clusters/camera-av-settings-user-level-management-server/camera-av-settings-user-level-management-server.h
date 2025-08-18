@@ -127,7 +127,7 @@ public:
      * @param aZoom The validated value of the zoom that is to be set
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual void MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+    virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                                  PhysicalPTZCallback * callback) = 0;
 
     /**
@@ -140,7 +140,7 @@ public:
      * @param aZoom The validated value of the zoom that is to be set
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual void MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                                   PhysicalPTZCallback * callback) = 0;
 
     /**
@@ -154,7 +154,7 @@ public:
      * @param aZoom   The value for Zoom associated with the preset
      * @param callback The callback to be invoked once the physical movement of the camera has completed
      */
-    virtual void MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                                   PhysicalPTZCallback * callback) = 0;
 
     /**
@@ -342,17 +342,13 @@ public:
     void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) override;
 
     // Is a command already being processed
-    bool IsProcessingAsyncCommand() const { return mAsyncCommandHandler.IsValid(); }
+    bool IsProcessingAsyncCommand() const { return false; }
 
 private:
     Delegate & mDelegate;
     EndpointId mEndpointId;
     BitFlags<Feature> mFeatures;
     BitFlags<OptionalAttributes> mOptionalAttrs;
-
-    // Command handler callback
-    app::CommandHandler::Handle mAsyncCommandHandler;
-    ConcreteCommandPath mRequestPath = ConcreteCommandPath(0, 0, 0);
 
     // Next available preset ID
     uint8_t mCurrentPresetID = 1;
@@ -371,6 +367,8 @@ private:
 
     std::vector<MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<DPTZStruct> mDptzStreams;
+
+    bool physicalMovementState;
 
     // Holding variables for values subject to successful physical movement
     Optional<int16_t> mTargetPan;

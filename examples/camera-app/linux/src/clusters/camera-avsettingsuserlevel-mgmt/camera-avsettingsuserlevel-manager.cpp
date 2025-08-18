@@ -29,6 +29,8 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
 
+static void onTimerExpiry(System::Layer * systemLayer, void * data);
+
 void CameraAVSettingsUserLevelManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDeviceHAL)
 {
     mCameraDeviceHAL = aCameraDeviceHAL;
@@ -57,7 +59,7 @@ void CameraAVSettingsUserLevelManager::DefaultViewportUpdated(Globals::Structs::
     this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
 
-void CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                                                        PhysicalPTZCallback * callback)
 {
     mCallback = callback;
@@ -68,13 +70,15 @@ void CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, O
     //
     mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    // For the purposes of the Camera App assume that the physical movement has completed.  An actual HAL will need to
-    // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success); });
+    ChipLogDetail(Zcl, "Starting PTZ mimic timer of 2s");
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
+    return Status::Success;
 }
 
-void CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                                                         PhysicalPTZCallback * callback)
 {
     mCallback = callback;
@@ -85,13 +89,16 @@ void CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, 
     //
     mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    // For the purposes of the Camera App assume that the physical movement has completed.  An actual HAL will need to
-    // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success); });
+    ChipLogDetail(Zcl, "Starting PTZ mimic timer of 2s");
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
+    return Status::Success;
+
 }
 
-void CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
+Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
                                                         Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     mCallback = callback;
@@ -102,10 +109,12 @@ void CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optiona
     //
     mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    // For the purposes of the Camera App assume that the physical movement has completed.  An actual HAL will need to
-    // invoke this based on actual confirmation of PTZ movement completion via the local OnPhysicalMoveCompleted method.
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
     //
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success); });
+    ChipLogDetail(Zcl, "Starting PTZ mimic timer of 2s");
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
+    return Status::Success;
 }
 
 Status CameraAVSettingsUserLevelManager::MPTZSavePreset(uint8_t aPreset)
@@ -301,6 +310,16 @@ CHIP_ERROR CameraAVSettingsUserLevelManager::PersistentAttributesLoadedCallback(
 {
     ChipLogDetail(Camera, "CameraAvSettingsUserLevelManagement: Persistent attributes loaded");
     return CHIP_NO_ERROR;
+}
+
+// Timer expiration to mimic PTZ phyiscal movememt
+//
+static void onTimerExpiry(System::Layer * systemLayer, void * data)
+{
+    ChipLogDetail(Zcl, "Timer expired");
+    CameraAVSettingsUserLevelManager * delegate = reinterpret_cast<CameraAVSettingsUserLevelManager *>(data);
+
+    delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
 }
 
 // To be invoked by the camera once a physical PTZ action has completed

@@ -160,6 +160,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     SetTilt(MakeOptional(kDefaultTilt));
     SetZoom(MakeOptional(kDefaultZoom));
 
+    physicalMovementState = false;
+
     LoadPersistentAttributes();
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
@@ -836,16 +838,21 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
         return;
     }
 
-    // We don't send the response until the delegate confirms via callback that the physical device movement is complete
+    Status status = mDelegate.MPTZSetPosition(pan, tilt, zoom, this);
+
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is complete
     //
-    ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
-    mAsyncCommandHandler = CommandHandler::Handle(&ctx.mCommandHandler);
-    mRequestPath         = ctx.mRequestPath;
     mTargetPan           = pan;
     mTargetTilt          = tilt;
     mTargetZoom          = zoom;
 
-    mDelegate.MPTZSetPosition(pan, tilt, zoom, this);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext & ctx,
@@ -1002,16 +1009,21 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         return;
     }
 
-    // We don't send the response until the delegate confirms via callback that the physical device movement is complete
+    Status status = mDelegate.MPTZRelativeMove(newPan, newTilt, newZoom, this);
+
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is complete
     //
-    ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
-    mAsyncCommandHandler = CommandHandler::Handle(&ctx.mCommandHandler);
-    mRequestPath         = ctx.mRequestPath;
     mTargetPan           = newPan;
     mTargetTilt          = newTilt;
     mTargetZoom          = newZoom;
 
-    mDelegate.MPTZRelativeMove(newPan, newTilt, newZoom, this);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext & ctx,
@@ -1070,17 +1082,21 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
 
     auto presetValues = it->GetMptzPosition();
 
-    // We don't send the response until the delegate confirms via callback that the physical device movement is complete
+    Status status = mDelegate.MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom, this);
+
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is complete
     //
-    ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
-    mAsyncCommandHandler = CommandHandler::Handle(&ctx.mCommandHandler);
-    mRequestPath         = ctx.mRequestPath;
     mTargetPan           = presetValues.pan;
     mTargetTilt          = presetValues.tilt;
     mTargetZoom          = presetValues.zoom;
 
-    // Inform the delegate that the device is requested to move to PTZ values given by the selected preset id
-    mDelegate.MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom, this);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & ctx,
@@ -1310,10 +1326,6 @@ void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status stat
         SetTilt(mTargetTilt);
         SetZoom(mTargetZoom);
     }
-
-    auto commandHandleRef = std::move(mAsyncCommandHandler);
-    auto commandHandle    = commandHandleRef.Get();
-    commandHandle->AddStatus(mRequestPath, status);
 }
 
 } // namespace CameraAvSettingsUserLevelManagement
