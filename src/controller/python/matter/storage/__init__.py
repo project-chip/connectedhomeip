@@ -20,6 +20,7 @@ import copy
 import ctypes
 import json
 import logging
+import re
 from abc import ABC, abstractmethod
 from configparser import ConfigParser
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
@@ -281,6 +282,9 @@ class PersistentStorageINI(VolatileTemporaryPersistentStorage):
     This persistent storage is compatible with the chip-tool implementation.
     """
 
+    # Regular expression to match CA keys in the INI file.
+    caKeyMatch = re.compile(r'^(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey)\d+$')
+
     class ConfigParser(ConfigParser):
         """Parser that preserves key case and does not use interpolation."""
 
@@ -315,17 +319,10 @@ class PersistentStorageINI(VolatileTemporaryPersistentStorage):
                     for k, v in config.items('REPL')
                 }
             if chipToolFabricStoragePath:
-                # Compatibility layer with chip-tool persistent storage.
                 LOGGER.info("Loading fabric configuration from INI file: %s", chipToolFabricStoragePath)
                 config.read(chipToolFabricStoragePath)
-                if value := config.get('Default', 'ExampleCAIntermediateCert0', fallback=None):
-                    data['sdk-config']['ExampleCAIntermediateCert1'] = value
-                if value := config.get('Default', 'ExampleCARootCert0', fallback=None):
-                    data['sdk-config']['ExampleCARootCert1'] = value
-                if value := config.get('Default', 'ExampleOpCredsCAKey0', fallback=None):
-                    data['sdk-config']['ExampleOpCredsCAKey1'] = value
-                if value := config.get('Default', 'ExampleOpCredsICAKey0', fallback=None):
-                    data['sdk-config']['ExampleOpCredsICAKey1'] = value
+                for key, value in config.items('Default'):
+                    data['sdk-config'][key] = value
         except Exception as ex:
             LOGGER.critical("Could not load configuration from INI file: %s", ex)
         self._path = path
@@ -338,14 +335,10 @@ class PersistentStorageINI(VolatileTemporaryPersistentStorage):
         if self._chipToolFabricStoragePath:
             # Compatibility layer with chip-tool persistent storage.
             configFabric = PersistentStorageINI.ConfigParser()
-            if value := sdkConfig.pop('ExampleCAIntermediateCert1', None):
-                configFabric['Default']['ExampleCAIntermediateCert0'] = value
-            if value := sdkConfig.pop('ExampleCARootCert1', None):
-                configFabric['Default']['ExampleCARootCert0'] = value
-            if value := sdkConfig.pop('ExampleOpCredsCAKey1', None):
-                configFabric['Default']['ExampleOpCredsCAKey0'] = value
-            if value := sdkConfig.pop('ExampleOpCredsICAKey1', None):
-                configFabric['Default']['ExampleOpCredsICAKey0'] = value
+            for key in self._data['sdk-config']:
+                # Move CA keys to the separate fabric configuration file.
+                if self.caKeyMatch.match(key):
+                    configFabric['Default'][key] = sdkConfig.pop(key)
             try:
                 with open(self._chipToolFabricStoragePath, 'w') as f:
                     configFabric.write(f)

@@ -271,10 +271,7 @@ class CertificateAuthorityManager:
     def _AllocateNextCaIndex(self):
         ''' Allocate the next un-used CA index.
         '''
-        nextCaIndex = 1
-        for ca in self._activeCaList:
-            nextCaIndex = ca.caIndex + 1
-        return nextCaIndex
+        return max(self._activeCaList, key=lambda ca: ca.caIndex + 1, default=0)
 
     def LoadAuthoritiesFromStorage(self):
         ''' Loads any existing CertificateAuthority instances present in persistent storage.
