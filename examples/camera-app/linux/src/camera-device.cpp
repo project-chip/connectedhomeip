@@ -673,7 +673,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(videoPipeline, &state, nullptr, 5 * GST_SECOND);
+    gst_element_get_state(videoPipeline, &state, nullptr, 6 * GST_SECOND);
     if (state != GST_STATE_PLAYING)
     {
         ChipLogError(Camera, "Video pipeline did not reach PLAYING state.");
