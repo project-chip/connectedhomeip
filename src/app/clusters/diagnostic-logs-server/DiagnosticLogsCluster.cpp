@@ -29,12 +29,6 @@ namespace app {
 namespace Clusters {
 
 using Protocols::InteractionModel::Status;
-DiagnosticLogsCluster DiagnosticLogsCluster::sInstance;
-
-DiagnosticLogsCluster & DiagnosticLogsCluster::Instance()
-{
-    return sInstance;
-}
 
 // Implementation of virtual methods from DefaultServerCluster
 DataModel::ActionReturnStatus DiagnosticLogsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -72,13 +66,12 @@ std::optional<DataModel::ActionReturnStatus> DiagnosticLogsCluster::InvokeComman
         }
         if (protocol == TransferProtocolEnum::kResponsePayload)
         {
-            HandleLogRequestForResponsePayload(handler, request.path, commandData.intent);
+            return HandleLogRequestForResponsePayload(handler, request.path, commandData.intent);
         }
         else
         {
-            HandleLogRequestForBdx(handler, request.path, commandData.intent, commandData.transferFileDesignator);
+            return HandleLogRequestForBdx(handler, request.path, commandData.intent, commandData.transferFileDesignator);
         }
-        return std::nullopt;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;

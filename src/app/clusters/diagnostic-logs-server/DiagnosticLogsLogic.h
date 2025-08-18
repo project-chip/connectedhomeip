@@ -20,6 +20,7 @@
 
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 
 namespace chip {
 namespace app {
@@ -30,6 +31,20 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 class DiagnosticLogsProviderLogic
 {
 public:
+    /**
+     * Initialize the diagnostic logs provider logic
+     *
+     * @param ServerEndpointCount The number of server endpoints for the diagnostic logs cluster
+     */
+    void Init(size_t serverEndpointCount);
+
+    ~DiagnosticLogsProviderLogic()
+    {
+        delete[] mDiagnosticLogsProviderDelegateTable;
+        mDiagnosticLogsProviderDelegateTable = nullptr;
+        mDiagnosticLogsServerEndpointCount   = 0;
+    }
+
     /**
      * Set the default delegate of the diagnostic logs cluster for the specified endpoint
      *
@@ -49,11 +64,26 @@ public:
      * @param status      The status to be returned on success
      *
      */
-    void HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path, IntentEnum intent,
-                                            StatusEnum status = StatusEnum::kSuccess);
+    std::optional<DataModel::ActionReturnStatus> HandleLogRequestForResponsePayload(CommandHandler * commandObj,
+                                                                                    const ConcreteCommandPath & path,
+                                                                                    IntentEnum intent,
+                                                                                    StatusEnum status = StatusEnum::kSuccess);
 
-    void HandleLogRequestForBdx(CommandHandler * commandObj, const ConcreteCommandPath & path, IntentEnum intent,
-                                Optional<CharSpan> transferFileDesignator);
+    std::optional<DataModel::ActionReturnStatus> HandleLogRequestForBdx(CommandHandler * commandObj,
+                                                                        const ConcreteCommandPath & path, IntentEnum intent,
+                                                                        Optional<CharSpan> transferFileDesignator);
+
+private:
+    DiagnosticLogsProviderDelegate ** mDiagnosticLogsProviderDelegateTable = nullptr;
+    size_t mDiagnosticLogsServerEndpointCount                              = 0;
+    /**
+     * Get the delegate for the specified endpoint
+     *
+     * @param endpoint The endpoint to get the delegate for
+     *
+     * @return The delegate for the specified endpoint
+     */
+    DiagnosticLogsProviderDelegate * GetDelegate(EndpointId endpoint);
 };
 
 } // namespace Clusters

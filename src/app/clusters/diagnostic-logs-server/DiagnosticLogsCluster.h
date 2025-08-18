@@ -28,7 +28,9 @@ class DiagnosticLogsCluster : public DefaultServerCluster, public DiagnosticLogs
 {
 public:
     DiagnosticLogsCluster() : DefaultServerCluster({ kRootEndpointId, DiagnosticLogs::Id }) {}
-    static DiagnosticLogsCluster & Instance();
+    static DiagnosticLogsCluster & Instance() { return sInstance; }
+
+    void Init(size_t serverEndpointCount) { DiagnosticLogsProviderLogic::Init(serverEndpointCount); }
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

@@ -16,17 +16,4 @@
  *    limitations under the License.
  */
 #pragma once
-
-#include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DiagnosticLogs {
-
-void SetDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
-
-} // namespace DiagnosticLogs
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#include <app/clusters/diagnostic-logs-server/CodegenIntegration.h>

@@ -16,13 +16,20 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.cpp"
-    "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.h"
-    "${CLUSTER_DIR}/DiagnosticLogsProviderDelegate.h"
-    "${CLUSTER_DIR}/DiagnosticLogsCluster.cpp"
-    "${CLUSTER_DIR}/DiagnosticLogsCluster.h"
-    "${CLUSTER_DIR}/DiagnosticLogsLogic.cpp"
-    "${CLUSTER_DIR}/DiagnosticLogsLogic.h"
-    "${CLUSTER_DIR}/CodeIntegration.cpp"
-    "${CLUSTER_DIR}/CodeIntegration.h"
+  "${CLUSTER_DIR}/CodegenIntegration.cpp"
+  "${CLUSTER_DIR}/CodegenIntegration.h"
+  "${CLUSTER_DIR}/diagnostic-logs-server.h"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+  "${CLUSTER_DIR}/DiagnosticLogsCluster.cpp"
+  "${CLUSTER_DIR}/DiagnosticLogsCluster.h"
+  "${CLUSTER_DIR}/DiagnosticLogsLogic.cpp"
+  "${CLUSTER_DIR}/DiagnosticLogsLogic.h"
+  "${CLUSTER_DIR}/DiagnosticLogsProviderDelegate.h"
+  "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.cpp"
+  "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.h"
 )
