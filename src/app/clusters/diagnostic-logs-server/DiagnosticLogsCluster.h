@@ -28,7 +28,6 @@ class DiagnosticLogsCluster : public DefaultServerCluster, public DiagnosticLogs
 {
 public:
     DiagnosticLogsCluster() : DefaultServerCluster({ kRootEndpointId, DiagnosticLogs::Id }) {}
-    static DiagnosticLogsCluster & Instance() { return sInstance; }
 
     void Init(size_t serverEndpointCount) { DiagnosticLogsProviderLogic::Init(serverEndpointCount); }
 
@@ -40,9 +39,6 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
-
-private:
-    static DiagnosticLogsCluster sInstance;
 };
 
 } // namespace Clusters

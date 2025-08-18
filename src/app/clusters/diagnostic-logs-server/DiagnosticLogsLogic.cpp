@@ -24,8 +24,11 @@
 
 #include "BDXDiagnosticLogsProvider.h"
 
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DiagnosticLogs;
 using chip::Protocols::InteractionModel::Status;
+using DiagnosticLogs::IntentEnum;
 
 using chip::bdx::DiagnosticLogs::kMaxFileDesignatorLen;
 using chip::bdx::DiagnosticLogs::kMaxLogContentSize;
@@ -60,7 +63,7 @@ DiagnosticLogsProviderDelegate * DiagnosticLogsProviderLogic::GetDelegate(Endpoi
 
     if (delegate == nullptr)
     {
-        ChipLogProgress(Zcl, "Diagnosticlogs: no log provider delegate set for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "Diagnostic Logs: no log provider delegate set for endpoint:%u", endpoint);
     }
 
     return delegate;

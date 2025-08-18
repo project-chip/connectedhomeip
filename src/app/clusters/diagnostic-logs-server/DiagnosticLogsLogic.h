@@ -26,8 +26,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-using namespace chip::app::Clusters::DiagnosticLogs;
-
 class DiagnosticLogsProviderLogic
 {
 public:
@@ -52,7 +50,7 @@ public:
      *
      * @param delegate The log provider delegate at the endpoint
      */
-    void SetDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
+    void SetDelegate(EndpointId endpoint, chip::app::Clusters::DiagnosticLogs::DiagnosticLogsProviderDelegate * delegate);
 
     /**
      * Handles the request to download diagnostic logs of type specified in the intent argument for protocol type ResponsePayload
@@ -64,18 +62,19 @@ public:
      * @param status      The status to be returned on success
      *
      */
-    std::optional<DataModel::ActionReturnStatus> HandleLogRequestForResponsePayload(CommandHandler * commandObj,
-                                                                                    const ConcreteCommandPath & path,
-                                                                                    IntentEnum intent,
-                                                                                    StatusEnum status = StatusEnum::kSuccess);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                       DiagnosticLogs::IntentEnum intent,
+                                       DiagnosticLogs::StatusEnum status = DiagnosticLogs::StatusEnum::kSuccess);
 
     std::optional<DataModel::ActionReturnStatus> HandleLogRequestForBdx(CommandHandler * commandObj,
-                                                                        const ConcreteCommandPath & path, IntentEnum intent,
+                                                                        const ConcreteCommandPath & path,
+                                                                        DiagnosticLogs::IntentEnum intent,
                                                                         Optional<CharSpan> transferFileDesignator);
 
 private:
-    DiagnosticLogsProviderDelegate ** mDiagnosticLogsProviderDelegateTable = nullptr;
-    size_t mDiagnosticLogsServerEndpointCount                              = 0;
+    chip::app::Clusters::DiagnosticLogs::DiagnosticLogsProviderDelegate ** mDiagnosticLogsProviderDelegateTable = nullptr;
+    size_t mDiagnosticLogsServerEndpointCount                                                                   = 0;
     /**
      * Get the delegate for the specified endpoint
      *
@@ -83,7 +82,7 @@ private:
      *
      * @return The delegate for the specified endpoint
      */
-    DiagnosticLogsProviderDelegate * GetDelegate(EndpointId endpoint);
+    chip::app::Clusters::DiagnosticLogs::DiagnosticLogsProviderDelegate * GetDelegate(EndpointId endpoint);
 };
 
 } // namespace Clusters
