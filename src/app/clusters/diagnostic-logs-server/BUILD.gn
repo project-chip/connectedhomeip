@@ -31,6 +31,7 @@ source_set("diagnostic-logs-server") {
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/protocols/bdx",
+    "${chip_root}/src/protocols/bdx",
     "${chip_root}/zzz_generated/app-common/clusters/DiagnosticLogs",
   ]
   public_configs = [ "${chip_root}/src:includes" ]

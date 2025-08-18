@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "CodeIntegration.h"
+#include "CodegenIntegration.h"
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsCluster.h>
 #include <app/static-cluster-config/DiagnosticLogs.h>
@@ -54,21 +54,6 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
     return true;
 }
 } // namespace
-
-void emberAfDiagnosticLogsClusterInitCallback(EndpointId endpointId)
-{
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
-    gServers[arrayIndex].Create();
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register Diagnostic Logs on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
-    }
-}
 
 void emberAfDiagnosticLogsClusterShutdownCallback(EndpointId endpointId)
 {
@@ -129,12 +114,26 @@ namespace app {
 namespace Clusters {
 namespace DiagnosticLogs {
 
-void SetDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
+DiagnosticLogsServer DiagnosticLogsServer::sInstance;
+
+DiagnosticLogsServer & DiagnosticLogsServer::Instance()
+{
+    return sInstance;
+}
+
+void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpoint, arrayIndex))
     {
         return;
+    }
+    gServers[arrayIndex].Create();
+    gServers[arrayIndex].Cluster().Init(kDiagnosticLogsMaxClusterCount);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register Diagnostic Logs on endpoint %u: %" CHIP_ERROR_FORMAT, endpoint, err.Format());
     }
     gServers[arrayIndex].Cluster().SetDelegate(endpoint, delegate);
 }
