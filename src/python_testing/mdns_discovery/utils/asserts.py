@@ -15,9 +15,9 @@
 #    limitations under the License.
 #
 
-import ipaddress
 import functools
 import inspect
+import ipaddress
 import re
 
 from mdns_discovery.mdns_discovery import MdnsServiceType
