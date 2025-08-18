@@ -124,7 +124,7 @@ def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransac
         for cluster_id, cluster in endpoint.items():
             if not is_standard_cluster_id(cluster_id):
                 continue
-            if cluster_id not in xml_clusters.keys():
+            if cluster_id not in xml_clusters:
                 # This is covered by another test - we don't want to block every test, so just warn here
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
                 problems.append(ProblemNotice(test_name="General error", location=location,
