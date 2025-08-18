@@ -78,7 +78,7 @@ TEST(TestSecureSession, SecureChannelEncryptTest)
 
     packetHeader.SetSessionId(1);
     EXPECT_TRUE(packetHeader.IsEncrypted());
-    EXPECT_EQ(packetHeader.MICTagLength(), 16);
+    EXPECT_EQ(packetHeader.MICTagLength(), channel.EncryptionOverhead());
 
     CryptoContext::NonceStorage nonce;
     CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
