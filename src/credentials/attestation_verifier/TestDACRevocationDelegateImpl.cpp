@@ -165,6 +165,8 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & a
         return false;
     }
 
+    VerifyOrReturnValue(jsonData.isArray(), false, ChipLogError(NotSpecified, "Revocation set is not a valid JSON Array"));
+
     // 6.2.4.2. Determining Revocation Status of an Entity
     for (const auto & revokedSet : jsonData)
     {
