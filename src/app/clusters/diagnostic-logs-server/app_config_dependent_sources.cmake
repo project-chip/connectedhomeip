@@ -19,6 +19,10 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.cpp"
     "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.h"
     "${CLUSTER_DIR}/DiagnosticLogsProviderDelegate.h"
-    "${CLUSTER_DIR}/diagnostic-logs-server.cpp"
-    "${CLUSTER_DIR}/diagnostic-logs-server.h"
+    "${CLUSTER_DIR}/DiagnosticLogsCluster.cpp"
+    "${CLUSTER_DIR}/DiagnosticLogsCluster.h"
+    "${CLUSTER_DIR}/DiagnosticLogsLogic.cpp"
+    "${CLUSTER_DIR}/DiagnosticLogsLogic.h"
+    "${CLUSTER_DIR}/CodeIntegration.cpp"
+    "${CLUSTER_DIR}/CodeIntegration.h"
 )
