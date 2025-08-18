@@ -16,7 +16,6 @@ static constexpr uint32_t kAES_KeyId_Default = (PSA_KEY_ID_USER_MIN + 2);
 class OtaTlvEncryptionKey
 {
 public:
-
     OtaTlvEncryptionKey(uint32_t id = 0) { mId = (id > 0) ? id : kAES_KeyId_Default; }
     ~OtaTlvEncryptionKey() = default;
 
