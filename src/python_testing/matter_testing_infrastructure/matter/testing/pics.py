@@ -115,7 +115,8 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
 def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransaction.ReadResponse, xml_clusters: dict[uint, XmlCluster]) -> tuple[dict[int, list[str]], list[ProblemNotice]]:
     ''' Returns a list of device element PICS and problems from each device wildcard.
     '''
-    device_pics = {}
+    # Endpoint to list of device element PICS
+    device_pics: dict[int, list[str]] = {}
     problems = []
     for endpoint_id, endpoint in wildcard.tlvAttributes.items():
         endpoint_has_server = False
