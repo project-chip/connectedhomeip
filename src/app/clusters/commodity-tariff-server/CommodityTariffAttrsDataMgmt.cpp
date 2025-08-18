@@ -16,10 +16,7 @@
  *    limitations under the License.
  */
 
-#include "CommodityTariffConsts.h"
-#include <cassert>
-
-#include "commodity-tariff-server.h" //Used for TariffUpdateCtx
+#include "CommodityTariffAttrsDataMgmt.h"
 
 using namespace chip;
 using namespace chip::app;

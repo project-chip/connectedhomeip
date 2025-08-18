@@ -133,30 +133,6 @@ COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 
 /** @} */ // end of attribute_management
 
-struct TariffUpdateCtx
-{
-    DataModel::Nullable<uint32_t> & TariffStartTimestamp;
-    /* DayEntryIDs */
-    std::unordered_set<uint32_t> DayEntryKeyIDs; /* Master - IDs of all given DayEntry items */
-
-    std::unordered_set<uint32_t> DayPatternsDayEntryIDs;    /* IDs mentioned in DayPattern items */
-    std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;  /* IDs mentioned in TariffPeriod items */
-    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs; /* IDs mentioned in IndividualDays items */
-
-    /* TariffComponentIDs */
-    std::unordered_set<uint32_t> TariffComponentKeyIDs;           /* Master - IDs of all given TariffComponent items */
-    std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs; /* IDs mentioned in TariffPeriods items */
-
-    /* DayPatternsIDs */
-    std::unordered_set<uint32_t> DayPatternKeyIDs;             /* Master - IDs of all given DayPattern items */
-    std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs; /* IDs mentioned in CalendarPeriods items */
-
-    BitMask<Feature> mFeature;
-
-    uint32_t TariffUpdateTimestamp;
-    // uint32_t TariffStartTimestamp;
-};
-
 /**
  * @class Delegate
  * @brief Core tariff data management and processing class

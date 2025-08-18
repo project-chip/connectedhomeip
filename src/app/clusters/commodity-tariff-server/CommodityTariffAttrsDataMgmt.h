@@ -25,6 +25,8 @@
 
 #include <atomic>
 #include <cassert>
+#include <unordered_set>
+#include <map>
 
 namespace chip {
 
@@ -73,6 +75,106 @@ inline bool operator==(const Type & lhs, const Type & rhs)
 } // namespace Globals
 
 namespace CommodityTariff {
+
+/**
+ * @struct TariffUpdateCtx
+ * @brief Context for validating tariff attribute updates and maintaining referential integrity
+ *
+ * This structure tracks relationships between tariff components during attribute updates
+ * to ensure all references are valid and consistent. It serves as a validation context
+ * that collects all IDs and references before checking their consistency.
+ *
+ * @section references Referential Integrity Tracking
+ * The context maintains several sets of IDs to validate that:
+ * - All referenced DayEntry IDs exist in the master set
+ * - All referenced TariffComponent IDs exist in the master set
+ * - All referenced DayPattern IDs exist in the master set
+ * - No dangling references exist between tariff components
+ *
+ * @section lifecycle Lifecycle
+ * - Created at the start of a tariff update operation
+ * - Populated during attribute parsing/processing
+ * - Used for validation before committing changes
+ * - Destroyed after update completion
+ */
+struct TariffUpdateCtx
+{
+    /**
+     * @brief Reference to the tariff's start timestamp
+     * @note This is a reference to allow validation against the actual attribute value
+     */
+    DataModel::Nullable<uint32_t> & TariffStartTimestamp;
+
+    /// @name DayEntry ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid DayEntry IDs
+     * @details Contains all DayEntry IDs that exist in the tariff definition
+     */
+    std::unordered_set<uint32_t> DayEntryKeyIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by DayPattern items
+     * @details Collected separately for reference validation
+     */
+    std::unordered_set<uint32_t> DayPatternsDayEntryIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by TariffPeriod items
+     * @details Collected separately for reference validation
+     */
+    std::unordered_set<uint32_t> TariffPeriodsDayEntryIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by IndividualDays items
+     * @details Collected separately for reference validation
+     */
+    std::unordered_set<uint32_t> IndividualDaysDayEntryIDs;
+    /// @}
+
+    /// @name TariffComponent ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid TariffComponent IDs
+     * @details Contains all TariffComponent IDs that exist in the tariff definition
+     */
+    std::unordered_set<uint32_t> TariffComponentKeyIDs;
+
+    /**
+     * @brief TariffComponent IDs referenced by TariffPeriod items
+     * @details Collected for validating period->component references
+     */
+    std::unordered_set<uint32_t> TariffPeriodsTariffComponentIDs;
+    /// @}
+
+    /// @name DayPattern ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid DayPattern IDs
+     * @details Contains all DayPattern IDs that exist in the tariff definition
+     */
+    std::unordered_set<uint32_t> DayPatternKeyIDs;
+
+    /**
+     * @brief DayPattern IDs referenced by CalendarPeriod items
+     * @details Collected for validating calendar->pattern references
+     */
+    std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs;
+    /// @}
+
+    /**
+     * @brief Bitmask of active tariff features
+     * @details Used to validate feature-dependent constraints
+     */
+    BitMask<Feature> mFeature;
+
+    /**
+     * @brief Timestamp when the tariff update was initiated
+     * @note Used for change tracking and versioning
+     */
+    uint32_t TariffUpdateTimestamp;
+};
+
 namespace Structs {
 
 namespace TariffPriceStruct {
