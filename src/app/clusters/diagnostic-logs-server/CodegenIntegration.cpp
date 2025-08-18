@@ -30,6 +30,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DiagnosticLogs;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
@@ -48,14 +49,14 @@ bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
 
     if (arrayIndex >= kDiagnosticLogsMaxClusterCount)
     {
-        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
+        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
         return false;
     }
     return true;
 }
 } // namespace
 
-void emberAfDiagnosticLogsClusterShutdownCallback(EndpointId endpointId)
+void emberAfDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
 {
     uint16_t arrayIndex = 0;
     if (!findEndpointWithLog(endpointId, arrayIndex))
@@ -70,40 +71,6 @@ void emberAfDiagnosticLogsClusterShutdownCallback(EndpointId endpointId)
                      err.Format());
     }
     gServers[arrayIndex].Destroy();
-}
-
-bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandHandler * commandObj,
-                                                             const chip::app::ConcreteCommandPath & commandPath,
-                                                             const Commands::RetrieveLogsRequest::DecodableType & commandData)
-{
-    EndpointId endpoint = commandPath.mEndpointId;
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpoint, arrayIndex))
-    {
-        return false;
-    }
-
-    // If the Intent and/or the RequestedProtocol arguments contain invalid (out of range) values the command SHALL fail with a
-    // Status Code of INVALID_COMMAND.
-    auto intent   = commandData.intent;
-    auto protocol = commandData.requestedProtocol;
-    if (intent == IntentEnum::kUnknownEnumValue || protocol == TransferProtocolEnum::kUnknownEnumValue)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
-
-    auto instance = gServers[arrayIndex].Cluster().Instance();
-    if (protocol == TransferProtocolEnum::kResponsePayload)
-    {
-        instance.HandleLogRequestForResponsePayload(commandObj, commandPath, intent);
-    }
-    else
-    {
-        instance.HandleLogRequestForBdx(commandObj, commandPath, intent, commandData.transferFileDesignator);
-    }
-
-    return true;
 }
 
 void MatterDiagnosticLogsPluginServerInitCallback() {}

@@ -33,6 +33,7 @@ namespace app {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DiagnosticLogs;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr EndpointId kEndpoint0 = 0;
