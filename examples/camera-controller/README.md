@@ -185,9 +185,9 @@ appear, confirming that the stream is active.
 
 ### 4. Running the Video Recording Upload Demo
 
-The Push AV Server acts as the recording destination (like a cloud service or
-NVR) for video clips. The demo shows how a Matter Camera Controller tells a
-Matter Camera to record a clip and upload it to that server.
+The Push AV Server acts as the recording destination (like a cloud service) for
+video clips. The demo shows how a Matter Camera Controller tells a Matter Camera
+to record a clip and upload it to that server.
 
 The server itself doesn't control the camera; it's a passive service that
 securely receives and stores media. The relationship is established by the
@@ -197,7 +197,7 @@ controller.
 
 The Push AV Server runs in the background, waiting for authenticated devices to
 push video content to it. The key piece of information it provides is its ingest
-URL, which looks like this: https://localhost:1234/streams/1
+URL, which looks like this: `https://localhost:1234/streams/1`
 
 Think of this server as a secure, private YouTube or Dropbox, but just for your
 camera's video clips.
@@ -230,7 +230,7 @@ This happens in this specific command:
 
 ```
 ./scripts/examples/gn_build_example.sh examples/camera-app/linux out/debug
-/out/debug/chip-camera-app
+./out/debug/chip-camera-app
 ```
 
 -   Build & run `chip-camera-controller` steps for clip recording & uploading
@@ -282,7 +282,7 @@ pushavstreamtransport manually-trigger-transport 1 0 1 1
 
 This command means, "Start recording now and upload the clip to the URL I gave
 you earlier." The camera then connects to the push_av_server at
-https://localhost:1234/streams/1 and pushes the CMAF-formatted video clip.
+`https://localhost:1234/streams/1` and pushes the video clip.
 
 #### Summary Analogy
 
