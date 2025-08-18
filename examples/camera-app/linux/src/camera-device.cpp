@@ -441,9 +441,9 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     const std::vector<std::pair<GstElement *, const char *>> elements = {
         { pipeline, "pipeline" },         //
         { source, "source" },             //
-        { capsfilter, "mjpeg_caps" },     //
-        { jpegdec, "jpegdec" },           //
+        { capsfilter1, "filter1" },       //
         { videoconvert, "videoconvert" }, //
+        { capsfilter2, "filter2" },       //
         { x264enc, "encoder" },           //
         { appsink, "appsink" }            //
     };
@@ -471,7 +471,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     gst_caps_unref(caps2);
 
     // Configure encoder for low‑latency
-    g_object_set(x264enc, "tune", "zerolatency", "key-int-max", framerate * 1, "profile", "high", nullptr);
+    g_object_set(x264enc, "tune", "stillimage|fastdecode", "key-int-max", framerate * 1, nullptr);
 
     // Configure appsink for receiving H.264 buffers data
     g_object_set(appsink, "emit-signals", TRUE, nullptr);
