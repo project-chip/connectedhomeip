@@ -282,6 +282,114 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithMatchingPAIAndDACProductID
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kAttestationSignatureInvalid);
 }
 
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithExpiredDACCertificate)
+{
+    // Prepare TLV attestationElements
+    uint8_t cdData[32]    = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t nonceData[32] = { 0x55, 0x66, 0x77, 0x88 };
+    uint8_t tlvBuf[128];
+
+    chip::TLV::TLVWriter writer;
+    writer.Init(tlvBuf, sizeof(tlvBuf));
+    chip::TLV::TLVType outerType;
+
+    CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
+    writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData));
+    writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0));
+    writer.Put(chip::TLV::ContextTag(4), ByteSpan());
+    writer.Put(chip::TLV::ContextTag(5), ByteSpan());
+
+    err = writer.EndContainer(outerType);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    size_t tlvLen = writer.GetLengthWritten();
+
+    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
+
+    uint8_t toSign[128 + 32];
+    memcpy(toSign, tlvBuf, tlvLen);
+    memcpy(toSign + tlvLen, challengeData, sizeof(challengeData));
+
+    chip::Crypto::P256Keypair keypair;
+    err = LoadKeypairFromRaw(
+        ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey),
+        ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_PublicKey),
+        keypair);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    chip::Crypto::P256ECDSASignature signature;
+    err = keypair.ECDSA_sign_msg(toSign, tlvLen + sizeof(challengeData), signature);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    DeviceAttestationVerifier::AttestationInfo expiredDACInfo(
+        ByteSpan(tlvBuf, tlvLen), ByteSpan(challengeData), ByteSpan(signature.ConstBytes(), signature.Length()),
+        TestCerts::sTestCert_PAI_FFF2_8004_FB_Cert,
+        TestCerts::sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert,
+        ByteSpan(nonceData), static_cast<VendorId>(0xFFF2), 8004);
+
+    verifier.VerifyAttestationInformation(expiredDACInfo, &attestationCallback);
+    
+    #if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacExpired);
+    #endif
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidInFutureDACCertificate)
+{
+    uint8_t cdData[32]    = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t nonceData[32] = { 0x55, 0x66, 0x77, 0x88 };
+    uint8_t tlvBuf[128];
+
+    chip::TLV::TLVWriter writer;
+    writer.Init(tlvBuf, sizeof(tlvBuf));
+    chip::TLV::TLVType outerType;
+
+    CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
+    writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData));
+    writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0));
+    writer.Put(chip::TLV::ContextTag(4), ByteSpan());
+    writer.Put(chip::TLV::ContextTag(5), ByteSpan());
+
+    err = writer.EndContainer(outerType);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    size_t tlvLen = writer.GetLengthWritten();
+
+    uint8_t challengeData[32] = { 0xAA, 0xBB, 0xCC, 0xDD };
+
+    uint8_t toSign[128 + 32];
+    memcpy(toSign, tlvBuf, tlvLen);
+    memcpy(toSign + tlvLen, challengeData, sizeof(challengeData));
+
+    chip::Crypto::P256Keypair keypair;
+    err = LoadKeypairFromRaw(
+        ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey),
+        ByteSpan(TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey),
+        keypair);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    chip::Crypto::P256ECDSASignature signature;
+    err = keypair.ECDSA_sign_msg(toSign, tlvLen + sizeof(challengeData), signature);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    DeviceAttestationVerifier::AttestationInfo expiredDACInfo(
+        ByteSpan(tlvBuf, tlvLen), ByteSpan(challengeData), ByteSpan(signature.ConstBytes(), signature.Length()),
+        TestCerts::sTestCert_PAI_FFF2_8004_FB_Cert,
+        TestCerts::sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert,
+        ByteSpan(nonceData), static_cast<VendorId>(0xFFF2), 8004);
+
+    verifier.VerifyAttestationInformation(expiredDACInfo, &attestationCallback);
+    #if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacExpired);
+    #endif
+}
+
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithValidSignature)
 {
     // Prepare TLV attestationElements
