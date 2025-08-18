@@ -70,10 +70,7 @@ std::optional<DataModel::ActionReturnStatus> DiagnosticLogsCluster::InvokeComman
         {
             return HandleLogRequestForResponsePayload(handler, request.path, commandData.intent);
         }
-        else
-        {
-            return HandleLogRequestForBdx(handler, request.path, commandData.intent, commandData.transferFileDesignator);
-        }
+        return HandleLogRequestForBdx(handler, request.path, commandData.intent, commandData.transferFileDesignator);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
