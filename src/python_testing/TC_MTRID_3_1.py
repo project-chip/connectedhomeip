@@ -46,9 +46,7 @@ import logging
 from mobly import asserts
 from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
-from matter.clusters import Globals, MeterIdentification
-from matter.clusters.Types import NullValue
-from matter.testing import matter_asserts
+from matter.clusters import MeterIdentification
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
