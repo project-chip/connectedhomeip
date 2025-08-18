@@ -81,7 +81,7 @@ class TestPicsHelpers(MatterBaseTest):
         lock_expected = [f'DRLK.S.{s}' for s in lock_expected_suffix]
         lock_expected.append('DRLK.S')
 
-        def check_expected_pics():
+        def check_expected_pics(pics_list: dict[int, list[str]]):
             asserts.assert_equal(set(pics_list.keys()), set([0, 1]), "Unexpected endpoints in PICS list")
             asserts.assert_equal(set(pics_list[0]), set(desc_expected + opcreds_expected + cadmin_expected +
                                  ['IDM.S', 'MCORE.ROLE.COMMISSIONEE']), "Incorrect PICS list on EP0")
@@ -89,7 +89,7 @@ class TestPicsHelpers(MatterBaseTest):
 
         pics_list, problems = generate_device_element_pics_from_device_wildcard(wildcard, xml_cluster)
         asserts.assert_equal(len(problems), 0, "Unexpected problems found generating PICS list")
-        check_expected_pics()
+        check_expected_pics(pics_list)
 
         # Add globals, should be no errors, should not appear
         wildcard.tlvAttributes[1][lock.id][lock.Attributes.AttributeList.attribute_id].extend(
@@ -97,7 +97,7 @@ class TestPicsHelpers(MatterBaseTest):
 
         pics_list, problems = generate_device_element_pics_from_device_wildcard(wildcard, xml_cluster)
         asserts.assert_equal(len(problems), 0, "Unexpected problems found generating PICS list")
-        check_expected_pics()
+        check_expected_pics(pics_list)
 
         # Add MEI cluster, MEI attribute, MEI accepted command, MEI generated command - should be no errors, should not appear
         unit_testing = Clusters.UnitTesting
@@ -111,7 +111,7 @@ class TestPicsHelpers(MatterBaseTest):
 
         pics_list, problems = generate_device_element_pics_from_device_wildcard(wildcard, xml_cluster)
         asserts.assert_equal(len(problems), 0, "Unexpected problems found generating PICS list")
-        check_expected_pics()
+        check_expected_pics(pics_list)
 
         # Add a standard cluster that's not part of the standard cluster set - this should cause an error because we don't know the PICS
         unknown_standard_cluster = max(xml_cluster.keys()) + 1
@@ -120,7 +120,7 @@ class TestPicsHelpers(MatterBaseTest):
 
         pics_list, problems = generate_device_element_pics_from_device_wildcard(wildcard, xml_cluster)
         asserts.assert_equal(len(problems), 1, "Unexpected problems found generating PICS list")
-        check_expected_pics()
+        check_expected_pics(pics_list)
 
 
 if __name__ == "__main__":
