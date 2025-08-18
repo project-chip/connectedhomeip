@@ -22,7 +22,7 @@
 #include <app/static-cluster-config/DiagnosticLogs.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 
 #include "BDXDiagnosticLogsProvider.h"
@@ -41,36 +41,53 @@ static constexpr size_t kDiagnosticLogsMaxClusterCount =
 
 LazyRegisteredServerCluster<DiagnosticLogsCluster> gServers[kDiagnosticLogsMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
-// Log an error if not found.
-bool findEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpointId, DiagnosticLogs::Id, kDiagnosticLogsFixedClusterCount);
-
-    if (arrayIndex >= kDiagnosticLogsMaxClusterCount)
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogError(AppServer, "Could not find endpoint index for endpoint %u", endpointId);
-        return false;
+        gServers[emberEndpointIndex].Create(endpointId);
+        return gServers[emberEndpointIndex].Registration();
     }
-    return true;
-}
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    {
+        return gServers[emberEndpointIndex].Cluster();
+    }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+};
+
 } // namespace
 
-void emberAfDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
+void emberAfDiagnosticLogsClusterServerInitCallback(EndpointId endpoint)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister Diagnostic Logs on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-    gServers[arrayIndex].Destroy();
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpoint,
+            .clusterId                       = DiagnosticLogs::Id,
+            .fixedClusterServerEndpointCount = kDiagnosticLogsFixedClusterCount,
+            .maxEndpointCount                = kDiagnosticLogsMaxClusterCount,
+            .fetchFeatureMap                 = false,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
+}
+
+void MatterDiagnosticLogsClusterServerShutdownCallback(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = DiagnosticLogs::Id,
+            .fixedClusterServerEndpointCount = kDiagnosticLogsFixedClusterCount,
+            .maxEndpointCount                = kDiagnosticLogsMaxClusterCount,
+        },
+        integrationDelegate);
 }
 
 void MatterDiagnosticLogsPluginServerInitCallback() {}
@@ -90,18 +107,9 @@ DiagnosticLogsServer & DiagnosticLogsServer::Instance()
 
 void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
-    uint16_t arrayIndex = 0;
-    if (!findEndpointWithLog(endpoint, arrayIndex))
-    {
-        return;
-    }
-    gServers[arrayIndex].Create();
-    gServers[arrayIndex].Cluster().Init(kDiagnosticLogsMaxClusterCount);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register Diagnostic Logs on endpoint %u: %" CHIP_ERROR_FORMAT, endpoint, err.Format());
-    }
+    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpoint, DiagnosticLogs::Id, kDiagnosticLogsFixedClusterCount);
+    VerifyOrReturn(arrayIndex < kDiagnosticLogsMaxClusterCount);
+
     gServers[arrayIndex].Cluster().SetDelegate(endpoint, delegate);
 }
 

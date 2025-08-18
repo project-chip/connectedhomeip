@@ -27,7 +27,7 @@ namespace Clusters {
 class DiagnosticLogsCluster : public DefaultServerCluster, public DiagnosticLogsProviderLogic
 {
 public:
-    DiagnosticLogsCluster() : DefaultServerCluster({ kRootEndpointId, DiagnosticLogs::Id }) {}
+    DiagnosticLogsCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, DiagnosticLogs::Id }) {}
 
     void Init(size_t serverEndpointCount) { DiagnosticLogsProviderLogic::Init(serverEndpointCount); }
 
