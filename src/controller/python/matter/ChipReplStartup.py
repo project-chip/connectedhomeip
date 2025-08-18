@@ -180,7 +180,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
     console.print(
         '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
     \t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
-    \t[red]caList\[n].adminList\[m][blue]:\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
+    \t[red]caList\\[n].adminList\\[m][blue]:\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
 
     console.print(
         f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): '
