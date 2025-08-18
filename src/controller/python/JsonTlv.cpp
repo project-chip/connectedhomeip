@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Support for JsonTlv.
- *
- */
-
 #include <lib/support/jsontlv/JsonToTlv.h>
 #include <string>
 
@@ -41,6 +35,7 @@ size_t pychip_JsonToTlv(const char * json, uint8_t * buf, size_t size)
     CHIP_ERROR err = JsonToTlv(json, tlvSpan);
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(NotSpecified, "Error parsing JsonTlv %s", err.AsString());
         return 0;
     }
     return tlvSpan.size();

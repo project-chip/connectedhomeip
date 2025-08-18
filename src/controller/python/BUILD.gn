@@ -65,7 +65,7 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
-      "JsonTlvSupport.cpp",
+      "JsonTlv.cpp",
       "OpCredsBinding.cpp",
       "chip/bdx/bdx-transfer.cpp",
       "chip/bdx/bdx-transfer.h",
