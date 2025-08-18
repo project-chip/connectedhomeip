@@ -20,6 +20,7 @@ namespace CommodityMetering {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MeteredQuantity {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(MeteredQuantity::Id,
