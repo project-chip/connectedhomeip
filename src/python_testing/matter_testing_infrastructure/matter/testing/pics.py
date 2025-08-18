@@ -114,7 +114,6 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
 
 def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransaction.ReadResponse, xml_clusters: dict[uint, XmlCluster]) -> tuple[dict[int, list[str]], list[ProblemNotice]]:
     ''' Returns a list of device element PICS and problems from each device wildcard.
-        TODO: Add unit tests with a mock reader to show problems too. One for each type at least and MEI both cluster and attribute and cmd etc.
     '''
     device_pics = {}
     problems = []
