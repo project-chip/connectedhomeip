@@ -21,10 +21,9 @@ import ctypes
 import json
 import logging
 from abc import ABC, abstractmethod
-from binascii import hexlify
 from configparser import ConfigParser
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from ..native import GetLibraryHandle
 
@@ -138,12 +137,12 @@ class PersistentStorage(ABC):
             del self._closure
 
     @abstractmethod
-    def GetKey(self, key: str) -> bytes | None:
+    def GetKey(self, key: str) -> Any | None:
         """Retrieve the value of a key or None if it does not exist."""
         pass
 
     @abstractmethod
-    def SetKey(self, key: str, value: bytes):
+    def SetKey(self, key: str, value: Any):
         """Set the value of a key.
 
         If the key does not exist, it shall be created.
@@ -206,13 +205,13 @@ class VolatileTemporaryPersistentStorage(PersistentStorage):
     PersistentStorageINI.
     """
 
-    def GetKey(self, key: str) -> bytes | None:
+    def GetKey(self, key: str) -> Any | None:
         return copy.deepcopy(self._data['repl-config'].get(key, None))
 
-    def SetKey(self, key: str, value: bytes):
-        LOGGER.debug("Set key: %s = %s", key, hexlify(value))
+    def SetKey(self, key: str, value: Any):
         if not key:
             raise ValueError("Invalid key")
+        LOGGER.debug("Set key: %s = %s", key, value)
         self._data['repl-config'][key] = value
         self.Commit()
 
@@ -227,11 +226,11 @@ class VolatileTemporaryPersistentStorage(PersistentStorage):
         return None
 
     def SetSdkKey(self, key: str, value: bytes):
-        LOGGER.debug("Set SDK key: %s = %s", key, hexlify(value))
         if not key:
             raise ValueError("Invalid SDK key")
         if value is None:
             raise ValueError("SDK key value is not expected to be None")
+        LOGGER.debug("Set SDK key: %s = hex:%s", key, value.hex())
         self._data['sdk-config'][key] = base64.b64encode(value).decode("utf-8")
         self.Commit()
 
