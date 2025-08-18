@@ -12,8 +12,8 @@ guides to get started.
 
 ### Enabling ESP-Insights:
 
--   Before building the app, enable the option: `ESP_INSIGHTS_ENABLED` through
-    menuconfig.
+-   Before building the app, enable the options: `ESP_INSIGHTS_ENABLED` and
+    `ENABLE_ESP_DIAGNOSTICS_TRACE` through menuconfig.
 
 -   Create a file named `insights_auth_key.txt` in the main directory of the
     example.

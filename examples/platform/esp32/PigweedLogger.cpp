@@ -23,7 +23,7 @@
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+#if CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
 #include <esp_diagnostics.h>
 #endif
 
@@ -130,7 +130,7 @@ extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, co
     }
 #endif
 
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+#if CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
     esp_diag_log_writev(level, tag, format, v);
 #endif
 
@@ -162,7 +162,7 @@ extern "C" void __wrap_esp_log_writev(esp_log_level_t level, const char * tag, c
     }
 #endif
 
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+#if CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
     esp_diag_log_write(level, tag, format, v);
 #endif
 }
