@@ -1,6 +1,6 @@
-/**
- *
- *    Copyright (c) 2021 Project CHIP Authors
+/*
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#include <app/clusters/diagnostic-logs-server/DiagnosticLogsLogic.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <lib/support/ScopedBuffer.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 
 #include "BDXDiagnosticLogsProvider.h"
@@ -36,20 +38,33 @@ using chip::Protocols::InteractionModel::Status;
 using chip::bdx::DiagnosticLogs::kMaxFileDesignatorLen;
 using chip::bdx::DiagnosticLogs::kMaxLogContentSize;
 
+// Global delegate table
+static DiagnosticLogsProviderDelegate *
+    gDiagnosticLogsProviderDelegateTable[kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize];
+
+#if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+// Global BDX provider instance
+static BDXDiagnosticLogsProvider gBDXDiagnosticLogsProvider;
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace DiagnosticLogs {
 
-namespace {
-
-DiagnosticLogsProviderDelegate * gDiagnosticLogsProviderDelegateTable[kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize] = {
-    nullptr
-};
-
-DiagnosticLogsProviderDelegate * GetDiagnosticLogsProviderDelegate(EndpointId endpoint)
+void DiagnosticLogsProviderLogic::SetDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Id, MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, DiagnosticLogs::Id, MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize)
+    {
+        gDiagnosticLogsProviderDelegateTable[ep] = delegate;
+    }
+}
+
+DiagnosticLogsProviderDelegate * GetDelegate(EndpointId endpoint)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, DiagnosticLogs::Id, MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
     auto delegate =
         (ep >= MATTER_ARRAY_SIZE(gDiagnosticLogsProviderDelegateTable) ? nullptr : gDiagnosticLogsProviderDelegateTable[ep]);
 
@@ -80,33 +95,11 @@ void AddResponse(CommandHandler * commandObj, const ConcreteCommandPath & path, 
     commandObj->AddResponse(path, response);
 }
 
-#if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
-BDXDiagnosticLogsProvider gBDXDiagnosticLogsProvider;
-#endif // CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
-
-} // anonymous namespace
-
-DiagnosticLogsServer DiagnosticLogsServer::sInstance;
-
-void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Id, MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (ep < kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize)
-    {
-        gDiagnosticLogsProviderDelegateTable[ep] = delegate;
-    }
-}
-
-DiagnosticLogsServer & DiagnosticLogsServer::Instance()
-{
-    return sInstance;
-}
-
-void DiagnosticLogsServer::HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
-                                                              IntentEnum intent, StatusEnum status)
+void DiagnosticLogsProviderLogic::HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                                                     IntentEnum intent, StatusEnum status)
 {
     // If there is no delegate, there is no mechanism to read the logs. Assume those are empty and return NoLogs
-    auto * delegate = GetDiagnosticLogsProviderDelegate(path.mEndpointId);
+    auto * delegate = GetDelegate(path.mEndpointId);
     VerifyOrReturn(nullptr != delegate, AddResponse(commandObj, path, StatusEnum::kNoLogs));
 
     Platform::ScopedMemoryBuffer<uint8_t> buffer;
@@ -126,8 +119,8 @@ void DiagnosticLogsServer::HandleLogRequestForResponsePayload(CommandHandler * c
     AddResponse(commandObj, path, status, logContent, timeStamp, timeSinceBoot);
 }
 
-void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, const ConcreteCommandPath & path, IntentEnum intent,
-                                                  Optional<CharSpan> transferFileDesignator)
+void DiagnosticLogsProviderLogic::HandleLogRequestForBdx(CommandHandler * commandObj, const ConcreteCommandPath & path,
+                                                         IntentEnum intent, Optional<CharSpan> transferFileDesignator)
 {
     // If the RequestedProtocol is set to BDX and there is no TransferFileDesignator the command SHALL fail with a Status Code of
     // INVALID_COMMAND.
@@ -137,7 +130,7 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
                    commandObj->AddStatus(path, Status::ConstraintError));
 
     // If there is no delegate, there is no mechanism to read the logs. Assume those are empty and return NoLogs
-    auto * delegate = GetDiagnosticLogsProviderDelegate(path.mEndpointId);
+    auto * delegate = GetDelegate(path.mEndpointId);
     VerifyOrReturn(nullptr != delegate, AddResponse(commandObj, path, StatusEnum::kNoLogs));
 
     auto size = delegate->GetSizeForIntent(intent);
@@ -148,10 +141,10 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
     // the RetrieveLogsResponse SHALL be set to Exhausted and a BDX session SHALL NOT be initiated.
     VerifyOrReturn(size > kMaxLogContentSize, HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kExhausted));
 
-    // If the RequestedProtocol is set to BDX and either the Node does not support BDX or it is not possible for the Node
-    // to establish a BDX session, then the Node SHALL utilize the LogContent field of the RetrieveLogsResponse command
-    // to transfer as much of the current logs as it can fit within the response, and the Status field of the
-    // RetrieveLogsResponse SHALL be set to Exhausted.
+// If the RequestedProtocol is set to BDX and either the Node does not support BDX or it is not possible for the Node
+// to establish a BDX session, then the Node SHALL utilize the LogContent field of the RetrieveLogsResponse command
+// to transfer as much of the current logs as it can fit within the response, and the Status field of the
+// RetrieveLogsResponse SHALL be set to Exhausted.
 #if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
     VerifyOrReturn(!gBDXDiagnosticLogsProvider.IsBusy(), AddResponse(commandObj, path, StatusEnum::kBusy));
     auto err = gBDXDiagnosticLogsProvider.InitializeTransfer(commandObj, path, delegate, intent, transferFileDesignator.Value());
@@ -161,38 +154,7 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
 #endif // CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 }
 
-} // namespace DiagnosticLogs
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandHandler * commandObj,
-                                                             const chip::app::ConcreteCommandPath & commandPath,
-                                                             const Commands::RetrieveLogsRequest::DecodableType & commandData)
-{
-    // If the Intent and/or the RequestedProtocol arguments contain invalid (out of range) values the command SHALL fail with a
-    // Status Code of INVALID_COMMAND.
-    auto intent   = commandData.intent;
-    auto protocol = commandData.requestedProtocol;
-    if (intent == IntentEnum::kUnknownEnumValue || protocol == TransferProtocolEnum::kUnknownEnumValue)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
-
-    auto instance = DiagnosticLogsServer::Instance();
-    if (protocol == TransferProtocolEnum::kResponsePayload)
-    {
-        instance.HandleLogRequestForResponsePayload(commandObj, commandPath, intent);
-    }
-    else
-    {
-        instance.HandleLogRequestForBdx(commandObj, commandPath, intent, commandData.transferFileDesignator);
-    }
-
-    return true;
-}
-
-void MatterDiagnosticLogsPluginServerInitCallback() {}
-void MatterDiagnosticLogsPluginServerShutdownCallback() {}
-#endif // #ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif // MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT

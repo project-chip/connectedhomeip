@@ -15,6 +15,10 @@ app_config_dependent_sources = [
   "BDXDiagnosticLogsProvider.cpp",
   "BDXDiagnosticLogsProvider.h",
   "DiagnosticLogsProviderDelegate.h",
-  "diagnostic-logs-server.cpp",
-  "diagnostic-logs-server.h",
+  "DiagnosticLogsCluster.h",
+  "DiagnosticLogsCluster.cpp",
+  "DiagnosticLogsLogic.h",
+  "DiagnosticLogsLogic.cpp",
+  "CodeIntegration.h",
+  "CodeIntegration.cpp",
 ]

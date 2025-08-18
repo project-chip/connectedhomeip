@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,21 +18,18 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace DiagnosticLogs {
 
-/// A reference implementation for DiagnosticLogs source.
-class DiagnosticLogsServer
+using namespace chip::app::Clusters::DiagnosticLogs;
+
+class DiagnosticLogsProviderLogic
 {
 public:
-    static DiagnosticLogsServer & Instance();
-
     /**
      * Set the default delegate of the diagnostic logs cluster for the specified endpoint
      *
@@ -40,7 +37,7 @@ public:
      *
      * @param delegate The log provider delegate at the endpoint
      */
-    void SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
+    void SetDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
 
     /**
      * Handles the request to download diagnostic logs of type specified in the intent argument for protocol type ResponsePayload
@@ -57,12 +54,8 @@ public:
 
     void HandleLogRequestForBdx(CommandHandler * commandObj, const ConcreteCommandPath & path, IntentEnum intent,
                                 Optional<CharSpan> transferFileDesignator);
-
-private:
-    static DiagnosticLogsServer sInstance;
 };
 
-} // namespace DiagnosticLogs
 } // namespace Clusters
 } // namespace app
 } // namespace chip
