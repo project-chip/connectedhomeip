@@ -77,19 +77,19 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             TestStep("2", """Set up a subscription to the Meter Identification cluster:
                      - MinIntervalFloor: 0
                      - MaxIntervalCeiling: 10""", "Subscription successfully established."),
-            TestStep("3", "TH read MeterType attribute.", """
+            TestStep("3", "TH reads MeterType attribute.", """
                      - DUT replies a null or a MeterTypeEnum value;
                      - Store value as meter_type."""),
-            TestStep("4", "TH read PointOfDelivery attribute.", """
+            TestStep("4", "TH reads PointOfDelivery attribute.", """
                      - DUT replies a null or a value of string type;
                      - Store value as point_of_delivery."""),
-            TestStep("5", "TH read MeterSerialNumber attribute.", """
+            TestStep("5", "TH reads MeterSerialNumber attribute.", """
                      - DUT replies a null or a value of string type;
                      - Store value as meter_serial_number."""),
-            TestStep("6", "TH read ProtocolVersion attribute.", """
+            TestStep("6", "TH reads ProtocolVersion attribute.", """
                      - DUT replies a null or a value of string type;
                      - Store value as protocol_version."""),
-            TestStep("7", "TH read PowerThreshold attribute.", """
+            TestStep("7", "TH reads PowerThreshold attribute.", """
                      - DUT replies a null or a MeterTypeEnum value;
                      - Store value as power_threshold."""),
             TestStep("8", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
@@ -138,55 +138,43 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
         meter_type = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeterType
         )
-        if meter_type is not NullValue:
-            matter_asserts.assert_valid_enum(
-                meter_type,
-                "MeterType attribute must return a Clusters.MeterIdentification.Enums.MeterTypeEnum",
-                MeterIdentification.Enums.MeterTypeEnum,
-            )
+        self.check_meter_type_attribute(endpoint, meter_type)
 
         self.step("4")
         point_of_delivery = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PointOfDelivery
         )
-        if point_of_delivery is not NullValue:
-            matter_asserts.assert_is_string(point_of_delivery, "PointOfDelivery must be a string")
+        self.check_point_of_delivery_attribute(endpoint, point_of_delivery)
 
         self.step("5")
         meter_serial_number = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeterSerialNumber
         )
-        if meter_serial_number is not NullValue:
-            matter_asserts.assert_is_string(meter_serial_number, "MeterSerialNumber must be a string")
+        self.check_meter_serial_number_attribute(endpoint, meter_serial_number)
 
-        self.step("6")
-        if not self.check_pics("MTRID.S.A0003"):
-            logger.info("PICS MTRID.S.A0003 is not True")
-            self.mark_current_step_skipped()
-
-        protocol_version = None
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ProtocolVersion):
-            protocol_version = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
-            )
-            if protocol_version is not NullValue and protocol_version is not None:
-                matter_asserts.assert_is_string(protocol_version, "ProtocolVersion must be a string")
-
-        self.step("7")
-        if not self.check_pics("MTRID.S.F00"):
-            logger.info("PICS MTRID.S.F00 is not True")
-            self.mark_current_step_skipped()
-
-        power_threshold = None
-        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
-            power_threshold = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
-            )
-            if power_threshold is not NullValue:
-                asserts.assert_true(
-                    isinstance(power_threshold, Globals.Structs.PowerThresholdStruct),
-                    "power_threshold must be of type Globals.Structs.PowerThresholdStruct",
+        if self.check_pics("MTRID.S.A0003"):
+            self.step("6")
+            protocol_version = None
+            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ProtocolVersion):
+                protocol_version = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
                 )
+                self.check_protocol_version_attribute(endpoint, protocol_version)
+        else:
+            logger.info("PICS MTRID.S.A0003 is not True")
+            self.skip_step("6")
+
+        if self.check_pics("MTRID.S.F00"):
+            self.step("7")
+            power_threshold = None
+            if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+                power_threshold = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
+                )
+                self.check_power_threshold_attribute(endpoint, power_threshold)
+        else:
+            logger.info("PICS MTRID.S.F00 is not True")
+            self.skip_step("7")
 
         self.step("8")
         await self.check_test_event_triggers_enabled()
@@ -196,19 +184,25 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
 
         self.step("10")
         self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeterType, "MeterType", meter_type)
+        self.check_meter_type_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeterType])
 
         self.step("11")
         self.verify_reporting(subscription_handler.attribute_reports,
                               cluster.Attributes.PointOfDelivery, "PointOfDelivery", point_of_delivery)
+        self.check_point_of_delivery_attribute(endpoint, subscription_handler.attribute_reports[cluster.Attributes.PointOfDelivery])
 
         self.step("12")
         self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.MeterSerialNumber,
                               "MeterSerialNumber", meter_serial_number)
+        self.check_meter_serial_number_attribute(
+            endpoint, subscription_handler.attribute_reports[cluster.Attributes.MeterSerialNumber])
 
         if self.check_pics("MTRID.S.A0003"):
             self.step("13")
             self.verify_reporting(subscription_handler.attribute_reports,
                                   cluster.Attributes.ProtocolVersion, "ProtocolVersion", protocol_version)
+            self.check_protocol_version_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.ProtocolVersion])
         else:
             self.skip_step("13")
 
@@ -216,6 +210,8 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             self.step("14")
             self.verify_reporting(subscription_handler.attribute_reports,
                                   cluster.Attributes.PowerThreshold, "PowerThreshold", power_threshold)
+            self.check_power_threshold_attribute(
+                endpoint, subscription_handler.attribute_reports[cluster.Attributes.PowerThreshold])
         else:
             self.skip_step("14")
 

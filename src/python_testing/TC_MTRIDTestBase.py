@@ -20,14 +20,17 @@ import time
 
 from mobly import asserts
 
-from matter.clusters import ClusterObjects, Globals
+from matter.clusters import ClusterObjects, Globals, MeterIdentification
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest
 
 logger = logging.getLogger(__name__)
 
+cluster = MeterIdentification
 
-class MeterIdentificationTestBaseHelper:
+
+class MeterIdentificationTestBaseHelper(MatterBaseTest):
     """This class contains supporting methods for the MeterIdentification test cases."""
 
     # TestEventTriggers IDs
@@ -54,6 +57,65 @@ class MeterIdentificationTestBaseHelper:
                 "PowerThresholdSource attribute must return a Globals.Enums.PowerThresholdSourceEnum",
                 Globals.Enums.PowerThresholdSourceEnum,
             )
+
+    async def check_meter_type_attribute(self, endpoint, attribute_value=None):
+
+        if not attribute_value:
+            attribute_value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeterType
+            )
+        if attribute_value is not NullValue:
+            matter_asserts.assert_valid_enum(
+                attribute_value,
+                "MeterType attribute must return a Clusters.MeterIdentification.Enums.MeterTypeEnum",
+                MeterIdentification.Enums.MeterTypeEnum,
+            )
+            matter_asserts.assert_int_in_range(attribute_value, 0, 2, "MeterType must be in range 0 - 2")
+
+    async def check_point_of_delivery_attribute(self, endpoint, attribute_value=None):
+
+        if not attribute_value:
+            attribute_value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PointOfDelivery
+            )
+        if attribute_value is not NullValue:
+            matter_asserts.assert_is_string(attribute_value, "PointOfDelivery must be a string")
+            asserts.assert_less_equal(len(attribute_value), 64, "PointOfDelivery must have length at most 64!")
+
+    async def check_meter_serial_number_attribute(self, endpoint, attribute_value=None):
+
+        if not attribute_value:
+            attribute_value = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeterSerialNumber
+            )
+        if attribute_value is not NullValue:
+            matter_asserts.assert_is_string(attribute_value, "MeterSerialNumber must be a string")
+            asserts.assert_less_equal(len(attribute_value), 64, "MeterSerialNumber must have length at most 64!")
+
+    async def check_protocol_version_attribute(self, endpoint, attribute_value=None):
+
+        if not attribute_value:
+            if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
+                attribute_value = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
+                )
+        if attribute_value is not NullValue and attribute_value is not None:
+            matter_asserts.assert_is_string(attribute_value, "ProtocolVersion must be a string")
+            asserts.assert_less_equal(len(attribute_value), 64, "ProtocolVersion must have length at most 64!")
+
+    async def check_power_threshold_attribute(self, endpoint, attribute_value=None):
+
+        if not attribute_value:
+            if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+                attribute_value = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
+                )
+        if attribute_value is not NullValue:
+            asserts.assert_true(
+                isinstance(attribute_value, Globals.Structs.PowerThresholdStruct),
+                "PowerThreshold must be of type Globals.Structs.PowerThresholdStruct",
+            )
+            await self.checkPowerThresholdStruct(struct=attribute_value)
 
     async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> None:
 

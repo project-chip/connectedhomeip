@@ -43,12 +43,9 @@
 
 import logging
 
-from mobly import asserts
 from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
-from matter.clusters import Globals, MeterIdentification
-from matter.clusters.Types import NullValue
-from matter.testing import matter_asserts
+from matter.clusters import MeterIdentification
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -65,24 +62,24 @@ class TC_MTRID_2_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
 
     def pics_TC_MTRID_2_1(self) -> list[str]:
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["MTRID.S", "DGGEN.S", "DGGEN.S.A0008", "DGGEN.S.C00.Rsp"]
+        return ["MTRID.S"]
 
     def steps_TC_MTRID_2_1(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
-            TestStep("2", "Read MeterType attribute", """
+            TestStep("2", "TH reads MeterType attribute", """
                      - DUT replies a null or a MeterTypeEnum value;
                      - Verify that value in range 0 - 2."""),
-            TestStep("3", "Read PointOfDelivery attribute", """
+            TestStep("3", "TH reads PointOfDelivery attribute", """
                      - DUT replies a null or a value of string type;
                      - Verify that size is in range 0 - 64."""),
-            TestStep("4", "Read MeterSerialNumber attribute", """
+            TestStep("4", "TH reads MeterSerialNumber attribute", """
                      - DUT replies a null or a value of string type;
                      - Verify that size is in range 0 - 64."""),
-            TestStep("5", "Read ProtocolVersion attribute", """
+            TestStep("5", "TH reads ProtocolVersion attribute", """
                      - DUT replies a null or a value of string type;
                      - Verify that size is in range 0 - 64."""),
-            TestStep("6", "Read PowerThreshold attribute", """
+            TestStep("6", "TH reads PowerThreshold attribute", """
                      - DUT replies a null or a value of PowerThresholdStruct type;
                      - PowerThreshold field has type int64;
                      - ApparentPowerThreshold field has type int64;
@@ -96,70 +93,38 @@ class TC_MTRID_2_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
         """The main test procedure for TC_MTRID_2_1."""
 
         endpoint = self.get_endpoint()
-        attributes = cluster.Attributes
-
-        # If TestEventTriggers is not enabled this TC can't be checked properly.
-        if not self.check_pics("DGGEN.S") or not self.check_pics("DGGEN.S.A0008") or not self.check_pics("DGGEN.S.C00.Rsp"):
-            asserts.skip("PICS DGGEN.S or DGGEN.S.A0008 or DGGEN.S.C00.Rsp is not True")
 
         self.step("1")
 
         self.step("2")
-        val = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeterType
-        )
-        if val is not NullValue:
-            matter_asserts.assert_valid_enum(
-                val,
-                "MeterType attribute must return a Clusters.MeterIdentification.Enums.MeterTypeEnum",
-                MeterIdentification.Enums.MeterTypeEnum,
-            )
-            matter_asserts.assert_int_in_range(val, 0, 2, "MeterType must be in range 0 - 2")
+        # TH reads MeterType attribute, expects a null or a MeterTypeEnum value
+        self.check_meter_type_attribute(endpoint)
 
         self.step("3")
-        val = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PointOfDelivery
-        )
-        if val is not NullValue:
-            matter_asserts.assert_is_string(val, "PointOfDelivery must be a string")
-            asserts.assert_less_equal(len(val), 64, "PointOfDelivery must have length at most 64!")
+        # TH reads PointOfDelivery attribute, expects a null or a value of string type
+        self.check_point_of_delivery_attribute(endpoint)
 
         self.step("4")
-        val = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeterSerialNumber
-        )
-        if val is not NullValue:
-            matter_asserts.assert_is_string(val, "MeterSerialNumber must be a string")
-            asserts.assert_less_equal(len(val), 64, "MeterSerialNumber must have length at most 64!")
+        # TH reads MeterSerialNumber attribute, expects a null or a value of string type
+        self.check_meter_serial_number_attribute(endpoint)
 
         self.step("5")
+        # Check that PICS MTRID.S.A0003 is True
         if not self.check_pics("MTRID.S.A0003"):
             logger.info("PICS MTRID.S.A0003 is not True")
             self.mark_current_step_skipped()
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ProtocolVersion):
-            val = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
-            )
-            if val is not NullValue and val is not None:
-                matter_asserts.assert_is_string(val, "ProtocolVersion must be a string")
-                asserts.assert_less_equal(len(val), 64, "ProtocolVersion must have length at most 64!")
+        # TH reads ProtocolVersion attribute, expects a null or a value of string type
+        self.check_protocol_version_attribute(endpoint)
 
         self.step("6")
+        # Check that PICS MTRID.S.F00 is True
         if not self.check_pics("MTRID.S.F00"):
             logger.info("PICS MTRID.S.F00 is not True")
             self.mark_current_step_skipped()
 
-        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
-            val = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
-            )
-            if val is not NullValue:
-                asserts.assert_true(
-                    isinstance(val, Globals.Structs.PowerThresholdStruct),
-                    "val must be of type Globals.Structs.PowerThresholdStruct",
-                )
-                await self.checkPowerThresholdStruct(struct=val)
+        # TH reads PowerThreshold attribute, expects a null or a value of PowerThresholdStruct type
+        self.check_power_threshold_attribute(endpoint)
 
 
 if __name__ == "__main__":
