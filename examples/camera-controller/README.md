@@ -183,7 +183,7 @@ liveview start 1
 Wave your hand in front of the camera to trigger live view; a video window will
 appear, confirming that the stream is active.
 
-### 3. Running the Video Recording Upload Demo
+### 4. Running the Video Recording Upload Demo
 
 The Push AV Server acts as the recording destination (like a cloud service or
 NVR) for video clips. The demo shows how a Matter Camera Controller tells a
