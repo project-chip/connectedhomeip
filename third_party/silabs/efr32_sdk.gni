@@ -711,6 +711,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
+      "${efr32_sdk_root}/platform/bootloader/app_properties/app_properties.c",
       "${efr32_sdk_root}/platform/bootloader/core/flash/btl_internal_flash.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_core_cortexm.c",
@@ -868,7 +869,6 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_event_handler.c",
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
       "${silabs_gen_folder}/main.c",
-      "${efr32_sdk_root}/platform/bootloader/app_properties/app_properties.c",
     ]
 
     if (chip_enable_multi_ota_requestor) {
