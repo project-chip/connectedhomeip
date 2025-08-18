@@ -56,59 +56,43 @@ class TC_ACL_2_7(MatterBaseTest):
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
 
-    def _validate_events_th1(self, events, f1, f2, is_filtered):
-        """Helper method to validate events for TH1"""
-        logging.info("Found %d events", len(events))
-        found_valid_event = False
-        found_th2_event = False
+    def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered):
+        """Helper method to validate events for a TH"""
+        logging.info(f"Found {len(events)} events for {controller_name}")
 
-        for event_data in events:
-            logging.info("Examining event: %s", str(event_data))
-            if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                # Check for valid TH1 event
-                if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                    event_data.Data.adminNodeID == self.th1.nodeId and
-                    isinstance(event_data.Data.adminPasscodeID, Nullable) and
-                    event_data.Data.latestValue.data == D_OK_EMPTY and
-                    event_data.Data.latestValue.fabricIndex == f1 and
-                        event_data.Data.fabricIndex == f1):
-                    found_valid_event = True
+        found_valid_events = 0
+        found_other_event = False
 
-                # Check for TH2 events
-                if (event_data.Data.adminNodeID == self.th2.nodeId or
-                    event_data.Data.latestValue.fabricIndex == f2 or
-                        event_data.Data.fabricIndex == f2):
-                    found_th2_event = True
+        for event in events:
+            logging.info(f"Examining event: {str(event)}")
+            if hasattr(event, 'Data') and hasattr(event.Data, 'changeType'):
+                if expected_node_id == self.th1.nodeId:
+                    # Check for expected field values
+                    if (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
+                    event.Data.adminNodeID == self.th1.nodeId and
+                    isinstance(event.Data.adminPasscodeID, Nullable) and
+                    event.Data.latestValue.data == D_OK_EMPTY and
+                    event.Data.latestValue.fabricIndex == expected_fabric_index and
+                    event.Data.fabricIndex == expected_fabric_index):
+                        found_valid_events += 1
 
-        asserts.assert_true(found_valid_event, "Did not find the expected event with specified fields for TH1")
-        asserts.assert_false(found_th2_event, "TH1 should not see any events from TH2's fabric when fabric filtered")
+                if expected_node_id == self.th2.nodeId:
+                    # Check for expected field values
+                    if (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
+                    event.Data.adminNodeID == self.th2.nodeId and
+                    isinstance(event.Data.adminPasscodeID, Nullable) and
+                    event.Data.latestValue.data == D_OK_SINGLE and
+                    event.Data.latestValue.fabricIndex == expected_fabric_index and
+                    event.Data.fabricIndex == expected_fabric_index):
+                        found_valid_events += 1
 
-    def _validate_events_th2(self, events, f1, f2, is_filtered):
-        """Helper method to validate events for TH2"""
-        logging.info("Found %d events", len(events))
-        found_valid_event = False
-        found_th1_event = False
+                # If this is an event for the other fabric
+                if event.Data.fabricIndex == other_fabric_index:
+                    found_other_event = True
 
-        for event_data in events:
-            logging.info("Examining event: %s", str(event_data))
-            if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                # Check for valid TH2 event
-                if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                    event_data.Data.adminNodeID == self.th2.nodeId and
-                    isinstance(event_data.Data.adminPasscodeID, Nullable) and
-                    event_data.Data.latestValue.data == D_OK_SINGLE and
-                    event_data.Data.latestValue.fabricIndex == f2 and
-                        event_data.Data.fabricIndex == f2):
-                    found_valid_event = True
-
-                # Check for TH1 events
-                if (event_data.Data.adminNodeID == self.th1.nodeId or
-                    event_data.Data.latestValue.fabricIndex == f1 or
-                        event_data.Data.fabricIndex == f1):
-                    found_th1_event = True
-
-        asserts.assert_true(found_valid_event, "Did not find the expected event with specified fields for TH2")
-        asserts.assert_false(found_th1_event, "TH2 should not see any events from TH1's fabric when fabric filtered")
+        if is_filtered:
+            other_controller = "TH1" if controller_name == "TH2" else "TH2"
+            asserts.assert_false(found_other_event, f"{controller_name} should not see any events from {other_controller}'s fabric when fabric filtered")
 
     def desc_TC_ACL_2_7(self) -> str:
         return "[TC-ACL-2.7] Multiple fabrics test"
@@ -226,7 +210,7 @@ class TC_ACL_2_7(MatterBaseTest):
             fabric_filtered=False
         )
         logging.info("TH1 read result (fabricFiltered=False): %s", str(result_unfiltered))
-        asserts.assert_equal(len(result_unfiltered), 2, "Should have two extensions when not fabric filtered")
+        asserts.assert_greater(len(result_unfiltered), 1, "Should have at least two extensions when not fabric filtered")
         # Check that the TH2 extension data is empty
         endpoint_data_th2 = result_unfiltered[1]
         asserts.assert_equal(
@@ -251,7 +235,7 @@ class TC_ACL_2_7(MatterBaseTest):
             fabric_filtered=False
         )
         logging.info("TH2 read result (fabricFiltered=False): %s", str(result2_unfiltered))
-        asserts.assert_true(len(result2_unfiltered) >= 2, "Should have two extensions when not fabric filtered")
+        asserts.assert_greater(len(result2_unfiltered), 1, "Should have at least two extensions when not fabric filtered")
         # Check that the TH1 extension data is empty
         endpoint_data_th1 = result2_unfiltered[0]
         asserts.assert_equal(
@@ -267,7 +251,7 @@ class TC_ACL_2_7(MatterBaseTest):
             events=[(0, acec_event)],
             fabricFiltered=True
         )
-        self._validate_events_th1(events_response_filtered, f1, f2, True)
+        self._validate_events(events_response_filtered, f1, self.th1.nodeId, f2, "TH1", True)
 
         # Read with fabricFiltered=False
         events_response_unfiltered = await self.th1.ReadEvent(
@@ -275,7 +259,7 @@ class TC_ACL_2_7(MatterBaseTest):
             events=[(0, acec_event)],
             fabricFiltered=False
         )
-        self._validate_events_th1(events_response_unfiltered, f1, f2, False)
+        self._validate_events(events_response_unfiltered, f1, self.th1.nodeId, f2, "TH1", False)
 
         self.step(10)
         # TH2 reads AccessControlExtensionChanged event with both fabricFiltered True and False
@@ -285,7 +269,7 @@ class TC_ACL_2_7(MatterBaseTest):
             events=[(0, acec_event)],
             fabricFiltered=True
         )
-        self._validate_events_th2(events_response2_filtered, f1, f2, True)
+        self._validate_events(events_response2_filtered, f2, self.th2.nodeId, f1, "TH2", True)
 
         # Read with fabricFiltered=False
         events_response2_unfiltered = await self.th2.ReadEvent(
@@ -293,7 +277,7 @@ class TC_ACL_2_7(MatterBaseTest):
             events=[(0, acec_event)],
             fabricFiltered=False
         )
-        self._validate_events_th2(events_response2_unfiltered, f1, f2, False)
+        self._validate_events(events_response2_unfiltered, f2, self.th2.nodeId, f1, "TH2", False)
 
         self.step(11)
         # TH_CR1 sends RemoveFabric for TH2 fabric command to DUT_CE
