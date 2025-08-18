@@ -40,6 +40,7 @@ public:
     FabricTableHolder() {}
     ~FabricTableHolder()
     {
+        mFabricTable.Shutdown();
         mOpKeyStore.Finish();
         mOpCertStore.Finish();
     }
