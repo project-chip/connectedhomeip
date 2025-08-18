@@ -40,6 +40,12 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     EventTriggerChangeDay = 0x0700000000000002
     EventTriggerChangeTime = 0x0700000000000003
 
+    async def check_list_elements_uniqueness(self, list_to_check: list, object_name: str = "Elements"):
+        """
+        Checks that all elements in the list are unique.
+        """
+        asserts.assert_equal(len(list_to_check), len(set(list_to_check)), f"{object_name} in the list must be unique")
+
     async def checkAuxiliaryLoadSwitchSettingsStruct(self,
                                                      endpoint: int = None,
                                                      cluster: Clusters.CommodityTariff = None,
@@ -124,11 +130,10 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         matter_asserts.is_valid_int_value(struct.daysOfWeek)
         # Check bitmap value less than or equal to (Sunday | Monday | Tuesday | Wednesday | Thursday | Friday | Saturday)
         asserts.assert_less_equal(struct.daysOfWeek, 127)
-        matter_asserts.assert_list(struct.dayEntryIDs, "DayEntryIDs attribute must return a list")
-        matter_asserts.assert_list_element_type(
-            struct.dayEntryIDs, int, "DayEntryIDs attribute must contain int elements")
-        asserts.assert_greater_equal(len(struct.dayEntryIDs), 1, "DayEntryIDs must have at least 1 entries!")
-        asserts.assert_less_equal(len(struct.dayEntryIDs), 96, "DayEntryIDs must have at most 96 entries!")
+        matter_asserts.assert_list(struct.dayEntryIDs, "DayEntryIDs attribute must return a list", min_length=1, max_length=96)
+        self.check_list_elements_uniqueness(struct.dayEntryIDs, "DayEntryIDs")
+        for dayEntryID in struct.dayEntryIDs:
+            matter_asserts.assert_valid_uint32(dayEntryID, 'DayEntryID must has uint32 type.')
 
     async def checkDayStruct(self,
                              endpoint: int = None,
@@ -146,6 +151,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             struct.dayEntryIDs, "DayEntryIDs attribute must return a list with length in range 1 - 96", min_length=1, max_length=96)
         for dayEntryID in struct.dayEntryIDs:
             matter_asserts.assert_valid_uint32(dayEntryID, 'DayEntryID must has uint32 type.')
+        self.check_list_elements_uniqueness(struct.dayEntryIDs, "DayEntryIDs")
 
     async def checkPeakPeriodStruct(self,
                                     endpoint: int = None,
@@ -271,6 +277,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             struct.dayEntryIDs, "DayEntryIDs attribute must return a list with length in range 1 - 20", min_length=1, max_length=20)
         for dayEntryID in struct.dayEntryIDs:
             matter_asserts.assert_valid_uint32(dayEntryID, 'DayEntryID must has uint32 type.')
+        self.check_list_elements_uniqueness(struct.dayEntryIDs, "DayEntryIDs")
 
         matter_asserts.assert_list(
             struct.tariffComponentIDs, "TariffComponentIDs attribute must return a list with length in range 1 - 20", min_length=1, max_length=20)
