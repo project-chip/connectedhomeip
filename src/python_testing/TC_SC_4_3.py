@@ -46,11 +46,11 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import ipaddress
 import logging
-import re
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.utils.asserts import (assert_valid_hostname, assert_valid_sai_key, assert_valid_sat_key, assert_valid_sii_key, assert_valid_sai_key,
+                                          assert_valid_icd_key, assert_valid_t_key, assert_valid_ipv6_addresses)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -164,15 +164,10 @@ class TC_SC_4_3(MatterBaseTest):
         logging.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
         # Verify t_value is a decimal number without leading zeros and less than or equal to 6
         try:
-            T_int = int(t_value)
-            if T_int < 0 or T_int > MAX_T_VALUE:
-                return False, f"T value ({t_value}) is not in the range 0 to 6. ({t_value})"
-            if str(t_value).startswith("0") and T_int != 0:
-                return False, f"T value ({t_value}) has leading zeros."
-            if T_int != float(t_value):
-                return False, f"T value ({t_value}) is not an integer."
+            assert_valid_t_key(t_value, enforce_provisional=False)
 
             # Convert to bitmap and verify bit 0 is clear
+            T_int = int(t_value)
             if T_int & 1 == 0:
                 return True, f"T value ({t_value}) is valid and bit 0 is clear."
             else:
@@ -192,30 +187,6 @@ class TC_SC_4_3(MatterBaseTest):
                     return True, f"T value ({t_value}) is valid."
         except ValueError:
             return False, f"T value ({t_value}) is not a valid integer"
-
-    @staticmethod
-    def is_valid_ipv6_address(address) -> bool:
-        try:
-            # Attempt to create an IPv6 address object. If successful, this is an IPv6 address.
-            ipaddress.IPv6Address(address)
-            return True
-        except ipaddress.AddressValueError:
-            # If an AddressValueError is raised, the current address is not a valid IPv6 address.
-            return False
-
-    @staticmethod
-    def verify_hostname(hostname: str) -> bool:
-        # Remove any trailing dot
-        if hostname.endswith('.'):
-            hostname = hostname[:-1]
-
-        # Remove '.local' suffix if present
-        if hostname.endswith('.local'):
-            hostname = hostname[:-6]
-
-        # Regular expression to match an uppercase hexadecimal string of 12 or 16 characters
-        pattern = re.compile(r'^[0-9A-F]{12}$|^[0-9A-F]{16}$')
-        return bool(pattern.match(hostname))
 
     @async_test_body
     async def test_TC_SC_4_3(self):
@@ -322,8 +293,7 @@ class TC_SC_4_3(MatterBaseTest):
             return txt_record_returned and key in txt_record.txt.keys()
 
         # Verify hostname character length (12 or 16)
-        asserts.assert_true(self.verify_hostname(hostname=srv_record.hostname),
-                            f"Hostname for '{srv_record.hostname}' is not a 12 or 16 character uppercase hexadecimal string")
+        assert_valid_hostname(srv_record.hostname)
 
         # ICD TXT KEY
         if supports_lit:
@@ -333,8 +303,7 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('ICD'), "ICD key is NOT present in the TXT record.")
 
             # Verify it has the value of 0 or 1 (ASCII)
-            icd_value = int(txt_record.txt['ICD'])
-            asserts.assert_true(icd_value == 0 or icd_value == 1, "ICD value is different than 0 or 1 (ASCII).")
+            assert_valid_icd_key(txt_record.txt['ICD'])
         else:
             logging.info("supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
             if txt_record_returned:
@@ -345,7 +314,7 @@ class TC_SC_4_3(MatterBaseTest):
             sit_mode = True
 
         if supports_icd and supports_lit:
-            if icd_value == 0:
+            if int(txt_record.txt['ICD']) == 0:
                 sit_mode = True
             else:
                 sit_mode = False
@@ -358,9 +327,7 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('SII'), "SII key is NOT present in the TXT record.")
 
             logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
-            sii_value = txt_record.txt['SII']
-            result, message = self.verify_decimal_value(sii_value, ONE_HOUR_IN_MS)
-            asserts.assert_true(result, message)
+            assert_valid_sii_key(txt_record.txt['SII'])
 
         # SAI TXT KEY
         if supports_icd:
@@ -368,21 +335,17 @@ class TC_SC_4_3(MatterBaseTest):
             asserts.assert_true(txt_has_key('SAI'), "SAI key is NOT present in the TXT record.")
 
             logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
-            sai_value = txt_record.txt['SAI']
-            result, message = self.verify_decimal_value(sai_value, ONE_HOUR_IN_MS)
-            asserts.assert_true(result, message)
+            assert_valid_sai_key(txt_record.txt['SAI'])
 
         # SAT TXT KEY
         if txt_has_key('SAT'):
             logging.info(
                 "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
-            sat_value = txt_record.txt['SAT']
-            result, message = self.verify_decimal_value(sat_value, MAX_SAT_VALUE)
-            asserts.assert_true(result, message)
+            assert_valid_sat_key(txt_record.txt['SAT'])
 
             if supports_icd:
                 logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
-                asserts.assert_equal(int(sat_value), active_mode_threshold_ms)
+                asserts.assert_equal(int(txt_record.txt['SAT']), active_mode_threshold_ms)
 
         # T TXT KEY
         result, message = self.verify_t_value(txt_record)
@@ -390,11 +353,8 @@ class TC_SC_4_3(MatterBaseTest):
 
         # Verify the AAAA records contain a valid IPv6 address
         logging.info("Verify the AAAA record contains a valid IPv6 address")
-        for r in quada_records:
-            asserts.assert_true(
-                self.is_valid_ipv6_address(r.address),
-                f"Invalid IPv6 address: '{r.address}'"
-            )
+        ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
+        assert_valid_ipv6_addresses(ipv6_addresses)
 
         # # *** STEP 10 ***
         # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed
