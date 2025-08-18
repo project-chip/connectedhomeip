@@ -499,6 +499,7 @@ template("efr32_sdk") {
       "SL_RAIL_3_API=1",
       "SL_CODE_COMPONENT_OPENTHREAD=openthread",
       "SL_CODE_COMPONENT_INTERRUPT_MANAGER=interrupt_manager",
+      "SL_APP_PROPERTIES",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -867,6 +868,7 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_event_handler.c",
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
       "${silabs_gen_folder}/main.c",
+      "${efr32_sdk_root}/platform/bootloader/app_properties/app_properties.c",
     ]
 
     if (chip_enable_multi_ota_requestor) {
