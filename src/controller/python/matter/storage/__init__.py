@@ -20,6 +20,7 @@ import copy
 import ctypes
 import json
 import logging
+from binascii import hexlify
 from configparser import ConfigParser
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
 from typing import Dict, Optional
@@ -39,7 +40,7 @@ class PersistentStorage:
 
         This class does not provide any persistence storage on its own. It keeps
         the configuration in memory. Please use a dedicated subclass to provide non-volatile
-        persistence storage, such as PersistentStorageJSON.
+        persistence storage, such as PersistentStorageJSON or PersistentStorageINI.
 
         Configuration native to the Python libraries is organized under the top-level
         'repl-config' key while configuration native to the SDK and owned by the various
@@ -68,13 +69,10 @@ class PersistentStorage:
             sizeOfValue = size[0]
             sizeToCopy = min(sizeOfValue, len(keyValue))
 
-            count = 0
-
-            for idx, val in enumerate(keyValue):
+            for count, val in enumerate(keyValue):
                 if sizeToCopy == count:
                     break
-                value[idx] = val
-                count = count + 1
+                value[count] = val
 
             # As mentioned above, we are intentionally not returning
             # sizeToCopy as one might expect because the caller
@@ -126,7 +124,7 @@ class PersistentStorage:
     def SetReplKey(self, key: str, value):
         ''' Set a REPL key to a specific value. Creates the key if one doesn't exist already.
         '''
-        LOGGER.debug("SetReplKey: %s = %s", key, value)
+        LOGGER.debug("SetReplKey: %s = %s", key, hexlify(value))
 
         if not key:
             raise ValueError("Invalid Key")
@@ -147,7 +145,7 @@ class PersistentStorage:
     def SetSdkKey(self, key: str, value: bytes):
         ''' Set an SDK key to a specific value. Creates the key if one doesn't exist already.
         '''
-        LOGGER.debug("SetSdkKey: %s = %s", key, value)
+        LOGGER.debug("SetSdkKey: %s = %s", key, hexlify(value))
 
         if not key:
             raise ValueError("Invalid Key")
