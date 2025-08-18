@@ -182,7 +182,8 @@ class TC_ACL_2_8(MatterBaseTest):
 
         if is_filtered:
             other_controller = "TH1" if controller_name == "TH2" else "TH2"
-            asserts.assert_false(found_other_event, f"{controller_name} should not see any events from {other_controller}'s fabric when fabric filtered")
+            asserts.assert_false(
+                found_other_event, f"{controller_name} should not see any events from {other_controller}'s fabric when fabric filtered")
 
     async def internal_test_TC_ACL_2_8(self, force_legacy_encoding: bool):
         self.step(1)

@@ -69,21 +69,21 @@ class TC_ACL_2_7(MatterBaseTest):
                 if expected_node_id == self.th1.nodeId:
                     # Check for expected field values
                     if (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                    event.Data.adminNodeID == self.th1.nodeId and
-                    isinstance(event.Data.adminPasscodeID, Nullable) and
-                    event.Data.latestValue.data == D_OK_EMPTY and
-                    event.Data.latestValue.fabricIndex == expected_fabric_index and
-                    event.Data.fabricIndex == expected_fabric_index):
+                        event.Data.adminNodeID == self.th1.nodeId and
+                        isinstance(event.Data.adminPasscodeID, Nullable) and
+                        event.Data.latestValue.data == D_OK_EMPTY and
+                        event.Data.latestValue.fabricIndex == expected_fabric_index and
+                            event.Data.fabricIndex == expected_fabric_index):
                         found_valid_events += 1
 
                 if expected_node_id == self.th2.nodeId:
                     # Check for expected field values
                     if (event.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                    event.Data.adminNodeID == self.th2.nodeId and
-                    isinstance(event.Data.adminPasscodeID, Nullable) and
-                    event.Data.latestValue.data == D_OK_SINGLE and
-                    event.Data.latestValue.fabricIndex == expected_fabric_index and
-                    event.Data.fabricIndex == expected_fabric_index):
+                        event.Data.adminNodeID == self.th2.nodeId and
+                        isinstance(event.Data.adminPasscodeID, Nullable) and
+                        event.Data.latestValue.data == D_OK_SINGLE and
+                        event.Data.latestValue.fabricIndex == expected_fabric_index and
+                            event.Data.fabricIndex == expected_fabric_index):
                         found_valid_events += 1
 
                 # If this is an event for the other fabric
@@ -92,7 +92,8 @@ class TC_ACL_2_7(MatterBaseTest):
 
         if is_filtered:
             other_controller = "TH1" if controller_name == "TH2" else "TH2"
-            asserts.assert_false(found_other_event, f"{controller_name} should not see any events from {other_controller}'s fabric when fabric filtered")
+            asserts.assert_false(
+                found_other_event, f"{controller_name} should not see any events from {other_controller}'s fabric when fabric filtered")
 
     def desc_TC_ACL_2_7(self) -> str:
         return "[TC-ACL-2.7] Multiple fabrics test"
