@@ -24,15 +24,15 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest
 
 logger = logging.getLogger(__name__)
 
+cluster = Clusters.CommodityTariff
 
-class CommodityTariffTestBaseHelper:
+
+class CommodityTariffTestBaseHelper(MatterBaseTest):
     """This class contains supporting methods for the CommodityTariff test cases."""
-
-    StartDate = None
-    StartTime = None
 
     # Test event trigger IDs
     EventTriggerFakeData = 0x0700000000000000
@@ -88,11 +88,11 @@ class CommodityTariffTestBaseHelper:
         """
         Checks the correctness of the DayEntryStruct data type entries."""
 
-        matter_asserts.assert_valid_uint32(struct.dayEntryID, 'DayEntryID')
-        matter_asserts.assert_valid_uint16(struct.startTime, 'StartTime')
+        matter_asserts.assert_valid_uint32(struct.dayEntryID, 'DayEntryID must has uint32 type.')
+        matter_asserts.assert_valid_uint16(struct.startTime, 'StartTime must has uint16 type.')
         asserts.assert_less_equal(struct.startTime, 1499)
         if struct.duration is not None:
-            matter_asserts.assert_valid_uint16(struct.duration, 'Duration')
+            matter_asserts.assert_valid_uint16(struct.duration, 'Duration must has uint16 type.')
             asserts.assert_less_equal(struct.duration, 1500 - struct.startTime)
         if self.check_pics("SETRF.S.F05"):
             if struct.randomizationType is not None:
@@ -317,3 +317,188 @@ class CommodityTariffTestBaseHelper:
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerChangeTime)
         time.sleep(3)  # Wait some time to be sure that test event triggers takes effect
+
+    async def check_tariff_info_attribute(self, endpoint):
+
+        tariff_info = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffInfo)
+        if tariff_info is not NullValue:
+            asserts.assert_true(isinstance(
+                tariff_info, cluster.Structs.TariffInformationStruct), "TariffInfo must be of type TariffInformationStruct")
+            await self.checkTariffInformationStruct(endpoint=endpoint, cluster=cluster, struct=tariff_info)
+
+    async def check_tariff_unit_attribute(self, endpoint):
+
+        tariff_unit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
+        if tariff_unit is not NullValue:
+            matter_asserts.assert_valid_enum(
+                tariff_unit, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
+            asserts.assert_true(tariff_unit >= 0 and tariff_unit <= 1, "TariffUnit must be in range 0 - 1")
+
+    async def check_start_date_attribute(self, endpoint):
+
+        self.startDateAttributeValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.StartDate)
+        if self.startDateAttributeValue is not NullValue:
+            matter_asserts.assert_valid_uint32(self.startDateAttributeValue, 'StartDate attribute must has uint32 type.')
+
+    async def check_day_entries_attribute(self, endpoint):
+
+        day_entries = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
+        if day_entries is not NullValue:
+            matter_asserts.assert_list(day_entries, "DayEntries attribute must return a list")
+            matter_asserts.assert_list_element_type(
+                day_entries, cluster.Structs.DayEntryStruct, "DayEntries attribute must contain DayEntryStruct elements")
+            for item in day_entries:
+                await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=item)
+
+    async def check_day_patterns_attribute(self, endpoint):
+
+        day_patterns = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
+        if day_patterns is not NullValue:
+            matter_asserts.assert_list(
+                day_patterns, "DayPatterns attribute must return a list with length less or equal 28", min_length=0, max_length=28)
+            if day_patterns:
+                matter_asserts.assert_list_element_type(
+                    day_patterns, cluster.Structs.DayPatternStruct, "DayPatterns attribute must contain DayPatternStruct elements")
+                for item in day_patterns:
+                    await self.checkDayPatternStruct(endpoint=endpoint, cluster=cluster, struct=item)
+
+    async def check_calendar_periods_attribute(self, endpoint):
+
+        calendar_periods = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
+        if calendar_periods is not NullValue:
+            matter_asserts.assert_list(
+                calendar_periods, "CalendarPeriods attribute must return a list with length in range 1 - 4", min_length=1, max_length=4)
+            matter_asserts.assert_list_element_type(
+                calendar_periods, cluster.Structs.CalendarPeriodStruct, "CalendarPeriods attribute must contain CalendarPeriodStruct elements")
+            for item in calendar_periods:
+                await self.checkCalendarPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item, start_date_attribute=self.startDateAttributeValue)
+            for item in range(len(calendar_periods) - 1):
+                asserts.assert_less(calendar_periods[item].startDate, calendar_periods[item + 1].startDate,
+                                    "CalendarPeriods must be sorted by Date in increasing order!")
+            if self.startDateAttributeValue is NullValue:
+                asserts.assert_true(calendar_periods[0].startDate is NullValue,
+                                    "If StartDate is Null, the first CalendarPeriod item Start Date field must also be Null")
+                if len(calendar_periods) > 1:
+                    for item in range(1, len(calendar_periods)):
+                        asserts.assert_true(calendar_periods[item].startDate is not NullValue,
+                                            "If StartDate is Null only first CalendarPeriod item Start Date field must be Null, the other CalendarPeriod items Start Date field must not be Null")
+
+    async def check_individual_days_attribute(self, endpoint):
+
+        individual_days = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
+        if individual_days is not NullValue:
+            matter_asserts.assert_list(
+                individual_days, "IndividualDays attribute must return a list with length less or equal 50", max_length=50)
+            matter_asserts.assert_list_element_type(
+                individual_days, cluster.Structs.DayStruct, "IndividualDays attribute must contain DayStruct elements")
+            for item in individual_days:
+                await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=item)
+            for item in range(len(individual_days) - 1):
+                asserts.assert_less(individual_days[item].date, individual_days[item + 1].date,
+                                    "IndividualDays must be sorted by Date in increasing order!")
+
+    async def check_current_day_attribute(self, endpoint):
+
+        current_day = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
+        if current_day is not NullValue:
+            asserts.assert_true(isinstance(
+                current_day, cluster.Structs.DayStruct), "CurrentDay must be of type DayStruct")
+            await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=current_day)
+
+    async def check_next_day_attribute(self, endpoint):
+
+        next_day = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay)
+        if next_day is not NullValue:
+            asserts.assert_true(isinstance(
+                next_day, cluster.Structs.DayStruct), "NextDay must be of type DayStruct")
+            await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=next_day)
+
+    async def check_current_day_entry_attribute(self, endpoint):
+
+        current_day_entry = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry)
+        if current_day_entry is not NullValue:
+            asserts.assert_true(isinstance(
+                current_day_entry, cluster.Structs.DayEntryStruct), "CurrentDayEntry must be of type DayEntryStruct")
+            await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=current_day_entry)
+
+    async def check_current_day_entry_date_attribute(self, endpoint):
+
+        current_day_entry_date = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
+        if current_day_entry_date is not NullValue:
+            matter_asserts.assert_valid_uint32(current_day_entry_date, 'CurrentDayEntryDate must be of type uint32')
+
+    async def check_next_day_entry_attribute(self, endpoint):
+
+        next_day_entry = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntry)
+        if next_day_entry is not NullValue:
+            asserts.assert_true(isinstance(
+                next_day_entry, cluster.Structs.DayEntryStruct), "NextDayEntry must be of type DayEntryStruct")
+            await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=next_day_entry)
+
+    async def check_next_day_entry_date_attribute(self, endpoint):
+
+        next_day_entry_date = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
+        if next_day_entry_date is not NullValue:
+            matter_asserts.assert_valid_uint32(next_day_entry_date, 'NextDayEntryDate must be of type uint32')
+
+    async def check_tariff_components_attribute(self, endpoint):
+
+        tariff_components = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
+        if tariff_components is not NullValue:
+            matter_asserts.assert_list(
+                tariff_components, "TariffComponents attribute must return a list with length greater or equal 1", min_length=1)
+            matter_asserts.assert_list_element_type(
+                tariff_components, cluster.Structs.TariffComponentStruct, "TariffComponents attribute must contain TariffComponentStruct elements")
+            for item in tariff_components:
+                await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
+
+    async def check_tariff_periods_attribute(self, endpoint):
+
+        tariff_periods = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
+        if tariff_periods is not NullValue:
+            matter_asserts.assert_list(
+                tariff_periods, "TariffPeriods attribute must return a list with length greater or equal 1", min_length=1)
+            matter_asserts.assert_list_element_type(
+                tariff_periods, cluster.Structs.TariffPeriodStruct, "TariffPeriods attribute must contain TariffPeriodStruct elements")
+            for item in tariff_periods:
+                await self.checkTariffPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item)
+
+    async def check_current_tariff_components_attribute(self, endpoint):
+
+        current_tariff_components = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents)
+        if current_tariff_components is not NullValue:
+            matter_asserts.assert_list(
+                current_tariff_components, "CurrentTariffComponents attribute must return a list with length less or equal 20", max_length=20)
+            matter_asserts.assert_list_element_type(
+                current_tariff_components, cluster.Structs.TariffComponentStruct, "CurrentTariffComponents attribute must contain TariffComponentStruct elements")
+            for item in current_tariff_components:
+                await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
+
+    async def check_next_tariff_components_attribute(self, endpoint):
+
+        next_tariff_components = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents)
+        if next_tariff_components is not NullValue:
+            matter_asserts.assert_list(
+                next_tariff_components, "NextTariffComponents attribute must return a list with length less or equal 20", max_length=20)
+            matter_asserts.assert_list_element_type(
+                next_tariff_components, cluster.Structs.TariffComponentStruct, "NextTariffComponents attribute must contain TariffComponentStruct elements")
+            for item in next_tariff_components:
+                await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
+
+    async def check_default_randomization_offset_attribute(self, endpoint):
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+            default_randomization_offset = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
+            if default_randomization_offset is not NullValue:
+                matter_asserts.assert_valid_int16(default_randomization_offset, 'DefaultRandomizationOffset must be of type int16')
+
+    async def check_default_randomization_type_attribute(self, endpoint):
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
+            default_randomization_type = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
+            if default_randomization_type is not NullValue:
+                matter_asserts.assert_valid_enum(
+                    default_randomization_type, "DefaultRandomizationType attribute must return a DayEntryRandomizationTypeEnum", cluster.Enums.DayEntryRandomizationTypeEnum)
+                asserts.assert_greater_equal(default_randomization_type, 0,
+                                             "DefaultRandomizationType must be greater or equal than 0.")
+                asserts.assert_less_equal(default_randomization_type, 4, "DefaultRandomizationType must be less or equal than 4.")
