@@ -198,9 +198,8 @@ class TC_AVSM_2_5(MatterBaseTest):
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1.")
 
-        outOfConstraintStreamUsage = Globals.Enums.StreamUsageEnum.kInternal
-
         self.step(8)
+        outOfConstraintStreamUsage = Globals.Enums.StreamUsageEnum.kInternal
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=outOfConstraintStreamUsage,
