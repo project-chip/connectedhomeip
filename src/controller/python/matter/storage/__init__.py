@@ -244,16 +244,54 @@ class VolatileTemporaryPersistentStorage(PersistentStorage):
         pass
 
 
+# Regular expression to match CA keys.
+_caKeyMatch = re.compile(r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey)(\d+)')
+
+
 class PersistentStorageJSON(VolatileTemporaryPersistentStorage):
     """Persistent storage back-end which stores data in a JSON file."""
+
+    def _caKeysBackwardCompatibilityRewrite(self, data: Dict) -> Dict:
+        """Rewrites CA keys if the index does not start from 0.
+
+        This rewrite is a backward compatibility patch for old CertificateAuthority
+        class which used 1-based indexing for CA keys. The new implementation uses
+        0-based indexing to be compatible with chip-tool implementation.
+        """
+        sdkConfig = data.get('sdk-config', {})
+        replConfig = data.get('repl-config', {})
+
+        caKeys = {}
+        for key in sdkConfig:
+            if match := _caKeyMatch.fullmatch(key):
+                caKeys[key] = (match.group(1), int(match.group(2)))
+
+        if not caKeys or min([v[1] for v in caKeys.values()]) == 0:
+            # No CA keys found or they are 0-based indexed - nothing to rewrite.
+            return data
+
+        LOGGER.info("Rewriting CA keys to 0-based indexing")
+
+        caKeysRewritten = {}
+        for key, (prefix, index) in caKeys.items():
+            caKeysRewritten[f"{prefix}{index - 1}"] = sdkConfig.pop(key)
+        data['sdk-config'].update(caKeysRewritten)
+
+        caListRewritten = {}
+        for key, value in replConfig.get('caList', {}).items():
+            caListRewritten[str(int(key) - 1)] = value
+        replConfig['caList'] = caListRewritten
+
+        return data
 
     def __init__(self, path: str):
         LOGGER.info("Loading configuration from JSON file: %s", path)
         self._path = path
         try:
             with open(self._path) as f:
-                LOGGER.info("Loading configuration from JSON file")
                 data = json.loads(f.read() or '{}')
+                # TODO: Remove this compatibility layer when all JSON files are rewritten.
+                data = self._caKeysBackwardCompatibilityRewrite(data)
         except FileNotFoundError:
             LOGGER.info("Configuration file not found, using empty configuration")
             data = {}
@@ -282,9 +320,6 @@ class PersistentStorageINI(VolatileTemporaryPersistentStorage):
     This persistent storage is compatible with the chip-tool implementation.
     """
 
-    # Regular expression to match CA keys in the INI file.
-    caKeyMatch = re.compile(r'^(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey)\d+$')
-
     class ConfigParser(ConfigParser):
         """Parser that preserves key case and does not use interpolation."""
 
@@ -306,10 +341,12 @@ class PersistentStorageINI(VolatileTemporaryPersistentStorage):
         from a separate file. This allows to load chip-tool persistent storage which
         stores fabric CA in a separate file.
         """
+        LOGGER.info("Loading configuration from INI file: %s", path)
+        self._chipToolFabricStoragePath = chipToolFabricStoragePath
+        self._path = path
         try:
             data = {}
             config = PersistentStorageINI.ConfigParser()
-            LOGGER.info("Loading configuration from INI file: %s", path)
             config.read(path)
             if config.has_section('Default'):
                 data['sdk-config'] = dict(config.items('Default'))
@@ -325,8 +362,6 @@ class PersistentStorageINI(VolatileTemporaryPersistentStorage):
                     data['sdk-config'][key] = value
         except Exception as ex:
             LOGGER.critical("Could not load configuration from INI file: %s", ex)
-        self._path = path
-        self._chipToolFabricStoragePath = chipToolFabricStoragePath
         super().__init__(data)
 
     def Commit(self):
@@ -337,7 +372,7 @@ class PersistentStorageINI(VolatileTemporaryPersistentStorage):
             configFabric = PersistentStorageINI.ConfigParser()
             for key in self._data['sdk-config']:
                 # Move CA keys to the separate fabric configuration file.
-                if self.caKeyMatch.match(key):
+                if _caKeyMatch.fullmatch(key):
                     configFabric['Default'][key] = sdkConfig.pop(key)
             try:
                 with open(self._chipToolFabricStoragePath, 'w') as f:
