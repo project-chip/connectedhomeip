@@ -20,6 +20,7 @@ import copy
 import ctypes
 import json
 import logging
+from abc import ABC, abstractmethod
 from binascii import hexlify
 from configparser import ConfigParser
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
@@ -34,66 +35,55 @@ _GetKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char), POINT
 _DeleteKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p)
 
 
-class PersistentStorage:
-    ''' Class that provided persistent storage to back both native Python and
-        SDK configuration key/value pairs.
+class PersistentStorage(ABC):
+    """Abstract base class for persistent storage.
 
-        This class does not provide any persistence storage on its own. It keeps
-        the configuration in memory. Please use a dedicated subclass to provide non-volatile
-        persistence storage, such as PersistentStorageJSON or PersistentStorageINI.
+    This class provides persistent storage interface for both the Matter SDK
+    and the native Python configuration storage. It keeps the configuration in
+    the dictionary _data attribute with two top-level keys 'repl-config' and
+    'sdk-config' respectively for the REPL and SDK configurations.
 
-        Configuration native to the Python libraries is organized under the top-level
-        'repl-config' key while configuration native to the SDK and owned by the various
-        C++ logic is organized under the top-level 'sdk-config' key.
+    It interfaces with a C++ adapter that implements the PersistentStorageDelegate
+    interface and can be passed into C++ logic that needs an instance of that
+    interface.
 
-        This interfaces with a C++ adapter that implements the PersistentStorageDelegate interface
-        and can be passed into C++ logic that needs an instance of that interface.
-
-        Object must be resident before the Matter stack starts up and last past its shutdown.
-    '''
-
-    @_SetKeyValueCbFunc
-    def _OnSetKeyValueCb(self, key: bytes, value, size):
-        self.SetSdkKey(key.decode("utf-8"), ctypes.string_at(value, size))
+    This object must be available throughout the lifetime of the Matter stack.
+    """
 
     @_GetKeyValueCbFunc
     def _OnGetKeyValueCb(self, key: bytes, value, size, is_found):
-        ''' This does not adhere to the API requirements of
-        PersistentStorageDelegate::SyncGetKeyValue, but that is okay since
-        the C++ storage binding layer is capable of adapting results from
-        this method to the requirements of
-        PersistentStorageDelegate::SyncGetKeyValue.
-        '''
-        keyValue = self.GetSdkKey(key.decode("utf-8"))
-        if keyValue is not None:
-            sizeOfValue = size[0]
-            sizeToCopy = min(sizeOfValue, len(keyValue))
-
-            for count, val in enumerate(keyValue):
+        # This does not adhere to the API requirements of PersistentStorageDelegate::SyncGetKeyValue,
+        # but that is okay since the C++ storage binding layer is capable of adapting results from
+        # this method to the requirements of PersistentStorageDelegate::SyncGetKeyValue.
+        retrievedValue = self.GetSdkKey(key.decode("utf-8"))
+        if retrievedValue is not None:
+            sizeToCopy = min(size[0], len(retrievedValue))
+            for count, val in enumerate(retrievedValue):
                 if sizeToCopy == count:
                     break
                 value[count] = val
-
             # As mentioned above, we are intentionally not returning
             # sizeToCopy as one might expect because the caller
             # will use the value in size[0] to determine if it should
             # return CHIP_ERROR_BUFFER_TOO_SMALL.
-            size[0] = len(keyValue)
+            size[0] = len(retrievedValue)
             is_found[0] = True
         else:
             is_found[0] = False
             size[0] = 0
+
+    @_SetKeyValueCbFunc
+    def _OnSetKeyValueCb(self, key: bytes, value, size):
+        self.SetSdkKey(key.decode("utf-8"), ctypes.string_at(value, size))
 
     @_DeleteKeyValueCbFunc
     def _OnDeleteKeyValueCb(self, key):
         self.DeleteSdkKey(key.decode("utf-8"))
 
     def __init__(self, data: Dict = {}):
-        ''' Initializes the persistent storage with provided data.
-        '''
+        """Initializes the persistent storage with provided data."""
         self._data = copy.deepcopy(data)
         self._handle = GetLibraryHandle()
-        self._isActive = True
 
         if 'sdk-config' not in self._data:
             LOGGER.warning("No valid SDK configuration present")
@@ -108,91 +98,153 @@ class PersistentStorage:
                                                                          _SetKeyValueCbFunc,
                                                                          _GetKeyValueCbFunc,
                                                                          _DeleteKeyValueCbFunc]
+
         self._closure = self._handle.pychip_Storage_InitializeStorageAdapter(
             ctypes.py_object(self), self._OnSetKeyValueCb, self._OnGetKeyValueCb, self._OnDeleteKeyValueCb)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.Shutdown()
+
+    def __del__(self):
+        if hasattr(self, '_closure'):
+            LOGGER.warning("PersistentStorage object is being deleted without explicit shutdown. "
+                           "Calling Shutdown() to clean up resources.")
+            # The caller should call Shutdown() explicitly or use a context manager
+            # to ensure that the object is cleaned up properly. However, we should
+            # try our best not to leak any resources...
+            self.Shutdown()
+
     def GetSdkStorageObject(self):
-        ''' Returns a ctypes c_void_p reference to the SDK-side adapter instance.
-        '''
+        """Return a ctypes reference to the SDK-side adapter instance."""
         return self._closure
 
-    def Commit(self):
-        ''' Commits the cached configuration.
-        '''
+    def Shutdown(self):
+        """Shut down the object by freeing up the associated adapter instance.
+
+        You cannot interact with this object there-after.
+
+        This should only be called after the CHIP stack has shutdown (i.e
+        after calling pychip_DeviceController_StackShutdown()).
+        """
+        if hasattr(self, '_closure'):
+            self._handle.pychip_Storage_ShutdownAdapter.argtypes = [c_void_p]
+            # Since the stack is not running at this point, we can safely call
+            # C++ method directly on the current execution context without worrying
+            # about race conditions.
+            self._handle.pychip_Storage_ShutdownAdapter(self._closure)
+            del self._closure
+
+    @abstractmethod
+    def GetKey(self, key: str) -> bytes | None:
+        """Retrieve the value of a key or None if it does not exist."""
         pass
 
-    def SetReplKey(self, key: str, value):
-        ''' Set a REPL key to a specific value. Creates the key if one doesn't exist already.
-        '''
-        LOGGER.debug("SetReplKey: %s = %s", key, hexlify(value))
+    @abstractmethod
+    def SetKey(self, key: str, value: bytes):
+        """Set the value of a key.
 
-        if not key:
-            raise ValueError("Invalid Key")
+        If the key does not exist, it shall be created.
 
-        if value is None:
-            self._data['repl-config'].pop(key, None)
-        else:
-            self._data['repl-config'][key] = value
+        After setting the key, the changes shall be committed using the
+        Commit() method.
+        """
+        pass
 
-        self.Commit()
+    @abstractmethod
+    def DeleteKey(self, key: str):
+        """Delete a key.
 
-    def GetReplKey(self, key: str):
-        ''' Retrieves the value of a REPL key. Returns 'None' if the key
-            doesn't exist.
-        '''
+        If the key does not exist, this method should do nothing.
+
+        After deleting the key, the changes shall be committed using the
+        Commit() method.
+        """
+        pass
+
+    @abstractmethod
+    def GetSdkKey(self, key: str) -> bytes | None:
+        """Retrieve the value of an SDK key or None if it does not exist."""
+        pass
+
+    @abstractmethod
+    def SetSdkKey(self, key: str, value: bytes):
+        """Set the value of an SDK key.
+
+        If the key does not exist, it shall be created.
+
+        After setting the key, the changes shall be committed using the
+        Commit() method.
+        """
+        pass
+
+    @abstractmethod
+    def DeleteSdkKey(self, key: str):
+        """Delete an SDK key.
+
+        If the key does not exist, this method should do nothing.
+
+        After deleting the key, the changes shall be committed using the
+        Commit() method.
+        """
+        pass
+
+    @abstractmethod
+    def Commit(self):
+        """Commit the changes to persistent storage."""
+        pass
+
+
+class VolatileTemporaryPersistentStorage(PersistentStorage):
+    """In-memory temporary persistent storage.
+
+    This class does not provide any persistence storage on its own. It keeps
+    the configuration in memory. Please use a dedicated subclass to provide
+    a non-volatile persistence storage, such as PersistentStorageJSON or
+    PersistentStorageINI.
+    """
+
+    def GetKey(self, key: str) -> bytes | None:
         return copy.deepcopy(self._data['repl-config'].get(key, None))
 
-    def SetSdkKey(self, key: str, value: bytes):
-        ''' Set an SDK key to a specific value. Creates the key if one doesn't exist already.
-        '''
-        LOGGER.debug("SetSdkKey: %s = %s", key, hexlify(value))
-
+    def SetKey(self, key: str, value: bytes):
+        LOGGER.debug("Set key: %s = %s", key, hexlify(value))
         if not key:
-            raise ValueError("Invalid Key")
-        if value is None:
-            raise ValueError('Value is not expected to be None')
-
-        self._data['sdk-config'][key] = base64.b64encode(value).decode("utf-8")
+            raise ValueError("Invalid key")
+        self._data['repl-config'][key] = value
         self.Commit()
 
-    def GetSdkKey(self, key: str):
-        ''' Returns the SDK key if one exist. Otherwise, returns 'None'.
-        '''
+    def DeleteKey(self, key: str):
+        LOGGER.debug("Delete key: %s", key)
+        self._data['repl-config'].pop(key, None)
+        self.Commit()
+
+    def GetSdkKey(self, key: str) -> bytes | None:
         if value := self._data['sdk-config'].get(key, None):
             return base64.b64decode(value)
         return None
 
-    def DeleteSdkKey(self, key: str):
-        ''' Deletes an SDK key if one exists.
-        '''
-        LOGGER.debug("DeleteSdkKey: %s", key)
+    def SetSdkKey(self, key: str, value: bytes):
+        LOGGER.debug("Set SDK key: %s = %s", key, hexlify(value))
+        if not key:
+            raise ValueError("Invalid SDK key")
+        if value is None:
+            raise ValueError("SDK key value is not expected to be None")
+        self._data['sdk-config'][key] = base64.b64encode(value).decode("utf-8")
+        self.Commit()
 
+    def DeleteSdkKey(self, key: str):
+        LOGGER.debug("Delete SDK key: %s", key)
         self._data['sdk-config'].pop(key, None)
         self.Commit()
 
-    def Shutdown(self):
-        ''' Shuts down the object by free'ing up the associated adapter instance.
-            You cannot interact with this object there-after.
-
-            This should only be called after the CHIP stack has shutdown (i.e
-            after calling pychip_DeviceController_StackShutdown()).
-        '''
-        if self._isActive:
-            self._handle.pychip_Storage_ShutdownAdapter.argtypes = [c_void_p]
-
-            #
-            # Since the stack is not running at this point, we can safely call
-            # C++ method directly on the current execution context without worrying
-            # about race conditions.
-            #
-            self._handle.pychip_Storage_ShutdownAdapter(self._closure)
-            self._isActive = False
-
-    def __del__(self):
-        self.Shutdown()
+    def Commit(self):
+        pass
 
 
-class PersistentStorageJSON(PersistentStorage):
+class PersistentStorageJSON(VolatileTemporaryPersistentStorage):
     """Persistent storage back-end which stores data in a JSON file."""
 
     def __init__(self, path: str):
@@ -224,7 +276,7 @@ class PersistentStorageJSON(PersistentStorage):
         return copy.deepcopy(self._data)
 
 
-class PersistentStorageINI(PersistentStorage):
+class PersistentStorageINI(VolatileTemporaryPersistentStorage):
     """Persistent storage back-end which stores data in an INI file.
 
     This persistent storage is compatible with the chip-tool implementation.
@@ -241,7 +293,7 @@ class PersistentStorageINI(PersistentStorage):
             self.add_section('Default')
 
         def optionxform(self, option: str) -> str:
-            """Preserves case of keys."""
+            # Preserves case of keys.
             return option
 
     def __init__(self, path: str, chipToolFabricStoragePath: Optional[str] = None):

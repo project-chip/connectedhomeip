@@ -120,12 +120,12 @@ class CertificateAuthority:
 
         LOGGER.info("Loading fabric admins from storage...")
 
-        caList = self._persistentStorage.GetReplKey(key='caList')
+        caList = self._persistentStorage.GetKey(key='caList')
         if (str(self._caIndex) not in caList):
             caList[str(self._caIndex)] = []
-            self._persistentStorage.SetReplKey(key='caList', value=caList)
+            self._persistentStorage.SetKey(key='caList', value=caList)
 
-        fabricAdminMetadataList = self._persistentStorage.GetReplKey(key='caList')[str(self._caIndex)]
+        fabricAdminMetadataList = self._persistentStorage.GetKey(key='caList')[str(self._caIndex)]
         for adminMetadata in fabricAdminMetadataList:
             self.NewFabricAdmin(vendorId=int(adminMetadata['vendorId']), fabricId=int(adminMetadata['fabricId']))
 
@@ -148,14 +148,14 @@ class CertificateAuthority:
 
         fabricAdmin = FabricAdmin.FabricAdmin(self, vendorId=vendorId, fabricId=fabricId)
 
-        caList = self._persistentStorage.GetReplKey('caList')
+        caList = self._persistentStorage.GetKey('caList')
         if (caList is not None):
             replFabricEntry = {'fabricId': fabricId, 'vendorId': vendorId}
 
             if (replFabricEntry not in caList[str(self._caIndex)]):
                 caList[str(self._caIndex)].append(replFabricEntry)
 
-            self._persistentStorage.SetReplKey(key='caList', value=caList)
+            self._persistentStorage.SetKey(key='caList', value=caList)
 
         self._activeAdmins.append(fabricAdmin)
 
@@ -288,7 +288,7 @@ class CertificateAuthorityManager:
         #
         # Persist details to storage (read modify write).
         #
-        caList = self._persistentStorage.GetReplKey('caList')
+        caList = self._persistentStorage.GetKey('caList')
         if (caList is None):
             caList = {}
 
@@ -312,13 +312,13 @@ class CertificateAuthorityManager:
         #
         # Persist details to storage (read modify write).
         #
-        caList = self._persistentStorage.GetReplKey('caList')
+        caList = self._persistentStorage.GetKey('caList')
         if (caList is None):
             caList = {}
 
         if (str(caIndex) not in caList):
             caList[str(caIndex)] = []
-            self._persistentStorage.SetReplKey(key='caList', value=caList)
+            self._persistentStorage.SetKey(key='caList', value=caList)
 
         if certificateValidityPeriodSec is None:
             certificateValidityPeriodSec = CERTIFICATE_VALIDITY_PERIOD_SEC
