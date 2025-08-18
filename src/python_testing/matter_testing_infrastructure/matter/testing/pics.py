@@ -151,9 +151,9 @@ def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransac
                 device_pics[endpoint_id].append(generated_cmd_pics_str(cluster_pics, cmd_id))
         if endpoint_has_server:
             device_pics[endpoint_id].append('IDM.S')
-    ep0_device_types = [d.deviceType for d in wildcard.attributes[0]
-                        [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
-    if 0x16 in ep0_device_types:
-        device_pics[0].append('MCORE.ROLE.COMMISSIONEE')
+    ep0_device_type_list = wildcard.attributes.get(0, {}).get(
+        Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.DeviceTypeList, [])
+    if any(d.deviceType == 0x16 for d in ep0_device_type_list):
+        device_pics.setdefault(0, []).append('MCORE.ROLE.COMMISSIONEE')
 
     return device_pics, problems

@@ -52,21 +52,21 @@ class TestPicsHelpers(MatterBaseTest):
         wildcard.tlvAttributes[0][opcreds.id][opcreds.Attributes.AttributeList.attribute_id] = [
             opcreds.Attributes.NOCs.attribute_id]
         wildcard.tlvAttributes[0][opcreds.id][opcreds.Attributes.AcceptedCommandList.attribute_id] = [
-            opcreds.Commands.AttestationRequest.command_id]
+            opcreds.Commands.AttestationRequest.command_id, opcreds.Commands.AddTrustedRootCertificate.command_id]
         wildcard.tlvAttributes[0][opcreds.id][opcreds.Attributes.GeneratedCommandList.attribute_id] = [
             opcreds.Commands.AttestationResponse.command_id]
         wildcard.tlvAttributes[0][opcreds.id][opcreds.Attributes.FeatureMap.attribute_id] = 0
-        opcreds_expected_suffix = ['A0000', 'C00.Rsp', 'C01.Tx']
+        opcreds_expected_suffix = ['A0000', 'C00.Rsp', 'C0b.Rsp', 'C01.Tx']
         opcreds_expected = [f'OPCREDS.S.{s}' for s in opcreds_expected_suffix]
         opcreds_expected.append('OPCREDS.S')
 
         wildcard.tlvAttributes[0][cadmin.id][cadmin.Attributes.AttributeList.attribute_id] = [
-            opcreds.Attributes.Fabrics.attribute_id]
+            cadmin.Attributes.AdminFabricIndex.attribute_id]
         wildcard.tlvAttributes[0][cadmin.id][cadmin.Attributes.AcceptedCommandList.attribute_id] = [
-            opcreds.Commands.AddTrustedRootCertificate.command_id]
+            cadmin.Commands.OpenCommissioningWindow.command_id]
         wildcard.tlvAttributes[0][cadmin.id][cadmin.Attributes.GeneratedCommandList.attribute_id] = []
         wildcard.tlvAttributes[0][cadmin.id][cadmin.Attributes.FeatureMap.attribute_id] = 1
-        cadmin_expected_suffix = ['A0001', 'C0b.Rsp', 'F00']
+        cadmin_expected_suffix = ['A0001', 'C00.Rsp', 'F00']
         cadmin_expected = [f'CADMIN.S.{s}' for s in cadmin_expected_suffix]
         cadmin_expected.append('CADMIN.S')
 
@@ -80,8 +80,6 @@ class TestPicsHelpers(MatterBaseTest):
         lock_expected_suffix = ['A0003', 'A0001', 'C1b.Rsp', 'C24.Rsp', 'C1c.Tx', 'C25.Tx', 'F00', 'F01']
         lock_expected = [f'DRLK.S.{s}' for s in lock_expected_suffix]
         lock_expected.append('DRLK.S')
-
-        print(wildcard)
 
         def check_expected_pics():
             asserts.assert_equal(set(pics_list.keys()), set([0, 1]), "Unexpected endpoints in PICS list")
