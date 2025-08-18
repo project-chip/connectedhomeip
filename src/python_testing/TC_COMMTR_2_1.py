@@ -45,13 +45,9 @@
 import logging
 
 import test_plan_support
-from mobly import asserts
 from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
 
 import matter.clusters as Clusters
-from matter.clusters import Globals
-from matter.clusters.Types import NullValue
-from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
@@ -101,40 +97,19 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
 
         self.step("2")
         # Read MaximumMeteredQuantities attribute, expected to be Null or uint16
-        self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
-        if self.MaximumMeteredQuantities is not NullValue:
-            matter_asserts.assert_valid_uint16(self.MaximumMeteredQuantities, 'MaximumMeteredQuantities must be uint16')
+        self.check_maximum_metered_quantities_attribute(endpoint)
 
         self.step("3")
         # Read MeteredQuantity attribute, expected to be Null or list of MeteredQuantityStruct entries.
-        val = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeteredQuantity
-        )
-        if val is not NullValue:
-            # Looks like MaximumMeteredQuantities can't be Null if MeteredQuantity is not Null due to it defines the size of the list
-            asserts.assert_not_equal(self.MaximumMeteredQuantities, NullValue, "MaximumMeteredQuantities must not be NullValue")
-            matter_asserts.assert_list(val, "MeteredQuantity attribute must return a list",
-                                       max_length=self.MaximumMeteredQuantities)
-            matter_asserts.assert_list_element_type(
-                val, cluster.Structs.MeteredQuantityStruct, "MeteredQuantity attribute must contain MeteredQuantityStruct elements")
-            for item in val:
-                await self.checkMeteredQuantityStruct(struct=item)
+        self.check_metered_quantity_attribute(endpoint)
 
         self.step("4")
         # Read MeteredQuantityTimestamp attribute, expected to be Null or epoch-s
-        val = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeteredQuantityTimestamp
-        )
-        if val is not NullValue:
-            matter_asserts.assert_valid_uint32(val, 'MeteredQuantityTimestamp')
+        self.check_metered_quantity_timestamp_attribute(endpoint)
 
         self.step("5")
         # Read TariffUnit attribute, expected to be Null or TariffUnitEnum
-        val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
-        if val is not NullValue:
-            asserts.assert_is_instance(
-                val, Globals.Enums.TariffUnitEnum, "TariffUnit attribute must return a TariffUnitEnum")
-            matter_asserts.assert_int_in_range(val, 0, 1, "TariffUnit must be in range 0 - 1")
+        self.check_tariff_unit_attribute(endpoint)
 
 
 if __name__ == "__main__":
