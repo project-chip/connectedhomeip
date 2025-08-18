@@ -6,7 +6,7 @@ Wi-Fi Boards.
 <hr>
 
 -   [Matter Refrigerator and Temperature Controlled
-    Example](#matter-refrigerator-and-Temperature -controlled-example)
+    Example](#matter-refrigerator-and-Temperature-controlled-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
