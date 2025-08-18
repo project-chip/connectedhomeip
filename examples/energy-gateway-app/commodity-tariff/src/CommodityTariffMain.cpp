@@ -17,7 +17,7 @@
  */
 
 #include <CommodityTariffMain.h>
-#include <fstream>
+
 
 /*
  *  @brief  Creates a Delegate and Instance for Commodity Tariff cluster

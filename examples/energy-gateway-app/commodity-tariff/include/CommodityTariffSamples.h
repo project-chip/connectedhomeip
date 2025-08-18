@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
-
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 namespace chip {
 namespace app {
 namespace Clusters {

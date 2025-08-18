@@ -18,8 +18,6 @@
 
 #include <CommodityTariffInstance.h>
 
-#include <app/clusters/commodity-tariff-server/CommodityTariffConsts.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
