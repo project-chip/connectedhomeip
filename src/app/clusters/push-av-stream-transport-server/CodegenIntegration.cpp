@@ -18,7 +18,7 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 #include <cstdint>
 
@@ -37,62 +37,54 @@ static constexpr size_t kPushAvStreamTransportMaxClusterCount =
 
 LazyRegisteredServerCluster<PushAvStreamTransportServer> gServers[kPushAvStreamTransportMaxClusterCount];
 
-// Find the 0-based array index corresponding to the given endpoint id.
-// Log an error if not found.
-bool FindEndpointWithLog(EndpointId endpointId, uint16_t & outArrayIndex)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
-
-    if (arrayIndex >= kPushAvStreamTransportMaxClusterCount)
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogError(AppServer, "Cound not find endpoint index for endpoint %u", endpointId);
-        return false;
+        ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, emberEndpointIndex);
+        gServers[emberEndpointIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
+        return gServers[emberEndpointIndex].Registration();
     }
-    return true;
-}
+
+    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    {
+        return gServers[emberEndpointIndex].Cluster();
+    }
+    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+};
 
 } // namespace
 void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId)
 {
 
-    uint16_t arrayIndex = 0;
-    if (!FindEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
-    uint32_t rawFeatureMap;
-    if (FeatureMap::Get(endpointId, &rawFeatureMap) != Status::Success)
-    {
-        ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpointId);
-        rawFeatureMap = 0;
-    }
-    ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, arrayIndex);
-    gServers[arrayIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(rawFeatureMap));
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register Push AV Stream Transport on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = PushAvStreamTransport::Id,
+            .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
+            .maxEndpointCount                = kPushAvStreamTransportMaxClusterCount,
+            .fetchFeatureMap                 = true,
+            .fetchOptionalAttributes         = false,
+        },
+        integrationDelegate);
 }
 
 void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpointId)
 {
-    uint16_t arrayIndex = 0;
-    if (!FindEndpointWithLog(endpointId, arrayIndex))
-    {
-        return;
-    }
+    IntegrationDelegate integrationDelegate;
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServers[arrayIndex].Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister Push AV Stream Transport on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-    gServers[arrayIndex].Cluster().Deinit();
-    gServers[arrayIndex].Destroy();
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                      = endpointId,
+            .clusterId                       = PushAvStreamTransport::Id,
+            .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
+            .maxEndpointCount                = kPushAvStreamTransportMaxClusterCount,
+        },
+        integrationDelegate);
 }
 
 void MatterPushAvStreamTransportPluginServerInitCallback() {}
@@ -107,11 +99,19 @@ namespace PushAvStreamTransport {
 void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting Push AV Stream Transport delegate on endpoint %u", endpointId);
-    uint16_t arrayIndex = 0;
-    if (!FindEndpointWithLog(endpointId, arrayIndex))
+    uint16_t arrayIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
+    if (arrayIndex >= kPushAvStreamTransportMaxClusterCount)
     {
         return;
     }
+
+    if (!gServers[arrayIndex].IsConstructed())
+    {
+        ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set delegate");
+        return;
+    }
+
     gServers[arrayIndex].Cluster().SetDelegate(endpointId, delegate);
     gServers[arrayIndex].Cluster().Init();
 }
