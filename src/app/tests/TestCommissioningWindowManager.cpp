@@ -406,7 +406,7 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
-TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplet) 
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete) 
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
@@ -420,4 +420,17 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplet)
 
 }
 
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled) 
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly), CHIP_NO_ERROR);
+
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
+
+    commissionMgr.OnPlatformEvent(&event);
+    // EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen);
+
+}
 } // namespace

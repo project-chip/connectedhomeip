@@ -32,6 +32,11 @@
 
 namespace chip {
 
+namespace Test {
+// Forward declaration of CommissioningWindowManagerTestAccess class tests to allow it to be friends with CommissioningManager
+class CommissioningWindowManagerTestAccess;
+} // namespace Test
+
 enum class CommissioningWindowAdvertisement
 {
     kAllSupported,
@@ -71,7 +76,7 @@ public:
     /**
      * Open the pairing window using default configured parameters.
      */
-    CHIP_ERROR
+    CHIP_ERROR 
     OpenBasicCommissioningWindow(
         System::Clock::Seconds32 commissioningTimeout      = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS),
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
@@ -223,6 +228,8 @@ private:
     // without having to wait 3 minutes.
     Optional<System::Clock::Seconds32> mMinCommissioningTimeoutOverride;
 
+
+    friend class Test::CommissioningWindowManagerAccess;
     // The PASE session we are using, so we can handle CloseSession properly.
     SessionHolderWithDelegate mPASESession;
 
