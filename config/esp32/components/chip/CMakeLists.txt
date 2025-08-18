@@ -412,7 +412,7 @@ externalproject_add(
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}
     DEPENDS                 args_gn
-    BUILD_ALWAYS            1
+    BUILD_ALWAYS            FALSE         # TODO: Use the external flag instead of setting this to false
 )
 
 idf_component_get_property(freertos_dir freertos COMPONENT_DIR)
