@@ -42,6 +42,7 @@ def not_none_args(func):
 
 # Discovery
 
+
 @not_none_args
 def assert_valid_operational_instance_name(instance_name: str) -> None:
     """
@@ -175,7 +176,6 @@ def assert_valid_hostname(hostname: str) -> None:
         # Validate domain suffix
         if not re.fullmatch(r'[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.?', domain_part[1:]):
             failed = constraints[1]
-
 
     asserts.assert_true(
         failed is None,
