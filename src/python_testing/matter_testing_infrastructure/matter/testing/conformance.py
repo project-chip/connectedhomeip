@@ -92,6 +92,9 @@ class ConformanceDecisionWithChoice:
     decision: ConformanceDecision
     choice: Optional[Choice] = None
 
+    def is_mandatory(self) -> bool:
+        return self.decision == ConformanceDecision.MANDATORY
+
 
 @dataclass
 class ConformanceParseParameters:
