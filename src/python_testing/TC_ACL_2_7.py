@@ -199,10 +199,10 @@ class TC_ACL_2_7(MatterBaseTest):
         logging.info("TH1 read result (fabricFiltered=True): %s", str(result_filtered))
         asserts.assert_equal(len(result_filtered), 1, "Should have exactly one extension when fabric filtered")
 
-        endpoint_data = result_filtered[0]
+        endpoint_data = [r for r in result_filtered if r.fabricIndex == f1]
         asserts.assert_equal(
-            endpoint_data.data, D_OK_EMPTY, "Extension data should match D_OK_EMPTY")
-        asserts.assert_equal(endpoint_data.fabricIndex,
+            endpoint_data[0].data, D_OK_EMPTY, "Extension data should match D_OK_EMPTY")
+        asserts.assert_equal(endpoint_data[0].fabricIndex,
                              f1, "FabricIndex should match F1")
 
         # Read with fabric_filtered=False
@@ -213,9 +213,9 @@ class TC_ACL_2_7(MatterBaseTest):
         logging.info("TH1 read result (fabricFiltered=False): %s", str(result_unfiltered))
         asserts.assert_greater(len(result_unfiltered), 1, "Should have at least two extensions when not fabric filtered")
         # Check that the TH2 extension data is empty
-        endpoint_data_th2 = result_unfiltered[1]
+        endpoint_data_th2 = [r for r in result_unfiltered if r.fabricIndex == f2]
         asserts.assert_equal(
-            endpoint_data_th2.data, b'', "Extension data should be empty")
+            endpoint_data_th2[0].data, b'', "Extension data should be empty")
 
         self.step(8)
         # TH2 reads Extension attribute with both fabricFiltered True and False
@@ -225,10 +225,10 @@ class TC_ACL_2_7(MatterBaseTest):
         logging.info("TH2 read result (fabricFiltered=True): %s", str(result2_filtered))
         asserts.assert_equal(len(result2_filtered), 1, "Should have exactly one extension when fabric filtered")
 
-        endpoint_data2 = result2_filtered[0]
+        endpoint_data2 = [r for r in result2_filtered if r.fabricIndex == f2]
         asserts.assert_equal(
-            endpoint_data2.data, D_OK_SINGLE, "Extension data should match D_OK_SINGLE")
-        asserts.assert_equal(endpoint_data2.fabricIndex, f2, "FabricIndex should match F2")
+            endpoint_data2[0].data, D_OK_SINGLE, "Extension data should match D_OK_SINGLE")
+        asserts.assert_equal(endpoint_data2[0].fabricIndex, f2, "FabricIndex should match F2")
 
         # Read with fabric_filtered=False
         result2_unfiltered = await self.read_single_attribute_check_success(
@@ -238,9 +238,9 @@ class TC_ACL_2_7(MatterBaseTest):
         logging.info("TH2 read result (fabricFiltered=False): %s", str(result2_unfiltered))
         asserts.assert_greater(len(result2_unfiltered), 1, "Should have at least two extensions when not fabric filtered")
         # Check that the TH1 extension data is empty
-        endpoint_data_th1 = result2_unfiltered[0]
+        endpoint_data_th1 = [r for r in result2_unfiltered if r.fabricIndex == f1]
         asserts.assert_equal(
-            endpoint_data_th1.data, b'', "Extension data should be empty")
+            endpoint_data_th1[0].data, b'', "Extension data should be empty")
 
         self.step(9)
         # TH1 reads AccessControlExtensionChanged event with both fabricFiltered True and False
