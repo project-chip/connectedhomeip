@@ -37,6 +37,7 @@ public:
      * @param delegate The log provider delegate at the endpoint
      */
     void SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
+
 private:
     static DiagnosticLogsServer sInstance;
 };

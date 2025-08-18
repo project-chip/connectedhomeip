@@ -24,6 +24,8 @@
 #include <clusters/DiagnosticLogs/Ids.h>
 #include <clusters/DiagnosticLogs/Metadata.h>
 
+using namespace chip::app::Clusters::DiagnosticLogs;
+
 namespace chip {
 namespace app {
 namespace Clusters {
