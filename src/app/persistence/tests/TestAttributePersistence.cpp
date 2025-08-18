@@ -13,6 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <pw_unit_test/framework.h>
+
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
@@ -20,12 +22,12 @@
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/String.h>
 #include <clusters/TimeFormatLocalization/Enums.h>
+#include <clusters/TimeFormatLocalization/EnumsCheck.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <pw_unit_test/framework.h>
 #include <unistd.h>
 
 namespace {
@@ -205,6 +207,7 @@ TEST(TestAttributePersistence, TestStrings)
 TEST(TestAttributePersistence, TestEnumHandling)
 {
     // Using TimeFormatLocalization enums for these tests.
+    using namespace chip::app::Clusters;
     using namespace chip::app::Clusters::TimeFormatLocalization;
 
     TestPersistentStorageDelegate storageDelegate;
@@ -233,6 +236,7 @@ TEST(TestAttributePersistence, TestEnumHandling)
     {
         const ConcreteAttributePath path(3, 2, 1);
         const uint8_t testUnknownValue = static_cast<uint8_t>(CalendarTypeEnum::kUnknownEnumValue) + 1;
+        ASSERT_EQ(EnsureKnownEnumValue(static_cast<CalendarTypeEnum>(testUnknownValue)), CalendarTypeEnum::kUnknownEnumValue);
         WriteOperation writeOp(path);
         AttributeValueDecoder decoder = writeOp.DecoderFor(testUnknownValue);
         EXPECT_EQ(persistence.DecodeAndStoreNativeEndianValue(path, decoder, valueRead), CHIP_IM_GLOBAL_STATUS(ConstraintError));
