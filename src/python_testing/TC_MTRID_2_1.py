@@ -160,7 +160,7 @@ class TC_MTRID_2_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             logger.info("PICS MTRID.S.A0003 is not True")
             self.mark_current_step_skipped()
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ProtocolVersion):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.ProtocolVersion):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
             )
@@ -173,7 +173,7 @@ class TC_MTRID_2_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             logger.info("PICS MTRID.S.F00 is not True")
             self.mark_current_step_skipped()
 
-        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+        if self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
             )
@@ -222,7 +222,7 @@ class TC_MTRID_2_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             logger.info("PICS MTRID.S.A0003 is not True")
             self.mark_current_step_skipped()
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ProtocolVersion):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.ProtocolVersion):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ProtocolVersion
             )
@@ -237,7 +237,7 @@ class TC_MTRID_2_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
             logger.info("PICS MTRID.S.F00 is not True")
             self.mark_current_step_skipped()
 
-        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+        if self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PowerThreshold
             )

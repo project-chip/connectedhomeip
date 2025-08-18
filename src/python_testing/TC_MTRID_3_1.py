@@ -176,7 +176,7 @@ class TC_MTRID_3_1(MatterBaseTest, MeterIdentificationTestBaseHelper):
         await self.subscribe_attribute()
 
         self.step("3")
-        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+        if self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
             power_threshold = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                              attribute=cluster.Attributes.PowerThreshold)
 
