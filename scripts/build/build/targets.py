@@ -832,6 +832,7 @@ def BuildRealtekTarget():
     # board
     target.AppendFixedTargets([
         TargetPart('rtl8777g', board=RealtekBoard.RTL8777G),
+        TargetPart('rtl87x2g', board=RealtekBoard.RTL87X2G),
     ])
 
     # apps

@@ -10,11 +10,10 @@ The example is based on:
 -   [Matter](https://github.com/project-chip/connectedhomeip)
 -   [Realtek zephyr SDK](https://github.com/rtkconnectivity/zephyr)
 -   [Realtek HAL module](https://github.com/rtkconnectivity/hal_realtek)
--   [OT-REALTEK](https://github.com/rtkconnectivity/ot-realtek)
 
 ## Supported Device
 
--   RTL8762GN
+-   RTL87x2G
 
 ## Introduction
 
@@ -76,29 +75,11 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
 
 ## Building
 
-Complete the following steps to build the sample:
+-   To build the demo application:
 
-1.  Navigate to the example's directory:
-
-        ```
-        $ cd examples/lighting-app/realtek/zephyr
+        ```bash
+        $ ./scripts/build/build_examples.py --target realtek-rtl87x2g-lighting build
         ```
 
-2.  Run the following command to build the example with the build target name,
-    for example `rtl8762gn_evb`:
-
-            ```
-            $ west build -b rtl8762gn_evb
-            ```
-
-The output `zephyr.hex` file will be available in the `build/zephyr/` directory.
-
-### Removing build artifacts
-
-If you're planning to build the example for a different kit or make changes to
-the configuration, remove all build artifacts before building. To do so, use the
-following command:
-
-    ```
-    $ rm -r build
-    ```
+    The output `zephyr.hex` file will be available in the
+    `out/realtek-rtl87x2g-lighting/zephyr` directory.

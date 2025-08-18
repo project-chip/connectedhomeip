@@ -197,4 +197,4 @@ config REALTEK_OTA_BANK1
 	default n
 	depends on CHIP_OTA_REQUESTOR
 
-endif() # CONFIG_CHIP
+endif # CONFIG_CHIP
