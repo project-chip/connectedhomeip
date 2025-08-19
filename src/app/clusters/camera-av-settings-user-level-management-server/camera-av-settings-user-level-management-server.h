@@ -351,6 +351,10 @@ private:
     BitFlags<Feature> mFeatures;
     BitFlags<OptionalAttributes> mOptionalAttrs;
 
+    // Command handler callback
+    app::CommandHandler::Handle mAsyncCommandHandler;
+    ConcreteCommandPath mRequestPath = ConcreteCommandPath(0, 0, 0);
+
     // Next available preset ID
     uint8_t mCurrentPresetID = 1;
 
