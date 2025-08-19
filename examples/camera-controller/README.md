@@ -202,7 +202,7 @@ URL, which, for example, looks like this: `https://localhost:1234/streams/1`
 Think of this server as a secure, private YouTube or Dropbox, but just for your
 camera's video clips.
 
-Here is the command to Setup local Push AV Server, use a virtual environment
+Here is the command to set up a local Push AV Server, using a virtual environment.
 (recommended)
 
 ```
