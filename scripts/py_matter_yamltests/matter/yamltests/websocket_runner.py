@@ -110,7 +110,9 @@ class WebSocketRunner(TestRunner):
                 text=True,                  # return str instead of bytes
                 bufsize=1,                  # line-buffered
                 stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT
+                stderr=subprocess.STDOUT,
+                encoding="utf-8",           # force utf-8 decoding
+                errors="replace"            # replace bad bytes so readline() never fails
             )
 
             # Loop to read the subprocess output with a timeout
