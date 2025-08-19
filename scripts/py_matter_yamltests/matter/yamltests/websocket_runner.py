@@ -106,22 +106,20 @@ class WebSocketRunner(TestRunner):
         if command:
             start_time = time.time()
 
-            # Disable buffering for live test output, if 'stdbuf' is available.
-            # This improves real-time logs in WebSocketRunner.
-            if shutil.which("stdbuf"):
-                command = ['stdbuf', '-o0', '-e0'] + command
-            else:
-                logging.debug("'stdbuf' not found - output may be buffered.")
-
             instance = subprocess.Popen(
-                command, text=False, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                command,
+                text=True,                  # return str instead of bytes
+                bufsize=1,                  # line-buffered
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT
+            )
 
             # Loop to read the subprocess output with a timeout
             lines = []
             while True:
                 if time.time() - start_time > _WEBSOCKET_SERVER_MESSAGE_TIMEOUT:
                     for line in lines:
-                        print(line.decode('utf-8'), end='')
+                        print(line, end='')
                     self._hooks.abort(url)
                     await self._stop_server(instance)
                     raise Exception(
@@ -130,9 +128,9 @@ class WebSocketRunner(TestRunner):
                 ready, _, _ = select.select([instance.stdout], [], [], 1)
                 if ready:
                     line = instance.stdout.readline()
-                    if len(line):
+                    if line:
                         lines.append(line)
-                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8')):
+                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line):
                             break  # Exit the loop if the pattern is found
                 else:
                     continue
