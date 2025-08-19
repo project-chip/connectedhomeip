@@ -21,6 +21,7 @@ import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -84,7 +85,7 @@ class TC_SU_2_8(MatterBaseTest):
         resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
         logging.info(f"Announce resp: {resp}.")
 
-    async def configure_acl_permissions(self, controller, endpoint: int, node_id):
+    async def configure_acl_permissions(self, controller, endpoint: int, node_id, cluster):
         """
         Configure ACL entries required for OTA communication.
         """
@@ -108,10 +109,7 @@ class TC_SU_2_8(MatterBaseTest):
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=[],
-                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                    endpoint=endpoint,
-                    cluster=Clusters.OtaSoftwareUpdateRequestor.id
-                )]
+                targets=[]
             )
         ]
 
@@ -119,35 +117,6 @@ class TC_SU_2_8(MatterBaseTest):
         resp = await controller.WriteAttribute(node_id, [(endpoint, acl_attr)])
         asserts.assert_equal(resp[0].Status, Status.Success, "ACL write failed.")
         logging.info("ACL permissions configured successfully.")
-
-    async def wait_for_update_state(self, endpoint: int, valid_state):
-        """
-        Poll UpdateState until it enters a valid one.
-        """
-
-        max_wait = 60
-        interval = 3
-        elapsed = 0
-
-        logging.info(f"Checking for {valid_state} state.")
-
-        while elapsed < max_wait:
-            state = await self.read_single_attribute_check_success(
-                node_id=self.dut_node_id,
-                endpoint=endpoint,
-                attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
-                cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
-            )
-
-            logging.info(f"[{elapsed}s] UpdateState = {state.name}.")
-
-            if state == valid_state:
-                return state
-
-            time.sleep(interval)
-            elapsed += interval
-
-        raise AssertionError(f"DUT did not reach expected OTA state. Final state: {state.name}.")
 
     async def check_state_remains_idle(self, endpoint: int, idle):
         """
@@ -174,17 +143,19 @@ class TC_SU_2_8(MatterBaseTest):
             time.sleep(interval)
             elapsed += interval
 
+    async def check_event_status(self, event, previous_state, next_state, software_version):
+        logging.info(f"State Transition: {event}")
+
+        asserts.assert_equal(previous_state, event.previousState,
+                             f"Previous state is {event.previousState} and it should be {previous_state}.")
+        asserts.assert_equal(next_state, event.newState,
+                             f"PreNewvious state is {event.newState} and it should be {next_state}.")
+
+        asserts.assert_equal(software_version, event.targetSoftwareVersion,
+                             f"Target version is {event.targetSoftwareVersion} and it should be {software_version}.")
+
     @async_test_body
     async def test_TC_SU_2_8(self):
-
-        valid_states = [
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnUserConsent
-        ]
 
         # Commissioning constants
         P1_NODE_ID = 10
@@ -263,14 +234,37 @@ class TC_SU_2_8(MatterBaseTest):
         logging.info(f"Commissioning response: {resp}.")
 
         # ACL permissions are not required
-        # await self.configure_acl_permissions(th1, endpoint, p1_node)
-        await self.configure_acl_permissions(th2, endpoint, p2_node)
+        # await self.configure_acl_permissions(th1, endpoint, p1_node, cluster=Clusters.OtaSoftwareUpdateRequestor.id)
+        # await self.configure_acl_permissions(th1, endpoint, dut_node_id, cluster=Clusters.OtaSoftwareUpdateProvider.id)
+        # await self.configure_acl_permissions(th2, endpoint, p2_node, cluster=Clusters.OtaSoftwareUpdateRequestor.id)
+        # await self.configure_acl_permissions(th2, endpoint, dut_node_id, cluster=Clusters.OtaSoftwareUpdateProvider.id)
 
         if fabric_id_th2 == th1.fabricId:
             raise AssertionError(f"Fabric IDs are the same for TH1: {th1.fabricId} and TH2: {fabric_id_th2}.")
 
         await self._write_default_providers(th1, endpoint, p1_node)
+
+        default_ota_providers = await self.read_single_attribute_check_success(
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders,
+            cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
+            dev_ctrl=th1
+        )
+
+        logging.info(f"Default OTA Providers: {default_ota_providers}.")
+
         await self._write_default_providers(th2, endpoint, p2_node)
+
+        default_ota_providers = await self.read_single_attribute_check_success(
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders,
+            cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
+            dev_ctrl=th2
+        )
+
+        logging.info(f"Default OTA Providers: {default_ota_providers}.")
 
         # DUT tries to send a QueryImage command to TH1/OTA-P.
         self.step(1)
@@ -282,28 +276,24 @@ class TC_SU_2_8(MatterBaseTest):
         time.sleep(5)
 
         # Check state remains as kIdle for TH1
-        await self.check_state_remains_idle(endpoint, valid_states[0])
+        await self.check_state_remains_idle(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
 
         # TH1/OTA-P does not respond with QueryImageResponse and sends QueryImage command to TH2/OTA-P.
         self.step(2)
 
         await self._announce(th2, vendor_id, p2_node, endpoint)
 
-        # Check state changes to Querying and Downloading
-        await self.wait_for_update_state(endpoint, valid_states[1])
-        await self.wait_for_update_state(endpoint, valid_states[2])
+        # Read Events
+        target_version = 2
+        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id, endpoint=endpoint,
+                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5000)
+        event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        progress = 0
-
-        while progress < 100:
-            progress = await self.read_single_attribute_check_success(
-                node_id=self.dut_node_id,
-                endpoint=endpoint,
-                attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress,
-                cluster=Clusters.Objects.OtaSoftwareUpdateRequestor
-            )
-            logging.info(f"Progress: {progress}.")
-            time.sleep(5)
+        self.check_event_status(event=event, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+                                next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
+        self.check_event_status(event=event, previous_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
+                                next_state=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading, software_version=target_version)
 
 
 if __name__ == "__main__":
