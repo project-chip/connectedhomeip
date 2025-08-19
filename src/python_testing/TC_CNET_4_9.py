@@ -101,7 +101,7 @@ class TC_CNET_4_9(MatterBaseTest):
         return '[TC-CNET-4.9] [Wi-Fi] Verification for RemoveNetwork Command [DUT-Server]'
 
     def pics_TC_CNET_4_9(self):
-        return ['CNET.S']
+        return ['CNET.S.F00']
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
