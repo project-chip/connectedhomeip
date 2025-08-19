@@ -411,7 +411,7 @@ private:
      */
     bool KnownVideoStreamID(uint16_t aVideoStreamID);
 
-    /** 
+    /**
      * Mutator for MovementState, only accessible by the server instance
      */
     void SetMovementState(PhysicalMovementEnum aMovementState);

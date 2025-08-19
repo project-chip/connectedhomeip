@@ -70,10 +70,10 @@ Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan,
     //
     mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
-    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
     //
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 }
 
@@ -88,10 +88,10 @@ Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan
     //
     mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
-    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
     //
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 
 }
@@ -107,10 +107,10 @@ Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optio
     //
     mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
-    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
     //
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 }
 

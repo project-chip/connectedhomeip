@@ -645,7 +645,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: can not get MovementState, feature is not supported",
                          mEndpointId));
-        ReturnErrorOnFailure(aEncoder.Encode(mMovementState));   
+        ReturnErrorOnFailure(aEncoder.Encode(mMovementState));
     }
 
     return CHIP_NO_ERROR;
