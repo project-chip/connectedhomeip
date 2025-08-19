@@ -123,6 +123,7 @@ endfunction()
 #            "zap-generated/IMClusterCommandHandler.cpp"
 #     OUTPUT_PATH  DIR_NAME_VAR
 #     OUTPUT_FILES  FILE_NAMES_VAR
+#     ZCL_PATH     "path/to/custom/zcl.json" # Optional: override default ZCL path
 #   )
 #
 # Arguments:
@@ -135,6 +136,8 @@ endfunction()
 #
 #   OUTPUT_FILES - [OUT] output variable will contain the path of generated files.
 #                  suitable to be added within a build target
+# ZCL_PATH      - [OPTIONAL] path to a custom ZCL JSON file. If provided, it overrides the default ZCL path used by generate.py.
+#                 This allows applications to customize the cluster definitions used during code generation.
 #
 function(chip_zapgen TARGET_NAME)
     cmake_parse_arguments(ARG

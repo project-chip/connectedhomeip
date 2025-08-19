@@ -71,6 +71,15 @@ endfunction()
 # EXTERNAL_CLUSTERS Clusters with external implementations. The default implementations
 # will not be used nor required for these clusters.
 # Format: MY_CUSTOM_CLUSTER'.
+# ZCL_PATH          [OPTIONAL] Path to a custom ZCL JSON file. If provided, it is passed to chip_zapgen to override
+#                   the default ZCL path when generating code.
+#
+# Example usage:
+# chip_configure_data_model(
+#     APP_TARGET app
+#     ZAP_FILE "some_file.zap"
+#     ZCL_PATH "path/to/custom/zcl.json"  # Optional: override default ZCL path
+# )
 #
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
