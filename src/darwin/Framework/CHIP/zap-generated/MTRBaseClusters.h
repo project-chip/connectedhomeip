@@ -14913,7 +14913,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command MPTZSetPosition
  *
- * This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ.
+ * This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ.
  */
 - (void)MPTZSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)MPTZSetPositionWithCompletion:(MTRStatusCompletion)completion
@@ -15010,6 +15010,12 @@ MTR_PROVISIONALLY_AVAILABLE
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributePanMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeMovementStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMovementStateWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMovementStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -21811,6 +21817,11 @@ typedef NS_OPTIONS(uint32_t, MTRCameraAVStreamManagementFeature) {
     MTRCameraAVStreamManagementFeatureLocalStorage MTR_PROVISIONALLY_AVAILABLE = 0x100,
     MTRCameraAVStreamManagementFeatureHighDynamicRange MTR_PROVISIONALLY_AVAILABLE = 0x200,
     MTRCameraAVStreamManagementFeatureNightVision MTR_PROVISIONALLY_AVAILABLE = 0x400,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRCameraAVSettingsUserLevelManagementPhysicalMovement) {
+    MTRCameraAVSettingsUserLevelManagementPhysicalMovementIdle MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRCameraAVSettingsUserLevelManagementPhysicalMovementMoving MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRCameraAVSettingsUserLevelManagementFeature) {

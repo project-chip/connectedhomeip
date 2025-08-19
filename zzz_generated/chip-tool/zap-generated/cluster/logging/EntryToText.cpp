@@ -4432,6 +4432,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "PanMin";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::PanMax::Id:
             return "PanMax";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MovementState::Id:
+            return "MovementState";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::AcceptedCommandList::Id:

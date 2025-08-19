@@ -6555,6 +6555,11 @@ provisional cluster CameraAvStreamManagement = 1361 {
 provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
+  enum PhysicalMovementEnum : enum8 {
+    kIdle = 0;
+    kMoving = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kDigitalPTZ = 0x1;
     kMechanicalPan = 0x2;
@@ -6589,6 +6594,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   readonly attribute optional int16s tiltMax = 6;
   readonly attribute optional int16s panMin = 7;
   readonly attribute optional int16s panMax = 8;
+  readonly attribute optional PhysicalMovementEnum movementState = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6632,7 +6638,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     optional int8s zoomDelta = 3;
   }
 
-  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  /** This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ. */
   command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
   /** This command SHALL move the camera by the delta values relative to the currently defined position. */
   command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
@@ -9207,6 +9213,7 @@ endpoint 1 {
     ram      attribute tiltMax default = 90;
     ram      attribute panMin default = -180;
     ram      attribute panMax default = 180;
+    ram      attribute movementState;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -9630,6 +9637,1352 @@ endpoint 4 {
     ram      attribute multiPressMax default = 3;
     ram      attribute featureMap default = 30;
     ram      attribute clusterRevision default = 2;
+  }
+}
+endpoint 5 {
+  device type ma_powersource = 17, version 1;
+  device type ma_onofflight = 256, version 1;
+
+  binding cluster OnOff;
+
+  server cluster Identify {
+    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyType default = 0x0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 0x0005;
+
+    handle command Identify;
+    handle command TriggerEffect;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+
+    handle command AddGroup;
+    handle command AddGroupResponse;
+    handle command ViewGroup;
+    handle command ViewGroupResponse;
+    handle command GetGroupMembership;
+    handle command GetGroupMembershipResponse;
+    handle command RemoveGroup;
+    handle command RemoveGroupResponse;
+    handle command RemoveAllGroups;
+    handle command AddGroupIfIdentifying;
+  }
+
+  server cluster OnOff {
+    persist  attribute onOff default = 0x00;
+    ram      attribute globalSceneControl default = 0x01;
+    ram      attribute onTime default = 0x0000;
+    ram      attribute offWaitTime default = 0x0000;
+    persist  attribute startUpOnOff default = 0xFF;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0001;
+    ram      attribute clusterRevision default = 6;
+
+    handle command Off;
+    handle command On;
+    handle command Toggle;
+    handle command OffWithEffect;
+    handle command OnWithRecallGlobalScene;
+    handle command OnWithTimedOff;
+  }
+
+  server cluster LevelControl {
+    persist  attribute currentLevel default = 0xFE;
+    ram      attribute remainingTime default = 0x0000;
+    ram      attribute minLevel default = 0x01;
+    ram      attribute maxLevel default = 0xFE;
+    ram      attribute currentFrequency default = 0x0000;
+    ram      attribute minFrequency default = 0x0000;
+    ram      attribute maxFrequency default = 0x0000;
+    ram      attribute options default = 0x00;
+    ram      attribute onOffTransitionTime default = 0x0000;
+    ram      attribute onLevel default = 0xFF;
+    ram      attribute onTransitionTime;
+    ram      attribute offTransitionTime;
+    ram      attribute defaultMoveRate default = 50;
+    persist  attribute startUpCurrentLevel default = 255;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 6;
+
+    handle command MoveToLevel;
+    handle command Move;
+    handle command Step;
+    handle command Stop;
+    handle command MoveToLevelWithOnOff;
+    handle command MoveWithOnOff;
+    handle command StepWithOnOff;
+    handle command StopWithOnOff;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Actions {
+    callback attribute actionList;
+    callback attribute endpointLists;
+    ram      attribute setupURL default = "https://example.com";
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command InstantAction;
+    handle command InstantActionWithTransition;
+    handle command StartAction;
+    handle command StartActionWithDuration;
+    handle command StopAction;
+    handle command PauseAction;
+    handle command PauseActionWithDuration;
+    handle command ResumeAction;
+    handle command EnableAction;
+    handle command EnableActionWithDuration;
+    handle command DisableAction;
+    handle command DisableActionWithDuration;
+  }
+
+  server cluster PowerSource {
+    emits event BatFaultChange;
+    ram      attribute status default = 0;
+    ram      attribute order default = 2;
+    ram      attribute description default = "B2";
+    ram      attribute batChargeLevel default = 0;
+    ram      attribute batReplacementNeeded;
+    ram      attribute batReplaceability;
+    callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster Switch {
+    emits event SwitchLatched;
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster BooleanState {
+    ram      attribute stateValue default = 0;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OvenCavityOperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
+    callback attribute phaseList;
+    callback attribute currentPhase;
+    callback attribute countdownTime;
+    callback attribute operationalStateList;
+    callback attribute operationalState;
+    callback attribute operationalError;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Stop;
+    handle command Start;
+    handle command OperationalCommandResponse;
+  }
+
+  server cluster OvenMode {
+    callback attribute supportedModes;
+    ram      attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster LaundryDryerControls {
+    callback attribute supportedDrynessLevels;
+    ram      attribute selectedDrynessLevel;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ModeSelect {
+    ram      attribute description default = "Coffee";
+    ram      attribute standardNamespace default = 0;
+    callback attribute supportedModes;
+    persist  attribute currentMode default = 0;
+    persist  attribute startUpMode default = 0;
+    persist  attribute onMode default = 255;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 2;
+    ram      attribute manufacturerExtension default = 255;
+
+    handle command ChangeToMode;
+  }
+
+  server cluster LaundryWasherMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 2;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster RefrigeratorAndTemperatureControlledCabinetMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 2;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster LaundryWasherControls {
+    callback attribute spinSpeeds;
+    ram      attribute spinSpeedCurrent;
+    ram      attribute numberOfRinses;
+    callback attribute supportedRinses;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster RvcRunMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster RvcCleanMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster TemperatureControl {
+    ram      attribute selectedTemperatureLevel default = 0;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SetTemperature;
+  }
+
+  server cluster RefrigeratorAlarm {
+    emits event Notify;
+    ram      attribute mask default = 1;
+    ram      attribute state default = 0;
+    ram      attribute supported default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster DishwasherMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 2;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster AirQuality {
+    callback attribute airQuality;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster SmokeCoAlarm {
+    emits event SmokeAlarm;
+    emits event COAlarm;
+    emits event LowBattery;
+    emits event HardwareFault;
+    emits event EndOfService;
+    emits event SelfTestComplete;
+    emits event AlarmMuted;
+    emits event MuteEnded;
+    emits event InterconnectSmokeAlarm;
+    emits event InterconnectCOAlarm;
+    emits event AllClear;
+    persist  attribute expressedState default = 0;
+    persist  attribute smokeState default = 0;
+    persist  attribute COState default = 0;
+    persist  attribute batteryAlert default = 0;
+    persist  attribute deviceMuted default = 0;
+    ram      attribute testInProgress default = 0;
+    persist  attribute hardwareFaultAlert default = 0;
+    persist  attribute endOfServiceAlert default = 0;
+    ram      attribute interconnectSmokeAlarm default = 0;
+    ram      attribute interconnectCOAlarm default = 0;
+    ram      attribute contaminationState default = 0;
+    ram      attribute smokeSensitivityLevel default = 1;
+    ram      attribute expiryDate default = 0;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SelfTestRequest;
+  }
+
+  server cluster DishwasherAlarm {
+    emits event Notify;
+    ram      attribute mask default = 1;
+    ram      attribute latch default = 1;
+    ram      attribute state default = 0;
+    ram      attribute supported default = 15;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Reset;
+    handle command ModifyEnabledAlarms;
+  }
+
+  server cluster MicrowaveOvenMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
+    callback attribute phaseList;
+    callback attribute currentPhase;
+    callback attribute countdownTime;
+    callback attribute operationalStateList;
+    callback attribute operationalState;
+    callback attribute operationalError;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 2;
+
+    handle command Pause;
+    handle command Stop;
+    handle command Start;
+    handle command Resume;
+    handle command OperationalCommandResponse;
+  }
+
+  server cluster RvcOperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
+    callback attribute phaseList;
+    callback attribute currentPhase;
+    callback attribute countdownTime;
+    callback attribute operationalStateList;
+    callback attribute operationalState;
+    callback attribute operationalError;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Pause;
+    handle command Resume;
+    handle command OperationalCommandResponse;
+    handle command GoHome;
+  }
+
+  server cluster ScenesManagement {
+    ram      attribute sceneTableSize default = 16;
+    callback attribute fabricSceneInfo;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AddScene;
+    handle command AddSceneResponse;
+    handle command ViewScene;
+    handle command ViewSceneResponse;
+    handle command RemoveScene;
+    handle command RemoveSceneResponse;
+    handle command RemoveAllScenes;
+    handle command RemoveAllScenesResponse;
+    handle command StoreScene;
+    handle command StoreSceneResponse;
+    handle command RecallScene;
+    handle command GetSceneMembership;
+    handle command GetSceneMembershipResponse;
+    handle command CopyScene;
+    handle command CopySceneResponse;
+  }
+
+  server cluster HepaFilterMonitoring {
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication;
+    callback attribute inPlaceIndicator;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ResetCondition;
+  }
+
+  server cluster ActivatedCarbonFilterMonitoring {
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication;
+    callback attribute inPlaceIndicator;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ResetCondition;
+  }
+
+  server cluster BooleanStateConfiguration {
+    emits event AlarmsStateChanged;
+    emits event SensorFault;
+    callback attribute currentSensitivityLevel;
+    ram      attribute supportedSensitivityLevels default = 3;
+    ram      attribute defaultSensitivityLevel default = 2;
+    ram      attribute alarmsActive;
+    ram      attribute alarmsSuppressed;
+    persist  attribute alarmsEnabled;
+    ram      attribute alarmsSupported default = 0x03;
+    ram      attribute sensorFault default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0F;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SuppressAlarm;
+    handle command EnableDisableAlarm;
+  }
+
+  server cluster ValveConfigurationAndControl {
+    emits event ValveStateChanged;
+    emits event ValveFault;
+    ram      attribute openDuration;
+    persist  attribute defaultOpenDuration;
+    ram      attribute autoCloseTime;
+    callback attribute remainingDuration;
+    ram      attribute currentState;
+    ram      attribute targetState;
+    ram      attribute currentLevel;
+    ram      attribute targetLevel;
+    persist  attribute defaultOpenLevel default = 100;
+    ram      attribute valveFault default = 0;
+    ram      attribute levelStep default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Open;
+    handle command Close;
+  }
+
+  server cluster EnergyPreference {
+    callback attribute energyBalances;
+    ram      attribute currentEnergyBalance;
+    callback attribute energyPriorities;
+    callback attribute lowPowerModeSensitivities;
+    ram      attribute currentLowPowerModeSensitivity;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster WindowCovering {
+    ram      attribute type default = 0x08;
+    ram      attribute physicalClosedLimitLift default = 0xFFFF;
+    ram      attribute physicalClosedLimitTilt default = 0xFFFF;
+    persist  attribute currentPositionLift default = 0x7FFF;
+    persist  attribute currentPositionTilt default = 0x7FFF;
+    persist  attribute numberOfActuationsLift default = 0x0000;
+    persist  attribute numberOfActuationsTilt default = 0x0000;
+    persist  attribute configStatus default = 0x03;
+    persist  attribute currentPositionLiftPercentage default = 50;
+    persist  attribute currentPositionTiltPercentage default = 50;
+    ram      attribute operationalStatus default = 0x00;
+    ram      attribute targetPositionLiftPercent100ths default = 5000;
+    ram      attribute targetPositionTiltPercent100ths default = 5000;
+    ram      attribute endProductType default = 0x00;
+    persist  attribute currentPositionLiftPercent100ths default = 5000;
+    persist  attribute currentPositionTiltPercent100ths default = 5000;
+    persist  attribute installedOpenLimitLift default = 0x0000;
+    persist  attribute installedClosedLimitLift default = 0xFFFF;
+    persist  attribute installedOpenLimitTilt default = 0x0000;
+    persist  attribute installedClosedLimitTilt default = 0xFFFF;
+    persist  attribute mode default = 0x00;
+    ram      attribute safetyStatus default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x17;
+    ram      attribute clusterRevision default = 5;
+
+    handle command UpOrOpen;
+    handle command DownOrClose;
+    handle command StopMotion;
+    handle command GoToLiftValue;
+    handle command GoToLiftPercentage;
+    handle command GoToTiltValue;
+    handle command GoToTiltPercentage;
+  }
+
+  server cluster PumpConfigurationAndControl {
+    ram      attribute maxPressure;
+    ram      attribute maxSpeed;
+    ram      attribute maxFlow;
+    ram      attribute minConstPressure;
+    ram      attribute maxConstPressure;
+    ram      attribute minCompPressure;
+    ram      attribute maxCompPressure;
+    ram      attribute minConstSpeed;
+    ram      attribute maxConstSpeed;
+    ram      attribute minConstFlow;
+    ram      attribute maxConstFlow;
+    ram      attribute minConstTemp;
+    ram      attribute maxConstTemp;
+    ram      attribute pumpStatus;
+    ram      attribute effectiveOperationMode;
+    ram      attribute effectiveControlMode;
+    ram      attribute capacity;
+    ram      attribute speed;
+    ram      attribute lifetimeRunningHours default = 0x000000;
+    ram      attribute power;
+    ram      attribute lifetimeEnergyConsumed default = 0x00000000;
+    ram      attribute operationMode default = 0x00;
+    ram      attribute controlMode default = 0x00;
+    ram      attribute featureMap default = 0x1F;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Thermostat {
+    ram      attribute localTemperature;
+    ram      attribute absMinHeatSetpointLimit default = 0x02BC;
+    ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
+    ram      attribute absMinCoolSetpointLimit default = 0x0640;
+    ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
+    ram      attribute localTemperatureCalibration default = 0x00;
+    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
+    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
+    ram      attribute minHeatSetpointLimit default = 0x02BC;
+    ram      attribute maxHeatSetpointLimit default = 0x0BB8;
+    ram      attribute minCoolSetpointLimit default = 0x0640;
+    ram      attribute maxCoolSetpointLimit default = 0x0C80;
+    ram      attribute minSetpointDeadBand default = 0x19;
+    ram      attribute controlSequenceOfOperation default = 0x04;
+    ram      attribute systemMode default = 0x01;
+    callback attribute presetTypes;
+    callback attribute scheduleTypes;
+    ram      attribute numberOfPresets default = 0;
+    ram      attribute numberOfSchedules default = 0;
+    ram      attribute numberOfScheduleTransitionPerDay default = 0xFF;
+    ram      attribute activePresetHandle;
+    ram      attribute activeScheduleHandle;
+    callback attribute presets;
+    callback attribute schedules;
+    ram      attribute setpointHoldExpiryTimestamp;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0123;
+    ram      attribute clusterRevision default = 7;
+
+    handle command SetpointRaiseLower;
+    handle command SetActiveScheduleRequest;
+    handle command SetActivePresetRequest;
+    handle command AtomicResponse;
+    handle command AtomicRequest;
+  }
+
+  server cluster FanControl {
+    ram      attribute fanMode default = 0x00;
+    ram      attribute fanModeSequence default = 0x02;
+    ram      attribute percentSetting default = 0x00;
+    ram      attribute percentCurrent default = 0x00;
+    ram      attribute speedMax default = 100;
+    ram      attribute speedSetting default = 0x00;
+    ram      attribute speedCurrent default = 0x00;
+    ram      attribute rockSupport default = 0x03;
+    ram      attribute rockSetting default = 0x00;
+    ram      attribute windSupport default = 0x03;
+    ram      attribute windSetting default = 0x00;
+    ram      attribute airflowDirection default = 0;
+    ram      attribute featureMap default = 0x3F;
+    ram      attribute clusterRevision default = 4;
+
+    handle command Step;
+  }
+
+  server cluster ThermostatUserInterfaceConfiguration {
+    ram      attribute temperatureDisplayMode default = 0x00;
+    ram      attribute keypadLockout default = 0x00;
+    ram      attribute scheduleProgrammingVisibility;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster ColorControl {
+    persist  attribute currentHue default = 0x00;
+    persist  attribute currentSaturation default = 0x00;
+    ram      attribute remainingTime default = 0x0000;
+    persist  attribute currentX default = 0x616B;
+    persist  attribute currentY default = 0x607D;
+    ram      attribute driftCompensation;
+    ram      attribute compensationText;
+    persist  attribute colorTemperatureMireds default = 0x00FA;
+    ram      attribute colorMode default = 0x01;
+    ram      attribute options default = 0x00;
+    ram      attribute numberOfPrimaries;
+    ram      attribute primary1X;
+    ram      attribute primary1Y;
+    ram      attribute primary1Intensity;
+    ram      attribute primary2X;
+    ram      attribute primary2Y;
+    ram      attribute primary2Intensity;
+    ram      attribute primary3X;
+    ram      attribute primary3Y;
+    ram      attribute primary3Intensity;
+    ram      attribute primary4X;
+    ram      attribute primary4Y;
+    ram      attribute primary4Intensity;
+    ram      attribute primary5X;
+    ram      attribute primary5Y;
+    ram      attribute primary5Intensity;
+    ram      attribute primary6X;
+    ram      attribute primary6Y;
+    ram      attribute primary6Intensity;
+    ram      attribute whitePointX;
+    ram      attribute whitePointY;
+    ram      attribute colorPointRX;
+    ram      attribute colorPointRY;
+    ram      attribute colorPointRIntensity;
+    ram      attribute colorPointGX;
+    ram      attribute colorPointGY;
+    ram      attribute colorPointGIntensity;
+    ram      attribute colorPointBX;
+    ram      attribute colorPointBY;
+    ram      attribute colorPointBIntensity;
+    persist  attribute enhancedCurrentHue default = 0x0000;
+    persist  attribute enhancedColorMode default = 0x01;
+    persist  attribute colorLoopActive default = 0x00;
+    persist  attribute colorLoopDirection default = 0x00;
+    persist  attribute colorLoopTime default = 0x0019;
+    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
+    ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
+    ram      attribute colorCapabilities default = 0x1F;
+    ram      attribute colorTempPhysicalMinMireds default = 0x009A;
+    ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
+    ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
+    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
+    ram      attribute featureMap default = 0x1F;
+    ram      attribute clusterRevision default = 7;
+
+    handle command MoveToHue;
+    handle command MoveHue;
+    handle command StepHue;
+    handle command MoveToSaturation;
+    handle command MoveSaturation;
+    handle command StepSaturation;
+    handle command MoveToHueAndSaturation;
+    handle command MoveToColor;
+    handle command MoveColor;
+    handle command StepColor;
+    handle command MoveToColorTemperature;
+    handle command EnhancedMoveToHue;
+    handle command EnhancedMoveHue;
+    handle command EnhancedStepHue;
+    handle command EnhancedMoveToHueAndSaturation;
+    handle command ColorLoopSet;
+    handle command StopMoveStep;
+    handle command MoveColorTemperature;
+    handle command StepColorTemperature;
+  }
+
+  server cluster BallastConfiguration {
+    ram      attribute physicalMinLevel default = 0x01;
+    ram      attribute physicalMaxLevel default = 0xFE;
+    ram      attribute ballastStatus default = 0x00;
+    ram      attribute minLevel default = 0x01;
+    ram      attribute maxLevel default = 0xFE;
+    ram      attribute intrinsicBallastFactor;
+    ram      attribute ballastFactorAdjustment default = 0xFF;
+    ram      attribute lampQuantity;
+    ram      attribute lampType;
+    ram      attribute lampManufacturer;
+    ram      attribute lampRatedHours default = 0xFFFFFF;
+    ram      attribute lampBurnHours default = 0x000000;
+    ram      attribute lampAlarmMode default = 0x00;
+    ram      attribute lampBurnHoursTripPoint default = 0xFFFFFF;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster IlluminanceMeasurement {
+    ram      attribute measuredValue default = 0x0000;
+    ram      attribute minMeasuredValue default = 0x01;
+    ram      attribute maxMeasuredValue default = 0xFFFE;
+    ram      attribute tolerance;
+    ram      attribute lightSensorType default = 0xFF;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster TemperatureMeasurement {
+    ram      attribute measuredValue default = 0x8000;
+    ram      attribute minMeasuredValue default = 0x8000;
+    ram      attribute maxMeasuredValue default = 0x8000;
+    ram      attribute tolerance;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster PressureMeasurement {
+    ram      attribute measuredValue default = 0x0000;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster FlowMeasurement {
+    ram      attribute measuredValue default = 5;
+    ram      attribute minMeasuredValue default = 0;
+    ram      attribute maxMeasuredValue default = 100;
+    ram      attribute tolerance default = 0;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster RelativeHumidityMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue default = 0;
+    ram      attribute maxMeasuredValue default = 0x2710;
+    ram      attribute tolerance;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster OccupancySensing {
+    ram      attribute occupancy;
+    ram      attribute occupancySensorType;
+    ram      attribute occupancySensorTypeBitmap default = 1;
+    callback attribute holdTime;
+    callback attribute holdTimeLimits;
+    callback attribute PIROccupiedToUnoccupiedDelay;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster CarbonMonoxideConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster CarbonDioxideConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster NitrogenDioxideConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster OzoneConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster Pm25ConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster FormaldehydeConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster Pm1ConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster Pm10ConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster RadonConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster SoilMeasurement {
+    callback attribute soilMoistureMeasurementLimits;
+    callback attribute soilMoistureMeasuredValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster WakeOnLan {
+    ram      attribute MACAddress;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LowPower {
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Sleep;
+  }
+
+  server cluster CameraAvStreamManagement {
+    callback attribute maxConcurrentEncoders;
+    callback attribute maxEncodedPixelRate;
+    callback attribute videoSensorParams;
+    callback attribute nightVisionUsesInfrared;
+    callback attribute minViewport;
+    callback attribute rateDistortionTradeOffPoints;
+    callback attribute maxContentBufferSize;
+    callback attribute microphoneCapabilities;
+    callback attribute speakerCapabilities;
+    callback attribute twoWayTalkSupport;
+    callback attribute snapshotCapabilities;
+    callback attribute maxNetworkBandwidth;
+    callback attribute currentFrameRate;
+    callback attribute HDRModeEnabled;
+    callback attribute supportedStreamUsages;
+    callback attribute allocatedVideoStreams;
+    callback attribute allocatedAudioStreams;
+    callback attribute allocatedSnapshotStreams;
+    callback attribute streamUsagePriorities;
+    callback attribute softRecordingPrivacyModeEnabled;
+    callback attribute softLivestreamPrivacyModeEnabled;
+    callback attribute hardPrivacyModeOn;
+    callback attribute nightVision;
+    callback attribute nightVisionIllum;
+    callback attribute viewport;
+    callback attribute speakerMuted;
+    callback attribute speakerVolumeLevel;
+    callback attribute speakerMaxLevel;
+    callback attribute speakerMinLevel;
+    callback attribute microphoneMuted;
+    callback attribute microphoneVolumeLevel;
+    callback attribute microphoneMaxLevel;
+    callback attribute microphoneMinLevel;
+    callback attribute microphoneAGCEnabled;
+    callback attribute imageRotation;
+    callback attribute imageFlipHorizontal;
+    callback attribute imageFlipVertical;
+    callback attribute localVideoRecordingEnabled;
+    callback attribute localSnapshotRecordingEnabled;
+    callback attribute statusLightEnabled;
+    callback attribute statusLightBrightness;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SnapshotStreamAllocate;
+    handle command SnapshotStreamAllocateResponse;
+    handle command SnapshotStreamDeallocate;
+    handle command SetStreamPriorities;
+    handle command CaptureSnapshot;
+    handle command CaptureSnapshotResponse;
+  }
+
+  server cluster CameraAvSettingsUserLevelManagement {
+    callback attribute MPTZPosition;
+    ram      attribute maxPresets default = 5;
+    callback attribute MPTZPresets;
+    callback attribute DPTZStreams;
+    ram      attribute zoomMax default = 100;
+    ram      attribute tiltMin default = -90;
+    ram      attribute tiltMax default = 90;
+    ram      attribute panMin default = -180;
+    ram      attribute panMax default = 180;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command MPTZSetPosition;
+    handle command MPTZRelativeMove;
+    handle command MPTZMoveToPreset;
+    handle command MPTZSavePreset;
+    handle command MPTZRemovePreset;
+    handle command DPTZSetViewport;
+    handle command DPTZRelativeMove;
+  }
+
+  server cluster PushAvStreamTransport {
+    emits event PushTransportBegin;
+    emits event PushTransportEnd;
+    callback attribute supportedFormats;
+    callback attribute currentConnections;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AllocatePushTransport;
+    handle command AllocatePushTransportResponse;
+    handle command DeallocatePushTransport;
+    handle command ModifyPushTransport;
+    handle command SetTransportStatus;
+    handle command ManuallyTriggerTransport;
+    handle command FindTransport;
+    handle command FindTransportResponse;
+  }
+
+  server cluster Chime {
+    callback attribute installedChimeSounds;
+    callback attribute selectedChime;
+    callback attribute enabled;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command PlayChimeSound;
+  }
+
+  server cluster TlsCertificateManagement {
+    callback attribute maxRootCertificates;
+    callback attribute provisionedRootCertificates;
+    callback attribute maxClientCertificates;
+    callback attribute provisionedClientCertificates;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+
+    handle command ProvisionRootCertificate;
+    handle command ProvisionRootCertificateResponse;
+    handle command FindRootCertificate;
+    handle command FindRootCertificateResponse;
+    handle command LookupRootCertificate;
+    handle command LookupRootCertificateResponse;
+    handle command RemoveRootCertificate;
+    handle command TLSClientCSR;
+    handle command TLSClientCSRResponse;
+    handle command ProvisionClientCertificate;
+    handle command FindClientCertificate;
+    handle command FindClientCertificateResponse;
+    handle command LookupClientCertificate;
+    handle command LookupClientCertificateResponse;
+    handle command RemoveClientCertificate;
+  }
+
+  server cluster TlsClientManagement {
+    callback attribute maxProvisioned;
+    callback attribute provisionedEndpoints;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+
+    handle command ProvisionEndpoint;
+    handle command ProvisionEndpointResponse;
+    handle command FindEndpoint;
+    handle command FindEndpointResponse;
+    handle command RemoveEndpoint;
+  }
+
+  server cluster UnitTesting {
+    emits event TestEvent;
+    emits event TestFabricScopedEvent;
+    emits event TestDifferentVendorMeiEvent;
+    ram      attribute boolean default = false;
+    ram      attribute bitmap8 default = 0;
+    ram      attribute bitmap16 default = 0;
+    ram      attribute bitmap32 default = 0;
+    ram      attribute bitmap64 default = 0;
+    ram      attribute int8u default = 0;
+    ram      attribute int16u default = 0;
+    ram      attribute int24u default = 0;
+    ram      attribute int32u default = 0;
+    ram      attribute int40u default = 0;
+    ram      attribute int48u default = 0;
+    ram      attribute int56u default = 0;
+    ram      attribute int64u default = 0;
+    ram      attribute int8s default = 0;
+    ram      attribute int16s default = 0;
+    ram      attribute int24s default = 0;
+    ram      attribute int32s default = 0;
+    ram      attribute int40s default = 0;
+    ram      attribute int48s default = 0;
+    ram      attribute int56s default = 0;
+    ram      attribute int64s default = 0;
+    ram      attribute enum8 default = 0;
+    ram      attribute enum16 default = 0;
+    ram      attribute floatSingle default = 0;
+    ram      attribute floatDouble default = 0;
+    ram      attribute octetString;
+    callback attribute listInt8u;
+    callback attribute listOctetString;
+    callback attribute listStructOctetString;
+    ram      attribute longOctetString;
+    ram      attribute charString;
+    ram      attribute longCharString;
+    ram      attribute epochUs;
+    ram      attribute epochS;
+    ram      attribute vendorId;
+    callback attribute listNullablesAndOptionalsStruct;
+    ram      attribute enumAttr;
+    callback attribute structAttr;
+    ram      attribute rangeRestrictedInt8u default = 70;
+    ram      attribute rangeRestrictedInt8s default = -20;
+    ram      attribute rangeRestrictedInt16u default = 200;
+    ram      attribute rangeRestrictedInt16s default = -100;
+    callback attribute listLongOctetString;
+    callback attribute listFabricScoped;
+    ram      attribute timedWriteBoolean;
+    callback attribute generalErrorBoolean;
+    callback attribute clusterErrorBoolean;
+    ram      attribute globalEnum;
+    callback attribute globalStruct;
+    ram      attribute readFailureCode default = 1;
+    callback attribute failureInt32U default = 0;
+    ram      attribute nullableBoolean default = false;
+    ram      attribute nullableBitmap8 default = 0;
+    ram      attribute nullableBitmap16 default = 0;
+    ram      attribute nullableBitmap32 default = 0;
+    ram      attribute nullableBitmap64 default = 0;
+    ram      attribute nullableInt8u default = 0;
+    ram      attribute nullableInt16u default = 0;
+    ram      attribute nullableInt24u default = 0;
+    ram      attribute nullableInt32u default = 0;
+    ram      attribute nullableInt40u default = 0;
+    ram      attribute nullableInt48u default = 0;
+    ram      attribute nullableInt56u default = 0;
+    ram      attribute nullableInt64u default = 0;
+    ram      attribute nullableInt8s default = 0;
+    ram      attribute nullableInt16s default = 0;
+    ram      attribute nullableInt24s default = 0;
+    ram      attribute nullableInt32s default = 0;
+    ram      attribute nullableInt40s default = 0;
+    ram      attribute nullableInt48s default = 0;
+    ram      attribute nullableInt56s default = 0;
+    ram      attribute nullableInt64s default = 0;
+    ram      attribute nullableEnum8 default = 0;
+    ram      attribute nullableEnum16 default = 0;
+    ram      attribute nullableFloatSingle default = 0;
+    ram      attribute nullableFloatDouble default = 0;
+    ram      attribute nullableOctetString;
+    ram      attribute nullableCharString;
+    ram      attribute nullableEnumAttr;
+    callback attribute nullableStruct;
+    ram      attribute nullableRangeRestrictedInt8u default = 70;
+    ram      attribute nullableRangeRestrictedInt8s default = -20;
+    ram      attribute nullableRangeRestrictedInt16u default = 200;
+    ram      attribute nullableRangeRestrictedInt16s default = -100;
+    callback attribute writeOnlyInt8u default = 0;
+    ram      attribute nullableGlobalEnum;
+    callback attribute nullableGlobalStruct;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+    ram      attribute meiInt8u default = 0;
+
+    handle command Test;
+    handle command TestSpecificResponse;
+    handle command TestNotHandled;
+    handle command TestAddArgumentsResponse;
+    handle command TestSpecific;
+    handle command TestAddArguments;
+    handle command TestListInt8UReverseResponse;
+    handle command TestEnumsResponse;
+    handle command TestNullableOptionalResponse;
+    handle command TestStructArgumentRequest;
+    handle command TestNestedStructArgumentRequest;
+    handle command TestListStructArgumentRequest;
+    handle command SimpleStructResponse;
+    handle command TestListInt8UArgumentRequest;
+    handle command TestEmitTestEventResponse;
+    handle command TestNestedStructListArgumentRequest;
+    handle command TestEmitTestFabricScopedEventResponse;
+    handle command TestListNestedStructListArgumentRequest;
+    handle command TestListInt8UReverseRequest;
+    handle command StringEchoResponse;
+    handle command TestEnumsRequest;
+    handle command GlobalEchoResponse;
+    handle command TestNullableOptionalRequest;
+    handle command SimpleStructEchoRequest;
+    handle command TimedInvokeRequest;
+    handle command TestSimpleOptionalArgumentRequest;
+    handle command TestEmitTestEventRequest;
+    handle command TestEmitTestFabricScopedEventRequest;
+    handle command TestBatchHelperRequest;
+    handle command TestSecondBatchHelperRequest;
+    handle command StringEchoRequest;
+    handle command GlobalEchoRequest;
+    handle command TestCheckCommandFlags;
+    handle command TestDifferentVendorMeiRequest;
+    handle command TestDifferentVendorMeiResponse;
   }
 }
 endpoint 65534 {

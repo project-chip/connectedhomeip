@@ -47836,6 +47836,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="tiltMax", Tag=0x00000006, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="panMin", Tag=0x00000007, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="panMax", Tag=0x00000008, Type=typing.Optional[int]),
+                ClusterObjectFieldDescriptor(Label="movementState", Tag=0x00000009, Type=typing.Optional[CameraAvSettingsUserLevelManagement.Enums.PhysicalMovementEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -47852,11 +47853,22 @@ class CameraAvSettingsUserLevelManagement(Cluster):
     tiltMax: typing.Optional[int] = None
     panMin: typing.Optional[int] = None
     panMax: typing.Optional[int] = None
+    movementState: typing.Optional[CameraAvSettingsUserLevelManagement.Enums.PhysicalMovementEnum] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
+
+    class Enums:
+        class PhysicalMovementEnum(MatterIntEnum):
+            kIdle = 0x00
+            kMoving = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -48185,6 +48197,22 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
 
             value: typing.Optional[int] = None
+
+        @dataclass
+        class MovementState(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000552
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[CameraAvSettingsUserLevelManagement.Enums.PhysicalMovementEnum])
+
+            value: typing.Optional[CameraAvSettingsUserLevelManagement.Enums.PhysicalMovementEnum] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

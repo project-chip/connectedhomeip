@@ -155,12 +155,23 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
                                          mEndpointId));
     }
 
+    if (SupportsOptAttr(OptionalAttributes::kMovementState))
+    {
+        VerifyOrReturnError(
+            HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom),
+            CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MovementState is enabled "
+                         "then one of Pan, Tilt, or Zoom is required",
+                         mEndpointId));
+    }
+
     // Set up our defaults
     SetPan(MakeOptional(kDefaultPan));
     SetTilt(MakeOptional(kDefaultTilt));
     SetZoom(MakeOptional(kDefaultZoom));
 
-    physicalMovementState = false;
+    SetMovementState(PhysicalMovementEnum::kIdle);
 
     LoadPersistentAttributes();
 
@@ -371,6 +382,12 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
             MarkDirty(Attributes::MPTZPosition::Id);
         }
     }
+}
+
+void CameraAvSettingsUserLevelMgmtServer::SetMovementState(PhysicalMovementEnum aMovementState)
+{
+    mMovementState = aMovementState;
+    MarkDirty(Attributes::MovementState::Id);
 }
 
 /**
@@ -622,6 +639,13 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: can not get PanMax, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mPanMax));
         break;
+    case MovementState::Id:
+        VerifyOrReturnError(
+            HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom),
+            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: can not get MovementState, feature is not supported",
+                         mEndpointId));
+        ReturnErrorOnFailure(aEncoder.Encode(mMovementState));   
     }
 
     return CHIP_NO_ERROR;
@@ -848,9 +872,11 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
 
     // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is complete
     //
-    mTargetPan           = pan;
-    mTargetTilt          = tilt;
-    mTargetZoom          = zoom;
+    mTargetPan     = pan;
+    mTargetTilt    = tilt;
+    mTargetZoom    = zoom;
+
+    SetMovementState(PhysicalMovementEnum::kMoving);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -1022,6 +1048,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     mTargetPan           = newPan;
     mTargetTilt          = newTilt;
     mTargetZoom          = newZoom;
+    mMovementState = PhysicalMovementEnum::kMoving;
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -1092,9 +1119,10 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
 
     // We don't update the server persisted attributes until the delegate confirms via callback that the physical device movement is complete
     //
-    mTargetPan           = presetValues.pan;
-    mTargetTilt          = presetValues.tilt;
-    mTargetZoom          = presetValues.zoom;
+    mTargetPan     = presetValues.pan;
+    mTargetTilt    = presetValues.tilt;
+    mTargetZoom    = presetValues.zoom;
+    mMovementState = PhysicalMovementEnum::kMoving;
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -1326,6 +1354,8 @@ void CameraAvSettingsUserLevelMgmtServer::OnPhysicalMovementComplete(Status stat
         SetTilt(mTargetTilt);
         SetZoom(mTargetZoom);
     }
+
+    SetMovementState(PhysicalMovementEnum::kIdle);
 }
 
 } // namespace CameraAvSettingsUserLevelManagement

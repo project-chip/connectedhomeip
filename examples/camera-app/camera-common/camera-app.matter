@@ -2786,6 +2786,11 @@ provisional cluster CameraAvStreamManagement = 1361 {
 provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
+  enum PhysicalMovementEnum : enum8 {
+    kIdle = 0;
+    kMoving = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kDigitalPTZ = 0x1;
     kMechanicalPan = 0x2;
@@ -2820,6 +2825,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   readonly attribute optional int16s tiltMax = 6;
   readonly attribute optional int16s panMin = 7;
   readonly attribute optional int16s panMax = 8;
+  readonly attribute optional PhysicalMovementEnum movementState = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2863,7 +2869,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     optional int8s zoomDelta = 3;
   }
 
-  /** This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ. */
+  /** This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ. */
   command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
   /** This command SHALL move the camera by the delta values relative to the currently defined position. */
   command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
@@ -3969,6 +3975,7 @@ endpoint 1 {
     ram      attribute tiltMax default = 90;
     ram      attribute panMin default = -180;
     ram      attribute panMax default = 180;
+    ram      attribute movementState;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

@@ -228,15 +228,16 @@ protected:
 
 enum class OptionalAttributes : uint32_t
 {
-    kMptzPosition = 0x0001,
-    kMaxPresets   = 0x0002,
-    kMptzPresets  = 0x0004,
-    kDptzStreams  = 0x0008,
-    kZoomMax      = 0x0010,
-    kTiltMin      = 0x0020,
-    kTiltMax      = 0x0040,
-    kPanMin       = 0x0080,
-    kPanMax       = 0x0100,
+    kMptzPosition  = 0x0001,
+    kMaxPresets    = 0x0002,
+    kMptzPresets   = 0x0004,
+    kDptzStreams   = 0x0008,
+    kZoomMax       = 0x0010,
+    kTiltMin       = 0x0020,
+    kTiltMax       = 0x0040,
+    kPanMin        = 0x0080,
+    kPanMax        = 0x0100,
+    kMovementState = 0x0200,
 };
 
 class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface,
@@ -342,7 +343,7 @@ public:
     void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) override;
 
     // Is a command already being processed
-    bool IsProcessingAsyncCommand() const { return false; }
+    bool IsProcessingAsyncCommand() const { return mMovementState == PhysicalMovementEnum::kMoving; }
 
 private:
     Delegate & mDelegate;
@@ -368,7 +369,7 @@ private:
     std::vector<MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<DPTZStruct> mDptzStreams;
 
-    bool physicalMovementState;
+    PhysicalMovementEnum mMovementState;
 
     // Holding variables for values subject to successful physical movement
     Optional<int16_t> mTargetPan;
@@ -410,6 +411,10 @@ private:
      */
     bool KnownVideoStreamID(uint16_t aVideoStreamID);
 
+    /** 
+     * Mutator for MovementState, only accessible by the server instance
+     */
+    void SetMovementState(PhysicalMovementEnum aMovementState);
     /**
      * Helper function for attribute handlers to mark the attribute as dirty
      */

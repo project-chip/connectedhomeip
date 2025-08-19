@@ -14518,6 +14518,7 @@ private:
 | * TiltMax                                                           | 0x0006 |
 | * PanMin                                                            | 0x0007 |
 | * PanMax                                                            | 0x0008 |
+| * MovementState                                                     | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -30097,6 +30098,7 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<ReadAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "pan-min", Attributes::PanMin::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "pan-max", Attributes::PanMax::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "movement-state", Attributes::MovementState::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -30123,6 +30125,8 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "pan-max", INT16_MIN, INT16_MAX, Attributes::PanMax::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum>>(
+            Id, "movement-state", 0, UINT8_MAX, Attributes::MovementState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -30144,6 +30148,7 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<SubscribeAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "pan-min", Attributes::PanMin::Id, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, "pan-max", Attributes::PanMax::Id, credsIssuerConfig),                              //
+        make_unique<SubscribeAttribute>(Id, "movement-state", Attributes::MovementState::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

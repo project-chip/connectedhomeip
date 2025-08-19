@@ -73,7 +73,6 @@ Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan,
     // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
     // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
     //
-    ChipLogDetail(Zcl, "Starting PTZ mimic timer of 2s");
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
     return Status::Success;
 }
@@ -92,7 +91,6 @@ Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan
     // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
     // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
     //
-    ChipLogDetail(Zcl, "Starting PTZ mimic timer of 2s");
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
     return Status::Success;
 
@@ -112,7 +110,6 @@ Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optio
     // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will 
     // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed. 
     //
-    ChipLogDetail(Zcl, "Starting PTZ mimic timer of 2s");
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this); 
     return Status::Success;
 }
@@ -316,7 +313,6 @@ CHIP_ERROR CameraAVSettingsUserLevelManager::PersistentAttributesLoadedCallback(
 //
 static void onTimerExpiry(System::Layer * systemLayer, void * data)
 {
-    ChipLogDetail(Zcl, "Timer expired");
     CameraAVSettingsUserLevelManager * delegate = reinterpret_cast<CameraAVSettingsUserLevelManager *>(data);
 
     delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
