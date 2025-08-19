@@ -531,9 +531,9 @@ class TestMatterTestingSupport(MatterBaseTest):
         # 1 (dt 1) - 2 (dt 2) - tag 2,3
         #          - 3 (dt 2) - tag 2,4
         desc_ep1 = {Clusters.Descriptor.Attributes.FeatureMap: 0,
-            Clusters.Descriptor.Attributes.PartsList: [2, 3],
-            Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(1, 1)],
-            }
+                    Clusters.Descriptor.Attributes.PartsList: [2, 3],
+                    Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(1, 1)],
+                    }
 
         desc_dt2_tag23 = {Clusters.Descriptor.Attributes.FeatureMap: Clusters.Descriptor.Bitmaps.Feature.kTagList,
                           Clusters.Descriptor.Attributes.PartsList: [],
