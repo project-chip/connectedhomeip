@@ -28,7 +28,6 @@ from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
-from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.realtek import RealtekApp, RealtekBoard, RealtekBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
@@ -571,6 +570,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw71")
     target.AppendModifier(name="no-ble", disable_ble=True)
     target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
+    target.AppendModifier(name="iw610", iw610_transceiver=True).OnlyIfRe('rt1060').OnlyIfRe('evkc').OnlyIfRe('cmake')
 
     return target
 
@@ -851,21 +851,6 @@ def BuildRealtekTarget():
     return target
 
 
-def BuildOpenIotSdkTargets():
-    target = BuildTarget('openiotsdk', OpenIotSdkBuilder)
-
-    target.AppendFixedTargets([
-        TargetPart('shell', app=OpenIotSdkApp.SHELL),
-        TargetPart('lock', app=OpenIotSdkApp.LOCK),
-    ])
-
-    # Modifiers
-    target.AppendModifier('mbedtls', crypto=OpenIotSdkCryptoBackend.MBEDTLS).ExceptIfRe('-(psa)')
-    target.AppendModifier('psa', crypto=OpenIotSdkCryptoBackend.PSA).ExceptIfRe('-(mbedtls)')
-
-    return target
-
-
 BUILD_TARGETS = [
     BuildAmebaTarget(),
     BuildASRTarget(),
@@ -892,5 +877,4 @@ BUILD_TARGETS = [
     BuildStm32Target(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
-    BuildOpenIotSdkTargets(),
 ]
