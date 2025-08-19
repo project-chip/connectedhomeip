@@ -139,7 +139,7 @@ public:
     virtual MediaController & GetMediaController() = 0;
 
     // Getter for PushAVStreamTransport Delegate
-    virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVDelegate() = 0;
+    virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
