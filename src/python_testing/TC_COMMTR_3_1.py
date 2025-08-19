@@ -73,7 +73,7 @@ class TC_COMMTR_3_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
     def steps_TC_COMMTR_3_1(self) -> list[TestStep]:
 
         steps = [
-            TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
+            TestStep("1", "Commissioning, already done", "DUT is commissioned", is_commissioning=True),
             TestStep("2", """Set up a subscription to the Commodity Metering cluster attributes:
                      - MinIntervalFloor: 0
                      - MaxIntervalCeiling: 10""",
@@ -122,8 +122,8 @@ class TC_COMMTR_3_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
         # commissioning
 
         self.step("2")
-        # TH establishes a subscription to MeteredQuantity attribute.
-        subscription_handler = AttributeSubscriptionHandler(cluster, cluster.Attributes.MeteredQuantity)
+        # TH establishes a subscription to Commodity Metering cluster attributes.
+        subscription_handler = AttributeSubscriptionHandler(cluster)
         await subscription_handler.start(self.default_controller, self.dut_node_id,
                                          endpoint,
                                          min_interval_sec=0,
