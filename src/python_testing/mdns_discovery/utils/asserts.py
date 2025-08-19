@@ -211,7 +211,7 @@ def assert_valid_long_discriminator_subtype(ld_subtype: str) -> None:
     constraints = [
         "Must match format '_L<value>._sub.<commissionable-service-type>'",
         "Value must be a decimal integer without leading zeroes",
-        "Value must be within 0–4095 (12-bit range)",
+        "Value must be within 0-4095 (12-bit range)",
     ]
 
     failed = None
@@ -263,7 +263,7 @@ def assert_valid_short_discriminator_subtype(sd_subtype: str) -> None:
     constraints = [
         "Must match format '_S<value>._sub.<commissionable-service-type>'",
         "Value must be a decimal integer without leading zeroes",
-        "Value must be within 0–15 (4-bit range)",
+        "Value must be within 0-15 (4-bit range)",
     ]
 
     failed = None
@@ -315,7 +315,7 @@ def assert_valid_vendor_subtype(vendor_subtype: str) -> None:
     constraints = [
         "Must match format '_V<value>._sub.<commissionable-service-type>'",
         "Value must be a decimal integer without leading zeroes",
-        "Value must be within 0–65535 (16-bit range)",
+        "Value must be within 0-65535 (16-bit range)",
     ]
 
     failed = None
@@ -367,7 +367,7 @@ def assert_valid_devtype_subtype(devtype_subtype: str) -> None:
     constraints = [
         "Must match format '_T<value>._sub.<commissionable-service-type>'",
         "Value must be a decimal integer without leading zeroes",
-        "Value must be within 0–4294967295 (32-bit range)",
+        "Value must be within 0-4294967295 (32-bit range)",
     ]
 
     failed = None
@@ -407,11 +407,9 @@ def assert_valid_d_key(d_key: str) -> None:
     - Encoded as a variable-length decimal number in ASCII text
     - Omitting any leading zeroes
     - Up to four digits
-    - May optionally be prefixed with "D="
 
     Example:
         "3840"
-        "D=3840"
 
     Returns:
         None
@@ -423,18 +421,19 @@ def assert_valid_d_key(d_key: str) -> None:
         https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#15-txt-key-for-discriminator-d
     """
     constraints = [
-        "Must be a decimal integer optionally prefixed with 'D='",
+        "Must be a decimal integer",
         "Value must be a decimal integer without leading zeroes",
-        "Value must be within 0–4095 (12-bit range)",
+        "Value must be within 0-4095 (12-bit range)",
     ]
 
     failed = None
-    m = re.fullmatch(r'(?:D=)?(?P<val>0|[1-9]\d{0,3})', d_key)
+    # Require strictly a number, no optional "D=" prefix
+    m = re.fullmatch(r'(0|[1-9]\d{0,3})', d_key)
 
     if not m:
         failed = constraints[0]
     else:
-        val_str = m.group("val")
+        val_str = m.group(0)
         try:
             val = int(val_str)
             if val > 4095:
@@ -580,7 +579,7 @@ def assert_valid_dt_key(dt_key: str) -> None:
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
-        "Value must be within 0–4294967295 (32-bit range)",
+        "Value must be within 0-4294967295 (32-bit range)",
     ]
 
     failed = None
@@ -697,7 +696,7 @@ def assert_valid_ph_key(ph_key: str) -> None:
     - Encoded as a variable-length decimal number in ASCII text
     - Omitting any leading zeroes
     - Must be greater than 0
-    - Only bits 0–19 are valid
+    - Only bits 0-19 are valid
 
     Example:
         "33"
@@ -714,7 +713,7 @@ def assert_valid_ph_key(ph_key: str) -> None:
     constraints = [
         "Must be a decimal integer without leading zeroes",
         "Value must be greater than 0",
-        "Only bits 0–19 may be set (value must fit in 20 bits)",
+        "Only bits 0-19 may be set (value must fit in 20 bits)",
     ]
 
     failed = None
@@ -792,7 +791,7 @@ def assert_valid_jf_key(jf_key: str) -> None:
     - Encoded as a variable-length decimal number in ASCII text
     - Omitting any leading zeroes
     - Reject any value with bits 4 or higher set
-    - Bit 0 cannot coexist with bits 1–3
+    - Bit 0 cannot coexist with bits 1-3
     - Bit 2 requires bit 1
     - Bit 3 requires both bits 1 and 2
 
@@ -810,8 +809,8 @@ def assert_valid_jf_key(jf_key: str) -> None:
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
-        "Only bits 0–3 may be set (value must fit in 4 bits)",
-        "Bit 0 cannot coexist with bits 1–3",
+        "Only bits 0-3 may be set (value must fit in 4 bits)",
+        "Bit 0 cannot coexist with bits 1-3",
         "Bit 2 requires bit 1",
         "Bit 3 requires both bits 1 and 2",
     ]
@@ -1040,7 +1039,7 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
     else:
         try:
             v = int(t_key)
-            # Only bits 0–2 allowed
+            # Only bits 0-2 allowed
             if v & ~0x7:
                 failed = constraints[1]
             # Bit 0 reserved
@@ -1113,7 +1112,7 @@ def assert_valid_vendor_id(vendor_id: str) -> None:
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
-        "Value must be within 0–65535 (16-bit range)",
+        "Value must be within 0-65535 (16-bit range)",
     ]
 
     failed = None
@@ -1160,7 +1159,7 @@ def assert_valid_product_id(product_id: str) -> None:
     """
     constraints = [
         "Must be a decimal integer without leading zeroes",
-        "Value must be within 0–65535 (16-bit range)",
+        "Value must be within 0-65535 (16-bit range)",
     ]
 
     failed = None
