@@ -108,7 +108,7 @@ CHIP_ERROR FactoryDataProvider::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CONFIG_FACTORY_DATA
-#define BUFFER_LEN (1024 * 3)
+#define BUFFER_LEN (2560)
     uint8_t * buffer         = (uint8_t *) malloc(BUFFER_LEN); // FactoryData won't overflow 2KB
     uint16_t factorydata_len = 0x5A5A;
 
