@@ -68,7 +68,7 @@ jobs:
                 filters: |
                   non_markdown_changes:
                     # returns true if at least one non-markdown file is present
-                    - '!.md'
+                    - '!**/*.md'
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -189,7 +189,7 @@ jobs:
                 filters: |
                   non_markdown_changes:
                     # returns true if at least one non-markdown file is present
-                    - '!.md'
+                    - '!**/*.md'
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -372,7 +372,7 @@ jobs:
                 filters: |
                   non_markdown_changes:
                     # returns true if at least one non-markdown file is present
-                    - '!.md'
+                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -445,7 +445,7 @@ jobs:
                 filters: |
                   non_markdown_changes:
                     # returns true if at least one non-markdown file is present
-                    - '!.md'
+                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -473,7 +473,7 @@ jobs:
                 filters: |
                   non_markdown_changes:
                     # returns true if at least one non-markdown file is present
-                    - '!.md'
+                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -574,7 +574,7 @@ jobs:
                 filters: |
                   non_markdown_changes:
                     # returns true if at least one non-markdown file is present
-                    - '!.md'
+                    - '!**/*.md'
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
