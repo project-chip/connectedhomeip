@@ -22,7 +22,6 @@ import sys
 import graphviz
 from rich.console import Console
 
-from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
 from matter.testing.taglist_and_topology_test import build_tree_for_graph
 
