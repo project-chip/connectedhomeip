@@ -55,20 +55,20 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            - name: Build some M5Stack variations
+            - name: Build some ESP32 variations
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target esp32-m5stack-all-clusters \
+                        --target esp32-devkitc-all-clusters \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
             - name: Prepare bloat report
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                     esp32 m5stack all-clusters-app \
-                     out/esp32-m5stack-all-clusters/chip-all-clusters-app.elf \
+                     esp32 devkitc all-clusters-app \
+                     out/esp32-devkitc-all-clusters/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
 
             - name: Prepare code pregen and ensure compile time pregen not possible
@@ -79,12 +79,12 @@ jobs:
             - name: Clean output
               run: rm -rf ./out
 
-            - name: Build some M5Stack variations with pregen
+            - name: Build some ESP32 variations with pregen
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target esp32-m5stack-all-clusters-minimal \
+                        --target esp32-devkitc-all-clusters-minimal \
                         --pregen-dir ./zzz_pregenerated \
                         build \
                         --copy-artifacts-to out/artifacts \
