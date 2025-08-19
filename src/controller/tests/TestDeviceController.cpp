@@ -94,7 +94,7 @@ public:
         factoryInitParams.fabricTable              = nullptr;
         factoryInitParams.fabricIndependentStorage = &factoryStorage;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        WiFiPAF::WiFiPAFLayer * wifipaf_layer = WiFiPAF::WiFiPAFLayer();
+        factoryInitParams.wifipaf_layer = WiFiPAFLayer::GetWiFiPAFLayer();;
 #endif
     }
     void TearDown() override
