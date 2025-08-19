@@ -23,7 +23,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libControllerTests"
 
-  test_sources = []
+  test_sources = [ "TestDeviceController.cpp" ]
 
   # Not supported on efr32.
   if (chip_device_platform != "efr32") {
@@ -62,10 +62,6 @@ chip_test_suite("tests") {
 
   if (chip_device_config_enable_joint_fabric) {
     test_sources += [ "TestJCMCommissioner.cpp" ]
-  }
-
-  if (!chip_device_config_enable_wifipaf) {
-    test_sources += [ "TestDeviceController.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
