@@ -18,7 +18,6 @@
 
 #include <CommodityTariffMain.h>
 
-
 /*
  *  @brief  Creates a Delegate and Instance for Commodity Tariff cluster
  *
