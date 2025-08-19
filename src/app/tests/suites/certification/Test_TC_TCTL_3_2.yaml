@@ -141,8 +141,7 @@ tests:
           "Step 10: TH sends command SetTemperatureCommand with a temperature
           number between minTemp and maxTemp inclusive, saved as setTemp"
       command: "SetTemperature"
-      PICS:
-           PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
+      PICS: PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
       arguments:
           values:
               - name: "TargetTemperature"
