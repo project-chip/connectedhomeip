@@ -2466,7 +2466,7 @@ CHIP_ERROR DeviceCommissioner::ParseGeneralCommissioningInfo(ReadCommissioningIn
         info.supportsConcurrentConnection = true; // default to true (concurrent), not a fatal error
     }
 
-    err = mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.general.isCommissioningWithoutPower);
+    err = mAttributeCache->Get<IsCommissioningWithoutPower::TypeInfo>(kRootEndpointId, info.general.isCommissioningWithoutPower);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Ignoring failure to read IsCommissioningWithoutPower: %" CHIP_ERROR_FORMAT, err.Format());
