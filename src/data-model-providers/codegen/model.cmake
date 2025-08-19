@@ -15,6 +15,8 @@ set(BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 # If you change this list, please ALSO CHANGE model.gni
 SET(CODEGEN_DATA_MODEL_SOURCES
+  "${BASE_DIR}/ClusterIntegration.cpp"
+  "${BASE_DIR}/ClusterIntegration.h"
   "${BASE_DIR}/CodegenDataModelProvider.cpp"
   "${BASE_DIR}/CodegenDataModelProvider.h"
   "${BASE_DIR}/CodegenDataModelProvider_Read.cpp"
@@ -22,10 +24,9 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/EmberAttributeDataBuffer.cpp"
   "${BASE_DIR}/EmberAttributeDataBuffer.h"
   "${BASE_DIR}/Instance.cpp"
-  "${BASE_DIR}/ServerClusterInterfaceRegistry.cpp"
-  "${BASE_DIR}/ServerClusterInterfaceRegistry.h"
 
   # These are dependencies from model.gni that are not included directly in cmake
+
   # "${chip_root}/src/app/server-cluster",
   "${BASE_DIR}/../../app/server-cluster/AttributeListBuilder.cpp"
   "${BASE_DIR}/../../app/server-cluster/AttributeListBuilder.h"
@@ -34,4 +35,18 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/../../app/server-cluster/ServerClusterContext.h"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.h"
+
+  # "${chip_root}/src/app/persistence",
+  "${BASE_DIR}/../../app/persistence/AttributePersistence.cpp"
+  "${BASE_DIR}/../../app/persistence/AttributePersistence.h"
+  "${BASE_DIR}/../../app/persistence/AttributePersistenceProvider.h"
+  "${BASE_DIR}/../../app/persistence/PascalString.h"
+  "${BASE_DIR}/../../app/persistence/String.cpp"
+  "${BASE_DIR}/../../app/persistence/String.h"
+
+  # "${chip_root}/src/app/server-cluster:registry",
+  "${BASE_DIR}/../../app/server-cluster/ServerClusterInterfaceRegistry.cpp"
+  "${BASE_DIR}/../../app/server-cluster/ServerClusterInterfaceRegistry.h"
+  "${BASE_DIR}/../../app/server-cluster/SingleEndpointServerClusterRegistry.cpp"
+  "${BASE_DIR}/../../app/server-cluster/SingleEndpointServerClusterRegistry.h"
 )
