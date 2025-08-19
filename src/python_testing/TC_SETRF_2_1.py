@@ -337,21 +337,21 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         # TH reads NextTariffComponents attribute, expects a list of TariffComponentStruct
         self.check_next_tariff_components_attribute(endpoint)
 
-        self.step("19")
         if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
             logger.info("PICS SETRF.S.A0011 is not True")
-            self.mark_current_step_skipped()
+            self.skip_step("19")
+        else:
+            self.step("19")
+            # TH reads DefaultRandomizationOffset attribute, expects a int16
+            self.check_default_randomization_offset_attribute(endpoint)
 
-        # TH reads DefaultRandomizationOffset attribute, expects a int16
-        self.check_default_randomization_offset_attribute(endpoint)
-
-        self.step("20")
         if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
             logger.info("PICS SETRF.S.A0012 is not True")
-            self.mark_current_step_skipped()
-
-        # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
-        self.check_default_randomization_type_attribute(endpoint)
+            self.skip_step("20")
+        else:
+            self.step("20")
+            # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
+            self.check_default_randomization_type_attribute(endpoint)
 
 
 if __name__ == "__main__":

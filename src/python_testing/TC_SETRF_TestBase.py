@@ -21,7 +21,7 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.clusters import Globals
+from matter.clusters import ClusterObjects, Globals
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest
@@ -529,3 +529,11 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_greater_equal(attribute_value, 0,
                                          "DefaultRandomizationType must be greater or equal than 0.")
             asserts.assert_less_equal(attribute_value, 4, "DefaultRandomizationType must be less or equal than 4.")
+
+    async def verify_reporting(self, reports: dict, attribute: ClusterObjects.ClusterAttributeDescriptor, attribute_name: str, saved_value) -> None:
+
+        try:
+            asserts.assert_not_equal(reports[attribute], saved_value,
+                                     "Reported value should be different from saved value")
+        except KeyError as err:
+            asserts.fail(f"There is not reports for attribute {attribute_name}:\n{err}")
