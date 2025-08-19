@@ -70,7 +70,7 @@ void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Globals::Stru
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                            Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+                                                              Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
@@ -81,7 +81,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                             Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+                                                               Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
@@ -92,7 +92,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                             Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+                                                               Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated the preset is valid, and provided the MPTZ values associated with that preset.
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed
