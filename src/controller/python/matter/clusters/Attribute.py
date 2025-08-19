@@ -557,9 +557,10 @@ class SubscriptionTransaction:
         Sets the callback function for when a subscription report with at least one path starts,
         accepts a Callable that accepts the transaction. If set to None, disable the callback.
         '''
-        self._onReportBeginCb = callback
-    else:
-        self._onReportBeginCb = DefaultReportBeginCallback
+        if callback is not None:
+            self._onReportBeginCb = callback
+        else:
+            self._onReportBeginCb = DefaultReportBeginCallback
 
     def SetReportEndCallback(self, callback: Callable[[SubscriptionTransaction], None]):
         '''
