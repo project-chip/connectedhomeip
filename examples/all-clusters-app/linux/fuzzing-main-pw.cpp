@@ -20,10 +20,12 @@
 
 #include "AppMain.h"
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <CommissionableInit.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::DeviceLayer;
 
 using namespace fuzztest;
@@ -63,6 +65,8 @@ void AllClustersFuzzer(const std::vector<std::uint8_t> & Bytes)
         // ChipLinuxAppMainLoop blocks, and we don't want that here.
         static chip::CommonCaseDeviceServerInitParams initParams;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
+        initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
         VerifyOrDie(Server::GetInstance().Init(initParams) == CHIP_NO_ERROR);
 
         ApplicationInit();
@@ -81,6 +85,9 @@ void AllClustersFuzzer(const std::vector<std::uint8_t> & Bytes)
     // But maybe we should try to separately extract a PeerAddress and data from
     // the incoming data?
     Transport::PeerAddress peerAddr;
+    // Transport::PeerAddress peerAddr(Transport::Type::kTcp);
+    // Transport::PeerAddress peerAddr(Transport::Type::kWiFiPAF);
+
     System::PacketBufferHandle buf =
         System::PacketBufferHandle::NewWithData(Bytes.data(), Bytes.size(), /* aAdditionalSize = */ 0, /* aReservedSize = */ 0);
 
@@ -91,9 +98,40 @@ void AllClustersFuzzer(const std::vector<std::uint8_t> & Bytes)
     // passing it all sorts of garbage that will cause it to fail.
     Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
 
+    // Transport::MessageTransportContext msgContext;
+    //  Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf), &msgContext);
+
     // Now process pending events until our sentinel is reached.
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     PlatformMgr().RunEventLoop();
 }
 
-FUZZ_TEST(AllClustersApp, AllClustersFuzzer).WithDomains(Arbitrary<vector<uint8_t>>());
+uint8_t unauthenticated_example[] = { 0x4,  0x0,  0x0,  0x0,  0x4d, 0xb5, 0xfa, 0x2,  0xd1, 0x30, 0xe,  0xef, 0x63, 0x25,
+                                      0x90, 0x9f, 0x5,  0x20, 0x3f, 0xb0, 0x0,  0x0,  0x15, 0x30, 0x1,  0x20, 0xf2, 0xdf,
+                                      0xd4, 0xc9, 0x2d, 0x6c, 0xde, 0x4e, 0x2c, 0x2c, 0x90, 0xc0, 0xae, 0xe6, 0x76, 0x80,
+                                      0xbe, 0x95, 0xba, 0x87, 0x4f, 0x59, 0x60, 0xb1, 0x9b, 0xd9, 0xaf, 0x87, 0x84, 0xf3,
+                                      0xe5, 0x1d, 0x25, 0x2,  0x99, 0x85, 0x24, 0x3,  0x0,  0x28, 0x4,  0x35, 0x5,  0x25,
+                                      0x1,  0xf4, 0x1,  0x25, 0x2,  0x2c, 0x1,  0x25, 0x3,  0xa0, 0xf,  0x24, 0x4,  0x13,
+                                      0x24, 0x5,  0xc,  0x26, 0x6,  0x0,  0x2,  0x4,  0x1,  0x24, 0x7,  0x1,  0x18, 0x18 };
+
+auto unauthenticatedSeed()
+{
+    vector<uint8_t> data(&unauthenticated_example[0], &unauthenticated_example[0] + sizeof(unauthenticated_example));
+
+    return Arbitrary<vector<uint8_t>>().WithSeeds({ data });
+}
+
+uint8_t unauthenticated_example_SHUTDOWN[] = {
+    0x4,  0x0,  0x0,  0x0, 0x0,  0x7f, 0x5f, 0xd, 0xa8, 0x62, 0x41, 0xdc, 0x30,
+    0x3b, 0x13, 0xba, 0x3, 0x10, 0xf8, 0x32, 0x0, 0x0,  0x29, 0x1c, 0x8,  0xc,
+};
+
+auto unauthenticatedSeedSHUTDOWN()
+{
+    vector<uint8_t> data(&unauthenticated_example_SHUTDOWN[0],
+                         &unauthenticated_example_SHUTDOWN[0] + sizeof(unauthenticated_example_SHUTDOWN));
+
+    return Arbitrary<vector<uint8_t>>().WithSeeds({ data });
+}
+
+FUZZ_TEST(AllClustersApp, AllClustersFuzzer).WithDomains(unauthenticatedSeed());
