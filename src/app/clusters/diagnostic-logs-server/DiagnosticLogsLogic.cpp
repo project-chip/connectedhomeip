@@ -42,33 +42,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-void DiagnosticLogsProviderLogic::Init(size_t serverEndpointCount)
-{
-    mDiagnosticLogsProviderDelegateTable = new DiagnosticLogsProviderDelegate *[serverEndpointCount]();
-    mDiagnosticLogsServerEndpointCount   = serverEndpointCount;
-}
-
-void DiagnosticLogsProviderLogic::SetDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
-{
-    VerifyOrReturn(mDiagnosticLogsProviderDelegateTable != nullptr);
-    VerifyOrReturn(endpoint < mDiagnosticLogsServerEndpointCount);
-    mDiagnosticLogsProviderDelegateTable[endpoint] = delegate;
-}
-
-DiagnosticLogsProviderDelegate * DiagnosticLogsProviderLogic::GetDelegate(EndpointId endpoint)
-{
-    VerifyOrReturnValue(mDiagnosticLogsProviderDelegateTable != nullptr, nullptr);
-    VerifyOrReturnValue(endpoint < mDiagnosticLogsServerEndpointCount, nullptr);
-    auto delegate = mDiagnosticLogsProviderDelegateTable[endpoint];
-
-    if (delegate == nullptr)
-    {
-        ChipLogProgress(Zcl, "Diagnostic Logs: no log provider delegate set for endpoint:%u", endpoint);
-    }
-
-    return delegate;
-}
-
 void AddResponse(CommandHandler * commandObj, const ConcreteCommandPath & path, StatusEnum status)
 {
     Commands::RetrieveLogsResponse::Type response;
@@ -93,8 +66,7 @@ DiagnosticLogsProviderLogic::HandleLogRequestForResponsePayload(CommandHandler *
                                                                 IntentEnum intent, StatusEnum status)
 {
     // If there is no delegate, there is no mechanism to read the logs. Assume those are empty and return NoLogs
-    auto * delegate = GetDelegate(path.mEndpointId);
-    VerifyOrReturnError(nullptr != delegate, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
+    VerifyOrReturnError(nullptr != mDelegate, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
     Platform::ScopedMemoryBuffer<uint8_t> buffer;
     VerifyOrReturnError(buffer.Alloc(kMaxLogContentSize), std::nullopt, AddResponse(commandObj, path, StatusEnum::kDenied));
 
@@ -102,9 +74,9 @@ DiagnosticLogsProviderLogic::HandleLogRequestForResponsePayload(CommandHandler *
     Optional<uint64_t> timeStamp;
     Optional<uint64_t> timeSinceBoot;
 
-    auto size = delegate->GetSizeForIntent(intent);
+    auto size = mDelegate->GetSizeForIntent(intent);
     VerifyOrReturnError(size != 0, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
-    auto err = delegate->GetLogForIntent(intent, logContent, timeStamp, timeSinceBoot);
+    auto err = mDelegate->GetLogForIntent(intent, logContent, timeStamp, timeSinceBoot);
     VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
     VerifyOrReturnError(CHIP_NO_ERROR == err, std::nullopt, AddResponse(commandObj, path, StatusEnum::kDenied));
     AddResponse(commandObj, path, status, logContent, timeStamp, timeSinceBoot);
@@ -121,12 +93,10 @@ DiagnosticLogsProviderLogic::HandleLogRequestForBdx(CommandHandler * commandObj,
 
     VerifyOrReturnError(transferFileDesignator.Value().size() <= kMaxFileDesignatorLen, std::nullopt,
                         commandObj->AddStatus(path, Status::ConstraintError));
-
     // If there is no delegate, there is no mechanism to read the logs. Assume those are empty and return NoLogs
-    auto * delegate = GetDelegate(path.mEndpointId);
-    VerifyOrReturnError(nullptr != delegate, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
+    VerifyOrReturnError(nullptr != mDelegate, std::nullopt, AddResponse(commandObj, path, StatusEnum::kNoLogs));
 
-    auto size = delegate->GetSizeForIntent(intent);
+    auto size = mDelegate->GetSizeForIntent(intent);
     // In the case where the size is 0 sets the Status field of the RetrieveLogsResponse to NoLogs and do not start a BDX session.
     VerifyOrReturnError(size != 0, std::nullopt, HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kNoLogs));
 
@@ -140,7 +110,7 @@ DiagnosticLogsProviderLogic::HandleLogRequestForBdx(CommandHandler * commandObj,
 // RetrieveLogsResponse SHALL be set to Exhausted.
 #if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
     VerifyOrReturnError(!gBDXDiagnosticLogsProvider.IsBusy(), std::nullopt, AddResponse(commandObj, path, StatusEnum::kBusy));
-    auto err = gBDXDiagnosticLogsProvider.InitializeTransfer(commandObj, path, delegate, intent, transferFileDesignator.Value());
+    auto err = gBDXDiagnosticLogsProvider.InitializeTransfer(commandObj, path, mDelegate, intent, transferFileDesignator.Value());
     VerifyOrReturnError(CHIP_NO_ERROR == err, std::nullopt, AddResponse(commandObj, path, StatusEnum::kDenied));
 #else
     HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kExhausted);

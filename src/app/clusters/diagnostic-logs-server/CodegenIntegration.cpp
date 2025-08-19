@@ -107,10 +107,10 @@ DiagnosticLogsServer & DiagnosticLogsServer::Instance()
 
 void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
-    uint16_t arrayIndex = emberAfGetClusterServerEndpointIndex(endpoint, DiagnosticLogs::Id, kDiagnosticLogsFixedClusterCount);
+    uint16_t arrayIndex =
+        emberAfGetClusterServerEndpointIndex(endpoint, DiagnosticLogs::Id, static_cast<uint16_t>(kDiagnosticLogsFixedClusterCount));
     VerifyOrReturn(arrayIndex < kDiagnosticLogsMaxClusterCount);
-
-    gServers[arrayIndex].Cluster().SetDelegate(endpoint, delegate);
+    gServers[arrayIndex].Cluster().SetDelegate(delegate);
 }
 
 } // namespace DiagnosticLogs
