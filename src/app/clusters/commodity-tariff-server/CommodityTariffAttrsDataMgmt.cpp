@@ -640,7 +640,7 @@ CHIP_ERROR Validate<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Ty
         // Validate dayPatternIDs count
         if (item.dayPatternIDs.empty() || item.dayPatternIDs.size() > kCalendarPeriodItemMaxDayPatternIDs)
         {
-            ChipLogError(NotSpecified, "DayPatternIDs count must be between 1 and %" PRIuMAX, kCalendarPeriodItemMaxDayPatternIDs);
+            ChipLogError(NotSpecified, "DayPatternIDs count must be between 1 and %" PRIu32, (uint32_t) kCalendarPeriodItemMaxDayPatternIDs);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 

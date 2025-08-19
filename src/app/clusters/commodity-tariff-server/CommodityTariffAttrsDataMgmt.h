@@ -25,6 +25,7 @@
 
 #include <atomic>
 #include <cassert>
+#include <string> 
 #include <unordered_set>
 #include <map>
 
@@ -919,7 +920,7 @@ public:
         }
         else
         {
-            ChipLogError(NotSpecified, "The value of attr %d is not valid!", mAttrId);
+            ChipLogError(NotSpecified, "The value of attr %" PRIu32 " is not valid!", mAttrId);
         }
 
         return err;
