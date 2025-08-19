@@ -555,18 +555,21 @@ class SubscriptionTransaction:
     def SetReportBeginCallback(self, callback: Callable[[SubscriptionTransaction], None]):
         '''
         Sets the callback function for when a subscription report with at least one path starts,
-        accepts a Callable that accepts the transaction.
+        accepts a Callable that accepts the transaction. If set to None, disable the callback.
         '''
-        if callback is not None:
-            self._onReportBeginCb = callback
+        self._onReportBeginCb = callback
+    else:
+        self._onReportBeginCb = DefaultReportBeginCallback
 
     def SetReportEndCallback(self, callback: Callable[[SubscriptionTransaction], None]):
         '''
         Sets the callback function for when a subscription report with at least one path ends,
-        accepts a Callable that accepts the transaction.
+        accepts a Callable that accepts the transaction. If set to None, disable the callback.
         '''
         if callback is not None:
             self._onReportEndCb = callback
+        else:
+            self._onReportEndCb = DefaultReportEndCallback
 
     def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], None]):
         if callback is not None:
