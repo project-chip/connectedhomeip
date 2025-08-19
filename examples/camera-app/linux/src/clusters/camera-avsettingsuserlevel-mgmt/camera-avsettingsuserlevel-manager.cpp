@@ -29,6 +29,8 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
 
+static void onTimerExpiry(System::Layer * systemLayer, void * data);
+
 void CameraAVSettingsUserLevelManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDeviceHAL)
 {
     mCameraDeviceHAL = aCameraDeviceHAL;
