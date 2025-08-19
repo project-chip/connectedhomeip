@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ZoneManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MaxUserDefinedZones {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxUserDefinedZones::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -49,10 +51,18 @@ namespace TwoDCartesianMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TwoDCartesianMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TwoDCartesianMax
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    MaxZones::kMetadataEntry,
+    Zones::kMetadataEntry,
+    Triggers::kMetadataEntry,
+    SensitivityMax::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace CreateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(CreateTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
@@ -61,10 +71,6 @@ namespace UpdateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(UpdateTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace UpdateTwoDCartesianZone
-namespace GetTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(GetTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
-} // namespace GetTwoDCartesianZone
 namespace RemoveZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveZone::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
@@ -79,6 +85,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveTrigger::I
 } // namespace RemoveTrigger
 
 } // namespace Commands
+
+namespace Events {
+namespace ZoneTriggered {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ZoneTriggered
+namespace ZoneStopped {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ZoneStopped
+
+} // namespace Events
 } // namespace ZoneManagement
 } // namespace Clusters
 } // namespace app

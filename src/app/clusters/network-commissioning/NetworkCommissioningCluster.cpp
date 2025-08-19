@@ -41,7 +41,7 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::ReadAttribute(const D
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(mLogic.Features().Raw());
+        return encoder.Encode(mLogic.Features());
     case ClusterRevision::Id:
         return encoder.Encode(NetworkCommissioning::kRevision);
     case MaxNetworks::Id:
@@ -90,7 +90,7 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const 
     {
         bool value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return mLogic.SetInterfaceEnabled(value);
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, mLogic.SetInterfaceEnabled(value));
     }
 
     return Protocols::InteractionModel::Status::InvalidAction;
@@ -202,7 +202,7 @@ CHIP_ERROR NetworkCommissioningCluster::GeneratedCommands(const ConcreteClusterP
     using namespace NetworkCommissioning::Commands;
     using NetworkCommissioning::Feature;
 
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(4));
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kAcceptedCommandsCount));
 
     if (mLogic.Features().HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {

@@ -41,7 +41,6 @@
  *****************************************************************************/
 // Mapping of Functional buttons
 #define APP_FUNCTION_BUTTON PB5_BUTTON_GPIO_PIN
-#define APP_COMMISSION_BUTTON PB2_BUTTON_GPIO_PIN
 #define APP_READ_TEMPERATURE_BUTTON PB1_BUTTON_GPIO_PIN
 
 // Mapping of LEDs
@@ -63,14 +62,14 @@
  *
  *****************************************************************************/
 // --- Mapping GPIOs to Switches or Buttons
-#define QPINCFG_BUTTONS QPINCFG_GPIO_LIST(APP_FUNCTION_BUTTON, APP_COMMISSION_BUTTON, APP_READ_TEMPERATURE_BUTTON)
+#define QPINCFG_BUTTONS QPINCFG_GPIO_LIST(APP_FUNCTION_BUTTON, APP_READ_TEMPERATURE_BUTTON)
 
 // --- Mapping GPIOs to LEDs
 #define QPINCFG_STATUS_LED QPINCFG_GPIO_LIST(SYSTEM_STATE_LED, SYSTEM_OPERATING_LED)
 
 // --- Unused pins
 #define QPINCFG_UNUSED                                                                                                             \
-    QPINCFG_GPIO_LIST(PB3_BUTTON_GPIO_PIN, PB4_BUTTON_GPIO_PIN, ANIO0_GPIO_PIN, ANIO1_GPIO_PIN, EXT_32KXTAL_P, EXT_32KXTAL_N,      \
-                      BOARD_UNUSED_GPIO_PINS)
+    QPINCFG_GPIO_LIST(PB2_BUTTON_GPIO_PIN, PB3_BUTTON_GPIO_PIN, PB4_BUTTON_GPIO_PIN, ANIO0_GPIO_PIN, ANIO1_GPIO_PIN,               \
+                      EXT_32KXTAL_P, EXT_32KXTAL_N, BOARD_UNUSED_GPIO_PINS)
 
 #endif // _QPINCFG_H_

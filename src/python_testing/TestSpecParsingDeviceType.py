@@ -17,17 +17,18 @@
 import re
 import xml.etree.ElementTree as ElementTree
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.testing.conformance import conformance_allowed
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
-                                       parse_single_device_type)
-from chip.tlv import uint
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests, get_supersets
+
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.testing.conformance import conformance_allowed
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
+                                         parse_single_device_type)
+from matter.tlv import uint
 
 
 class TestSpecParsingDeviceType(MatterBaseTest):
@@ -247,11 +248,13 @@ class TestSpecParsingDeviceType(MatterBaseTest):
             asserts.assert_false(success, "Unexpected success running test that should fail")
 
     def test_spec_files(self):
+        one_two, one_two_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_2)
         one_three, one_three_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_3)
         one_four, one_four_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
         one_four_one, one_four_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_1)
         one_four_two, one_four_two_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_2)
 
+        asserts.assert_equal(len(one_two_problems), 0, "Problems found when parsing 1.2 spec")
         asserts.assert_equal(len(one_three_problems), 0, "Problems found when parsing 1.3 spec")
         asserts.assert_equal(len(one_four_problems), 0, "Problems found when parsing 1.4 spec")
         asserts.assert_equal(len(one_four_one_problems), 0, "Problems found when parsing 1.4.1 spec")
@@ -265,8 +268,15 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                0, "Master dir does not contain any device types not in 1.3")
         asserts.assert_greater(len(set(one_four_two.keys()) - set(one_four.keys())),
                                0, "Master dir does not contain any device types not in 1.4")
-        asserts.assert_greater(len(set(one_four.keys()) - set(one_three.keys())),
-                               0, "1.4 dir does not contain any clusters not in 1.3")
+        asserts.assert_greater(len(set(one_four_two.keys()) - set(one_three.keys())),
+                               0, "1.4 dir does not contain any device types not in 1.3")
+        asserts.assert_greater(len(set(one_four_two.keys()) - set(one_two.keys())),
+                               0, "Master does not contain any device types not in 1.2")
+
+        # Heating/cooling unit was provisional, then removed in 1.3
+        # https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/5541
+        asserts.assert_equal(set(one_two.keys() - set(one_three.keys())),
+                             set([0x0300]), "1.2 contains unexpected device types not in 1.3")
         asserts.assert_equal(len(one_four.keys()), len(one_four_one.keys()),
                              "Number of device types in 1.4 and 1.4.1 does not match")
         asserts.assert_equal(set(one_three.keys()) - set(one_four.keys()),

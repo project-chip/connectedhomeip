@@ -45,6 +45,7 @@ namespace NetworkCommissioning {
 
 CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
 {
+    ThreadStackMgrImpl().InjectNetworkCommissioningDriver(this);
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(statusChangeCallback);
     ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork);
     ReturnErrorOnFailure(PlatformMgr().AddEventHandler(OnThreadStateChangeHandler, reinterpret_cast<intptr_t>(this)));

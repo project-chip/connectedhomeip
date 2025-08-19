@@ -40,11 +40,12 @@
 import logging
 import time
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                         has_cluster, run_if_endpoint_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_LVL_2_3(MatterBaseTest):
@@ -131,7 +132,7 @@ class TC_LVL_2_3(MatterBaseTest):
         start_current_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.CurrentLevel)
 
         self.step(6)
-        sub_handler = ClusterAttributeChangeAccumulator(lvl)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=lvl)
         await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(7)

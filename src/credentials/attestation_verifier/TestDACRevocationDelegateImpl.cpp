@@ -165,9 +165,14 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & a
         return false;
     }
 
+    VerifyOrReturnValue(jsonData.isArray(), false, ChipLogError(NotSpecified, "Revocation set is not a valid JSON Array"));
+
     // 6.2.4.2. Determining Revocation Status of an Entity
     for (const auto & revokedSet : jsonData)
     {
+        VerifyOrReturnValue(revokedSet.isObject(), false,
+                            ChipLogError(NotSpecified, "Revocation set entry is not a valid JSON object"));
+
         if (revokedSet["issuer_name"].asString() != issuerNameBase64Str)
         {
             continue;
@@ -288,13 +293,13 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
     std::string issuerName;
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetIssuerNameBase64Str(certDer, issuerName), false);
-    ChipLogDetail(NotSpecified, "Issuer: %.*s", static_cast<int>(issuerName.size()), issuerName.data());
+    ChipLogDetail(NotSpecified, "Issuer: %s", NullTerminated(issuerName.data(), issuerName.size()).c_str());
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetSerialNumberHexStr(certDer, serialNumber), false);
-    ChipLogDetail(NotSpecified, "Serial Number: %.*s", static_cast<int>(serialNumber.size()), serialNumber.data());
+    ChipLogDetail(NotSpecified, "Serial Number: %s", NullTerminated(serialNumber.data(), serialNumber.size()).c_str());
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
-    ChipLogDetail(NotSpecified, "AKID: %.*s", static_cast<int>(akid.size()), akid.data());
+    ChipLogDetail(NotSpecified, "AKID: %s", NullTerminated(akid.data(), akid.size()).c_str());
 
     return IsEntryInRevocationSet(akid, issuerName, serialNumber);
 }

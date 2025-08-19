@@ -132,7 +132,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
             // Validate header signature and store header content to NVM
             // Note: this will initialize progress storage structure; do not call anything else before it
             uint16_t headerSize;
-            VerifyOrReturnError(true != qvCHIP_OtaValidateandStoreHeader(block.data(), block.size(), &headerSize, nullptr, 128),
+            VerifyOrReturnError(qvCHIP_OtaStatusSuccess ==
+                                    qvCHIP_OtaValidateandStoreHeader(block.data(), block.size(), &headerSize, nullptr, 128),
                                 CHIP_ERROR_INTEGRITY_CHECK_FAILED);
 
             // Get and store provider location
@@ -204,7 +205,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     CHIP_ERROR err = ProcessHeader(block);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Matter image header parser error %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "Matter image header parser error: %" CHIP_ERROR_FORMAT, err.Format());
         this->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return err;
     }

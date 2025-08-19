@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ClosureControl {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace CountdownTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CountdownTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -33,32 +35,62 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace CurrentErrorList
-namespace OverallState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace OverallCurrentState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallCurrentState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace OverallState
-namespace OverallTarget {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallTarget::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+} // namespace OverallCurrentState
+namespace OverallTargetState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallTargetState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace OverallTarget
+} // namespace OverallTargetState
+namespace LatchControlModes {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace LatchControlModes
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    MainState::kMetadataEntry,
+    CurrentErrorList::kMetadataEntry,
+    OverallCurrentState::kMetadataEntry,
+    OverallTargetState::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Stop {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Stop::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace Stop
 namespace MoveTo {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MoveTo::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(MoveTo::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kOperate);
 } // namespace MoveTo
 namespace Calibrate {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Calibrate::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(Calibrate::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kManage);
 } // namespace Calibrate
 
 } // namespace Commands
+
+namespace Events {
+namespace OperationalError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationalError
+namespace MovementCompleted {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MovementCompleted
+namespace EngageStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace EngageStateChanged
+namespace SecureStateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SecureStateChanged
+
+} // namespace Events
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
