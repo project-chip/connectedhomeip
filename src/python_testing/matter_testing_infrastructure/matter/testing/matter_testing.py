@@ -256,6 +256,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
         if app_pipe is None:
+            # Align with config naming used by the runner
             app_pipe = self.matter_test_config.pipe_name
 
         if not isinstance(app_pipe, str):

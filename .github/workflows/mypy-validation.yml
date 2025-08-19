@@ -31,12 +31,12 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build:153
+      image: ghcr.io/project-chip/chip-build:162
       options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout submodules & Bootstrap
         uses: ./.github/actions/checkout-submodules-and-bootstrap
@@ -85,6 +85,7 @@ jobs:
             src/python_testing/matter_testing_infrastructure/matter/testing/tasks.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/taglist_and_topology_test.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/pics.py \
+            src/python_testing/matter_testing_infrastructure/matter/testing/runner.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/choice_conformance.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/commissioning.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/decorators.py \
